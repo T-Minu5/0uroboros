@@ -15,6 +15,7 @@ import { hasLegalDraftAction } from '../game/engine/draft';
 import type { MarketCategory } from '../game/engine/draft';
 import {
   bankView,
+  cardPowerOf,
   handView,
   marketView,
   nodeViews,
@@ -29,10 +30,13 @@ import { PlayerStatus } from './hud/PlayerStatus';
 import { EffectBankRow } from './hud/EffectBankRow';
 import { HandRail } from './hud/HandRail';
 import { DraftPanel } from './hud/DraftPanel';
-import { PhaseAnnouncement } from './hud/PhaseAnnouncement';
+import { circuitAnnouncement, PhaseAnnouncement } from './hud/PhaseAnnouncement';
+import { CollapseTheaterOverlay } from './hud/CollapseTheater';
+import { applyCollapseSnapshot, useCollapseTheater } from './collapseTheater';
 import { DebugPanel } from './debug/DebugPanel';
 import type { DragPointer } from './board/DragGhost';
 import { isVisuallyRevealed, useRevealPlayback } from './revealPlayback';
+import { useResolutionPlayback } from './fxPlayback';
 
 export type GameTableProps = BoardProps<OuroborosState>;
 
@@ -53,20 +57,40 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
       isVisuallyRevealed(instanceId, revealed, G.revealQueue, revealPlayed),
     [G.revealQueue, revealPlayed],
   );
+  const revealDone = G.revealQueue.length === 0 || revealPlayed >= G.revealQueue.length;
+  const fxRevealed = useCallback(
+    (instanceId: string) => isVisuallyRevealed(instanceId, true, G.revealQueue, revealPlayed),
+    [G.revealQueue, revealPlayed],
+  );
+  const fx = useResolutionPlayback(G.fxQueue ?? [], fxRevealed, revealDone);
+  const theater = useCollapseTheater(
+    G.collapseReport,
+    revealDone && (ctx.phase === 'draft' || G.phase === 'waveCollapse' || G.phase === 'endgame'),
+    viewer,
+  );
 
   const inCircuit = ctx.phase === 'circuit';
-  const inDraft = ctx.phase === 'draft';
+  const inDraft = ctx.phase === 'draft' && !theater.active;
   const endedTurn = G.players[viewer].endedTurn;
   const windowOpen = inCircuit && !endedTurn;
 
   const hand = useMemo(() => handView(G, viewer, windowOpen), [G, viewer, windowOpen]);
-  const nodes = useMemo(
-    () =>
-      nodeViews(G, viewer, {
-        isRevealed: (card) => visuallyRevealed(card.instanceId, card.revealed),
-      }),
-    [G, viewer, visuallyRevealed],
-  );
+  const nodes = useMemo(() => {
+    const views = nodeViews(G, viewer, {
+      isRevealed: (card) => visuallyRevealed(card.instanceId, card.revealed),
+      powerOf: (card) => fx.power(card.instanceId) ?? cardPowerOf(card),
+    }).map((node) => ({
+      ...node,
+      probability: fx.chance(node.index) ?? node.probability,
+    }));
+    if (!theater.active || !G.collapseReport) return views;
+    return applyCollapseSnapshot(
+      views,
+      G.collapseReport,
+      viewer,
+      theater.highlightSelection,
+    );
+  }, [G, viewer, visuallyRevealed, fx, theater]);
   const localStatus = statusView(G, viewer);
   const rivalStatus = statusView(G, rival);
 
@@ -108,6 +132,7 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
           side="rival"
           label={`Player ${rival}`}
           showWallet={inDraft}
+          fx={fx}
         />
       </div>
 
@@ -127,7 +152,12 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
         </button>
       </div>
 
-      <ProbabilityStrip nodes={nodes} />
+      <ProbabilityStrip
+        nodes={nodes}
+        fx={fx}
+        measuring={theater.measuring}
+        selectedNode={theater.highlightSelection ? theater.selectedNode : null}
+      />
 
       <div className="table__board">
         <EffectBankRow slots={bankView(G, rival)} label="Opponent bank" />
@@ -138,6 +168,9 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
             legalNodes={legalNodes}
             onSelectNode={(index) => deployTo(index)}
             isCardFaceUp={(card) => visuallyRevealed(card.instanceId, card.revealed)}
+            powerOf={(card) => fx.power(card.instanceId) ?? cardPowerOf(card)}
+            fx={fx}
+            collapsingNode={theater.focusNode}
           />
 
           <Board3D
@@ -147,6 +180,9 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
             onSelectNode={(index) => deployTo(index)}
             onHoverNode={setHoveredNode}
             visuallyRevealed={visuallyRevealed}
+            hitCardIds={fx.hitCardIds}
+            focusNode={theater.focusNode ?? fx.focusNode}
+            collapsingNode={theater.beat?.kind === 'node' ? theater.focusNode : null}
             ghost={
               dragging && dragPointer
                 ? {
@@ -159,7 +195,26 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
           />
         </div>
 
-        <PhaseAnnouncement phase={G.phase} cycle={G.cycle} />
+        {fx.active?.text ? (
+          <div className="resolve" data-kind={fx.active.kind}>
+            <span className="resolve__text">{fx.active.text}</span>
+          </div>
+        ) : null}
+
+        <CollapseTheaterOverlay theater={theater} />
+        <PhaseAnnouncement
+          announcement={
+            theater.active
+              ? null
+              : inDraft
+                ? {
+                    key: `draft:${G.cycle}:${G.collapseSerial}`,
+                    title: 'Draft',
+                    subtitle: `Cycle ${G.cycle}`,
+                  }
+                : circuitAnnouncement(G.phase, G.cycle, G.turn, G.revealSerial)
+          }
+        />
 
         {inDraft ? (
           <DraftPanel
@@ -224,6 +279,7 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
           side="local"
           label={`Player ${viewer} (you)`}
           showWallet={inDraft}
+          fx={fx}
         />
       </div>
 

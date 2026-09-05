@@ -97,18 +97,22 @@ export interface NodeView {
 export function nodeViews(
   G: OuroborosState,
   viewer: PlayerID,
-  options: { isRevealed?: (card: CardInstance) => boolean } = {},
+  options: {
+    isRevealed?: (card: CardInstance) => boolean;
+    powerOf?: (card: CardInstance) => number;
+  } = {},
 ): NodeView[] {
   const config = getActiveConfig();
   const rival = opponentOf(viewer);
   const isRevealed = options.isRevealed ?? ((card: CardInstance) => card.revealed);
+  const powerOf = options.powerOf ?? cardPowerOf;
 
   return G.nodes.map((node) => {
     const location = node.locationId ? LOCATION_DEFINITIONS[node.locationId] : undefined;
     const selfCards = cardsAt(G, node.index, viewer);
     const rivalCards = cardsAt(G, node.index, rival);
-    const selfPower = selfCards.filter(isRevealed).reduce((total, card) => total + cardPowerOf(card), 0);
-    const rivalPower = rivalCards.filter(isRevealed).reduce((total, card) => total + cardPowerOf(card), 0);
+    const selfPower = selfCards.filter(isRevealed).reduce((total, card) => total + powerOf(card), 0);
+    const rivalPower = rivalCards.filter(isRevealed).reduce((total, card) => total + powerOf(card), 0);
 
     return {
       index: node.index,

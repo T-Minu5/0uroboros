@@ -329,6 +329,33 @@ describe('Full table render', () => {
     expect(html).toContain('Claim');
   });
 
+  it('still renders Draft when a collapse report is present', () => {
+    const { state } = createHarness();
+    state.phase = 'draft';
+    state.collapseReport = {
+      serial: 1,
+      cycle: 1,
+      nodes: [
+        {
+          index: 0,
+          winner: '0',
+          power0: 9,
+          power1: 0,
+          locationName: 'Occult archive',
+          locationText: 'On collapse, the winner gains 2 Victory Points.',
+          rewardText: 'On collapse, the winner gains 2 Victory Points.',
+        },
+      ],
+      selectedNode: 0,
+      eligible: ['0'],
+      endedEarly: false,
+    };
+
+    const html = renderTable(state, '0', 'draft');
+    expect(html).toContain('Draft');
+    expect(html).toContain('Base offerings');
+  });
+
   it('does not leak opponent hand contents into the seat markup', () => {
     const { state } = createHarness();
     // Give the opponent a distinctive card, then apply the server-side filter.

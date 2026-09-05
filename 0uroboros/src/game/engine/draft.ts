@@ -135,7 +135,13 @@ export function purchase(
   // onAcquire effects resolve immediately after the card is granted.
   for (const effect of def.effects) {
     if (effect.timing !== 'onAcquire') continue;
-    const ctx: EffectContext = { controller: player, nodeIndex: null, sourceCard: card };
+    const ctx: EffectContext = {
+      controller: player,
+      nodeIndex: null,
+      sourceCard: card,
+      chapter: 'draft',
+      effectText: effect.text,
+    };
     resolveOps(state, effect.ops, ctx, config, random);
   }
 
@@ -163,7 +169,13 @@ export function claimCircuitReward(
 
   for (const effect of reward.effects) {
     if (effect.timing !== 'onAcquire') continue;
-    const ctx: EffectContext = { controller: player, nodeIndex: null, sourceCard: null };
+    const ctx: EffectContext = {
+      controller: player,
+      nodeIndex: null,
+      sourceCard: null,
+      chapter: 'draft',
+      effectText: effect.text,
+    };
     resolveOps(state, effect.ops, ctx, config, random);
   }
 

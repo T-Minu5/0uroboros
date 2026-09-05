@@ -53,6 +53,13 @@ describe('Wave Collapse resolution', () => {
     runWaveCollapse(state, config, random);
     expect(state.players['0'].victoryPoints).toBe(2);
     expect(state.players['1'].victoryPoints).toBe(0);
+    expect(state.collapseReport?.nodes[0]).toMatchObject({
+      index: 0,
+      winner: '0',
+      locationName: 'Occult archive',
+      rewardText: 'On collapse, the winner gains 2 Victory Points.',
+    });
+    expect(state.collapseSerial).toBeGreaterThan(0);
   });
 
   it('grants a Location reward to both players when the Node is tied', () => {
@@ -189,6 +196,12 @@ describe('Endgame interruption during Collapse', () => {
     // No Circuit Reward selection occurs when Collapse stops early.
     expect(result.selectedNode).toBeNull();
     expect(result.circuitRewardEligible).toEqual([]);
+    expect(state.collapseReport).toMatchObject({
+      endedEarly: true,
+      selectedNode: null,
+      eligible: [],
+    });
+    expect(state.collapseReport?.nodes).toHaveLength(1);
     // Later Nodes never collapsed.
     expect(state.nodes[2].state).not.toBe('collapsed');
   });

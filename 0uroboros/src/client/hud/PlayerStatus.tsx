@@ -7,6 +7,8 @@
  */
 
 import type { StatusView } from '../selectors';
+import type { FxView } from '../fxPlayback';
+import { formatFxDelta } from '../fxPlayback';
 
 export interface PlayerStatusProps {
   status: StatusView;
@@ -14,9 +16,14 @@ export interface PlayerStatusProps {
   label: string;
   /** Draft is running, so the Wallet is relevant. */
   showWallet: boolean;
+  fx?: FxView;
 }
 
-export function PlayerStatus({ status, side, label, showWallet }: PlayerStatusProps) {
+export function PlayerStatus({ status, side, label, showWallet, fx }: PlayerStatusProps) {
+  const vp = status.victoryPoints - (fx?.vpPending(status.player) ?? 0);
+  const wallet = status.wallet - (fx?.walletPending(status.player) ?? 0);
+  const vpPop = fx?.active?.kind === 'vp' && fx.active.player === status.player;
+  const walletPop = fx?.active?.kind === 'crypto' && fx.active.player === status.player;
   return (
     <div className="status" data-side={side}>
       <div className="status__id">
@@ -31,23 +38,29 @@ export function PlayerStatus({ status, side, label, showWallet }: PlayerStatusPr
 
       <div className="dc-group">
         {status.dataCenters.map((dc) => {
-          const pct = dc.maxHealth === 0 ? 0 : (dc.health / dc.maxHealth) * 100;
+          const health = fx?.dcHealth(status.player, dc.id) ?? dc.health;
+          const pct = dc.maxHealth === 0 ? 0 : (health / dc.maxHealth) * 100;
+          const hit = fx?.hitDcKey === `${status.player}:${dc.id}`;
+          const delta =
+            hit && fx?.active ? formatFxDelta(fx.active) : null;
           return (
             <div
               key={dc.id}
               className="dc"
-              data-destroyed={dc.destroyed}
+              data-destroyed={dc.destroyed && health <= 0}
               data-low={!dc.destroyed && pct <= 25}
+              data-hit={hit}
             >
               <div className="dc__top">
-                <span>{dc.destroyed ? `${dc.label} down` : dc.label}</span>
-                <span className="dc__value">
-                  {dc.health}/{dc.maxHealth}
+                <span>{dc.destroyed && health <= 0 ? `${dc.label} down` : dc.label}</span>
+                <span className="dc__value" data-pop={hit}>
+                  {health}/{dc.maxHealth}
                 </span>
               </div>
-                  <div className="dc__track">
-                    <div className="dc__fill" style={{ transform: `scaleX(${pct / 100})` }} />
-                  </div>
+              <div className="dc__track">
+                <div className="dc__fill" style={{ transform: `scaleX(${pct / 100})` }} />
+                {delta ? <span className="fx-floater">{delta}</span> : null}
+              </div>
             </div>
           );
         })}
@@ -55,13 +68,20 @@ export function PlayerStatus({ status, side, label, showWallet }: PlayerStatusPr
 
       <div className="metric metric--vp">
         <span className="metric__label">Victory</span>
-        <span className="metric__value">{status.victoryPoints}</span>
+        <span className="metric__value" data-pop={vpPop}>
+          {vp}
+        </span>
+        {vpPop && fx?.active ? (
+          <span className="fx-floater">{formatFxDelta(fx.active)}</span>
+        ) : null}
       </div>
 
       {showWallet ? (
         <div className="metric metric--wallet">
           <span className="metric__label">Wallet</span>
-          <span className="metric__value">{status.wallet}</span>
+          <span className="metric__value" data-pop={walletPop}>
+            {wallet}
+          </span>
         </div>
       ) : null}
 

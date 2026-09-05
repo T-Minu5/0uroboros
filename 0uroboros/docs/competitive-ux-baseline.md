@@ -111,7 +111,7 @@ Snap announces reveal. Hearthstone announces turn start with a distinct sound an
 
 **Does 0uroboros have this problem?** Yes, and the documentation requires a dedicated announcement animation for every major phase and state transition.
 
-**0uroboros solution.** A single announcement overlay component driven by phase transitions, using rules vocabulary: Node opening, reveal, Wave Collapse, Circuit Reward, Draft, Start of Cycle, End of Cycle. Phase 1 ships plain text with correct timing hooks; the motion treatment is layered in later without changing the trigger contract.
+**0uroboros solution.** Every phase or Circuit beat opens with a mini-animated title using rules vocabulary: Start of Cycle, Node N opens, Reveal, Wave Collapse, Draft, Endgame. Wave Collapse is a major multi-beat sequence: each Node collapses and awards its Location text, then probability lands on one Node, then the Wave Collapse winner is announced to both players before Draft appears.
 
 ### Pattern: resolution as a stepped sequence, not an instant recalculation
 

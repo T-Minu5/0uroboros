@@ -25,6 +25,7 @@ When implementing:
 - Do not infer new gameplay rules from example card text
 - Use proper sentence case in user-facing copy
 - Do not use em dashes in 0uroboros user-facing content
+- Every phase or Circuit beat is announced with a mini-animated title. Wave Collapse is a multi-beat sequence (per-Node Location award, probability pick, winner) before Draft
 
 ## Important terminology
 

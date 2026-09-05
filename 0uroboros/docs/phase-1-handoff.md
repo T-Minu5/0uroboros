@@ -91,7 +91,7 @@ docs' allowance for early development.
 - Disconnect, reconnect, and AFK production behavior
 - Final card art, frames, rarity treatments; card components take placeholder
   chrome only and are structured so art can be layered in
-- Animation queue: phase changes announce through a simple overlay
+- Animation queue: each phase or Circuit beat has a mini-animated title; Wave Collapse plays a multi-beat sequence before Draft
 
 ## Open product decisions, unchanged from the plan
 

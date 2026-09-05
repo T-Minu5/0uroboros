@@ -79,8 +79,10 @@
 - Begin Match opening/title sequence
 ## Animation and modal system
 
-- Every major game phase/state transition needs a dedicated announcement animation
-- Examples include turn changes, Node opening, Wave Collapse, Draft, Start/End of Cycle, and match opening
+- Every phase or Circuit beat opens with a mini-animated title so both players share the same vocabulary
+- Required titles: Start of Cycle, Node N opens, Reveal, Wave Collapse, Draft, Endgame, and match opening
+- Wave Collapse is a major event, not a single title. Play it as a multi-beat sequence: each Node collapses and awards its Location text (if any) to the Node winner, or to both players if tied; then animate which Node probability collapsed into; then announce the Wave Collapse winner to both players before Draft appears
+- The Wave Collapse winner is the player eligible for the Circuit Reward (both players if the selected Node tied)
 - Choice-resolution modals must support optional, mandatory, and timed choices
 - Invalid/no-target effects require explicit user feedback
 

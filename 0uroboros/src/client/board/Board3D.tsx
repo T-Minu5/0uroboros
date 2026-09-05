@@ -40,6 +40,9 @@ export interface Board3DProps {
     pointer: DragPointer;
   } | null;
   visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
+  hitCardIds?: ReadonlySet<string>;
+  focusNode?: number | null;
+  collapsingNode?: number | null;
 }
 
 export function Board3D({
@@ -50,6 +53,9 @@ export function Board3D({
   onHoverNode,
   ghost,
   visuallyRevealed,
+  hitCardIds = new Set(),
+  focusNode = null,
+  collapsingNode = null,
 }: Board3DProps) {
   const frustum = frustumHalfWidth(nodes.length);
 
@@ -82,6 +88,9 @@ export function Board3D({
           isSelected={selectedNode === node.index}
           onSelect={() => onSelectNode(node.index)}
           visuallyRevealed={visuallyRevealed}
+          hitCardIds={hitCardIds}
+          resolving={focusNode === node.index}
+          collapsing={collapsingNode === node.index}
         />
       ))}
 
@@ -178,6 +187,9 @@ interface NodeColumnProps {
   isSelected: boolean;
   onSelect: () => void;
   visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
+  hitCardIds: ReadonlySet<string>;
+  resolving: boolean;
+  collapsing: boolean;
 }
 
 /**
@@ -191,6 +203,9 @@ function NodeColumn({
   isSelected,
   onSelect,
   visuallyRevealed,
+  hitCardIds,
+  resolving,
+  collapsing,
 }: NodeColumnProps) {
   const platform = useRef<Mesh>(null);
   const group = useRef<Group>(null);
@@ -205,6 +220,8 @@ function NodeColumn({
     if (node.state === 'open') target = 0.2;
     if (node.state === 'collapsed') target = 0.1;
     if (isLegal) target = 0.55;
+    if (resolving) target = 0.72;
+    if (collapsing) target = 0.95;
     if (isSelected) target = 0.85;
     if (node.isCollapseSelection) {
       target = 0.5 + Math.sin(performance.now() / 240) * 0.35;
@@ -221,7 +238,7 @@ function NodeColumn({
     if (group.current) {
       // Closed Nodes still accept commits. They sit slightly lower so "unopened"
       // is readable, but not so low they look disabled.
-      const restingY = node.state === 'closed' ? -0.14 : 0;
+      const restingY = collapsing ? -0.28 : node.state === 'closed' ? -0.14 : 0;
       group.current.position.y = THREE.MathUtils.damp(
         group.current.position.y,
         restingY,
@@ -231,7 +248,11 @@ function NodeColumn({
     }
   });
 
-  const accent = node.isCollapseSelection ? '#8b6bd9' : isLegal || isSelected ? '#3fbfe0' : '#2f4a66';
+  const accent = collapsing || node.isCollapseSelection
+    ? '#8b6bd9'
+    : isLegal || isSelected
+      ? '#3fbfe0'
+      : '#2f4a66';
 
   return (
     <group ref={group} position={[x, 0, 0]}>
@@ -261,6 +282,7 @@ function NodeColumn({
           z={-1.05 - i * CARD_DEPTH_STEP}
           side="rival"
           visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
+          impacted={hitCardIds.has(card.instanceId)}
         />
       ))}
 
@@ -272,6 +294,7 @@ function NodeColumn({
           z={1.05 + i * CARD_DEPTH_STEP}
           side="self"
           visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
+          impacted={hitCardIds.has(card.instanceId)}
         />
       ))}
     </group>
@@ -283,6 +306,7 @@ interface CardProxyProps {
   z: number;
   side: 'self' | 'rival';
   visualRevealed: boolean;
+  impacted: boolean;
 }
 
 /**
@@ -290,9 +314,14 @@ interface CardProxyProps {
  * the readable card face lives in the 2D layer. Final art, frames, and rarity
  * treatments replace the material here without touching layout.
  */
-function CardProxy({ z, side, visualRevealed }: CardProxyProps) {
+function CardProxy({ z, side, visualRevealed, impacted }: CardProxyProps) {
   const mesh = useRef<Mesh>(null);
   const spawn = useRef(0);
+  const impact = useRef(0);
+
+  useEffect(() => {
+    if (impacted) impact.current = 1;
+  }, [impacted]);
 
   useFrame((_, delta) => {
     if (!mesh.current) return;
@@ -310,8 +339,11 @@ function CardProxy({ z, side, visualRevealed }: CardProxyProps) {
     // Placement settle, so committing a card has weight.
     spawn.current = Math.min(1, spawn.current + delta * 4);
     const eased = 1 - (1 - spawn.current) ** 3;
+    impact.current = Math.max(0, impact.current - delta * 3.2);
+    const shake = impact.current * Math.sin(performance.now() / 16) * 0.09;
     mesh.current.position.y = 0.09 + (1 - eased) * 0.7;
-    mesh.current.scale.setScalar(0.9 + eased * 0.1);
+    mesh.current.position.x = shake;
+    mesh.current.scale.setScalar(0.9 + eased * 0.1 + impact.current * 0.06);
   });
 
   const faceColor = visualRevealed ? (side === 'self' ? '#20465c' : '#5c3f20') : '#141d2b';

@@ -82,7 +82,13 @@ export function deploy(
   // onPlay effects resolve at deployment, before reveal.
   for (const effect of getCardDefinition(card.cardDefId).effects) {
     if (effect.timing !== 'onPlay') continue;
-    const ctx: EffectContext = { controller: player, nodeIndex, sourceCard: card };
+    const ctx: EffectContext = {
+      controller: player,
+      nodeIndex,
+      sourceCard: card,
+      chapter: 'play',
+      effectText: effect.text,
+    };
     const outcome = resolveOps(state, effect.ops, ctx, config, random);
     if (outcome.noValidTarget) {
       addLog(state, 'deploy', `${getCardDefinition(card.cardDefId).name} had no valid target.`);
@@ -120,6 +126,8 @@ export function revealCard(
       controller: card.controller,
       nodeIndex: card.nodeIndex,
       sourceCard: card,
+      chapter: 'reveal',
+      effectText: effect.text,
     };
     const outcome = resolveOps(state, effect.ops, ctx, config, random);
     if (outcome.noValidTarget) {

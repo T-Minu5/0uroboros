@@ -102,8 +102,12 @@ export function createInitialState(
     revealPriority: random.int(2) === 0 ? '0' : '1',
     revealQueue: [],
     revealSerial: 0,
+    fxQueue: [],
+    fxSeq: 0,
     market: createMarket(config, random),
     collapseSelectedNode: null,
+    collapseReport: null,
+    collapseSerial: 0,
     pendingChoices: [],
     log: [],
     logSeq: 0,
@@ -148,6 +152,8 @@ export function startOfCycle(
           controller: card.controller,
           nodeIndex: null,
           sourceCard: card,
+          chapter: 'cycle',
+          effectText: effect.text,
         };
         resolveOps(state, effect.ops, ctx, config, random);
       }
@@ -221,6 +227,8 @@ export function postCollapseCleanup(
           controller: card.controller,
           nodeIndex: null,
           sourceCard: card,
+          chapter: 'cycle',
+          effectText: effect.text,
         };
         resolveOps(state, effect.ops, ctx, config, random);
       }
@@ -301,7 +309,13 @@ export function beginDraft(
       state.players[player].wallet += def.cryptoValue ?? 0;
       for (const effect of def.effects) {
         if (effect.timing !== 'onDraftStart') continue;
-        const ctx: EffectContext = { controller: player, nodeIndex: null, sourceCard: card };
+        const ctx: EffectContext = {
+          controller: player,
+          nodeIndex: null,
+          sourceCard: card,
+          chapter: 'draft',
+          effectText: effect.text,
+        };
         resolveOps(state, effect.ops, ctx, config, random);
       }
       moveToDiscard(state, card);

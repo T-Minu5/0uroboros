@@ -212,6 +212,66 @@ export interface LogEntry {
   turn: number;
 }
 
+/** When during the documented sequence this beat should play on the client. */
+export type FxChapter = 'play' | 'reveal' | 'collapse' | 'cycle' | 'draft';
+
+/**
+ * One resolved effect beat for presentation. Recording it does not change
+ * legality, scoring, or the order the engine already applied.
+ */
+export interface FxEvent {
+  id: number;
+  kind:
+    | 'power'
+    | 'damageDc'
+    | 'healDc'
+    | 'hitCard'
+    | 'chance'
+    | 'vp'
+    | 'crypto'
+    | 'nodeFocus'
+    | 'collapseSelect';
+  chapter: FxChapter;
+  /** Rules text that produced this beat, when one exists. */
+  text?: string;
+  sourceInstanceId?: string;
+  nodeIndex?: NodeIndex | null;
+  instanceId?: string;
+  player?: PlayerID;
+  dataCenter?: DataCenterId;
+  amount?: number;
+  before?: number;
+  after?: number;
+  fromNode?: NodeIndex;
+  toNode?: NodeIndex;
+  fromBefore?: number;
+  toBefore?: number;
+  fromAfter?: number;
+  toAfter?: number;
+}
+
+/** Public per-Node outcome recorded for Wave Collapse presentation. */
+export interface CollapseNodeReport {
+  index: NodeIndex;
+  /** Null when the Node tied. */
+  winner: PlayerID | null;
+  power0: number;
+  power1: number;
+  locationName: string;
+  locationText: string;
+  /** Location text that awards the winner or loser after Power is known. */
+  rewardText: string;
+}
+
+export interface CollapseReport {
+  serial: number;
+  cycle: number;
+  nodes: CollapseNodeReport[];
+  selectedNode: NodeIndex | null;
+  eligible: PlayerID[];
+  endedEarly: boolean;
+}
+
 /** A pending player decision that blocks resolution until answered or timed out. */
 export interface PendingChoice {
   id: string;
@@ -260,9 +320,23 @@ export interface OuroborosState {
   revealQueue: string[];
   /** Increments each time a new reveal sequence is committed, so the client can replay it. */
   revealSerial: number;
+  /**
+   * Presentation-only record of resolved effect beats. The engine applies every
+   * op immediately so tests stay deterministic. The client walks this queue to
+   * animate numbers, hits, and Data Center damage in resolution order.
+   */
+  fxQueue: FxEvent[];
+  fxSeq: number;
   market: DraftMarket;
   /** Node selected by the probabilistic Wave Collapse, for presentation. */
   collapseSelectedNode: NodeIndex | null;
+  /**
+   * Public snapshot of the last Wave Collapse. The engine has already applied
+   * every award. The client uses this to play the Collapse as a major sequence
+   * before showing Draft.
+   */
+  collapseReport: CollapseReport | null;
+  collapseSerial: number;
   pendingChoices: PendingChoice[];
   log: LogEntry[];
   logSeq: number;

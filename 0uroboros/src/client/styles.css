@@ -320,7 +320,16 @@ button {
 }
 
 .dc {
+  position: relative;
   min-width: 116px;
+}
+
+.dc[data-hit='true'] .dc__fill {
+  background: var(--damage);
+}
+
+.dc[data-hit='true'] .dc__track {
+  box-shadow: 0 0 12px color-mix(in oklab, var(--damage) 55%, transparent);
 }
 
 .dc__top {
@@ -337,11 +346,11 @@ button {
 }
 
 .dc__track {
+  position: relative;
   height: 5px;
   margin-top: 3px;
   border: 1px solid var(--line-soft);
   background: var(--ground-deep);
-  overflow: hidden;
 }
 
 .dc__fill {
@@ -365,6 +374,7 @@ button {
 }
 
 .metric {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -502,6 +512,29 @@ button {
   color: var(--chance);
 }
 
+.chance__cell[data-pulse='true'] .chance__fill {
+  box-shadow: 0 0 10px color-mix(in oklab, var(--chance) 70%, transparent);
+}
+
+.chance__cell[data-measure='true'] .chance__fill {
+  animation: chance-scan 720ms var(--ease-out) infinite;
+}
+
+.chance__cell[data-measure='true'][data-selected='true'] .chance__fill {
+  animation: none;
+  box-shadow: 0 0 14px color-mix(in oklab, var(--chance) 80%, transparent);
+}
+
+@keyframes chance-scan {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* --- Node header overlay, aligned to the 3D columns --- */
 
 .node-heads {
@@ -525,7 +558,10 @@ button {
   background: transparent;
   font: inherit;
   color: inherit;
-  transition: border-color var(--dur-mid), opacity var(--dur-mid);
+  transition:
+    border-color var(--dur-mid) var(--ease-out),
+    opacity var(--dur-mid) var(--ease-out),
+    transform var(--dur-mid) var(--ease-out);
   opacity: 0.7;
 }
 
@@ -549,6 +585,13 @@ button {
   border-top-color: var(--chance);
 }
 
+.node-head[data-resolving='true'] {
+  opacity: 1;
+  border-top-color: var(--chance);
+  background: color-mix(in oklab, var(--chance) 10%, transparent);
+  transform: translateY(4px);
+}
+
 .node-head__index {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -565,6 +608,7 @@ button {
 }
 
 .node-head__power {
+  position: relative;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -914,6 +958,99 @@ button {
   color: var(--damage);
 }
 
+[data-pop='true'] {
+  animation: num-pop var(--dur-mid) var(--ease-out);
+}
+
+.fx-floater {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--damage);
+  pointer-events: none;
+  animation: fx-rise var(--dur-slow) var(--ease-out) forwards;
+}
+
+.metric--vp .fx-floater,
+.dc[data-hit='true'] .fx-floater {
+  color: var(--damage);
+}
+
+.metric--vp .fx-floater {
+  color: var(--text);
+}
+
+.node-head__power .fx-floater {
+  color: var(--heal);
+}
+
+.resolve {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.resolve__text {
+  max-width: min(560px, 80%);
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--ground-deep) 88%, transparent);
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+  animation: fade-in var(--dur-fast) var(--ease-out);
+}
+
+.resolve[data-kind='damageDc'] .resolve__text {
+  border-color: color-mix(in oklab, var(--damage) 50%, var(--line));
+}
+
+@keyframes num-pop {
+  from {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes fx-rise {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-floater,
+  [data-pop='true'],
+  .resolve__text,
+  .announce__text,
+  .announce__kicker,
+  .collapse-show__title,
+  .collapse-show__sub {
+    animation: none;
+  }
+
+  .chance__cell[data-measure='true'] .chance__fill {
+    animation: none;
+  }
+
+  .node-head[data-resolving='true'] {
+    transform: none;
+  }
+}
+
 /* --- Draft --- */
 
 .draft {
@@ -1007,7 +1144,17 @@ button {
   z-index: 5;
   display: grid;
   place-items: center;
+  gap: 4px;
   pointer-events: none;
+}
+
+.announce__kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  animation: announce var(--dur-mid) var(--ease-out);
 }
 
 .announce__text {
@@ -1027,6 +1174,68 @@ button {
     transform: scale(0.94);
     opacity: 0;
     letter-spacing: 0.5em;
+  }
+}
+
+/* --- Wave Collapse theater --- */
+
+.collapse-show {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  pointer-events: none;
+  background: color-mix(in oklab, var(--ground-deep) 55%, transparent);
+}
+
+.collapse-show__kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--chance);
+}
+
+.collapse-show__title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  animation: collapse-title var(--dur-slow) var(--ease-out);
+}
+
+.collapse-show__sub {
+  max-width: 42ch;
+  margin-inline: auto;
+  font-size: 13px;
+  color: var(--text-dim);
+  animation: collapse-sub var(--dur-mid) var(--ease-out);
+}
+
+.collapse-show[data-kind='select'] .collapse-show__title {
+  color: var(--chance);
+}
+
+.collapse-show[data-kind='winner'] .collapse-show__title {
+  color: var(--self);
+}
+
+@keyframes collapse-title {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+    letter-spacing: 0.36em;
+    filter: blur(6px);
+  }
+}
+
+@keyframes collapse-sub {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 

@@ -16,7 +16,13 @@
  * Nodes resolve, no Circuit Reward selection occurs, and Draft is skipped.
  */
 
-import type { EffectDefinition, NodeIndex, OuroborosState, PlayerID } from '../types';
+import type {
+  CollapseNodeReport,
+  EffectDefinition,
+  NodeIndex,
+  OuroborosState,
+  PlayerID,
+} from '../types';
 import type { OuroborosConfig } from '../config/defaults';
 import type { RandomAPI } from './random';
 import { getCardDefinition } from '../content/cards';
@@ -27,6 +33,7 @@ import { resolveOps, type EffectContext } from './effects';
 import { isEliminated } from './dataCenters';
 import { selectCollapseNode } from './probability';
 import { addLog } from './log';
+import { pushFx } from './fx';
 
 export interface CollapseResult {
   /** True when a Data Center destruction ended the match mid-Collapse. */
@@ -51,6 +58,13 @@ export function destroyUnrevealedCards(state: OuroborosState): number {
       'collapse',
       `${getCardDefinition(card.cardDefId).name} was destroyed while still unrevealed.`,
     );
+    pushFx(state, {
+      kind: 'hitCard',
+      chapter: 'collapse',
+      instanceId: card.instanceId,
+      nodeIndex: card.nodeIndex,
+      text: `${getCardDefinition(card.cardDefId).name} was destroyed while still unrevealed.`,
+    });
   });
   return unrevealed.length;
 }
@@ -75,11 +89,17 @@ function resolveNode(
   nodeIndex: NodeIndex,
   config: OuroborosConfig,
   random: RandomAPI,
-): { dataCenterDestroyed: boolean } {
+): { dataCenterDestroyed: boolean; report: CollapseNodeReport } {
   const node = state.nodes[nodeIndex];
   let dataCenterDestroyed = false;
 
   addLog(state, 'collapse', `Node ${nodeIndex + 1} collapse begins.`);
+  pushFx(state, {
+    kind: 'nodeFocus',
+    chapter: 'collapse',
+    nodeIndex,
+    text: `Node ${nodeIndex + 1} collapse.`,
+  });
 
   const location =
     node.locationId && !node.locationSilenced
@@ -98,6 +118,8 @@ function resolveNode(
       controller: '0',
       nodeIndex,
       sourceCard: null,
+      chapter: 'collapse',
+      effectText: effect.text,
     };
     const outcome = resolveOps(state, effect.ops, ctx, config, random);
     if (outcome.dataCenterDestroyed) dataCenterDestroyed = true;
@@ -121,6 +143,8 @@ function resolveNode(
         controller: card.controller,
         nodeIndex,
         sourceCard: card,
+        chapter: 'collapse',
+        effectText: effect.text,
       };
       const outcome = resolveOps(state, effect.ops, ctx, config, random);
       if (outcome.dataCenterDestroyed) dataCenterDestroyed = true;
@@ -153,6 +177,8 @@ function resolveNode(
       sourceCard: null,
       nodeWinner: finalOutcome.result === 'win' ? finalOutcome.winner : null,
       nodeLoser: finalOutcome.result === 'win' ? finalOutcome.loser : undefined,
+      chapter: 'collapse',
+      effectText: effect.text,
     };
     const outcome = resolveOps(state, effect.ops, ctx, config, random);
     if (outcome.dataCenterDestroyed) dataCenterDestroyed = true;
@@ -162,7 +188,22 @@ function resolveNode(
   }
 
   node.state = 'collapsed';
-  return { dataCenterDestroyed };
+  const rewardText = locationEffects
+    .filter((effect) => dependsOnNodeOutcome(effect))
+    .map((effect) => effect.text)
+    .join(' ');
+  return {
+    dataCenterDestroyed,
+    report: {
+      index: nodeIndex,
+      winner: finalOutcome.result === 'win' ? finalOutcome.winner : null,
+      power0: p0,
+      power1: p1,
+      locationName: location?.name ?? 'Unassigned',
+      locationText: location?.text ?? '',
+      rewardText,
+    },
+  };
 }
 
 /** Effect Bank onCollapse effects resolve last, oldest arrival to newest. */
@@ -185,6 +226,8 @@ function resolveEffectBanks(
           controller: card.controller,
           nodeIndex: null,
           sourceCard: card,
+          chapter: 'collapse',
+          effectText: effect.text,
         };
         const outcome = resolveOps(state, effect.ops, ctx, config, random);
         if (outcome.dataCenterDestroyed) dataCenterDestroyed = true;
@@ -202,11 +245,13 @@ export function runWaveCollapse(
   destroyUnrevealedCards(state);
 
   const resolvedNodes: NodeIndex[] = [];
+  const nodeReports: CollapseNodeReport[] = [];
   let endedEarly = false;
 
   for (const node of state.nodes) {
-    const { dataCenterDestroyed } = resolveNode(state, node.index, config, random);
+    const { dataCenterDestroyed, report } = resolveNode(state, node.index, config, random);
     resolvedNodes.push(node.index);
+    nodeReports.push(report);
 
     // Finish the current Node completely, then stop if the match has ended.
     if (dataCenterDestroyed && (isEliminated(state, '0') || isEliminated(state, '1'))) {
@@ -221,11 +266,13 @@ export function runWaveCollapse(
   }
 
   if (endedEarly) {
+    publishCollapseReport(state, nodeReports, null, [], true);
     return { endedEarly: true, resolvedNodes, selectedNode: null, circuitRewardEligible: [] };
   }
 
   const bankResult = resolveEffectBanks(state, config, random);
   if (bankResult.dataCenterDestroyed && (isEliminated(state, '0') || isEliminated(state, '1'))) {
+    publishCollapseReport(state, nodeReports, null, [], true);
     return { endedEarly: true, resolvedNodes, selectedNode: null, circuitRewardEligible: [] };
   }
 
@@ -243,9 +290,34 @@ export function runWaveCollapse(
       'reward',
       `Wave Collapse selected Node ${selectedNode + 1} at ${state.nodes[selectedNode].probability}% for the Circuit Reward.`,
     );
+    pushFx(state, {
+      kind: 'collapseSelect',
+      chapter: 'collapse',
+      nodeIndex: selectedNode,
+      text: `Wave Collapse selected Node ${selectedNode + 1}.`,
+    });
   } else {
     addLog(state, 'reward', 'Wave Collapse selected no Node for the Circuit Reward.');
   }
 
+  publishCollapseReport(state, nodeReports, selectedNode, circuitRewardEligible, false);
   return { endedEarly: false, resolvedNodes, selectedNode, circuitRewardEligible };
+}
+
+function publishCollapseReport(
+  state: OuroborosState,
+  nodes: CollapseNodeReport[],
+  selectedNode: NodeIndex | null,
+  eligible: PlayerID[],
+  endedEarly: boolean,
+): void {
+  state.collapseSerial += 1;
+  state.collapseReport = {
+    serial: state.collapseSerial,
+    cycle: state.cycle,
+    nodes,
+    selectedNode,
+    eligible,
+    endedEarly,
+  };
 }

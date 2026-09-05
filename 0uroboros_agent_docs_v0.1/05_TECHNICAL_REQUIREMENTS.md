@@ -86,7 +86,7 @@ The coding agent should implement explicit authoritative states and transitions 
 - Deck/discard/reshuffle flow supports starting 10-card decks, 5-card hands, acquired cards, generated cards, Trash, and Destroyed states
 - Reconnect, AFK, concession, and forfeit rules function
 - Public/private information boundaries are enforced
-- All major phase transitions expose hooks for future announcement animations and choice modals
+- All major phase transitions expose announcement hooks. Each phase or Circuit beat plays a mini-animated title. Wave Collapse uses a multi-beat presentation sequence before Draft.
 - All current balance/timing counts are configurable without core-engine changes
 
 
