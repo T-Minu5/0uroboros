@@ -11,36 +11,57 @@
  */
 
 import { useMemo, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import type { Group, Mesh, MeshStandardMaterial } from 'three';
 import * as THREE from 'three';
 
-import type { CardInstance } from '../../game/types';
+import { useEffect } from 'react';
+import type { CardDefinition, CardInstance } from '../../game/types';
 import type { NodeView } from '../selectors';
-
-/** World spacing between Node centres. */
-const NODE_SPACING = 2.35;
-const CARD_DEPTH_STEP = 0.42;
+import {
+  CAMERA_POSITION,
+  CARD_DEPTH_STEP,
+  frustumHalfWidth,
+  nodeIndexAtX,
+  NODE_SPACING,
+} from './boardLayout';
+import { clientToBoard, DragGhost, type DragPointer } from './DragGhost';
 
 export interface Board3DProps {
   nodes: NodeView[];
-  /** Nodes the currently selected card may legally be deployed to. */
+  /** Nodes the currently selected or dragged card may legally be deployed to. */
   legalNodes: number[];
   selectedNode: number | null;
   onSelectNode: (index: number) => void;
+  onHoverNode: (index: number | null) => void;
+  ghost: {
+    definition: CardDefinition;
+    card: CardInstance;
+    pointer: DragPointer;
+  } | null;
+  visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
 }
 
-export function Board3D({ nodes, legalNodes, selectedNode, onSelectNode }: Board3DProps) {
-  const frustum = (nodes.length * NODE_SPACING) / 2 + 0.6;
+export function Board3D({
+  nodes,
+  legalNodes,
+  selectedNode,
+  onSelectNode,
+  onHoverNode,
+  ghost,
+  visuallyRevealed,
+}: Board3DProps) {
+  const frustum = frustumHalfWidth(nodes.length);
 
   return (
     <Canvas
       orthographic
       dpr={[1, 2]}
-      camera={{ position: [0, 7.4, 8.6], zoom: 1, near: 0.1, far: 100 }}
-      onCreated={({ camera, size }) => {
+      camera={{ position: CAMERA_POSITION, zoom: 1, near: 0.1, far: 100 }}
+      onCreated={({ camera, size, gl }) => {
         applyFrustum(camera as THREE.OrthographicCamera, size.width, size.height, frustum);
         camera.lookAt(0, 0, 0);
+        gl.domElement.style.touchAction = 'none';
       }}
       gl={{ antialias: true, alpha: true }}
     >
@@ -60,10 +81,52 @@ export function Board3D({ nodes, legalNodes, selectedNode, onSelectNode }: Board
           isLegal={legalNodes.includes(node.index)}
           isSelected={selectedNode === node.index}
           onSelect={() => onSelectNode(node.index)}
+          visuallyRevealed={visuallyRevealed}
         />
       ))}
+
+      <DropSensor
+        pointer={ghost?.pointer ?? null}
+        nodeCount={nodes.length}
+        onHoverNode={onHoverNode}
+      />
+
+      {ghost ? (
+        <DragGhost
+          definition={ghost.definition}
+          card={ghost.card}
+          pointer={ghost.pointer}
+        />
+      ) : null}
     </Canvas>
   );
+}
+
+function DropSensor({
+  pointer,
+  nodeCount,
+  onHoverNode,
+}: {
+  pointer: DragPointer | null;
+  nodeCount: number;
+  onHoverNode: (index: number | null) => void;
+}) {
+  const { camera, gl } = useThree();
+
+  useEffect(() => {
+    if (!pointer) {
+      onHoverNode(null);
+      return;
+    }
+    const hit = clientToBoard(pointer.clientX, pointer.clientY, camera, gl.domElement);
+    if (!hit || Math.abs(hit.z) > 2.45) {
+      onHoverNode(null);
+      return;
+    }
+    onHoverNode(nodeIndexAtX(hit.x, nodeCount));
+  }, [camera, gl.domElement, nodeCount, onHoverNode, pointer]);
+
+  return null;
 }
 
 /** Keep the orthographic frustum locked to the Node row as the canvas resizes. */
@@ -114,13 +177,21 @@ interface NodeColumnProps {
   isLegal: boolean;
   isSelected: boolean;
   onSelect: () => void;
+  visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
 }
 
 /**
  * One Node: a platform with the local player's cards toward the camera and the
  * opponent's away from it, so ownership is read from position rather than colour.
  */
-function NodeColumn({ node, x, isLegal, isSelected, onSelect }: NodeColumnProps) {
+function NodeColumn({
+  node,
+  x,
+  isLegal,
+  isSelected,
+  onSelect,
+  visuallyRevealed,
+}: NodeColumnProps) {
   const platform = useRef<Mesh>(null);
   const group = useRef<Group>(null);
 
@@ -148,7 +219,9 @@ function NodeColumn({ node, x, isLegal, isSelected, onSelect }: NodeColumnProps)
     // Motion 2: closed Nodes sit lower and lift as they open, giving the Node
     // opening sequence a physical read.
     if (group.current) {
-      const restingY = node.state === 'closed' ? -0.32 : 0;
+      // Closed Nodes still accept commits. They sit slightly lower so "unopened"
+      // is readable, but not so low they look disabled.
+      const restingY = node.state === 'closed' ? -0.14 : 0;
       group.current.position.y = THREE.MathUtils.damp(
         group.current.position.y,
         restingY,
@@ -187,6 +260,7 @@ function NodeColumn({ node, x, isLegal, isSelected, onSelect }: NodeColumnProps)
           card={card}
           z={-1.05 - i * CARD_DEPTH_STEP}
           side="rival"
+          visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
         />
       ))}
 
@@ -197,6 +271,7 @@ function NodeColumn({ node, x, isLegal, isSelected, onSelect }: NodeColumnProps)
           card={card}
           z={1.05 + i * CARD_DEPTH_STEP}
           side="self"
+          visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
         />
       ))}
     </group>
@@ -207,6 +282,7 @@ interface CardProxyProps {
   card: CardInstance;
   z: number;
   side: 'self' | 'rival';
+  visualRevealed: boolean;
 }
 
 /**
@@ -214,7 +290,7 @@ interface CardProxyProps {
  * the readable card face lives in the 2D layer. Final art, frames, and rarity
  * treatments replace the material here without touching layout.
  */
-function CardProxy({ card, z, side }: CardProxyProps) {
+function CardProxy({ z, side, visualRevealed }: CardProxyProps) {
   const mesh = useRef<Mesh>(null);
   const spawn = useRef(0);
 
@@ -223,7 +299,7 @@ function CardProxy({ card, z, side }: CardProxyProps) {
 
     // Motion 3: cards flip on reveal rather than swapping state instantly, so
     // resolution reads as a sequence and causality stays legible.
-    const targetFlip = card.revealed ? 0 : Math.PI;
+    const targetFlip = visualRevealed ? 0 : Math.PI;
     mesh.current.rotation.z = THREE.MathUtils.damp(
       mesh.current.rotation.z,
       targetFlip,
@@ -238,7 +314,7 @@ function CardProxy({ card, z, side }: CardProxyProps) {
     mesh.current.scale.setScalar(0.9 + eased * 0.1);
   });
 
-  const faceColor = card.revealed ? (side === 'self' ? '#20465c' : '#5c3f20') : '#141d2b';
+  const faceColor = visualRevealed ? (side === 'self' ? '#20465c' : '#5c3f20') : '#141d2b';
   const edgeColor = side === 'self' ? '#3fbfe0' : '#e0a13f';
 
   return (
@@ -247,7 +323,7 @@ function CardProxy({ card, z, side }: CardProxyProps) {
       <meshStandardMaterial
         color={faceColor}
         emissive={edgeColor}
-        emissiveIntensity={card.revealed ? 0.18 : 0.05}
+        emissiveIntensity={visualRevealed ? 0.18 : 0.05}
         roughness={0.5}
         metalness={0.3}
       />

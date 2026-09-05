@@ -3,7 +3,8 @@
  *
  * Clean cyberpunk: dark ground, technical grid, restrained neon. Accent colour
  * always carries meaning. Cyan is you, amber is your opponent, red is damage,
- * and violet marks probability. Nothing is neon purely for decoration.
+ * violet marks probability, and crypto green is Wallet and cost. Nothing is neon
+ * purely for decoration.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
@@ -27,6 +28,7 @@
   --damage: oklch(0.63 0.2 22);
   --heal: oklch(0.78 0.15 152);
   --chance: oklch(0.7 0.15 300);
+  --crypto: oklch(0.84 0.13 130);
 
   --radius: 3px;
   --radius-lg: 5px;
@@ -38,7 +40,10 @@
   --dur-mid: 240ms;
   --dur-slow: 460ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-snap: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+
+  caret-color: var(--self);
+  scrollbar-color: var(--line) var(--ground-deep);
 }
 
 * {
@@ -67,6 +72,16 @@ button {
   font-family: inherit;
   color: inherit;
   cursor: pointer;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--self) 35%, var(--ground));
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--self);
+  outline-offset: 2px;
 }
 
 /* --- Shell --- */
@@ -330,9 +345,11 @@ button {
 }
 
 .dc__fill {
+  width: 100%;
   height: 100%;
+  transform-origin: left center;
   background: var(--heal);
-  transition: width var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-out);
 }
 
 .dc[data-low='true'] .dc__fill {
@@ -373,7 +390,7 @@ button {
 }
 
 .metric--wallet .metric__value {
-  color: var(--rival);
+  color: var(--crypto);
 }
 
 .badge {
@@ -426,6 +443,12 @@ button {
   color: var(--text-dim);
 }
 
+.clock__timer {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+}
+
 /* --- Probability strip --- */
 
 .chance {
@@ -463,17 +486,20 @@ button {
 }
 
 .chance__fill {
+  width: 100%;
   height: 100%;
+  transform-origin: left center;
   background: var(--chance);
-  transition: width var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-out);
 }
 
 .chance__cell[data-selected='true'] .chance__fill {
-  background: var(--self);
+  background: var(--chance);
 }
 
-.chance__cell[data-selected='true'] .chance__pct {
-  color: var(--self);
+.chance__cell[data-selected='true'] .chance__pct,
+.chance__cell[data-selected='true'] .chance__row {
+  color: var(--chance);
 }
 
 /* --- Node header overlay, aligned to the 3D columns --- */
@@ -484,19 +510,33 @@ button {
   display: grid;
   grid-template-columns: repeat(var(--nodes, 5), 1fr);
   gap: 8px;
-  pointer-events: none;
   z-index: 2;
 }
 
 .node-head {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   padding: 5px 6px;
+  border: 0;
   border-top: 1px solid var(--line-soft);
+  background: transparent;
+  font: inherit;
+  color: inherit;
   transition: border-color var(--dur-mid), opacity var(--dur-mid);
-  opacity: 0.55;
+  opacity: 0.7;
+}
+
+.node-head[aria-disabled='true'] {
+  cursor: default;
+}
+
+.node-head[data-legal='true'] {
+  cursor: pointer;
+  opacity: 1;
+  border-top-color: var(--self);
 }
 
 .node-head[data-state='open'] {
@@ -507,10 +547,6 @@ button {
 .node-head[data-state='collapsed'] {
   opacity: 0.8;
   border-top-color: var(--chance);
-}
-
-.node-head[data-legal='true'] {
-  border-top-color: var(--self);
 }
 
 .node-head__index {
@@ -557,9 +593,63 @@ button {
 
 .node-head__lead {
   font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--text-faint);
+}
+
+.node-head__piles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.node-head__pile {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.node-head__pile[data-side='rival'] {
+  color: var(--rival);
+}
+
+.node-head__pile[data-side='self'] {
+  color: var(--self);
+}
+
+.node-head__text {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  z-index: 4;
+  width: min(220px, 28vw);
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--ground-deep) 94%, transparent);
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    visibility var(--dur-fast);
+  pointer-events: none;
+}
+
+.node-head:hover .node-head__text,
+.node-head:focus-visible .node-head__text {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%);
 }
 
 /* --- Effect Bank --- */
@@ -608,7 +698,7 @@ button {
   margin-left: auto;
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--chance);
+  color: var(--text-dim);
 }
 
 @keyframes slot-in {
@@ -634,15 +724,45 @@ button {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  min-height: 124px;
-  padding-top: 18px;
+  min-height: 168px;
+  padding-top: 40px;
+}
+
+.rail__card {
+  position: relative;
+  flex: 0 0 auto;
+  touch-action: none;
+  cursor: grab;
+  transition: transform 180ms var(--ease-out);
+  transform-origin: 50% 100%;
+}
+
+.rail__card:not(:first-child) {
+  margin-left: -36px;
+}
+
+.rail__card .card {
+  pointer-events: none;
+}
+
+.rail__card[data-focus='true'] {
+  z-index: 6;
+  transform: translateY(-36px) scale(1.22);
+}
+
+.rail__card[data-dragging='true'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rail__card:active {
+  cursor: grabbing;
 }
 
 .rail__empty {
   align-self: center;
   font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--text-faint);
 }
 
@@ -653,17 +773,22 @@ button {
   min-width: 122px;
 }
 
+.rail__hint {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-faint);
+}
+
 .act {
   padding: 9px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   transition:
-    transform var(--dur-fast) var(--ease-snap),
+    transform var(--dur-fast) var(--ease-out),
     border-color var(--dur-fast),
     background var(--dur-fast);
 }
@@ -682,6 +807,11 @@ button {
   color: var(--self);
 }
 
+.act[data-danger='true'] {
+  color: var(--text-faint);
+  border-color: var(--line-soft);
+}
+
 .act:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -691,12 +821,12 @@ button {
 
 .card {
   position: relative;
-  width: 106px;
-  height: 148px;
+  width: 118px;
+  height: 166px;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  padding: 7px;
+  padding: 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: linear-gradient(165deg, var(--surface-raised), var(--surface));
@@ -707,14 +837,9 @@ button {
     opacity var(--dur-fast);
 }
 
-.rail__cards .card:not(:first-child) {
-  margin-left: -26px;
-}
-
 .rail__cards .card:hover,
 .rail__cards .card[data-selected='true'] {
-  transform: translateY(-20px);
-  z-index: 3;
+  transform: none;
 }
 
 .card[data-selected='true'] {
@@ -738,14 +863,14 @@ button {
 
 .card__cost {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--rival);
+  color: var(--crypto);
 }
 
 .card__power {
   font-family: var(--font-mono);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1;
   color: var(--self);
@@ -754,23 +879,22 @@ button {
 
 .card__name {
   margin-top: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .card__kind {
   margin-top: 2px;
-  font-size: 8px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.08em;
   color: var(--text-faint);
 }
 
 .card__text {
-  margin-top: 5px;
-  font-size: 9px;
-  line-height: 1.32;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.35;
   color: var(--text-dim);
   overflow: hidden;
 }
@@ -780,14 +904,13 @@ button {
   display: flex;
   justify-content: space-between;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-faint);
 }
 
 .card__block {
-  font-size: 8px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.03em;
   color: var(--damage);
 }
 

@@ -16,7 +16,7 @@ import type {
 import { CARD_DEFINITIONS } from '../game/content/cards';
 import { LOCATION_DEFINITIONS } from '../game/content/locations';
 import { getActiveConfig } from '../game/OuroborosGame';
-import { cardPower, nodeOutcome, nodePower } from '../game/engine/power';
+import { cardPower } from '../game/engine/power';
 import { legalNodesFor } from '../game/engine/deploy';
 import { totalVictoryPoints } from '../game/engine/scoring';
 import { availableSupply, type MarketCategory } from '../game/engine/draft';
@@ -94,14 +94,21 @@ export interface NodeView {
   isCollapseSelection: boolean;
 }
 
-export function nodeViews(G: OuroborosState, viewer: PlayerID): NodeView[] {
+export function nodeViews(
+  G: OuroborosState,
+  viewer: PlayerID,
+  options: { isRevealed?: (card: CardInstance) => boolean } = {},
+): NodeView[] {
   const config = getActiveConfig();
   const rival = opponentOf(viewer);
+  const isRevealed = options.isRevealed ?? ((card: CardInstance) => card.revealed);
 
   return G.nodes.map((node) => {
     const location = node.locationId ? LOCATION_DEFINITIONS[node.locationId] : undefined;
-    const outcome = nodeOutcome(G, node.index);
     const selfCards = cardsAt(G, node.index, viewer);
+    const rivalCards = cardsAt(G, node.index, rival);
+    const selfPower = selfCards.filter(isRevealed).reduce((total, card) => total + cardPowerOf(card), 0);
+    const rivalPower = rivalCards.filter(isRevealed).reduce((total, card) => total + cardPowerOf(card), 0);
 
     return {
       index: node.index,
@@ -109,12 +116,11 @@ export function nodeViews(G: OuroborosState, viewer: PlayerID): NodeView[] {
       locationName: location?.name ?? 'Unassigned',
       locationText: location?.text ?? '',
       probability: node.probability,
-      selfPower: nodePower(G, node.index, viewer),
-      rivalPower: nodePower(G, node.index, rival),
-      leader:
-        outcome.result === 'tie' ? null : outcome.winner === viewer ? 'self' : 'rival',
+      selfPower,
+      rivalPower,
+      leader: selfPower === rivalPower ? null : selfPower > rivalPower ? 'self' : 'rival',
       selfCards,
-      rivalCards: cardsAt(G, node.index, rival),
+      rivalCards,
       selfAtCapacity: selfCards.length >= config.nodeCapacityPerPlayer,
       isCollapseSelection: G.collapseSelectedNode === node.index,
     };

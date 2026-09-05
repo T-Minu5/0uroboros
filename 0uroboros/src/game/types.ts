@@ -258,6 +258,8 @@ export interface OuroborosState {
   revealPriority: PlayerID;
   /** Instance ids queued to reveal, in resolved reveal order. */
   revealQueue: string[];
+  /** Increments each time a new reveal sequence is committed, so the client can replay it. */
+  revealSerial: number;
   market: DraftMarket;
   /** Node selected by the probabilistic Wave Collapse, for presentation. */
   collapseSelectedNode: NodeIndex | null;

@@ -101,6 +101,7 @@ export function createInitialState(
     // Turn 1 reveal priority is random.
     revealPriority: random.int(2) === 0 ? '0' : '1',
     revealQueue: [],
+    revealSerial: 0,
     market: createMarket(config, random),
     collapseSelectedNode: null,
     pendingChoices: [],

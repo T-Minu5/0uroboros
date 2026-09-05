@@ -22,7 +22,10 @@ export function ProbabilityStrip({ nodes }: ProbabilityStripProps) {
             <span className="chance__pct">{formatPercent(node.probability)}</span>
           </div>
           <div className="chance__track">
-            <div className="chance__fill" style={{ width: `${node.probability}%` }} />
+            <div
+              className="chance__fill"
+              style={{ transform: `scaleX(${node.probability / 100})` }}
+            />
           </div>
         </div>
       ))}

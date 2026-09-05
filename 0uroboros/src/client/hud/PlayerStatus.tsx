@@ -45,9 +45,9 @@ export function PlayerStatus({ status, side, label, showWallet }: PlayerStatusPr
                   {dc.health}/{dc.maxHealth}
                 </span>
               </div>
-              <div className="dc__track">
-                <div className="dc__fill" style={{ width: `${pct}%` }} />
-              </div>
+                  <div className="dc__track">
+                    <div className="dc__fill" style={{ transform: `scaleX(${pct / 100})` }} />
+                  </div>
             </div>
           );
         })}

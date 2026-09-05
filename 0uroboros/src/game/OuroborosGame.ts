@@ -243,7 +243,7 @@ function beginCycle(G: OuroborosState, random: RandomAPI): void {
  */
 function closeWindow(G: OuroborosState, random: RandomAPI): void {
   G.phase = 'reveal';
-  runRevealSequence(G, random);
+  const windowReveals = runRevealSequence(G, random);
 
   // Next-window reveal priority follows controlled probability weight, and is
   // fixed once per turn rather than recalculated after each reveal.
@@ -251,6 +251,7 @@ function closeWindow(G: OuroborosState, random: RandomAPI): void {
   G.windowsCompleted += 1;
   resetEndedTurn(G);
 
+  let openingReveals: string[] = [];
   if (G.windowsCompleted < totalWindows(G)) {
     G.turn = G.windowsCompleted;
     const opening = G.nodes[G.turn];
@@ -258,21 +259,27 @@ function closeWindow(G: OuroborosState, random: RandomAPI): void {
       opening.state = 'open';
       addLog(G, 'phase', `Node ${G.turn + 1} opens.`);
       // Opening reveal sequence for cards already committed to this Node.
-      runRevealSequence(G, random);
+      openingReveals = runRevealSequence(G, random);
     }
     G.phase = 'circuitDeploy';
   }
+
+  // One chronological queue for the client. Window-close reveals play first,
+  // then the newly opened Node's waiting cards, never in parallel.
+  const sequence = [...windowReveals, ...openingReveals];
+  if (sequence.length > 0) {
+    G.revealQueue = sequence;
+    G.revealSerial += 1;
+  }
 }
 
-/** Reveal every currently eligible card in the resolved reveal order. */
-function runRevealSequence(G: OuroborosState, random: RandomAPI): void {
+/** Reveal every currently eligible card. Returns the order they resolved. */
+function runRevealSequence(G: OuroborosState, random: RandomAPI): string[] {
   const queue = buildRevealQueue(G);
-  if (queue.length === 0) return;
-
-  G.revealQueue = queue;
   for (const instanceId of queue) {
     revealCard(G, instanceId, activeConfig, random);
   }
+  return queue;
 }
 
 /**

@@ -6,7 +6,7 @@
  * All game questions are answered by selectors, which delegate to the engine.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { BoardProps } from 'boardgame.io/react';
 
 import type { NodeIndex, OuroborosState, PlayerID } from '../game/types';
@@ -31,6 +31,8 @@ import { HandRail } from './hud/HandRail';
 import { DraftPanel } from './hud/DraftPanel';
 import { PhaseAnnouncement } from './hud/PhaseAnnouncement';
 import { DebugPanel } from './debug/DebugPanel';
+import type { DragPointer } from './board/DragGhost';
+import { isVisuallyRevealed, useRevealPlayback } from './revealPlayback';
 
 export type GameTableProps = BoardProps<OuroborosState>;
 
@@ -39,7 +41,18 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
   const rival = opponentOf(viewer);
 
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [hoveredInstanceId, setHoveredInstanceId] = useState<string | null>(null);
+  const [draggingInstanceId, setDraggingInstanceId] = useState<string | null>(null);
+  const [dragPointer, setDragPointer] = useState<DragPointer | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<number | null>(null);
   const [debugOpen, setDebugOpen] = useState(false);
+
+  const revealPlayed = useRevealPlayback(G.revealQueue, G.revealSerial);
+  const visuallyRevealed = useCallback(
+    (instanceId: string, revealed: boolean) =>
+      isVisuallyRevealed(instanceId, revealed, G.revealQueue, revealPlayed),
+    [G.revealQueue, revealPlayed],
+  );
 
   const inCircuit = ctx.phase === 'circuit';
   const inDraft = ctx.phase === 'draft';
@@ -47,23 +60,34 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
   const windowOpen = inCircuit && !endedTurn;
 
   const hand = useMemo(() => handView(G, viewer, windowOpen), [G, viewer, windowOpen]);
-  const nodes = useMemo(() => nodeViews(G, viewer), [G, viewer]);
+  const nodes = useMemo(
+    () =>
+      nodeViews(G, viewer, {
+        isRevealed: (card) => visuallyRevealed(card.instanceId, card.revealed),
+      }),
+    [G, viewer, visuallyRevealed],
+  );
   const localStatus = statusView(G, viewer);
   const rivalStatus = statusView(G, rival);
 
   const selected = hand.find((entry) => entry.card.instanceId === selectedInstanceId) ?? null;
-  const legalNodes = selected?.legalNodes ?? [];
+  const dragging = hand.find((entry) => entry.card.instanceId === draggingInstanceId) ?? null;
+  const legalNodes = (dragging ?? selected)?.legalNodes ?? [];
 
   // Drop a stale selection when the card leaves hand or the window closes.
   useEffect(() => {
     if (selectedInstanceId && !selected) setSelectedInstanceId(null);
   }, [selectedInstanceId, selected]);
 
-  const deployTo = (index: number) => {
-    if (!selected) return;
-    if (!selected.legalNodes.includes(index as NodeIndex)) return;
-    moves.deployCard(selected.card.instanceId, index as NodeIndex);
+  const deployTo = (index: number, instanceId = selected?.card.instanceId) => {
+    const entry = hand.find((item) => item.card.instanceId === instanceId);
+    if (!entry) return false;
+    if (!entry.legalNodes.includes(index as NodeIndex)) return false;
+    moves.deployCard(entry.card.instanceId, index as NodeIndex);
     setSelectedInstanceId(null);
+    setDraggingInstanceId(null);
+    setHoveredNode(null);
+    return true;
   };
 
   const gameover = ctx.gameover as
@@ -72,7 +96,12 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
     | undefined;
 
   return (
-    <div className="table">
+    <div
+      className="table"
+      data-dragging={draggingInstanceId ?? ''}
+      data-hover={hoveredInstanceId ?? ''}
+      data-hover-node={hoveredNode ?? ''}
+    >
       <div className="table__rival">
         <PlayerStatus
           status={rivalStatus}
@@ -86,6 +115,7 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
         <span className="clock__cycle">Cycle {G.cycle}</span>
         <span className="clock__phase">{phaseLabel(G.phase)}</span>
         {inCircuit ? <span>Window {G.turn + 1} of {G.nodes.length}</span> : null}
+        <span className="clock__timer">Playtest: no countdown</span>
 
         <button
           type="button"
@@ -103,13 +133,29 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
         <EffectBankRow slots={bankView(G, rival)} label="Opponent bank" />
 
         <div className="board">
-          <NodeHeaders nodes={nodes} legalNodes={legalNodes} />
+          <NodeHeaders
+            nodes={nodes}
+            legalNodes={legalNodes}
+            onSelectNode={(index) => deployTo(index)}
+            isCardFaceUp={(card) => visuallyRevealed(card.instanceId, card.revealed)}
+          />
 
           <Board3D
             nodes={nodes}
             legalNodes={legalNodes}
-            selectedNode={null}
-            onSelectNode={deployTo}
+            selectedNode={hoveredNode}
+            onSelectNode={(index) => deployTo(index)}
+            onHoverNode={setHoveredNode}
+            visuallyRevealed={visuallyRevealed}
+            ghost={
+              dragging && dragPointer
+                ? {
+                    definition: dragging.definition,
+                    card: dragging.card,
+                    pointer: dragPointer,
+                  }
+                : null
+            }
           />
         </div>
 
@@ -184,9 +230,24 @@ export function GameTable({ G, ctx, moves, playerID }: GameTableProps) {
       <HandRail
         hand={hand}
         selectedInstanceId={selectedInstanceId}
+        focusedInstanceId={hoveredInstanceId ?? selectedInstanceId}
         windowOpen={windowOpen}
         endedTurn={endedTurn}
+        draggingInstanceId={draggingInstanceId}
+        onFocus={setHoveredInstanceId}
         onSelect={setSelectedInstanceId}
+        onDragActive={(id) => {
+          setDraggingInstanceId(id);
+          if (id) setSelectedInstanceId(id);
+        }}
+        onDragMove={setDragPointer}
+        onDragEnd={() => {
+          if (draggingInstanceId !== null && hoveredNode !== null) {
+            deployTo(hoveredNode, draggingInstanceId);
+          }
+          setDragPointer(null);
+          setHoveredNode(null);
+        }}
         onEndDeployment={() => moves.endDeployment()}
         onConcede={() => moves.concede()}
       />

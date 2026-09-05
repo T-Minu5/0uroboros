@@ -95,6 +95,21 @@ describe('Node headers', () => {
       <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[]} />,
     );
     expect(html).toContain('Occult archive');
+    expect(html).toContain('On collapse, the winner gains 2 Victory Points.');
+  });
+
+  it('names revealed cards on the Node without leaking facedown identity', () => {
+    const { state } = createHarness();
+    openNodes(state, [0]);
+    placeCardAtNode(state, '0', 'monolith_core', 0, { revealed: true });
+    placeCardAtNode(state, '1', 'cipher_runner', 0, { revealed: false });
+
+    const html = renderToStaticMarkup(
+      <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[]} />,
+    );
+    expect(html).toContain('Monolith core 9');
+    expect(html).toContain('1 committed');
+    expect(html).not.toContain('Cipher runner');
   });
 
   it('marks legal Nodes so legality is taught before the attempt', () => {
@@ -290,6 +305,7 @@ describe('Full table render', () => {
     expect(html).toContain('Opponent bank');
     expect(html).toContain('Player 0 (you)');
     expect(html).toContain('Cipher runner');
+    expect(html).toContain('End turn');
     // The Crypto card is present but explicitly unplayable.
     expect(html).toContain('Not played at Nodes');
   });
