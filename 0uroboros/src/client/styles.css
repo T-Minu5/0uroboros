@@ -1,0 +1,1032 @@
+/*
+ * 0uroboros interface tokens.
+ *
+ * Clean cyberpunk: dark ground, technical grid, restrained neon. Accent colour
+ * always carries meaning. Cyan is you, amber is your opponent, red is damage,
+ * and violet marks probability. Nothing is neon purely for decoration.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --ground: oklch(0.15 0.025 255);
+  --ground-deep: oklch(0.11 0.02 258);
+  --surface: oklch(0.21 0.03 255);
+  --surface-raised: oklch(0.26 0.035 255);
+  --line: oklch(0.34 0.03 255);
+  --line-soft: oklch(0.28 0.025 255);
+
+  --text: oklch(0.94 0.01 250);
+  --text-dim: oklch(0.72 0.02 250);
+  --text-faint: oklch(0.56 0.02 250);
+
+  --self: oklch(0.79 0.14 197);
+  --self-deep: oklch(0.45 0.11 200);
+  --rival: oklch(0.81 0.15 74);
+  --rival-deep: oklch(0.48 0.12 70);
+  --damage: oklch(0.63 0.2 22);
+  --heal: oklch(0.78 0.15 152);
+  --chance: oklch(0.7 0.15 300);
+
+  --radius: 3px;
+  --radius-lg: 5px;
+
+  --font-display: 'Chakra Petch', 'Trebuchet MS', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --dur-fast: 120ms;
+  --dur-mid: 240ms;
+  --dur-slow: 460ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-display);
+  color: var(--text);
+  background:
+    radial-gradient(120% 80% at 50% -10%, oklch(0.24 0.05 250) 0%, transparent 60%),
+    radial-gradient(90% 60% at 50% 110%, oklch(0.19 0.04 280) 0%, transparent 55%),
+    linear-gradient(180deg, var(--ground) 0%, var(--ground-deep) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* --- Shell --- */
+
+.shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shell__bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in oklab, var(--ground-deep) 80%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.shell__brand {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-right: auto;
+}
+
+.shell__brand span {
+  color: var(--self);
+}
+
+.seat-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: var(--ground-deep);
+}
+
+.seat-tabs button {
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.seat-tabs button[data-active='true'] {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.seat-tabs button[data-seat='0'][data-active='true'] {
+  box-shadow: inset 0 -2px 0 var(--self);
+}
+
+.seat-tabs button[data-seat='1'][data-active='true'] {
+  box-shadow: inset 0 -2px 0 var(--rival);
+}
+
+.toggle {
+  padding: 5px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: border-color var(--dur-fast), color var(--dur-fast);
+}
+
+.toggle[data-on='true'] {
+  border-color: var(--self-deep);
+  color: var(--self);
+}
+
+.toggle:hover {
+  border-color: var(--line);
+  color: var(--text-dim);
+}
+
+.seats {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+}
+
+/*
+ * boardgame.io wraps each board in an unstyled div. Every ancestor of the 3D
+ * canvas needs a definite height, otherwise the canvas resolves height: 100%
+ * against a content-sized box, reports a slightly larger size each time it
+ * measures itself, and walks the board down the screen frame by frame.
+ */
+.bgio-client {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+/*
+ * minmax(0, 1fr) rather than 1fr: a bare fr track cannot shrink below its
+ * content's min-content width, and a full table is far wider than half the
+ * viewport, so 1fr 1fr sizes the first column to the whole window and pushes the
+ * second seat off screen.
+ */
+.seats[data-split='true'] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1px;
+  background: var(--line-soft);
+}
+
+/* --- Table layout --- */
+
+.table {
+  display: grid;
+  /*
+   * One track per in-flow child, in DOM order: opponent status, clock,
+   * probability strip, board, your bank, your status, hand rail. The board takes
+   * the free space. Adding a row to the table means adding a track here, or the
+   * free space lands on the wrong child and the board collapses to its content.
+   */
+  grid-template-rows: auto auto auto 1fr auto auto auto;
+  /* Single column that may shrink below its content, so a narrow seat clips the
+   * HUD instead of widening the table and the canvas with it. */
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--ground);
+}
+
+.table__rival,
+.table__local {
+  padding: 8px 16px;
+}
+
+/*
+ * Parked in the clock row, which keeps free space on both sides at any seat
+ * width. The table's corners are all occupied: status badges at the top, hand
+ * rail actions and the selection hint at the bottom.
+ */
+.table__debug {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  z-index: 9;
+}
+
+.table__board {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  /* Explicit minmax(0, ...) on both axes. An auto or bare-fr track takes its
+   * minimum from the canvas, which locks the canvas at whatever size it last
+   * measured and stops it from ever shrinking again. */
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+}
+
+/* The 3D area. Node headers are positioned against this box so they stay aligned
+ * with the Node columns rather than with the opponent's Effect Bank above it. */
+.board {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* --- Status block --- */
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.status__id {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 132px;
+}
+
+.status__avatar {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status[data-side='local'] .status__avatar {
+  border-color: var(--self-deep);
+  color: var(--self);
+}
+
+.status[data-side='rival'] .status__avatar {
+  border-color: var(--rival-deep);
+  color: var(--rival);
+}
+
+.status__name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.status__sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+/* Data Centers stay separate because damage never spills between them. */
+.dc-group {
+  display: flex;
+  gap: 10px;
+}
+
+.dc {
+  min-width: 116px;
+}
+
+.dc__top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+}
+
+.dc__value {
+  color: var(--text-dim);
+}
+
+.dc__track {
+  height: 5px;
+  margin-top: 3px;
+  border: 1px solid var(--line-soft);
+  background: var(--ground-deep);
+  overflow: hidden;
+}
+
+.dc__fill {
+  height: 100%;
+  background: var(--heal);
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+.dc[data-low='true'] .dc__fill {
+  background: var(--damage);
+}
+
+.dc[data-destroyed='true'] .dc__top {
+  color: var(--damage);
+}
+
+.dc[data-destroyed='true'] .dc__track {
+  border-color: color-mix(in oklab, var(--damage) 50%, var(--line-soft));
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.metric__label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.metric__value {
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric--vp .metric__value {
+  color: var(--text);
+}
+
+.metric--wallet .metric__value {
+  color: var(--rival);
+}
+
+.badge {
+  padding: 3px 8px;
+  border: 1px solid var(--self-deep);
+  border-radius: 2px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--self);
+}
+
+.badge[data-kind='waiting'] {
+  border-color: var(--line-soft);
+  color: var(--text-faint);
+}
+
+.badge[data-kind='ended'] {
+  border-color: var(--rival-deep);
+  color: var(--rival);
+}
+
+/* --- Clock: the single authority on where we are --- */
+
+.clock {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.clock__phase {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--text);
+}
+
+.clock__cycle {
+  color: var(--text-dim);
+}
+
+/* --- Probability strip --- */
+
+.chance {
+  display: grid;
+  grid-template-columns: repeat(var(--nodes, 5), 1fr);
+  gap: 6px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.chance__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chance__row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.chance__pct {
+  color: var(--chance);
+  font-variant-numeric: tabular-nums;
+}
+
+.chance__track {
+  height: 3px;
+  background: var(--ground-deep);
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+
+.chance__fill {
+  height: 100%;
+  background: var(--chance);
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+.chance__cell[data-selected='true'] .chance__fill {
+  background: var(--self);
+}
+
+.chance__cell[data-selected='true'] .chance__pct {
+  color: var(--self);
+}
+
+/* --- Node header overlay, aligned to the 3D columns --- */
+
+.node-heads {
+  position: absolute;
+  inset: 8px 16px auto 16px;
+  display: grid;
+  grid-template-columns: repeat(var(--nodes, 5), 1fr);
+  gap: 8px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.node-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px;
+  border-top: 1px solid var(--line-soft);
+  transition: border-color var(--dur-mid), opacity var(--dur-mid);
+  opacity: 0.55;
+}
+
+.node-head[data-state='open'] {
+  opacity: 1;
+  border-top-color: var(--self-deep);
+}
+
+.node-head[data-state='collapsed'] {
+  opacity: 0.8;
+  border-top-color: var(--chance);
+}
+
+.node-head[data-legal='true'] {
+  border-top-color: var(--self);
+}
+
+.node-head__index {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+}
+
+.node-head__name {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.node-head__power {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-head__power b {
+  font-weight: 600;
+}
+
+.node-head__power .rival {
+  color: var(--rival);
+}
+
+.node-head__power .self {
+  color: var(--self);
+}
+
+.node-head__power .sep {
+  color: var(--text-faint);
+  font-size: 10px;
+}
+
+.node-head__lead {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* --- Effect Bank --- */
+
+.bank {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px;
+}
+
+.bank__label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  min-width: 82px;
+}
+
+.bank__slots {
+  display: flex;
+  gap: 5px;
+}
+
+.bank__slot {
+  min-width: 104px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 7px;
+  border: 1px dashed var(--line-soft);
+  border-radius: 2px;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.bank__slot[data-filled='true'] {
+  border-style: solid;
+  border-color: var(--line);
+  color: var(--text-dim);
+  animation: slot-in var(--dur-mid) var(--ease-snap);
+}
+
+.bank__slot .dur {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--chance);
+}
+
+@keyframes slot-in {
+  from {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+}
+
+/* --- Hand rail --- */
+
+.rail {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, transparent, oklch(0.13 0.02 258));
+}
+
+.rail__cards {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 124px;
+  padding-top: 18px;
+}
+
+.rail__empty {
+  align-self: center;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.rail__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 122px;
+}
+
+.act {
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    transform var(--dur-fast) var(--ease-snap),
+    border-color var(--dur-fast),
+    background var(--dur-fast);
+}
+
+.act:hover:not(:disabled) {
+  border-color: var(--self-deep);
+  background: var(--surface-raised);
+}
+
+.act:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.act[data-primary='true'] {
+  border-color: var(--self-deep);
+  color: var(--self);
+}
+
+.act:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Card --- */
+
+.card {
+  position: relative;
+  width: 106px;
+  height: 148px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(165deg, var(--surface-raised), var(--surface));
+  text-align: left;
+  transition:
+    transform var(--dur-mid) var(--ease-out),
+    border-color var(--dur-fast),
+    opacity var(--dur-fast);
+}
+
+.rail__cards .card:not(:first-child) {
+  margin-left: -26px;
+}
+
+.rail__cards .card:hover,
+.rail__cards .card[data-selected='true'] {
+  transform: translateY(-20px);
+  z-index: 3;
+}
+
+.card[data-selected='true'] {
+  border-color: var(--self);
+}
+
+.card[data-playable='false'] {
+  opacity: 0.5;
+}
+
+.card[data-playable='false']:hover {
+  transform: translateY(-8px);
+}
+
+.card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.card__cost {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rival);
+}
+
+.card__power {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--self);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__name {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.card__kind {
+  margin-top: 2px;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.card__text {
+  margin-top: 5px;
+  font-size: 9px;
+  line-height: 1.32;
+  color: var(--text-dim);
+  overflow: hidden;
+}
+
+.card__foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-faint);
+}
+
+.card__block {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--damage);
+}
+
+/* --- Draft --- */
+
+.draft {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: color-mix(in oklab, var(--ground-deep) 92%, transparent);
+  backdrop-filter: blur(6px);
+  animation: fade-in var(--dur-mid) var(--ease-out);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.draft__head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.draft__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-right: auto;
+}
+
+.draft__body {
+  overflow-y: auto;
+  padding: 14px 18px;
+}
+
+.draft__group {
+  margin-bottom: 18px;
+}
+
+.draft__groupname {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 7px;
+}
+
+.draft__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.draft__foot {
+  display: flex;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.reward {
+  padding: 10px 12px;
+  border: 1px solid var(--chance);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--chance) 8%, transparent);
+}
+
+.reward__name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reward__text {
+  margin-top: 3px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* --- Announcement --- */
+
+.announce {
+  position: absolute;
+  top: 38%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.announce__text {
+  padding: 8px 26px;
+  border-top: 1px solid var(--self-deep);
+  border-bottom: 1px solid var(--self-deep);
+  background: color-mix(in oklab, var(--ground-deep) 70%, transparent);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: announce var(--dur-slow) var(--ease-out);
+}
+
+@keyframes announce {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+    letter-spacing: 0.5em;
+  }
+}
+
+/* --- Result --- */
+
+.result {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  text-align: center;
+  background: color-mix(in oklab, var(--ground-deep) 94%, transparent);
+}
+
+.result__headline {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.result__reason {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* --- Debug drawer --- */
+
+.debug {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 7;
+  width: 372px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-right: 1px solid var(--line);
+  background: color-mix(in oklab, var(--ground-deep) 96%, transparent);
+  animation: slide-in var(--dur-mid) var(--ease-out);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+}
+
+.debug__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.debug__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-right: auto;
+}
+
+.debug__body {
+  overflow-y: auto;
+  padding: 10px 12px 20px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.debug__section {
+  margin-bottom: 12px;
+}
+
+.debug__h {
+  color: var(--self);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 9px;
+  margin-bottom: 3px;
+}
+
+.debug__kv {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  column-gap: 8px;
+  color: var(--text-dim);
+}
+
+.debug__kv dt {
+  color: var(--text-faint);
+}
+
+.debug__kv dd {
+  margin: 0;
+}
+
+.debug__list {
+  margin: 0;
+  padding-left: 14px;
+  color: var(--text-dim);
+}
+
+.debug__log {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+  color: var(--text-dim);
+}
+
+.debug__log span {
+  display: block;
+}
+
+.debug__log b {
+  color: var(--text-faint);
+  font-weight: 400;
+}

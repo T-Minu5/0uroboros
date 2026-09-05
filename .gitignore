@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+dist/
+coverage/
+.vite/
+*.local
+
+# Cloned third-party ecosystem, tracked in its own repository.
+shokunin/
