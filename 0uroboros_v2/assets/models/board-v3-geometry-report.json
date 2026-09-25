@@ -1,0 +1,162 @@
+{
+  "componentAssemblies": 49,
+  "anchorCount": 51,
+  "glbBytes": 4767772,
+  "meshes": 9,
+  "materials": 9,
+  "nodes": 60,
+  "scene": "Ouroboros_Perimeter_V3.001",
+  "baseToPerimeterAnchorsUnchanged": true,
+  "comparedToV2": true,
+  "intentionallyChangedAnchors": [
+    {
+      "name": "local_backup_integrity",
+      "position": [
+        -4.599999904632568,
+        0.3799999952316284,
+        4.75
+      ]
+    },
+    {
+      "name": "local_primary_integrity",
+      "position": [
+        4.599999904632568,
+        0.3799999952316284,
+        4.75
+      ]
+    },
+    {
+      "name": "Node_1_local_power",
+      "position": [
+        -5.599999904632568,
+        0.46000000834465027,
+        0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_1_opponent_power",
+      "position": [
+        -5.599999904632568,
+        0.699999988079071,
+        -0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_1_probability",
+      "position": [
+        -5.599999904632568,
+        0.699999988079071,
+        3.9000000953674316
+      ]
+    },
+    {
+      "name": "Node_2_local_power",
+      "position": [
+        -2.799999952316284,
+        0.46000000834465027,
+        0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_2_opponent_power",
+      "position": [
+        -2.799999952316284,
+        0.699999988079071,
+        -0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_2_probability",
+      "position": [
+        -2.799999952316284,
+        0.699999988079071,
+        3.9000000953674316
+      ]
+    },
+    {
+      "name": "Node_3_local_power",
+      "position": [
+        0,
+        0.46000000834465027,
+        0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_3_opponent_power",
+      "position": [
+        0,
+        0.699999988079071,
+        -0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_3_probability",
+      "position": [
+        0,
+        0.699999988079071,
+        3.9000000953674316
+      ]
+    },
+    {
+      "name": "Node_4_local_power",
+      "position": [
+        2.799999952316284,
+        0.46000000834465027,
+        0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_4_opponent_power",
+      "position": [
+        2.799999952316284,
+        0.699999988079071,
+        -0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_4_probability",
+      "position": [
+        2.799999952316284,
+        0.699999988079071,
+        3.9000000953674316
+      ]
+    },
+    {
+      "name": "Node_5_local_power",
+      "position": [
+        5.599999904632568,
+        0.46000000834465027,
+        0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_5_opponent_power",
+      "position": [
+        5.599999904632568,
+        0.699999988079071,
+        -0.9800000190734863
+      ]
+    },
+    {
+      "name": "Node_5_probability",
+      "position": [
+        5.599999904632568,
+        0.699999988079071,
+        3.9000000953674316
+      ]
+    }
+  ],
+  "unchangedAnchors": 34,
+  "triangles": 78964,
+  "materialNames": [
+    "OB / cyan Data Center core",
+    "OB / graphite titanium",
+    "OB / Location smoked violet",
+    "OB / magenta inlay",
+    "OB / milled gunmetal",
+    "OB / obsidian polymer",
+    "OB / probability gold",
+    "OB / restrained red traces",
+    "OB / wine-black field glass"
+  ]
+}

@@ -1,0 +1,140 @@
+/* These instruments share the board's projected anchors; no screen-space offsets. */
+.bank-dock { position:relative; width:224px; }
+.world-anchor .duration.live-bank {
+ width:224px; height:88px; padding:0; display:grid;
+ grid-template-rows:12px 62px 10px; gap:2px; text-align:center;
+}
+.world-anchor .duration.live-bank>small,
+.world-anchor .duration.live-bank>span { margin:0; transform:none; line-height:1; }
+.world-anchor .duration.live-bank>small { font:600 8px/12px Orbitron,sans-serif; letter-spacing:.6px; }
+.world-anchor .duration.live-bank>div { height:62px; margin:0; justify-content:center; align-items:center; gap:9px; }
+.world-anchor .duration.live-bank>span { font-size:7px; color:#92adbd; }
+.world-anchor .duration.live-bank .bank-slot {
+ width:45px!important; height:60px!important; border:1px solid #7cbfc354!important;
+ background:#09151dc9!important; border-radius:3px;
+}
+.world-anchor .duration.far.live-bank .bank-slot { border-color:#d379c654!important; }
+.undo-planning {
+ position:absolute; top:calc(100% + 13px); left:0; right:0;
+ margin:auto; padding:4px 0; border:0; background:none; box-shadow:none;
+ font:500 11px/1.4 Inter,sans-serif; color:#aff3eb; text-decoration:underline;
+ text-decoration-color:#5c8e8b; text-underline-offset:4px; cursor:pointer;
+}
+.undo-planning:disabled { color:#638087; text-decoration:none; opacity:.55; cursor:default; }
+.undo-planning:hover:not(:disabled) { color:#efffff; background:none; }
+.undo-planning:focus-visible { outline:1px solid #aff3eb; outline-offset:3px; }
+.world-anchor .crypto-cache {
+ width:174px; min-height:116px; padding:9px 11px 7px; transform:none;
+ border:1px solid #35b08788; border-radius:8px;
+ background:linear-gradient(145deg,#08251fe8,#071814ed);
+ box-shadow:inset 0 0 20px #0cff8c09,0 5px 15px #0007;
+}
+.world-anchor .crypto-cache>.cache-cards { height:68px; min-height:68px; margin:6px 0; }
+.world-anchor .cache-cards .cache-card { overflow:hidden; width:49px; height:65px; left:calc(50% - 27px + var(--stack-index)*5px); }
+.world-anchor .cache-card>.card-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.world-anchor .cache-card>strong,.world-anchor .cache-card>.icon { display:none; }
+.world-anchor .cache-card>span { position:absolute; bottom:3px; right:3px; padding:2px 3px; color:#d0ffe6; background:#04291de8; font:600 10px Orbitron,sans-serif; border:1px solid #54e4a78a; border-radius:3px; }
+.world-anchor .crypto-cache>small { font-size:7px; letter-spacing:.15px; }
+/* Placement stays face up. The End Turn commit supplies the concealment beat. */
+.flying-card:not(.crypto-flight) .flying-face { animation:none; opacity:1; display:grid; }
+.flying-card:not(.crypto-flight) .flying-back { animation:none; opacity:0; }
+.world-anchor .field-card.planning-card { border-color:#9eeae0; box-shadow:0 0 7px #70ffda22; }
+.world-anchor .deployment-grid.sealed { opacity:1; }
+.world-anchor .field-card.hidden-card { animation:commit-card 340ms ease-in-out both; }
+@keyframes commit-card { 0% {transform:rotateY(-85deg)} 100% {transform:rotateY(0)} }
+.cycle-recap>span>b>small { color:#63858f; font-size:14px; margin:0 5px; }
+.source-card-text { border-top:1px solid #56708455; margin:16px 0; padding-top:13px; }
+.source-card-text>small { color:#87afa9; font-size:9px; letter-spacing:1px; }
+.source-card-text ul { padding-left:16px; font-size:12px; line-height:1.6; color:#b9cbd2; }
+.inspect { max-height:88vh; overflow:auto; }
+@media(prefers-reduced-motion:reduce) { .world-anchor .field-card.hidden-card {animation:none} }
+
+/* Current board pass: the glass tube is the health bar; the DOM strip stays accessible only. */
+.world-anchor .data-center {
+ width:188px;
+ height:30px;
+ padding:0;
+ background:none;
+ box-shadow:none;
+ overflow:visible;
+}
+.world-anchor .data-center>i {
+ position:absolute!important;
+ width:1px!important;
+ height:1px!important;
+ overflow:hidden!important;
+ clip:rect(0 0 0 0)!important;
+ clip-path:inset(50%)!important;
+ white-space:nowrap!important;
+ border:0!important;
+ padding:0!important;
+ margin:-1px!important;
+ opacity:0!important;
+}
+.world-anchor .data-center.dc-drain,
+.world-anchor .data-center.dc-restore {
+ animation:none;
+}
+.world-anchor .data-center.dc-drain .dc-readout b {
+ color:#ff607f;
+ text-shadow:0 0 8px #fa0048;
+}
+.world-anchor .data-center.dc-restore .dc-readout b {
+ color:var(--gold);
+ text-shadow:0 0 8px #ffcc12;
+}
+
+/* The lane art is cleaner now, so field cards can breathe again. */
+.world-anchor .deployment-grid,
+.world-anchor .deployment-grid.local-drop {
+ width:150px;
+ height:140px;
+ grid-template-columns:repeat(2,59px);
+ grid-template-rows:repeat(2,66px);
+ gap:5px 9px;
+}
+.world-anchor .field-card {
+ width:59px;
+ height:66px;
+ grid-template-rows:50px 14px;
+ box-shadow:0 2px 0 #8c8496,0 4px 0 #10111b,0 8px 10px #000c;
+}
+.world-anchor .field-card>.card-art,
+.world-anchor .field-card>.missing-art {
+ width:57px;
+ height:50px;
+}
+.world-anchor .field-card.hidden-card>img {
+ width:57px;
+ height:64px;
+}
+.world-anchor .field-card>b {
+ min-width:18px;
+ height:19px;
+ font-size:11px;
+ top:-4px;
+ right:-5px;
+}
+.world-anchor .field-card>span {
+ font-size:6px;
+ padding:2px 2px 0;
+}
+
+.world-anchor .power-badge.winning b,
+.board-canvas .power-badge.winning b {
+ color:#e9fbff;
+ filter:none;
+ text-shadow:0 2px 2px #02030a,0 0 8px currentColor,0 0 18px currentColor;
+}
+.world-anchor .power-badge.local.winning b,
+.board-canvas .power-badge.local.winning b {
+ color:#58f7ff;
+}
+.world-anchor .power-badge.opponent.winning b,
+.board-canvas .power-badge.opponent.winning b {
+ color:#ff3d82;
+}
+.world-anchor .power-badge.local.winning,
+.world-anchor .power-badge.opponent.winning {
+ filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 18px currentColor);
+}

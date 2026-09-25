@@ -1,0 +1,82 @@
+{
+  "errors": [],
+  "checks": [
+    "Idle has no drop highlights",
+    "Dragged card follows pointer delta without lag or re-centering",
+    "Card lifts cleanly out of the hand",
+    "Exactly one Location illuminates on lane hover",
+    "Full lane edge selects its Location",
+    "Hover light transfers without leaving other lanes lit",
+    "Closed lane does not advertise a valid drop",
+    "Immediate re-grab replaces the returning preview with one visible card",
+    "Invalid drop returns the card and preserves the hand",
+    "Invalid drag does not open card inspect",
+    "Escape cancels a drag without deploying or inspecting",
+    "Test release is below the compact card placement grid",
+    "Release flight starts at the dragged card",
+    "Full-lane drop deploys exactly one card into its placement grid",
+    "Successful drag does not open inspect",
+    "Click inspect still works after dragging",
+    "Layout keeps percentages, scores, hand and instruments clear at 1600",
+    "Layout keeps percentages, scores, hand and instruments clear at 1366",
+    "Resolved leading lanes illuminate",
+    "Dragging temporarily shows only the hovered lane even when other lanes lead",
+    "Leading-lane lighting returns when the drag ends"
+  ],
+  "viewports": [
+    {
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "layout": {
+        "walletAligned": true,
+        "weightsClear": true,
+        "handGap": 54.79412841796875,
+        "scoreGaps": [
+          3.277557373046875,
+          4.27978515625,
+          4.27978515625,
+          3.277557373046875,
+          3.277557373046875
+        ],
+        "farDurationTop": 71.85260009765625,
+        "headerBottom": 66
+      }
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "layout": {
+        "walletAligned": true,
+        "weightsClear": true,
+        "handGap": 44.5078125,
+        "scoreGaps": [
+          2.91253662109375,
+          3.80316162109375,
+          3.80316162109375,
+          2.91253662109375,
+          2.91253662109375
+        ],
+        "farDurationTop": 68.65934753417969,
+        "headerBottom": 66
+      }
+    }
+  ],
+  "winnerLanes": [
+    {
+      "side": "opponent",
+      "cards": 2
+    },
+    {
+      "side": "opponent",
+      "cards": 1
+    },
+    {
+      "side": "opponent",
+      "cards": 1
+    }
+  ]
+}

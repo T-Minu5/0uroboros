@@ -1,0 +1,1622 @@
+{
+  "cardCount": 106,
+  "cards": [
+    {
+      "id": "atomic-unit",
+      "name": "Atomic Unit",
+      "cost": 2,
+      "types": [
+        "action"
+      ],
+      "description": "Stored for 5 turns. Gain 1 action each turn.",
+      "effects": [
+        "+1 Action for the next 5 turns"
+      ],
+      "artwork": "/assets/card_art/base cards/action/atomic-unit.png",
+      "video": [
+        "public/assets/cards/action/atomic-unit.mp4"
+      ]
+    },
+    {
+      "id": "atomic-mass",
+      "name": "Atomic Mass",
+      "cost": 3,
+      "types": [
+        "action"
+      ],
+      "description": "Stored for 3 turns. Draw 1 card each turn.",
+      "effects": [
+        "+1 Card for the next 3 turns"
+      ],
+      "artwork": "/assets/card_art/base cards/action/atomic-mass.png",
+      "video": [
+        "public/assets/cards/action/atomic-mass.mp4"
+      ]
+    },
+    {
+      "id": "thorn-shadow",
+      "name": "Thorn Shadow",
+      "cost": 3,
+      "types": [
+        "action"
+      ],
+      "description": "+2 actions, +1 crypto now. +1 action +1 crypto on your next turn.",
+      "effects": [
+        "+2 Actions,+1 Crypto on 1st turn",
+        "+1 Action,+1 Crypto on 2nd turn"
+      ],
+      "artwork": "/assets/card_art/base cards/action/thorn-shadow.png",
+      "video": [
+        "public/assets/cards/action/thorn-shadow.mp4"
+      ]
+    },
+    {
+      "id": "dash-dot",
+      "name": "Dash-Dot",
+      "cost": 3,
+      "types": [
+        "action"
+      ],
+      "description": "+1 card and +2 actions.",
+      "effects": [
+        "+2 Actions",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/base cards/action/dash-dot.png",
+      "video": [
+        "public/assets/cards/action/dash-dot.mp4"
+      ]
+    },
+    {
+      "id": "slash-dot",
+      "name": "Slash-Dot",
+      "cost": 4,
+      "types": [
+        "action"
+      ],
+      "description": "+3 cards.",
+      "effects": [
+        "+3 Cards"
+      ],
+      "artwork": "/assets/card_art/base cards/action/slash-dot.png",
+      "video": [
+        "public/assets/cards/action/slash-dot.mp4"
+      ]
+    },
+    {
+      "id": "the-inbetweener",
+      "name": "The Inbetweener",
+      "cost": 4,
+      "types": [
+        "action"
+      ],
+      "description": "Randomized. 2 cards or 2 actions, plus 1 draft & 1 crypto",
+      "effects": [
+        "+2 Actions  OR   +2 Cards",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/the-inbetweener.png",
+      "video": [
+        "public/assets/cards/action/the-inbetweener.mp4"
+      ]
+    },
+    {
+      "id": "wave-card",
+      "name": "Wave Card",
+      "cost": 0,
+      "types": [
+        "action"
+      ],
+      "description": "Gain 2 actions.",
+      "effects": [
+        "+2 Actions",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/wave-form.png"
+    },
+    {
+      "id": "particle-card",
+      "name": "Particle Card",
+      "cost": 0,
+      "types": [
+        "action"
+      ],
+      "description": "Draw 2 cards.",
+      "effects": [
+        "+2 Cards",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/particle-form.png"
+    },
+    {
+      "id": "dotkrawler",
+      "name": "Dotkrawler",
+      "cost": 4,
+      "types": [
+        "action"
+      ],
+      "description": "+1 card, +1 draft, +2 actions.",
+      "effects": [
+        "+2 Actions",
+        "+1 Card",
+        "+1 Draft"
+      ],
+      "artwork": "/assets/card_art/base cards/action/dotkrawler.png",
+      "video": [
+        "public/assets/cards/action/dotkrawler.mp4"
+      ]
+    },
+    {
+      "id": "quantum-telementry",
+      "name": "Quantum Telemetry",
+      "cost": 5,
+      "types": [
+        "action"
+      ],
+      "description": "+2 actions, +1 draft, +2 crypto.",
+      "effects": [
+        "+2 Actions",
+        "+1 Draft",
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/quantum-telementry.png",
+      "video": [
+        "public/assets/cards/action/quantum-telementry.mp4"
+      ]
+    },
+    {
+      "id": "byte-drone",
+      "name": "Byte Drone",
+      "cost": 5,
+      "types": [
+        "action"
+      ],
+      "description": "Duration card +2 crypto for next 3 turns.",
+      "effects": [
+        "+2 Crypto for the next 3 turns"
+      ],
+      "artwork": "/assets/card_art/base cards/action/byte-drone.png",
+      "video": [
+        "public/assets/cards/action/byte-drone.mp4"
+      ]
+    },
+    {
+      "id": "recursive-seance",
+      "name": "Recursive Seance",
+      "cost": 5,
+      "types": [
+        "action"
+      ],
+      "description": "Duration card - +1 crypto for 6 turns.",
+      "effects": [
+        "+1 Crypto for the next 6 turns"
+      ],
+      "artwork": "/assets/card_art/base cards/action/recursive-seance.png"
+    },
+    {
+      "id": "cowl-obscyra",
+      "name": "Cowl Obscyra",
+      "cost": 5,
+      "types": [
+        "action"
+      ],
+      "description": "+2 actions, +1 card",
+      "effects": [
+        "+1 Action",
+        "+2 Cards"
+      ],
+      "artwork": "/assets/card_art/base cards/action/cowl-obscyra.png",
+      "video": [
+        "public/assets/cards/action/cowl-obscyra.mp4"
+      ]
+    },
+    {
+      "id": "infernal-kernel",
+      "name": "Infernal Kernel",
+      "cost": 6,
+      "types": [
+        "action"
+      ],
+      "description": "+1 action, +1 card, +1 draft, +1 crypto.",
+      "effects": [
+        "+1 Action",
+        "+1 Card",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/infernal-kernel.png"
+    },
+    {
+      "id": "the-tesseract-magi",
+      "name": "The Tesseract Magi",
+      "cost": 6,
+      "types": [
+        "action"
+      ],
+      "description": "Duration card +1 card for next 6 turns.",
+      "effects": [
+        "+1 Card for the next 6 turns"
+      ],
+      "artwork": "/assets/card_art/base cards/action/the-tesseract-magi.png"
+    },
+    {
+      "id": "root-rune",
+      "name": "Root Rune",
+      "cost": 7,
+      "types": [
+        "action"
+      ],
+      "description": "+2 actions, +3 cards.",
+      "effects": [
+        "+2 Actions",
+        "+3 Cards"
+      ],
+      "artwork": "/assets/card_art/base cards/action/root-rune.png",
+      "video": [
+        "public/assets/cards/action/root-rune.mp4"
+      ]
+    },
+    {
+      "id": "astra-ascii",
+      "name": "Astra Ascii",
+      "cost": 9,
+      "types": [
+        "action"
+      ],
+      "description": "+2 actions, +1 card, +1 draft, +2 crypto.",
+      "effects": [
+        "+2 Actions",
+        "+1 Card",
+        "+1 Draft",
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/astra-ascii.png",
+      "video": [
+        "public/assets/cards/action/astra-ascii.mp4"
+      ]
+    },
+    {
+      "id": "shiva-of-cern",
+      "name": "The Shiva of CERN",
+      "cost": 10,
+      "types": [
+        "action"
+      ],
+      "description": "+1 action, +4 cards, +2 crypto.",
+      "effects": [
+        "+1 Action",
+        "+4 Cards",
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/action/shiva-of-cern.png",
+      "video": [
+        "public/assets/cards/action/shiva-of-cern.mp4"
+      ]
+    },
+    {
+      "id": "nyx-luna",
+      "name": "Nyx Luna",
+      "cost": 2,
+      "types": [
+        "attack"
+      ],
+      "description": "Slip through the night and strike opponent's backup data center.",
+      "effects": [
+        "Drain -75 from your opponent's Backup Data Center",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/nyx-luna.png",
+      "video": [
+        "public/assets/cards/attack/nyx-luna.mp4"
+      ]
+    },
+    {
+      "id": "rezz-razor",
+      "name": "Rezz Razor",
+      "cost": 3,
+      "types": [
+        "attack"
+      ],
+      "description": "Exploit a vulnerability in the opponent's data center.",
+      "effects": [
+        "Drain -75",
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/rezz-razor.png"
+    },
+    {
+      "id": "rezz-blade",
+      "name": "Rezz Blade",
+      "cost": 4,
+      "types": [
+        "attack"
+      ],
+      "description": "Advanced exploit that drains power and generates resources.",
+      "effects": [
+        "Drain -100",
+        "+2 Actions",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/rezz-blade.png"
+    },
+    {
+      "id": "invocation-of-the-sword",
+      "name": "Invocation of the Sword",
+      "cost": 4,
+      "types": [
+        "attack"
+      ],
+      "description": "Force your opponent to discard 2 cards.",
+      "effects": [
+        "Opponent must discard 2 cards",
+        "Drain -100"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png",
+      "video": [
+        "public/assets/cards/attack/invocation-of-the-sword.mp4"
+      ]
+    },
+    {
+      "id": "bushido-io",
+      "name": "Bushido.io",
+      "cost": 4,
+      "types": [
+        "attack"
+      ],
+      "description": "Drain -100 when played and -75 for the next 3 turns, and gain +2 crypto on duration end.",
+      "effects": [
+        "Drain -100 when played, -75 for the next 3 turns. Gain +2 Crypto on 4th turn"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/bushido-io.png",
+      "video": [
+        "public/assets/cards/attack/bushido-io.mp4"
+      ]
+    },
+    {
+      "id": "bloodlet-drone",
+      "name": "Bloodlet Drone",
+      "cost": 4,
+      "types": [
+        "attack"
+      ],
+      "description": "Slowly leech -100 power from your opponent's Data Center for 8 turns.",
+      "effects": [
+        "Drain -100 for the next 8 turns"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/bloodlet-drone.png"
+    },
+    {
+      "id": "h3x1-d3x1",
+      "name": "H3x1-D3x1",
+      "cost": 5,
+      "types": [
+        "attack"
+      ],
+      "description": "Force a critical system failure in the opponent's infrastructure.",
+      "effects": [
+        "Drain -250 from your opponent"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/h3x1-d3x1.PNG",
+      "video": [
+        "public/assets/cards/attack/h3x1-d3x1.mp4",
+        "public/assets/cards/attack/h3x1-d3x1_1.mp4"
+      ]
+    },
+    {
+      "id": "1337_speaker",
+      "name": "1337 Speaker",
+      "cost": 5,
+      "types": [
+        "attack"
+      ],
+      "description": "Leet speak the opponent's backup data center.",
+      "effects": [
+        "Drain -200 from your opponent's Backup Data Center",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/1337-speaker.png"
+    },
+    {
+      "id": "glitch-witch",
+      "name": "Glitch-Witch.exe",
+      "cost": 6,
+      "types": [
+        "attack"
+      ],
+      "description": "+1 card, +1 action. Throws a glitch (-1VP) in your opponent's system. Only 12 glitches available per game. Draws an additional card once limit is reached.",
+      "effects": [
+        "Add a Glitch card (-1vp) to your opponent's discard pile",
+        "+1 Card",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/glitch-witch.png",
+      "video": [
+        "public/assets/cards/attack/glitch-witch.mp4"
+      ]
+    },
+    {
+      "id": "qubit-kid",
+      "name": "The Qubit Kid",
+      "cost": 5,
+      "types": [
+        "attack"
+      ],
+      "description": "Remove a script from your opponent's next Runtime phase.",
+      "effects": [
+        "Choose a card from your opponent's hand to discard"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/qubit-kid.png",
+      "video": [
+        "public/assets/cards/attack/qubit-kid.mp4"
+      ]
+    },
+    {
+      "id": "chrome-mitchell",
+      "name": "Chrome Mitchell",
+      "cost": 7,
+      "types": [
+        "attack"
+      ],
+      "description": "Exploit quantum vulnerabilities in the opponent's infrastructure and drain 200 power from both data centers.",
+      "effects": [
+        "Drain -200 from both of your opponent's Data Centers"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
+      "video": [
+        "public/assets/cards/attack/chrome-mitchell.mp4"
+      ]
+    },
+    {
+      "id": "mary-mallon",
+      "name": "Mary Mallon",
+      "cost": 8,
+      "types": [
+        "attack"
+      ],
+      "description": "Mary evolves each time she's played. Dealing exponential damage. Draining from -75 upto -600 power",
+      "effects": [
+        "Mary deals exponential damage each time she's played. Draining from -75 up to -600 power"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/mary-mallon.png",
+      "video": [
+        "public/assets/cards/attack/mary-mallon.mp4"
+      ]
+    },
+    {
+      "id": "maryMalice",
+      "name": "Mary Malice",
+      "cost": 0,
+      "types": [
+        "attack"
+      ],
+      "description": "Mary is changing. Do you see?",
+      "effects": [
+        "Drain -150",
+        "Mary is changing. Do you see?"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/mary-malice.png"
+    },
+    {
+      "id": "maryMalware",
+      "name": "Mary Malware",
+      "cost": 0,
+      "types": [
+        "attack"
+      ],
+      "description": "Mary is becoming. Do you see?",
+      "effects": [
+        "Drain -300",
+        "Mary is becoming. Do you see?"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/mary-malware.png"
+    },
+    {
+      "id": "typhoidMary",
+      "name": "Typhoid Mary",
+      "cost": 0,
+      "types": [
+        "attack"
+      ],
+      "description": "Mary is reborn. Do you see?",
+      "effects": [
+        "Drain -600",
+        "Mary is reborn. Do you see?"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/typhoid-mary.png"
+    },
+    {
+      "id": "delta-wave",
+      "name": "∆-Wave",
+      "cost": 9,
+      "types": [
+        "attack"
+      ],
+      "description": "An electromagnetic pulse that severely damages opponent's data centers.",
+      "effects": [
+        "Drain -300 from both of your opponent's Data Centers"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/delta-wave.png",
+      "video": [
+        "public/assets/cards/attack/delta-wave.mp4"
+      ]
+    },
+    {
+      "id": "system-seppuku",
+      "name": "System Seppuku",
+      "cost": 23,
+      "types": [
+        "attack"
+      ],
+      "description": "Destroy your backup data center and rob your enemy of claiming its points",
+      "effects": [
+        "Destroy your own backup data center and deny your enemy of claiming its points"
+      ],
+      "artwork": "/assets/card_art/chaos cards/attack/system-seppuku.png",
+      "video": [
+        "public/assets/cards/attack/system-seppuku.mp4"
+      ]
+    },
+    {
+      "id": "sudo-demiurge",
+      "name": "Sudo Demiurge",
+      "cost": 5,
+      "types": [
+        "power"
+      ],
+      "description": "Force a critical system failure in the opponent's infrastructure.",
+      "effects": [
+        "Opponent discards the top card from their deck",
+        "Drain -175",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/sudo-demiurge.png"
+    },
+    {
+      "id": "cicada-3301",
+      "name": "Cicada 3301",
+      "cost": 6,
+      "types": [
+        "power"
+      ],
+      "description": "Drain -100, +300 Power to your data center, opponent discards 2 from deck.",
+      "effects": [
+        "Opponent discards top 2 cards",
+        "Drain -100",
+        "+300 Power"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/cicada-3301.png",
+      "video": [
+        "public/assets/cards/power/cicada-3301.mp4"
+      ]
+    },
+    {
+      "id": "skinwalker",
+      "name": "Skinwalker",
+      "cost": 6,
+      "types": [
+        "power"
+      ],
+      "description": "Randomly morphs into one of 5 animal forms.",
+      "effects": [
+        "Morphs into a powerful form, draining between 75-300 power from your opponent."
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/skinwalker.png",
+      "video": [
+        "public/assets/cards/power/skinwalker.mp4"
+      ]
+    },
+    {
+      "id": "leviathan-form",
+      "name": "Leviathan Form",
+      "cost": 0,
+      "types": [
+        "power"
+      ],
+      "description": "Drain -300 power from opponent.",
+      "effects": [
+        "Drain -300"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/leviathan-form.png"
+    },
+    {
+      "id": "spider-form",
+      "name": "Spider Form",
+      "cost": 0,
+      "types": [
+        "power"
+      ],
+      "description": "+2 Cards, +1 Action, Drain -100.",
+      "effects": [
+        "Drain -100",
+        "+1 Action",
+        "+2 Cards"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/spider-form.png"
+    },
+    {
+      "id": "wasp-form",
+      "name": "Wasp Form",
+      "cost": 0,
+      "types": [
+        "power"
+      ],
+      "description": "+2 Actions, +1 Card, Drain -75.",
+      "effects": [
+        "Drain -75",
+        "+2 Actions",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/wasp-form.png"
+    },
+    {
+      "id": "viper-form",
+      "name": "Viper Form",
+      "cost": 0,
+      "types": [
+        "power"
+      ],
+      "description": "+1 Card, +1 Action, Drain -150.",
+      "effects": [
+        "Drain -150",
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/viper-form.png"
+    },
+    {
+      "id": "wolf-form",
+      "name": "Wolf Form",
+      "cost": 0,
+      "types": [
+        "power"
+      ],
+      "description": "+1 Crypto, +1 Draft, Drain -200.",
+      "effects": [
+        "Drain -200",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/wolf-form.png"
+    },
+    {
+      "id": "subroutine_succubus",
+      "name": "Subroutine Succubus",
+      "cost": 6,
+      "types": [
+        "power"
+      ],
+      "description": "+150 Power, Drain -150, +2 Crypto, opponent discards 1 from deck.",
+      "effects": [
+        "Opponent discards 1 from deck",
+        "Drain -150",
+        "+150 Power",
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/subroutine-succubus.png",
+      "video": [
+        "public/assets/cards/power/subroutine_succubus.mp4"
+      ]
+    },
+    {
+      "id": "iterative-incubus",
+      "name": "Iterative Incubus",
+      "cost": 7,
+      "types": [
+        "power"
+      ],
+      "description": "Duration card - Drain -150, +150 Power, +1 Action, +1 Crypto for 4 turns.",
+      "effects": [
+        "Drain -150, +150 Power, +1 Action, +1 Crypto for the next 4 turns"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/iterative-incubus.png",
+      "video": [
+        "public/assets/cards/power/iterative-incubus.mp4"
+      ]
+    },
+    {
+      "id": "node-feratu",
+      "name": "Node Feratu",
+      "cost": 7,
+      "types": [
+        "power"
+      ],
+      "description": "Drain -225, +225 Power, +1 Action.",
+      "effects": [
+        "Drain -225",
+        "+225 Power",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/node-feratu.png",
+      "video": [
+        "public/assets/cards/power/node-feratu.mp4"
+      ]
+    },
+    {
+      "id": "the-azimuthal-kill",
+      "name": "The Azimuthal Kill",
+      "cost": 8,
+      "types": [
+        "power"
+      ],
+      "description": "Drain -200 now, -25 for 4 turns, -450 from backup on 5th turn.",
+      "effects": [
+        "Drain -200 when played,-25 for next 4 turns, and drain -450 from Backup on the 5th turn"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/the-azimuthal-kill.png",
+      "video": [
+        "public/assets/cards/power/the-azimuthal-kill.mp4"
+      ]
+    },
+    {
+      "id": "tihkal-hound",
+      "name": "Tihkal Hound",
+      "cost": 9,
+      "types": [
+        "power"
+      ],
+      "description": "Drain -300 now, -150 for 3 turns, +3 Crypto on 3rd turn.",
+      "effects": [
+        "Drain -300 when played, -150 for next 3 turns, and +3 Crypto on 3rd turn."
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/tihkal-hound.png",
+      "video": [
+        "public/assets/cards/power/tihkal-hound.mp4"
+      ]
+    },
+    {
+      "id": "veil-of-cthulhu",
+      "name": "Veil of Cthulhu",
+      "cost": 12,
+      "types": [
+        "power"
+      ],
+      "description": "Opponent discards top 2 cards, Drain -600, +300 Power",
+      "effects": [
+        "Opponent discards top 2 cards",
+        "Drain -600",
+        "+300 Power"
+      ],
+      "artwork": "/assets/card_art/chaos cards/hackers/veil-of-cthulhu.png",
+      "video": [
+        "public/assets/cards/power/veil-of-cthulhu.mp4",
+        "public/assets/cards/power/veil-of-cthulhu3.mp4"
+      ]
+    },
+    {
+      "id": "night-scythe",
+      "name": "Night Scythe",
+      "cost": 2,
+      "types": [
+        "utility"
+      ],
+      "description": "Trim runtime code for stronger routines. Trash 1 card from your hand.",
+      "effects": [
+        "Trash 1 card from your hand"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/night-scythe.png"
+    },
+    {
+      "id": "superpositioning",
+      "name": "Superpositioning",
+      "cost": 2,
+      "types": [
+        "utility"
+      ],
+      "description": "You may discard 3 cards from your hand. If you do, draw 3 cards.",
+      "effects": [
+        "You may discard 3 cards from your hand. If you do, draw 3 cards",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/superpositioning.png"
+    },
+    {
+      "id": "summon-the-acolytes",
+      "name": "Summon the Acolytes",
+      "cost": 3,
+      "types": [
+        "utility"
+      ],
+      "description": "Draw 4 cards, discard 3 cards.",
+      "effects": [
+        "Draw 4 cards, then discard any 3 cards from your hand"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/summon-the-acolytes.png",
+      "video": [
+        "public/assets/cards/utility/summon-the-acolytes.mp4"
+      ]
+    },
+    {
+      "id": "temporal-rift",
+      "name": "Temporal Rift",
+      "cost": 3,
+      "types": [
+        "utility"
+      ],
+      "description": "Goes into storage. Draw 4 cards on the start of your 4th turn.",
+      "effects": [
+        "Goes into storage. Draw 4 cards at the start of your 4th turn."
+      ],
+      "artwork": "/assets/card_art/base cards/utility/temporal-rift.png"
+    },
+    {
+      "id": "ghost-key",
+      "name": "Ghost Key",
+      "cost": 4,
+      "types": [
+        "utility"
+      ],
+      "description": "Trim runtime code for stronger routines. Gain 1 crypto and 1 draft. Trash 1 card from your hand.",
+      "effects": [
+        "Trash 1 Card from your hand",
+        "+1 Draft",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/ghost-key.png",
+      "video": [
+        "public/assets/cards/utility/ghost-key.mp4"
+      ]
+    },
+    {
+      "id": "banishing-ritual",
+      "name": "Banishing Ritual",
+      "cost": 4,
+      "types": [
+        "utility"
+      ],
+      "description": "Trim your incoming runtime code. Look at the top 5 cards of your deck. You may discard any of them.",
+      "effects": [
+        "Look at the top 5 cards of your deck. You may discard any of them",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/banishing-ritual.png",
+      "video": [
+        "public/assets/cards/utility/banishing-ritual.mp4"
+      ]
+    },
+    {
+      "id": "opulent-void",
+      "name": "Opulent Void",
+      "cost": 4,
+      "types": [
+        "utility"
+      ],
+      "description": "Purify the runtime by offloading obsolete code for stronger routines.",
+      "effects": [
+        "Trash up to 3 cards from your hand (choose 1-3)"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/opulent-void.png",
+      "video": [
+        "public/assets/cards/utility/opulent-void.mp4"
+      ]
+    },
+    {
+      "id": "sacrifical-sigil",
+      "name": "Sacrifical Sigil",
+      "cost": 4,
+      "types": [
+        "utility"
+      ],
+      "description": "You may discard 2 cards from your hand. If you do, gain 3 crypto and 1 buy.",
+      "effects": [
+        "You may discard 2 cards from your hand. If you do, +3 Crypto and +1 Draft"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/sacrifical-sigil.png"
+    },
+    {
+      "id": "heisenberg-hag",
+      "name": "The Heisenberg Hag",
+      "cost": 4,
+      "types": [
+        "utility"
+      ],
+      "description": "Insert a Schrödinger's Cat Box into your deck.",
+      "effects": [
+        "Gain a Schrödinger's Box with either a dead cat in it, or a live cat with a unquie effect",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/the-heisenberg-hag.png",
+      "video": [
+        "public/assets/cards/utility/heisenberg-hag.mp4",
+        "public/assets/cards/utility/the-heisenberg-hag.mp4"
+      ]
+    },
+    {
+      "id": "byte-heist",
+      "name": "Byte Heist",
+      "cost": 5,
+      "types": [
+        "utility"
+      ],
+      "description": "Pocket a Byte-coin and yield both tactical advantage and lasting prosperity.",
+      "effects": [
+        "Add a Byte Coin to the top of your deck",
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/byte-heist.png",
+      "video": [
+        "public/assets/cards/utility/byte-heist.mp4"
+      ]
+    },
+    {
+      "id": "cyptoAlchemist",
+      "name": "Cypto Alchemist",
+      "cost": 5,
+      "types": [
+        "utility",
+        "morph"
+      ],
+      "description": "when played it moprhs into +1,+2,+3 or +5 Crypto. Resets every turn",
+      "effects": [
+        "Moprhs into +1, +2, +3 or +5 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/crypto-alchemist.png"
+    },
+    {
+      "id": "code-sniper",
+      "name": "Code Sniper",
+      "cost": 6,
+      "types": [
+        "utility"
+      ],
+      "description": "Choose one:",
+      "effects": [
+        "Choose one: +2 Actions, +2 Cards, or +2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/code-sniper.png",
+      "video": [
+        "public/assets/cards/utility/code-sniper.mp4",
+        "public/assets/cards/utility/code-sniper2.mp4",
+        "public/assets/cards/utility/code-sniper_1.mp4"
+      ]
+    },
+    {
+      "id": "kilo-cycle",
+      "name": "Kilo Cycle",
+      "cost": 7,
+      "types": [
+        "utility"
+      ],
+      "description": "Goes into storage. Gain 1 Kilo Coin on the end of your 3rd turn",
+      "effects": [
+        "Goes into storage. Add a Kilo-Coin to the top of your deck after your 3rd turn"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/kilo-cycle.png",
+      "video": [
+        "public/assets/cards/utility/kilo-cycle.mp4"
+      ]
+    },
+    {
+      "id": "entropic-infantry",
+      "name": "Entropic Infantry",
+      "cost": 8,
+      "types": [
+        "utility",
+        "morph"
+      ],
+      "description": "Cycles between team Alpha, Bravo, and Charlie. Each team presents a unique effect.",
+      "effects": [
+        "Cycles between team Alpha, Bravo, and Charlie. Each team offers a choice-based effect"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/entropic-infantry.png"
+    },
+    {
+      "id": "chronos-cache",
+      "name": "Chronos Cache",
+      "cost": 9,
+      "types": [
+        "utility"
+      ],
+      "description": "Goes into storage. Gain 1 Mega Cache on the top of your deck, after your 3rd turn.",
+      "effects": [
+        "Goes into storage. Add a Mega-Cache to the top of your deck, after your 3rd turn"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/chronos-cache.png",
+      "video": [
+        "public/assets/cards/utility/chronos-cache.mp4"
+      ]
+    },
+    {
+      "id": "merchant-of-chaos",
+      "name": "Merchant of Chaos",
+      "cost": 12,
+      "types": [
+        "utility"
+      ],
+      "description": "When played, add a random Widget (1VP) to your deck. Each Widget has a unique effect",
+      "effects": [
+        "Add a random Widget (1VP) to the bottom of your deck. Each Widget has a unique effect"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/merchant-of-chaos.png"
+    },
+    {
+      "id": "alchemic-shyte",
+      "name": "Alchemic Shyte",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Gain 1 crypto.",
+      "effects": [
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/alchemic-shyte.png"
+    },
+    {
+      "id": "alchemic-byte",
+      "name": "Alchemic Byte",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Gain 2 crypto.",
+      "effects": [
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/alchemic-byte.png"
+    },
+    {
+      "id": "alchemic-kilo",
+      "name": "Alchemic Kilo",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Gain 3 crypto.",
+      "effects": [
+        "+3 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/alchemic-kilo.png"
+    },
+    {
+      "id": "alchemic-mega",
+      "name": "Alchemic Mega",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Gain 5 crypto.",
+      "effects": [
+        "+5 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/alchemic-mega.png"
+    },
+    {
+      "id": "alphaTeam",
+      "name": "Alpha Team",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Choose one: ",
+      "effects": [
+        "Choose: +2 Actions & +1 Card or +1 Draft & +2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/alpha-team.png"
+    },
+    {
+      "id": "bravoTeam",
+      "name": "Bravo Team",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Choose one:",
+      "effects": [
+        "Choose: +1 Action & +2 Cards or +3 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/bravo-team.png"
+    },
+    {
+      "id": "charlieTeam",
+      "name": "Charlie Team",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Choose one:",
+      "effects": [
+        "Choose: +3 Cards or Drain -150"
+      ],
+      "artwork": "/assets/card_art/base cards/utility/charlie-team.png"
+    },
+    {
+      "id": "shyte-coin",
+      "name": "Shyte-Coin",
+      "cost": 0,
+      "types": [
+        "crypto"
+      ],
+      "description": "Basic crypto unit used for data acquisition.",
+      "effects": [
+        "+1 crypto"
+      ],
+      "artwork": "/assets/card_art/crypto/shyte-coin.png"
+    },
+    {
+      "id": "byte-coin",
+      "name": "Byte-Coin",
+      "cost": 3,
+      "types": [
+        "crypto"
+      ],
+      "description": "Enhanced crypto unit with double processing power.",
+      "effects": [
+        "+2 crypto"
+      ],
+      "artwork": "/assets/card_art/crypto/byte-coin.png"
+    },
+    {
+      "id": "kilo-coin",
+      "name": "Kilo-Coin",
+      "cost": 6,
+      "types": [
+        "crypto"
+      ],
+      "description": "Advanced crypto with triple processing capacity.",
+      "effects": [
+        "+3 crypto"
+      ],
+      "artwork": "/assets/card_art/crypto/kilo-coin.png"
+    },
+    {
+      "id": "mega-cache",
+      "name": "Mega-Cache",
+      "cost": 9,
+      "types": [
+        "crypto"
+      ],
+      "description": "Premium crypto with exceptional computational power.",
+      "effects": [
+        "+5 crypto"
+      ],
+      "artwork": "/assets/card_art/crypto/mega-cache.png"
+    },
+    {
+      "id": "basic-encryption",
+      "name": "Basic Encryption",
+      "cost": 2,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Basic encryption. When played, it restores +50 power.",
+      "effects": [
+        "1vp",
+        "+50 Power"
+      ],
+      "artwork": "/assets/card_art/volume/1vp.png"
+    },
+    {
+      "id": "vault-encryption",
+      "name": "Vault Encryption",
+      "cost": 3,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Secure military-grade encryption. When played, it restores +100 power.",
+      "effects": [
+        "2vp",
+        "+100 Power"
+      ],
+      "artwork": "/assets/card_art/volume/2vp-b.png"
+    },
+    {
+      "id": "quantum-archive",
+      "name": "Quantum Archive",
+      "cost": 5,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Stores data across multiple quantum states. When played, it restores +150 power.",
+      "effects": [
+        "3vp",
+        "+150 Power"
+      ],
+      "artwork": "/assets/card_art/volume/3vp.png"
+    },
+    {
+      "id": "bios-archive",
+      "name": "BIOS Archive",
+      "cost": 6,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Bio storage integration. In storage, it restores +75 power per turn.",
+      "effects": [
+        "4vp",
+        "+75 Power per turn",
+        "Permanent storage"
+      ],
+      "artwork": "/assets/card_art/volume/4vp.png"
+    },
+    {
+      "id": "esoteric-encryption",
+      "name": "Esoteric Encryption",
+      "cost": 8,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Spellbound encryption. When played, it restores +150 power.",
+      "effects": [
+        "6vp",
+        "+150 Power"
+      ],
+      "artwork": "/assets/card_art/volume/6vp-b.png"
+    },
+    {
+      "id": "neural-wetware",
+      "name": "Neural Wetware",
+      "cost": 8,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "A storage matrix integrated into your brain. In storage, it restores +75 power per turn.",
+      "effects": [
+        "6vp",
+        "+75 Power per turn",
+        "Permanent storage"
+      ],
+      "artwork": "/assets/card_art/volume/6vp.png"
+    },
+    {
+      "id": "zenith-worx",
+      "name": "Zenith Worx",
+      "cost": 11,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Quantum entangled storage. When played, it restores +300 power.",
+      "effects": [
+        "8vp",
+        "+300 Power"
+      ],
+      "artwork": "/assets/card_art/volume/10vp.png"
+    },
+    {
+      "id": "zenith-wetware",
+      "name": "Zenith Wetware",
+      "cost": 11,
+      "types": [
+        "encryptedVolume"
+      ],
+      "description": "Quantum entangled cellular storage. In storage, it restores +100 power per turn.",
+      "effects": [
+        "8vp",
+        "+100 Power per turn",
+        "Permanent storage"
+      ],
+      "artwork": "/assets/card_art/volume/10vp-b.png"
+    },
+    {
+      "id": "schrodinger-box",
+      "name": "Schrödinger's Cat Box",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "There is a cat in the box, is it alive, or dead?",
+      "effects": [
+        "what's in the box?"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/schrodinger-box.png"
+    },
+    {
+      "id": "cat-attack",
+      "name": "Cat Attack",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A cat attack",
+      "effects": [
+        "Drain -150"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/cat-attack.png"
+    },
+    {
+      "id": "big-cat",
+      "name": "Big Cat",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A big cat",
+      "effects": [
+        "+1 Action",
+        "+1 Card",
+        "+1 Crypto",
+        "+100 Power"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/big-cat.png"
+    },
+    {
+      "id": "mad-cat",
+      "name": "Mad Cat",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A mad cat",
+      "effects": [
+        "+1 Action",
+        "+2 Cards"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/mad-cat.png"
+    },
+    {
+      "id": "cat-pounce",
+      "name": "Cat Pounce",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A cat pounce",
+      "effects": [
+        "+1 Action",
+        "Drain -50"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/cat-pounce.png"
+    },
+    {
+      "id": "cat-run",
+      "name": "Cat Run",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A cat run",
+      "effects": [
+        "+1 Draft",
+        "+2 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/cat-run.png"
+    },
+    {
+      "id": "cat-hack",
+      "name": "Cat Hack",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "A cat hack",
+      "effects": [
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/cat-hack.png"
+    },
+    {
+      "id": "dead-cat-01",
+      "name": "Dead Cat 01",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "It's a dead cat",
+      "effects": [
+        "I'm dead"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-01.png"
+    },
+    {
+      "id": "dead-cat-02",
+      "name": "Dead Cat 02",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "It's a dead cat",
+      "effects": [
+        "I'm dead"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-02.png"
+    },
+    {
+      "id": "dead-cat-03",
+      "name": "Dead Cat 03",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "It's a dead cat",
+      "effects": [
+        "I'm dead"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-03.png"
+    },
+    {
+      "id": "dead-cat-04",
+      "name": "Dead Cat 04",
+      "cost": 0,
+      "types": [
+        "cat",
+        "utility"
+      ],
+      "description": "It's a dead cat",
+      "effects": [
+        "I'm dead"
+      ],
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-04.png"
+    },
+    {
+      "id": "quark",
+      "name": "Quark Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "A quark particle widget",
+      "effects": [
+        "1vp",
+        "+1 Action"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/quark.png"
+    },
+    {
+      "id": "charm-quark",
+      "name": "Charm Quark Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "You want particles? I'll give you particles!",
+      "effects": [
+        "1vp",
+        "+1 Card",
+        "Sets Background"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/charm-quark.png"
+    },
+    {
+      "id": "tachyon",
+      "name": "Tachyon Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "A tachyon particle widget",
+      "effects": [
+        "1vp",
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/tachyon.png"
+    },
+    {
+      "id": "neutrino",
+      "name": "Neutrino Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "A neutrino particle widget",
+      "effects": [
+        "1vp",
+        "+1 Crypto"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/neutrino.png"
+    },
+    {
+      "id": "tau",
+      "name": "Tau Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "When you stare into the grid, the grid staes back!",
+      "effects": [
+        "1vp",
+        "+1 Card",
+        "Sets Background"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/tau.png"
+    },
+    {
+      "id": "photon",
+      "name": "Photon Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "A photon particle widget",
+      "effects": [
+        "1vp",
+        "+50 Power"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/photon.png"
+    },
+    {
+      "id": "strange-quark",
+      "name": "Strange Quark Widget",
+      "cost": 0,
+      "types": [
+        "widget",
+        "encryptedVolume"
+      ],
+      "description": "Play the Merchant of Chaos theme song!",
+      "effects": [
+        "1vp",
+        "+1 Card",
+        "Plays Song"
+      ],
+      "artwork": "/assets/card_art/base cards/widgets/strange-quark.png"
+    },
+    {
+      "id": "razor-blade-jade",
+      "name": "Razor Blade Jade",
+      "cost": 0,
+      "types": [
+        "attack"
+      ],
+      "description": "Razor Blade Jade",
+      "effects": [
+        "Drain -100 from both Data Centers",
+        "+1 Action",
+        "+1 Card"
+      ],
+      "artwork": "/assets/card_art/runtimeHacks/razorBladeJade.png"
+    },
+    {
+      "id": "dit-bot",
+      "name": "Dit Bot",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "Dit Bot",
+      "effects": [
+        "Draw 2 for the next 4 turns"
+      ],
+      "artwork": "/assets/card_art/runtimeHacks/dit-bot.png"
+    },
+    {
+      "id": "owl-king",
+      "name": "The Owl King",
+      "cost": 0,
+      "types": [
+        "utility"
+      ],
+      "description": "The Owl King",
+      "effects": [
+        "+100 Power",
+        "Drain -300",
+        "+1 Action",
+        "+1 Card",
+        "+4 Crypto"
+      ],
+      "artwork": "/assets/card_art/runtimeHacks/owl-king.png"
+    },
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "cost": 0,
+      "types": [
+        "glitch"
+      ],
+      "description": "A system glitch that reduces victory points",
+      "effects": [
+        "-1 VP"
+      ],
+      "artwork": "/assets/card_art/image_placeHolder.png"
+    }
+  ]
+}

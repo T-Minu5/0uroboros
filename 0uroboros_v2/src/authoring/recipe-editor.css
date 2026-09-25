@@ -1,0 +1,65 @@
+.au-recipe-editor { margin-top: 19px; padding-top: 19px; border-top: 1px solid var(--au-line-soft); }
+.au-recipe-editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+.au-recipe-editor-heading h3 { margin: 0; font-size: 14px; }
+.au-recipe-editor-heading p { margin: 5px 0 0; color: var(--au-muted); font-size: 11px; }
+.au-recipe-empty { margin: 0; padding: 12px; border: 1px dashed #44576a; border-radius: 7px; color: #8ca0b3; background: #0f1725; font-size: 11px; }
+.au-recipe-editor-list { display: grid; gap: 10px; }
+.au-recipe-editor-row { min-width: 0; padding: 13px; border: 1px solid #3c5166; border-radius: 9px; background: #142237; }
+.au-recipe-editor-top { display: flex; align-items: end; gap: 10px; }
+.au-recipe-step { align-self: center; width: 22px; flex: none; color: #7bdce5; font: 700 12px Orbitron, Inter, sans-serif; }
+.au-recipe-columns { min-width: 0; flex: 1; display: grid; grid-template-columns: minmax(145px, 1.25fr) minmax(70px, .46fr) minmax(180px, 1.5fr); gap: 9px; align-items: end; }
+.au-recipe-field { min-width: 0; display: flex; flex-direction: column; gap: 5px; color: #d5e3ee; font-size: 11px; font-weight: 700; }
+.au-recipe-field > span:first-child { display: block; }
+.authoring-app .au-recipe-field :is(input, select) { display: block; width: 100%; min-width: 0; min-height: 37px; padding: 8px 9px; border: 1px solid #3c5064; border-radius: 7px; outline: none; background: #0e1726; color: #e8f3fc; font-size: 12px; font-weight: 500; line-height: 1.35; }
+.authoring-app .au-recipe-field :is(input, select):focus { border-color: #66dbe9; box-shadow: 0 0 0 2px #66dbe926; }
+.authoring-app .au-recipe-field select:disabled { color: #b9cbd7; opacity: 1; cursor: default; }
+.au-recipe-fixed { display: flex !important; align-items: center; min-height: 37px; padding: 8px 9px; border: 1px solid #34475b; border-radius: 7px; background: #17283b; color: #c8dbe9; font-size: 12px; font-weight: 500; }
+.au-recipe-actions { display: flex; flex: none; gap: 3px; }
+.au-recipe-actions button { display: grid; place-items: center; width: 29px; height: 37px; padding: 0; border: 1px solid #40576a; border-radius: 6px; background: #182c40; color: #d5e8f3; font-size: 17px; cursor: pointer; }
+.au-recipe-actions button:last-child { border-color: #654859; background: #2c2131; color: #fac1cc; }
+.au-recipe-actions button:disabled { opacity: .35; cursor: default; }
+.au-recipe-help { margin: 8px 0 0; color: #aebfd1; font-size: 10px; line-height: 1.4; }
+.au-recipe-summary { margin: 11px 0 0; padding: 8px 10px; border-left: 2px solid #65dbe7; border-radius: 0 5px 5px 0; background: #102b39; color: #d6f1f4; font-size: 11px; line-height: 1.4; }
+.au-recipe-catalog, .au-morph-forms { display: grid; gap: 8px; margin-top: 11px; padding: 10px; border: 1px solid #354e61; border-radius: 7px; background: #102032; }
+.au-recipe-catalog-choice { display: flex; align-items: end; gap: 9px; }
+.au-recipe-catalog-choice > img { width: 33px; height: 45px; flex: none; border-radius: 4px; object-fit: cover; }
+.au-recipe-catalog-choice > .au-recipe-field { flex: 1; }
+.au-recipe-catalog small, .au-morph-forms small { color: #91a9bd; font-size: 10px; }
+.au-morph-form-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-height: 180px; overflow: auto; }
+.au-morph-sequence { display: grid; gap: 4px; padding: 7px; border: 1px solid #395368; border-radius: 6px; background: #13283b; }
+.au-morph-sequence > b { color: #b7d4e5; font-size: 10px; }
+.au-morph-empty { padding: 5px; color: #f4c6cf; font-size: 10px; }
+.au-morph-sequence-item { display: flex; align-items: center; justify-content: space-between; gap: 7px; min-height: 29px; padding: 3px 5px; border-radius: 4px; background: #1b3449; color: #e1eef6; font-size: 10px; }
+.au-morph-sequence-item > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.au-morph-order-actions { display: flex; flex: none; gap: 3px; }
+.au-morph-order-actions button { width: 25px; height: 23px; padding: 0; border: 1px solid #4b667b; border-radius: 4px; background: #233e53; color: #e5f5fc; cursor: pointer; }
+.au-morph-order-actions button:disabled { opacity: .4; cursor: default; }
+.au-morph-form { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 5px; border: 1px solid #395368; border-radius: 5px; background: #162b3f; color: #d6e6f1; font-size: 10px; cursor: pointer; }
+.au-morph-form input { flex: none; margin: 0; accent-color: #65dbe7; }
+.au-morph-form img { width: 20px; height: 27px; flex: none; border-radius: 2px; object-fit: cover; }
+.au-morph-form span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.au-recipe-advanced { margin-top: 9px; padding: 8px 10px; border: 1px solid #42506a; border-radius: 6px; background: #162135; }
+.au-recipe-advanced summary { color: #c8d3eb; font-size: 11px; cursor: pointer; }
+.au-recipe-advanced-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+.au-recipe-advanced-fields .au-recipe-help { grid-column: 1 / -1; }
+.au-recipe-check { display: flex; align-items: center; gap: 7px; color: #d5e3ee; font-size: 11px; }
+.au-recipe-check input { accent-color: #65dbe7; }
+@media (max-width: 860px) {
+  .au-recipe-editor-top { flex-wrap: wrap; }
+  .au-recipe-columns { flex-basis: calc(100% - 35px); }
+  .au-recipe-actions { margin-left: 32px; }
+}
+@media (max-width: 600px) {
+  .au-recipe-editor-heading { align-items: flex-start; }
+  .au-recipe-editor-heading .au-button { flex: none; }
+  .au-recipe-columns { grid-template-columns: minmax(0, 1fr) minmax(72px, .43fr); }
+  .au-recipe-columns .au-recipe-field:last-child { grid-column: 1 / -1; }
+  .au-morph-form-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 390px) {
+  .au-recipe-editor-top { gap: 6px; }
+  .au-recipe-step { display: none; }
+  .au-recipe-columns { flex-basis: 100%; }
+  .au-recipe-actions { margin-left: 0; }
+  .au-recipe-advanced-fields { grid-template-columns: minmax(0, 1fr); }
+}

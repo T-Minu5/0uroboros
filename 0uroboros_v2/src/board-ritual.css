@@ -1,0 +1,11 @@
+/* Board-only finish. The rhombus silhouette belongs to the physical socket. */
+.board-canvas .power-badge {border:0;background:transparent;box-shadow:none;border-radius:0;min-width:34px;filter:drop-shadow(0 1px 2px #000);}
+.board-canvas .power-badge.local {height:35px;}
+.board-canvas .power-badge.opponent {height:30px;}
+.board-canvas .power-badge b {font-size:23px;font-weight:800;text-shadow:0 0 8px #72e7ff66;}
+.board-canvas .power-badge.opponent b {text-shadow:0 0 8px #ff64b466;}
+.board-canvas .power-badge.winning {color:#fff;}
+.board-canvas .power-badge.trailing {color:#b1b7c4;}
+.board-canvas .field-card {transition:transform .24s ease,filter .24s ease;}
+.board-canvas .field-card.active-source {filter:brightness(1.18) drop-shadow(0 0 7px #87caff);}
+@media (prefers-reduced-motion:reduce){.board-canvas .field-card{transition:none;}}

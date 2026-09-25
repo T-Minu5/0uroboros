@@ -1,0 +1,8 @@
+{
+  "errors": [],
+  "configuredMax": "2",
+  "penaltyRate": "1.25",
+  "concession": true,
+  "heldCardReturnedOnExpiry": true,
+  "inspectWorksAfterExpiry": true
+}

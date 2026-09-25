@@ -1,0 +1,59 @@
+{
+  "errors": [],
+  "failedResources": [],
+  "viewports": [
+    {
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "layout": {
+        "outside": [],
+        "scoreGaps": [
+          3.27752685546875,
+          2.275299072265625,
+          3.27752685546875,
+          2.275299072265625,
+          2.275299072265625
+        ],
+        "scrollWidth": 1600,
+        "width": 1600,
+        "contextLost": false,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)"
+      },
+      "frameTiming": {
+        "medianMs": 16.7,
+        "p95Ms": 16.8,
+        "frames": 180
+      },
+      "shot": "docs/evidence/board-lookdev-1600.png"
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "layout": {
+        "outside": [],
+        "scoreGaps": [
+          2.912567138671875,
+          2.021942138671875,
+          2.912567138671875,
+          2.021942138671875,
+          2.021942138671875
+        ],
+        "scrollWidth": 1366,
+        "width": 1366,
+        "contextLost": false,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)"
+      },
+      "frameTiming": {
+        "medianMs": 16.7,
+        "p95Ms": 16.8,
+        "frames": 180
+      },
+      "shot": "docs/evidence/board-lookdev-1366.png"
+    }
+  ],
+  "reducedMotionReady": true
+}

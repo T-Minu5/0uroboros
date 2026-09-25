@@ -1,0 +1,54 @@
+{
+  "cycles": [
+    {
+      "cycle": 1,
+      "collapseObserved": true,
+      "draftReached": true,
+      "nextCycleReached": true
+    },
+    {
+      "cycle": 2,
+      "collapseObserved": true,
+      "draftReached": true,
+      "nextCycleReached": true
+    }
+  ],
+  "deployments": 15,
+  "purchases": 2,
+  "inspectPass": true,
+  "dragInspectPass": true,
+  "errors": [],
+  "fiveCardOpening": true,
+  "allNodesInitiallyClosed": true,
+  "cryptoTransferConserved": true,
+  "openingIntervals": [
+    797,
+    799
+  ],
+  "resourceColors": [
+    "rgb(39, 226, 255)",
+    "rgb(31, 255, 177)",
+    "rgb(255, 204, 18)"
+  ],
+  "closedNodes": 2,
+  "randomWeightPlacement": [
+    "20%",
+    "10%",
+    "25%",
+    "30%",
+    "15%"
+  ],
+  "locationInspect": true,
+  "effectColors": {
+    "draw": "rgb(65, 133, 255)",
+    "actions": "rgb(39, 226, 255)",
+    "crypto": "rgb(31, 255, 177)",
+    "restore": "rgb(255, 204, 18)"
+  },
+  "drainEvidence": true,
+  "noProbabilityOverlap": true,
+  "collapseEvidence": true,
+  "privilegeClaims": 2,
+  "finalPhase": "CYCLE 03 / RUNTIME 1 OF 3",
+  "consoleErrors": 0
+}

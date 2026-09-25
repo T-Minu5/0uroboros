@@ -1,0 +1,2188 @@
+{
+  "generatedAt": "2026-09-23",
+  "authorityPackage": "0uroboros_v3_1_clean_start",
+  "sources": [
+    {
+      "id": "0uroboros_v3_1_clean_start/00_START_HERE.md",
+      "path": "0uroboros_v3_1_clean_start/00_START_HERE.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2535,
+      "sha256": "21710bec75c5e26c51c3edbf8e82e2a4d771d8687cca6850a5daf235e3d405ed"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/01_AUTHORITY_AND_CHANGE_CONTROL.md",
+      "path": "0uroboros_v3_1_clean_start/01_AUTHORITY_AND_CHANGE_CONTROL.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1950,
+      "sha256": "06a152dd6dd090ee3961f1974451af87ab5ab272bd1f4dc434dc860b15e29f53"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/02_CANONICAL_GAME_RULES.md",
+      "path": "0uroboros_v3_1_clean_start/02_CANONICAL_GAME_RULES.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 4228,
+      "sha256": "6f19f60139a303a1553e408b47700be628620935441b1cd2b42518ca55e11947"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/03_STARTER_DECK_AND_CARD_SEMANTICS.md",
+      "path": "0uroboros_v3_1_clean_start/03_STARTER_DECK_AND_CARD_SEMANTICS.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2202,
+      "sha256": "1c5f13b1483326852aa8f78c02fb19002beb49c4029ef776f15e0d0533e7cc33"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/04_RUNTIME_REVEAL_PROBABILITY_COLLAPSE.md",
+      "path": "0uroboros_v3_1_clean_start/04_RUNTIME_REVEAL_PROBABILITY_COLLAPSE.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2587,
+      "sha256": "8b4c3306e9bd766348393258c262fa12244c4423350598162213e153b508b352"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/05_DRAFT_REWARDS_ZONES_ENDGAME.md",
+      "path": "0uroboros_v3_1_clean_start/05_DRAFT_REWARDS_ZONES_ENDGAME.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2727,
+      "sha256": "906875b95d52668172f9f93f659a17e3c9536073babff6dd71e78089aa627e03"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/06A_CANONICAL_CONTENT_CATALOG.md",
+      "path": "0uroboros_v3_1_clean_start/06A_CANONICAL_CONTENT_CATALOG.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 7058,
+      "sha256": "e80d0b8516673020f55befc9a34885a746d94846367afe9a24a4cef91593d1d8"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/06_NETWORK_TIMERS_AND_FUTURE_SCOPE.md",
+      "path": "0uroboros_v3_1_clean_start/06_NETWORK_TIMERS_AND_FUTURE_SCOPE.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1040,
+      "sha256": "c230166e6119019872e9af49b544b29ddcd0e964ef5be5761c834a830a2fd8e9"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/07_UX_PRODUCT_CONTRACT.md",
+      "path": "0uroboros_v3_1_clean_start/07_UX_PRODUCT_CONTRACT.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3204,
+      "sha256": "df7a9a6770e681ab0b703521f871a292219b50aa331287b925224d59ef9a341c"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/08_LOOKDEV_ART_DIRECTION.md",
+      "path": "0uroboros_v3_1_clean_start/08_LOOKDEV_ART_DIRECTION.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 4563,
+      "sha256": "c9762e17cbaf9606fff68ad2d0bb4a6f07564d73b13ca517a18061832d50c360"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/09_EFFECTS_AND_REFERENCE_POLICY.md",
+      "path": "0uroboros_v3_1_clean_start/09_EFFECTS_AND_REFERENCE_POLICY.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3115,
+      "sha256": "221811c82814101c0ec0d25370de7b55868e79b174198546fdbc344a0c71ddb2"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/10_LOOKDEV_ADDITIONS.md",
+      "path": "0uroboros_v3_1_clean_start/10_LOOKDEV_ADDITIONS.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3506,
+      "sha256": "7bd424948cb2662120b35e074dfde658325c6e9359cac505147633f1eac28ebe"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/11_ASSET_AND_SOURCE_MANIFEST.md",
+      "path": "0uroboros_v3_1_clean_start/11_ASSET_AND_SOURCE_MANIFEST.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2514,
+      "sha256": "752f8ca16624c08c25f066d048275268a712dbece0c0a4cae97039b65c98a614"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/12_AGENT_TEAM_AND_DEVELOPMENT_MODEL.md",
+      "path": "0uroboros_v3_1_clean_start/12_AGENT_TEAM_AND_DEVELOPMENT_MODEL.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3630,
+      "sha256": "2752e6dc851039a71b0151df9afe0b0ec5264f892f71c2fd3871b8d6f6099ee3"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/13_IMPLEMENTATION_ROADMAP.md",
+      "path": "0uroboros_v3_1_clean_start/13_IMPLEMENTATION_ROADMAP.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1860,
+      "sha256": "67e03b24217820a3b8263a88179fffe8c2abcdee81356daa7672b0c0f8268523"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/14_TESTING_AND_ACCEPTANCE.md",
+      "path": "0uroboros_v3_1_clean_start/14_TESTING_AND_ACCEPTANCE.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2269,
+      "sha256": "78fafc2b33fec427a0c8412d9bf6850abe7e64cf9bee5b6a7e5c087f4e5f237c"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/15_OPEN_QUESTIONS_AND_TBDS.md",
+      "path": "0uroboros_v3_1_clean_start/15_OPEN_QUESTIONS_AND_TBDS.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1045,
+      "sha256": "d731e04bc892ac52534940f5bf6e472ce7fa06595055f38b703edfe204dcf95c"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/16_REVIEWER_AUDIT.md",
+      "path": "0uroboros_v3_1_clean_start/16_REVIEWER_AUDIT.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2339,
+      "sha256": "1cb34f205b63044f3c15df1a77d527a7506a7440e8544f2d9a605a2ce36a613f"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/17_ASTRA_BOOTSTRAP_PROMPT.md",
+      "path": "0uroboros_v3_1_clean_start/17_ASTRA_BOOTSTRAP_PROMPT.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 5146,
+      "sha256": "e4520f8a49632970fe565cdb34ecde3d3d84cf0cd887d77bb366f2346bae0199"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/18_VERIFICATION_REPORT.md",
+      "path": "0uroboros_v3_1_clean_start/18_VERIFICATION_REPORT.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1787,
+      "sha256": "64e7649ec209546ca8223867e9ecaf8fdffa2ca6e636395684c26caa7aa7cfd9"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/CHANGELOG.md",
+      "path": "0uroboros_v3_1_clean_start/CHANGELOG.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1326,
+      "sha256": "7fc9298f856674c0126678e978ed1813708916eb7529616aa64d7e4a2c284c08"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/PROJECT_MANIFEST.json",
+      "path": "0uroboros_v3_1_clean_start/PROJECT_MANIFEST.json",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "json",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1100,
+      "sha256": "c131eeaac64c589614feedfad40c45dd88062dc1f25b47ea8e2223bd4d27a828"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/REVIEW_CHECKLIST.md",
+      "path": "0uroboros_v3_1_clean_start/REVIEW_CHECKLIST.md",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1093,
+      "sha256": "c9c875f3cff03362fc52af0aff4327017412e026f026ddbb9f1cb1a5c1c39d6c"
+    },
+    {
+      "id": "0uroboros_v3_1_clean_start/SHA256SUMS.txt",
+      "path": "0uroboros_v3_1_clean_start/SHA256SUMS.txt",
+      "sourceClass": "authority-package",
+      "authorityClass": "V3.1",
+      "mediaType": "txt",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2185,
+      "sha256": "2cae3a016a6128f0d9ee67c68087c9678ecb7fe058a4042dab755dedf249fa65"
+    },
+    {
+      "id": "0uroboros_implementation_v2/00_README.md",
+      "path": "0uroboros_implementation_v2/00_README.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2309,
+      "sha256": "016f4d40617614785aaf3d89e05ab5cb2016f49b749f149557ec86c1f2627051"
+    },
+    {
+      "id": "0uroboros_implementation_v2/01_PRODUCT_CONSTITUTION.md",
+      "path": "0uroboros_implementation_v2/01_PRODUCT_CONSTITUTION.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 5486,
+      "sha256": "043539408143569b8d2782b711920f1c5dda34e019d7533722798da68d12a7a0"
+    },
+    {
+      "id": "0uroboros_implementation_v2/02_SOURCE_AND_REFERENCE_GUIDE.md",
+      "path": "0uroboros_implementation_v2/02_SOURCE_AND_REFERENCE_GUIDE.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 4785,
+      "sha256": "47f3038f5ccdd5b0bf4f488b6ec7af8bc8e7ecc5b7e4f764592bebdf7f33103b"
+    },
+    {
+      "id": "0uroboros_implementation_v2/03_RUNTIME_IMPLEMENTATION.md",
+      "path": "0uroboros_implementation_v2/03_RUNTIME_IMPLEMENTATION.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3999,
+      "sha256": "7d60eef35e0f4880a2c72c36c96829289b5b98f8d000ff517a77b17dc8a9f75b"
+    },
+    {
+      "id": "0uroboros_implementation_v2/04_UX_LOOKDEV_EFFECTS.md",
+      "path": "0uroboros_implementation_v2/04_UX_LOOKDEV_EFFECTS.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 4191,
+      "sha256": "9b92e7c457cb0ad47d465de81fe2d5d385fc48a269e7372768f49036aaa1ae27"
+    },
+    {
+      "id": "0uroboros_implementation_v2/05_ACCEPTANCE_AND_CHECKPOINTS.md",
+      "path": "0uroboros_implementation_v2/05_ACCEPTANCE_AND_CHECKPOINTS.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3409,
+      "sha256": "4a38b63638c6825c4edcfae025730db8de34e7fc9e01c74e44b7ecd96fb6aae3"
+    },
+    {
+      "id": "0uroboros_implementation_v2/06_DEVELOPMENT_OPERATING_MODEL.md",
+      "path": "0uroboros_implementation_v2/06_DEVELOPMENT_OPERATING_MODEL.md",
+      "sourceClass": "0uroboros_implementation_v2",
+      "authorityClass": "implementation",
+      "mediaType": "md",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2970,
+      "sha256": "fe557d02809405f41e22ca9c5773f64d53783c24d654e0192e84bcdf712e7008"
+    },
+    {
+      "id": "assets/Icons/icon-actions.svg",
+      "path": "assets/Icons/icon-actions.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 184,
+      "sha256": "ef7d176002ef23b8aff44be0bf6fc51aa01332f599b83eac91ee4d16abae3694"
+    },
+    {
+      "id": "assets/Icons/icon-attack.svg",
+      "path": "assets/Icons/icon-attack.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 971,
+      "sha256": "f4e8cc46549c81c6689248f092a17c432ca28cfb0e5f82eb7ac3939905bcbd60"
+    },
+    {
+      "id": "assets/Icons/icon-crypto.svg",
+      "path": "assets/Icons/icon-crypto.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 1301,
+      "sha256": "a4aa6a772f361d7074a52282522e3b9260fa15f35403536b7e58d3d058164c01"
+    },
+    {
+      "id": "assets/Icons/icon-database.svg",
+      "path": "assets/Icons/icon-database.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 581,
+      "sha256": "3f5c28726ddba0b79070611908c007f68e75c6e1bb62d33983bfe2516ec5188b"
+    },
+    {
+      "id": "assets/Icons/icon-deck.svg",
+      "path": "assets/Icons/icon-deck.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 2138,
+      "sha256": "233cdf058ca68cb740609cc9b793546f92c244cbf2f5d9067d9bff82e02e5ac7"
+    },
+    {
+      "id": "assets/Icons/icon-discard.svg",
+      "path": "assets/Icons/icon-discard.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 1213,
+      "sha256": "cce19d7bf29040dfbd0aed5533dcda94e3261ae6cd019bb67cf7c4b22d555ae6"
+    },
+    {
+      "id": "assets/Icons/icon-duration.svg",
+      "path": "assets/Icons/icon-duration.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 1265,
+      "sha256": "50e61057776b2c113ac184746b40cbc59d21ae62b560b4673e3c026be4f06784"
+    },
+    {
+      "id": "assets/Icons/icon-hand.svg",
+      "path": "assets/Icons/icon-hand.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 915,
+      "sha256": "e9bec2b95c02ecd43b35ad3491e4fd0bdf6766861b76fd28ed245758133caf98"
+    },
+    {
+      "id": "assets/Icons/icon-infinite.svg",
+      "path": "assets/Icons/icon-infinite.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 1629,
+      "sha256": "cd16e3a944b0a5f13554ad35fbdfcbdbe1b15928778b5a762cc69b01df852a89"
+    },
+    {
+      "id": "assets/Icons/icon-power.svg",
+      "path": "assets/Icons/icon-power.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 773,
+      "sha256": "1d7779f09551b671a55b7374d5c1662e2737b4431fd2c7c424f66cedc76be327"
+    },
+    {
+      "id": "assets/Icons/icon-priority.svg",
+      "path": "assets/Icons/icon-priority.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 690,
+      "sha256": "ff5f54e86cc6d001bf77c89b4647a7b99876c2f29e55d109fb152410ad7884ff"
+    },
+    {
+      "id": "assets/Icons/icon-runtime.svg",
+      "path": "assets/Icons/icon-runtime.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 1129,
+      "sha256": "0664b9bfc57c5c0ee73b5eab285f38143ba9678394e08a9005f9d27c148e6769"
+    },
+    {
+      "id": "assets/Icons/icon-trash.svg",
+      "path": "assets/Icons/icon-trash.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 2812,
+      "sha256": "200e8e4dd2a4b91aa5b5f91d390d104eaa5aa7affb79fa220d29e593dc465b48"
+    },
+    {
+      "id": "assets/Icons/icon-utility.svg",
+      "path": "assets/Icons/icon-utility.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 3092,
+      "sha256": "f517f14bd91c2b4f359ced6126423821662b805c071359f85c4973dd52138040"
+    },
+    {
+      "id": "assets/Icons/icon-volume.svg",
+      "path": "assets/Icons/icon-volume.svg",
+      "sourceClass": "icon",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 392,
+      "sha256": "ac5b8b8f44407e0580b45a6d5582e384e99e68d727287abfa781d9ef4df91d6a"
+    },
+    {
+      "id": "assets/Interface Elements/Card-Stats.svg",
+      "path": "assets/Interface Elements/Card-Stats.svg",
+      "sourceClass": "interface-reference",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 10147,
+      "sha256": "335fa3b513ed25d5565a8b7ae3c6c5d9468377e5d07f639fd61c936847dc2345"
+    },
+    {
+      "id": "assets/Interface Elements/Neural Storage_Effects_Bank_Examples.svg",
+      "path": "assets/Interface Elements/Neural Storage_Effects_Bank_Examples.svg",
+      "sourceClass": "interface-reference",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 53172,
+      "sha256": "81f3131e91c7f58cc0a52cc31225dc1909f0e7f1c8156efbadc29f3ed69f732e"
+    },
+    {
+      "id": "assets/Interface Elements/PlayerStats.svg",
+      "path": "assets/Interface Elements/PlayerStats.svg",
+      "sourceClass": "interface-reference",
+      "authorityClass": "first-party",
+      "mediaType": "svg",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 8495,
+      "sha256": "a8e3483b260e693b9492adb60f968b2a5a13639f722045c6134618d261aad1d9"
+    },
+    {
+      "id": "assets/Interface Elements/Supply Piles.png",
+      "path": "assets/Interface Elements/Supply Piles.png",
+      "sourceClass": "interface-reference",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3782430,
+      "sha256": "8a6eae4850619dca8a0dc5849b27d08368c9a59c367b9a11e3440a395fb04302"
+    },
+    {
+      "id": "assets/board/game-board_with cards.png",
+      "path": "assets/board/game-board_with cards.png",
+      "sourceClass": "board-concept",
+      "authorityClass": "FIRST_PARTY_LAYOUT_AUTHORITY",
+      "mediaType": "png",
+      "tags": [
+        "BOARD_CONCEPT",
+        "HAND_LAYOUT_REFERENCE"
+      ],
+      "visualInspection": true,
+      "bytes": 3329015,
+      "sha256": "57018b4dd0633ed5993c8124ab3ac7a93c8b5ce7163d55a7a0422483b7669cf6"
+    },
+    {
+      "id": "assets/board/game-board_without cards.png",
+      "path": "assets/board/game-board_without cards.png",
+      "sourceClass": "board-concept",
+      "authorityClass": "FIRST_PARTY_LAYOUT_AUTHORITY",
+      "mediaType": "png",
+      "tags": [
+        "BOARD_CONCEPT",
+        "BASE_LAYOUT_REFERENCE"
+      ],
+      "visualInspection": true,
+      "bytes": 2964220,
+      "sha256": "f94ed0fc86536f9a6c56ef48c7c9922eed3b4201664900a0d489e6767b389091"
+    },
+    {
+      "id": "assets/card_art/base cards/alchemic-byte.png",
+      "path": "assets/card_art/base cards/alchemic-byte.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 222863,
+      "sha256": "5098a48960ad8215b743604527a2704a7656bcfae15b5dbc5c4ece7c02bb71e5"
+    },
+    {
+      "id": "assets/card_art/base cards/alchemic-kilo.png",
+      "path": "assets/card_art/base cards/alchemic-kilo.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 223262,
+      "sha256": "1862decd80166072731fd6af642df3312cf8589bc82f5efaa8f84f2626c38460"
+    },
+    {
+      "id": "assets/card_art/base cards/alchemic-mega.png",
+      "path": "assets/card_art/base cards/alchemic-mega.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 221993,
+      "sha256": "366a70b356eb129e1e2cba78ec4ab6e6f00a969c8c065fb037a100b91084b563"
+    },
+    {
+      "id": "assets/card_art/base cards/alchemic-shyte.png",
+      "path": "assets/card_art/base cards/alchemic-shyte.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 220847,
+      "sha256": "8fc3e738f7a663b46be264813ae15436661314f0ba99712de35b8e54310fe34a"
+    },
+    {
+      "id": "assets/card_art/base cards/alpha-team.png",
+      "path": "assets/card_art/base cards/alpha-team.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 186366,
+      "sha256": "7975820f40fe2170524a224a1de5d8326bd464a5e5cd94490ffbd65f3966a483"
+    },
+    {
+      "id": "assets/card_art/base cards/astra-ascii.png",
+      "path": "assets/card_art/base cards/astra-ascii.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 202075,
+      "sha256": "b51d6df1ecb17f285b58335183fdc44ac8d845dd940790436d67703fda95b882"
+    },
+    {
+      "id": "assets/card_art/base cards/atomic-mass.png",
+      "path": "assets/card_art/base cards/atomic-mass.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 185255,
+      "sha256": "aa678713d7ec8c8f0729febc8aef0a3f80a5529caac411303b9df98879b3af5c"
+    },
+    {
+      "id": "assets/card_art/base cards/atomic-unit.png",
+      "path": "assets/card_art/base cards/atomic-unit.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 178415,
+      "sha256": "ac281d8055889ea54075818488a255f8f3afa7b1353d15afd7228f47126ee968"
+    },
+    {
+      "id": "assets/card_art/base cards/banishing-ritual.png",
+      "path": "assets/card_art/base cards/banishing-ritual.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 197128,
+      "sha256": "f5f8f9b8342e1a63e905d2e8c855432c277e8e1318966b6f2f92d0ed5e439b8c"
+    },
+    {
+      "id": "assets/card_art/base cards/bravo-team.png",
+      "path": "assets/card_art/base cards/bravo-team.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 186346,
+      "sha256": "1e6ddeeece7362a2391cbc15ea45ca4af30774438a4ccfa28474f4223731f814"
+    },
+    {
+      "id": "assets/card_art/base cards/byte-drone.png",
+      "path": "assets/card_art/base cards/byte-drone.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 219767,
+      "sha256": "868dd1b3808292c6549613e250ea3e71d34a1863369f41407b913c5ed4f8690c"
+    },
+    {
+      "id": "assets/card_art/base cards/byte-heist.png",
+      "path": "assets/card_art/base cards/byte-heist.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 139397,
+      "sha256": "46dec8d833d1d935d194a024f47decf8216927238cb9be835201c5fd270a765c"
+    },
+    {
+      "id": "assets/card_art/base cards/charlie-team.png",
+      "path": "assets/card_art/base cards/charlie-team.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 183009,
+      "sha256": "d6b2250b9afd43ad26fbbaa0424304e0249be97092f32b20f98ebc4d9084e49a"
+    },
+    {
+      "id": "assets/card_art/base cards/chronos-cache.png",
+      "path": "assets/card_art/base cards/chronos-cache.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 185934,
+      "sha256": "a054b4d3d0619e80c2db9efac2922f9c31cc248cab0a32b220792a80d13d131f"
+    },
+    {
+      "id": "assets/card_art/base cards/code-sniper.png",
+      "path": "assets/card_art/base cards/code-sniper.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 191781,
+      "sha256": "67964f82a68b728ae4b257ca4b7b27b6ee23235deb3a0112a4fbbfc22f1f2d64"
+    },
+    {
+      "id": "assets/card_art/base cards/cowl-obscyra.png",
+      "path": "assets/card_art/base cards/cowl-obscyra.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 196895,
+      "sha256": "1c2aa5814f0c64de81ae2ddc8f82d7e62df8f6b59d9fc443540c0674dadcabe2"
+    },
+    {
+      "id": "assets/card_art/base cards/crypto-alchemist.png",
+      "path": "assets/card_art/base cards/crypto-alchemist.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 223491,
+      "sha256": "3ac268b4b0132f43e8d1f9537a239a00542deed9d30ac6290869422ab8cf2b96"
+    },
+    {
+      "id": "assets/card_art/base cards/dash-dot.png",
+      "path": "assets/card_art/base cards/dash-dot.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 263632,
+      "sha256": "8a725c3be18c781faab790fabb0877b5fbd38c3e96ecb450e7c53d6f422dd44b"
+    },
+    {
+      "id": "assets/card_art/base cards/dotkrawler.png",
+      "path": "assets/card_art/base cards/dotkrawler.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 4172550,
+      "sha256": "615d3df6fb364bc8c029238fa6683acf72b3776b7039cd5433bd4de5aa78515f"
+    },
+    {
+      "id": "assets/card_art/base cards/entropic-infantry.png",
+      "path": "assets/card_art/base cards/entropic-infantry.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 240520,
+      "sha256": "59c559c5c6c3afdcf14c45b80f0fa8eec3b96f4c153aa33d4b45fc8c18f9c5a6"
+    },
+    {
+      "id": "assets/card_art/base cards/ghost-key.png",
+      "path": "assets/card_art/base cards/ghost-key.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 208514,
+      "sha256": "ec71556415a50b3cc632731265ad08990564f7282d702b5aae16d3334a111c4e"
+    },
+    {
+      "id": "assets/card_art/base cards/image_placeHolder.png",
+      "path": "assets/card_art/base cards/image_placeHolder.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 138990,
+      "sha256": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365"
+    },
+    {
+      "id": "assets/card_art/base cards/infernal-kernel.png",
+      "path": "assets/card_art/base cards/infernal-kernel.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 230470,
+      "sha256": "a198fff6da99c368b3d2346367f820f23a18ebec40dc0b81d869cc879a8c699b"
+    },
+    {
+      "id": "assets/card_art/base cards/kilo-cycle.png",
+      "path": "assets/card_art/base cards/kilo-cycle.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 186181,
+      "sha256": "242984fd38798ca24628d402a39f6fed8b5b1d2506b95dd3f151d5f51232c90f"
+    },
+    {
+      "id": "assets/card_art/base cards/merchant-of-chaos.png",
+      "path": "assets/card_art/base cards/merchant-of-chaos.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 198238,
+      "sha256": "2d43abd841789091e2fb89682c15d8f969325df0dd409c658321583554067538"
+    },
+    {
+      "id": "assets/card_art/base cards/night-scythe.png",
+      "path": "assets/card_art/base cards/night-scythe.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 210575,
+      "sha256": "c71b8e6e3ab126d5bc39de2dc48d5f70302e4f8043d649d328655e96c101a68e"
+    },
+    {
+      "id": "assets/card_art/base cards/opulent-void.png",
+      "path": "assets/card_art/base cards/opulent-void.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 190562,
+      "sha256": "2053e2592e3f15711c4f400aa4a4ca47bba91ead88b79e402cae81cb1c160043"
+    },
+    {
+      "id": "assets/card_art/base cards/particle-form.png",
+      "path": "assets/card_art/base cards/particle-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 179395,
+      "sha256": "9d14e035f6c3b97cdb22e92a77af6efbe321d8d290797ec4288428d8b18818da"
+    },
+    {
+      "id": "assets/card_art/base cards/quantum-telementry.png",
+      "path": "assets/card_art/base cards/quantum-telementry.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 220309,
+      "sha256": "bf06adac1aa8dc2d574f7e2527dcf6c62871b9871af052f01b25aa18116fe642"
+    },
+    {
+      "id": "assets/card_art/base cards/recursive-seance.png",
+      "path": "assets/card_art/base cards/recursive-seance.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 214765,
+      "sha256": "4b5d23d2318a1032f54162b50610c116e5d210f9406aff79d8b802ea00b197df"
+    },
+    {
+      "id": "assets/card_art/base cards/root-rune.png",
+      "path": "assets/card_art/base cards/root-rune.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 204712,
+      "sha256": "826da6437308cf68e69a31301468324743a466c619942f45f18fbcb2547cb21f"
+    },
+    {
+      "id": "assets/card_art/base cards/sacrifical-sigil.png",
+      "path": "assets/card_art/base cards/sacrifical-sigil.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 200025,
+      "sha256": "80f8548a24f04d6ac19693f5c65790eed3719dad22edcccfc37f7e27a3e0f86c"
+    },
+    {
+      "id": "assets/card_art/base cards/screen-scryer.png",
+      "path": "assets/card_art/base cards/screen-scryer.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 199110,
+      "sha256": "4b5f1a0e10b0ae186b1e1f6706643cc9d7f9e9d7816b3e5931dabf9d8b7cf668"
+    },
+    {
+      "id": "assets/card_art/base cards/shiva-of-cern.png",
+      "path": "assets/card_art/base cards/shiva-of-cern.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 207387,
+      "sha256": "6b59f2f2cebc6a55dcf2cc82a83998d2942a5e60b9fa2f818588197314e64b1b"
+    },
+    {
+      "id": "assets/card_art/base cards/slash-dot.png",
+      "path": "assets/card_art/base cards/slash-dot.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 193316,
+      "sha256": "2499086b0508c617673e949bd4fbb023fe6895a473b6fc8dbbfd45878c81f618"
+    },
+    {
+      "id": "assets/card_art/base cards/summon-the-acolytes.png",
+      "path": "assets/card_art/base cards/summon-the-acolytes.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 198263,
+      "sha256": "966d1ef9bf186c1e4672d8da89ed02f969a27fec96118846677801a688f9395f"
+    },
+    {
+      "id": "assets/card_art/base cards/superpositioning.png",
+      "path": "assets/card_art/base cards/superpositioning.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 199110,
+      "sha256": "4b5f1a0e10b0ae186b1e1f6706643cc9d7f9e9d7816b3e5931dabf9d8b7cf668"
+    },
+    {
+      "id": "assets/card_art/base cards/temporal-rift.png",
+      "path": "assets/card_art/base cards/temporal-rift.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 188310,
+      "sha256": "ca9b957ce3493629f5d194ffed7fe04e438f401534ac65332ce85176d4eb1107"
+    },
+    {
+      "id": "assets/card_art/base cards/the-heisenberg-hag.png",
+      "path": "assets/card_art/base cards/the-heisenberg-hag.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 232255,
+      "sha256": "b5fd3641c2c0c6ae884a85bb57793172580303f111ce40f56a9ce9d3f130ba21"
+    },
+    {
+      "id": "assets/card_art/base cards/the-inbetweener.png",
+      "path": "assets/card_art/base cards/the-inbetweener.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 203274,
+      "sha256": "eecf04db57cbae50d961782d194d3fdd5acb23bbcd0aad9d84a1535aa9585b28"
+    },
+    {
+      "id": "assets/card_art/base cards/the-tesseract-magi.png",
+      "path": "assets/card_art/base cards/the-tesseract-magi.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 227144,
+      "sha256": "629a7890c4374492d1e67ad3684d2224f8a7561b437af1d852e02eb17185b35d"
+    },
+    {
+      "id": "assets/card_art/base cards/thorn-shadow.png",
+      "path": "assets/card_art/base cards/thorn-shadow.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 205525,
+      "sha256": "ea002b9670d7544c6fbf0c3f44846c937925025402b64255d605a9db95a586fc"
+    },
+    {
+      "id": "assets/card_art/base cards/wave-form.png",
+      "path": "assets/card_art/base cards/wave-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 182634,
+      "sha256": "a37c2fba3066dda6b5475657035ad99b7921bb096ad5b69df585b61d33147486"
+    },
+    {
+      "id": "assets/card_art/card backs/cardback_01_swordSnake",
+      "path": "assets/card_art/card backs/cardback_01_swordSnake",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "unknown",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 2445092,
+      "sha256": "928f5571dd0a01d5ad0158e1e2fdf418c8b1688451d48390feeae04db5c2dd26"
+    },
+    {
+      "id": "assets/card_art/card backs/cardback_02_silicone.png",
+      "path": "assets/card_art/card backs/cardback_02_silicone.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 2501171,
+      "sha256": "74b005a97987eee9bceb8a9796276fd98a448279c64bcab71eaca31a67cd13c2"
+    },
+    {
+      "id": "assets/card_art/chaos cards/1337-speaker.png",
+      "path": "assets/card_art/chaos cards/1337-speaker.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 219026,
+      "sha256": "48a087f17641f8f1b24ee10ff98436fbd20e2c15a7fce755738b2bed099ac511"
+    },
+    {
+      "id": "assets/card_art/chaos cards/bloodlet-drone.png",
+      "path": "assets/card_art/chaos cards/bloodlet-drone.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 224775,
+      "sha256": "20862ff543b65a8b8e0045afae3c4b0ca3cd283b9ffdf5d57385780d0a347f13"
+    },
+    {
+      "id": "assets/card_art/chaos cards/bloodlet-flux.png",
+      "path": "assets/card_art/chaos cards/bloodlet-flux.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 6555606,
+      "sha256": "2b38672c54c9aadbe015874066999cc1da4e948fc0532f27495e65e031d8e4a7"
+    },
+    {
+      "id": "assets/card_art/chaos cards/bushido-io.png",
+      "path": "assets/card_art/chaos cards/bushido-io.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 234714,
+      "sha256": "1a86c6959ff9fc07cacd7e5f6e93159fb73c08681ab36ecd9a5f1750395f4222"
+    },
+    {
+      "id": "assets/card_art/chaos cards/byte-heist2.png",
+      "path": "assets/card_art/chaos cards/byte-heist2.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 218369,
+      "sha256": "87c13c1f09d5092ffb7b697ca5cfdd713a6f768d8388aa6d8116c5dabde4d41a"
+    },
+    {
+      "id": "assets/card_art/chaos cards/chrome-mitchell.png",
+      "path": "assets/card_art/chaos cards/chrome-mitchell.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 232231,
+      "sha256": "2348a31ed6ba11f4250bf665a1d83e6c27e93df80eb2a586a4d61791fb8a38eb"
+    },
+    {
+      "id": "assets/card_art/chaos cards/cicada-3301.png",
+      "path": "assets/card_art/chaos cards/cicada-3301.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 171971,
+      "sha256": "64efe1ddd44cb48dc57f21e03fe8a2c782488d2543ebc1fc5f591fb1f1143c10"
+    },
+    {
+      "id": "assets/card_art/chaos cards/delta-wave.png",
+      "path": "assets/card_art/chaos cards/delta-wave.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 4067170,
+      "sha256": "8e2feaf975820e621de01a89f94469ce12837e479b9aa3f05908462e8307e7a0"
+    },
+    {
+      "id": "assets/card_art/chaos cards/glitch-witch.png",
+      "path": "assets/card_art/chaos cards/glitch-witch.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 240323,
+      "sha256": "9dce9e739a2298d4fa6989885cedb645583ef4d469fb678fcb1fe4baa0251b19"
+    },
+    {
+      "id": "assets/card_art/chaos cards/h3x1-d3x1.PNG",
+      "path": "assets/card_art/chaos cards/h3x1-d3x1.PNG",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "PNG",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 230343,
+      "sha256": "fd5228d754f6c92b89e718c468df7cc05a636dd1c4f7815b3a6dca36ef18a8a2"
+    },
+    {
+      "id": "assets/card_art/chaos cards/invocation-of-the-sword.png",
+      "path": "assets/card_art/chaos cards/invocation-of-the-sword.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 184915,
+      "sha256": "49a88ea743eed8550dfc1e3303d1a087ed6d8001853c0ca41ecdc335f872202e"
+    },
+    {
+      "id": "assets/card_art/chaos cards/iterative-incubus.png",
+      "path": "assets/card_art/chaos cards/iterative-incubus.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 221895,
+      "sha256": "db6c424933144b740f964cdadb73d888fedd8f7ff6420d8241ada9f0cbd285a7"
+    },
+    {
+      "id": "assets/card_art/chaos cards/leviathan-form.png",
+      "path": "assets/card_art/chaos cards/leviathan-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 218914,
+      "sha256": "dc39e92f1dcef0bf857a5c7c26acb382cb88af74f0415d1b60a96cde5c30848a"
+    },
+    {
+      "id": "assets/card_art/chaos cards/mary-malice.png",
+      "path": "assets/card_art/chaos cards/mary-malice.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 191718,
+      "sha256": "bcce131a7d03409e4fd6b934c762033f8adb2c50c3b5151059a1d970d9f42f21"
+    },
+    {
+      "id": "assets/card_art/chaos cards/mary-mallon.png",
+      "path": "assets/card_art/chaos cards/mary-mallon.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 209776,
+      "sha256": "2732a3808ecd7ccfba3493a7b2667a05802af71e30d752098d365116ce4895b7"
+    },
+    {
+      "id": "assets/card_art/chaos cards/mary-malware.png",
+      "path": "assets/card_art/chaos cards/mary-malware.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 183244,
+      "sha256": "692a455f0a11ea162c2f86cedf5ec1a01920a6b404a95e388647bdad72a1255e"
+    },
+    {
+      "id": "assets/card_art/chaos cards/node-feratu.png",
+      "path": "assets/card_art/chaos cards/node-feratu.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 238232,
+      "sha256": "5d4990f27c364d3c8b69af4ab1ca9100ad95d7198173459b17f5a3e6c6dbd3d4"
+    },
+    {
+      "id": "assets/card_art/chaos cards/nyx-luna.png",
+      "path": "assets/card_art/chaos cards/nyx-luna.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 213342,
+      "sha256": "391cba193518a0be734d39d1f3cbb37a97ca6a77f7862713f30ffa05d530ea34"
+    },
+    {
+      "id": "assets/card_art/chaos cards/qubit-kid.png",
+      "path": "assets/card_art/chaos cards/qubit-kid.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 205369,
+      "sha256": "5c107f09a7ab0966c340bb33040f993f55b9cf6e8ac097dd14b9304541bc24ce"
+    },
+    {
+      "id": "assets/card_art/chaos cards/rezz-blade.png",
+      "path": "assets/card_art/chaos cards/rezz-blade.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 143162,
+      "sha256": "617caf0f844814705cce2c7ed0c6b784d22ccb02e90995cd1cfe3bf64ced8ad9"
+    },
+    {
+      "id": "assets/card_art/chaos cards/rezz-razor.png",
+      "path": "assets/card_art/chaos cards/rezz-razor.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 137725,
+      "sha256": "9470b203a5258d5b5000a02f8e5745616b5514cf731334c65a9b577478c4ca56"
+    },
+    {
+      "id": "assets/card_art/chaos cards/skinwalker.png",
+      "path": "assets/card_art/chaos cards/skinwalker.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 214944,
+      "sha256": "d6a879bc749fa5d7c8c462755755b8bf31df3ec62952ced7a0c26ff1500f6119"
+    },
+    {
+      "id": "assets/card_art/chaos cards/spider-form.png",
+      "path": "assets/card_art/chaos cards/spider-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 154445,
+      "sha256": "6c5876f39bc441e5a80b753ebd8639575ad4355816adc7936e3afe986740b3b6"
+    },
+    {
+      "id": "assets/card_art/chaos cards/subroutine-succubus.png",
+      "path": "assets/card_art/chaos cards/subroutine-succubus.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 221922,
+      "sha256": "99428c1c2d8b04985d17ac4304f17a72bfeb50ada1985fee9e78cbc728effc7f"
+    },
+    {
+      "id": "assets/card_art/chaos cards/sudo-demiurge.png",
+      "path": "assets/card_art/chaos cards/sudo-demiurge.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 203045,
+      "sha256": "4f1ab7a9ec324006c9fd6306365d800f1ebfa3607bfd81a445a423c7b51df43e"
+    },
+    {
+      "id": "assets/card_art/chaos cards/system-seppuku.png",
+      "path": "assets/card_art/chaos cards/system-seppuku.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 181538,
+      "sha256": "aee67cc285398151ddd8142358db96dff6dfbd973383602c39663d073fec3e05"
+    },
+    {
+      "id": "assets/card_art/chaos cards/the-azimuthal-kill.png",
+      "path": "assets/card_art/chaos cards/the-azimuthal-kill.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 192938,
+      "sha256": "e67fcadd80231a22415e4911ad99392d2c86bd149329a6ca69b5ef8cb9fc6a6f"
+    },
+    {
+      "id": "assets/card_art/chaos cards/tihkal-hound.png",
+      "path": "assets/card_art/chaos cards/tihkal-hound.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 215581,
+      "sha256": "354bcec9e3efd914c87c76510a812338c6d8c5baa3d5d8a1983710d0d00e8405"
+    },
+    {
+      "id": "assets/card_art/chaos cards/typhoid-mary.png",
+      "path": "assets/card_art/chaos cards/typhoid-mary.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 185772,
+      "sha256": "5d7455943fc4ee97388fb498efd227d5d0351052bbf5e6a705103b8f16c4bdbe"
+    },
+    {
+      "id": "assets/card_art/chaos cards/veil-of-cthulhu.png",
+      "path": "assets/card_art/chaos cards/veil-of-cthulhu.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 232434,
+      "sha256": "00953b8ea63a471eeccd4a2bd51d015df1abe0b93c1758121a2b29bac3c724e5"
+    },
+    {
+      "id": "assets/card_art/chaos cards/viper-form.png",
+      "path": "assets/card_art/chaos cards/viper-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 176478,
+      "sha256": "e72b553020b8b3004d6c57cb97e596bb7a0214a421e3cd7bc25937d86c56a500"
+    },
+    {
+      "id": "assets/card_art/chaos cards/wasp-form.png",
+      "path": "assets/card_art/chaos cards/wasp-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 193909,
+      "sha256": "c98454c24f887ecb0e1df73d1822c824272b321203181d5aaccaf9a9b5bd4a60"
+    },
+    {
+      "id": "assets/card_art/chaos cards/wolf-form.png",
+      "path": "assets/card_art/chaos cards/wolf-form.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 146101,
+      "sha256": "19ba168feda5910d520505c496c647b4de878136bb96120aa0a42711580162b1"
+    },
+    {
+      "id": "assets/card_art/chaos cards/\u2206-wave.png",
+      "path": "assets/card_art/chaos cards/\u2206-wave.png",
+      "sourceClass": "identity-art",
+      "authorityClass": "first-party",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": true,
+      "bytes": 4067170,
+      "sha256": "8e2feaf975820e621de01a89f94469ce12837e479b9aa3f05908462e8307e7a0"
+    },
+    {
+      "id": "assets/effect_animations/fx-01.webp",
+      "path": "assets/effect_animations/fx-01.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 11888,
+      "sha256": "e968401f3ff88a69a2ab55090332c933e85136c7cc6633abdf4f80d4cf822117"
+    },
+    {
+      "id": "assets/effect_animations/fx-02.webp",
+      "path": "assets/effect_animations/fx-02.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 48848,
+      "sha256": "ad25e1f6bf616676d42f1d83866c98eeb185ce98e82a5f525a50fc40af10dd1d"
+    },
+    {
+      "id": "assets/effect_animations/fx-03.webp",
+      "path": "assets/effect_animations/fx-03.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 40872,
+      "sha256": "b4deb25967d610c152908b09d9f249723154007f09867a4d5cd6f1a18a7a94ff"
+    },
+    {
+      "id": "assets/effect_animations/fx-04.webp",
+      "path": "assets/effect_animations/fx-04.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 6046,
+      "sha256": "fd3555150bbc88bedf430562a7d4c667796b695f081eed5338e233a084d3c386"
+    },
+    {
+      "id": "assets/effect_animations/fx-05.webp",
+      "path": "assets/effect_animations/fx-05.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 61966,
+      "sha256": "efa50d1ec8be047a452dbf4b086fd0ae419ad3e4c8a8b3713774a79d8ee1edd6"
+    },
+    {
+      "id": "assets/effect_animations/fx-06.webp",
+      "path": "assets/effect_animations/fx-06.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 76272,
+      "sha256": "ac3d7303cbf5038a1d6b362a1fb3384662f9573d77307b16573b0723d8dc8451"
+    },
+    {
+      "id": "assets/effect_animations/fx-07.webp",
+      "path": "assets/effect_animations/fx-07.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 21426,
+      "sha256": "a988437a810a2d47def0613219c039b56211aca88523094810b0f441526c5dbf"
+    },
+    {
+      "id": "assets/effect_animations/fx-08.webp",
+      "path": "assets/effect_animations/fx-08.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 19164,
+      "sha256": "bb07ae7020f191e8d111a219e7854b02d33d91caadd2b1aed6cc8e3b5438e45c"
+    },
+    {
+      "id": "assets/effect_animations/fx-09.webp",
+      "path": "assets/effect_animations/fx-09.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 48300,
+      "sha256": "a7fcd5469d2c2479d9a660b8118be56c19a749624abe8b66d913dd9f8e9cdba1"
+    },
+    {
+      "id": "assets/effect_animations/fx-10_occult.webp",
+      "path": "assets/effect_animations/fx-10_occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 1157892,
+      "sha256": "c93ed5c39c1952a258dcb24588c85b471d70a7b8073edc4b304dc1514c4783c5"
+    },
+    {
+      "id": "assets/effect_animations/fx-11-quantum.webp",
+      "path": "assets/effect_animations/fx-11-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": false,
+      "bytes": 2096348,
+      "sha256": "f1286a1072e26ece9e63d62bdca3459116773b3fa4490a1a80cc5c232e5d2d5a"
+    },
+    {
+      "id": "assets/effect_animations/fx-12-occult.webp",
+      "path": "assets/effect_animations/fx-12-occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 9870,
+      "sha256": "aa859b6b53eb9f511d52136ab39f68f037e53ce08f6dfce15c8c58a2040317b3"
+    },
+    {
+      "id": "assets/effect_animations/fx-13-occult.webp",
+      "path": "assets/effect_animations/fx-13-occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 1557622,
+      "sha256": "70f3d180dbd93b8388cdb52c8dff6243e8b628ec2049af4b62a493dcb7a82a2a"
+    },
+    {
+      "id": "assets/effect_animations/fx-14-quantum.webp",
+      "path": "assets/effect_animations/fx-14-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": false,
+      "bytes": 122128,
+      "sha256": "e381a84a1b4455ba91b69a5e22a1831add9fca6a9c8c7a3941e75584f4fe20d9"
+    },
+    {
+      "id": "assets/effect_animations/fx-15-destroy.webp",
+      "path": "assets/effect_animations/fx-15-destroy.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "destroy"
+      ],
+      "visualInspection": true,
+      "bytes": 64064,
+      "sha256": "b91e46d5bc3a71582deded008cc7a421bb81013f7385d0f59edd9b53078ee3e9"
+    },
+    {
+      "id": "assets/effect_animations/fx-16-quantum.webp",
+      "path": "assets/effect_animations/fx-16-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": false,
+      "bytes": 13718,
+      "sha256": "0dbc877c2138a7a9fe55e730dcf75cabe672ecc16c784d1ea4f643d376ab7797"
+    },
+    {
+      "id": "assets/effect_animations/fx-17-fire.webp",
+      "path": "assets/effect_animations/fx-17-fire.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 68776,
+      "sha256": "d1723b11588a5aa5301c0e6b218904dcdbe7fe11748e398414b6487a1eb884cf"
+    },
+    {
+      "id": "assets/effect_animations/fx-18.webp",
+      "path": "assets/effect_animations/fx-18.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 67920,
+      "sha256": "07f042f45ce44254a10eea859d224d8f10620b089a943234e6a32505c6f73986"
+    },
+    {
+      "id": "assets/effect_animations/fx-19-quantum.webp",
+      "path": "assets/effect_animations/fx-19-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": true,
+      "bytes": 354566,
+      "sha256": "2e687b92757d44fa400812709ba9fe4de232c8896f08a471c0f7443984a87152"
+    },
+    {
+      "id": "assets/effect_animations/fx-20.webp",
+      "path": "assets/effect_animations/fx-20.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 19490,
+      "sha256": "c95353d98ed245f50394a8f38aaad4445747e7d76cd5880c259eb4e53e68dd89"
+    },
+    {
+      "id": "assets/effect_animations/fx-22.webp",
+      "path": "assets/effect_animations/fx-22.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 96012,
+      "sha256": "5b8433b28d0886114c365cd0e4c5b01d3797b91873251e4fdf6d8e9515cb3ba5"
+    },
+    {
+      "id": "assets/effect_animations/fx-23.webp",
+      "path": "assets/effect_animations/fx-23.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 15424,
+      "sha256": "0a4d03683f84ce8bb4fb909f5a206c57c4b652791329f2b8a8281faec1064597"
+    },
+    {
+      "id": "assets/effect_animations/fx-24-occult-big-attack.webp",
+      "path": "assets/effect_animations/fx-24-occult-big-attack.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult",
+        "attack"
+      ],
+      "visualInspection": true,
+      "bytes": 80002,
+      "sha256": "080d65dbfb128fc8f3bfe0682875067456277dfd7d56bda1ef6676f327c6a8ee"
+    },
+    {
+      "id": "assets/effect_animations/fx-25-big-attack.webp",
+      "path": "assets/effect_animations/fx-25-big-attack.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "attack"
+      ],
+      "visualInspection": false,
+      "bytes": 39788,
+      "sha256": "a29cf34e02bab2e011c11b67b8fb29eafbd804be43cf1df1042daf282220b10e"
+    },
+    {
+      "id": "assets/effect_animations/fx-26occult.webp",
+      "path": "assets/effect_animations/fx-26occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 40960,
+      "sha256": "ae13fa2ee0f2eebbb3605f1cdca8965fe1e51fb7613017d5173993c58955f191"
+    },
+    {
+      "id": "assets/effect_animations/fx-27.webp",
+      "path": "assets/effect_animations/fx-27.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 29842,
+      "sha256": "15c32d996b5306d806f75fcf4bae90374a0ace2aa5d0b668d2eeeadb188f2b70"
+    },
+    {
+      "id": "assets/effect_animations/fx-28-bigattack.webp",
+      "path": "assets/effect_animations/fx-28-bigattack.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "attack"
+      ],
+      "visualInspection": false,
+      "bytes": 30784,
+      "sha256": "17ae281703dae271df8e1624d02274b3b98f123fb994ff1326caaa30a6c5a875"
+    },
+    {
+      "id": "assets/effect_animations/fx-29.webp",
+      "path": "assets/effect_animations/fx-29.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 5652,
+      "sha256": "86b9fdaa68f995603b5da2f673a1b93f3975d698d6d35db3b9c519c4d340463e"
+    },
+    {
+      "id": "assets/effect_animations/fx-30.webp",
+      "path": "assets/effect_animations/fx-30.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 66410,
+      "sha256": "6d2adb79b55f0684dd63379ae785dd5090793792784a700528b416e367e4f82b"
+    },
+    {
+      "id": "assets/effect_animations/fx-31.webp",
+      "path": "assets/effect_animations/fx-31.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 15368,
+      "sha256": "620cdec1dc3a38d82b25ae64640d3243c10cc949464edd075bb1e619392e06f6"
+    },
+    {
+      "id": "assets/effect_animations/fx-32-heal.webp",
+      "path": "assets/effect_animations/fx-32-heal.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "heal"
+      ],
+      "visualInspection": true,
+      "bytes": 54332,
+      "sha256": "14860016ff0763afee8cea7fce10e65cb5f42c0e882b3fc37bd20a7dda93c565"
+    },
+    {
+      "id": "assets/effect_animations/fx-33-quantum.webp",
+      "path": "assets/effect_animations/fx-33-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": false,
+      "bytes": 44752,
+      "sha256": "0b7e1bd9084d3974e2889aa65bd7484e0fc23e8827b4f85c96985d8ecd44fe73"
+    },
+    {
+      "id": "assets/effect_animations/fx-34.webp",
+      "path": "assets/effect_animations/fx-34.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 30400,
+      "sha256": "562f368cfb81581885486521c9a90e7991c3dd42edb52e73c2c9d25717b1215d"
+    },
+    {
+      "id": "assets/effect_animations/fx-35-heal.webp",
+      "path": "assets/effect_animations/fx-35-heal.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "heal"
+      ],
+      "visualInspection": false,
+      "bytes": 13042,
+      "sha256": "4148e709041de82fcb298ca36a1bc4392f6724d1d3793ece36dea3ed36883c78"
+    },
+    {
+      "id": "assets/effect_animations/fx-36.webp",
+      "path": "assets/effect_animations/fx-36.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 23024,
+      "sha256": "bfcb764eb4de143321efe4e24609f6102e2b0b1dec8991cf7fcad8bbe4b0b4c0"
+    },
+    {
+      "id": "assets/effect_animations/fx-40-heal-occult.webp",
+      "path": "assets/effect_animations/fx-40-heal-occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult",
+        "heal"
+      ],
+      "visualInspection": true,
+      "bytes": 54974,
+      "sha256": "adebb779ec421f3d89c008673b2afef3ef879805a6fb278ba2825728fdf0dee8"
+    },
+    {
+      "id": "assets/effect_animations/fx-40.webp",
+      "path": "assets/effect_animations/fx-40.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 21708,
+      "sha256": "d7da05463b330cac97877bb28d88f402f349f7b9d09cf01665be6f4f55f928e9"
+    },
+    {
+      "id": "assets/effect_animations/fx-41-quantum.webp",
+      "path": "assets/effect_animations/fx-41-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum"
+      ],
+      "visualInspection": false,
+      "bytes": 31958,
+      "sha256": "aad175efb1462bd2087f6ee16ac20dd3329ee35a336770d8d35ebe311108724e"
+    },
+    {
+      "id": "assets/effect_animations/fx-41.webp",
+      "path": "assets/effect_animations/fx-41.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 53276,
+      "sha256": "12aed384cc72d192aff0664f668a523bb380b0243193bae08713293549c0abdd"
+    },
+    {
+      "id": "assets/effect_animations/fx-45.webp",
+      "path": "assets/effect_animations/fx-45.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2672816,
+      "sha256": "320adb81a85e395b8a5ee504b38efa173987decd8ef9ad9f6c1ea904994d049b"
+    },
+    {
+      "id": "assets/effect_animations/fx-46-occult-quantum.webp",
+      "path": "assets/effect_animations/fx-46-occult-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum",
+        "occult"
+      ],
+      "visualInspection": true,
+      "bytes": 475734,
+      "sha256": "b5c02280bbfd9fa00ed7fe6c4b71c618bccf27d96c82bd55ed1335a781d834ce"
+    },
+    {
+      "id": "assets/effect_animations/fx-48-occult.webp",
+      "path": "assets/effect_animations/fx-48-occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 5033230,
+      "sha256": "1be9d34cdf9bb1f4c665939dd6d24648dce6a1956f2d811b2593c12610774bb0"
+    },
+    {
+      "id": "assets/effect_animations/fx-50.webp",
+      "path": "assets/effect_animations/fx-50.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1329742,
+      "sha256": "869197f4a65289a2ce7c2e339804ffb14da66f44d9f7c360843f11c7a1d6e605"
+    },
+    {
+      "id": "assets/effect_animations/fx-52-occult-quantum.webp",
+      "path": "assets/effect_animations/fx-52-occult-quantum.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "quantum",
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 2829034,
+      "sha256": "0aa92062f6639b95c3cdfe74669137bcbd433776668b950718ac3b9a17766f4c"
+    },
+    {
+      "id": "assets/effect_animations/fx-occult.webp",
+      "path": "assets/effect_animations/fx-occult.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "occult"
+      ],
+      "visualInspection": false,
+      "bytes": 56480,
+      "sha256": "806b3608f27311f555d08b96d1251bc97d6a942deca65df6b4615866aac93a7e"
+    },
+    {
+      "id": "assets/effect_animations/fx37-heal.webp",
+      "path": "assets/effect_animations/fx37-heal.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [
+        "heal"
+      ],
+      "visualInspection": false,
+      "bytes": 56584,
+      "sha256": "c65aa2e14d50db07fc1fa05cfa129626fcda7d2865d94165c3ae87587dde2fa4"
+    },
+    {
+      "id": "assets/effect_animations/several exaples.webp",
+      "path": "assets/effect_animations/several exaples.webp",
+      "sourceClass": "effect-reference",
+      "authorityClass": "reference-only",
+      "mediaType": "webp",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 96080,
+      "sha256": "a1f232b15340fcadb8049785c2bd36c16b903ec38a51a91129f3b23836d49134"
+    },
+    {
+      "id": "assets/models/board-regions.json",
+      "path": "assets/models/board-regions.json",
+      "sourceClass": "authored-board",
+      "authorityClass": "implementation",
+      "mediaType": "json",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 2189,
+      "sha256": "55702881f690e8e0485e8cb08b0c386eaa559c05cb648b85bd8aea9bef41ecca"
+    },
+    {
+      "id": "assets/models/board-review.png",
+      "path": "assets/models/board-review.png",
+      "sourceClass": "authored-board",
+      "authorityClass": "implementation",
+      "mediaType": "png",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1975823,
+      "sha256": "55dab843c5e96702d834c681bdf013405a8c6543de02bf266a70d3684af2e05b"
+    },
+    {
+      "id": "assets/models/ouroboros-board.blend",
+      "path": "assets/models/ouroboros-board.blend",
+      "sourceClass": "authored-board",
+      "authorityClass": "implementation",
+      "mediaType": "blend",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1689200,
+      "sha256": "a142bfc839b1bceb326d150d8e4417fa3e256aaff18f4a66803683b9591a77c8"
+    },
+    {
+      "id": "assets/models/ouroboros-board.glb",
+      "path": "assets/models/ouroboros-board.glb",
+      "sourceClass": "authored-board",
+      "authorityClass": "implementation",
+      "mediaType": "glb",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 3888696,
+      "sha256": "f5e58c1ddace34c66b0d4543768bfa45e086bfadf906762e7f24c339c3b146c9"
+    },
+    {
+      "id": "src/App.tsx",
+      "path": "src/App.tsx",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "tsx",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 18448,
+      "sha256": "ea8a8c2301ada41f893b8c47fd0aa3e73178b98b5c3c6f0ae259858ca3fc886b"
+    },
+    {
+      "id": "src/BoardScene.tsx",
+      "path": "src/BoardScene.tsx",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "tsx",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 7534,
+      "sha256": "d684d3eacf1b3e832b9681ddd0a51b92cf7b531347064e1d05afc5014d27f6f1"
+    },
+    {
+      "id": "src/Effects.tsx",
+      "path": "src/Effects.tsx",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "tsx",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 1416,
+      "sha256": "67cc8e6384135d65f70d76ca99622dc251ea6ed05b4087aa051ae6c622c62bc9"
+    },
+    {
+      "id": "src/game.ts",
+      "path": "src/game.ts",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "ts",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 9851,
+      "sha256": "3fd70bf98bb159107d79a030f56f8996c6a0766d47fd17021fa5100d390a4e63"
+    },
+    {
+      "id": "src/main.tsx",
+      "path": "src/main.tsx",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "tsx",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 223,
+      "sha256": "111aab7927233b0d936c86c898984e247e866f89cc122a6ea8ee678aa74f669f"
+    },
+    {
+      "id": "src/runtime.ts",
+      "path": "src/runtime.ts",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "ts",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 18390,
+      "sha256": "83f6741e78f71c1dff8f67e87c5f56a4a84c986dcee3f9041eadae8ff1f212e5"
+    },
+    {
+      "id": "src/styles.css",
+      "path": "src/styles.css",
+      "sourceClass": "src",
+      "authorityClass": "implementation",
+      "mediaType": "css",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 30480,
+      "sha256": "e14795bb5cd0893f13c5db36c9e75710f94ca78921e310d49c0f706b67fb9ebb"
+    },
+    {
+      "id": "tests/game.test.ts",
+      "path": "tests/game.test.ts",
+      "sourceClass": "tests",
+      "authorityClass": "implementation",
+      "mediaType": "ts",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 6051,
+      "sha256": "7546a72c05b2562ef01af4d4539e9790ce2a2673d24cfa5db4742f4c16ddeea5"
+    },
+    {
+      "id": "tests/runtime.test.ts",
+      "path": "tests/runtime.test.ts",
+      "sourceClass": "tests",
+      "authorityClass": "implementation",
+      "mediaType": "ts",
+      "tags": [],
+      "visualInspection": false,
+      "bytes": 16028,
+      "sha256": "fc6129fd6fc956d87f0c3ff0e0292b09821a2d0e7b450917a9219889c407ad13"
+    }
+  ],
+  "tooling": {
+    "BlenderMCP": "Available. 1.0.3 connector; board authored/exported through Blender MCP; see docs/BOARD_BUILD.md"
+  },
+  "externalReferenceLibrary": "../0uroboros/0uroboros_swarm_v2_0/06_RESOURCE_LIBRARY.md",
+  "contentGaps": [
+    "Full Base/Chaos/VP/Crypto definitions not present in assets. Art does not define mechanics.",
+    "Location effects/rewards and Circuit offerings not found in supplied V3.1 assets.",
+    "ART_ASSET_MISSING: Byte-Coin, Kilo-Coin, Vault Encryption identity illustrations; neutral labeled placeholders used instead of unrelated named art."
+  ],
+  "sourceConflicts": [
+    "Concept art example DC values 2400/1600 yield to canonical rules 2000/1500.",
+    "Existing prototype had ten-card opening, fixed opponent, invented Wallet/weights and nonfunctional purchases; replaced with local session.",
+    "Historical Location source explicitly placeholder content referencing deprecated Cipher runner; not imported as canon."
+  ],
+  "iconSemantics": {
+    "actions": "actions",
+    "crypto": "crypto",
+    "power": "power",
+    "database": "database",
+    "deck": "deck",
+    "discard": "discard",
+    "hand": "hand",
+    "duration": "duration",
+    "priority": "priority",
+    "trash": "trash",
+    "runtime": "runtime"
+  }
+}

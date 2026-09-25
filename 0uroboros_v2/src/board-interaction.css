@@ -1,0 +1,80 @@
+/* Pointer-driven cards keep the original fan pose and grab point. */
+.hand-card { touch-action:none; user-select:none; -webkit-user-select:none; }
+.hand-card img { pointer-events:none; -webkit-user-drag:none; }
+.hand-card.dragging { opacity:0; }
+.hand-card.pointer-card {
+ position:fixed;
+ margin:0;
+ z-index:1000;
+ pointer-events:none;
+ transition:none;
+ animation:none;
+ opacity:1;
+ cursor:grabbing;
+ will-change:transform;
+ box-shadow:1px 2px 0 #a8a0b4,2px 4px 0 #343144,0 20px 28px #000a;
+}
+.card-dragging,.card-dragging * { cursor:grabbing!important; user-select:none!important; }
+.pointer-card[data-drop-allowed='true'] { border-color:#ddcaff; }
+
+/* Hit area covers the whole near lane; card placement remains the compact grid. */
+.world-anchor .lane-drop-target {
+ width:163px;
+ height:179px;
+ pointer-events:none;
+ background:none;
+ border:0;
+}
+.world-anchor .deployment-grid { border-color:transparent; background:none; box-shadow:none; }
+.world-anchor .deployment-grid.hovered-placement { border-color:transparent; background:none; box-shadow:none; }
+.world-anchor .location-plate.drop-highlight {
+ border-color:#d9c0ff;
+ background:linear-gradient(145deg,#49365e,#2c2440 60%,#211b32);
+ box-shadow:inset 0 0 12px #c597ff22,0 0 18px #ba8fff77;
+}
+
+/* Open up the gap between the physical table, player instruments and the hand. */
+.hand-zone { bottom:15px; }
+.world-anchor .duration.far>small { transform:translateY(3px); }
+.world-anchor .data-center.near { height:18px; }
+.world-anchor .data-center.near>i { bottom:0; }
+.world-anchor .data-center.near .dc-readout { padding-top:5px; }
+
+/* Blender supplies the rhombus face and peaked probability shoulder. */
+.world-anchor .power-badge b { font-size:20px; text-shadow:0 1px 3px #000; }
+.world-anchor .power-badge.winning b { color:#fff; text-shadow:0 0 7px #cab2f788,0 1px 2px #000; }
+.world-anchor .power-badge.score-active { outline:0; }
+.world-anchor .node-weight,
+.world-anchor .node-weight.selected {
+ width:75px;
+ min-height:29px;
+ padding:1px 0 0;
+ border:0;
+ border-radius:0;
+ background:none;
+ box-shadow:none;
+ color:#e7dbaa;
+ font:500 italic 25px/1 Orbitron,sans-serif;
+ text-align:center;
+ text-shadow:0 2px 3px #080812;
+}
+.world-anchor .node-weight small { font-size:13px; margin-left:1px; }
+.world-anchor .node-weight.selected { color:#fff2b7; filter:drop-shadow(0 0 7px #e3c86a88); }
+
+/* The face is unchanged until the release flight turns it face down. */
+.flying-card:not(.crypto-flight) { animation-name:pointer-placement; }
+@keyframes pointer-placement {
+ 0% { transform:translate(0,0) rotate(var(--flight-angle,0deg)) scale(1); }
+ 78% { transform:translate(var(--flight-x),calc(var(--flight-y) - 3px)) scale(calc(var(--flight-scale) * 1.03)); }
+ 100% { transform:translate(var(--flight-x),var(--flight-y)) scale(var(--flight-scale)); }
+}
+
+.flying-face.hand-card.flight-face-card {
+ position:absolute;inset:0;width:100%;height:100%;margin:0;
+ transform:none;transition:none;box-shadow:none;
+ grid-template-rows:60% 12% 18% 10%;pointer-events:none;
+}
+.flying-face.hand-card.flight-face-card>.card-art,
+.flying-face.hand-card.flight-face-card>.missing-art { width:100%;height:100%; }
+
+.world-anchor:has(>.lane-drop-target) { pointer-events:none; }

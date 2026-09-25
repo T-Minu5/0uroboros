@@ -1,0 +1,1192 @@
+{
+  "schemaVersion": 1,
+  "source": "assets/card_art/cards.json",
+  "mapping": "src/cardArtwork.json",
+  "policy": "Artwork paths only. Exact category folder first, then unique supplied suffix/filename. No mechanics or video changes; no video use.",
+  "placeholder": "/assets/card_art/image_placeHolder.png",
+  "cardCount": 106,
+  "preservedCardDataSha256": "7825370d1d8398afb4dc9f1c4549a14c47070967b2ba172d055e813f4a1c9a34",
+  "counts": {
+    "resolved": 105,
+    "missing": 1,
+    "ambiguous": 0,
+    "placeholder": 0
+  },
+  "issues": [
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "originalArtwork": null,
+      "artwork": "/assets/card_art/image_placeHolder.png",
+      "status": "missing",
+      "reason": "No artwork reference supplied",
+      "candidates": []
+    }
+  ],
+  "cards": [
+    {
+      "id": "atomic-unit",
+      "name": "Atomic Unit",
+      "originalArtwork": "src/assets/cards/action/atomic-unit.png",
+      "artwork": "/assets/card_art/base cards/action/atomic-unit.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/atomic-unit.png"
+      ]
+    },
+    {
+      "id": "atomic-mass",
+      "name": "Atomic Mass",
+      "originalArtwork": "src/assets/cards/action/atomic-mass.png",
+      "artwork": "/assets/card_art/base cards/action/atomic-mass.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/atomic-mass.png"
+      ]
+    },
+    {
+      "id": "thorn-shadow",
+      "name": "Thorn Shadow",
+      "originalArtwork": "src/assets/cards/action/thorn-shadow.png",
+      "artwork": "/assets/card_art/base cards/action/thorn-shadow.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/thorn-shadow.png"
+      ]
+    },
+    {
+      "id": "dash-dot",
+      "name": "Dash-Dot",
+      "originalArtwork": "src/assets/cards/action/dash-dot.png",
+      "artwork": "/assets/card_art/base cards/action/dash-dot.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/dash-dot.png"
+      ]
+    },
+    {
+      "id": "slash-dot",
+      "name": "Slash-Dot",
+      "originalArtwork": "src/assets/cards/action/slash-dot.png",
+      "artwork": "/assets/card_art/base cards/action/slash-dot.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/slash-dot.png"
+      ]
+    },
+    {
+      "id": "the-inbetweener",
+      "name": "The Inbetweener",
+      "originalArtwork": "src/assets/cards/action/the-inbetweener.png",
+      "artwork": "/assets/card_art/base cards/action/the-inbetweener.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/the-inbetweener.png"
+      ]
+    },
+    {
+      "id": "wave-card",
+      "name": "Wave Card",
+      "originalArtwork": "src/assets/cards/action/wave-form.png",
+      "artwork": "/assets/card_art/base cards/action/wave-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/wave-form.png"
+      ]
+    },
+    {
+      "id": "particle-card",
+      "name": "Particle Card",
+      "originalArtwork": "src/assets/cards/action/particle-form.png",
+      "artwork": "/assets/card_art/base cards/action/particle-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/particle-form.png"
+      ]
+    },
+    {
+      "id": "dotkrawler",
+      "name": "Dotkrawler",
+      "originalArtwork": "src/assets/cards/action/dotkrawler.png",
+      "artwork": "/assets/card_art/base cards/action/dotkrawler.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/dotkrawler.png"
+      ]
+    },
+    {
+      "id": "quantum-telementry",
+      "name": "Quantum Telemetry",
+      "originalArtwork": "src/assets/cards/action/quantum-telementry.png",
+      "artwork": "/assets/card_art/base cards/action/quantum-telementry.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/quantum-telementry.png"
+      ]
+    },
+    {
+      "id": "byte-drone",
+      "name": "Byte Drone",
+      "originalArtwork": "src/assets/cards/action/byte-drone.png",
+      "artwork": "/assets/card_art/base cards/action/byte-drone.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/byte-drone.png"
+      ]
+    },
+    {
+      "id": "recursive-seance",
+      "name": "Recursive Seance",
+      "originalArtwork": "src/assets/cards/action/recursive-seance.png",
+      "artwork": "/assets/card_art/base cards/action/recursive-seance.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/recursive-seance.png"
+      ]
+    },
+    {
+      "id": "cowl-obscyra",
+      "name": "Cowl Obscyra",
+      "originalArtwork": "src/assets/cards/action/cowl-obscyra.png",
+      "artwork": "/assets/card_art/base cards/action/cowl-obscyra.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/cowl-obscyra.png"
+      ]
+    },
+    {
+      "id": "infernal-kernel",
+      "name": "Infernal Kernel",
+      "originalArtwork": "src/assets/cards/action/infernal-kernel.png",
+      "artwork": "/assets/card_art/base cards/action/infernal-kernel.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/infernal-kernel.png"
+      ]
+    },
+    {
+      "id": "the-tesseract-magi",
+      "name": "The Tesseract Magi",
+      "originalArtwork": "src/assets/cards/action/the-tesseract-magi.png",
+      "artwork": "/assets/card_art/base cards/action/the-tesseract-magi.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/the-tesseract-magi.png"
+      ]
+    },
+    {
+      "id": "root-rune",
+      "name": "Root Rune",
+      "originalArtwork": "src/assets/cards/action/root-rune.png",
+      "artwork": "/assets/card_art/base cards/action/root-rune.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/root-rune.png"
+      ]
+    },
+    {
+      "id": "astra-ascii",
+      "name": "Astra Ascii",
+      "originalArtwork": "src/assets/cards/action/astra-ascii.png",
+      "artwork": "/assets/card_art/base cards/action/astra-ascii.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/astra-ascii.png"
+      ]
+    },
+    {
+      "id": "shiva-of-cern",
+      "name": "The Shiva of CERN",
+      "originalArtwork": "src/assets/cards/action/shiva-of-cern.png",
+      "artwork": "/assets/card_art/base cards/action/shiva-of-cern.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/action/shiva-of-cern.png"
+      ]
+    },
+    {
+      "id": "nyx-luna",
+      "name": "Nyx Luna",
+      "originalArtwork": "src/assets/cards/attack/nyx-luna.png",
+      "artwork": "/assets/card_art/chaos cards/attack/nyx-luna.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/nyx-luna.png"
+      ]
+    },
+    {
+      "id": "rezz-razor",
+      "name": "Rezz Razor",
+      "originalArtwork": "src/assets/cards/attack/rezz-razor.png",
+      "artwork": "/assets/card_art/chaos cards/attack/rezz-razor.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/rezz-razor.png"
+      ]
+    },
+    {
+      "id": "rezz-blade",
+      "name": "Rezz Blade",
+      "originalArtwork": "src/assets/cards/attack/rezz-blade.png",
+      "artwork": "/assets/card_art/chaos cards/attack/rezz-blade.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/rezz-blade.png"
+      ]
+    },
+    {
+      "id": "invocation-of-the-sword",
+      "name": "Invocation of the Sword",
+      "originalArtwork": "src/assets/cards/attack/invocation-of-the-sword.png",
+      "artwork": "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/invocation-of-the-sword.png"
+      ]
+    },
+    {
+      "id": "bushido-io",
+      "name": "Bushido.io",
+      "originalArtwork": "src/assets/cards/attack/bushido-io.png",
+      "artwork": "/assets/card_art/chaos cards/attack/bushido-io.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/bushido-io.png"
+      ]
+    },
+    {
+      "id": "bloodlet-drone",
+      "name": "Bloodlet Drone",
+      "originalArtwork": "src/assets/cards/attack/bloodlet-drone.png",
+      "artwork": "/assets/card_art/chaos cards/attack/bloodlet-drone.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/bloodlet-drone.png"
+      ]
+    },
+    {
+      "id": "h3x1-d3x1",
+      "name": "H3x1-D3x1",
+      "originalArtwork": "src/assets/cards/attack/h3x1-d3x1.PNG",
+      "artwork": "/assets/card_art/chaos cards/attack/h3x1-d3x1.PNG",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/h3x1-d3x1.PNG"
+      ]
+    },
+    {
+      "id": "1337_speaker",
+      "name": "1337 Speaker",
+      "originalArtwork": "src/assets/cards/attack/1337-speaker.png",
+      "artwork": "/assets/card_art/chaos cards/attack/1337-speaker.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/1337-speaker.png"
+      ]
+    },
+    {
+      "id": "glitch-witch",
+      "name": "Glitch-Witch.exe",
+      "originalArtwork": "src/assets/cards/attack/glitch-witch.png",
+      "artwork": "/assets/card_art/chaos cards/attack/glitch-witch.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/glitch-witch.png"
+      ]
+    },
+    {
+      "id": "qubit-kid",
+      "name": "The Qubit Kid",
+      "originalArtwork": "src/assets/cards/attack/qubit-kid.png",
+      "artwork": "/assets/card_art/chaos cards/attack/qubit-kid.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/qubit-kid.png"
+      ]
+    },
+    {
+      "id": "chrome-mitchell",
+      "name": "Chrome Mitchell",
+      "originalArtwork": "src/assets/cards/attack/chrome-mitchell.png",
+      "artwork": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/chrome-mitchell.png"
+      ]
+    },
+    {
+      "id": "mary-mallon",
+      "name": "Mary Mallon",
+      "originalArtwork": "src/assets/cards/attack/mary-mallon.png",
+      "artwork": "/assets/card_art/chaos cards/attack/mary-mallon.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/mary-mallon.png"
+      ]
+    },
+    {
+      "id": "maryMalice",
+      "name": "Mary Malice",
+      "originalArtwork": "src/assets/cards/attack/mary-malice.png",
+      "artwork": "/assets/card_art/chaos cards/attack/mary-malice.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/mary-malice.png"
+      ]
+    },
+    {
+      "id": "maryMalware",
+      "name": "Mary Malware",
+      "originalArtwork": "src/assets/cards/attack/mary-malware.png",
+      "artwork": "/assets/card_art/chaos cards/attack/mary-malware.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/mary-malware.png"
+      ]
+    },
+    {
+      "id": "typhoidMary",
+      "name": "Typhoid Mary",
+      "originalArtwork": "src/assets/cards/attack/typhoid-mary.png",
+      "artwork": "/assets/card_art/chaos cards/attack/typhoid-mary.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/typhoid-mary.png"
+      ]
+    },
+    {
+      "id": "delta-wave",
+      "name": "∆-Wave",
+      "originalArtwork": "src/assets/cards/attack/delta-wave.png",
+      "artwork": "/assets/card_art/chaos cards/attack/delta-wave.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/delta-wave.png"
+      ]
+    },
+    {
+      "id": "system-seppuku",
+      "name": "System Seppuku",
+      "originalArtwork": "src/assets/cards/attack/system-seppuku.png",
+      "artwork": "/assets/card_art/chaos cards/attack/system-seppuku.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/attack/system-seppuku.png"
+      ]
+    },
+    {
+      "id": "sudo-demiurge",
+      "name": "Sudo Demiurge",
+      "originalArtwork": "src/assets/cards/power/sudo-demiurge.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/sudo-demiurge.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/sudo-demiurge.png"
+      ]
+    },
+    {
+      "id": "cicada-3301",
+      "name": "Cicada 3301",
+      "originalArtwork": "src/assets/cards/power/cicada-3301.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/cicada-3301.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/cicada-3301.png"
+      ]
+    },
+    {
+      "id": "skinwalker",
+      "name": "Skinwalker",
+      "originalArtwork": "src/assets/cards/power/skinwalker.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/skinwalker.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/skinwalker.png"
+      ]
+    },
+    {
+      "id": "leviathan-form",
+      "name": "Leviathan Form",
+      "originalArtwork": "src/assets/cards/power/leviathan-form.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/leviathan-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/leviathan-form.png"
+      ]
+    },
+    {
+      "id": "spider-form",
+      "name": "Spider Form",
+      "originalArtwork": "src/assets/cards/power/spider-form.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/spider-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/spider-form.png"
+      ]
+    },
+    {
+      "id": "wasp-form",
+      "name": "Wasp Form",
+      "originalArtwork": "src/assets/cards/power/wasp-form.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/wasp-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/wasp-form.png"
+      ]
+    },
+    {
+      "id": "viper-form",
+      "name": "Viper Form",
+      "originalArtwork": "src/assets/cards/power/viper-form.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/viper-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/viper-form.png"
+      ]
+    },
+    {
+      "id": "wolf-form",
+      "name": "Wolf Form",
+      "originalArtwork": "src/assets/cards/power/wolf-form.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/wolf-form.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/wolf-form.png"
+      ]
+    },
+    {
+      "id": "subroutine_succubus",
+      "name": "Subroutine Succubus",
+      "originalArtwork": "src/assets/cards/power/subroutine-succubus.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/subroutine-succubus.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/subroutine-succubus.png"
+      ]
+    },
+    {
+      "id": "iterative-incubus",
+      "name": "Iterative Incubus",
+      "originalArtwork": "src/assets/cards/power/iterative-incubus.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/iterative-incubus.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/iterative-incubus.png"
+      ]
+    },
+    {
+      "id": "node-feratu",
+      "name": "Node Feratu",
+      "originalArtwork": "src/assets/cards/power/node-feratu.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/node-feratu.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/node-feratu.png"
+      ]
+    },
+    {
+      "id": "the-azimuthal-kill",
+      "name": "The Azimuthal Kill",
+      "originalArtwork": "src/assets/cards/power/the-azimuthal-kill.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/the-azimuthal-kill.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/the-azimuthal-kill.png"
+      ]
+    },
+    {
+      "id": "tihkal-hound",
+      "name": "Tihkal Hound",
+      "originalArtwork": "src/assets/cards/power/tihkal-hound.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/tihkal-hound.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/tihkal-hound.png"
+      ]
+    },
+    {
+      "id": "veil-of-cthulhu",
+      "name": "Veil of Cthulhu",
+      "originalArtwork": "src/assets/cards/power/veil-of-cthulhu.png",
+      "artwork": "/assets/card_art/chaos cards/hackers/veil-of-cthulhu.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "chaos cards/hackers/veil-of-cthulhu.png"
+      ]
+    },
+    {
+      "id": "night-scythe",
+      "name": "Night Scythe",
+      "originalArtwork": "src/assets/cards/utility/night-scythe.png",
+      "artwork": "/assets/card_art/base cards/utility/night-scythe.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/night-scythe.png"
+      ]
+    },
+    {
+      "id": "superpositioning",
+      "name": "Superpositioning",
+      "originalArtwork": "src/assets/cards/utility/superpositioning.png",
+      "artwork": "/assets/card_art/base cards/utility/superpositioning.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/superpositioning.png"
+      ]
+    },
+    {
+      "id": "summon-the-acolytes",
+      "name": "Summon the Acolytes",
+      "originalArtwork": "src/assets/cards/utility/summon-the-acolytes.png",
+      "artwork": "/assets/card_art/base cards/utility/summon-the-acolytes.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/summon-the-acolytes.png"
+      ]
+    },
+    {
+      "id": "temporal-rift",
+      "name": "Temporal Rift",
+      "originalArtwork": "src/assets/cards/utility/temporal-rift.png",
+      "artwork": "/assets/card_art/base cards/utility/temporal-rift.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/temporal-rift.png"
+      ]
+    },
+    {
+      "id": "ghost-key",
+      "name": "Ghost Key",
+      "originalArtwork": "src/assets/cards/utility/ghost-key.png",
+      "artwork": "/assets/card_art/base cards/utility/ghost-key.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/ghost-key.png"
+      ]
+    },
+    {
+      "id": "banishing-ritual",
+      "name": "Banishing Ritual",
+      "originalArtwork": "src/assets/cards/utility/banishing-ritual.png",
+      "artwork": "/assets/card_art/base cards/utility/banishing-ritual.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/banishing-ritual.png"
+      ]
+    },
+    {
+      "id": "opulent-void",
+      "name": "Opulent Void",
+      "originalArtwork": "src/assets/cards/utility/opulent-void.png",
+      "artwork": "/assets/card_art/base cards/utility/opulent-void.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/opulent-void.png"
+      ]
+    },
+    {
+      "id": "sacrifical-sigil",
+      "name": "Sacrifical Sigil",
+      "originalArtwork": "src/assets/cards/utility/sacrifical-sigil.png",
+      "artwork": "/assets/card_art/base cards/utility/sacrifical-sigil.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/sacrifical-sigil.png"
+      ]
+    },
+    {
+      "id": "heisenberg-hag",
+      "name": "The Heisenberg Hag",
+      "originalArtwork": "src/assets/cards/utility/the-heisenberg-hag.png",
+      "artwork": "/assets/card_art/base cards/utility/the-heisenberg-hag.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/the-heisenberg-hag.png"
+      ]
+    },
+    {
+      "id": "byte-heist",
+      "name": "Byte Heist",
+      "originalArtwork": "src/assets/cards/utility/byte-heist.png",
+      "artwork": "/assets/card_art/base cards/utility/byte-heist.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/byte-heist.png"
+      ]
+    },
+    {
+      "id": "cyptoAlchemist",
+      "name": "Cypto Alchemist",
+      "originalArtwork": "src/assets/cards/utility/crypto-alchemist.png",
+      "artwork": "/assets/card_art/base cards/utility/crypto-alchemist.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/crypto-alchemist.png"
+      ]
+    },
+    {
+      "id": "code-sniper",
+      "name": "Code Sniper",
+      "originalArtwork": "src/assets/cards/utility/code-sniper.png",
+      "artwork": "/assets/card_art/base cards/utility/code-sniper.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/code-sniper.png"
+      ]
+    },
+    {
+      "id": "kilo-cycle",
+      "name": "Kilo Cycle",
+      "originalArtwork": "src/assets/cards/utility/kilo-cycle.png",
+      "artwork": "/assets/card_art/base cards/utility/kilo-cycle.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/kilo-cycle.png"
+      ]
+    },
+    {
+      "id": "entropic-infantry",
+      "name": "Entropic Infantry",
+      "originalArtwork": "src/assets/cards/utility/entropic-infantry.png",
+      "artwork": "/assets/card_art/base cards/utility/entropic-infantry.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/entropic-infantry.png"
+      ]
+    },
+    {
+      "id": "chronos-cache",
+      "name": "Chronos Cache",
+      "originalArtwork": "src/assets/cards/utility/chronos-cache.png",
+      "artwork": "/assets/card_art/base cards/utility/chronos-cache.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/chronos-cache.png"
+      ]
+    },
+    {
+      "id": "merchant-of-chaos",
+      "name": "Merchant of Chaos",
+      "originalArtwork": "src/assets/cards/utility/merchant-of-chaos.png",
+      "artwork": "/assets/card_art/base cards/utility/merchant-of-chaos.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/merchant-of-chaos.png"
+      ]
+    },
+    {
+      "id": "alchemic-shyte",
+      "name": "Alchemic Shyte",
+      "originalArtwork": "src/assets/cards/utility/alchemic-shyte.png",
+      "artwork": "/assets/card_art/base cards/utility/alchemic-shyte.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/alchemic-shyte.png"
+      ]
+    },
+    {
+      "id": "alchemic-byte",
+      "name": "Alchemic Byte",
+      "originalArtwork": "src/assets/cards/utility/alchemic-byte.png",
+      "artwork": "/assets/card_art/base cards/utility/alchemic-byte.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/alchemic-byte.png"
+      ]
+    },
+    {
+      "id": "alchemic-kilo",
+      "name": "Alchemic Kilo",
+      "originalArtwork": "src/assets/cards/utility/alchemic-kilo.png",
+      "artwork": "/assets/card_art/base cards/utility/alchemic-kilo.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/alchemic-kilo.png"
+      ]
+    },
+    {
+      "id": "alchemic-mega",
+      "name": "Alchemic Mega",
+      "originalArtwork": "src/assets/cards/utility/alchemic-mega.png",
+      "artwork": "/assets/card_art/base cards/utility/alchemic-mega.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/alchemic-mega.png"
+      ]
+    },
+    {
+      "id": "alphaTeam",
+      "name": "Alpha Team",
+      "originalArtwork": "src/assets/cards/utility/alpha-team.png",
+      "artwork": "/assets/card_art/base cards/utility/alpha-team.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/alpha-team.png"
+      ]
+    },
+    {
+      "id": "bravoTeam",
+      "name": "Bravo Team",
+      "originalArtwork": "src/assets/cards/utility/bravo-team.png",
+      "artwork": "/assets/card_art/base cards/utility/bravo-team.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/bravo-team.png"
+      ]
+    },
+    {
+      "id": "charlieTeam",
+      "name": "Charlie Team",
+      "originalArtwork": "src/assets/cards/utility/charlie-team.png",
+      "artwork": "/assets/card_art/base cards/utility/charlie-team.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "base cards/utility/charlie-team.png"
+      ]
+    },
+    {
+      "id": "shyte-coin",
+      "name": "Shyte-Coin",
+      "originalArtwork": "src/assets/cards/crypto/shyte-coin.png",
+      "artwork": "/assets/card_art/crypto/shyte-coin.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "crypto/shyte-coin.png"
+      ]
+    },
+    {
+      "id": "byte-coin",
+      "name": "Byte-Coin",
+      "originalArtwork": "src/assets/cards/crypto/byte-coin.png",
+      "artwork": "/assets/card_art/crypto/byte-coin.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "crypto/byte-coin.png"
+      ]
+    },
+    {
+      "id": "kilo-coin",
+      "name": "Kilo-Coin",
+      "originalArtwork": "src/assets/cards/crypto/kilo-coin.png",
+      "artwork": "/assets/card_art/crypto/kilo-coin.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "crypto/kilo-coin.png"
+      ]
+    },
+    {
+      "id": "mega-cache",
+      "name": "Mega-Cache",
+      "originalArtwork": "src/assets/cards/crypto/mega-cache.png",
+      "artwork": "/assets/card_art/crypto/mega-cache.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "crypto/mega-cache.png"
+      ]
+    },
+    {
+      "id": "basic-encryption",
+      "name": "Basic Encryption",
+      "originalArtwork": "src/assets/cards/volume/1vp.png",
+      "artwork": "/assets/card_art/volume/1vp.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/1vp.png"
+      ]
+    },
+    {
+      "id": "vault-encryption",
+      "name": "Vault Encryption",
+      "originalArtwork": "src/assets/cards/volume/2vp-b.png",
+      "artwork": "/assets/card_art/volume/2vp-b.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/2vp-b.png"
+      ]
+    },
+    {
+      "id": "quantum-archive",
+      "name": "Quantum Archive",
+      "originalArtwork": "src/assets/cards/volume/3vp.png",
+      "artwork": "/assets/card_art/volume/3vp.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/3vp.png"
+      ]
+    },
+    {
+      "id": "bios-archive",
+      "name": "BIOS Archive",
+      "originalArtwork": "src/assets/cards/volume/4vp.png",
+      "artwork": "/assets/card_art/volume/4vp.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/4vp.png"
+      ]
+    },
+    {
+      "id": "esoteric-encryption",
+      "name": "Esoteric Encryption",
+      "originalArtwork": "src/assets/cards/volume/6vp-b.png",
+      "artwork": "/assets/card_art/volume/6vp-b.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/6vp-b.png"
+      ]
+    },
+    {
+      "id": "neural-wetware",
+      "name": "Neural Wetware",
+      "originalArtwork": "src/assets/cards/volume/6vp.png",
+      "artwork": "/assets/card_art/volume/6vp.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/6vp.png"
+      ]
+    },
+    {
+      "id": "zenith-worx",
+      "name": "Zenith Worx",
+      "originalArtwork": "src/assets/cards/volume/10vp.png",
+      "artwork": "/assets/card_art/volume/10vp.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/10vp.png"
+      ]
+    },
+    {
+      "id": "zenith-wetware",
+      "name": "Zenith Wetware",
+      "originalArtwork": "src/assets/cards/volume/10vp-b.png",
+      "artwork": "/assets/card_art/volume/10vp-b.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "volume/10vp-b.png"
+      ]
+    },
+    {
+      "id": "schrodinger-box",
+      "name": "Schrödinger's Cat Box",
+      "originalArtwork": "src/assets/cards/cats/schrodinger-box.png",
+      "artwork": "/assets/card_art/base cards/cats/schrodinger-box.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/schrodinger-box.png"
+      ]
+    },
+    {
+      "id": "cat-attack",
+      "name": "Cat Attack",
+      "originalArtwork": "src/assets/cards/cats/cat-attack.png",
+      "artwork": "/assets/card_art/base cards/cats/cat-attack.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/cat-attack.png"
+      ]
+    },
+    {
+      "id": "big-cat",
+      "name": "Big Cat",
+      "originalArtwork": "src/assets/cards/cats/big-cat.png",
+      "artwork": "/assets/card_art/base cards/cats/big-cat.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/big-cat.png"
+      ]
+    },
+    {
+      "id": "mad-cat",
+      "name": "Mad Cat",
+      "originalArtwork": "src/assets/cards/cats/mad-cat.png",
+      "artwork": "/assets/card_art/base cards/cats/mad-cat.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/mad-cat.png"
+      ]
+    },
+    {
+      "id": "cat-pounce",
+      "name": "Cat Pounce",
+      "originalArtwork": "src/assets/cards/cats/cat-pounce.png",
+      "artwork": "/assets/card_art/base cards/cats/cat-pounce.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/cat-pounce.png"
+      ]
+    },
+    {
+      "id": "cat-run",
+      "name": "Cat Run",
+      "originalArtwork": "src/assets/cards/cats/cat-run.png",
+      "artwork": "/assets/card_art/base cards/cats/cat-run.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/cat-run.png"
+      ]
+    },
+    {
+      "id": "cat-hack",
+      "name": "Cat Hack",
+      "originalArtwork": "src/assets/cards/cats/cat-hack.png",
+      "artwork": "/assets/card_art/base cards/cats/cat-hack.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/cat-hack.png"
+      ]
+    },
+    {
+      "id": "dead-cat-01",
+      "name": "Dead Cat 01",
+      "originalArtwork": "src/assets/cards/cats/dead-cat-01.png",
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-01.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/dead-cat-01.png"
+      ]
+    },
+    {
+      "id": "dead-cat-02",
+      "name": "Dead Cat 02",
+      "originalArtwork": "src/assets/cards/cats/dead-cat-02.png",
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-02.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/dead-cat-02.png"
+      ]
+    },
+    {
+      "id": "dead-cat-03",
+      "name": "Dead Cat 03",
+      "originalArtwork": "src/assets/cards/cats/dead-cat-03.png",
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-03.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/dead-cat-03.png"
+      ]
+    },
+    {
+      "id": "dead-cat-04",
+      "name": "Dead Cat 04",
+      "originalArtwork": "src/assets/cards/cats/dead-cat-04.png",
+      "artwork": "/assets/card_art/base cards/cats/dead-cat-04.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/cats/dead-cat-04.png"
+      ]
+    },
+    {
+      "id": "quark",
+      "name": "Quark Widget",
+      "originalArtwork": "src/assets/cards/widgets/quark.png",
+      "artwork": "/assets/card_art/base cards/widgets/quark.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/quark.png"
+      ]
+    },
+    {
+      "id": "charm-quark",
+      "name": "Charm Quark Widget",
+      "originalArtwork": "src/assets/cards/widgets/charm-quark.png",
+      "artwork": "/assets/card_art/base cards/widgets/charm-quark.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/charm-quark.png"
+      ]
+    },
+    {
+      "id": "tachyon",
+      "name": "Tachyon Widget",
+      "originalArtwork": "src/assets/cards/widgets/tachyon.png",
+      "artwork": "/assets/card_art/base cards/widgets/tachyon.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/tachyon.png"
+      ]
+    },
+    {
+      "id": "neutrino",
+      "name": "Neutrino Widget",
+      "originalArtwork": "src/assets/cards/widgets/neutrino.png",
+      "artwork": "/assets/card_art/base cards/widgets/neutrino.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/neutrino.png"
+      ]
+    },
+    {
+      "id": "tau",
+      "name": "Tau Widget",
+      "originalArtwork": "src/assets/cards/widgets/tau.png",
+      "artwork": "/assets/card_art/base cards/widgets/tau.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/tau.png"
+      ]
+    },
+    {
+      "id": "photon",
+      "name": "Photon Widget",
+      "originalArtwork": "src/assets/cards/widgets/photon.png",
+      "artwork": "/assets/card_art/base cards/widgets/photon.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/photon.png"
+      ]
+    },
+    {
+      "id": "strange-quark",
+      "name": "Strange Quark Widget",
+      "originalArtwork": "src/assets/cards/widgets/strange-quark.png",
+      "artwork": "/assets/card_art/base cards/widgets/strange-quark.png",
+      "status": "resolved",
+      "reason": "unique-suffix",
+      "candidates": [
+        "base cards/widgets/strange-quark.png"
+      ]
+    },
+    {
+      "id": "razor-blade-jade",
+      "name": "Razor Blade Jade",
+      "originalArtwork": "src/assets/cards/runtimeHacks/razorBladeJade.png",
+      "artwork": "/assets/card_art/runtimeHacks/razorBladeJade.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "runtimeHacks/razorBladeJade.png"
+      ]
+    },
+    {
+      "id": "dit-bot",
+      "name": "Dit Bot",
+      "originalArtwork": "src/assets/cards/runtimeHacks/dit-bot.png",
+      "artwork": "/assets/card_art/runtimeHacks/dit-bot.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "runtimeHacks/dit-bot.png"
+      ]
+    },
+    {
+      "id": "owl-king",
+      "name": "The Owl King",
+      "originalArtwork": "src/assets/cards/runtimeHacks/owl-king.png",
+      "artwork": "/assets/card_art/runtimeHacks/owl-king.png",
+      "status": "resolved",
+      "reason": "exact-preferred",
+      "candidates": [
+        "runtimeHacks/owl-king.png"
+      ]
+    },
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "originalArtwork": null,
+      "artwork": "/assets/card_art/image_placeHolder.png",
+      "status": "missing",
+      "reason": "No artwork reference supplied",
+      "candidates": []
+    }
+  ]
+}

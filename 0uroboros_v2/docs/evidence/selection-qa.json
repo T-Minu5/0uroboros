@@ -1,0 +1,31 @@
+{
+  "errors": [],
+  "layout": {
+    "clear": true,
+    "walletTop": 668.5093383789062,
+    "handArch": 644.117431640625,
+    "buttonRight": 1328.8812255859375
+  },
+  "selection": {
+    "indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      0,
+      1,
+      2,
+      3,
+      4,
+      0,
+      1,
+      2,
+      3,
+      4,
+      3
+    ],
+    "earlyResult": false,
+    "landed": true
+  }
+}

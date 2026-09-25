@@ -1,0 +1,33 @@
+{
+  "package": "0uroboros_v3_clean_start",
+  "version": "3.1.0",
+  "date": "2026-09-22",
+  "project": "0uroboros: The Circuit and the Serpent",
+  "mode_target": "Runtime V1",
+  "fresh_context": true,
+  "authority_order": [
+    "Mel explicit current decisions",
+    "Canonical V3 rules",
+    "Approved UX product contract",
+    "First-party visual assets and concept art",
+    "Approved LookDev additions",
+    "Repository implementation evidence",
+    "Curated competitive/effects references",
+    "Historical implementation docs",
+    "External research"
+  ],
+  "bootstrap_prompt": "17_ASTRA_BOOTSTRAP_PROMPT.md",
+  "review_status": "PASS_WITH_VISIBLE_TBDS",
+  "package_name": "0uroboros_v3_1_clean_start",
+  "notes": [
+    "Board concept art in assets/board is first-party layout authority",
+    "Blender MCP guidance strengthened for 3D board creation"
+  ],
+  "required_reading_order": [
+    "06A_CANONICAL_CONTENT_CATALOG.md"
+  ],
+  "canonical_rule_docs": [
+    "06A_CANONICAL_CONTENT_CATALOG.md"
+  ],
+  "content_catalog_status": "SOURCE_REQUIRED_FOR_EXACT_NONSTARTER_LOCATION_CIRCUIT_CONTENT"
+}

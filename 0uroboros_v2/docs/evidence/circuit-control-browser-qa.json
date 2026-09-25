@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-24",
+  "surface": "Codex in-app browser, local development build",
+  "viewport": { "width": 1014, "height": 803 },
+  "fixture": "Normal evaluation session, plus Quantum Telemetry deliberately added using the visible test catalog",
+  "checks": {
+    "catalogPlayableDefinitions": 74,
+    "runtimeErrorsAfterVerificationReload": 0,
+    "closedNodeAcceptsPlacement": true,
+    "currentPlacementShowsOriginalArt": true,
+    "undoRestoresHandOrder": true,
+    "undoRestoresActions": { "beforePlacement": 2, "afterPlacement": 1, "afterUndo": 2 },
+    "endTurnConcealsAllPlannedCards": true,
+    "endTurnDisablesUndo": true,
+    "unopenedNodeRemainsConcealedInLaterPlanning": true,
+    "newlyOpenedNodeRevealsBeforePlanning": true,
+    "powerTransfer": { "from": "N1", "to": "N2", "amount": 1, "before": [3, 2, 2, 0, 0], "after": [2, 3, 2, 0, 0], "conserved": true },
+    "nodePercentageElements": 0,
+    "localDrawDiscardAlignment": "Equal measured top position: 502.7617 px",
+    "cycleOneResult": { "localWins": 2, "opponentWins": 2, "tiedLocations": 1, "reward": "Integrity patch", "bothEligible": true },
+    "localPurchases": ["Root Rune", "Basic Encryption"],
+    "opponentPurchases": ["Mega-Cache", "Basic Encryption"],
+    "nextCycleReached": 2,
+    "nextCycleDeal": 5,
+    "purchasedCardSeenInNextHand": "Root Rune"
+  }
+}

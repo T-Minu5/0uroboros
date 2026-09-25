@@ -1,0 +1,138 @@
+{
+  "cycles": [
+    {
+      "cycle": 1,
+      "collapseObserved": true,
+      "draftReached": true,
+      "nextCycleReached": true
+    }
+  ],
+  "deployments": 7,
+  "purchases": 1,
+  "inspectPass": true,
+  "dragInspectPass": true,
+  "errors": [],
+  "fiveCardOpening": true,
+  "allNodesInitiallyClosed": true,
+  "cryptoTransferConserved": true,
+  "openingIntervals": [
+    800,
+    798
+  ],
+  "resourceColors": [
+    "rgb(39, 226, 255)",
+    "rgb(31, 255, 177)",
+    "rgb(255, 204, 18)"
+  ],
+  "walletClear": true,
+  "bankHeights": [
+    18.040176391601562,
+    18.040176391601562,
+    18.0401611328125,
+    18.0401611328125
+  ],
+  "walletTop": 746.8717651367188,
+  "closedNodes": 2,
+  "randomWeightPlacement": [
+    "20%",
+    "10%",
+    "30%",
+    "25%",
+    "15%"
+  ],
+  "locationInspect": true,
+  "effectColors": {
+    "draw": "rgb(65, 133, 255)",
+    "actions": "rgb(39, 226, 255)",
+    "crypto": "rgb(31, 255, 177)"
+  },
+  "shot_draw": true,
+  "drainEvidence": true,
+  "shot_attack": true,
+  "noProbabilityOverlap": true,
+  "collapseEvidence": true,
+  "shot_flip": true,
+  "shot_cash": true,
+  "finalPhase": "CYCLE 02 / RUNTIME 1 OF 3",
+  "motion": {
+    "draws": [
+      {
+        "id": "10",
+        "cards": [
+          "Dash-Dot2+1 Card. +1 Action.1 Action"
+        ]
+      },
+      {
+        "id": "27",
+        "cards": [
+          "Slash-Dot3+3 Cards.1 Action"
+        ]
+      },
+      {
+        "id": "42",
+        "cards": [
+          "IDENTITY ART PENDINGByte-Coin+2 Crypto.Auto-resolves at Draft"
+        ]
+      },
+      {
+        "id": "47",
+        "cards": [
+          "IDENTITY ART PENDINGKilo-Coin+3 Crypto.Auto-resolves at Draft",
+          "Rezz-Razor4Drain 75. +1 Card. +1 Action.1 Action"
+        ]
+      }
+    ],
+    "cash": [
+      {
+        "id": "0:byte-1",
+        "total": "1"
+      },
+      {
+        "id": "0:byte-2",
+        "total": "3"
+      },
+      {
+        "id": "0:kilo",
+        "total": "5"
+      }
+    ],
+    "closed": [
+      "0",
+      "0,1",
+      "0,1,2",
+      "0,1,2,3",
+      "0,1,2,3,4",
+      ""
+    ],
+    "flips": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "ties": [
+      "1",
+      "2"
+    ],
+    "selection": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      0,
+      1,
+      2,
+      3,
+      4,
+      0,
+      1,
+      2,
+      3,
+      4,
+      3
+    ]
+  },
+  "consoleErrors": 0
+}

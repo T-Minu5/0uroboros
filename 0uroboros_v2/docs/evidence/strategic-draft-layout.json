@@ -1,0 +1,22 @@
+{
+  "errors": [],
+  "layouts": [
+    {
+      "width": 1600,
+      "walletColor": "rgb(31, 255, 177)",
+      "headingTop": 66,
+      "buttonVisible": true,
+      "cardCount": 18,
+      "overflow": false
+    },
+    {
+      "width": 1366,
+      "walletColor": "rgb(31, 255, 177)",
+      "headingTop": 66,
+      "buttonVisible": true,
+      "cardCount": 18,
+      "overflow": false
+    }
+  ],
+  "passed": true
+}

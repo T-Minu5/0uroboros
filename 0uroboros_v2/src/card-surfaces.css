@@ -1,0 +1,37 @@
+/* Card surfaces keep the same face in the editor, hand, Draft and inspection. */
+.hand-card:has(> .cf-card),
+.flying-face.hand-card.flight-face-card:has(> .cf-card) {
+ display:block;padding:0;border:0;background:transparent;overflow:visible;
+}
+.hand-card:has(> .cf-card) {border-radius:8px;}
+.hand-card > .cf-card {width:100%;height:100%;}
+.flying-card:has(.cf-card) {border:0;overflow:visible;background:transparent;}
+.flying-card:not(.crypto-flight) .flying-face:has(> .cf-card) {display:block;}
+.world-anchor .field-card.revealed:has(> .cf-card) {display:block;padding:0;border:0;background:transparent;overflow:visible;}
+.field-card > .cf-card {width:100%;height:100%;}
+.world-anchor .cache-cards .cache-card:has(> .cf-card) {padding:0;overflow:visible;border:0;background:transparent;}
+.cache-card > .cf-card {width:100%;height:100%;}
+.world-anchor .duration.live-bank button.bank-slot:has(> .cf-card) {padding:0;overflow:visible;border:0!important;background:transparent!important;}
+.bank-slot > .cf-card {width:100%;height:100%;}
+.strategic-draft .market-art:has(> .cf-card) {
+ width:100%;height:auto;aspect-ratio:158/224;overflow:visible;border:0;background:none;border-radius:8px;
+}
+.strategic-draft .market-art > .cf-card {width:100%;height:100%;}
+.catalog-art:has(> .cf-card) {height:auto;aspect-ratio:158/224;overflow:visible;background:none;padding:8px;border-radius:8px;}
+.catalog-grid article:has(.cf-card) {overflow:visible;}
+.catalog-art > .cf-card {width:100%;height:100%;}
+.inspect:has(.cf-card) {align-items:start;}
+.inspect .inspect-art:has(> .cf-card) {padding:22px 16px;width:100%;height:auto;min-height:0;align-self:start;background:none;}
+.inspect-art > .cf-card {width:100%;height:auto;aspect-ratio:158/224;}
+.authoring-app .au-card-face-wrap {width:100%;aspect-ratio:158/224;min-width:0;}
+.au-card-face-wrap > .cf-card {width:100%;height:100%;}
+.authoring-app .au-preview-modes {display:flex;gap:4px;margin:8px 0 14px;border:1px solid #365263;border-radius:7px;padding:3px;background:#0a1522;}
+.authoring-app .au-preview-modes button {flex:1;padding:5px 8px;font-size:11px;border:0;background:none;color:#9db4c7;}
+.authoring-app .au-preview-modes button[aria-pressed='true'] {color:#dcf8ff;background:#204355;}
+.authoring-app .au-preview-meta {border-top:0;margin-top:12px;}
+.authoring-app .au-preview-meta .au-preview-effect {font-size:12px;line-height:1.6;color:#c9d8e2;white-space:pre-line;}
+@media(max-width:760px){
+ .authoring-app .au-card-face-wrap {max-width:240px;margin-inline:auto;}
+ .authoring-app .au-preview-modes {max-width:240px;margin-inline:auto;}
+ .inspect .inspect-art:has(> .cf-card) {padding:18px 12px;}
+}

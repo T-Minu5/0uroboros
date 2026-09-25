@@ -1,0 +1,261 @@
+{
+  "result": "PASS",
+  "source": "strategic-browser.json",
+  "method": "Chrome UI interaction at 1600×1000; RNG seed 341; no injected hands, wallets, queues or engine state.",
+  "cyclesCompleted": 4,
+  "finalPhase": "CYCLE 05 / RUNTIME 1 OF 3",
+  "paceByCycle": [
+    {
+      "cycle": 1,
+      "pace": "normal"
+    },
+    {
+      "cycle": 2,
+      "pace": "fast"
+    },
+    {
+      "cycle": 3,
+      "pace": "normal"
+    },
+    {
+      "cycle": 4,
+      "pace": "fast"
+    }
+  ],
+  "deployments": 24,
+  "purchasesByOwner": [
+    {
+      "owner": 0,
+      "count": 16
+    },
+    {
+      "owner": 1,
+      "count": 12
+    }
+  ],
+  "purchasesByCycle": [
+    {
+      "cycle": 1,
+      "players": [
+        {
+          "owner": 0,
+          "purchases": [
+            {
+              "cardId": "0:acquired-3",
+              "text": "PURCHASEYou acquire Chronos Cache to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-4",
+              "text": "PURCHASEYou acquire Glitch-Witch.exe to Discard for 5 Crypto."
+            },
+            {
+              "cardId": "0:acquired-5",
+              "text": "PURCHASEYou acquire Ghost Key to Discard for 2 Crypto."
+            }
+          ]
+        },
+        {
+          "owner": 1,
+          "purchases": [
+            {
+              "cardId": "1:acquired-1",
+              "text": "PURCHASEOpponent acquires Chronos Cache to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "1:acquired-2",
+              "text": "PURCHASEOpponent acquires Quantum Telemetry to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "1:acquired-6",
+              "text": "PURCHASEOpponent acquires Temporal Rift to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "1:acquired-7",
+              "text": "PURCHASEOpponent acquires Ghost Key to Discard for 2 Crypto."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 2,
+      "players": [
+        {
+          "owner": 0,
+          "purchases": [
+            {
+              "cardId": "0:acquired-11",
+              "text": "PURCHASEYou acquire Byte-Coin to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-12",
+              "text": "PURCHASEYou acquire Temporal Rift to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-13",
+              "text": "PURCHASEYou acquire Banishing Ritual to Discard for 2 Crypto."
+            },
+            {
+              "cardId": "0:acquired-14",
+              "text": "PURCHASEYou acquire Quantum Telemetry to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-15",
+              "text": "PURCHASEYou acquire Slash-Dot to Discard for 4 Crypto."
+            },
+            {
+              "cardId": "0:acquired-16",
+              "text": "PURCHASEYou acquire Ghost Key to Discard for 2 Crypto."
+            }
+          ]
+        },
+        {
+          "owner": 1,
+          "purchases": [
+            {
+              "cardId": "1:acquired-8",
+              "text": "PURCHASEOpponent acquires Banishing Ritual to Discard for 2 Crypto."
+            },
+            {
+              "cardId": "1:acquired-9",
+              "text": "PURCHASEOpponent acquires Chronos Cache to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "1:acquired-10",
+              "text": "PURCHASEOpponent acquires Ghost Key to Discard for 2 Crypto."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 3,
+      "players": [
+        {
+          "owner": 0,
+          "purchases": [
+            {
+              "cardId": "0:acquired-18",
+              "text": "PURCHASEYou acquire Vault Encryption to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-20",
+              "text": "PURCHASEYou acquire Glitch-Witch.exe to Discard for 5 Crypto."
+            },
+            {
+              "cardId": "0:acquired-21",
+              "text": "PURCHASEYou acquire Dash-Dot to Discard for 3 Crypto."
+            }
+          ]
+        },
+        {
+          "owner": 1,
+          "purchases": [
+            {
+              "cardId": "1:acquired-17",
+              "text": "PURCHASEOpponent acquires Recursive Seance to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "1:acquired-19",
+              "text": "PURCHASEOpponent acquires Alchemic Mega to Discard for 9 Crypto."
+            },
+            {
+              "cardId": "1:acquired-22",
+              "text": "PURCHASEOpponent acquires Banishing Ritual to Discard for 2 Crypto."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "cycle": 4,
+      "players": [
+        {
+          "owner": 0,
+          "purchases": [
+            {
+              "cardId": "0:acquired-25",
+              "text": "PURCHASEYou acquire Glitch-Witch.exe to Discard for 5 Crypto."
+            },
+            {
+              "cardId": "0:acquired-26",
+              "text": "PURCHASEYou acquire Dotkrawler to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-27",
+              "text": "PURCHASEYou acquire Recursive Seance to Discard for 3 Crypto."
+            },
+            {
+              "cardId": "0:acquired-28",
+              "text": "PURCHASEYou acquire Nyx Luna to Discard for 4 Crypto."
+            }
+          ]
+        },
+        {
+          "owner": 1,
+          "purchases": [
+            {
+              "cardId": "1:acquired-23",
+              "text": "PURCHASEOpponent acquires Glitch-Witch.exe to Discard for 5 Crypto."
+            },
+            {
+              "cardId": "1:acquired-24",
+              "text": "PURCHASEOpponent acquires Recursive Seance to Discard for 3 Crypto."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "acquiredCardRevealEvents": 19,
+  "localAcquiredDeployments": 8,
+  "mandatoryChoices": [
+    {
+      "cycle": 2,
+      "turn": 3,
+      "selected": "+1 Card"
+    },
+    {
+      "cycle": 3,
+      "turn": 2,
+      "selected": "+2 Crypto"
+    },
+    {
+      "cycle": 4,
+      "turn": 1,
+      "selected": "Node 2"
+    },
+    {
+      "cycle": 4,
+      "turn": 3,
+      "selected": "+2 Crypto"
+    }
+  ],
+  "checks": [
+    "Both players bought actual named cards with their own Wallet",
+    "Acquired cards entered normal draw/play flow and revealed for both owners",
+    "Duration cards persisted in both Effect Banks; bank inspect worked",
+    "Ghost Key draw and Crypto options resumed resolution",
+    "Temporal Rift mandatory target choice resolved",
+    "Local Crypto and VP acquisitions made",
+    "Draft End/Resume, 9 Base/3 VP/3 Crypto/3 Chaos piles, and all category filters passed",
+    "Draft Wallet/timer/end controls remained visible at lower market rows",
+    "Mixed Normal/Fast playback completed; no browser page or console errors"
+  ],
+  "screenshots": [
+    "strategic-draft-1.png",
+    "strategic-draft-scrolled.png",
+    "strategic-bank.png",
+    "strategic-bank-inspect.png",
+    "strategic-choice.png",
+    "strategic-board-4.png",
+    "strategic-final.png"
+  ],
+  "limitations": [
+    "One seeded desktop Chrome session; this is not balance validation or exhaustive branching coverage.",
+    "Not every offered card was played: recovery selection and all possible Duration combinations are not claimed as browser-covered.",
+    "Final snapshot reaches Cycle 5 opening; four complete Cycles were exercised, not the full 16-Cycle gameover path.",
+    "Known gold Draft Wallet numeral is a separate pending CSS-only palette correction; no functional failure observed."
+  ],
+  "initialRun": "strategic-browser-first-run.json preserves the first run that failed only the duplicate React sibling-key console gate; parent namespaced those keys before this passing rerun."
+}

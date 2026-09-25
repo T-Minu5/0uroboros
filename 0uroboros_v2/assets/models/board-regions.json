@@ -1,0 +1,152 @@
+{
+  "coordinateSystem": "glTF Y-up; local player +Z",
+  "nodes": [
+    {
+      "index": 0,
+      "x": -5.6,
+      "location": [
+        -5.6,
+        0.46,
+        0
+      ],
+      "powerLocal": [
+        -5.6,
+        0.405,
+        0.98
+      ],
+      "powerOpponent": [
+        -5.6,
+        0.405,
+        -0.98
+      ],
+      "deploymentLocal": [
+        -5.6,
+        0.24,
+        2.4
+      ],
+      "deploymentOpponent": [
+        -5.6,
+        0.24,
+        -2.4
+      ]
+    },
+    {
+      "index": 1,
+      "x": -2.8,
+      "location": [
+        -2.8,
+        0.46,
+        0
+      ],
+      "powerLocal": [
+        -2.8,
+        0.405,
+        0.98
+      ],
+      "powerOpponent": [
+        -2.8,
+        0.405,
+        -0.98
+      ],
+      "deploymentLocal": [
+        -2.8,
+        0.24,
+        2.4
+      ],
+      "deploymentOpponent": [
+        -2.8,
+        0.24,
+        -2.4
+      ]
+    },
+    {
+      "index": 2,
+      "x": 0,
+      "location": [
+        0,
+        0.46,
+        0
+      ],
+      "powerLocal": [
+        0,
+        0.405,
+        0.98
+      ],
+      "powerOpponent": [
+        0,
+        0.405,
+        -0.98
+      ],
+      "deploymentLocal": [
+        0,
+        0.24,
+        2.4
+      ],
+      "deploymentOpponent": [
+        0,
+        0.24,
+        -2.4
+      ]
+    },
+    {
+      "index": 3,
+      "x": 2.8,
+      "location": [
+        2.8,
+        0.46,
+        0
+      ],
+      "powerLocal": [
+        2.8,
+        0.405,
+        0.98
+      ],
+      "powerOpponent": [
+        2.8,
+        0.405,
+        -0.98
+      ],
+      "deploymentLocal": [
+        2.8,
+        0.24,
+        2.4
+      ],
+      "deploymentOpponent": [
+        2.8,
+        0.24,
+        -2.4
+      ]
+    },
+    {
+      "index": 4,
+      "x": 5.6,
+      "location": [
+        5.6,
+        0.46,
+        0
+      ],
+      "powerLocal": [
+        5.6,
+        0.405,
+        0.98
+      ],
+      "powerOpponent": [
+        5.6,
+        0.405,
+        -0.98
+      ],
+      "deploymentLocal": [
+        5.6,
+        0.24,
+        2.4
+      ],
+      "deploymentOpponent": [
+        5.6,
+        0.24,
+        -2.4
+      ]
+    }
+  ],
+  "sourceMeshObjects": 338,
+  "meshBatches": 9
+}
