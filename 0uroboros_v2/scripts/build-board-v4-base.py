@@ -6,7 +6,7 @@ import bpy, math, json, struct, re
 from pathlib import Path
 from mathutils import Vector
 
-ROOT = Path('/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros_v2')
+ROOT = Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
 OUT = ROOT / 'assets/models'
 OUT.mkdir(parents=True, exist_ok=True)
 scene = bpy.data.scenes.new('Ouroboros_Table_V4_Base')

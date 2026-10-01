@@ -6,7 +6,7 @@ import bpy, math, json
 from pathlib import Path
 from mathutils import Vector
 
-ROOT = Path('/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros_v2')
+ROOT = Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
 OUT = ROOT / 'assets/models'
 OUT.mkdir(parents=True, exist_ok=True)
 # Prior builds are retained, but release semantic names for the latest export.

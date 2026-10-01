@@ -4,7 +4,7 @@ All helper inputs are Three.js X/Y-up/Z coordinates. No gameplay mesh is moved.
 import bpy, math, json, struct, re
 from pathlib import Path
 from mathutils import Vector
-ROOT=Path('/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros_v2')
+ROOT=Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
 OUT=ROOT/'assets/models'
 source=OUT/'ouroboros-board-v4-base.glb'
 scene=bpy.data.scenes.new('Ouroboros_Perimeter_V4')
