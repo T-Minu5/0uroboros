@@ -24,7 +24,7 @@ Exactly twelve definitions mention +Draft: The Inbetweener, Wave Card, Particle 
 
 Canonical starters stay unchanged. The user has allowed preserving useful tested placeholder mechanics; keep those explicit rather than silently overwriting them with incompatible same-name source rules. Generated forms should remain excluded from ordinary market piles unless a specific offer is deliberately authorized. These safeguards do not require asking the user to reapprove existing rules.
 
-1. **Evaluation design authority:** May we assign missing Node Power and select 5/10/15% shifts with stated source/destination rules, while retaining imported printed costs for ordinary nonstarter candidates? Clarify that source +N Power describes Data Center restoration where context supports it, not +N Node Power. Do not use VP values or healing magnitudes as Node Power defaults.
+1. **Evaluation design authority:** May we assign missing Node Power and select 5/10/15% shifts with stated source/destination rules, while retaining imported printed costs for ordinary nonstarter candidates? Clarify that source +N Power describes Server restoration where context supports it, not +N Node Power. Do not use VP values or healing magnitudes as Node Power defaults.
 2. **Time conversion:** Should old turns become full Cycles? If so, decide whether “next N turns” includes the deployment Cycle, which currently must count as Duration Cycle one; when recurring benefits trigger; and how delayed third/fourth/fifth-turn payouts map to start/end of a Cycle. Current OnReveal Actions remain unavailable until the next Runtime turn, regardless of source wording such as now.
 3. **Conflicting source fields:** Which field should govern incomplete descriptions and direct contradictions: effects, description, or explicit per-card adjudication? Cowl Obscyra is the minimal concrete example: description +2 Actions/+1 Card, effects +1 Action/+2 Cards. A precedence choice must still preserve sealed starter rules and explicitly authorized exceptions.
 
@@ -228,7 +228,7 @@ Effects: +1 Action / +4 Cards / +2 Crypto
 
 Source: cost 2; tags `attack`. Status: **COLLISION**.
 
-Effects: Drain -75 from your opponent's Backup Data Center / +1 Action
+Effects: Drain -75 from your opponent's Backup Server / +1 Action
 
 Source cost 2, explicit Backup Drain 75/+1 Action; evaluation cost 4, Power 3, +1 Card/+1 Crypto. Explicit Backup targeting requires engine extension.
 
@@ -284,7 +284,7 @@ Generic Drain 250 supported after global Power/timing; preserve case-sensitive a
 
 Source: cost 5; tags `attack`. Status: **TARGET**.
 
-Effects: Drain -200 from your opponent's Backup Data Center / +1 Action
+Effects: Drain -200 from your opponent's Backup Server / +1 Action
 
 Explicit Backup Drain 200/+1 Action requires card-level explicit DC targeting; ID underscore needs stable alias, not a new card.
 
@@ -308,7 +308,7 @@ Effects choose opponent hand card to discard, requiring explicit permitted hand 
 
 Source: cost 7; tags `attack`. Status: **TARGET**.
 
-Effects: Drain -200 from both of your opponent's Data Centers
+Effects: Drain -200 from both of your opponent's Servers
 
 Drain 200 from both opposing DCs requires two-target card resolution and defined simultaneous/sequential destruction accounting.
 
@@ -348,7 +348,7 @@ Cost 0, Drain 600; final Mary form/reset/replay behavior missing.
 
 Source: cost 9; tags `attack`. Status: **TARGET**.
 
-Effects: Drain -300 from both of your opponent's Data Centers
+Effects: Drain -300 from both of your opponent's Servers
 
 Drain 300 from both opposing DCs requires explicit both-target operation; source ∆-Wave name preserved.
 
@@ -356,7 +356,7 @@ Drain 300 from both opposing DCs requires explicit both-target operation; source
 
 Source: cost 23; tags `attack`. Status: **RULE_EXCEPTION**.
 
-Effects: Destroy your own backup data center and deny your enemy of claiming its points
+Effects: Destroy your own backup server and deny your enemy of claiming its points
 
 Explicit self-Backup destruction denies enemy destruction VP, conflicting with ordinary destruction awards unless adopted as a card exception; game-ending consequences and scoring ordering need approval.
 
@@ -900,7 +900,7 @@ Widget VP 1/+1 Card plus Plays Song. Audio is currently deferred; no source soun
 
 Source: cost 0; tags `attack`. Status: **POOL**.
 
-Effects: Drain -100 from both Data Centers / +1 Action / +1 Card
+Effects: Drain -100 from both Servers / +1 Action / +1 Card
 
 Cost 0 attack with both-DC Drain 100/+1 Action/+1 Card; no generator relation supplied. Needs availability decision and both-target operation; do not create free attack pile.
 

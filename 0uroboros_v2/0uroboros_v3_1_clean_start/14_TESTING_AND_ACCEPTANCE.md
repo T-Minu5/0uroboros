@@ -3,7 +3,7 @@
 Tests do not replace human visual judgment; human visual judgment does not replace deterministic tests.
 
 ## Rule tests
-Cover starter deck, Actions, VP free deployment, Crypto non-deployment, draw/reshuffle, reveal order, priority, ControlledWeight, probability floors/normalization, Drain, Restore, Data Center destruction/VP, Wave Collapse order, Location/Circuit separation, Effect Bank, Draft, endgame.
+Cover starter deck, Actions, VP free deployment, Crypto non-deployment, draw/reshuffle, reveal order, priority, ControlledWeight, probability floors/normalization, Drain, Restore, Server destruction/VP, Wave Collapse order, Location/Circuit separation, Effect Bank, Draft, endgame.
 
 ## Browser smoke
 Before checkpoint play at least:

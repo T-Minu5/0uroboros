@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "0uroboros Agent Runtime Contracts",
+  "$defs": {
+    "SpecialistAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assignment_id",
+        "work_order_id",
+        "role",
+        "objective",
+        "canonical_context_ids",
+        "questions",
+        "constraints",
+        "expected_output",
+        "proposal_limit",
+        "authority_boundary"
+      ],
+      "properties": {
+        "assignment_id": {
+          "type": "string"
+        },
+        "work_order_id": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "canonical_context_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_excerpt_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expected_output": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proposal_limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "authority_boundary": {
+          "type": "string"
+        }
+      }
+    },
+    "Recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "rationale",
+        "priority"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    "SpecialistResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent",
+        "assignment_id",
+        "summary",
+        "findings",
+        "recommendations",
+        "risks",
+        "assumptions",
+        "dependencies",
+        "open_questions",
+        "canonical_ids_referenced",
+        "confidence"
+      ],
+      "properties": {
+        "agent": {
+          "type": "string"
+        },
+        "assignment_id": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "open_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "canonical_ids_referenced": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "RunBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_turns",
+        "max_total_agent_calls",
+        "max_specialist_calls",
+        "max_review_calls",
+        "max_conflict_rounds",
+        "max_proposals_per_assignment",
+        "retry_limit"
+      ],
+      "properties": {
+        "max_turns": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_total_agent_calls": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_specialist_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_review_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_conflict_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "max_proposals_per_assignment": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "retry_limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "optional_token_budget": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

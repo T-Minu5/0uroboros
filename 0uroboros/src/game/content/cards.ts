@@ -1,15 +1,14 @@
 /**
  * Minimum viable card content for Phase 1 playtesting.
  *
- * These are original placeholder cards whose only purpose is to exercise the
- * engine. Every card exists to test a specific system, noted in its comment.
- * Balance values are arbitrary and expected to change.
+ * Approved starters live in STARTING_DECK. Placeholder definitions remain as
+ * fixtures and market content. They are not the Cycle 1 starting identities.
  */
 
 import type { CardDefinition } from '../types';
 
 export const CARD_DEFINITIONS: Record<string, CardDefinition> = {
-  // --- Starting deck: 4 Character cards ---
+  // --- Fixture Character cards. Not the approved starting identities. ---
 
   /** Tests plain deployment and Power comparison with no effect text. */
   cipher_runner: {
@@ -404,6 +403,139 @@ export const CARD_DEFINITIONS: Record<string, CardDefinition> = {
   },
 
   /** Tests trashing an opposing card as distinct from destroying it. */
+  slash_dot: {
+    id: 'slash_dot',
+    name: 'Slash-Dot',
+    kind: 'character',
+    power: 3,
+    cost: 4,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: '+3 Cards.',
+        ops: [{ op: 'draw', amount: 3, target: 'self' }],
+      },
+    ],
+  },
+
+  dash_dot: {
+    id: 'dash_dot',
+    name: 'Dash-Dot',
+    kind: 'character',
+    power: 2,
+    cost: 3,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: '+1 Card. +1 Action.',
+        ops: [
+          { op: 'draw', amount: 1, target: 'self' },
+          { op: 'gainActions', amount: 1, target: 'self' },
+        ],
+      },
+    ],
+  },
+
+  dotkrawler: {
+    id: 'dotkrawler',
+    name: 'Dotkrawler',
+    kind: 'character',
+    power: 1,
+    cost: 3,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: '+1 Card. +1 Action. +1 Crypto.',
+        ops: [
+          { op: 'draw', amount: 1, target: 'self' },
+          { op: 'gainActions', amount: 1, target: 'self' },
+          { op: 'gainCrypto', amount: 1, target: 'self' },
+        ],
+      },
+    ],
+  },
+
+  rezz_razor: {
+    id: 'rezz_razor',
+    name: 'Rezz-Razor',
+    kind: 'character',
+    power: 4,
+    cost: 3,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: 'Drain 75. +1 Card. +1 Action.',
+        ops: [
+          { op: 'damageDataCenter', amount: 75, target: 'opponent' },
+          { op: 'draw', amount: 1, target: 'self' },
+          { op: 'gainActions', amount: 1, target: 'self' },
+        ],
+      },
+    ],
+  },
+
+  rezz_blade: {
+    id: 'rezz_blade',
+    name: 'Rezz-Blade',
+    kind: 'character',
+    power: 3,
+    cost: 4,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: 'Drain 100. +1 Card. +2 Actions.',
+        ops: [
+          { op: 'damageDataCenter', amount: 100, target: 'opponent' },
+          { op: 'draw', amount: 1, target: 'self' },
+          { op: 'gainActions', amount: 2, target: 'self' },
+        ],
+      },
+    ],
+  },
+
+  byte_coin: {
+    id: 'byte_coin',
+    name: 'Byte-Coin',
+    kind: 'crypto',
+    power: 0,
+    cost: 3,
+    cryptoValue: 2,
+    deployable: false,
+    effects: [],
+  },
+
+  kilo_coin: {
+    id: 'kilo_coin',
+    name: 'Kilo-Coin',
+    kind: 'crypto',
+    power: 0,
+    cost: 6,
+    cryptoValue: 3,
+    deployable: false,
+    effects: [],
+  },
+
+  vault_encryption: {
+    id: 'vault_encryption',
+    name: 'Vault Encryption',
+    kind: 'victoryPoint',
+    power: 2,
+    cost: 3,
+    deployable: true,
+    effects: [
+      {
+        timing: 'onReveal',
+        text: 'Restore 100.',
+        ops: [{ op: 'healDataCenter', amount: 100, target: 'self' }],
+      },
+    ],
+  },
+
   void_auditor: {
     id: 'void_auditor',
     name: 'Void auditor',
@@ -423,19 +555,19 @@ export const CARD_DEFINITIONS: Record<string, CardDefinition> = {
 
 /**
  * Starting deck composition. Both players begin with identical 10-card decks:
- * 4 Character, 4 Crypto, 2 Victory Point.
+ * 5 Character, 3 Crypto, 2 Victory Point.
  */
 export const STARTING_DECK: string[] = [
-  'cipher_runner',
-  'echo_analyst',
-  'phase_broker',
-  'breach_daemon',
-  'crypto_shard',
-  'crypto_shard',
-  'crypto_shard',
-  'crypto_shard',
-  'ledger_sigil',
-  'ledger_sigil',
+  'slash_dot',
+  'dash_dot',
+  'dotkrawler',
+  'rezz_razor',
+  'rezz_blade',
+  'byte_coin',
+  'byte_coin',
+  'kilo_coin',
+  'vault_encryption',
+  'vault_encryption',
 ];
 
 /** Card definition ids eligible for each market category at match setup. */

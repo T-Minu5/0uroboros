@@ -118,8 +118,8 @@ During drag:
 Meaningful local effects should attach to actual source and target positions.
 
 Examples:
-- Drain: card/Location -> opponent Data Center
-- Restore: source -> Data Center
+- Drain: card/Location -> opponent Server
+- Restore: source -> Server
 - probability transfer: source Node -> destination Node
 - Action gain: source -> Action resource
 - reward: Node/Location -> recipient/resource
@@ -159,7 +159,7 @@ Draft must clearly communicate:
 
 Theming may be immersive, but usability dominates.
 
-## Data Centers
+## Servers
 
 Require:
 - current integrity

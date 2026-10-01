@@ -4,3 +4,11 @@ dist
 *.local
 .vite
 coverage
+.env
+.env.*
+!.env.example
+.cursor/memory/sessions/
+.cursor/memory/current-session.json
+tools/agent-harness/runs/
+tools/agent-harness/visual-cache/
+tools/agent-harness/delivery/

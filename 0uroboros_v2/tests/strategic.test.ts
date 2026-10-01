@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, createStrategicMarket } from "../src/evaluationMarket";
-import { createSession, seededRandom, type RuntimeSession, type RuntimeEvent } from "../src/runtime";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "../src/runtime";
 import { legalNodes, canDeploy, type Card } from "../src/game";
 
 const make = (seed = 41) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
@@ -13,7 +13,7 @@ function empty(session: RuntimeSession) {
 function drain(session: RuntimeSession, choose = true) {
   const events: RuntimeEvent[] = [];
   while (session.pendingCount || (choose && session.state.choice)) {
-    if (session.state.choice) events.push(session.choose(session.state.choice.options[0].id));
+    if (session.state.choice) events.push(session.choose(firstLegalSelection(session.state.choice)));
     else events.push(session.step()!.event);
     if (events.length > 600) throw new Error("Resolution stalled.");
   }
@@ -33,28 +33,35 @@ function cycle(session: RuntimeSession, play = false) {
 function draft(session: RuntimeSession) { cycle(session); return Date.now(); }
 
 describe("Strategic evaluation Draft", () => {
-  it("has four persistent Base piles, two rotating Base offers, and three rotating Chaos offers", () => {
+  it("has four persistent Base piles, two rotating Base offers, and four rotating Chaos offers", () => {
     expect(EVALUATION_BASE_CARDS.length).toBeGreaterThan(12); expect(EVALUATION_VP_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CRYPTO_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CHAOS_CARDS.length).toBeGreaterThanOrEqual(5);
-    const piles = createStrategicMarket();
+    const piles = createStrategicMarket(seededRandom(41));
     expect(piles.filter(pile => pile.category === "Base")).toHaveLength(4);
     expect(piles.filter(pile => pile.category !== "Crypto").every(pile => pile.supply === 8)).toBe(true);
     expect(piles.filter(pile => pile.category === "Crypto").every(pile => pile.supply === 16)).toBe(true);
+    const other = createStrategicMarket(seededRandom(99));
+    expect(other.filter(pile => pile.category === "Base")).toHaveLength(4);
+    expect(new Set(piles.filter(pile => pile.category === "Base").map(pile => pile.id))).not.toEqual(new Set(other.filter(pile => pile.category === "Base").map(pile => pile.id)));
     const session = make(); draft(session);
     expect(session.state.market.filter(pile => pile.category === "Base")).toHaveLength(6);
     expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating)).toHaveLength(2);
-    expect(session.state.market.filter(pile => pile.category === "Chaos")).toHaveLength(3);
+    expect(session.state.market.filter(pile => pile.category === "Chaos")).toHaveLength(4);
     expect(session.state.market.filter(pile => pile.category === "Chaos").every(pile => pile.remaining?.join() === "2,2")).toBe(true);
+    const stableIds = new Set(session.state.market.filter(pile => pile.category === "Base" && !pile.rotating).map(pile => pile.id));
+    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating).every(pile => !stableIds.has(pile.id))).toBe(true);
   });
 
   it("keeps shared purchases atomic while Chaos stock and cooldowns belong to each player", () => {
     const session = make(); const now = draft(session);
-    session.state.players.forEach(player => { player.wallet = 30; });
-    const shared = session.state.market[0]; shared.supply = 1;
+    session.state.players.forEach(player => { player.wallet = 80; });
+    const shared = session.state.market.find(pile => pile.category === "Base" && !pile.rotating && pile.card.cost <= 30) ?? session.state.market[0];
+    shared.supply = 1;
     session.buy(shared.id, now, 0);
     const untouched = session.state.players[1].wallet;
     expect(() => session.buy(shared.id, now, 1)).toThrow(/unavailable/);
     expect(session.state.players[1].wallet).toBe(untouched);
-    const chaos = session.state.market.find(pile => pile.category === "Chaos")!;
+    const chaos = session.state.market.find(pile => pile.category === "Chaos" && (pile.card.cost ?? 0) <= 40)!;
+    session.state.players.forEach(player => { player.wallet = Math.max(player.wallet, 80); });
     session.buy(chaos.id, now, 0); session.buy(chaos.id, now, 1);
     expect(chaos.remaining).toEqual([1, 1]);
     expect(() => session.buy(chaos.id, now + 1999, 0)).toThrow(/cooldown/);
@@ -144,18 +151,18 @@ describe("Strategic card systems", () => {
 
   it("uses imported VP cards for restore and scoring", () => {
     const session = make(); empty(session); const node = session.view().openNodes[0];
-    session.state.players[0].centers.primary = 1800;
+    session.state.players[0].servers.primary = 1800;
     session.state.players[0].hand = [vpCard("Basic Encryption", "basic"), vpCard("Quantum Archive", "archive")];
     session.deploy("basic", node); session.deploy("archive", node); session.endTurn();
     const events = drain(session).filter(event => event.kind === "restore");
     expect(events.map(event => event.amount)).toEqual([50, 150]);
-    expect(session.state.players[0].centers.primary).toBe(2000);
+    expect(session.state.players[0].servers.primary).toBe(2000);
     expect(session.state.players[0].totalVP).toBeGreaterThanOrEqual(4);
   });
 
   it("supports imported backup-targeting attacks", () => {
     const session = make(); empty(session); const node = session.view().openNodes[0];
-    session.state.players[1].centers = { primary: 500, backup: 300 };
+    session.state.players[1].servers = { primary: 500, backup: 300 };
     session.state.players[0].hand = [chaosCard("Nyx Luna", "nyx"), chaosCard("1337 Speaker", "speaker")];
     session.deploy("nyx", node); session.deploy("speaker", node); session.endTurn();
     const events = drain(session).filter(event => event.kind === "drain");
@@ -163,13 +170,13 @@ describe("Strategic card systems", () => {
       ["nyx", "backup", 75],
       ["speaker", "backup", 200],
     ]);
-    expect(session.state.players[1].centers).toEqual({ primary: 500, backup: 25 });
+    expect(session.state.players[1].servers).toEqual({ primary: 500, backup: 25 });
   });
 
-  it("supports Hacker cards that mill and swing Data Center integrity", () => {
+  it("supports Hacker cards that mill and swing Server integrity", () => {
     const session = make(); empty(session); const node = session.view().openNodes[0];
-    session.state.players[0].centers = { primary: 1500, backup: 1500 };
-    session.state.players[1].centers = { primary: 2000, backup: 1500 };
+    session.state.players[0].servers = { primary: 1500, backup: 1500 };
+    session.state.players[1].servers = { primary: 2000, backup: 1500 };
     session.state.players[1].draw = [card("Dash Relay", "mill-1"), card("Slash-Dot", "mill-2"), card("Cache Crawler", "mill-3")];
     session.state.players[1].discard = [card("Cycle Cache", "mill-stock")];
     session.state.players[0].hand = [chaosCard("Sudo Demiurge", "sudo"), chaosCard("Cicada 3301", "cicada")];
@@ -179,8 +186,8 @@ describe("Strategic card systems", () => {
     expect(events.filter(event => event.cardId === "cicada" && event.kind === "trash")[0]).toMatchObject({ amount: 2, targetOwner: 1 });
     expect(session.state.players[1].draw).toHaveLength(0);
     expect(session.state.players[1].discard.map(item => item.id)).toEqual(expect.arrayContaining(["mill-1", "mill-2", "mill-3"]));
-    expect(session.state.players[1].centers.primary).toBe(1725);
-    expect(session.state.players[0].centers.primary).toBe(1800);
+    expect(session.state.players[1].servers.primary).toBe(1725);
+    expect(session.state.players[0].servers.primary).toBe(1800);
     expect(events.filter(event => event.cardId === "sudo" && event.kind === "actions")[0]).toMatchObject({ amount: 1, targetOwner: 0 });
   });
 
@@ -305,7 +312,7 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
       { card: glitch, owner: 0, node, order: 1, revealed: true },
       { card: chronos, owner: 0, node, order: 2, revealed: true },
     ];
-    session.state.players[1].centers = { primary: 0, backup: 30 };
+    session.state.players[1].servers = { primary: 0, backup: 30 };
     session.state.players[0].bank = [{ card: card("Cycle Cache", "bank-must-not-fire"), enteredCycle: 1, expiresCycle: 2, order: 0 }];
     session.endTurn(); const events = drain(session);
     const lethal = events.findIndex(event => event.cardId === "lethal-glitch" && event.kind === "drain");
@@ -321,8 +328,12 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(events.some(event => ["circuit", "draft"].includes(event.kind))).toBe(false);
     expect(session.state.players[0].destructionVP).toBe(12);
     expect(session.state.players[0].rewardVP).toBeGreaterThanOrEqual(2);
-    expect(session.state.players[1].centers).toEqual({ primary: 0, backup: 0 });
+    expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
     expect(session.state.phase).toBe("gameover");
+    const score = session.view().finalScore![0];
+    expect(score.locationVP).toBe(2);
+    expect(score.destructionVP).toBe(12);
+    expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
   });
 
   it("recovers an opponent-origin VP instance from shared Trash into the recovering owner's score only", () => {
@@ -358,21 +369,25 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(session.view().players.map(player => player.totalVP)).toEqual([3, 0]);
   });
 
-  it("counts actual two-, three- and four-VP market purchases in the final Draft before scoring", () => {
+  it("counts actual VP market purchases in the final Draft before scoring", () => {
     const session = make(); draft(session);
     session.state.cycle = 16;
     const before = session.view().players[0].totalVP;
-    session.state.players[0].wallet = 13;
     const vpPiles = session.state.market.filter(pile => pile.category === "VP");
-    expect(vpPiles.map(pile => pile.card.vp)).toEqual([1, 2, 3]);
+    expect(vpPiles).toHaveLength(3);
+    const printed = vpPiles.map(pile => pile.card.vp!), bought = printed.reduce((sum, vp) => sum + vp, 0);
+    session.state.players[0].wallet = vpPiles.reduce((sum, pile) => sum + pile.card.cost, 0) + 3;
     for (const pile of vpPiles) session.buy(pile.id);
     expect(session.state.players[0].wallet).toBe(3);
-    expect(session.view().players[0].totalVP).toBe(before + 6);
-    expect(session.state.players[0].discard.filter(card => card.id.includes("acquired")).map(card => card.vp)).toEqual([1, 2, 3]);
+    expect(session.view().players[0].totalVP).toBe(before + bought);
+    expect(session.state.players[0].discard.filter(card => card.id.includes("acquired")).map(card => card.vp)).toEqual(printed);
     expect(session.state.phase).toBe("draft");
     session.endDraft(0); session.endDraft(1); session.nextCycle();
     expect(session.state.phase).toBe("gameover");
-    expect(session.state.players[0].totalVP).toBe(before + 6);
-    expect(session.state.endedReason).toContain(`${before + 6} to`);
+    expect(session.state.players[0].totalVP).toBe(before + bought);
+    expect(session.state.endedReason).toContain(`${before + bought} to`);
+    const score = session.view().finalScore![0];
+    expect(score.vpCards.filter(card => card.id.includes("acquired")).map(card => card.vp)).toEqual(printed);
+    expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
   });
 });

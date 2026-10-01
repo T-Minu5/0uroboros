@@ -26,6 +26,7 @@ import { resolveOps, type EffectContext } from './effects';
 import { resetProbabilities } from './probability';
 import { createMarket, refreshChaos } from './draft';
 import { addLog } from './log';
+import { clearCycleActions } from './actions';
 
 export function createInitialState(
   mode: OuroborosState['mode'],
@@ -75,6 +76,8 @@ export function createInitialState(
     nextPlayOrder: 0,
     endedTurn: false,
     endedDraft: false,
+    actions: 0,
+    pendingActions: 0,
     lastPurchaseAt: {},
     conceded: false,
   });
@@ -138,6 +141,7 @@ export function startOfCycle(
   resetProbabilities(state, config);
   state.collapseSelectedNode = null;
   state.revealQueue = [];
+  clearCycleActions(state);
 
   for (const player of ['0', '1'] as PlayerID[]) {
     state.players[player].endedTurn = false;
@@ -344,5 +348,6 @@ export function beginNextCycle(state: OuroborosState): void {
     state.players[player].nextPlayOrder = 0;
     state.players[player].endedTurn = false;
   }
+  clearCycleActions(state);
   addLog(state, 'phase', `Cycle ${state.cycle} begins.`);
 }

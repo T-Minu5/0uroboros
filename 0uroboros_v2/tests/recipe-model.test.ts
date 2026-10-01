@@ -62,17 +62,34 @@ describe('recipe editor model', () => {
     expect(targetChoices(legacy, 'card').map(choice => choice.value)).toEqual(['your-hand', 'your-top', 'your-discard', 'opponent-hand', 'opponent-top', 'opponent-discard']);
   });
 
-  it('makes choice and random steps with executable branches and limits scope targets', () => {
+  it('makes choice and random steps with executable branches and shares the full effect catalog', () => {
     expect(recipeSummary({ kind: 'choice' }, 'card', cards)).toBe('Choose +2 Crypto or draw 1 card.');
     for (const operation of ['choice', 'random']) {
       const recipe = createRecipe(operation, 'card', cards);
       expect((recipe.options as unknown[]).length).toBe(2);
       expect((recipe.options as { effects: unknown[] }[]).every(option => option.effects.length > 0)).toBe(true);
     }
-    expect(operationChoices('location', cards).map(choice => choice.value)).toEqual(['crypto', 'vp', 'draw', 'damageLoser']);
-    expect(targetChoices({ kind: 'damageLoser', amount: 200 }, 'location')).toEqual([{ value: 'loser-center', label: "Losing player's Data Center" }]);
-    expect(targetChoices({ kind: 'restorePrimary', amount: 400 }, 'circuit')).toEqual([{ value: 'eligible-primary', label: "Eligible player's Primary Data Center" }]);
-    expect(changeRecipeTarget({ kind: 'restorePrimary', amount: 400 }, 'opponent-backup', 'circuit')).toEqual({ kind: 'restorePrimary', amount: 400 });
+    const locationOps = operationChoices('location', cards).map(choice => choice.value);
+    const circuitOps = operationChoices('circuit', cards).map(choice => choice.value);
+    expect(locationOps).toContain('draw');
+    expect(locationOps).toContain('drain');
+    expect(locationOps).toContain('attachModifier');
+    expect(locationOps).not.toContain('trashSelf');
+    expect(circuitOps).toContain('vp');
+    expect(circuitOps).toContain('restore');
+    expect(circuitOps).toContain('attachModifier');
+    expect(targetChoices({ kind: 'damageLoser', amount: 200 }, 'location').map(choice => choice.value)).toContain('loser-automatic');
+    expect(targetChoices({ kind: 'restorePrimary', amount: 400 }, 'circuit').map(choice => choice.value)).toContain('eligible-primary');
+    expect(changeRecipeTarget({ kind: 'restorePrimary', amount: 400 }, 'other-backup', 'circuit')).toEqual({ kind: 'restorePrimary', amount: 400, opponent: true, target: 'backup' });
+    expect(targetChoices({ kind: 'moveCard' }, 'location').map(choice => choice.value)).toEqual([
+      'either', 'winner', 'loser', 'both',
+      'your-card', 'opponent-card',
+      'your-previous-card', 'your-next-card', 'opponent-previous-card', 'opponent-next-card',
+    ]);
+    expect(changeRecipeTarget({ kind: 'moveCard' }, 'winner', 'location')).toEqual({ kind: 'moveCard', boardSide: 'winner', cardPick: 'random' });
+    expect(createRecipe('move', 'location', cards)).toEqual({ kind: 'moveCard', boardSide: 'either', cardPick: 'random' });
+    expect(recipeSummary({ kind: 'moveCard', boardSide: 'loser', cardPick: 'random' }, 'location', cards)).toMatch(/random.*losing/i);
+    expect(recipeSummary({ kind: 'trashLowestAtLocation', amount: 1, boardSide: 'both' }, 'location', cards)).toMatch(/each side/);
   });
 
   it('prepares Morph forms from enabled non-Crypto definitions', () => {

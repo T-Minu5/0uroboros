@@ -1,5 +1,6 @@
 import {chromium} from 'playwright';
 import {writeFileSync} from 'node:fs';
+import {useSetting} from './settings-menu.mjs';
 const browser=await chromium.launch({headless:true,channel:'chrome'});
 const page=await browser.newPage({viewport:{width:1600,height:1000}});
 await page.addInitScript(()=>{let seed=341;Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};});
@@ -29,8 +30,9 @@ try{
  assert(await page.locator('.location-plate.drop-highlight').count()===0,'Idle has no drop highlights');
  await begin(card);
  await page.mouse.move(800,720);await page.waitForTimeout(40);
- const b=await rect(page.locator('.pointer-card'));await page.mouse.move(847,689);await page.waitForTimeout(40);
- const c=await rect(page.locator('.pointer-card'));
+ const offset=()=>page.locator('.pointer-card').evaluate(el=>{const [x,y]=el.style.transform.match(/translate3d\(([-\d.]+)px, ([-\d.]+)px/).slice(1).map(Number);return {x,y};});
+ const b=await offset();await page.mouse.move(847,689);await page.waitForTimeout(40);
+ const c=await offset();
  assert(Math.abs((c.x-b.x)-47)<1&&Math.abs((c.y-b.y)+31)<1,'Dragged card follows pointer delta without lag or re-centering');
  assert(await card.evaluate(el=>getComputedStyle(el).opacity)==='0','Card lifts cleanly out of the hand');
  await moveToLane(open[0],'left');
@@ -40,12 +42,16 @@ try{
  assert(await page.locator('.location-plate.drop-highlight').count()===1&&await page.locator(`[data-location-node="${open[1]}"].drop-highlight`).count()===1,'Hover light transfers without leaving other lanes lit');
  await moveToLane(closed,'lower');
  assert(await page.locator('.location-plate.drop-highlight').count()===0,'Closed lane does not advertise a valid drop');
- await page.mouse.up();
+ const offBoard=async()=>{await page.mouse.move(120,420,{steps:6});await page.waitForTimeout(50);};
+ await offBoard();await page.mouse.up();
  const retry=await rect(card);await page.mouse.move(retry.x+retry.width/2,retry.y+retry.height/2);await page.mouse.down();await page.mouse.move(retry.x+retry.width/2+8,retry.y+retry.height/2-8);
  assert(await page.locator('.pointer-card').count()===1&&await page.locator('.pointer-card').evaluate(el=>getComputedStyle(el).opacity)==='1','Immediate re-grab replaces the returning preview with one visible card');
- await moveToLane(closed,'lower');
- await page.mouse.up();await page.waitForTimeout(250);
- assert(await countCards()===initial&&await page.locator('.pointer-card').count()===0,'Invalid drop returns the card and preserves the hand');
+ await offBoard();
+ await page.mouse.up();
+ const springing=await page.locator('.pointer-card').evaluate(el=>el.style.transform).catch(()=>'');
+ assert(/rotateZ\(/.test(springing),'Released card springs home with its swing');
+ await page.waitForTimeout(1000);
+assert(await countCards()===initial&&await page.locator('.pointer-card').count()===0,'Invalid drop returns the card and preserves the hand');
  assert(await page.getByRole('dialog').count()===0,'Invalid drag does not open card inspect');
  await begin(card);await moveToLane(open[0]);await page.keyboard.press('Escape');await page.waitForTimeout(220);await page.mouse.up();
  assert(await countCards()===initial&&await page.getByRole('dialog').count()===0,'Escape cancels a drag without deploying or inspecting');
@@ -66,8 +72,8 @@ try{
   const layout=await page.evaluate(()=>{
    const rect=e=>e.getBoundingClientRect();
    const hand=[...document.querySelectorAll('.hand .hand-card')].map(rect),stats=rect(document.querySelector('.local-console'));
-   const percentage=[...document.querySelectorAll('.node-weight')].map(rect),centers=[...document.querySelectorAll('.data-center.near')].map(rect);
-   const weightsClear=percentage.every(a=>centers.every(b=>a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom));
+   const percentage=[...document.querySelectorAll('.node-weight')].map(rect),servers=[...document.querySelectorAll('.server.near')].map(rect);
+   const weightsClear=percentage.every(a=>servers.every(b=>a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom));
    const handGap=Math.min(...hand.map(r=>r.top))-stats.bottom;
    const scoreGaps=[...document.querySelectorAll('.power-badge.opponent b')].map((el,i)=>rect(document.querySelector(`[data-location-node="${i}"]`)).top-rect(el).bottom);
    const farDuration=rect(document.querySelector('.duration.far>small'));
@@ -79,7 +85,7 @@ try{
   await page.screenshot({path:`docs/evidence/board-interaction-${viewport.width}.png`});
  }
  await page.setViewportSize({width:1600,height:1000});
- await page.getByRole('button',{name:'Normal pace'}).click();await page.locator('.end-turn').click();await ready();
+ await useSetting(page,'Normal pace');await page.locator('.end-turn').click();await ready();
  const winnerEvidence=await page.evaluate(()=>[...document.querySelectorAll('[data-lane-lit="winner"]')].map(el=>({side:el.classList.contains('local-drop')?'local':'opponent',cards:el.querySelectorAll('.field-card').length})));
  assert(winnerEvidence.length>0,'Resolved leading lanes illuminate');evidence.winnerLanes=winnerEvidence;
  await page.waitForTimeout(1100);

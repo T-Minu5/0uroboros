@@ -413,154 +413,154 @@
       "id": "sudo-demiurge",
       "name": "Sudo Demiurge",
       "originalArtwork": "src/assets/cards/power/sudo-demiurge.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/sudo-demiurge.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/sudo-demiurge.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/sudo-demiurge.png"
+        "chaos cards/horrors/sudo-demiurge.png"
       ]
     },
     {
       "id": "cicada-3301",
       "name": "Cicada 3301",
       "originalArtwork": "src/assets/cards/power/cicada-3301.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/cicada-3301.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/cicada-3301.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/cicada-3301.png"
+        "chaos cards/horrors/cicada-3301.png"
       ]
     },
     {
       "id": "skinwalker",
       "name": "Skinwalker",
       "originalArtwork": "src/assets/cards/power/skinwalker.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/skinwalker.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/skinwalker.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/skinwalker.png"
+        "chaos cards/horrors/skinwalker.png"
       ]
     },
     {
       "id": "leviathan-form",
       "name": "Leviathan Form",
       "originalArtwork": "src/assets/cards/power/leviathan-form.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/leviathan-form.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/leviathan-form.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/leviathan-form.png"
+        "chaos cards/horrors/leviathan-form.png"
       ]
     },
     {
       "id": "spider-form",
       "name": "Spider Form",
       "originalArtwork": "src/assets/cards/power/spider-form.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/spider-form.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/spider-form.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/spider-form.png"
+        "chaos cards/horrors/spider-form.png"
       ]
     },
     {
       "id": "wasp-form",
       "name": "Wasp Form",
       "originalArtwork": "src/assets/cards/power/wasp-form.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/wasp-form.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/wasp-form.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/wasp-form.png"
+        "chaos cards/horrors/wasp-form.png"
       ]
     },
     {
       "id": "viper-form",
       "name": "Viper Form",
       "originalArtwork": "src/assets/cards/power/viper-form.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/viper-form.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/viper-form.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/viper-form.png"
+        "chaos cards/horrors/viper-form.png"
       ]
     },
     {
       "id": "wolf-form",
       "name": "Wolf Form",
       "originalArtwork": "src/assets/cards/power/wolf-form.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/wolf-form.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/wolf-form.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/wolf-form.png"
+        "chaos cards/horrors/wolf-form.png"
       ]
     },
     {
       "id": "subroutine_succubus",
       "name": "Subroutine Succubus",
       "originalArtwork": "src/assets/cards/power/subroutine-succubus.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/subroutine-succubus.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/subroutine-succubus.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/subroutine-succubus.png"
+        "chaos cards/horrors/subroutine-succubus.png"
       ]
     },
     {
       "id": "iterative-incubus",
       "name": "Iterative Incubus",
       "originalArtwork": "src/assets/cards/power/iterative-incubus.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/iterative-incubus.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/iterative-incubus.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/iterative-incubus.png"
+        "chaos cards/horrors/iterative-incubus.png"
       ]
     },
     {
       "id": "node-feratu",
       "name": "Node Feratu",
       "originalArtwork": "src/assets/cards/power/node-feratu.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/node-feratu.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/node-feratu.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/node-feratu.png"
+        "chaos cards/horrors/node-feratu.png"
       ]
     },
     {
       "id": "the-azimuthal-kill",
       "name": "The Azimuthal Kill",
       "originalArtwork": "src/assets/cards/power/the-azimuthal-kill.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/the-azimuthal-kill.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/the-azimuthal-kill.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/the-azimuthal-kill.png"
+        "chaos cards/horrors/the-azimuthal-kill.png"
       ]
     },
     {
       "id": "tihkal-hound",
       "name": "Tihkal Hound",
       "originalArtwork": "src/assets/cards/power/tihkal-hound.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/tihkal-hound.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/tihkal-hound.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/tihkal-hound.png"
+        "chaos cards/horrors/tihkal-hound.png"
       ]
     },
     {
       "id": "veil-of-cthulhu",
       "name": "Veil of Cthulhu",
       "originalArtwork": "src/assets/cards/power/veil-of-cthulhu.png",
-      "artwork": "/assets/card_art/chaos cards/hackers/veil-of-cthulhu.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/veil-of-cthulhu.png",
       "status": "resolved",
       "reason": "exact-preferred",
       "candidates": [
-        "chaos cards/hackers/veil-of-cthulhu.png"
+        "chaos cards/horrors/veil-of-cthulhu.png"
       ]
     },
     {

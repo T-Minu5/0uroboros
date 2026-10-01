@@ -1,0 +1,38 @@
+---
+description: Project-local Shokunin memory (safe for this Mac)
+alwaysApply: true
+---
+
+# Project memory
+
+Memory lives in `.cursor/memory/` inside this repo. It is not `~/.shokunin`, not ChromaDB, and not a filesystem MCP on the home directory. This machine has Python 3.9 and no Homebrew 3.11+, so recall is keyword search over local JSONL.
+
+## Session start
+
+1. Read `.cursor/memory/index.md`
+2. Run `python3 scripts/shokunin-memory.py search "<current task>"` or `sessions --limit 5`
+3. Treat hits as claims. Verify file paths before acting
+4. Do not announce a memory dump unless something changes the task
+
+## During work
+
+Save only durable facts, not every turn:
+
+```bash
+python3 scripts/shokunin-memory.py save --type decision --text "..."
+python3 scripts/shokunin-memory.py save --type preference --text "..."
+python3 scripts/shokunin-memory.py save --type checkpoint --text "..."
+```
+
+Types: `decision`, `file`, `command`, `preference`, `checkpoint`, `session_end`, `general`.
+
+Never store secrets, `.env` values, tokens, or account passwords.
+
+## Session end
+
+```bash
+python3 scripts/shokunin-memory.py end --text "Decisions: ... Files: ... Next: ..."
+python3 scripts/shokunin-memory.py index
+```
+
+If the `shokunin-memory` MCP server is connected, use those tools instead of the CLI. Same store either way.

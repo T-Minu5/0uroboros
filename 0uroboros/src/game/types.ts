@@ -54,6 +54,7 @@ export type EffectOp =
   | { op: 'damageDataCenter'; amount: number; target: PlayerRef; dataCenter?: DataCenterId }
   | { op: 'healDataCenter'; amount: number; target: PlayerRef; dataCenter?: DataCenterId }
   | { op: 'draw'; amount: number; target: PlayerRef }
+  | { op: 'gainActions'; amount: number; target: PlayerRef }
   | { op: 'trashSelf' }
   | { op: 'destroyCard'; target: CardSelector }
   | { op: 'trashCard'; target: CardSelector }
@@ -189,6 +190,10 @@ export interface PlayerState {
   nextPlayOrder: number;
   endedTurn: boolean;
   endedDraft: boolean;
+  /** Spendable Actions for the current Runtime turn. */
+  actions: number;
+  /** Actions gained on reveal, usable on the next Runtime turn. */
+  pendingActions: number;
   /** Last purchase timestamps per card definition, for repeat-buy cooldown. */
   lastPurchaseAt: Record<string, number>;
   conceded: boolean;
@@ -229,6 +234,8 @@ export interface FxEvent {
     | 'chance'
     | 'vp'
     | 'crypto'
+    | 'draw'
+    | 'actions'
     | 'nodeFocus'
     | 'collapseSelect';
   chapter: FxChapter;
@@ -285,7 +292,7 @@ export interface PendingChoice {
 export interface OuroborosState {
   mode: GameMode;
   cycle: number;
-  /** Runtime turn index, 0 through 4, mapping to the Node that opens. */
+  /** Runtime deployment window index, 0 through the last scheduled opening. */
   turn: number;
   /** Deployment windows closed during the current Cycle. */
   windowsCompleted: number;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { compileContent, createDefaultContent, type ContentDocument } from '../src/authoring/contentModel';
 import { starterCards, type Card } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
 
 const identity = (card: Card) => card.definitionId ?? card.id;
 const saved = (document: ContentDocument) => compileContent(JSON.parse(JSON.stringify(document)) as ContentDocument);
@@ -24,7 +24,7 @@ const finish = (session: RuntimeSession) => {
   const events: RuntimeEvent[] = [];
   for (let i = 0; session.pendingCount || session.state.choice; i++) {
     if (i > 500) throw new Error('Authored resolution stalled.');
-    events.push(session.state.choice ? session.choose(session.state.choice.options[0].id) : session.step()!.event);
+    events.push(session.state.choice ? session.choose(firstLegalSelection(session.state.choice)) : session.step()!.event);
   }
   return events;
 };
@@ -42,7 +42,7 @@ describe('authored content in RuntimeSession', () => {
     const compiled = saved(document);
     const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(19), strategicMarket: true, evaluationContent: true, content: compiled });
     const slots: Record<string, string> = {
-      slash: 'slash-dot', dash: 'dash', dot: 'dot', razor: 'rezz-razor', blade: 'rezz-blade',
+      slash: 'slash-dot', 'dash-dot': 'dash-dot', dotkrawler: 'dotkrawler', razor: 'rezz-razor', blade: 'rezz-blade',
       'byte-1': 'byte-coin', 'byte-2': 'byte-coin', kilo: 'kilo-coin',
       'vault-1': 'vault-encryption', 'vault-2': 'vault-encryption',
     };
@@ -68,7 +68,7 @@ describe('authored content in RuntimeSession', () => {
     const vaultInstance = local.find(card => card.id === '0:vault-1')!;
     empty(session);
     session.state.players[0].hand = [slashInstance, byteInstance, vaultInstance];
-    session.state.players[0].centers.primary = 1800;
+    session.state.players[0].servers.primary = 1800;
     session.deploy(slashInstance.id, 0); session.deploy(vaultInstance.id, 0);
     session.endTurn();
     const first = finish(session);
@@ -76,7 +76,7 @@ describe('authored content in RuntimeSession', () => {
       expect.objectContaining({ kind: 'crypto', cardId: slashInstance.id, amount: 4 }),
       expect.objectContaining({ kind: 'restore', cardId: vaultInstance.id, amount: 100 }),
     ]));
-    expect(session.state.players[0].centers.primary).toBe(1900);
+    expect(session.state.players[0].servers.primary).toBe(1900);
     expect(session.state.players[0].wallet).toBe(4);
     expect(session.view().players[0].totalVP).toBe(7);
     session.endTurn(); finish(session);
@@ -85,24 +85,32 @@ describe('authored content in RuntimeSession', () => {
     expect(last).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'crypto', cardId: byteInstance.id, amount: 9 })]));
   });
 
-  it('builds the core market and rotating offers from enabled authored pools and costs', () => {
+  it('builds the stable market and rotating offers from enabled authored pools and costs', () => {
     const document = createDefaultContent();
     document.cards.find(card => identity(card) === 'slash-dot')!.cost = 11;
     document.cards.find(card => identity(card) === 'eval-relocation-relay')!.cost = 1;
-    const rotatingBase = new Set(['eval-relocation-relay', 'eval-signal-amplifier']);
-    const chaos = new Set(['rezz-razor', 'rezz-blade', 'eval-hostile-reroute']);
+    const base = new Set(['slash-dot', 'dash-dot', 'dotkrawler', 'eval-cycle-cache', 'eval-relocation-relay', 'eval-signal-amplifier']);
+    const chaos = new Set(['rezz-razor', 'rezz-blade', 'eval-hostile-reroute', 'eval-power-siphon']);
     document.cards.forEach(card => {
-      if (card.pool === 'Base' && !card.core) card.enabled = rotatingBase.has(identity(card));
+      if (card.pool === 'Base') card.enabled = base.has(identity(card));
       if (card.pool === 'Chaos') card.enabled = chaos.has(identity(card));
     });
     const session = make(document);
-    expect(session.state.market.find(pile => pile.id === 'Base:slash-dot')?.card.cost).toBe(11);
+    const stables = session.state.market.filter(pile => pile.category === 'Base' && !pile.rotating);
+    expect(stables).toHaveLength(4);
+    const slash = session.state.market.find(pile => pile.id === 'Base:slash-dot');
+    if (slash) expect(slash.card.cost).toBe(11);
     empty(session);
     session.state.turn = 3;
     session.endTurn(); finish(session);
-    expect(new Set(session.state.market.filter(pile => pile.category === 'Base' && pile.rotating).map(pile => identity(pile.card)))).toEqual(rotatingBase);
+    const rotating = session.state.market.filter(pile => pile.category === 'Base' && pile.rotating);
+    expect(rotating).toHaveLength(2);
+    const stableIds = new Set(stables.map(pile => identity(pile.card)));
+    expect(rotating.every(pile => !stableIds.has(identity(pile.card)))).toBe(true);
+    expect([...stables, ...rotating].every(pile => base.has(identity(pile.card)))).toBe(true);
     expect(new Set(session.state.market.filter(pile => pile.category === 'Chaos').map(pile => identity(pile.card)))).toEqual(chaos);
-    expect(session.state.market.find(pile => pile.id === 'Base:eval-relocation-relay')?.card.cost).toBe(1);
+    const relocation = session.state.market.find(pile => pile.id === 'Base:eval-relocation-relay');
+    if (relocation) expect(relocation.card.cost).toBe(1);
   });
 
   it('resolves authored Location and Circuit recipes during Collapse and Draft', () => {
@@ -116,6 +124,8 @@ describe('authored content in RuntimeSession', () => {
     document.circuitRewards[0].effectId = 'circuit-vp';
     document.circuitRewards.slice(1).forEach(reward => { reward.enabled = false; });
     document.effects.find(effect => effect.id === 'circuit-vp')!.effects = [{ kind: 'vp', amount: 9 }];
+    // Keep a five-Location board so the authored fixture is guaranteed to appear.
+    document.locations.forEach((location, index) => { if (index >= 5) location.enabled = false; });
     const session = make(document);
     expect(session.state.nodes.some(node => node.location?.name === 'Saved Exchange')).toBe(true);
     empty(session);

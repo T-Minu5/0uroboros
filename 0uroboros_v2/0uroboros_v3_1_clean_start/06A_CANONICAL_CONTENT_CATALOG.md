@@ -203,7 +203,7 @@ The archived source defines the Circuit Reward **system**, but not the exact rew
 - The Circuit Reward appears in a dedicated privileged Draft slot.
 - Eligible player(s) have the Draft window to claim it.
 - Circuit Reward activity is logged.
-- Game-ending Data Center destruction during Wave Collapse stops before Circuit Reward selection.
+- Game-ending Server destruction during Wave Collapse stops before Circuit Reward selection.
 
 ## Exact Circuit Reward pool
 

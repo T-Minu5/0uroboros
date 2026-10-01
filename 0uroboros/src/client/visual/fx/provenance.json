@@ -1,0 +1,87 @@
+[
+  {
+    "effect_id": "sigil-draw",
+    "gameplay_event": "card or Location resolve when occult-tagged",
+    "theatrical_tier": 2,
+    "first_party_reference_assets": ["assets/effect_animations/fx-12-occult.webp", "assets/effect_animations/fx-occult.webp"],
+    "code_technique_references": [],
+    "theme_tags": ["occult"],
+    "implementation_mode": "svg",
+    "original_files_created": ["src/client/visual/FxMark.tsx"],
+    "visual_intent": "Readable geometric glyph that draws on, dual-bar axis + hex. Principle from fx-12, not a copy.",
+    "ux_intent": "Source object shows a ritual mark so the player knows the occult card/Location fired.",
+    "performance_notes": "Single SVG, GPU-cheap, HUD portal."
+  },
+  {
+    "effect_id": "hex-interference",
+    "gameplay_event": "card or Location resolve when quantum-tagged, plus chance family",
+    "theatrical_tier": 2,
+    "first_party_reference_assets": ["assets/effect_animations/fx-11-quantum.webp", "assets/effect_animations/fx-14-quantum.webp"],
+    "code_technique_references": ["https://tympanus.net/Development/ScanEffect/effect1/"],
+    "theme_tags": ["quantum"],
+    "implementation_mode": "svg",
+    "original_files_created": ["src/client/visual/FxMark.tsx"],
+    "visual_intent": "Nested hex scan with phase-offset dashes suggesting depth without shipping the tunnel webp.",
+    "ux_intent": "Probability / entanglement resolutions read as field interference.",
+    "performance_notes": "Stroke animation on four polygons."
+  },
+  {
+    "effect_id": "collapse-wavefield",
+    "gameplay_event": "Wave Collapse measure / select",
+    "theatrical_tier": 3,
+    "first_party_reference_assets": ["assets/effect_animations/fx-05.webp", "assets/gameboard concept art"],
+    "code_technique_references": [
+      "https://projects.arkon.digital/threejs/wavy-cubes/",
+      "https://threejs.org/docs/#EffectComposer",
+      "https://tympanus.net/Development/ScanEffect/effect2/"
+    ],
+    "theme_tags": [],
+    "implementation_mode": "shader",
+    "original_files_created": ["src/client/visual/WaveField.tsx"],
+    "visual_intent": "Table surface deforms and scans during Collapse; singularity core brightens under high amp. Original GLSL.",
+    "ux_intent": "Global event lives on the table, not a random HUD sparkle.",
+    "performance_notes": "One displaced plane, additive, damped off when idle."
+  },
+  {
+    "effect_id": "causal-arc",
+    "gameplay_event": "local card or Location resolve from source object to target",
+    "theatrical_tier": 2,
+    "first_party_reference_assets": ["assets/effect_animations/fx-09.webp", "assets/effect_animations/fx-16.webp"],
+    "code_technique_references": ["https://tympanus.net/Development/GeometryPainter/"],
+    "theme_tags": [],
+    "implementation_mode": "r3f",
+    "original_files_created": ["src/client/visual/EffectPath.tsx"],
+    "visual_intent": "Source sphere, solid causal arc, traveling bolt, target ring. Drain uses thicker hostile ribbon.",
+    "ux_intent": "Player can read who acted on what without HUD chrome.",
+    "performance_notes": "Short-lived meshes, no looping particles."
+  },
+  {
+    "effect_id": "collapse-well",
+    "gameplay_event": "Wave Collapse measure / select",
+    "theatrical_tier": 3,
+    "first_party_reference_assets": ["assets/effect_animations/fx-05.webp", "assets/gameboard concept art"],
+    "code_technique_references": [
+      "https://projects.arkon.digital/threejs/wavy-cubes/",
+      "https://threejs.org/examples/#webgl_points_sprites"
+    ],
+    "theme_tags": [],
+    "implementation_mode": "r3f",
+    "original_files_created": ["src/client/visual/CollapseVisual.tsx"],
+    "visual_intent": "Converging particles + liquid spiral tubes (fx-05 Drawing Lines principle) + Node well.",
+    "ux_intent": "Collapse should read as a table event with anticipation before selection.",
+    "performance_notes": "Points plus rings plus five TubeGeometry spirals, damped when idle."
+  },
+  {
+    "effect_id": "concept-table",
+    "gameplay_event": "persistent board presence",
+    "theatrical_tier": 1,
+    "first_party_reference_assets": ["assets/gameboard concept art/Best Layout and design"],
+    "code_technique_references": [],
+    "theme_tags": ["cyberpunk"],
+    "implementation_mode": "r3f",
+    "original_files_created": ["src/client/visual/TableVisual.tsx", "src/client/visual/LocationVisual.tsx"],
+    "visual_intent": "Octagon magenta rim, cyan inner rim, player-edge bar, cyan Node pad outlines from concept.",
+    "ux_intent": "Board reads as the same product as Mel's concept art.",
+    "performance_notes": "Static meshes + short point lights on pylons."
+  }
+]

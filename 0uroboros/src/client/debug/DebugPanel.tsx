@@ -115,6 +115,8 @@ export function DebugPanel({ G, bgioPhase, viewer, onClose }: DebugPanelProps) {
                 ['victory points', String(totalVictoryPoints(G, player))],
                 ['awarded VP', String(G.players[player].victoryPoints)],
                 ['wallet', String(G.players[player].wallet)],
+                ['actions', String(G.players[player].actions)],
+                ['pending actions', String(G.players[player].pendingActions)],
                 ['controlled weight', `${controlledWeight(G, player).toFixed(1)}%`],
                 [
                   'primary DC',

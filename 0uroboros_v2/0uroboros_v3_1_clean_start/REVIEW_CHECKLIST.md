@@ -6,7 +6,7 @@
 - [ ] Location Reward and Circuit Reward remain separate.
 - [ ] Wave Collapse order remains exact.
 - [ ] Draft follows Collapse.
-- [ ] Data Center targeting remains exact.
+- [ ] Server targeting remains exact.
 - [ ] No placeholder roster is reintroduced.
 
 ## UX

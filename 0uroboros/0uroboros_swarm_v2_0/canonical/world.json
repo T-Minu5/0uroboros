@@ -1,0 +1,83 @@
+{
+  "version": "2.0.0",
+  "items": [
+    {
+      "id": "WORLD-CORE-001",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-CORE-001` Core identity is Cyberpunk + Quantum Physics + Occult/Esoteric.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    },
+    {
+      "id": "WORLD-CORE-002",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-CORE-002` Individual concepts ideally blend 1–2 core signals. The total world balances all three.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    },
+    {
+      "id": "WORLD-CORE-003",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-CORE-003` Theme must not obscure concise mechanics.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    },
+    {
+      "id": "WORLD-SUB-001",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-SUB-001` Very sparse, especially Restore/healing: Solarpunk, Lunarpunk, Psychobilly.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    },
+    {
+      "id": "WORLD-SUB-002",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-SUB-002` Moderate: Cassettepunk, Dieselpunk.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    },
+    {
+      "id": "WORLD-OBS-001",
+      "domain": "WORLD",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`WORLD-OBS-001` Maintain linked worldbuilding in Obsidian-oriented structure: Characters, Factions, Locations, Cards, Mods, Technology, Occult Systems, Quantum Concepts, Terminology, Visual Motifs, Naming Conventions, Relationships.",
+      "tags": [
+        "world"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "05_WORLD_BIBLE_GUIDANCE.md"
+    }
+  ]
+}

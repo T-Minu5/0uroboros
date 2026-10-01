@@ -1,0 +1,37 @@
+{
+  "errors": [],
+  "preview": {
+    "status": "3D depth ready\nRegenerate"
+  },
+  "handImages": [
+    "/assets/card_art/depth/9470b203a5258d5b5000-v2.color.webp",
+    "/assets/card_art/depth/617caf0f844814705cce-v2.color.webp",
+    "/assets/card_art/depth/2e85b7787a7f69e2d0f3-v2.color.webp"
+  ],
+  "leans": {
+    "right": {
+      "rx": 0.28,
+      "ry": 18.47
+    },
+    "left": {
+      "rx": 0,
+      "ry": -19.95
+    },
+    "up": {
+      "rx": 22.79,
+      "ry": -0.16
+    },
+    "down": {
+      "rx": -23.55,
+      "ry": 0
+    }
+  },
+  "depthMoved": true,
+  "handTransforms": [
+    "matrix(1, 0, 0, 1, 0, -20)",
+    "matrix(1, 0, 0, 1, 0, 0)",
+    "matrix(0.997564, 0.0697565, -0.0697565, 0.997564, 0, 5)"
+  ],
+  "settledTransform": "translate3d(60px, -270px, 0px) matrix(1, 0, 0, 1, 0, -20)",
+  "passed": true
+}

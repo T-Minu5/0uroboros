@@ -26,7 +26,7 @@ Semantic node names are `Node_1_location`, `Node_1_local_power`, `Node_1_opponen
 
 DC centers X = `-4.6` Backup / `+4.6` Primary; Z = `±4.48`; integrity anchor Y `.65`. Resource anchors are X `0`, Y `.49`, Z `±4.60`. Cache = `[6,.04,6]`, End Turn = `[8.7,.12,6]`, hand fan origin = `[0,.4,6.05]` with width 10 clear. Duration X = `-9.3 + slot × .82`, Z = `±5.90`, Y `-.02`. Draw/discard X = `-8.95` / `-7.35`, Z = `±4.80`.
 
-The GLB is exported before the studio floor, lights and camera are created, so no review rig enters gameplay. Nine material batches are derived from 338 individual authored parts. Binary inspection verified 60 glTF nodes, 77,992 triangles, 3,888,696 bytes and stable semantic anchor names. The client may adjust materials by name (`OB / magenta inlay`, `OB / cyan Data Center core`, etc.) to match its lighting and tone mapping. No external textures, reference animation media, paid API calls or model-generated bitmap assets are used in this board asset.
+The GLB is exported before the studio floor, lights and camera are created, so no review rig enters gameplay. Nine material batches are derived from 338 individual authored parts. Binary inspection verified 60 glTF nodes, 77,992 triangles, 3,888,696 bytes and stable semantic anchor names. The client may adjust materials by name (`OB / magenta inlay`, `OB / cyan Server core`, etc.) to match its lighting and tone mapping. No external textures, reference animation media, paid API calls or model-generated bitmap assets are used in this board asset.
 
 ## Remaining criticism
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { addToHand, clearLocations, createHarness, openNodes } from './helpers';
+import { addToHand, clearLocations, createHarness, fundActions, openNodes } from './helpers';
 import { canDeploy, deploy, legalNodesFor, revealCard } from '../src/game/engine/deploy';
 import { cardPower } from '../src/game/engine/power';
 
@@ -50,6 +50,7 @@ describe('Deployment legality', () => {
 
   it('enforces the per-player Node capacity of 4', () => {
     const { state, config, random } = createHarness();
+    fundActions(state, '0', config.nodeCapacityPerPlayer);
     for (let i = 0; i < config.nodeCapacityPerPlayer; i += 1) {
       const id = addToHand(state, '0', 'cipher_runner');
       expect(canDeploy(state, '0', id, 0, config).ok).toBe(true);
@@ -64,6 +65,7 @@ describe('Deployment legality', () => {
 
   it('tracks capacity per player rather than per Node', () => {
     const { state, config, random } = createHarness();
+    fundActions(state, '0', config.nodeCapacityPerPlayer);
     for (let i = 0; i < config.nodeCapacityPerPlayer; i += 1) {
       const id = addToHand(state, '0', 'cipher_runner');
       deploy(state, '0', id, 0, config, random);

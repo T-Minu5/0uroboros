@@ -303,9 +303,9 @@
       "types": [
         "attack"
       ],
-      "description": "Slip through the night and strike opponent's backup data center.",
+      "description": "Slip through the night and strike opponent's backup server.",
       "effects": [
-        "Drain -75 from your opponent's Backup Data Center",
+        "Drain -75 from your opponent's Backup Server",
         "+1 Action"
       ],
       "artwork": "/assets/card_art/chaos cards/attack/nyx-luna.png",
@@ -320,7 +320,7 @@
       "types": [
         "attack"
       ],
-      "description": "Exploit a vulnerability in the opponent's data center.",
+      "description": "Exploit a vulnerability in the opponent's server.",
       "effects": [
         "Drain -75",
         "+1 Action",
@@ -383,7 +383,7 @@
       "types": [
         "attack"
       ],
-      "description": "Slowly leech -100 power from your opponent's Data Center for 8 turns.",
+      "description": "Slowly leech -100 power from your opponent's Server for 8 turns.",
       "effects": [
         "Drain -100 for the next 8 turns"
       ],
@@ -413,9 +413,9 @@
       "types": [
         "attack"
       ],
-      "description": "Leet speak the opponent's backup data center.",
+      "description": "Leet speak the opponent's backup server.",
       "effects": [
-        "Drain -200 from your opponent's Backup Data Center",
+        "Drain -200 from your opponent's Backup Server",
         "+1 Action"
       ],
       "artwork": "/assets/card_art/chaos cards/attack/1337-speaker.png"
@@ -461,9 +461,9 @@
       "types": [
         "attack"
       ],
-      "description": "Exploit quantum vulnerabilities in the opponent's infrastructure and drain 200 power from both data centers.",
+      "description": "Exploit quantum vulnerabilities in the opponent's infrastructure and drain 200 power from both servers.",
       "effects": [
-        "Drain -200 from both of your opponent's Data Centers"
+        "Drain -200 from both of your opponent's Servers"
       ],
       "artwork": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
       "video": [
@@ -535,9 +535,9 @@
       "types": [
         "attack"
       ],
-      "description": "An electromagnetic pulse that severely damages opponent's data centers.",
+      "description": "An electromagnetic pulse that severely damages opponent's servers.",
       "effects": [
-        "Drain -300 from both of your opponent's Data Centers"
+        "Drain -300 from both of your opponent's Servers"
       ],
       "artwork": "/assets/card_art/chaos cards/attack/delta-wave.png",
       "video": [
@@ -551,9 +551,9 @@
       "types": [
         "attack"
       ],
-      "description": "Destroy your backup data center and rob your enemy of claiming its points",
+      "description": "Destroy your backup server and rob your enemy of claiming its points",
       "effects": [
-        "Destroy your own backup data center and deny your enemy of claiming its points"
+        "Destroy your own backup server and deny your enemy of claiming its points"
       ],
       "artwork": "/assets/card_art/chaos cards/attack/system-seppuku.png",
       "video": [
@@ -573,7 +573,7 @@
         "Drain -175",
         "+1 Action"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/sudo-demiurge.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/sudo-demiurge.png"
     },
     {
       "id": "cicada-3301",
@@ -582,13 +582,13 @@
       "types": [
         "power"
       ],
-      "description": "Drain -100, +300 Power to your data center, opponent discards 2 from deck.",
+      "description": "Drain -100, +300 Power to your server, opponent discards 2 from deck.",
       "effects": [
         "Opponent discards top 2 cards",
         "Drain -100",
         "+300 Power"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/cicada-3301.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/cicada-3301.png",
       "video": [
         "public/assets/cards/power/cicada-3301.mp4"
       ]
@@ -604,7 +604,7 @@
       "effects": [
         "Morphs into a powerful form, draining between 75-300 power from your opponent."
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/skinwalker.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/skinwalker.png",
       "video": [
         "public/assets/cards/power/skinwalker.mp4"
       ]
@@ -620,7 +620,7 @@
       "effects": [
         "Drain -300"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/leviathan-form.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/leviathan-form.png"
     },
     {
       "id": "spider-form",
@@ -635,7 +635,7 @@
         "+1 Action",
         "+2 Cards"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/spider-form.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/spider-form.png"
     },
     {
       "id": "wasp-form",
@@ -650,7 +650,7 @@
         "+2 Actions",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/wasp-form.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/wasp-form.png"
     },
     {
       "id": "viper-form",
@@ -665,7 +665,7 @@
         "+1 Action",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/viper-form.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/viper-form.png"
     },
     {
       "id": "wolf-form",
@@ -680,7 +680,7 @@
         "+1 Draft",
         "+1 Crypto"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/wolf-form.png"
+      "artwork": "/assets/card_art/chaos cards/horrors/wolf-form.png"
     },
     {
       "id": "subroutine_succubus",
@@ -696,7 +696,7 @@
         "+150 Power",
         "+2 Crypto"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/subroutine-succubus.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/subroutine-succubus.png",
       "video": [
         "public/assets/cards/power/subroutine_succubus.mp4"
       ]
@@ -712,7 +712,7 @@
       "effects": [
         "Drain -150, +150 Power, +1 Action, +1 Crypto for the next 4 turns"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/iterative-incubus.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/iterative-incubus.png",
       "video": [
         "public/assets/cards/power/iterative-incubus.mp4"
       ]
@@ -730,7 +730,7 @@
         "+225 Power",
         "+1 Action"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/node-feratu.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/node-feratu.png",
       "video": [
         "public/assets/cards/power/node-feratu.mp4"
       ]
@@ -746,7 +746,7 @@
       "effects": [
         "Drain -200 when played,-25 for next 4 turns, and drain -450 from Backup on the 5th turn"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/the-azimuthal-kill.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/the-azimuthal-kill.png",
       "video": [
         "public/assets/cards/power/the-azimuthal-kill.mp4"
       ]
@@ -762,7 +762,7 @@
       "effects": [
         "Drain -300 when played, -150 for next 3 turns, and +3 Crypto on 3rd turn."
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/tihkal-hound.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/tihkal-hound.png",
       "video": [
         "public/assets/cards/power/tihkal-hound.mp4"
       ]
@@ -780,7 +780,7 @@
         "Drain -600",
         "+300 Power"
       ],
-      "artwork": "/assets/card_art/chaos cards/hackers/veil-of-cthulhu.png",
+      "artwork": "/assets/card_art/chaos cards/horrors/veil-of-cthulhu.png",
       "video": [
         "public/assets/cards/power/veil-of-cthulhu.mp4",
         "public/assets/cards/power/veil-of-cthulhu3.mp4"
@@ -1569,7 +1569,7 @@
       ],
       "description": "Razor Blade Jade",
       "effects": [
-        "Drain -100 from both Data Centers",
+        "Drain -100 from both Servers",
         "+1 Action",
         "+1 Card"
       ],

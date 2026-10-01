@@ -23,8 +23,8 @@ it('uses real starter Crypto and VP art without changing their canonical effects
   expect(cardArtworkPath(card)).toBe(`/assets/card_art/${suffix}`);
   expect(card.effect).toBe(effect);
  }
- expect(starterCards.find(card=>card.name==='Dash Relay')!.effect).toBe('+1 Card. +1 Action.');
- expect(starterCards.find(card=>card.name==='Cache Crawler')!.cost).toBe(3);
+ expect(starterCards.find(card=>card.name==='Dash-Dot')!.effect).toBe('+1 Card. +2 Actions.');
+ expect(starterCards.find(card=>card.name==='Dotkrawler')!.cost).toBe(4);
 });
 
 it('handles punctuation aliases and missing artwork using the supplied fallback',()=>{

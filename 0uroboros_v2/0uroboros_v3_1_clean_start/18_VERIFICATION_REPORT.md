@@ -16,7 +16,7 @@ Automated consistency checks: **28/28 passed**.
 - **PASS** — Collapse order explicit
 - **PASS** — Effect Bank after Node 5
 - **PASS** — Probability 30/25/20/15/10
-- **PASS** — Data centers 2000/1500
+- **PASS** — Servers 2000/1500
 - **PASS** — Restore fallback
 - **PASS** — Drain no spill
 - **PASS** — Draft supplies

@@ -1,0 +1,473 @@
+{
+  "version": "2.0.0",
+  "items": [
+    {
+      "id": "UX-BOARD-001",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-BOARD-001` Five vertical Node columns.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-BOARD-002",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-BOARD-002` Local player bottom, opponent top on each client.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-BOARD-003",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-BOARD-003` Opponent cards → opponent Power/priority → central Location UI/text → local Power/priority → local cards/drop area. Vertical relationship.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-001",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-001` Drop area explicitly says Node number.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-002",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-002` Clear hover and valid/invalid target feedback.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-003",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-003` Communicate 4-slot capacity and remaining slots.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-004",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-004` Cards compact/reflow when one leaves.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-005",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-005` Priority uses color plus icon/arrow.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-NODE-006",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-NODE-006` Node Power is the presentation name for Node P1 Power and Node P2 Power. The Node center communicates Player A Power, Location, Player B Power vertically. This is presentation, not a new gameplay mechanic.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-A11Y-001",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-A11Y-001` Critical state never uses color alone.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-A11Y-002",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-A11Y-002` Gameplay text/state remains readable during effects.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-PHASE-001",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-PHASE-001` Animate phase, turn, and Node-opening announcements.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-EFFECT-001",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-EFFECT-001` Effect animation communicates cause, target, magnitude, outcome.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-COLLAPSE-001",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-COLLAPSE-001` Wave Collapse short but theatrical, with clear Node resolution, probability selection, selected Node, reward winner.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-FX-001",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-FX-001` Use roughly 3–4 configurable theatrics tiers.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-FX-002",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-FX-002` Magnitude maps to gameplay impact.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-FX-003",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-FX-003` Prefer reusable configurable effect primitives.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-FX-004",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-FX-004` Visuals consume authoritative events and never decide outcomes.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-COLLAPSE-002",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-COLLAPSE-002` Promising bespoke direction: singularity/black-hole swell/collapse blended with liquid/wave interface treatment.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-COLLAPSE-003",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-COLLAPSE-003` Keep Cyberpunk + Quantum Physics + Occult.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "LOOKDEV-COLLAPSE-004",
+      "domain": "LOOKDEV",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`LOOKDEV-COLLAPSE-004` Camera direction open to agents subject to readability.",
+      "tags": [
+        "lookdev"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-TYPE-001",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-TYPE-001` Inter: primary UI/card/Location/log/modal text. Thin, Regular, Medium, Bold and italics.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-TYPE-002",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-TYPE-002` Orbitron Regular: card titles, game titles, subtitles, large numerals.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-TYPE-003",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-TYPE-003` No casual third font.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COLOR-001",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COLOR-001` Blue #4173F2; Light Blue #31A9FF; Cyan #27E2FF; Purple #BC64FF; Pink #FF0BA1; Red #FA0048; Gold #FFCC12; Green #1FFFB1; Black #030012.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COLOR-002",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COLOR-002` Derived tints/shades allowed.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COLOR-003",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COLOR-003` #030012 is darkest normal design color. Shadows and shaders may go darker.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COLOR-004",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COLOR-004` P1/P2 permanent colors not yet locked.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COPY-001",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COPY-001` Proper sentence case.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COPY-002",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COPY-002` One-line labels/titles need no period. Effect text does.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COPY-003",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COPY-003` Clear and concise.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COPY-004",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COPY-004` No em dashes.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "DESIGN-COPY-005",
+      "domain": "DESIGN",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`DESIGN-COPY-005` Bullets allowed for multiple effects.",
+      "tags": [
+        "design"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-LOG-001",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-LOG-001` Game/Draft logs inspectable, not dominant.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-LOG-002",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-LOG-002` Use P1/P2.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    },
+    {
+      "id": "UX-LOG-003",
+      "domain": "UX",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`UX-LOG-003` Concise.",
+      "tags": [
+        "ux"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "04_UX_LOOKDEV_DESIGN_SYSTEM.md"
+    }
+  ]
+}

@@ -27,11 +27,11 @@ describe('Starting decks', () => {
     expect(defs('0')).toEqual(defs('1'));
   });
 
-  it('contains 4 Character, 4 Crypto, and 2 Victory Point cards', () => {
+  it('contains 5 Character, 3 Crypto, and 2 Victory Point cards', () => {
     const { state } = createHarness();
     const kinds = state.decks['0'].map((id) => getCardDefinition(state.cards[id].cardDefId).kind);
-    expect(kinds.filter((kind) => kind === 'character')).toHaveLength(4);
-    expect(kinds.filter((kind) => kind === 'crypto')).toHaveLength(4);
+    expect(kinds.filter((kind) => kind === 'character')).toHaveLength(5);
+    expect(kinds.filter((kind) => kind === 'crypto')).toHaveLength(3);
     expect(kinds.filter((kind) => kind === 'victoryPoint')).toHaveLength(2);
   });
 });
@@ -104,22 +104,20 @@ describe('Trash versus Destroyed', () => {
   it('stops counting Victory Points once a card is trashed or destroyed', () => {
     const { state } = createHarness();
     const id = addToHand(state, '0', 'gnostic_tablet');
-    // Two starting Ledger sigils at 2 each, plus the 3-point tablet.
-    expect(totalVictoryPoints(state, '0')).toBe(4 + 3);
+    expect(totalVictoryPoints(state, '0')).toBe(3);
 
     moveToTrash(state, state.cards[id]);
-    expect(totalVictoryPoints(state, '0')).toBe(4);
+    expect(totalVictoryPoints(state, '0')).toBe(0);
 
     const second = addToHand(state, '0', 'gnostic_tablet');
     moveToDestroyed(state, state.cards[second]);
-    expect(totalVictoryPoints(state, '0')).toBe(4);
+    expect(totalVictoryPoints(state, '0')).toBe(0);
   });
 
   it('supports negative Victory Point values', () => {
     const { state } = createHarness();
     addToHand(state, '0', 'cursed_ledger');
-    // Two starting Ledger sigils at 2 each, Cursed ledger at -2.
-    expect(totalVictoryPoints(state, '0')).toBe(4 - 2);
+    expect(totalVictoryPoints(state, '0')).toBe(-2);
   });
 });
 

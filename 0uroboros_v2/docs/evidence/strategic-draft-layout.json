@@ -3,18 +3,42 @@
   "layouts": [
     {
       "width": 1600,
+      "fullCards": true,
+      "costBadges": 16,
+      "acquireBars": 0,
+      "resourceScale": 0.82,
+      "resourcesOneRow": true,
+      "boardOverflow": 0,
       "walletColor": "rgb(31, 255, 177)",
-      "headingTop": 66,
+      "footerBottom": 964,
       "buttonVisible": true,
-      "cardCount": 18,
+      "cardCount": 16,
+      "rows": {
+        "characters": 2,
+        "row1": 6,
+        "row2": 4,
+        "resources": 6
+      },
       "overflow": false
     },
     {
       "width": 1366,
+      "fullCards": true,
+      "costBadges": 16,
+      "acquireBars": 0,
+      "resourceScale": 0.82,
+      "resourcesOneRow": true,
+      "boardOverflow": 0,
       "walletColor": "rgb(31, 255, 177)",
-      "headingTop": 66,
+      "footerBottom": 864,
       "buttonVisible": true,
-      "cardCount": 18,
+      "cardCount": 16,
+      "rows": {
+        "characters": 2,
+        "row1": 6,
+        "row2": 4,
+        "resources": 6
+      },
       "overflow": false
     }
   ],

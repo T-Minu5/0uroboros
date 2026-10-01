@@ -14,12 +14,14 @@ import { getCardDefinition } from '../content/cards';
 import { cardsAtNode, moveToNode } from './zones';
 import { resolveOps, type EffectContext } from './effects';
 import { addLog } from './log';
+import { actionCostToDeploy, canAffordActions, spendActions } from './actions';
 
 export type DeployFailure =
   | 'notInHand'
   | 'notDeployable'
   | 'nodeCollapsed'
-  | 'nodeCapacityReached';
+  | 'nodeCapacityReached'
+  | 'insufficientActions';
 
 export type DeployCheck = { ok: true } | { ok: false; reason: DeployFailure };
 
@@ -45,6 +47,11 @@ export function canDeploy(
 
   if (cardsAtNode(state, nodeIndex, player).length >= config.nodeCapacityPerPlayer) {
     return { ok: false, reason: 'nodeCapacityReached' };
+  }
+
+  const cost = actionCostToDeploy(getCardDefinition(card.cardDefId).kind);
+  if (!canAffordActions(state, player, cost)) {
+    return { ok: false, reason: 'insufficientActions' };
   }
   return { ok: true };
 }
@@ -74,6 +81,9 @@ export function deploy(
   random: RandomAPI,
 ): void {
   const card = state.cards[instanceId];
+  const cost = actionCostToDeploy(getCardDefinition(card.cardDefId).kind);
+  if (!spendActions(state, player, cost)) return;
+
   const playOrder = state.players[player].nextPlayOrder;
   state.players[player].nextPlayOrder += 1;
 

@@ -56,7 +56,7 @@ Premium collectible objects around first-party art. Develop coherent frame, thic
 ## Locations
 Structural game objects, not normal cards. Possible forms: embedded plate, raised plinth, holographic slab, dimensional aperture, quantum/occult artifact, integrated Location frame. Choose one coherent system.
 
-## Data Centers
+## Servers
 Strong anchored world/HUD objects that react to Drain/Restore/destruction without overpowering Nodes.
 
 ## Negative space
@@ -73,7 +73,7 @@ Use them to define:
 - board silhouette and main table geometry
 - player/opponent zone placement
 - Duration storage placement
-- Primary and Backup Data Center placement and displayed power
+- Primary and Backup Server placement and displayed power
 - Actions, Crypto, VP, draw pile, discard pile, and hand placement
 - Crypto Cache placement
 - End Turn button structure and timer treatment
@@ -91,7 +91,7 @@ Requirements:
 - use the image with cards in hand as the authority for hand placement and spatial occupation
 - preserve readability and direct manipulation while translating the 2D concept into 3D
 - keep drop targets visibly attached to the board columns/wells
-- maintain unobstructed Power, Data Center, and Location readability
+- maintain unobstructed Power, Server, and Location readability
 - do not silently replace this with a generic table if Blender MCP is unavailable
 
 If Blender MCP is unavailable or blocked, Astra must report that as a tooling blocker and provide a fallback plan before substituting another approach.

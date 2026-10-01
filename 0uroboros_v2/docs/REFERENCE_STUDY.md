@@ -49,13 +49,13 @@ Follow the global reveal queue exactly: priority player, opponent, alternating e
 
 Gameplay trigger: Rezz-Razor Drain 75 or Rezz-Blade Drain 100 on reveal. Read the resolved target from the gameplay event: available enemy Primary, else available Backup; no overkill spill. Record before/after integrity in that event.
 
-Original visual: the source card draws two short magenta angled traces that converge into a small seed (180–240 ms); a narrow arcing data filament travels from the actual card to the exact enemy Data Center (350–450 ms); the target's rim compresses/recoils on arrival (120 ms); only then interpolate its displayed integrity and show the actual lost amount (250–350 ms); fragments dissipate (250 ms). Use authored SVG activation geometry plus a Three.js curve/particle path. Color can echo inspected Rezz art; do not use the reference flame skull. Keep the old integrity during travel. Zero-effect/no-target cases receive a short local explanation and no fake hit.
+Original visual: the source card draws two short magenta angled traces that converge into a small seed (180–240 ms); a narrow arcing data filament travels from the actual card to the exact enemy Server (350–450 ms); the target's rim compresses/recoils on arrival (120 ms); only then interpolate its displayed integrity and show the actual lost amount (250–350 ms); fragments dissipate (250 ms). Use authored SVG activation geometry plus a Three.js curve/particle path. Color can echo inspected Rezz art; do not use the reference flame skull. Keep the old integrity during travel. Zero-effect/no-target cases receive a short local explanation and no fake hit.
 
 ### Restore — tactical tier
 
 Gameplay trigger: Vault Encryption Restore 100 on reveal. Resolved target is owner's available Primary, else Backup. Clamp to capacity; destroyed centers cannot revive. Display actual restored amount, not unconditional +100.
 
-Original visual: incomplete cyan/green arcs activate at source (200 ms), two fine strands travel toward the owner Data Center (400 ms), three short concentric segments align around its existing rim (250 ms), integrity fills only as the segments complete (300 ms), and the rim returns to its quiet state (200 ms). Lesson from inspected heal references is convergence and reconstructing linework, not copied loops. Use authored SVG segments and Three.js paths. A full center displays a local “Integrity full” result, without a misleading green +100.
+Original visual: incomplete cyan/green arcs activate at source (200 ms), two fine strands travel toward the owner Server (400 ms), three short concentric segments align around its existing rim (250 ms), integrity fills only as the segments complete (300 ms), and the rim returns to its quiet state (200 ms). Lesson from inspected heal references is convergence and reconstructing linework, not copied loops. Use authored SVG segments and Three.js paths. A full center displays a local “Integrity full” result, without a misleading green +100.
 
 ### Wave Collapse — deterministic story followed by cinematic selection
 

@@ -25,7 +25,7 @@ Normal Draft keeps four persistent Base piles, two rotating Base offers, three p
 
 ## Presentation
 
-The board uses the attached cyberpunk/occult reference as visual direction: angular hardware, illuminated sacred geometry, longer local lanes, integrated Power diamonds, and animated neon glass Data Center tubes. Tube fill and local table illumination follow integrity; damage flashes red and healing gold. Percentage plaques and the weighted-selection animation are removed.
+The board uses the attached cyberpunk/occult reference as visual direction: angular hardware, illuminated sacred geometry, longer local lanes, integrated Power diamonds, and animated neon glass Server tubes. Tube fill and local table illumination follow integrity; damage flashes red and healing gold. Percentage plaques and the weighted-selection animation are removed.
 
 Wallet and Effect Bank overlays use the same board projection as their physical housings. The text-only Undo control sits below the local Effect Bank. Local placement flights remain face up. Location award ripples are confined to the winning side, with both sides allowed for a tied award.
 

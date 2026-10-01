@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS } from "../src/content";
-import { createSession, seededRandom, type RuntimeSession } from "../src/runtime";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "../src/runtime";
 import { starterCards } from "../src/game";
 
 const make = (seed = 17) => createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
 function drain(session: RuntimeSession) {
   const output = [];
-  while (session.pendingCount) { output.push(session.step()!); if (output.length > 500) throw new Error("Resolution did not terminate."); }
+  while (session.pendingCount || session.state.choice) {
+    if (session.state.choice) { session.choose(firstLegalSelection(session.state.choice)); continue; }
+    output.push(session.step()!); if (output.length > 500) throw new Error("Resolution did not terminate.");
+  }
   return output;
 }
 function clear(session: RuntimeSession) {
@@ -30,21 +33,29 @@ function draftFixture(rewardId: string, eligible: (0 | 1)[] = [0, 1]) {
 }
 
 describe("Evaluation Location content", () => {
-  it("assigns exactly the approved five once per Cycle and masks closed Locations", () => {
+  it("assigns five Locations from the approved pool once per Cycle and masks closed Locations", () => {
     const session = make();
     const before = session.state.nodes.map(node => node.location!.id);
+    const pool = new Set(EVALUATION_LOCATIONS.map(location => location.id));
     expect(new Set(before).size).toBe(5);
-    expect([...before].sort()).toEqual(EVALUATION_LOCATIONS.map(location => location.id).sort());
+    expect(before.every(id => pool.has(id))).toBe(true);
     session.view().nodes.forEach((node,index)=>{if(!session.view().openNodes.includes(index))expect(node.location).toBeNull();});
     for (let turn = 1; turn <= 3; turn++) { session.endTurn(); drain(session); }
     session.endDraft(); session.nextCycle();
     const after = session.state.nodes.map(node => node.location!.id);
-    expect([...after].sort()).toEqual([...before].sort());
+    expect(new Set(after).size).toBe(5);
+    expect(after.every(id => pool.has(id))).toBe(true);
+    // Same Cycle keeps the drawn five; a new Cycle may draw a different five from the pool.
     expect(after).not.toEqual(before);
   });
 
   it("grants both tied players Location Crypto and earned VP after each Node's final Power", () => {
     const session = make(); clear(session);
+    // Pin the original reward Locations so pool expansion cannot change the totals.
+    const pinned = ["data_exchange", "occult_archive", "quantum_commons", "signal_tower", "breach_relay"];
+    session.state.nodes.forEach((node, index) => {
+      node.location = structuredClone(EVALUATION_LOCATIONS.find(location => location.id === pinned[index])!);
+    });
     session.endTurn(); const result = drain(session);
     expect(session.state.players[0].wallet).toBe(3);
     expect(session.state.players[0].rewardVP).toBe(3);
@@ -52,8 +63,8 @@ describe("Evaluation Location content", () => {
     const draft = result.find(step => step.event.kind === "draft")!;
     expect(draft.view.players[1].wallet).toBe(3);
     expect(draft.view.players[1].rewardVP).toBe(3);
-    expect(session.state.players[0].centers.primary).toBe(2000);
-    expect(session.state.players[1].centers.primary).toBe(2000);
+    expect(session.state.players[0].servers.primary).toBe(2000);
+    expect(session.state.players[1].servers.primary).toBe(2000);
     for (let node = 0; node < 5; node++) {
       const power = result.findIndex(step => step.event.kind === "power" && step.event.node === node);
       const gains = result.map((step, i) => ({ ...step.event, i })).filter(event => event.source === "location" && event.node === node && ["crypto", "vp", "draw", "drain"].includes(event.kind));
@@ -77,17 +88,17 @@ describe("Evaluation Location content", () => {
 
   it("Breach relay damages only the final loser with no spill and no tied damage", () => {
     const session = make(); clear(session); locationOnly(session, "breach_relay", 2); winNode(session, 2, 0);
-    session.state.players[1].centers.primary = 100;
+    session.state.players[1].servers.primary = 100;
     session.endTurn(); const result = drain(session);
     const hit = result.find(step => step.event.kind === "drain" && step.event.source === "location")!;
     expect(hit.event).toMatchObject({ node: 2, owner: 0, targetOwner: 1, target: "primary", amount: 100, before: 100, after: 0 });
-    expect(session.state.players[1].centers.backup).toBe(1500);
+    expect(session.state.players[1].servers.backup).toBe(1500);
     expect(session.state.players[0].destructionVP).toBe(8);
   });
 
   it("finishes lethal Node awards then stops later Nodes, Effect Bank, Circuit selection and Draft", () => {
     const session = make(); clear(session); locationOnly(session, "breach_relay", 1); winNode(session, 1, 0);
-    session.state.players[1].centers = { primary: 0, backup: 150 };
+    session.state.players[1].servers = { primary: 0, backup: 150 };
     session.endTurn(); const result = drain(session);
     expect(session.state.phase).toBe("gameover");
     expect(session.state.players[0].destructionVP).toBe(12);
@@ -136,12 +147,12 @@ describe("Evaluation Circuit claims", () => {
 
   it("heals Primary only, clamps at maximum, and cannot revive or redirect", () => {
     const session = draftFixture("integrity_patch");
-    session.state.players[0].centers = { primary: 1850, backup: 900 };
-    session.state.players[1].centers = { primary: 0, backup: 900 };
+    session.state.players[0].servers = { primary: 1850, backup: 900 };
+    session.state.players[1].servers = { primary: 0, backup: 900 };
     expect(session.claimCircuitReward(0)).toMatchObject({ kind: "restore", amount: 150, before: 1850, after: 2000, target: "primary" });
     expect(session.claimCircuitReward(1)).toMatchObject({ amount: 0, before: 0, after: 0, target: "primary" });
-    expect(session.state.players[1].centers).toEqual({ primary: 0, backup: 900 });
-    expect(session.state.players[0].centers.backup).toBe(900);
+    expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 900 });
+    expect(session.state.players[0].servers.backup).toBe(900);
   });
 
   it("automatically presents the opponent's separate claim and preserves the local claim", () => {
@@ -187,11 +198,16 @@ describe("Evaluation information and repeat-play boundaries", () => {
       if (session.state.circuitEligible.includes(0)) session.claimCircuitReward();
       for (const owner of [0, 1] as const) {
         const player = session.state.players[owner];
-        const cards = [...player.hand, ...player.draw, ...player.discard, ...player.destroyed];
-        expect(cards).toHaveLength(10);
-        expect(new Set(cards.map(card => card.id)).size).toBe(10);
+        const cards = [...player.hand, ...player.draw, ...player.discard, ...player.destroyed, ...player.bank.map(entry => entry.card), ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))];
+        expect(new Set(cards.map(card => card.id)).size).toBe(cards.length);
         expect(player.totalVP).toBe(4 + player.rewardVP + player.destructionVP);
       }
+      const conserved = [0, 1].flatMap(owner => {
+        const player = session.state.players[owner];
+        return [...player.hand, ...player.draw, ...player.discard, ...player.destroyed, ...player.bank.map(entry => entry.card), ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))];
+      }).concat(session.state.trash);
+      expect(conserved).toHaveLength(20);
+      expect(new Set(conserved.map(card => card.id)).size).toBe(conserved.length);
       session.endDraft(); session.nextCycle();
       expect(session.state.circuitReward).toEqual({ definition: null, claimed: [] });
       expect(session.state.circuitEligible).toEqual([]);

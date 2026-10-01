@@ -1,15 +1,15 @@
-import { starterCards, type Card, type RandomSource } from './game';
+import type { Card, RandomSource } from './game';
 import { HISTORIC_CARDS, historicCategory } from './historicCatalog';
 import { CARD_ART_PLACEHOLDER } from './cardArtwork';
 export { HISTORIC_CARDS, HISTORIC_SOURCE_METADATA, HISTORIC_EXCLUSIONS } from './historicCatalog';
 export type MarketCategory='Base'|'VP'|'Crypto'|'Chaos';
 export type MarketPile={id:string;card:Card;category:MarketCategory;supply:number;remaining?:[number,number];rotating?:boolean};
-export type MarketContent={baseCards:readonly Card[];chaosCards:readonly Card[];vpCards:readonly Card[];cryptoCards:readonly Card[];coreBaseIds:readonly string[];activeVpIds:readonly string[];activeCryptoIds:readonly string[]};
+export type MarketContent={baseCards:readonly Card[];chaosCards:readonly Card[];vpCards:readonly Card[];cryptoCards:readonly Card[]};
 
 // Retained evaluation rules have distinct identities and never borrow historic artwork.
 const retainedBase:Card[]=[
- {...starterCards[1],name:'Dash Relay',art:CARD_ART_PLACEHOLDER,definitionId:'dash'},
- {...starterCards[2],name:'Cache Crawler',art:CARD_ART_PLACEHOLDER,definitionId:'dot'},
+ {id:'dash',definitionId:'dash',name:'Dash Relay',type:'Character',power:2,cost:3,effect:'+1 Card. +1 Action.',art:CARD_ART_PLACEHOLDER,onReveal:[{kind:'draw',amount:1},{kind:'actions',amount:1}]},
+ {id:'dot',definitionId:'dot',name:'Cache Crawler',type:'Character',power:1,cost:3,effect:'+1 Card. +1 Action. +1 Crypto.',art:CARD_ART_PLACEHOLDER,onReveal:[{kind:'draw',amount:1},{kind:'actions',amount:1},{kind:'crypto',amount:1}]},
  {id:'eval-cycle-cache',definitionId:'eval-cycle-cache',name:'Cycle Cache',type:'Character',power:1,cost:3,effect:'Duration 2 Cycles. On collapse, +1 Crypto.',art:CARD_ART_PLACEHOLDER,onReveal:[],duration:2,durationPeriod:'cycle',onCollapse:[{kind:'crypto',amount:1}]},
  {id:'eval-phase-runner',definitionId:'eval-phase-runner',name:'Phase Runner',type:'Character',power:4,cost:3,effect:'On reveal, move this card to another open Node.',art:CARD_ART_PLACEHOLDER,onReveal:[{kind:'moveSelf'}]},
  {id:'eval-signal-surveyor',definitionId:'eval-signal-surveyor',name:'Signal Surveyor',type:'Character',power:2,cost:3,effect:'On reveal, transfer 1 of your Power between this Node and a neighboring Node. +1 Card.',art:CARD_ART_PLACEHOLDER,onReveal:[{kind:'transferPower',amount:1},{kind:'draw',amount:1}]},
@@ -23,15 +23,36 @@ export const EVALUATION_CHAOS_CARDS:readonly Card[]=[...retainedChaos,...HISTORI
 export const EVALUATION_VP_CARDS:readonly Card[]=HISTORIC_CARDS.filter(card=>card.type==='VP');
 export const EVALUATION_CRYPTO_CARDS:readonly Card[]=HISTORIC_CARDS.filter(card=>card.type==='Crypto');
 export const EVALUATION_ALL_CARDS:readonly Card[]=[...EVALUATION_BASE_CARDS,...EVALUATION_CHAOS_CARDS,...EVALUATION_VP_CARDS,...EVALUATION_CRYPTO_CARDS];
-const CORE_BASE_IDS=new Set(['slash-dot','dash','dot','eval-cycle-cache']);
-const ACTIVE_VP_IDS=new Set(['basic-encryption','vault-encryption','quantum-archive']);
-const ACTIVE_CRYPTO_IDS=new Set(['byte-coin','kilo-coin','mega-cache']);
-export function createStrategicMarket(content?:MarketContent):MarketPile[]{
- const baseIds=content?new Set(content.coreBaseIds):CORE_BASE_IDS,vpIds=content?new Set(content.activeVpIds):ACTIVE_VP_IDS,cryptoIds=content?new Set(content.activeCryptoIds):ACTIVE_CRYPTO_IDS;
- return ([['Base',(content?.baseCards??EVALUATION_BASE_CARDS).filter(card=>baseIds.has(card.definitionId??card.id))],['VP',(content?.vpCards??EVALUATION_VP_CARDS).filter(card=>vpIds.has(card.definitionId??card.id))],['Crypto',(content?.cryptoCards??EVALUATION_CRYPTO_CARDS).filter(card=>cryptoIds.has(card.definitionId??card.id))]] as const).flatMap(([category,cards])=>cards.map(card=>({id:`${category}:${card.definitionId??card.id}`,card:structuredClone(card),category,supply:category==='Crypto'?16:8})));
-}
+const STABLE_BASE_COUNT=4;
+const VP_SHELF_COUNT=3;
+const CRYPTO_SHELF_COUNT=3;
+
+function cardId(card:Card){return card.definitionId??card.id;}
+
 function pick(cards:readonly Card[],count:number,random:RandomSource):Card[]{
- const shuffled=[...cards];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}return shuffled.slice(0,count);
+ const shuffled=[...cards];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}return shuffled.slice(0,Math.max(0,count));
 }
-export function baseOffer(random:RandomSource,content?:MarketContent):MarketPile[]{const core=content?new Set(content.coreBaseIds):CORE_BASE_IDS;return pick((content?.baseCards??EVALUATION_BASE_CARDS).filter(card=>!core.has(card.definitionId??card.id)),2,random).map(card=>({id:`Base:${card.definitionId??card.id}`,card:structuredClone(card),category:'Base',supply:8,rotating:true}));}
-export function chaosOffer(random:RandomSource,content?:MarketContent):MarketPile[]{return pick(content?.chaosCards??EVALUATION_CHAOS_CARDS,3,random).map(card=>({id:`Chaos:${card.definitionId??card.id}`,card:structuredClone(card),category:'Chaos',supply:4,remaining:[2,2]}));}
+
+/** Draw 4 stable Base piles at game setup from every Base card so the market varies between sessions. */
+export function pickStableBaseCards(random:RandomSource,content?:MarketContent,count=STABLE_BASE_COUNT):Card[]{
+ return pick(content?.baseCards??EVALUATION_BASE_CARDS,count,random);
+}
+
+/** Every shelf samples its whole pool each game; nothing is pinned to a fixed set. */
+export function createStrategicMarket(random:RandomSource,content?:MarketContent):MarketPile[]{
+ const stables=pickStableBaseCards(random,content);
+ const vp=pick(content?.vpCards??EVALUATION_VP_CARDS,VP_SHELF_COUNT,random);
+ const crypto=pick(content?.cryptoCards??EVALUATION_CRYPTO_CARDS,CRYPTO_SHELF_COUNT,random);
+ return [
+  ...stables.map(card=>({id:`Base:${cardId(card)}`,card:structuredClone(card),category:'Base' as const,supply:8})),
+  ...vp.map(card=>({id:`VP:${cardId(card)}`,card:structuredClone(card),category:'VP' as const,supply:8})),
+  ...crypto.map(card=>({id:`Crypto:${cardId(card)}`,card:structuredClone(card),category:'Crypto' as const,supply:16})),
+ ];
+}
+
+export function baseOffer(random:RandomSource,content?:MarketContent,excludeIds?:ReadonlySet<string>):MarketPile[]{
+ const exclude=excludeIds??new Set<string>();
+ return pick((content?.baseCards??EVALUATION_BASE_CARDS).filter(card=>!exclude.has(cardId(card))),2,random)
+  .map(card=>({id:`Base:${cardId(card)}`,card:structuredClone(card),category:'Base' as const,supply:8,rotating:true}));
+}
+export function chaosOffer(random:RandomSource,content?:MarketContent):MarketPile[]{return pick(content?.chaosCards??EVALUATION_CHAOS_CARDS,4,random).map(card=>({id:`Chaos:${cardId(card)}`,card:structuredClone(card),category:'Chaos',supply:4,remaining:[2,2]}));}

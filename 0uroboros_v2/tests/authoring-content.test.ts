@@ -7,7 +7,7 @@ describe('authored content', () => {
     expect(validateContent(document)).toEqual([]);
     const compiled = compileContent(document);
     expect(compiled.cards.length).toBeGreaterThan(74);
-    expect(compiled.locations).toHaveLength(5);
+    expect(compiled.locations).toHaveLength(6);
     expect(compiled.circuitRewards).toHaveLength(3);
     expect(compiled.baseCards.find(card => card.definitionId === 'eval-relocation-relay')?.onReveal).toEqual([{ kind: 'moveCard' }]);
     expect(compiled.chaosCards.find(card => card.definitionId === 'eval-power-siphon')?.onReveal).toEqual([{ kind: 'modifyPower', amount: -2, opponent: true }]);
@@ -37,7 +37,7 @@ describe('authored content', () => {
     const errors = validateContent(document);
     expect(errors).toEqual(expect.arrayContaining([
       expect.stringContaining('effectRefs.onCollapse[0]: unknown effect'),
-      expect.stringContaining('cards: at least 3 enabled Chaos cards'),
+      expect.stringContaining('cards: at least 4 enabled non-Generated Chaos cards'),
       expect.stringContaining('cards: rezz-razor is referenced by the starting deck'),
     ]));
     expect(errors.some(error => error.includes('.pool: incompatible'))).toBe(true);

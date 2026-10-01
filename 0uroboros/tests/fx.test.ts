@@ -102,6 +102,27 @@ describe('fx playback readiness', () => {
   });
 });
 
+describe('draw and Action beats', () => {
+  it('records a draw beat without changing the number of cards drawn', () => {
+    const { state, config, random } = createHarness();
+    const before = state.hands['0'].length;
+    const ctx: EffectContext = {
+      controller: '0',
+      nodeIndex: 0,
+      sourceCard: null,
+      chapter: 'reveal',
+      effectText: '+3 Cards.',
+    };
+    resolveOps(state, [{ op: 'draw', amount: 3, target: 'self' }], ctx, config, random);
+    expect(state.hands['0'].length).toBe(before + 3);
+    expect(state.fxQueue.find((event) => event.kind === 'draw')).toMatchObject({
+      kind: 'draw',
+      player: '0',
+      amount: 3,
+    });
+  });
+});
+
 describe('deploy still legal after recording', () => {
   it('does not block a later deploy because an fx event was stored', () => {
     const { state } = createHarness();

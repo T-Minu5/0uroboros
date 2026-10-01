@@ -1,0 +1,1175 @@
+{
+  "version": 2,
+  "entries": {
+    "/assets/card_art/base cards/action/astra-ascii.png": {
+      "sha": "b51d6df1ecb17f285b58335183fdc44ac8d845dd940790436d67703fda95b882",
+      "v": 2,
+      "color": "/assets/card_art/depth/b51d6df1ecb17f285b58-v2.color.webp",
+      "depth": "/assets/card_art/depth/b51d6df1ecb17f285b58-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5359
+    },
+    "/assets/card_art/base cards/action/atomic-mass.png": {
+      "sha": "aa678713d7ec8c8f0729febc8aef0a3f80a5529caac411303b9df98879b3af5c",
+      "v": 2,
+      "color": "/assets/card_art/depth/aa678713d7ec8c8f0729-v2.color.webp",
+      "depth": "/assets/card_art/depth/aa678713d7ec8c8f0729-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6049
+    },
+    "/assets/card_art/base cards/action/atomic-unit.png": {
+      "sha": "ac281d8055889ea54075818488a255f8f3afa7b1353d15afd7228f47126ee968",
+      "v": 2,
+      "color": "/assets/card_art/depth/ac281d8055889ea54075-v2.color.webp",
+      "depth": "/assets/card_art/depth/ac281d8055889ea54075-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4335
+    },
+    "/assets/card_art/base cards/action/byte-drone.png": {
+      "sha": "868dd1b3808292c6549613e250ea3e71d34a1863369f41407b913c5ed4f8690c",
+      "v": 2,
+      "color": "/assets/card_art/depth/868dd1b3808292c65496-v2.color.webp",
+      "depth": "/assets/card_art/depth/868dd1b3808292c65496-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.643
+    },
+    "/assets/card_art/base cards/action/cowl-obscyra.png": {
+      "sha": "1c2aa5814f0c64de81ae2ddc8f82d7e62df8f6b59d9fc443540c0674dadcabe2",
+      "v": 2,
+      "color": "/assets/card_art/depth/1c2aa5814f0c64de81ae-v2.color.webp",
+      "depth": "/assets/card_art/depth/1c2aa5814f0c64de81ae-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.671
+    },
+    "/assets/card_art/base cards/action/dash-dot.png": {
+      "sha": "8a725c3be18c781faab790fabb0877b5fbd38c3e96ecb450e7c53d6f422dd44b",
+      "v": 2,
+      "color": "/assets/card_art/depth/8a725c3be18c781faab7-v2.color.webp",
+      "depth": "/assets/card_art/depth/8a725c3be18c781faab7-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4204
+    },
+    "/assets/card_art/base cards/action/dotkrawler.png": {
+      "sha": "615d3df6fb364bc8c029238fa6683acf72b3776b7039cd5433bd4de5aa78515f",
+      "v": 2,
+      "color": "/assets/card_art/depth/615d3df6fb364bc8c029-v2.color.webp",
+      "depth": "/assets/card_art/depth/615d3df6fb364bc8c029-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.699
+    },
+    "/assets/card_art/base cards/action/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/base cards/action/infernal-kernel.png": {
+      "sha": "a198fff6da99c368b3d2346367f820f23a18ebec40dc0b81d869cc879a8c699b",
+      "v": 2,
+      "color": "/assets/card_art/depth/a198fff6da99c368b3d2-v2.color.webp",
+      "depth": "/assets/card_art/depth/a198fff6da99c368b3d2-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5141
+    },
+    "/assets/card_art/base cards/action/particle-form.png": {
+      "sha": "9d14e035f6c3b97cdb22e92a77af6efbe321d8d290797ec4288428d8b18818da",
+      "v": 2,
+      "color": "/assets/card_art/depth/9d14e035f6c3b97cdb22-v2.color.webp",
+      "depth": "/assets/card_art/depth/9d14e035f6c3b97cdb22-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4793
+    },
+    "/assets/card_art/base cards/action/quantum-telementry.png": {
+      "sha": "bf06adac1aa8dc2d574f7e2527dcf6c62871b9871af052f01b25aa18116fe642",
+      "v": 2,
+      "color": "/assets/card_art/depth/bf06adac1aa8dc2d574f-v2.color.webp",
+      "depth": "/assets/card_art/depth/bf06adac1aa8dc2d574f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4507
+    },
+    "/assets/card_art/base cards/action/recursive-seance.png": {
+      "sha": "e8c6b210363c78d2902e956322792cabac97c61e7bdfde4f650c0c086b17aee2",
+      "v": 2,
+      "color": "/assets/card_art/depth/e8c6b210363c78d2902e-v2.color.webp",
+      "depth": "/assets/card_art/depth/e8c6b210363c78d2902e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.329
+    },
+    "/assets/card_art/base cards/action/root-rune.png": {
+      "sha": "826da6437308cf68e69a31301468324743a466c619942f45f18fbcb2547cb21f",
+      "v": 2,
+      "color": "/assets/card_art/depth/826da6437308cf68e69a-v2.color.webp",
+      "depth": "/assets/card_art/depth/826da6437308cf68e69a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4512
+    },
+    "/assets/card_art/base cards/action/shiva-of-cern.png": {
+      "sha": "6b59f2f2cebc6a55dcf2cc82a83998d2942a5e60b9fa2f818588197314e64b1b",
+      "v": 2,
+      "color": "/assets/card_art/depth/6b59f2f2cebc6a55dcf2-v2.color.webp",
+      "depth": "/assets/card_art/depth/6b59f2f2cebc6a55dcf2-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2711
+    },
+    "/assets/card_art/base cards/action/slash-dot.png": {
+      "sha": "2499086b0508c617673e949bd4fbb023fe6895a473b6fc8dbbfd45878c81f618",
+      "v": 2,
+      "color": "/assets/card_art/depth/2499086b0508c617673e-v2.color.webp",
+      "depth": "/assets/card_art/depth/2499086b0508c617673e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3946
+    },
+    "/assets/card_art/base cards/action/the-inbetweener.png": {
+      "sha": "eecf04db57cbae50d961782d194d3fdd5acb23bbcd0aad9d84a1535aa9585b28",
+      "v": 2,
+      "color": "/assets/card_art/depth/eecf04db57cbae50d961-v2.color.webp",
+      "depth": "/assets/card_art/depth/eecf04db57cbae50d961-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4144
+    },
+    "/assets/card_art/base cards/action/the-tesseract-magi.png": {
+      "sha": "629a7890c4374492d1e67ad3684d2224f8a7561b437af1d852e02eb17185b35d",
+      "v": 2,
+      "color": "/assets/card_art/depth/629a7890c4374492d1e6-v2.color.webp",
+      "depth": "/assets/card_art/depth/629a7890c4374492d1e6-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4554
+    },
+    "/assets/card_art/base cards/action/thorn-shadow.png": {
+      "sha": "ea002b9670d7544c6fbf0c3f44846c937925025402b64255d605a9db95a586fc",
+      "v": 2,
+      "color": "/assets/card_art/depth/ea002b9670d7544c6fbf-v2.color.webp",
+      "depth": "/assets/card_art/depth/ea002b9670d7544c6fbf-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6464
+    },
+    "/assets/card_art/base cards/action/wave-form.png": {
+      "sha": "a37c2fba3066dda6b5475657035ad99b7921bb096ad5b69df585b61d33147486",
+      "v": 2,
+      "color": "/assets/card_art/depth/a37c2fba3066dda6b547-v2.color.webp",
+      "depth": "/assets/card_art/depth/a37c2fba3066dda6b547-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.7438
+    },
+    "/assets/card_art/base cards/cats/big-cat.png": {
+      "sha": "4fbc3b57f5ec73565867d4eabf5eebd8ab47bc979edbd5ce9c2ee4e76b75deb8",
+      "v": 2,
+      "color": "/assets/card_art/depth/4fbc3b57f5ec73565867-v2.color.webp",
+      "depth": "/assets/card_art/depth/4fbc3b57f5ec73565867-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6668
+    },
+    "/assets/card_art/base cards/cats/cat-attack.png": {
+      "sha": "549b00749b888234b6535a56505210b4b1d13fbeeb6dd98dee92ed063c9fddf0",
+      "v": 2,
+      "color": "/assets/card_art/depth/549b00749b888234b653-v2.color.webp",
+      "depth": "/assets/card_art/depth/549b00749b888234b653-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4547
+    },
+    "/assets/card_art/base cards/cats/cat-hack.png": {
+      "sha": "276801bf6b291f7ffcb1706d51c9e1097f79ff9a79ca9e5ecdc49d95d7e3f0a1",
+      "v": 2,
+      "color": "/assets/card_art/depth/276801bf6b291f7ffcb1-v2.color.webp",
+      "depth": "/assets/card_art/depth/276801bf6b291f7ffcb1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6264
+    },
+    "/assets/card_art/base cards/cats/cat-pounce.png": {
+      "sha": "ffdb73e01346802d5a20b4c27839943e9156722f1fb597460789f515e1e7bdf4",
+      "v": 2,
+      "color": "/assets/card_art/depth/ffdb73e01346802d5a20-v2.color.webp",
+      "depth": "/assets/card_art/depth/ffdb73e01346802d5a20-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.431
+    },
+    "/assets/card_art/base cards/cats/cat-run.png": {
+      "sha": "fd8ebec506739509112976ffce405bc3ee1923843deb7584e4697244beae793c",
+      "v": 2,
+      "color": "/assets/card_art/depth/fd8ebec5067395091129-v2.color.webp",
+      "depth": "/assets/card_art/depth/fd8ebec5067395091129-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4227
+    },
+    "/assets/card_art/base cards/cats/dead-cat-01.png": {
+      "sha": "80064c49f564dae7d763ff1581cd99143773b2c4e453e260c3252882a9c33121",
+      "v": 2,
+      "color": "/assets/card_art/depth/80064c49f564dae7d763-v2.color.webp",
+      "depth": "/assets/card_art/depth/80064c49f564dae7d763-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5618
+    },
+    "/assets/card_art/base cards/cats/dead-cat-02.png": {
+      "sha": "bac921af7ea2ab1c395934b7208788a5a1359e30024034af3630634d39789a2a",
+      "v": 2,
+      "color": "/assets/card_art/depth/bac921af7ea2ab1c3959-v2.color.webp",
+      "depth": "/assets/card_art/depth/bac921af7ea2ab1c3959-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5592
+    },
+    "/assets/card_art/base cards/cats/dead-cat-03.png": {
+      "sha": "fcddba1f30fdae7ab61a3660e8d3cc5dbdd1682546c2270fb4c137f178e8863f",
+      "v": 2,
+      "color": "/assets/card_art/depth/fcddba1f30fdae7ab61a-v2.color.webp",
+      "depth": "/assets/card_art/depth/fcddba1f30fdae7ab61a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6189
+    },
+    "/assets/card_art/base cards/cats/dead-cat-04.png": {
+      "sha": "0be80eeddc374a2c536f0b78cf21d4a1512a95b43bf143cee2e73bb2143d551c",
+      "v": 2,
+      "color": "/assets/card_art/depth/0be80eeddc374a2c536f-v2.color.webp",
+      "depth": "/assets/card_art/depth/0be80eeddc374a2c536f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6447
+    },
+    "/assets/card_art/base cards/cats/mad-cat.png": {
+      "sha": "85144fea68b321a4cd8dc16c556a2b1874dfdb9440a8cf4baa1c96e018190f39",
+      "v": 2,
+      "color": "/assets/card_art/depth/85144fea68b321a4cd8d-v2.color.webp",
+      "depth": "/assets/card_art/depth/85144fea68b321a4cd8d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.8413
+    },
+    "/assets/card_art/base cards/cats/schrodinger-box.png": {
+      "sha": "43f78b545cefce1b6aad5474f154aa59c767bd1bdacb1830dc166a38fe34781d",
+      "v": 2,
+      "color": "/assets/card_art/depth/43f78b545cefce1b6aad-v2.color.webp",
+      "depth": "/assets/card_art/depth/43f78b545cefce1b6aad-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2234
+    },
+    "/assets/card_art/base cards/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/base cards/utility/alchemic-byte.png": {
+      "sha": "5098a48960ad8215b743604527a2704a7656bcfae15b5dbc5c4ece7c02bb71e5",
+      "v": 2,
+      "color": "/assets/card_art/depth/5098a48960ad8215b743-v2.color.webp",
+      "depth": "/assets/card_art/depth/5098a48960ad8215b743-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4616
+    },
+    "/assets/card_art/base cards/utility/alchemic-kilo.png": {
+      "sha": "1862decd80166072731fd6af642df3312cf8589bc82f5efaa8f84f2626c38460",
+      "v": 2,
+      "color": "/assets/card_art/depth/1862decd80166072731f-v2.color.webp",
+      "depth": "/assets/card_art/depth/1862decd80166072731f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4792
+    },
+    "/assets/card_art/base cards/utility/alchemic-mega.png": {
+      "sha": "366a70b356eb129e1e2cba78ec4ab6e6f00a969c8c065fb037a100b91084b563",
+      "v": 2,
+      "color": "/assets/card_art/depth/366a70b356eb129e1e2c-v2.color.webp",
+      "depth": "/assets/card_art/depth/366a70b356eb129e1e2c-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4678
+    },
+    "/assets/card_art/base cards/utility/alchemic-shyte.png": {
+      "sha": "8fc3e738f7a663b46be264813ae15436661314f0ba99712de35b8e54310fe34a",
+      "v": 2,
+      "color": "/assets/card_art/depth/8fc3e738f7a663b46be2-v2.color.webp",
+      "depth": "/assets/card_art/depth/8fc3e738f7a663b46be2-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4882
+    },
+    "/assets/card_art/base cards/utility/alpha-team.png": {
+      "sha": "7975820f40fe2170524a224a1de5d8326bd464a5e5cd94490ffbd65f3966a483",
+      "v": 2,
+      "color": "/assets/card_art/depth/7975820f40fe2170524a-v2.color.webp",
+      "depth": "/assets/card_art/depth/7975820f40fe2170524a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3449
+    },
+    "/assets/card_art/base cards/utility/banishing-ritual.png": {
+      "sha": "f5f8f9b8342e1a63e905d2e8c855432c277e8e1318966b6f2f92d0ed5e439b8c",
+      "v": 2,
+      "color": "/assets/card_art/depth/f5f8f9b8342e1a63e905-v2.color.webp",
+      "depth": "/assets/card_art/depth/f5f8f9b8342e1a63e905-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4503
+    },
+    "/assets/card_art/base cards/utility/bravo-team.png": {
+      "sha": "1e6ddeeece7362a2391cbc15ea45ca4af30774438a4ccfa28474f4223731f814",
+      "v": 2,
+      "color": "/assets/card_art/depth/1e6ddeeece7362a2391c-v2.color.webp",
+      "depth": "/assets/card_art/depth/1e6ddeeece7362a2391c-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3777
+    },
+    "/assets/card_art/base cards/utility/byte-heist.png": {
+      "sha": "46dec8d833d1d935d194a024f47decf8216927238cb9be835201c5fd270a765c",
+      "v": 2,
+      "color": "/assets/card_art/depth/46dec8d833d1d935d194-v2.color.webp",
+      "depth": "/assets/card_art/depth/46dec8d833d1d935d194-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4261
+    },
+    "/assets/card_art/base cards/utility/charlie-team.png": {
+      "sha": "d6b2250b9afd43ad26fbbaa0424304e0249be97092f32b20f98ebc4d9084e49a",
+      "v": 2,
+      "color": "/assets/card_art/depth/d6b2250b9afd43ad26fb-v2.color.webp",
+      "depth": "/assets/card_art/depth/d6b2250b9afd43ad26fb-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2335
+    },
+    "/assets/card_art/base cards/utility/chronos-cache.png": {
+      "sha": "a054b4d3d0619e80c2db9efac2922f9c31cc248cab0a32b220792a80d13d131f",
+      "v": 2,
+      "color": "/assets/card_art/depth/a054b4d3d0619e80c2db-v2.color.webp",
+      "depth": "/assets/card_art/depth/a054b4d3d0619e80c2db-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.445
+    },
+    "/assets/card_art/base cards/utility/code-sniper.png": {
+      "sha": "67964f82a68b728ae4b257ca4b7b27b6ee23235deb3a0112a4fbbfc22f1f2d64",
+      "v": 2,
+      "color": "/assets/card_art/depth/67964f82a68b728ae4b2-v2.color.webp",
+      "depth": "/assets/card_art/depth/67964f82a68b728ae4b2-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3524
+    },
+    "/assets/card_art/base cards/utility/crypto-alchemist.png": {
+      "sha": "3ac268b4b0132f43e8d1f9537a239a00542deed9d30ac6290869422ab8cf2b96",
+      "v": 2,
+      "color": "/assets/card_art/depth/3ac268b4b0132f43e8d1-v2.color.webp",
+      "depth": "/assets/card_art/depth/3ac268b4b0132f43e8d1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4744
+    },
+    "/assets/card_art/base cards/utility/entropic-infantry.png": {
+      "sha": "59c559c5c6c3afdcf14c45b80f0fa8eec3b96f4c153aa33d4b45fc8c18f9c5a6",
+      "v": 2,
+      "color": "/assets/card_art/depth/59c559c5c6c3afdcf14c-v2.color.webp",
+      "depth": "/assets/card_art/depth/59c559c5c6c3afdcf14c-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4852
+    },
+    "/assets/card_art/base cards/utility/ghost-key.png": {
+      "sha": "ec71556415a50b3cc632731265ad08990564f7282d702b5aae16d3334a111c4e",
+      "v": 2,
+      "color": "/assets/card_art/depth/ec71556415a50b3cc632-v2.color.webp",
+      "depth": "/assets/card_art/depth/ec71556415a50b3cc632-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2539
+    },
+    "/assets/card_art/base cards/utility/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/base cards/utility/kilo-cycle.png": {
+      "sha": "242984fd38798ca24628d402a39f6fed8b5b1d2506b95dd3f151d5f51232c90f",
+      "v": 2,
+      "color": "/assets/card_art/depth/242984fd38798ca24628-v2.color.webp",
+      "depth": "/assets/card_art/depth/242984fd38798ca24628-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2467
+    },
+    "/assets/card_art/base cards/utility/merchant-of-chaos.png": {
+      "sha": "2d43abd841789091e2fb89682c15d8f969325df0dd409c658321583554067538",
+      "v": 2,
+      "color": "/assets/card_art/depth/2d43abd841789091e2fb-v2.color.webp",
+      "depth": "/assets/card_art/depth/2d43abd841789091e2fb-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5153
+    },
+    "/assets/card_art/base cards/utility/night-scythe.png": {
+      "sha": "c71b8e6e3ab126d5bc39de2dc48d5f70302e4f8043d649d328655e96c101a68e",
+      "v": 2,
+      "color": "/assets/card_art/depth/c71b8e6e3ab126d5bc39-v2.color.webp",
+      "depth": "/assets/card_art/depth/c71b8e6e3ab126d5bc39-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6414
+    },
+    "/assets/card_art/base cards/utility/opulent-void.png": {
+      "sha": "2053e2592e3f15711c4f400aa4a4ca47bba91ead88b79e402cae81cb1c160043",
+      "v": 2,
+      "color": "/assets/card_art/depth/2053e2592e3f15711c4f-v2.color.webp",
+      "depth": "/assets/card_art/depth/2053e2592e3f15711c4f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5149
+    },
+    "/assets/card_art/base cards/utility/recursive-seance.png": {
+      "sha": "4b5d23d2318a1032f54162b50610c116e5d210f9406aff79d8b802ea00b197df",
+      "v": 2,
+      "color": "/assets/card_art/depth/4b5d23d2318a1032f541-v2.color.webp",
+      "depth": "/assets/card_art/depth/4b5d23d2318a1032f541-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3698
+    },
+    "/assets/card_art/base cards/utility/sacrifical-sigil.png": {
+      "sha": "80f8548a24f04d6ac19693f5c65790eed3719dad22edcccfc37f7e27a3e0f86c",
+      "v": 2,
+      "color": "/assets/card_art/depth/80f8548a24f04d6ac196-v2.color.webp",
+      "depth": "/assets/card_art/depth/80f8548a24f04d6ac196-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4219
+    },
+    "/assets/card_art/base cards/utility/screen-scryer.png": {
+      "sha": "4b5f1a0e10b0ae186b1e1f6706643cc9d7f9e9d7816b3e5931dabf9d8b7cf668",
+      "v": 2,
+      "color": "/assets/card_art/depth/4b5f1a0e10b0ae186b1e-v2.color.webp",
+      "depth": "/assets/card_art/depth/4b5f1a0e10b0ae186b1e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4818
+    },
+    "/assets/card_art/base cards/utility/summon-the-acolytes.png": {
+      "sha": "966d1ef9bf186c1e4672d8da89ed02f969a27fec96118846677801a688f9395f",
+      "v": 2,
+      "color": "/assets/card_art/depth/966d1ef9bf186c1e4672-v2.color.webp",
+      "depth": "/assets/card_art/depth/966d1ef9bf186c1e4672-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4511
+    },
+    "/assets/card_art/base cards/utility/superpositioning.png": {
+      "sha": "4b5f1a0e10b0ae186b1e1f6706643cc9d7f9e9d7816b3e5931dabf9d8b7cf668",
+      "v": 2,
+      "color": "/assets/card_art/depth/4b5f1a0e10b0ae186b1e-v2.color.webp",
+      "depth": "/assets/card_art/depth/4b5f1a0e10b0ae186b1e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4818
+    },
+    "/assets/card_art/base cards/utility/temporal-rift.png": {
+      "sha": "ca9b957ce3493629f5d194ffed7fe04e438f401534ac65332ce85176d4eb1107",
+      "v": 2,
+      "color": "/assets/card_art/depth/ca9b957ce3493629f5d1-v2.color.webp",
+      "depth": "/assets/card_art/depth/ca9b957ce3493629f5d1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4336
+    },
+    "/assets/card_art/base cards/utility/the-heisenberg-hag.png": {
+      "sha": "b5fd3641c2c0c6ae884a85bb57793172580303f111ce40f56a9ce9d3f130ba21",
+      "v": 2,
+      "color": "/assets/card_art/depth/b5fd3641c2c0c6ae884a-v2.color.webp",
+      "depth": "/assets/card_art/depth/b5fd3641c2c0c6ae884a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3073
+    },
+    "/assets/card_art/base cards/utility/trash-collector.png": {
+      "sha": "a7a9b6e628d5943939a875d38b75cd5a8298b0ea8b6f87ba63e023f1dda6f300",
+      "v": 2,
+      "color": "/assets/card_art/depth/a7a9b6e628d5943939a8-v2.color.webp",
+      "depth": "/assets/card_art/depth/a7a9b6e628d5943939a8-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.304
+    },
+    "/assets/card_art/base cards/widgets/charm-quark.png": {
+      "sha": "313bdabd5c209a75f169b3a998acd808b6700ec52d2ccc846222ca2ed413b8fd",
+      "v": 2,
+      "color": "/assets/card_art/depth/313bdabd5c209a75f169-v2.color.webp",
+      "depth": "/assets/card_art/depth/313bdabd5c209a75f169-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.664
+    },
+    "/assets/card_art/base cards/widgets/neutrino.png": {
+      "sha": "4c8b8fe7f11c75a4236421d813b7971e225cc405328c4c1bfc8f6fdf251e9445",
+      "v": 2,
+      "color": "/assets/card_art/depth/4c8b8fe7f11c75a42364-v2.color.webp",
+      "depth": "/assets/card_art/depth/4c8b8fe7f11c75a42364-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3461
+    },
+    "/assets/card_art/base cards/widgets/photon.png": {
+      "sha": "dc65eb31488d8abcca6fcde11d6ccdeea171cdb8047a125896b94f58822ff3aa",
+      "v": 2,
+      "color": "/assets/card_art/depth/dc65eb31488d8abcca6f-v2.color.webp",
+      "depth": "/assets/card_art/depth/dc65eb31488d8abcca6f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2005
+    },
+    "/assets/card_art/base cards/widgets/quark.png": {
+      "sha": "30c6401bafea5f8da33a96178feb02692f4f42e751f91615f0eab8870fbabf4c",
+      "v": 2,
+      "color": "/assets/card_art/depth/30c6401bafea5f8da33a-v2.color.webp",
+      "depth": "/assets/card_art/depth/30c6401bafea5f8da33a-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.1246
+    },
+    "/assets/card_art/base cards/widgets/strange-quark.png": {
+      "sha": "33d077a352aa61265a64d44d17bbc7d3e020129be95d0b9ac1ccf428848cf7d1",
+      "v": 2,
+      "color": "/assets/card_art/depth/33d077a352aa61265a64-v2.color.webp",
+      "depth": "/assets/card_art/depth/33d077a352aa61265a64-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3132
+    },
+    "/assets/card_art/base cards/widgets/tachyon.png": {
+      "sha": "0a28c609ffe1c0eab0c38d5b38fb371842fb03f4c9534cfb2857d780ee46f10f",
+      "v": 2,
+      "color": "/assets/card_art/depth/0a28c609ffe1c0eab0c3-v2.color.webp",
+      "depth": "/assets/card_art/depth/0a28c609ffe1c0eab0c3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.1828
+    },
+    "/assets/card_art/base cards/widgets/tau.png": {
+      "sha": "c54523b5627c8589e2c5797369126cc761c7fc7ca478b2cb973947d38d79217a",
+      "v": 2,
+      "color": "/assets/card_art/depth/c54523b5627c8589e2c5-v2.color.webp",
+      "depth": "/assets/card_art/depth/c54523b5627c8589e2c5-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.8121
+    },
+    "/assets/card_art/card backs/cardback_01_swordSnake": {
+      "sha": "928f5571dd0a01d5ad0158e1e2fdf418c8b1688451d48390feeae04db5c2dd26",
+      "v": 2,
+      "color": "/assets/card_art/depth/928f5571dd0a01d5ad01-v2.color.webp",
+      "depth": "/assets/card_art/depth/928f5571dd0a01d5ad01-v2.depth.webp",
+      "width": 921,
+      "height": 1317,
+      "focus": 0.8561
+    },
+    "/assets/card_art/card backs/cardback_02_silicone.png": {
+      "sha": "74b005a97987eee9bceb8a9796276fd98a448279c64bcab71eaca31a67cd13c2",
+      "v": 2,
+      "color": "/assets/card_art/depth/74b005a97987eee9bceb-v2.color.webp",
+      "depth": "/assets/card_art/depth/74b005a97987eee9bceb-v2.depth.webp",
+      "width": 921,
+      "height": 1317,
+      "focus": 0.8523
+    },
+    "/assets/card_art/chaos cards/attack/∆-wave.png": {
+      "sha": "8e2feaf975820e621de01a89f94469ce12837e479b9aa3f05908462e8307e7a0",
+      "v": 2,
+      "color": "/assets/card_art/depth/8e2feaf975820e621de0-v2.color.webp",
+      "depth": "/assets/card_art/depth/8e2feaf975820e621de0-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.6189
+    },
+    "/assets/card_art/chaos cards/attack/1337-speaker.png": {
+      "sha": "48a087f17641f8f1b24ee10ff98436fbd20e2c15a7fce755738b2bed099ac511",
+      "v": 2,
+      "color": "/assets/card_art/depth/48a087f17641f8f1b24e-v2.color.webp",
+      "depth": "/assets/card_art/depth/48a087f17641f8f1b24e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3917
+    },
+    "/assets/card_art/chaos cards/attack/bloodlet-drone.png": {
+      "sha": "20862ff543b65a8b8e0045afae3c4b0ca3cd283b9ffdf5d57385780d0a347f13",
+      "v": 2,
+      "color": "/assets/card_art/depth/20862ff543b65a8b8e00-v2.color.webp",
+      "depth": "/assets/card_art/depth/20862ff543b65a8b8e00-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6657
+    },
+    "/assets/card_art/chaos cards/attack/bloodlet-flux.png": {
+      "sha": "2b38672c54c9aadbe015874066999cc1da4e948fc0532f27495e65e031d8e4a7",
+      "v": 2,
+      "color": "/assets/card_art/depth/2b38672c54c9aadbe015-v2.color.webp",
+      "depth": "/assets/card_art/depth/2b38672c54c9aadbe015-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.7121
+    },
+    "/assets/card_art/chaos cards/attack/bushido-io.png": {
+      "sha": "b22d6cfda7257b09e8e86f51c6264f3be1f07bccff8f3e105771061c903425db",
+      "v": 2,
+      "color": "/assets/card_art/depth/b22d6cfda7257b09e8e8-v2.color.webp",
+      "depth": "/assets/card_art/depth/b22d6cfda7257b09e8e8-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3538
+    },
+    "/assets/card_art/chaos cards/attack/byte-heist2.png": {
+      "sha": "87c13c1f09d5092ffb7b697ca5cfdd713a6f768d8388aa6d8116c5dabde4d41a",
+      "v": 2,
+      "color": "/assets/card_art/depth/87c13c1f09d5092ffb7b-v2.color.webp",
+      "depth": "/assets/card_art/depth/87c13c1f09d5092ffb7b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.461
+    },
+    "/assets/card_art/chaos cards/attack/chrome-mitchell.png": {
+      "sha": "2348a31ed6ba11f4250bf665a1d83e6c27e93df80eb2a586a4d61791fb8a38eb",
+      "v": 2,
+      "color": "/assets/card_art/depth/2348a31ed6ba11f4250b-v2.color.webp",
+      "depth": "/assets/card_art/depth/2348a31ed6ba11f4250b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5394
+    },
+    "/assets/card_art/chaos cards/attack/delta-wave.png": {
+      "sha": "8e2feaf975820e621de01a89f94469ce12837e479b9aa3f05908462e8307e7a0",
+      "v": 2,
+      "color": "/assets/card_art/depth/8e2feaf975820e621de0-v2.color.webp",
+      "depth": "/assets/card_art/depth/8e2feaf975820e621de0-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.6189
+    },
+    "/assets/card_art/chaos cards/attack/glitch-witch.png": {
+      "sha": "9dce9e739a2298d4fa6989885cedb645583ef4d469fb678fcb1fe4baa0251b19",
+      "v": 2,
+      "color": "/assets/card_art/depth/9dce9e739a2298d4fa69-v2.color.webp",
+      "depth": "/assets/card_art/depth/9dce9e739a2298d4fa69-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4699
+    },
+    "/assets/card_art/chaos cards/attack/h3x1-d3x1.PNG": {
+      "sha": "fd5228d754f6c92b89e718c468df7cc05a636dd1c4f7815b3a6dca36ef18a8a2",
+      "v": 2,
+      "color": "/assets/card_art/depth/fd5228d754f6c92b89e7-v2.color.webp",
+      "depth": "/assets/card_art/depth/fd5228d754f6c92b89e7-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4608
+    },
+    "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png": {
+      "sha": "49a88ea743eed8550dfc1e3303d1a087ed6d8001853c0ca41ecdc335f872202e",
+      "v": 2,
+      "color": "/assets/card_art/depth/49a88ea743eed8550dfc-v2.color.webp",
+      "depth": "/assets/card_art/depth/49a88ea743eed8550dfc-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5465
+    },
+    "/assets/card_art/chaos cards/attack/mary-malice.png": {
+      "sha": "bcce131a7d03409e4fd6b934c762033f8adb2c50c3b5151059a1d970d9f42f21",
+      "v": 2,
+      "color": "/assets/card_art/depth/bcce131a7d03409e4fd6-v2.color.webp",
+      "depth": "/assets/card_art/depth/bcce131a7d03409e4fd6-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.633
+    },
+    "/assets/card_art/chaos cards/attack/mary-mallon.png": {
+      "sha": "2732a3808ecd7ccfba3493a7b2667a05802af71e30d752098d365116ce4895b7",
+      "v": 2,
+      "color": "/assets/card_art/depth/2732a3808ecd7ccfba34-v2.color.webp",
+      "depth": "/assets/card_art/depth/2732a3808ecd7ccfba34-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4717
+    },
+    "/assets/card_art/chaos cards/attack/mary-malware.png": {
+      "sha": "692a455f0a11ea162c2f86cedf5ec1a01920a6b404a95e388647bdad72a1255e",
+      "v": 2,
+      "color": "/assets/card_art/depth/692a455f0a11ea162c2f-v2.color.webp",
+      "depth": "/assets/card_art/depth/692a455f0a11ea162c2f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.8685
+    },
+    "/assets/card_art/chaos cards/attack/nyx-luna.png": {
+      "sha": "391cba193518a0be734d39d1f3cbb37a97ca6a77f7862713f30ffa05d530ea34",
+      "v": 2,
+      "color": "/assets/card_art/depth/391cba193518a0be734d-v2.color.webp",
+      "depth": "/assets/card_art/depth/391cba193518a0be734d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5238
+    },
+    "/assets/card_art/chaos cards/attack/qubit-kid.png": {
+      "sha": "5c107f09a7ab0966c340bb33040f993f55b9cf6e8ac097dd14b9304541bc24ce",
+      "v": 2,
+      "color": "/assets/card_art/depth/5c107f09a7ab0966c340-v2.color.webp",
+      "depth": "/assets/card_art/depth/5c107f09a7ab0966c340-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4496
+    },
+    "/assets/card_art/chaos cards/attack/rezz-blade.png": {
+      "sha": "617caf0f844814705cce2c7ed0c6b784d22ccb02e90995cd1cfe3bf64ced8ad9",
+      "v": 2,
+      "color": "/assets/card_art/depth/617caf0f844814705cce-v2.color.webp",
+      "depth": "/assets/card_art/depth/617caf0f844814705cce-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4814
+    },
+    "/assets/card_art/chaos cards/attack/rezz-razor.png": {
+      "sha": "9470b203a5258d5b5000a02f8e5745616b5514cf731334c65a9b577478c4ca56",
+      "v": 2,
+      "color": "/assets/card_art/depth/9470b203a5258d5b5000-v2.color.webp",
+      "depth": "/assets/card_art/depth/9470b203a5258d5b5000-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4138
+    },
+    "/assets/card_art/chaos cards/attack/subroutine-succubus.png": {
+      "sha": "5e082c2fda39ada71d657eaa6e649570271a42308a16cee25b3c05d0c6bec4eb",
+      "v": 2,
+      "color": "/assets/card_art/depth/5e082c2fda39ada71d65-v2.color.webp",
+      "depth": "/assets/card_art/depth/5e082c2fda39ada71d65-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2971
+    },
+    "/assets/card_art/chaos cards/attack/system-seppuku.png": {
+      "sha": "aee67cc285398151ddd8142358db96dff6dfbd973383602c39663d073fec3e05",
+      "v": 2,
+      "color": "/assets/card_art/depth/aee67cc285398151ddd8-v2.color.webp",
+      "depth": "/assets/card_art/depth/aee67cc285398151ddd8-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5775
+    },
+    "/assets/card_art/chaos cards/attack/typhoid-mary.png": {
+      "sha": "5d7455943fc4ee97388fb498efd227d5d0351052bbf5e6a705103b8f16c4bdbe",
+      "v": 2,
+      "color": "/assets/card_art/depth/5d7455943fc4ee97388f-v2.color.webp",
+      "depth": "/assets/card_art/depth/5d7455943fc4ee97388f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.8767
+    },
+    "/assets/card_art/chaos cards/hackers/kim-dracula.png": {
+      "sha": "7684f2f47da8690b66ba1bea947e24ab0016708f9e251da710cb7963a6d0edd3",
+      "v": 2,
+      "color": "/assets/card_art/depth/7684f2f47da8690b66ba-v2.color.webp",
+      "depth": "/assets/card_art/depth/7684f2f47da8690b66ba-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.6472
+    },
+    "/assets/card_art/chaos cards/hackers/koda-kull.png": {
+      "sha": "bd531b445cfadeb6091ec7a8ef33ba4b165a13ec975b799c1937218b4c94b4c4",
+      "v": 2,
+      "color": "/assets/card_art/depth/bd531b445cfadeb6091e-v2.color.webp",
+      "depth": "/assets/card_art/depth/bd531b445cfadeb6091e-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.6441
+    },
+    "/assets/card_art/chaos cards/horrors/bushido-io.png": {
+      "sha": "1a86c6959ff9fc07cacd7e5f6e93159fb73c08681ab36ecd9a5f1750395f4222",
+      "v": 2,
+      "color": "/assets/card_art/depth/1a86c6959ff9fc07cacd-v2.color.webp",
+      "depth": "/assets/card_art/depth/1a86c6959ff9fc07cacd-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3697
+    },
+    "/assets/card_art/chaos cards/horrors/cicada-3301.png": {
+      "sha": "64efe1ddd44cb48dc57f21e03fe8a2c782488d2543ebc1fc5f591fb1f1143c10",
+      "v": 2,
+      "color": "/assets/card_art/depth/64efe1ddd44cb48dc57f-v2.color.webp",
+      "depth": "/assets/card_art/depth/64efe1ddd44cb48dc57f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.1958
+    },
+    "/assets/card_art/chaos cards/horrors/iterative-incubus.png": {
+      "sha": "db6c424933144b740f964cdadb73d888fedd8f7ff6420d8241ada9f0cbd285a7",
+      "v": 2,
+      "color": "/assets/card_art/depth/db6c424933144b740f96-v2.color.webp",
+      "depth": "/assets/card_art/depth/db6c424933144b740f96-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4156
+    },
+    "/assets/card_art/chaos cards/horrors/leviathan-form.png": {
+      "sha": "dc39e92f1dcef0bf857a5c7c26acb382cb88af74f0415d1b60a96cde5c30848a",
+      "v": 2,
+      "color": "/assets/card_art/depth/dc39e92f1dcef0bf857a-v2.color.webp",
+      "depth": "/assets/card_art/depth/dc39e92f1dcef0bf857a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3637
+    },
+    "/assets/card_art/chaos cards/horrors/node-feratu.png": {
+      "sha": "5d4990f27c364d3c8b69af4ab1ca9100ad95d7198173459b17f5a3e6c6dbd3d4",
+      "v": 2,
+      "color": "/assets/card_art/depth/5d4990f27c364d3c8b69-v2.color.webp",
+      "depth": "/assets/card_art/depth/5d4990f27c364d3c8b69-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3074
+    },
+    "/assets/card_art/chaos cards/horrors/skinwalker.png": {
+      "sha": "d6a879bc749fa5d7c8c462755755b8bf31df3ec62952ced7a0c26ff1500f6119",
+      "v": 2,
+      "color": "/assets/card_art/depth/d6a879bc749fa5d7c8c4-v2.color.webp",
+      "depth": "/assets/card_art/depth/d6a879bc749fa5d7c8c4-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2779
+    },
+    "/assets/card_art/chaos cards/horrors/spider-form.png": {
+      "sha": "6c5876f39bc441e5a80b753ebd8639575ad4355816adc7936e3afe986740b3b6",
+      "v": 2,
+      "color": "/assets/card_art/depth/6c5876f39bc441e5a80b-v2.color.webp",
+      "depth": "/assets/card_art/depth/6c5876f39bc441e5a80b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5443
+    },
+    "/assets/card_art/chaos cards/horrors/subroutine-succubus.png": {
+      "sha": "99428c1c2d8b04985d17ac4304f17a72bfeb50ada1985fee9e78cbc728effc7f",
+      "v": 2,
+      "color": "/assets/card_art/depth/99428c1c2d8b04985d17-v2.color.webp",
+      "depth": "/assets/card_art/depth/99428c1c2d8b04985d17-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2911
+    },
+    "/assets/card_art/chaos cards/horrors/sudo-demiurge.png": {
+      "sha": "4f1ab7a9ec324006c9fd6306365d800f1ebfa3607bfd81a445a423c7b51df43e",
+      "v": 2,
+      "color": "/assets/card_art/depth/4f1ab7a9ec324006c9fd-v2.color.webp",
+      "depth": "/assets/card_art/depth/4f1ab7a9ec324006c9fd-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3595
+    },
+    "/assets/card_art/chaos cards/horrors/the-azimuthal-kill.png": {
+      "sha": "e67fcadd80231a22415e4911ad99392d2c86bd149329a6ca69b5ef8cb9fc6a6f",
+      "v": 2,
+      "color": "/assets/card_art/depth/e67fcadd80231a22415e-v2.color.webp",
+      "depth": "/assets/card_art/depth/e67fcadd80231a22415e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6942
+    },
+    "/assets/card_art/chaos cards/horrors/tihkal-hound.png": {
+      "sha": "354bcec9e3efd914c87c76510a812338c6d8c5baa3d5d8a1983710d0d00e8405",
+      "v": 2,
+      "color": "/assets/card_art/depth/354bcec9e3efd914c87c-v2.color.webp",
+      "depth": "/assets/card_art/depth/354bcec9e3efd914c87c-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.35
+    },
+    "/assets/card_art/chaos cards/horrors/veil-of-cthulhu.png": {
+      "sha": "00953b8ea63a471eeccd4a2bd51d015df1abe0b93c1758121a2b29bac3c724e5",
+      "v": 2,
+      "color": "/assets/card_art/depth/00953b8ea63a471eeccd-v2.color.webp",
+      "depth": "/assets/card_art/depth/00953b8ea63a471eeccd-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3112
+    },
+    "/assets/card_art/chaos cards/horrors/viper-form.png": {
+      "sha": "e72b553020b8b3004d6c57cb97e596bb7a0214a421e3cd7bc25937d86c56a500",
+      "v": 2,
+      "color": "/assets/card_art/depth/e72b553020b8b3004d6c-v2.color.webp",
+      "depth": "/assets/card_art/depth/e72b553020b8b3004d6c-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4579
+    },
+    "/assets/card_art/chaos cards/horrors/wasp-form.png": {
+      "sha": "c98454c24f887ecb0e1df73d1822c824272b321203181d5aaccaf9a9b5bd4a60",
+      "v": 2,
+      "color": "/assets/card_art/depth/c98454c24f887ecb0e1d-v2.color.webp",
+      "depth": "/assets/card_art/depth/c98454c24f887ecb0e1d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4003
+    },
+    "/assets/card_art/chaos cards/horrors/wolf-form.png": {
+      "sha": "19ba168feda5910d520505c496c647b4de878136bb96120aa0a42711580162b1",
+      "v": 2,
+      "color": "/assets/card_art/depth/19ba168feda5910d5205-v2.color.webp",
+      "depth": "/assets/card_art/depth/19ba168feda5910d5205-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3146
+    },
+    "/assets/card_art/crypto/byte-coin.png": {
+      "sha": "d56c781f30d95710724973e0fcab948d86d53d099f87490c420dc990e581c74b",
+      "v": 2,
+      "color": "/assets/card_art/depth/d56c781f30d957107249-v2.color.webp",
+      "depth": "/assets/card_art/depth/d56c781f30d957107249-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4533
+    },
+    "/assets/card_art/crypto/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/crypto/kilo-coin.png": {
+      "sha": "a94c01b884a406f5ee8f020cc3ab9bbc322aeb6f2ec4b1fc02aac07184055a86",
+      "v": 2,
+      "color": "/assets/card_art/depth/a94c01b884a406f5ee8f-v2.color.webp",
+      "depth": "/assets/card_art/depth/a94c01b884a406f5ee8f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4733
+    },
+    "/assets/card_art/crypto/mega-cache.png": {
+      "sha": "524275f7be6fce584cbb130b710ba8328aec71c493b16c7f022b8f101ebeba60",
+      "v": 2,
+      "color": "/assets/card_art/depth/524275f7be6fce584cbb-v2.color.webp",
+      "depth": "/assets/card_art/depth/524275f7be6fce584cbb-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.454
+    },
+    "/assets/card_art/crypto/shyte-coin.png": {
+      "sha": "48640613679b51d9e401f15f05637bfeb7a9d546184a4e5418fac5b9dfd35a65",
+      "v": 2,
+      "color": "/assets/card_art/depth/48640613679b51d9e401-v2.color.webp",
+      "depth": "/assets/card_art/depth/48640613679b51d9e401-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4743
+    },
+    "/assets/card_art/glitches/glitch-01.png": {
+      "sha": "6049ae0e47e9edf3f1dbdb76989dd723809039fc65dce5d6271e5050dd8a2ea9",
+      "v": 2,
+      "color": "/assets/card_art/depth/6049ae0e47e9edf3f1db-v2.color.webp",
+      "depth": "/assets/card_art/depth/6049ae0e47e9edf3f1db-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4405
+    },
+    "/assets/card_art/glitches/glitch-02.png": {
+      "sha": "120f8e38c6a2ea356324213f8a29adebafcb3ebec4f8e6ed2d88a479080db086",
+      "v": 2,
+      "color": "/assets/card_art/depth/120f8e38c6a2ea356324-v2.color.webp",
+      "depth": "/assets/card_art/depth/120f8e38c6a2ea356324-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2828
+    },
+    "/assets/card_art/glitches/glitch-03.png": {
+      "sha": "f31bc97f6c4c723c8dcececfe3d5f57c0efda17eab54097b4e7d80428a0e7bf7",
+      "v": 2,
+      "color": "/assets/card_art/depth/f31bc97f6c4c723c8dce-v2.color.webp",
+      "depth": "/assets/card_art/depth/f31bc97f6c4c723c8dce-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.635
+    },
+    "/assets/card_art/glitches/glitch-04.png": {
+      "sha": "aeebce1b52ca3cae6d5d03c9c2d380436a3280dfa47434767e48ca468b95c451",
+      "v": 2,
+      "color": "/assets/card_art/depth/aeebce1b52ca3cae6d5d-v2.color.webp",
+      "depth": "/assets/card_art/depth/aeebce1b52ca3cae6d5d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.394
+    },
+    "/assets/card_art/glitches/glitch-05.png": {
+      "sha": "94b923f3d26c94835e234e344c2b8eae3bf7142dd35f1e34302d7ec41622db45",
+      "v": 2,
+      "color": "/assets/card_art/depth/94b923f3d26c94835e23-v2.color.webp",
+      "depth": "/assets/card_art/depth/94b923f3d26c94835e23-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.1988
+    },
+    "/assets/card_art/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/runtimeHacks/dit-bot.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/runtimeHacks/owl-king.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/runtimeHacks/razorBladeJade.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    },
+    "/assets/card_art/volume/10vp-b.png": {
+      "sha": "4402fe11289c1fec569f6a409d3184d6214c0844af37e17f816875e167865d27",
+      "v": 2,
+      "color": "/assets/card_art/depth/4402fe11289c1fec569f-v2.color.webp",
+      "depth": "/assets/card_art/depth/4402fe11289c1fec569f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2106
+    },
+    "/assets/card_art/volume/10vp.png": {
+      "sha": "63fc6ee4e4babd9afd48e01de774e394c730dda64008417ff90667c243668d16",
+      "v": 2,
+      "color": "/assets/card_art/depth/63fc6ee4e4babd9afd48-v2.color.webp",
+      "depth": "/assets/card_art/depth/63fc6ee4e4babd9afd48-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2459
+    },
+    "/assets/card_art/volume/1vp.png": {
+      "sha": "26a7858c99da90568748d58f73e51ab4ad0e54d3c84d54a05127eaeaf02f0a7a",
+      "v": 2,
+      "color": "/assets/card_art/depth/26a7858c99da90568748-v2.color.webp",
+      "depth": "/assets/card_art/depth/26a7858c99da90568748-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2713
+    },
+    "/assets/card_art/volume/2vp-b.png": {
+      "sha": "2e85b7787a7f69e2d0f35c8334fff89e930269e2761e75820dcf88cebd3ab9ab",
+      "v": 2,
+      "color": "/assets/card_art/depth/2e85b7787a7f69e2d0f3-v2.color.webp",
+      "depth": "/assets/card_art/depth/2e85b7787a7f69e2d0f3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3244
+    },
+    "/assets/card_art/volume/2vp.png": {
+      "sha": "1f4d8f5335bf5d06a4f79ce6d6edca2e80d70788a30e0901574180d3619133c1",
+      "v": 2,
+      "color": "/assets/card_art/depth/1f4d8f5335bf5d06a4f7-v2.color.webp",
+      "depth": "/assets/card_art/depth/1f4d8f5335bf5d06a4f7-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4285
+    },
+    "/assets/card_art/volume/3vp.png": {
+      "sha": "5185339f6f6407764bc1ce6b0ef1c76d916e19a203089aabbc82a73bcb7436bf",
+      "v": 2,
+      "color": "/assets/card_art/depth/5185339f6f6407764bc1-v2.color.webp",
+      "depth": "/assets/card_art/depth/5185339f6f6407764bc1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6636
+    },
+    "/assets/card_art/volume/4vp.png": {
+      "sha": "93c81c529f8b543e48c9651412059343b0c62dc7cc1ff89f8228463a346c5236",
+      "v": 2,
+      "color": "/assets/card_art/depth/93c81c529f8b543e48c9-v2.color.webp",
+      "depth": "/assets/card_art/depth/93c81c529f8b543e48c9-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4289
+    },
+    "/assets/card_art/volume/6vp-b.png": {
+      "sha": "680fb58fac3ebdd53b602cd2e651031e33aa544cc8beff382042fa722521ca36",
+      "v": 2,
+      "color": "/assets/card_art/depth/680fb58fac3ebdd53b60-v2.color.webp",
+      "depth": "/assets/card_art/depth/680fb58fac3ebdd53b60-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2846
+    },
+    "/assets/card_art/volume/6vp.png": {
+      "sha": "b66c5ac0325f7e46c371a849c97e4dfe4d565086356d64a38d7318ed9e6a01b2",
+      "v": 2,
+      "color": "/assets/card_art/depth/b66c5ac0325f7e46c371-v2.color.webp",
+      "depth": "/assets/card_art/depth/b66c5ac0325f7e46c371-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3194
+    },
+    "/assets/card_art/volume/7vp.png": {
+      "sha": "f995a47e05cabe120013cf27a5d1d884eb8cc487b10696903157fa0ae871f7fb",
+      "v": 2,
+      "color": "/assets/card_art/depth/f995a47e05cabe120013-v2.color.webp",
+      "depth": "/assets/card_art/depth/f995a47e05cabe120013-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2843
+    },
+    "/assets/card_art/volume/image_placeHolder.png": {
+      "sha": "305fed7d9a220f032a80660378e26e46c451995c479f5c5502ee2fef8cce8365",
+      "v": 2,
+      "color": "/assets/card_art/depth/305fed7d9a220f032a80-v2.color.webp",
+      "depth": "/assets/card_art/depth/305fed7d9a220f032a80-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4993
+    }
+  }
+}

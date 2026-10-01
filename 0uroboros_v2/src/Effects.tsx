@@ -18,7 +18,7 @@ export function EffectPath({event,duration}:{event:RuntimeEvent;duration:number}
   const draftTarget=event.source==='circuit'?document.querySelector(`[data-draft-resource="${owner}-${event.target}"]`):null;
   const nodeTarget=nodeTransfer&&event.targetNode!==undefined?document.querySelector(event.kind!=='move'?`[data-location-node="${event.targetNode}"]`:`[data-lane-node="${event.targetNode}"][data-lane-owner="${owner}"]`):null;
   const targetCard=event.kind==='power'&&event.targetCardId?document.querySelector(`.field-card[data-card-id="${CSS.escape(event.targetCardId)}"]`):null;
-  const target=targetCard??nodeTarget??draftTarget??document.querySelector(event.target==='trash'?'[data-resource="trash"]':event.target==='primary'||event.target==='backup'?`[data-dc="${owner}-${event.target}"]`:`[data-resource="${owner}-${event.target}"]`);
+  const target=targetCard??nodeTarget??draftTarget??document.querySelector(event.target==='trash'?'[data-resource="trash"]':event.target==='primary'||event.target==='backup'?`[data-server="${owner}-${event.target}"]`:`[data-resource="${owner}-${event.target}"]`);
   if(!source||!target)return;
   const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();
   const sx=a.x+a.width/2,sy=a.y+a.height/2,tx=b.x+b.width/2,ty=b.y+b.height/2;

@@ -15,12 +15,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "vite/client"],
     "baseUrl": ".",
     "paths": {
       "@game/*": ["src/game/*"],
       "@client/*": ["src/client/*"]
     }
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": ["src", "tests", "scripts/**/*.ts", "vite.config.ts"]
 }

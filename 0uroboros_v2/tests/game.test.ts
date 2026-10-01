@@ -31,7 +31,7 @@ describe("Runtime V1 rules", () => {
   });
 });
 
-import { applyDataCenterEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, runtimeActions, selectCircuitNode, transferProbability, type Deployment } from "../src/game";
+import { applyServerEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, runtimeActions, selectCircuitNode, transferProbability, type Deployment } from "../src/game";
 
 describe("Canonical engine primitives", () => {
   it("mirrors the five-card opening and remaining deck while keeping distinct owned instances", () => {
@@ -109,18 +109,18 @@ describe("Canonical engine primitives", () => {
   });
 
   it("Drains Primary without overkill spill and awards destruction only once", () => {
-    const result = applyDataCenterEffect({ primary: 50, backup: 1500 }, "drain", 100);
-    expect(result).toEqual({ centers: { primary: 0, backup: 1500 }, target: "primary", amount: 50, destructionVP: 8 });
-    const next = applyDataCenterEffect(result.centers, "drain", 2000);
-    expect(next.centers).toEqual({ primary: 0, backup: 0 });
+    const result = applyServerEffect({ primary: 50, backup: 1500 }, "drain", 100);
+    expect(result).toEqual({ servers: { primary: 0, backup: 1500 }, target: "primary", amount: 50, destructionVP: 8 });
+    const next = applyServerEffect(result.servers, "drain", 2000);
+    expect(next.servers).toEqual({ primary: 0, backup: 0 });
     expect(next.destructionVP).toBe(12);
-    expect(applyDataCenterEffect(next.centers, "drain", 100).destructionVP).toBe(0);
+    expect(applyServerEffect(next.servers, "drain", 100).destructionVP).toBe(0);
   });
 
   it("Restores Primary first with no overflow or resurrection, then Backup fallback", () => {
-    expect(applyDataCenterEffect({ primary: 1980, backup: 1200 }, "restore", 100).centers).toEqual({ primary: 2000, backup: 1200 });
-    expect(applyDataCenterEffect({ primary: 0, backup: 1400 }, "restore", 200).centers).toEqual({ primary: 0, backup: 1500 });
-    expect(applyDataCenterEffect({ primary: 0, backup: 0 }, "restore", 100).target).toBeNull();
+    expect(applyServerEffect({ primary: 1980, backup: 1200 }, "restore", 100).servers).toEqual({ primary: 2000, backup: 1200 });
+    expect(applyServerEffect({ primary: 0, backup: 1400 }, "restore", 200).servers).toEqual({ primary: 0, backup: 1500 });
+    expect(applyServerEffect({ primary: 0, backup: 0 }, "restore", 100).target).toBeNull();
   });
 
   it("requires explicit carryover configuration, delays reveal Actions, and resets each Cycle", () => {

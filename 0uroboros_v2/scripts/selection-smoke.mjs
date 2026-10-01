@@ -1,11 +1,12 @@
 import {chromium} from 'playwright';
 import {writeFileSync} from 'node:fs';
+import {useSetting} from './settings-menu.mjs';
 const browser=await chromium.launch({headless:true,channel:'chrome'}),page=await browser.newPage({viewport:{width:1366,height:900}}),result={errors:[]};
 page.on('pageerror',e=>result.errors.push(e.message));
 try{
  await page.goto('http://127.0.0.1:5173');await page.getByRole('button',{name:'Enter evaluation build'}).click();
  await page.waitForFunction(()=>document.querySelector('.end-turn')?.getAttribute('aria-label')==='End Turn');
- await page.getByRole('button',{name:'Normal pace'}).click();
+ await useSetting(page,'Normal pace');
  await page.screenshot({path:'docs/evidence/motion-board-1366.png'});
  result.layout=await page.evaluate(()=>{const wallet=document.querySelector('.crypto-cache').getBoundingClientRect(),hand=[...document.querySelectorAll('.hand>.hand-card')].map(e=>e.getBoundingClientRect()),button=document.querySelector('.end-turn').getBoundingClientRect();return {clear:hand.every(r=>r.right<=wallet.left||r.bottom<=wallet.top),walletTop:wallet.top,handArch:Math.min(...hand.map(r=>r.top)),buttonRight:button.right};});
  if(!result.layout.clear||result.layout.buttonRight>1366)throw new Error('Small-window wallet/control overlap');

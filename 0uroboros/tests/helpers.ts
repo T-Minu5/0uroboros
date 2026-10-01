@@ -12,6 +12,7 @@ import { createSeededRandom, type RandomAPI } from '../src/game/engine/random';
 import { createInitialState } from '../src/game/engine/cycle';
 import { createCardInstance, moveToNode } from '../src/game/engine/zones';
 import { resetInstanceCounter } from '../src/game/engine/zones';
+import { startRuntimeTurn } from '../src/game/engine/actions';
 
 export interface TestHarness {
   state: OuroborosState;
@@ -27,6 +28,7 @@ export function createHarness(
   const config = { ...DEFAULT_CONFIG, ...overrides };
   const random = createSeededRandom(seed);
   const state = createInitialState('runtime', config, random);
+  startRuntimeTurn(state, config, 0);
   return { state, config, random };
 }
 
@@ -61,6 +63,10 @@ export function placeCardAtNode(
 }
 
 /** Put a specific card definition into a player's hand. */
+export function fundActions(state: OuroborosState, player: PlayerID, amount: number): void {
+  state.players[player].actions = amount;
+}
+
 export function addToHand(
   state: OuroborosState,
   player: PlayerID,

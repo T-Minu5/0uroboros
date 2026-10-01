@@ -23,9 +23,9 @@ Combinations are allowed when coherent and performant.
 When applicable:
 `SOURCE -> ACTIVATION -> PATH -> TARGET -> REACTION -> RESULT`
 
-Drain: source activates -> path to opponent Data Center -> target reacts -> integrity changes.
+Drain: source activates -> path to opponent Server -> target reacts -> integrity changes.
 
-Restore: source activates -> stabilizing/reconstructive path -> Data Center -> integrity changes.
+Restore: source activates -> stabilizing/reconstructive path -> Server -> integrity changes.
 
 Probability: source Node visibly loses -> effect travels -> destination gains -> values interpolate.
 
@@ -36,7 +36,7 @@ Action: source -> Action resource response.
 ## Theatrical tiers
 Tier 1 micro: Draw, Action, Crypto, small Power.
 Tier 2 tactical: Drain, Restore, movement, probability transfer, reveal, Trash.
-Tier 3 major: Node winner, major Location reward, Data Center destruction.
+Tier 3 major: Node winner, major Location reward, Server destruction.
 Tier 4 cinematic: Wave Collapse final selection, game-ending event.
 
 ## Marvel Snap — sequencing

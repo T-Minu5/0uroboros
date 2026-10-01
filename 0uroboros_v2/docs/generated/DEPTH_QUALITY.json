@@ -1,0 +1,287 @@
+{
+  "sample": [
+    "/assets/card_art/base cards/action/astra-ascii.png",
+    "/assets/card_art/base cards/action/particle-form.png",
+    "/assets/card_art/base cards/action/wave-form.png",
+    "/assets/card_art/base cards/cats/dead-cat-04.png",
+    "/assets/card_art/base cards/utility/byte-heist.png",
+    "/assets/card_art/base cards/utility/night-scythe.png",
+    "/assets/card_art/base cards/widgets/charm-quark.png",
+    "/assets/card_art/chaos cards/attack/1337-speaker.png",
+    "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png",
+    "/assets/card_art/chaos cards/attack/system-seppuku.png",
+    "/assets/card_art/chaos cards/horrors/spider-form.png",
+    "/assets/card_art/crypto/byte-coin.png",
+    "/assets/card_art/volume/10vp-b.png",
+    "/assets/card_art/volume/7vp.png"
+  ],
+  "threshold": 0.99,
+  "best": {
+    "color": "q92",
+    "depth": "full-q90",
+    "mean_ssim": 0.99035,
+    "min_ssim": 0.98151,
+    "avg_bytes": 39821
+  },
+  "reference": {
+    "color": "lossless",
+    "depth": "full-lossless",
+    "mean_ssim": 0.99962,
+    "min_ssim": 0.999,
+    "avg_bytes": 148080
+  },
+  "rows": [
+    {
+      "color": "q80",
+      "depth": "half-q90",
+      "mean_ssim": 0.96855,
+      "min_ssim": 0.93717,
+      "avg_bytes": 23787
+    },
+    {
+      "color": "q80",
+      "depth": "full-q70",
+      "mean_ssim": 0.97304,
+      "min_ssim": 0.95096,
+      "avg_bytes": 23976
+    },
+    {
+      "color": "q80",
+      "depth": "full-q80",
+      "mean_ssim": 0.97494,
+      "min_ssim": 0.95504,
+      "avg_bytes": 24494
+    },
+    {
+      "color": "q80",
+      "depth": "full-q90",
+      "mean_ssim": 0.97725,
+      "min_ssim": 0.95886,
+      "avg_bytes": 26042
+    },
+    {
+      "color": "q85",
+      "depth": "half-q90",
+      "mean_ssim": 0.97469,
+      "min_ssim": 0.94726,
+      "avg_bytes": 28152
+    },
+    {
+      "color": "q85",
+      "depth": "full-q70",
+      "mean_ssim": 0.97922,
+      "min_ssim": 0.96141,
+      "avg_bytes": 28341
+    },
+    {
+      "color": "q85",
+      "depth": "full-q80",
+      "mean_ssim": 0.98114,
+      "min_ssim": 0.96554,
+      "avg_bytes": 28860
+    },
+    {
+      "color": "q80",
+      "depth": "half-lossless",
+      "mean_ssim": 0.97183,
+      "min_ssim": 0.94274,
+      "avg_bytes": 28958
+    },
+    {
+      "color": "q85",
+      "depth": "full-q90",
+      "mean_ssim": 0.9835,
+      "min_ssim": 0.96934,
+      "avg_bytes": 30407
+    },
+    {
+      "color": "q85",
+      "depth": "half-lossless",
+      "mean_ssim": 0.97804,
+      "min_ssim": 0.9528,
+      "avg_bytes": 33323
+    },
+    {
+      "color": "q90",
+      "depth": "half-q90",
+      "mean_ssim": 0.97984,
+      "min_ssim": 0.95592,
+      "avg_bytes": 34459
+    },
+    {
+      "color": "q90",
+      "depth": "full-q70",
+      "mean_ssim": 0.98441,
+      "min_ssim": 0.97006,
+      "avg_bytes": 34648
+    },
+    {
+      "color": "q90",
+      "depth": "full-q80",
+      "mean_ssim": 0.98636,
+      "min_ssim": 0.97432,
+      "avg_bytes": 35167
+    },
+    {
+      "color": "q90",
+      "depth": "full-q90",
+      "mean_ssim": 0.98875,
+      "min_ssim": 0.97815,
+      "avg_bytes": 36714
+    },
+    {
+      "color": "q92",
+      "depth": "half-q90",
+      "mean_ssim": 0.98141,
+      "min_ssim": 0.95898,
+      "avg_bytes": 37565
+    },
+    {
+      "color": "q92",
+      "depth": "full-q70",
+      "mean_ssim": 0.98598,
+      "min_ssim": 0.97338,
+      "avg_bytes": 37755
+    },
+    {
+      "color": "q92",
+      "depth": "full-q80",
+      "mean_ssim": 0.98795,
+      "min_ssim": 0.97758,
+      "avg_bytes": 38273
+    },
+    {
+      "color": "q90",
+      "depth": "half-lossless",
+      "mean_ssim": 0.98324,
+      "min_ssim": 0.96156,
+      "avg_bytes": 39630
+    },
+    {
+      "color": "q92",
+      "depth": "full-q90",
+      "mean_ssim": 0.99035,
+      "min_ssim": 0.98151,
+      "avg_bytes": 39821
+    },
+    {
+      "color": "q80",
+      "depth": "full-lossless",
+      "mean_ssim": 0.97975,
+      "min_ssim": 0.96402,
+      "avg_bytes": 41625
+    },
+    {
+      "color": "q92",
+      "depth": "half-lossless",
+      "mean_ssim": 0.98483,
+      "min_ssim": 0.96405,
+      "avg_bytes": 42737
+    },
+    {
+      "color": "q95",
+      "depth": "half-q90",
+      "mean_ssim": 0.9832,
+      "min_ssim": 0.96135,
+      "avg_bytes": 43721
+    },
+    {
+      "color": "q95",
+      "depth": "full-q70",
+      "mean_ssim": 0.98779,
+      "min_ssim": 0.97586,
+      "avg_bytes": 43911
+    },
+    {
+      "color": "q95",
+      "depth": "full-q80",
+      "mean_ssim": 0.98977,
+      "min_ssim": 0.98005,
+      "avg_bytes": 44429
+    },
+    {
+      "color": "q95",
+      "depth": "full-q90",
+      "mean_ssim": 0.99218,
+      "min_ssim": 0.98397,
+      "avg_bytes": 45977
+    },
+    {
+      "color": "q85",
+      "depth": "full-lossless",
+      "mean_ssim": 0.98604,
+      "min_ssim": 0.9745,
+      "avg_bytes": 45990
+    },
+    {
+      "color": "q95",
+      "depth": "half-lossless",
+      "mean_ssim": 0.98664,
+      "min_ssim": 0.96577,
+      "avg_bytes": 48893
+    },
+    {
+      "color": "q90",
+      "depth": "full-lossless",
+      "mean_ssim": 0.99134,
+      "min_ssim": 0.98351,
+      "avg_bytes": 52297
+    },
+    {
+      "color": "q92",
+      "depth": "full-lossless",
+      "mean_ssim": 0.99296,
+      "min_ssim": 0.98686,
+      "avg_bytes": 55403
+    },
+    {
+      "color": "q95",
+      "depth": "full-lossless",
+      "mean_ssim": 0.9948,
+      "min_ssim": 0.98937,
+      "avg_bytes": 61559
+    },
+    {
+      "color": "lossless",
+      "depth": "half-q90",
+      "mean_ssim": 0.98774,
+      "min_ssim": 0.96617,
+      "avg_bytes": 130242
+    },
+    {
+      "color": "lossless",
+      "depth": "full-q70",
+      "mean_ssim": 0.99233,
+      "min_ssim": 0.98431,
+      "avg_bytes": 130431
+    },
+    {
+      "color": "lossless",
+      "depth": "full-q80",
+      "mean_ssim": 0.99433,
+      "min_ssim": 0.98798,
+      "avg_bytes": 130949
+    },
+    {
+      "color": "lossless",
+      "depth": "full-q90",
+      "mean_ssim": 0.99681,
+      "min_ssim": 0.99234,
+      "avg_bytes": 132497
+    },
+    {
+      "color": "lossless",
+      "depth": "half-lossless",
+      "mean_ssim": 0.99138,
+      "min_ssim": 0.96996,
+      "avg_bytes": 135413
+    },
+    {
+      "color": "lossless",
+      "depth": "full-lossless",
+      "mean_ssim": 0.99962,
+      "min_ssim": 0.999,
+      "avg_bytes": 148080
+    }
+  ]
+}

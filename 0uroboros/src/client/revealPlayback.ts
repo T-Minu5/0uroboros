@@ -8,7 +8,10 @@
 
 import { useEffect, useState } from 'react';
 
-export const REVEAL_STEP_MS = 520;
+import { PRESENTATION_TIMING } from './presentation/timing';
+import { getPresentationSpeed } from './presentation/speed';
+
+export const REVEAL_STEP_MS = PRESENTATION_TIMING.normal.cardRevealMs;
 
 export function useRevealPlayback(queue: string[], serial: number): number {
   const [played, setPlayed] = useState(queue.length);
@@ -25,7 +28,7 @@ export function useRevealPlayback(queue: string[], serial: number): number {
       step += 1;
       setPlayed(step);
       if (step >= queue.length) window.clearInterval(id);
-    }, REVEAL_STEP_MS);
+    }, PRESENTATION_TIMING[getPresentationSpeed()].cardRevealMs);
 
     return () => window.clearInterval(id);
   }, [serial, queue.length]);

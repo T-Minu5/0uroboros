@@ -1,0 +1,1725 @@
+{
+  "generatedAt": "2026-10-01T01:04:14.260Z",
+  "base": "http://127.0.0.1:4173",
+  "uncapped": false,
+  "sampleMs": 6000,
+  "scenarios": [
+    {
+      "id": "laptop-1x",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 1,
+      "cpu": 1,
+      "boardReadyMs": 1302,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 189
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "1440x798",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 43,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 241,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2.4,
+          "p95": 3.1,
+          "max": 4.3
+        },
+        "gpuMsPerFrame": {
+          "samples": 241,
+          "p50": 6.11,
+          "p95": 14.22,
+          "max": 14.98
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2,
+          "p95": 2.9,
+          "max": 3.7
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 6.01,
+          "p95": 13.89,
+          "max": 18.04
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 461
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.6
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.5,
+          "p95": 2.5,
+          "max": 4.9
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 6.02,
+          "p95": 14.22,
+          "max": 27.45
+        },
+        "drawCalls": {
+          "p50": 210,
+          "max": 433
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.8
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 16.7
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 1,
+      "boardReadyMs": 1265,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 156
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 44,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2.3,
+          "p95": 3.1,
+          "max": 3.5
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 9.15,
+          "p95": 17.71,
+          "max": 19.5
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2,
+          "p95": 2.7,
+          "max": 3.6
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 10.59,
+          "p95": 18.74,
+          "max": 23.99
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 461
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.6
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.6,
+          "p95": 2.4,
+          "max": 5
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 10.57,
+          "p95": 19.7,
+          "max": 31.32
+        },
+        "drawCalls": {
+          "p50": 210,
+          "max": 442
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 16.6
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "desktop-1440p-2x",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "dpr": 2,
+      "cpu": 1,
+      "boardReadyMs": 1296,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 160
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2880x1760",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 60,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2.3,
+          "p95": 3.1,
+          "max": 3.4
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 15,
+          "p95": 25.12,
+          "max": 41.72
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.8,
+          "p95": 2.8,
+          "max": 3.1
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 16.08,
+          "p95": 26.8,
+          "max": 40.74
+        },
+        "drawCalls": {
+          "p50": 207,
+          "max": 461
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.6
+        },
+        "shaderLinks": {
+          "total": 1,
+          "worstFrameMs": 16.6
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.7,
+          "p95": 2.2,
+          "max": 5.4
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 14.84,
+          "p95": 35.63,
+          "max": 42.65
+        },
+        "drawCalls": {
+          "p50": 215,
+          "max": 459
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 16.8
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x-cpu4",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 4,
+      "boardReadyMs": 2425,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 188
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 53,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.6,
+          "p95": 6,
+          "max": 8
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 9.02,
+          "p95": 18.09,
+          "max": 19.48
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.5,
+          "p95": 6,
+          "max": 12.2
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 9.37,
+          "p95": 18.53,
+          "max": 22.18
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 457
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.3
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 59.8,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 33.3
+        },
+        "jankPct": {
+          "over20ms": 0.3,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.7,
+          "p95": 6.3,
+          "max": 9.3
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 9.46,
+          "p95": 18.55,
+          "max": 32.72
+        },
+        "drawCalls": {
+          "p50": 215,
+          "max": 439
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 3,
+          "worstFrameMs": 16.7
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x-cpu6",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 6,
+      "boardReadyMs": 2997,
+      "load": {
+        "resources": 17,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 995,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13611663,
+        "domContentLoadedMs": 250
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 53,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 241,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 7.6,
+          "p95": 9.6,
+          "max": 13.5
+        },
+        "gpuMsPerFrame": {
+          "samples": 241,
+          "p50": 9.39,
+          "p95": 19.3,
+          "max": 25.78
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 5.9,
+          "p95": 7.5,
+          "max": 9.9
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 9.43,
+          "p95": 18.64,
+          "max": 28.55
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 457
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.3
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 352,
+        "fps": 58.7,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 33.3,
+          "max": 50
+        },
+        "jankPct": {
+          "over20ms": 2,
+          "over33ms": 0.6
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 7.2,
+          "p95": 10.2,
+          "max": 16.3
+        },
+        "gpuMsPerFrame": {
+          "samples": 351,
+          "p50": 9.73,
+          "p95": 19.43,
+          "max": 31.39
+        },
+        "drawCalls": {
+          "p50": 210,
+          "max": 427
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 33.3
+        },
+        "longAnimationFrames": {
+          "count": 1,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "tablet-2x-cpu4",
+      "viewport": {
+        "width": 1180,
+        "height": 820
+      },
+      "dpr": 2,
+      "cpu": 4,
+      "touch": true,
+      "boardReadyMs": 2034,
+      "load": {
+        "resources": 17,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 995,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13611663,
+        "domContentLoadedMs": 240
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "1888x1152",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 66,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 241,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.7,
+          "p95": 5.9,
+          "max": 7.5
+        },
+        "gpuMsPerFrame": {
+          "samples": 241,
+          "p50": 8.59,
+          "p95": 17.25,
+          "max": 31.86
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.1,
+          "p95": 5.5,
+          "max": 6.7
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 8.77,
+          "p95": 17.98,
+          "max": 31.09
+        },
+        "drawCalls": {
+          "p50": 207,
+          "max": 461
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.6
+        },
+        "shaderLinks": {
+          "total": 1,
+          "worstFrameMs": 16.7
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 359,
+        "fps": 59.8,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 33.4
+        },
+        "jankPct": {
+          "over20ms": 0.3,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.5,
+          "p95": 6.2,
+          "max": 11.9
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 8.33,
+          "p95": 17.61,
+          "max": 30.52
+        },
+        "drawCalls": {
+          "p50": 211,
+          "max": 444
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 33.4
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x-reduced",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 1,
+      "reducedMotion": "reduce",
+      "boardReadyMs": 1258,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 137
+      },
+      "gpu": {
+        "contexts": 1,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 53,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2,
+          "p95": 2.9,
+          "max": 3.6
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 9.36,
+          "p95": 15.39,
+          "max": 19.99
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.4,
+          "p95": 1.7,
+          "max": 2.2
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 9.84,
+          "p95": 17.16,
+          "max": 29.4
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 449
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 302.5
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.4,
+          "p95": 1.9,
+          "max": 4
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 9.96,
+          "p95": 17.31,
+          "max": 29.87
+        },
+        "drawCalls": {
+          "p50": 214,
+          "max": 433
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.8
+        },
+        "shaderLinks": {
+          "total": 1,
+          "worstFrameMs": 16.6
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x-cpu6-reduced",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 6,
+      "reducedMotion": "reduce",
+      "boardReadyMs": 2919,
+      "load": {
+        "resources": 17,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 995,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13611663,
+        "domContentLoadedMs": 243
+      },
+      "gpu": {
+        "contexts": 1,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 67,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 6.7,
+          "p95": 8.4,
+          "max": 10.4
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 8.42,
+          "p95": 10.41,
+          "max": 19.31
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 359,
+        "fps": 59.8,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 33.3
+        },
+        "jankPct": {
+          "over20ms": 0.3,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 6,
+          "p95": 7.9,
+          "max": 11.1
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 9.04,
+          "p95": 14.22,
+          "max": 33
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 449
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 302.5
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 359,
+        "fps": 59.8,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 33.3
+        },
+        "jankPct": {
+          "over20ms": 0.3,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 6.1,
+          "p95": 7.8,
+          "max": 10.6
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 9.12,
+          "p95": 17.45,
+          "max": 29.85
+        },
+        "drawCalls": {
+          "p50": 210,
+          "max": 433
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.8
+        },
+        "shaderLinks": {
+          "total": 1,
+          "worstFrameMs": 33.3
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "collapse": null,
+      "errors": []
+    },
+    {
+      "id": "retina-2x-collapse",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 1,
+      "collapse": {
+        "sawCollapse": true,
+        "durationMs": 22748,
+        "frames": 1335,
+        "fps": 58.7,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 116.8
+        },
+        "jankPct": {
+          "over20ms": 0.4,
+          "over33ms": 0.4
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.7,
+          "p95": 5,
+          "max": 124.4
+        },
+        "gpuMsPerFrame": {
+          "samples": 1334,
+          "p50": 15.84,
+          "p95": 25.32,
+          "max": 41.12
+        },
+        "drawCalls": {
+          "p50": 255,
+          "max": 566
+        },
+        "trianglesK": {
+          "p50": 186.3,
+          "max": 372
+        },
+        "shaderLinks": {
+          "total": 76,
+          "worstFrameMs": 116.8
+        },
+        "longAnimationFrames": {
+          "count": 5,
+          "blockingMsPerSec": 16.2
+        }
+      },
+      "boardReadyMs": 1274,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 161
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 52,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 2,
+          "p95": 3,
+          "max": 4
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 10.48,
+          "p95": 18.32,
+          "max": 20.35
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.6,
+          "p95": 2.8,
+          "max": 3.8
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 10.64,
+          "p95": 19.13,
+          "max": 24.87
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 461
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.6
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 360,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 1.6,
+          "p95": 2.2,
+          "max": 4.6
+        },
+        "gpuMsPerFrame": {
+          "samples": 360,
+          "p50": 13.58,
+          "p95": 19.3,
+          "max": 33.3
+        },
+        "drawCalls": {
+          "p50": 211,
+          "max": 430
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 16.7
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "id": "retina-2x-cpu4-collapse",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "dpr": 2,
+      "cpu": 4,
+      "collapse": {
+        "sawCollapse": true,
+        "durationMs": 18150,
+        "frames": 1020,
+        "fps": 56.1,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 33.4,
+          "max": 166.7
+        },
+        "jankPct": {
+          "over20ms": 2.8,
+          "over33ms": 1
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 5.9,
+          "p95": 16.8,
+          "max": 170.1
+        },
+        "gpuMsPerFrame": {
+          "samples": 1018,
+          "p50": 18.25,
+          "p95": 33.22,
+          "max": 59.64
+        },
+        "drawCalls": {
+          "p50": 255,
+          "max": 580
+        },
+        "trianglesK": {
+          "p50": 186.3,
+          "max": 373.1
+        },
+        "shaderLinks": {
+          "total": 75,
+          "worstFrameMs": 166.7
+        },
+        "longAnimationFrames": {
+          "count": 6,
+          "blockingMsPerSec": 35.6
+        }
+      },
+      "boardReadyMs": 2400,
+      "load": {
+        "resources": 23,
+        "bytesByType": {
+          "js": 639564,
+          "css": 26847,
+          "/css2": 916,
+          "mp4": 642848,
+          "jpeg": 107757,
+          "png": 7425832,
+          "svg": 4895,
+          "/api/content": 444,
+          "glb": 4766460
+        },
+        "totalBytes": 13615563,
+        "domContentLoadedMs": 184
+      },
+      "gpu": {
+        "contexts": 2,
+        "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Max, Unspecified Version)",
+        "vendor": "Google Inc. (Apple)",
+        "drawingBuffer": "2304x1276",
+        "maxTextureSize": 16384,
+        "maxSamples": 8,
+        "timerQuery": true,
+        "heapMB": 91,
+        "cores": 18,
+        "deviceMemory": 32
+      },
+      "setupIdle": {
+        "frames": 240,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.5,
+          "p95": 5.4,
+          "max": 6.2
+        },
+        "gpuMsPerFrame": {
+          "samples": 240,
+          "p50": 8.47,
+          "p95": 9.67,
+          "max": 28.29
+        },
+        "drawCalls": {
+          "p50": 230,
+          "max": 465
+        },
+        "trianglesK": {
+          "p50": 155.5,
+          "max": 310.9
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "boardIdle": {
+        "frames": 361,
+        "fps": 60,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.7,
+          "p99": 16.8,
+          "max": 16.8
+        },
+        "jankPct": {
+          "over20ms": 0,
+          "over33ms": 0
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.4,
+          "p95": 5.6,
+          "max": 8.5
+        },
+        "gpuMsPerFrame": {
+          "samples": 361,
+          "p50": 9.45,
+          "p95": 14.19,
+          "max": 34.93
+        },
+        "drawCalls": {
+          "p50": 206,
+          "max": 457
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 310.3
+        },
+        "shaderLinks": {
+          "total": 0,
+          "worstFrameMs": 0
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "resolution": {
+        "frames": 359,
+        "fps": 59.8,
+        "frameMs": {
+          "p50": 16.7,
+          "p95": 16.8,
+          "p99": 16.8,
+          "max": 33.4
+        },
+        "jankPct": {
+          "over20ms": 0.3,
+          "over33ms": 0.3
+        },
+        "mainThreadMsPerFrame": {
+          "p50": 4.6,
+          "p95": 6,
+          "max": 11.8
+        },
+        "gpuMsPerFrame": {
+          "samples": 359,
+          "p50": 9.68,
+          "p95": 21.57,
+          "max": 30.77
+        },
+        "drawCalls": {
+          "p50": 215,
+          "max": 450
+        },
+        "trianglesK": {
+          "p50": 142.9,
+          "max": 285.9
+        },
+        "shaderLinks": {
+          "total": 2,
+          "worstFrameMs": 33.4
+        },
+        "longAnimationFrames": {
+          "count": 0,
+          "blockingMsPerSec": 0
+        }
+      },
+      "errors": []
+    }
+  ]
+}

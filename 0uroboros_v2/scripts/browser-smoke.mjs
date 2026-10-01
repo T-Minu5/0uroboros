@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
+import { useSetting } from './settings-menu.mjs';
 const browser=await chromium.launch({headless:true,channel:'chrome'});
 const page=await browser.newPage({viewport:{width:1600,height:1000},deviceScaleFactor:1});
 const errors=[],evidence={cycles:[],deployments:0,purchases:0,inspectPass:false,dragInspectPass:true,errors};
@@ -28,7 +29,7 @@ try {
  if(evidence.openingIntervals.some(interval=>interval<650||interval>1050))throw new Error('Opening interval differs from 800ms');
  if(await page.locator('.card-type,.power-badge .icon,.power-status').count())throw new Error('Removed badges/icons remain');
  if(await page.locator('.resources>.stat-vp').count()!==2)throw new Error('Both players need VP stats');
- if(await page.locator('.dc-readout>small .icon').count()!==4)throw new Error('Database icons must sit beside Data Center names');
+ if(await page.locator('.server-readout>small .icon').count()!==4)throw new Error('Database icons must sit beside Server names');
  const colors=await page.locator('.local-console .resources>span').evaluateAll(els=>els.map(el=>getComputedStyle(el).color));
  if(colors.join('|')!=='rgb(39, 226, 255)|rgb(31, 255, 177)|rgb(255, 204, 18)')throw new Error('Incorrect resource colors');
  evidence.resourceColors=colors;
@@ -47,7 +48,7 @@ try {
  if(await hand.count()) {await hand.first().click();await page.getByRole('dialog').waitFor();evidence.inspectPass=true;await page.getByRole('button',{name:'Close card inspect'}).click();}
 
  for(let cycle=1;cycle<=2;cycle++){
-  if(cycle===2)await page.getByRole('button',{name:'Normal pace'}).click();
+  if(cycle===2)await useSetting(page,'Normal pace');
   let sawCollapse=false;
   for(let turn=1;turn<=3;turn++){
    await page.waitForFunction(({cycle,turn})=>document.querySelector('.phase-label')?.textContent===`CYCLE ${String(cycle).padStart(2,'0')} / RUNTIME ${turn} OF 3`,{cycle,turn});
@@ -100,12 +101,13 @@ try {
   if(!sawCollapse)throw new Error('Draft appeared without observed Collapse');
   if(await page.locator('.cycle-recap').count()!==1)throw new Error('Missing Cycle result');
   await page.screenshot({path:`docs/evidence/draft-cycle-${cycle}.png`,animations:"disabled"});
-  const claim=page.getByRole('button',{name:'Claim free privilege',exact:true});
+  const claim=page.getByRole('button',{name:'Claim',exact:true});
   if(await claim.count()){await claim.click();await page.getByRole('button',{name:'Claimed',exact:true}).waitFor();await page.waitForTimeout(1200);evidence.privilegeClaims=(evidence.privilegeClaims||0)+1;}
-  const buy=page.locator('.market-card>button:last-child:not(:disabled)').first();
-  if(await buy.count()) {await buy.click();evidence.purchases++;await page.waitForTimeout(150);if(!await page.getByRole('button',{name:/Added to Discard/}).count())throw new Error('Missing purchase feedback');}
+  const buy=page.locator('.market-card .acquire-card:not([aria-disabled="true"])').first();
+  if(await buy.count()) {await buy.click();evidence.purchases++;await page.waitForTimeout(150);if(!await page.locator('.market-card.just-acquired').count())throw new Error('Missing purchase feedback');}
   await page.getByRole('button',{name:'End Draft',exact:true}).click();
-  await page.getByRole('button',{name:'Next Cycle',exact:true}).click();
+  if(cycle<3)await page.waitForFunction(c=>document.querySelector('.phase-label')?.textContent.includes(`CYCLE ${String(c+1).padStart(2,'0')}`),cycle,{timeout:90000});
+  else await page.waitForFunction(()=>!document.querySelector('.strategic-draft'),null,{timeout:90000});
   evidence.cycles.push({cycle,collapseObserved:true,draftReached:true,nextCycleReached:true});
   console.log('Completed browser Cycle',cycle,cycle===1?'normal pace':'fast pace');
  }

@@ -1,0 +1,17 @@
+---
+description: YouTube transcripts via youtube-full and visual watching via youtube-watch
+alwaysApply: true
+---
+
+# YouTube
+
+Use both skills when the user wants to watch a video.
+
+- Transcript / search / channel / playlist: `.cursor/skills/youtube-full/SKILL.md` (TranscriptAPI, no yt-dlp)
+- Visual frames: `.cursor/skills/youtube-watch/SKILL.md` or `~/.cursor/skills/youtube-watch/`
+
+```bash
+~/.cursor/skills/youtube-watch/.venv/bin/python \
+  ~/.cursor/skills/youtube-watch/scripts/watch_youtube.py \
+  "URL" --interval 5 --analyze
+```

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "delivery-state.schema.json",
+  "title": "DemoDeliveryState",
+  "type": "object",
+  "required": [
+    "mission_id",
+    "v3_version",
+    "canonical_version",
+    "milestone",
+    "stop_reason",
+    "iteration",
+    "confidence"
+  ],
+  "properties": {
+    "mission_id": { "type": "string" },
+    "v3_version": { "type": "string" },
+    "canonical_version": { "type": "string" },
+    "milestone": { "type": "string" },
+    "implementation_guide_completion": { "type": "number" },
+    "current_work_packages": { "type": "array" },
+    "completed_work_packages": { "type": "array" },
+    "blocked_work_packages": { "type": "array" },
+    "known_defects": { "type": "array" },
+    "quality_gate": { "type": "object" },
+    "visual_quality": { "type": "object" },
+    "effect_reference_coverage": { "type": "object" },
+    "effect_implementation_coverage": { "type": "object" },
+    "budget": { "type": "object" },
+    "model_usage": { "type": "array" },
+    "active_human_decisions": { "type": "array" },
+    "last_successful_integration": { "type": ["string", "null"] },
+    "next_objective": { "type": ["string", "null"] },
+    "iteration": { "type": "integer" },
+    "confidence": { "type": "object" },
+    "stop_reason": { "type": "string" },
+    "paused_for_human": { "type": "boolean" }
+  }
+}

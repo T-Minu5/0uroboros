@@ -1,0 +1,84 @@
+/* End-of-session sheet. No backdrop: the singularity keeps running above it. */
+.game-summary{
+ position:fixed;left:50%;bottom:0;z-index:60;
+ width:min(1040px,calc(100vw - 32px));max-height:62vh;
+ display:flex;flex-direction:column;gap:14px;
+ padding:18px 24px 22px;box-sizing:border-box;overflow:auto;
+ background:linear-gradient(180deg,#0d0e1ef2,#07070fe8);
+ border:1px solid #806694;border-bottom:0;border-radius:14px 14px 0 0;
+ box-shadow:0 -18px 60px #000a,inset 0 1px 0 #ffffff14;
+ transform:translateX(-50%);
+ animation:summary-rise 620ms cubic-bezier(.2,.9,.25,1) both;
+}
+.game-summary::before{
+ content:'';display:block;flex:0 0 auto;
+ width:44px;height:4px;margin:-8px auto 0;border-radius:2px;background:#ffffff2e;
+}
+@keyframes summary-rise{from{transform:translate(-50%,100%)}to{transform:translate(-50%,0)}}
+
+.summary-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.summary-head small{display:flex;align-items:center;gap:6px;font:8px Orbitron;letter-spacing:1.5px;color:#b990db}
+.summary-head small .icon{width:12px;height:12px}
+.summary-head h2{margin:6px 0 4px;font:600 26px Orbitron;letter-spacing:1px}
+.summary-head p{margin:0;font-size:11px;color:#b6b9cd}
+.game-summary .summary-head .primary-button{width:auto;flex:0 0 auto;margin:0}
+
+.summary-players{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.summary-player{
+ --tally-accent:#cfb8ed;
+ padding:14px 16px;border-radius:10px;
+ border:1px solid color-mix(in srgb,var(--tally-accent) 30%,transparent);
+ background:linear-gradient(160deg,color-mix(in srgb,var(--tally-accent) 10%,#11121f),#0b0c16);
+}
+.summary-player.leading{border-color:var(--tally-accent);box-shadow:0 0 24px color-mix(in srgb,var(--tally-accent) 25%,transparent)}
+.summary-player>header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.summary-player>header small{font:8px Orbitron;letter-spacing:1.5px;color:var(--tally-accent)}
+.summary-total{font:700 30px Orbitron;color:#fff;font-variant-numeric:tabular-nums}
+.summary-total span{margin-left:5px;font-size:10px;letter-spacing:1px;color:var(--muted)}
+
+.summary-rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.summary-rows>li{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+ padding:8px 0;border-top:1px solid #ffffff12;font-size:12px;
+ animation:summary-row 360ms ease-out both;
+ animation-delay:calc(260ms + var(--row-index) * 110ms);
+}
+@keyframes summary-row{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.summary-rows b{font:600 14px Orbitron;font-variant-numeric:tabular-nums}
+.summary-row-label{display:flex;align-items:center;gap:8px;color:#d9dcea}
+.summary-row-label em{font-style:normal;font-size:10px;color:var(--muted)}
+
+.summary-cards-toggle{
+ flex:1 1 100%;display:flex;align-items:center;justify-content:space-between;
+ margin:-4px -8px;padding:4px 8px;border:0;background:none;text-align:left;
+}
+.summary-cards-toggle:hover:not(:disabled){background:#ffffff0d}
+.summary-cards-toggle i{
+ display:grid;place-items:center;width:16px;height:16px;border-radius:4px;
+ font-style:normal;font-size:12px;line-height:1;
+ border:1px solid color-mix(in srgb,var(--tally-accent) 60%,transparent);color:var(--tally-accent);
+}
+.summary-cards-toggle:disabled{opacity:.6}
+
+.summary-cards{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}
+.summary-card{
+ position:relative;width:64px;padding:0;border:0;background:none;
+ animation:summary-card 280ms ease-out both;
+ animation-delay:calc(var(--card-index) * 35ms);
+}
+.summary-card:hover:not(:disabled){background:none;transform:translateY(-3px)}
+.summary-card>.cf-card{width:100%;height:auto}
+.summary-card-vp{
+ position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+ padding:1px 6px;border-radius:8px;
+ font:700 9px Orbitron;color:#181027;background:var(--tally-accent);
+}
+@keyframes summary-card{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+
+@media (max-width:760px){
+ .summary-players{grid-template-columns:1fr}
+ .summary-head{flex-direction:column;align-items:stretch}
+}
+@media (prefers-reduced-motion:reduce){
+ .game-summary,.summary-rows>li,.summary-card{animation:none}
+}

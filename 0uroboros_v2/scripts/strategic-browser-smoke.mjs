@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { openSettings, closeSettings } from './settings-menu.mjs';
 
 // Real UI only. The seeded shuffle is reproducible; no game state is injected.
 const cycles = Number(process.env.STRATEGIC_CYCLES || 4);
@@ -41,7 +42,7 @@ async function resources() {
     local: document.querySelector('.local-console .resources')?.textContent,
     opponent: document.querySelector('.opponent-console .resources')?.textContent,
     totals: [0, 1].map(owner => ({ owner, actions: document.querySelector(`[data-resource="${owner}-actions"] b`)?.textContent, wallet: document.querySelector(`[data-resource="${owner}-wallet"] b`)?.textContent, vp: document.querySelector(`[data-resource="${owner}-vp"] b`)?.textContent })),
-    wallet: document.querySelector('.draft-wallet')?.textContent,
+    wallet: document.querySelector('.draft-wallet-hero')?.textContent,
     bank: [...document.querySelectorAll('.live-bank')].map(el => ({ owner: el.dataset.owner, cards: [...el.querySelectorAll('.bank-slot')].map(card => ({ id: card.dataset.cardId, text: card.textContent })) })),
     opponentWallet: document.querySelector('.draft-opponent')?.dataset.opponentWallet,
     opponentReady: document.querySelector('.draft-opponent')?.dataset.opponentReady,
@@ -70,11 +71,27 @@ async function handleChoice(cycle, turn) {
   if (!await choice.count()) return false;
   const text = await choice.innerText();
   if (!report.coverage.choice) await screenshot('choice');
-  const buttons = choice.locator('.choice-options button[data-choice-option]:not(:disabled)');
+  const mode = await choice.getAttribute('data-choice-mode');
+  if (mode === 'groups' || mode === 'select') {
+    // Batched choices: take the first option in each group, or cards until Confirm enables.
+    const picks = mode === 'groups' ? choice.locator('.choice-group-actions button[data-choice-option]:first-child') : choice.locator('button[data-choice-option]');
+    const confirm = choice.locator('.choice-confirm');
+    const selected = [];
+    for (let i = 0; i < await picks.count() && !(mode === 'select' && await confirm.isEnabled()); i++) {
+      await picks.nth(i).click();
+      selected.push(await picks.nth(i).getAttribute('aria-label') ?? await picks.nth(i).innerText());
+    }
+    if (!await confirm.isEnabled()) throw new Error(`Batched choice never became confirmable: ${text}`);
+    await confirm.click();
+    report.choices.push({ cycle, turn, text, selected: selected.join(', ') });
+    report.coverage.choice = true;
+    return true;
+  }
+  const buttons = choice.locator('button[data-choice-option]:not(:disabled)');
   if (!await buttons.count()) throw new Error(`Choice has no legal option: ${text}`);
   const draw = buttons.filter({ hasText: /^\+1 Card$/ });
   const option = !report.coverage.drawChoice && await draw.count() ? draw.first() : buttons.first();
-  const selected = await option.innerText();
+  const selected = await option.getAttribute('aria-label') ?? await option.innerText();
   await option.click();
   if (selected === '+1 Card') report.coverage.drawChoice = true;
   report.choices.push({ cycle, turn, text, selected });
@@ -145,39 +162,41 @@ async function shop(cycle) {
     const opponentReady = await page.locator('.draft-opponent').getAttribute('data-opponent-ready');
     if (opponentReady !== 'true') {
       await end.click();
-      const resume = page.getByRole('button', { name: 'Resume Draft', exact: true });
+      const resume = page.getByRole('button', { name: 'Resume', exact: true });
       if (await resume.count()) {
-        if (await page.locator('.acquire-card:not(:disabled)').count()) throw new Error('Ready player can still acquire');
+        if (await page.locator('.acquire-card:not([aria-disabled="true"])').count()) throw new Error('Ready player can still acquire');
         await resume.click();
         report.coverage.endResume = true;
       } else throw new Error('Opponent completed during early-end test; Draft cannot resume');
     } else report.coverage.endResumeSkipped = 'Opponent was already ready on first Draft entry';
     const counts = await page.locator('.market-card').evaluateAll(els => Object.fromEntries(['Base', 'VP', 'Crypto', 'Chaos'].map(category => [category, els.filter(el => el.dataset.category === category).length])));
-    if (JSON.stringify(counts) !== JSON.stringify({ Base: 9, VP: 3, Crypto: 3, Chaos: 3 })) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
+    if (JSON.stringify(counts) !== JSON.stringify({ Base: 6, VP: 3, Crypto: 3, Chaos: 4 })) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
     report.coverage.marketCounts = counts;
-    for (const category of ['Base', 'VP', 'Crypto', 'Chaos']) {
-      await page.getByRole('button', { name: category, exact: true }).click();
-      if (await page.locator('.market-card').count() !== counts[category]) throw new Error(`${category} filter count incorrect`);
+    report.coverage.marketLayout = await page.evaluate(() => ({
+      row1: document.querySelectorAll('.character-row')[0]?.querySelectorAll('.market-card').length ?? 0,
+      row2: document.querySelectorAll('.character-row')[1]?.querySelectorAll('.market-card').length ?? 0,
+      resources: document.querySelectorAll('.resource-row .market-card').length,
+    }));
+    if (JSON.stringify(report.coverage.marketLayout) !== JSON.stringify({ row1: 6, row2: 4, resources: 6 })) {
+      throw new Error(`Market layout mismatch: ${JSON.stringify(report.coverage.marketLayout)}`);
     }
-    await page.getByRole('button', { name: 'All', exact: true }).click();
-    report.coverage.marketFilters = true;
   }
   await page.waitForTimeout(450);
   await page.locator('.draft-overlay').evaluate(el => { el.scrollTop = 0; });
   const before = await resources();
   await screenshot(`draft-${cycle}`);
-  const claim = page.getByRole('button', { name: 'Claim free privilege', exact: true });
+  const claim = page.getByRole('button', { name: 'Claim', exact: true });
   if (await claim.count() && await claim.isEnabled()) { await claim.click(); await page.waitForTimeout(1800); }
   const owned = new Set(report.purchases.map(p => p.name));
   for (let attempt = 0; attempt < 8; attempt++) {
     const options = await page.locator('.market-card').evaluateAll(els => els.map(el => ({
-      id: el.dataset.marketId, name: el.querySelector('h3')?.textContent || '', text: el.textContent,
-      enabled: !!el.querySelector('.acquire-card:not(:disabled)'), stock: el.dataset.stock, cost: el.dataset.cost, category: el.dataset.category,
+      id: el.dataset.marketId, name: el.dataset.cardName || el.querySelector('h3')?.textContent || '', text: el.textContent,
+      enabled: !!el.querySelector('.acquire-card:not([aria-disabled="true"])'), stock: el.dataset.stock, cost: el.dataset.cost, category: el.dataset.category,
     })).filter(el => el.enabled));
     options.sort((a, b) => purchasePriority(b.name, b.text, owned, cycle, b.category) - purchasePriority(a.name, a.text, owned, cycle, a.category));
     if (!options.length) break;
     const option = options[0];
-    const row = option.id ? page.locator(`[data-market-id="${option.id}"]`) : page.locator('.market-card').filter({ has: page.getByRole('heading', { name: option.name, exact: true }) });
+    const row = option.id ? page.locator(`[data-market-id="${option.id}"]`) : page.locator(`.market-card[data-card-name="${option.name}"]`);
     await row.locator('.acquire-card').click();
     report.purchases.push({ cycle, owner: 0, ...option, resourcesAfter: await resources() });
     owned.add(option.name);
@@ -187,18 +206,19 @@ async function shop(cycle) {
   const after = await resources();
   if (cycle === 1) {
     await page.locator('.market-card').last().scrollIntoViewIfNeeded();
-    const heading = await page.locator('.draft-heading').boundingBox();
-    report.coverage.stickyDraftHeading = !!heading && heading.y >= 65 && heading.y + heading.height < 1000;
+    const footer = await page.locator('.draft-footer').boundingBox();
+    report.coverage.stickyDraftFooter = !!footer && footer.y >= 65 && footer.y + footer.height <= 1000;
     await screenshot('draft-scrolled');
-    if (!report.coverage.stickyDraftHeading) throw new Error('Draft Wallet/timer/end controls scrolled out of view');
+    if (!report.coverage.stickyDraftFooter) throw new Error('Draft Wallet/End Draft controls scrolled out of view');
   }
   await page.locator('.draft-overlay').evaluate(el => { el.scrollTop = 0; });
   await screenshot(`draft-${cycle}-purchased`);
   await end.click();
-  await page.getByRole('button', { name: 'Next Cycle', exact: true }).waitFor({ timeout: 90000 });
   await collectLog(cycle, 'draft-ended');
   report.cycles.push({ cycle, before, after, pace: cycle % 2 ? 'normal' : 'fast' });
-  await page.getByRole('button', { name: 'Next Cycle', exact: true }).click();
+  // Next cycle starts automatically once both players end (or the timer expires).
+  if (cycle < cycles) await waitForRuntime(cycle + 1, 1);
+  else await page.waitForFunction(() => !document.querySelector('.strategic-draft'), null, { timeout: 90000 });
 }
 
 try {
@@ -207,7 +227,9 @@ try {
   for (let cycle = 1; cycle <= cycles; cycle++) {
     await waitForRuntime(cycle, 1);
     const desired = cycle % 2 ? 'Normal pace' : 'Fast pace';
+    await openSettings(page);
     if (!await page.getByRole('button', { name: desired, exact: true }).count()) await page.getByRole('button', { name: /^(Normal|Fast) pace$/ }).click();
+    await closeSettings(page);
     for (let turn = 1; turn <= 3; turn++) {
       await waitForRuntime(cycle, turn);
       await observeBank(cycle, turn);

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "shokunin-memory": {
+      "command": "/usr/bin/python3",
+      "args": ["scripts/shokunin-memory.py", "mcp"]
+    }
+  }
+}

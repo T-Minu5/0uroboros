@@ -156,16 +156,16 @@ describe('effect recipe quantities and recipients', () => {
     })]));
   });
 
-  it('retains existing Data Center targets even when opponent is specified on drain and restore', () => {
+  it('retains existing Server targets even when opponent is specified on drain and restore', () => {
     const game = session();
-    game.state.players[0].centers.primary = 1800;
-    game.state.players[1].centers.primary = 1900;
+    game.state.players[0].servers.primary = 1800;
+    game.state.players[1].servers.primary = 1900;
     const events = play(game, card('source', [
       { kind: 'drain', amount: 5, opponent: false },
       { kind: 'restore', amount: 5, opponent: true },
     ]));
-    expect(game.state.players[0].centers.primary).toBe(1805);
-    expect(game.state.players[1].centers.primary).toBe(1895);
+    expect(game.state.players[0].servers.primary).toBe(1805);
+    expect(game.state.players[1].servers.primary).toBe(1895);
     expect(events.filter(event => ['drain', 'restore'].includes(event.kind))).toEqual(expect.arrayContaining([
       expect.objectContaining({ kind: 'drain', owner: 0, targetOwner: 1, target: 'primary' }),
       expect.objectContaining({ kind: 'restore', owner: 0, targetOwner: 0, target: 'primary' }),

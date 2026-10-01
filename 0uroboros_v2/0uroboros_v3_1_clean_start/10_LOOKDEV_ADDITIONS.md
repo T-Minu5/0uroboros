@@ -12,7 +12,7 @@ Approved additions here outrank generic creative interpretation and competitive-
 
 **Goal:** What the player should perceive or feel.
 
-**Applies to:** Board / cards / Locations / Draft / Collapse / Data Centers / HUD / etc.
+**Applies to:** Board / cards / Locations / Draft / Collapse / Servers / HUD / etc.
 
 **Required:** Non-negotiable characteristics.
 
@@ -33,7 +33,7 @@ Approved additions here outrank generic creative interpretation and competitive-
 Use the two concept images in `assets/board` as the primary layout authority for the gameboard. The in-engine board should closely match their spatial organization, information grouping, and major visual zones.
 
 **Applies to:**
-Board / table / HUD integration / player status zones / hand zone / Duration storage / Data Centers / End Turn button / Crypto Cache / pile placement
+Board / table / HUD integration / player status zones / hand zone / Duration storage / Servers / End Turn button / Crypto Cache / pile placement
 
 **Required:**
 1. Inspect both images in `assets/board`:
@@ -43,8 +43,8 @@ Board / table / HUD integration / player status zones / hand zone / Duration sto
    - overall board layout
    - player/opponent information placement
    - Duration storage location
-   - Primary and Backup Data Center display
-   - displayed Data Center power/integrity
+   - Primary and Backup Server display
+   - displayed Server power/integrity
    - Actions, Crypto, VP/points, draw pile, discard pile, hand, and Crypto Cache placement
 3. Use the image without cards in hand as the clearest source for the underlying board layout.
 4. Use the image with cards in hand as the authority for hand placement, spacing/fanning, and how the board should read while cards are in hand.

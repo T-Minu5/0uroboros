@@ -88,7 +88,7 @@ High-confidence established areas include:
 - priority
 - Actions
 - Crypto
-- Data Centers
+- Servers
 - deck
 - discard
 - hand

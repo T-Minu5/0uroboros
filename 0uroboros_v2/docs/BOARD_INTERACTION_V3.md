@@ -13,11 +13,11 @@ After resolution, the leading player's half of a Location has a soft surface glo
 ## Composition and geometry
 
 - The camera shifts the board upward by approximately 60 screen pixels while preserving its angle and scale. Hand and stats have more clearance.
-- The local Data Center housings and shader cores are lower and narrower. Their integrity readouts sit below the bank, clear of the probability shoulders.
+- The local Server housings and shader cores are lower and narrower. Their integrity readouts sit below the bank, clear of the probability shoulders.
 - The percentages use larger slanted cream lettering on peaked physical plates, following the first-party no-card board concept.
 - All ten circular Power housings are replaced with rhombus mounts. Numbers remain a simple overlay with no icon or duplicate bezel.
 - Resolution keeps the rhombus unobscured; a leftover square score outline is removed.
-- Ten red lane assemblies are removed. The V2 perimeter, original material maps and restrained Data Center lighting are retained.
+- Ten red lane assemblies are removed. The V2 perimeter, original material maps and restrained Server lighting are retained.
 
 The native source is `assets/models/ouroboros-board-v3.blend`; runtime loads `ouroboros-board-v3.glb`. The GLB has 78,964 triangles, nine material meshes, and is 4,767,772 bytes. All 51 semantic anchor names and metadata survive. Exactly 17 intended positions change: ten Power anchors, five probability anchors and two local integrity anchors. The other 34 positions are unchanged. `scripts/verify-board-v3.py` verifies this contract and writes `assets/models/board-v3-geometry-report.json`.
 
@@ -33,6 +33,6 @@ The complete-Cycle browser test now reads an effect's presence and color in the 
 
 The final two-Cycle playthrough passes at normal and fast pace: 15 deployments, two purchases, two free privilege claims, both Collapse/Draft transitions and entry into Cycle 3, with zero browser exceptions. Five-card opening and Crypto conservation pass; opening intervals are 797 and 799 ms. All four observed effect colors match the approved palette, and populated cards clear the percentages. Full results: `evidence/browser-play.json`; populated and effect captures: `evidence/populated-board-final.png` and `evidence/drain-in-play.png`.
 
-The screenshot review covers `evidence/pointer-lane-hover.png`, `evidence/board-interaction-1600.png`, `evidence/board-interaction-1366.png`, and `evidence/winning-lanes.png`. Measured clearances in the two viewport checks are at least 44 px between the raised hand card and player stats; Power numerals clear the Location plaques by at least 2.9 px. Probability labels do not overlap local Data Center regions.
+The screenshot review covers `evidence/pointer-lane-hover.png`, `evidence/board-interaction-1600.png`, `evidence/board-interaction-1366.png`, and `evidence/winning-lanes.png`. Measured clearances in the two viewport checks are at least 44 px between the raised hand card and player stats; Power numerals clear the Location plaques by at least 2.9 px. Probability labels do not overlap local Server regions.
 
-Implementation: `src/useCardPointerDrag.ts`, `src/board-interaction.css`, `src/App.tsx`, `src/BoardScene.tsx`, `src/DataCenterLights.tsx`. Geometry reproduction: `scripts/build-board-v3-base.py` followed by `scripts/refine-board-v3.py` through Blender MCP. Production packaging includes the V3 GLB; authoring files and reference art remain excluded.
+Implementation: `src/useCardPointerDrag.ts`, `src/board-interaction.css`, `src/App.tsx`, `src/BoardScene.tsx`, `src/ServerLights.tsx`. Geometry reproduction: `scripts/build-board-v3-base.py` followed by `scripts/refine-board-v3.py` through Blender MCP. Production packaging includes the V3 GLB; authoring files and reference art remain excluded.

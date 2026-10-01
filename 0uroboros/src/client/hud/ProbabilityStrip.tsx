@@ -22,8 +22,9 @@ export function ProbabilityStrip({
   measuring = false,
   selectedNode = null,
 }: ProbabilityStripProps) {
+  const quiet = !measuring && fx?.active?.kind !== 'chance';
   return (
-    <div className="chance" style={{ ['--nodes' as string]: nodes.length }}>
+    <div className="chance" data-quiet={quiet} style={{ ['--nodes' as string]: nodes.length }}>
       {nodes.map((node) => {
         const value = fx?.chance(node.index) ?? node.probability;
         const moving =
@@ -58,6 +59,6 @@ export function ProbabilityStrip({
 }
 
 /** Show a half-point only when one exists, so 30 does not read as 30.0. */
-function formatPercent(value: number): string {
+export function formatPercent(value: number): string {
   return `${Number.isInteger(value) ? value : value.toFixed(1)}%`;
 }

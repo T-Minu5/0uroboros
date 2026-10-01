@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createSession, seededRandom, type RuntimeSession } from "../src/runtime";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "../src/runtime";
 import { starterCards } from "../src/game";
 
 const make = (seed = 7) => createSession({ carryover: false, priorityPreference: "higher", random: seededRandom(seed), practiceMarket: [starterCards[0], starterCards[1]] });
 function drain(session: RuntimeSession) {
   const events = [];
   let step;
-  while ((step = session.step())) {
-    events.push(step.event);
+  while (session.state.choice || (step = session.step())) {
+    events.push(session.state.choice ? session.choose(firstLegalSelection(session.state.choice)) : step!.event);
     if (events.length > 500) throw new Error("Resolution failed to terminate.");
   }
   return events;
@@ -67,11 +67,11 @@ describe("Local Runtime session", () => {
       if (step.event.owner === 0 && step.event.kind === "actions") {
         actionSeen = true;
         expect(player.actions).toBe(1);
-        expect(player.pendingActions).toBe(1);
+        expect(player.pendingActions).toBe(2);
       }
     }
     expect(actionSeen).toBe(true);
-    expect(player.actions).toBe(2);
+    expect(player.actions).toBe(3);
     expect(player.pendingActions).toBe(0);
     expect(player.hand.some(card => card.id === "test-slash")).toBe(true);
     expect(player.draw).toHaveLength(0);
@@ -173,15 +173,15 @@ describe("Local Runtime session", () => {
 });
 
 describe("Session edge conditions", () => {
-  it("awards destruction VP and ends when the opponent loses both Data Centers", () => {
+  it("awards destruction VP and ends when the opponent loses both Servers", () => {
     const session = make();
     session.state.players[0].hand = [{ ...starterCards[3], id: "fatal-razor" }];
-    session.state.players[1].centers = { primary: 0, backup: 50 };
+    session.state.players[1].servers = { primary: 0, backup: 50 };
     session.state.players[1].hand = [];
     session.deploy("fatal-razor", 0);
     session.endTurn();
     const events = drain(session);
-    expect(session.state.players[1].centers).toEqual({ primary: 0, backup: 0 });
+    expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
     expect(session.state.players[0].destructionVP).toBe(12);
     expect(session.state.phase).toBe("gameover");
     expect(events.filter(event => event.kind === "gameover")).toHaveLength(1);
@@ -245,12 +245,12 @@ describe("Resolution presentation data", () => {
     const session = make();
     session.state.players[0].hand = [{ ...starterCards[3], id: "clamped-razor" }];
     session.state.players[1].hand = [];
-    session.state.players[1].centers = { primary: 30, backup: 1500 };
+    session.state.players[1].servers = { primary: 30, backup: 1500 };
     session.deploy("clamped-razor", 0);
     session.endTurn();
     const effect = drain(session).find(event => event.kind === "drain")!;
     expect(effect).toMatchObject({ amount: 30, before: 30, after: 0, target: "primary", targetOwner: 1, owner: 0 });
-    expect(session.state.players[1].centers.backup).toBe(1500);
+    expect(session.state.players[1].servers.backup).toBe(1500);
   });
 });
 
@@ -265,10 +265,10 @@ describe("State and visibility invariants", () => {
           expect(cards).toHaveLength(10);
           expect(new Set(cards.map(card => card.id)).size).toBe(10);
           expect(player.actions).toBeGreaterThanOrEqual(0);
-          expect(player.centers.primary).toBeGreaterThanOrEqual(0);
-          expect(player.centers.primary).toBeLessThanOrEqual(2000);
-          expect(player.centers.backup).toBeGreaterThanOrEqual(0);
-          expect(player.centers.backup).toBeLessThanOrEqual(1500);
+          expect(player.servers.primary).toBeGreaterThanOrEqual(0);
+          expect(player.servers.primary).toBeLessThanOrEqual(2000);
+          expect(player.servers.backup).toBeGreaterThanOrEqual(0);
+          expect(player.servers.backup).toBeLessThanOrEqual(1500);
           expect(session.state.nodes.every(node => node.cards[owner].length <= 4)).toBe(true);
         }
         const view = session.view();
@@ -285,7 +285,10 @@ describe("State and visibility invariants", () => {
           }
           assertState();
           session.endTurn();
-          while (session.pendingCount) { session.step(); assertState(); }
+          while (session.pendingCount || session.state.choice) {
+            if (session.state.choice) session.choose(firstLegalSelection(session.state.choice)); else session.step();
+            assertState();
+          }
         }
         session.endDraft(); session.nextCycle(); assertState();
       }
@@ -297,11 +300,11 @@ describe("State and visibility invariants", () => {
     const view = session.view();
     const originalName = session.state.players[0].hand[0].name;
     view.players[0].hand[0].name = "modified outside engine";
-    view.players[0].centers.primary = 0;
+    view.players[0].servers.primary = 0;
     const originalWeight = session.state.weights[0];
     view.weights[0] = 100;
     expect(session.state.players[0].hand[0].name).toBe(originalName);
-    expect(session.state.players[0].centers.primary).toBe(2000);
+    expect(session.state.players[0].servers.primary).toBe(2000);
     expect(session.state.weights[0]).toBe(originalWeight);
   });
 });
@@ -342,7 +345,7 @@ describe("Approved VP scoring", () => {
     expect(session.state.endedReason).toMatch(/Tie, 4 to 4 VP/);
   });
 
-  it("chooses winner by total VP after lethal Drain, not by surviving Data Centers alone", () => {
+  it("chooses winner by total VP after lethal Drain, not by surviving Servers alone", () => {
     const session = make();
     session.state.players[0].draw = [];
     session.state.players[0].hand = [{ ...starterCards[3], id: "lethal" }];
@@ -351,7 +354,7 @@ describe("Approved VP scoring", () => {
     session.state.players[1].draw = [];
     session.state.players[1].discard = [];
     session.state.players[1].destructionVP = 20;
-    session.state.players[1].centers = { primary: 0, backup: 20 };
+    session.state.players[1].servers = { primary: 0, backup: 20 };
     session.deploy("lethal", 0); session.endTurn(); drain(session);
     expect(session.state.players[0].totalVP).toBe(12);
     expect(session.state.players[1].totalVP).toBe(20);
@@ -421,7 +424,7 @@ describe("Planning and Location-count rulings", () => {
     expect(session.state.phase).toBe('runtime');
     expect(session.state.nodes[3].cards[0][0].revealed).toBe(true);
     expect(session.state.nodes[4].cards[0][0].revealed).toBe(false);
-    expect(session.state.players[0].pendingActions).toBe(1);
+    expect(session.state.players[0].pendingActions).toBe(2);
     session.endTurn();const events=drain(session);
     expect(events.filter(event=>event.kind==='reveal'&&event.cardId==='last-node')).toHaveLength(1);
     expect(events.filter(event=>event.cardId==='opening-dash')).toHaveLength(0);
@@ -451,13 +454,13 @@ describe("Planning and Location-count rulings", () => {
   });
 });
 
-it("targeted Data Center effects cannot revive or repeatedly award a destroyed center",()=>{
+it("targeted Server effects cannot revive or repeatedly award a destroyed server",()=>{
   const session=make();session.state.nodeOrder=[0,1,2,3,4];
-  session.state.players[1].hand=[];session.state.players[1].centers.backup=50;
-  session.state.players[0].centers.primary=0;
+  session.state.players[1].hand=[];session.state.players[1].servers.backup=50;
+  session.state.players[0].servers.primary=0;
   session.state.players[0].hand=[{...starterCards[0],id:'targeted',onReveal:[{kind:'drain',target:'backup',amount:100},{kind:'drain',target:'backup',amount:100},{kind:'restore',target:'primary',amount:100}]}];
   session.deploy('targeted',0);session.endTurn();const events=drain(session);
   expect(events.filter(event=>event.kind==='drain').map(event=>event.amount)).toEqual([50,0]);
   expect(session.state.players[0].destructionVP).toBe(12);
-  expect(session.state.players[0].centers.primary).toBe(0);
+  expect(session.state.players[0].servers.primary).toBe(0);
 });

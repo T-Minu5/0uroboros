@@ -96,15 +96,15 @@ Draw, Hand, Discard, Nodes, Effect Bank, Trash, Destroyed.
 Trash is shared and recoverable by effects when text allows. Destroyed is permanent removal.
 
 ## Victory / endgame
-Data Centers: Primary 2000, Backup 1500.
+Servers: Primary 2000, Backup 1500.
 
 Destruction awards: Primary +8 VP, Backup +12 VP.
 
-Game ends when both Data Centers of one player are destroyed, or after Cycle 16 normal flow.
+Game ends when both Servers of one player are destroyed, or after Cycle 16 normal flow.
 
 Normal Cycle 16 includes the final Draft before final VP scoring.
 
-If game-ending Data Center destruction occurs during Wave Collapse: finish the current Node including awards, stop later Nodes, skip Draft, proceed to game end.
+If game-ending Server destruction occurs during Wave Collapse: finish the current Node including awards, stop later Nodes, skip Draft, proceed to game end.
 
 Winner is total VP. Equal VP is a tie.
 

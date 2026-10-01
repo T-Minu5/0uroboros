@@ -1,0 +1,29 @@
+{
+  "id": "VisualBenchmarkPacket",
+  "updated_at": "2026-09-08",
+  "first_party": {
+    "board_concept": "assets/gameboard concept art (octagon table, magenta rim, cyan corner energy, seated view). Inspected.",
+    "runtime_jpegs": ["src/client/visual/art/arena-city.jpg", "src/client/visual/art/arena-table.jpg", "src/client/visual/art/arena-pads.jpg"],
+    "icons_in_hud": ["priority", "action", "crypto", "database", "deck", "discard", "hand", "power"],
+    "card_art": "starter identities via cardArt.ts"
+  },
+  "examples_reviewed": {
+    "great_snap": ["https://www.youtube.com/watch?v=eKrOIG5tqJ4", "https://www.youtube.com/watch?v=hUi0eFuTi-g"],
+    "good": ["https://www.youtube.com/watch?v=NmkuxuKK_nU", "https://www.youtube.com/watch?v=zosDFA7_3M4"],
+    "drimgar": "https://demo.drimgar.com/"
+  },
+  "implemented_influences": [
+    "Octagon table + magenta rim from concept art",
+    "Corner pylons (cyan near, magenta far) from concept pillars",
+    "Lead chevron toward the winning seat (Snap location language)",
+    "Draft takes the table (Supply Piles concept)",
+    "Original sigil / interference SVG from occult and quantum refs",
+    "WaveField shader from ScanEffect / wavy-cubes technique notes"
+  ],
+  "still_fails_the_bar": [
+    "Collapse is not yet Snap-level spectacle",
+    "Cards still read as HUD objects more than physical 3D props",
+    "No EffectComposer bloom stack",
+    "Hand fan is competent, not StS/Snap tactile"
+  ]
+}

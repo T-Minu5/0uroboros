@@ -10,6 +10,7 @@ import {
   nodeOutcome,
   nodePower,
 } from '../src/game/engine/power';
+import { selectCollapseNode } from '../src/game/engine/probability';
 
 describe('Power', () => {
   it('sums only revealed cards at a Node', () => {
@@ -98,5 +99,52 @@ describe('Controlled weight and reveal priority', () => {
     state.revealPriority = '1';
     // No cards anywhere, so weights are equal.
     expect(nextRevealPriority(state)).toBe('1');
+  });
+
+  it('gives the winner 100% and the loser 0% of a Node weight', () => {
+    const { state } = createHarness();
+    openNodes(state, [0]);
+    placeCardAtNode(state, '0', 'cipher_runner', 0, { revealed: true });
+    const win = 30;
+    const remainderHalf = 35;
+    expect(controlledWeight(state, '0')).toBe(win + remainderHalf);
+    expect(controlledWeight(state, '1')).toBe(remainderHalf);
+  });
+
+  it('splits a tied contested Node 50/50 and sums multiple Nodes', () => {
+    const { state } = createHarness();
+    openNodes(state, [0, 1]);
+    placeCardAtNode(state, '0', 'cipher_runner', 0, { revealed: true });
+    placeCardAtNode(state, '0', 'cipher_runner', 1, { revealed: true });
+    placeCardAtNode(state, '1', 'cipher_runner', 1, { revealed: true });
+    expect(controlledWeight(state, '0')).toBe(30 + 12.5 + 10 + 7.5 + 5);
+    expect(controlledWeight(state, '1')).toBe(12.5 + 10 + 7.5 + 5);
+  });
+
+  it('preserves 0.5% increment precision on half of a tied Node', () => {
+    const { state } = createHarness();
+    state.nodes.forEach((node, index) => {
+      node.probability = index === 0 ? 0.5 : index === 1 ? 99.5 : 0;
+    });
+    expect(controlledWeight(state, '0')).toBe(50);
+    expect(controlledWeight(state, '1')).toBe(50);
+    openNodes(state, [0]);
+    placeCardAtNode(state, '0', 'cipher_runner', 0, { revealed: true });
+    expect(controlledWeight(state, '0')).toBe(0.5 + 99.5 / 2);
+    expect(controlledWeight(state, '1')).toBe(99.5 / 2);
+  });
+
+  it('is not raw card Power and is not Wave Collapse selection', () => {
+    const { state, random } = createHarness();
+    openNodes(state, [0, 4]);
+    placeCardAtNode(state, '0', 'cipher_runner', 0, { revealed: true });
+    placeCardAtNode(state, '1', 'monolith_core', 4, { revealed: true });
+    expect(nodePower(state, 0, '0')).toBeLessThan(nodePower(state, 4, '1'));
+    expect(controlledWeight(state, '0')).toBeGreaterThan(controlledWeight(state, '1'));
+    expect(state.collapseSelectedNode).toBeNull();
+    const selected = selectCollapseNode(state, random);
+    expect(selected).not.toBeNull();
+    expect(typeof controlledWeight(state, '0')).toBe('number');
+    expect(controlledWeight(state, '0')).not.toBe(selected);
   });
 });

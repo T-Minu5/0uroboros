@@ -1,17 +1,19 @@
-import { starterEffects, type Card, type EvaluationEffect } from '../game';
+import { compileChains, starterEffects, type Card, type EvaluationEffect } from '../game';
 import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS } from '../evaluationMarket';
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, type EvaluationLocation, type LocationRewardEffect, type CircuitRewardDefinition, type CircuitRewardEffect } from '../content';
 import { CARD_ART_PLACEHOLDER } from '../cardArtwork';
 import { HISTORIC_SOURCE_METADATA } from '../historicCatalog';
+import { deriveLocationText } from './recipeModel';
 
 export type CardPool = 'Base' | 'Chaos' | 'VP' | 'Crypto';
-export type CardClass = 'Action' | 'Utility' | 'Runtime' | 'Attack' | 'Hacker';
+export type CardClass = 'Action' | 'Utility' | 'Runtime' | 'Attack' | 'Hacker' | 'Horror';
 export type AuthoredCard = Card & {
   pool: CardPool;
   enabled: boolean;
-  core: boolean;
   cardClass?: CardClass;
+  /** Created only by card effects; any type or class, never offered in Draft. */
   generated?: boolean;
+  storyText?: string;
   effectRefs?: { onReveal?: string[]; onCollapse?: string[]; recurring?: string[] };
 };
 export type AuthoredLocation = EvaluationLocation & { enabled: boolean; effectIds?: string[] };
@@ -36,38 +38,39 @@ export type CompiledContent = {
   chaosCards: Card[];
   vpCards: Card[];
   cryptoCards: Card[];
-  coreBaseIds: string[];
-  activeVpIds: string[];
-  activeCryptoIds: string[];
   locations: EvaluationLocation[];
   circuitRewards: CircuitRewardDefinition[];
 };
 
-const CORE_BASE_IDS = new Set(['slash-dot', 'dash', 'dot', 'eval-cycle-cache']);
-const ACTIVE_VP_IDS = new Set(['basic-encryption', 'vault-encryption', 'quantum-archive']);
-const ACTIVE_CRYPTO_IDS = new Set(['byte-coin', 'kilo-coin', 'mega-cache']);
 function seededCardClass(card:Card,pool:CardPool):CardClass|undefined {
   if(card.type!=="Character")return undefined;
   const types=HISTORIC_SOURCE_METADATA[card.definitionId??card.id]?.types??[];
-  if(types.includes('power'))return 'Hacker';
+  if(types.includes('power'))return 'Horror';
   if(types.includes('action'))return 'Action';
   if(types.includes('utility'))return 'Utility';
   if(types.includes('attack'))return 'Attack';
-  if(card.durationPeriod==='runtime'&&card.duration)return 'Runtime';
   return pool==='Chaos'?'Attack':'Utility';
 }
-const STARTING_DECK: Record<string, Card['type']> = { 'slash-dot': 'Character', dash: 'Character', dot: 'Character', 'rezz-razor': 'Character', 'rezz-blade': 'Character', 'byte-coin': 'Crypto', 'kilo-coin': 'Crypto', 'vault-encryption': 'VP' };
-const CARD_KINDS = new Set(['draw', 'actions', 'crypto', 'drain', 'restore', 'moveSelf', 'moveCard', 'modifyPower', 'probability', 'trashSelf', 'recover', 'choice', 'mill', 'transferPower', 'handDiscard', 'handTrash', 'scry', 'gain', 'selfDestroyBackup', 'random', 'morph']);
-const LOCATION_KINDS = new Set(['crypto', 'vp', 'draw', 'damageLoser']);
-const CIRCUIT_KINDS = new Set(['crypto', 'vp', 'restorePrimary']);
+const STARTING_DECK: Record<string, Card['type']> = { 'slash-dot': 'Character', 'dash-dot': 'Character', dotkrawler: 'Character', 'rezz-razor': 'Character', 'rezz-blade': 'Character', 'byte-coin': 'Crypto', 'kilo-coin': 'Crypto', 'vault-encryption': 'VP' };
+const EVAL_KINDS = new Set(['draw', 'actions', 'crypto', 'vp', 'drain', 'restore', 'moveSelf', 'moveCard', 'modifyPower', 'probability', 'trashSelf', 'recover', 'choice', 'mill', 'transferPower', 'handDiscard', 'handTrash', 'scry', 'gain', 'selfDestroyBackup', 'random', 'morph', 'attachModifier', 'damageLoser', 'restorePrimary', 'trashLowestAtLocation', 'trashAtLocation', 'destroyAtLocation', 'boostPowerAtLocation', 'stealCrypto', 'destroyCard']);
+const CARD_KINDS = EVAL_KINDS;
+const LOCATION_KINDS = EVAL_KINDS;
+const CIRCUIT_KINDS = EVAL_KINDS;
 const CARD_EFFECT_FIELDS: Record<string, string[]> = {
-  draw: ['amount', 'opponent'], actions: ['amount', 'opponent'], crypto: ['amount', 'opponent'], drain: ['amount', 'target'], restore: ['amount', 'target'],
-  moveSelf: [], moveCard: ['opponent', 'optional'], modifyPower: ['amount', 'opponent', 'optional'], probability: ['amount'],
-  trashSelf: [], recover: [], choice: ['prompt', 'options'], mill: ['amount'], transferPower: ['amount'],
+  draw: ['amount', 'opponent'], actions: ['amount', 'opponent'], crypto: ['amount', 'opponent'], vp: ['amount', 'opponent'],
+  drain: ['amount', 'target', 'opponent'], restore: ['amount', 'target', 'opponent'],
+  moveSelf: [], moveCard: ['opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], modifyPower: ['amount', 'opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], probability: ['amount', 'direction'],
+  destroyCard: ['opponent', 'optional', 'cardRelation'],
+  trashSelf: [], recover: [], choice: ['prompt', 'options'], mill: ['amount', 'opponent'],
+  transferPower: ['amount', 'direction'], stealCrypto: ['amount'],
   handDiscard: ['amount', 'opponent', 'chooser', 'optional', 'min', 'then'],
   handTrash: ['amount', 'opponent', 'chooser', 'optional', 'min', 'then'],
-  scry: ['amount', 'optional'], gain: ['amount', 'cardId', 'destination', 'opponent'], selfDestroyBackup: [], random: ['options'],
+  scry: ['amount', 'optional', 'opponent'], gain: ['amount', 'cardId', 'destination', 'opponent'], selfDestroyBackup: ['opponent'], random: ['options'],
   morph: ['formIds', 'selection'],
+  attachModifier: ['modifier', 'amount', 'cardId', 'opponent', 'cardRelation', 'boardHost'],
+  damageLoser: ['amount'], restorePrimary: ['amount'],
+  trashLowestAtLocation: ['amount', 'boardSide'], boostPowerAtLocation: ['amount', 'boardSide'],
+  trashAtLocation: ['amount', 'boardSide', 'rank'], destroyAtLocation: ['amount', 'boardSide', 'rank'],
 };
 
 export function createDefaultContent(): ContentDocument {
@@ -82,12 +85,12 @@ export function createDefaultContent(): ContentDocument {
       const hooks = card.onReveal === undefined && starterEffects[card.name] ? { onReveal: structuredClone(starterEffects[card.name]) as EvaluationEffect[] } : {};
       const pool=pools.get(id)!;
       const cardClass=seededCardClass(card,pool);
-      return { ...structuredClone(card), ...hooks, pool, enabled: true, core: CORE_BASE_IDS.has(id) || ACTIVE_VP_IDS.has(id) || ACTIVE_CRYPTO_IDS.has(id), ...(cardClass?{cardClass}:{}) };
+      return { ...structuredClone(card), ...hooks, pool, enabled: true, ...(cardClass?{cardClass}:{}) };
     }).concat([
-      { id: 'eval-relocation-relay', definitionId: 'eval-relocation-relay', name: 'Relocation Relay', type: 'Character', power: 2, cost: 3, art: CARD_ART_PLACEHOLDER, effect: 'Move one of your revealed cards to another open Node.', onReveal: [{ kind: 'moveCard' }], pool: 'Base', enabled: true, core: false },
-      { id: 'eval-hostile-reroute', definitionId: 'eval-hostile-reroute', name: 'Hostile Reroute', type: 'Character', power: 2, cost: 4, art: CARD_ART_PLACEHOLDER, effect: 'Move one opponent revealed card to another open Node.', onReveal: [{ kind: 'moveCard', opponent: true }], pool: 'Chaos', enabled: true, core: false },
-      { id: 'eval-signal-amplifier', definitionId: 'eval-signal-amplifier', name: 'Signal Amplifier', type: 'Character', power: 2, cost: 3, art: CARD_ART_PLACEHOLDER, effect: 'Add 2 Power to one of your revealed cards while it remains deployed.', onReveal: [{ kind: 'modifyPower', amount: 2 }], pool: 'Base', enabled: true, core: false },
-      { id: 'eval-power-siphon', definitionId: 'eval-power-siphon', name: 'Power Siphon', type: 'Character', power: 2, cost: 4, art: CARD_ART_PLACEHOLDER, effect: 'Subtract 2 Power from one opponent revealed card while it remains deployed.', onReveal: [{ kind: 'modifyPower', amount: -2, opponent: true }], pool: 'Chaos', enabled: true, core: false },
+      { id: 'eval-relocation-relay', definitionId: 'eval-relocation-relay', name: 'Relocation Relay', type: 'Character', power: 2, cost: 3, art: CARD_ART_PLACEHOLDER, effect: 'Move one of your revealed cards to another open Node.', onReveal: [{ kind: 'moveCard' }], pool: 'Base', enabled: true },
+      { id: 'eval-hostile-reroute', definitionId: 'eval-hostile-reroute', name: 'Hostile Reroute', type: 'Character', power: 2, cost: 4, art: CARD_ART_PLACEHOLDER, effect: 'Move one opponent revealed card to another open Node.', onReveal: [{ kind: 'moveCard', opponent: true }], pool: 'Chaos', enabled: true },
+      { id: 'eval-signal-amplifier', definitionId: 'eval-signal-amplifier', name: 'Signal Amplifier', type: 'Character', power: 2, cost: 3, art: CARD_ART_PLACEHOLDER, effect: 'Add 2 Power to one of your revealed cards while it remains deployed.', onReveal: [{ kind: 'modifyPower', amount: 2 }], pool: 'Base', enabled: true },
+      { id: 'eval-power-siphon', definitionId: 'eval-power-siphon', name: 'Power Siphon', type: 'Character', power: 2, cost: 4, art: CARD_ART_PLACEHOLDER, effect: 'Subtract 2 Power from one opponent revealed card while it remains deployed.', onReveal: [{ kind: 'modifyPower', amount: -2, opponent: true }], pool: 'Chaos', enabled: true },
     ] as AuthoredCard[]).map(card=>({...card,...(card.cardClass?{}:seededCardClass(card,card.pool)?{cardClass:seededCardClass(card,card.pool)}:{})})),
     locations: EVALUATION_LOCATIONS.map(location => ({ ...structuredClone(location), enabled: true })),
     circuitRewards: EVALUATION_CIRCUIT_REWARDS.map(reward => ({ ...structuredClone(reward), enabled: true })),
@@ -139,16 +142,20 @@ function effectList(value: unknown, path: string, scope: AuthoredEffect['scope']
     const kind = item.kind;
     const kinds = scope === 'card' ? CARD_KINDS : scope === 'location' ? LOCATION_KINDS : CIRCUIT_KINDS;
     if (typeof kind !== 'string' || !kinds.has(kind)) { errors.push(`${p}.kind: unsupported ${scope} effect`); return; }
-    if (scope !== 'card') {
+    // Legacy location/circuit aliases keep the short {kind,amount} shape.
+    if ((kind === 'damageLoser' || kind === 'restorePrimary') && scope !== 'card') {
       extraFields(item, ['kind', 'amount'], p, errors);
       if (!integer(item.amount)) errors.push(`${p}.amount: expected integer from 0 to 1000000`);
       return;
     }
-    extraFields(item, ['kind', ...CARD_EFFECT_FIELDS[kind]], p, errors);
-    const amountRequired = ['draw', 'actions', 'crypto', 'drain', 'restore', 'mill', 'handDiscard', 'handTrash', 'scry', 'modifyPower'].includes(kind);
+    extraFields(item, ['kind', ...(CARD_EFFECT_FIELDS[kind] ?? []), ...(scope === 'card' ? ['chain', 'then'] : [])], p, errors);
+    if (item.chain !== undefined && typeof item.chain !== 'boolean') errors.push(`${p}.chain: expected boolean`);
+    const amountRequired = ['draw', 'actions', 'crypto', 'vp', 'drain', 'restore', 'mill', 'handDiscard', 'handTrash', 'scry', 'modifyPower', 'damageLoser', 'restorePrimary', 'trashLowestAtLocation', 'trashAtLocation', 'destroyAtLocation', 'boostPowerAtLocation'].includes(kind);
     if (amountRequired && item.amount === undefined) errors.push(`${p}.amount: required for ${kind}`);
     if (kind === 'modifyPower' && item.amount !== undefined && !integer(item.amount, -1000, 1000)) errors.push(`${p}.amount: expected integer from -1000 to 1000`);
-    else if (kind !== 'modifyPower' && item.amount !== undefined && !['probability', 'transferPower'].includes(kind) && !integer(item.amount)) errors.push(`${p}.amount: expected integer from 0 to 1000000`);
+    else if (kind === 'vp' && item.amount !== undefined && !integer(item.amount, -1000000, 1000000)) errors.push(`${p}.amount: expected integer from -1000000 to 1000000`);
+    else if (kind === 'attachModifier' && item.modifier === 'powerAuraAtLocation' && item.amount !== undefined && !integer(item.amount, 1, 1000)) errors.push(`${p}.amount: expected integer from 1 to 1000`);
+    else if (kind !== 'modifyPower' && kind !== 'vp' && kind !== 'attachModifier' && item.amount !== undefined && !['probability', 'transferPower'].includes(kind) && !integer(item.amount)) errors.push(`${p}.amount: expected integer from 0 to 1000000`);
     else if (kind !== 'modifyPower' && ['probability', 'transferPower'].includes(kind)) optionalNumber(item.amount, `${p}.amount`, errors);
     if (item.target !== undefined && !['primary', 'backup'].includes(String(item.target))) errors.push(`${p}.target: expected primary or backup`);
     if (item.opponent !== undefined && typeof item.opponent !== 'boolean') errors.push(`${p}.opponent: expected boolean`);
@@ -161,13 +168,23 @@ function effectList(value: unknown, path: string, scope: AuthoredEffect['scope']
     if (kind === 'gain' && item.amount !== undefined && !integer(item.amount,0,100)) errors.push(`${p}.amount: gain count must be an integer from 0 to 100`);
     else if (item.cardId !== undefined) requiredId(item.cardId, `${p}.cardId`, errors);
     if (item.destination !== undefined && !['top', 'discard', 'hand'].includes(String(item.destination))) errors.push(`${p}.destination: expected hand, top or discard`);
+    if (item.boardSide !== undefined && !['either', 'winner', 'loser', 'both', 'played', 'other'].includes(String(item.boardSide))) errors.push(`${p}.boardSide: expected either, winner, loser, both, played or other`);
+    if (item.cardPick !== undefined && !['choice', 'random'].includes(String(item.cardPick))) errors.push(`${p}.cardPick: expected choice or random`);
+    if (item.rank !== undefined && !['weakest', 'strongest', 'first'].includes(String(item.rank))) errors.push(`${p}.rank: expected weakest, strongest or first`);
+    if (item.cardRelation !== undefined && !['previous', 'next'].includes(String(item.cardRelation))) errors.push(`${p}.cardRelation: expected previous or next`);
+    if (item.boardHost !== undefined && typeof item.boardHost !== 'boolean') errors.push(`${p}.boardHost: expected boolean`);
+    if (item.direction !== undefined && !['choice', 'left', 'right', 'split'].includes(String(item.direction))) errors.push(`${p}.direction: expected choice, left, right or split`);
+    if (kind === 'attachModifier') {
+      if (!['doublePrintedEffects', 'powerAuraAtLocation', 'movableEachTurn'].includes(String(item.modifier))) errors.push(`${p}.modifier: expected doublePrintedEffects, powerAuraAtLocation or movableEachTurn`);
+      if (item.modifier === 'powerAuraAtLocation' && item.amount === undefined) errors.push(`${p}.amount: required for powerAuraAtLocation`);
+    }
     if(kind==='morph'){
       idList(item.formIds,`${p}.formIds`,errors);
       if(Array.isArray(item.formIds)&&!item.formIds.length)errors.push(`${p}.formIds: select at least one form card`);
       if(Array.isArray(item.formIds)&&new Set(item.formIds).size!==item.formIds.length)errors.push(`${p}.formIds: each form may appear only once`);
       if(item.selection!==undefined&&!['sequential','random'].includes(String(item.selection)))errors.push(`${p}.selection: expected sequential or random`);
     }
-    if (item.then !== undefined) effectList(item.then, `${p}.then`, 'card', errors, depth + 1);
+    if (item.then !== undefined) effectList(item.then, `${p}.then`, scope === 'card' ? 'card' : scope, errors, depth + 1);
     if (item.options !== undefined) {
       if (!Array.isArray(item.options) || item.options.length > 12 || item.options.length === 0) errors.push(`${p}.options: expected 1–12 choices`);
       else item.options.forEach((option, optionIndex) => {
@@ -176,7 +193,7 @@ function effectList(value: unknown, path: string, scope: AuthoredEffect['scope']
         extraFields(option, ['id', 'label', 'effects'], op, errors);
         requiredId(option.id, `${op}.id`, errors);
         requiredText(option.label, `${op}.label`, errors, 200);
-        effectList(option.effects, `${op}.effects`, 'card', errors, depth + 1);
+        effectList(option.effects, `${op}.effects`, scope === 'card' ? 'card' : scope, errors, depth + 1);
       });
       if (Array.isArray(item.options)) checkUnique(item.options, `${p}.options`, errors);
     } else if (kind === 'random') errors.push(`${p}.options: random effect requires explicit choices`);
@@ -224,24 +241,25 @@ export function validateContent(value: unknown): string[] {
   cards.forEach((item, index) => {
     const p = `cards[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a card object`); return; }
-    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'schedule', 'recurring', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'pool', 'enabled', 'core', 'cardClass', 'generated', 'effectRefs'], p, errors);
+    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'schedule', 'recurring', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'storyText', 'pool', 'enabled', 'cardClass', 'generated', 'effectRefs', 'modifiers', 'powerSource'], p, errors);
     requiredId(item.id, `${p}.id`, errors);
     if (item.definitionId !== undefined) requiredId(item.definitionId, `${p}.definitionId`, errors);
     requiredText(item.name, `${p}.name`, errors, 200);
     requiredText(item.art, `${p}.art`, errors, 1000);
     if (typeof item.effect !== 'string' || item.effect.length > 2000) errors.push(`${p}.effect: expected text up to 2000 characters`);
+    if (item.storyText !== undefined && (typeof item.storyText !== 'string' || item.storyText.length > 4000)) errors.push(`${p}.storyText: expected text up to 4000 characters`);
     if (!['Character', 'VP', 'Crypto'].includes(String(item.type))) errors.push(`${p}.type: expected Character, VP or Crypto`);
     if (!['Base', 'Chaos', 'VP', 'Crypto'].includes(String(item.pool))) errors.push(`${p}.pool: invalid pool`);
     if (item.type === 'Character' && !['Base', 'Chaos'].includes(String(item.pool)) || item.type === 'VP' && item.pool !== 'VP' || item.type === 'Crypto' && item.pool !== 'Crypto') errors.push(`${p}.pool: incompatible with card type`);
     if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
-    if (typeof item.core !== 'boolean') errors.push(`${p}.core: expected boolean`);
     if(item.generated!==undefined&&typeof item.generated!=='boolean')errors.push(`${p}.generated: expected boolean`);
-    if(item.generated===true&&item.core===true)errors.push(`${p}.generated: generated cards cannot be core market cards`);
-    if(item.cardClass!==undefined&&!['Action','Utility','Runtime','Attack','Hacker'].includes(String(item.cardClass)))errors.push(`${p}.cardClass: expected Action, Utility, Runtime, Attack or Hacker`);
-    if(item.cardClass==='Hacker'&&(item.type!=='Character'||item.pool!=='Chaos'))errors.push(`${p}.cardClass: Hacker cards must be Chaos Characters`);
-    if (item.core === true && item.pool === 'Chaos') errors.push(`${p}.core: Chaos cards cannot be fixed market cards`);
+    if(item.cardClass!==undefined&&!['Action','Utility','Runtime','Attack','Hacker','Horror'].includes(String(item.cardClass)))errors.push(`${p}.cardClass: expected Action, Utility, Runtime, Attack, Hacker or Horror`);
+    if(item.cardClass!==undefined&&item.type!=='Character')errors.push(`${p}.cardClass: only Characters have a class`);
+    if(item.powerSource!==undefined&&(item.type!=='Character'||!['trash','destroyed'].includes(String(item.powerSource))))errors.push(`${p}.powerSource: expected trash or destroyed on a Character`);
+    if((item.cardClass==='Hacker'||item.cardClass==='Attack'||item.cardClass==='Horror')&&(item.type!=='Character'||item.pool!=='Chaos'))errors.push(`${p}.cardClass: ${item.cardClass} cards must be Chaos Characters`);
+    if((item.cardClass==='Action'||item.cardClass==='Utility'||item.cardClass==='Runtime')&&item.type==='Character'&&item.pool==='Chaos')errors.push(`${p}.cardClass: ${item.cardClass} cards must be Base Characters`);
     if (!integer(item.cost, 0, 1000)) errors.push(`${p}.cost: expected integer from 0 to 1000`);
-    if (item.power !== undefined && !integer(item.power, 0, 1000)) errors.push(`${p}.power: expected integer from 0 to 1000`);
+    if (item.power !== undefined && !integer(item.power, -1000, 1000)) errors.push(`${p}.power: expected integer from -1000 to 1000`);
     if (item.vp !== undefined && !integer(item.vp, -1000, 1000)) errors.push(`${p}.vp: expected integer from -1000 to 1000`);
     if (item.cryptoValue !== undefined && !integer(item.cryptoValue, 0, 1000)) errors.push(`${p}.cryptoValue: expected integer from 0 to 1000`);
     if (item.type === 'Crypto' && item.cryptoValue === undefined) errors.push(`${p}.cryptoValue: Crypto cards require an explicit payout`);
@@ -276,11 +294,23 @@ export function validateContent(value: unknown): string[] {
   locations.forEach((item, index) => {
     const p = `locations[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a location object`); return; }
-    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'enabled', 'effectIds'], p, errors);
+    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'ongoing', 'onPlay', 'schedule', 'enabled', 'effectIds'], p, errors);
     requiredId(item.id, `${p}.id`, errors); requiredText(item.name, `${p}.name`, errors, 200);
     requiredText(item.rule, `${p}.rule`, errors, 2000); requiredText(item.reward, `${p}.reward`, errors, 2000);
     if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
     effectList(item.effects, `${p}.effects`, 'location', errors);
+    if (item.ongoing !== undefined) effectList(item.ongoing, `${p}.ongoing`, 'location', errors);
+    if (item.onPlay !== undefined) effectList(item.onPlay, `${p}.onPlay`, 'location', errors);
+    if (item.schedule !== undefined) {
+      if (!Array.isArray(item.schedule) || item.schedule.length > 8) errors.push(`${p}.schedule: expected up to 8 schedule entries`);
+      else item.schedule.forEach((entry: unknown, si: number) => {
+        const sp = `${p}.schedule[${si}]`;
+        if (!record(entry)) { errors.push(`${sp}: expected schedule object`); return; }
+        extraFields(entry, ['at', 'effects'], sp, errors);
+        if (![2, 3].includes(Number(entry.at))) errors.push(`${sp}.at: Location schedules use turn 2 or 3 only`);
+        effectList(entry.effects, `${sp}.effects`, 'location', errors);
+      });
+    }
     if (item.effectIds !== undefined) {
       idList(item.effectIds, `${p}.effectIds`, errors);
       if (Array.isArray(item.effectIds)) item.effectIds.forEach((ref: unknown, at: number) => checkRef(ref, 'location', `${p}.effectIds[${at}]`));
@@ -311,13 +341,12 @@ export function validateContent(value: unknown): string[] {
     if (!['card', 'location', 'circuit'].includes(String(item.scope))) errors.push(`${p}.scope: invalid scope`);
     else effectList(item.effects, `${p}.effects`, item.scope as AuthoredEffect['scope'], errors);
   });
-  const enabledCards = cards.filter(record).filter(card => card.enabled === true && card.generated !== true);
-  const count = (pool: CardPool, core?: boolean) => enabledCards.filter(card => card.pool === pool && (core === undefined || card.core === core)).length;
-  if (count('Base', true) < 4) errors.push('cards: at least 4 enabled core Base cards required');
-  if (count('Base', false) < 2) errors.push('cards: at least 2 enabled rotating Base cards required');
-  if (count('Chaos') < 3) errors.push('cards: at least 3 enabled Chaos cards required');
-  if (count('VP', true) < 3) errors.push('cards: at least 3 enabled core VP cards required');
-  if (count('Crypto', true) < 3) errors.push('cards: at least 3 enabled core Crypto cards required');
+  const draftable = cards.filter(record).filter(card => card.enabled === true && card.generated !== true);
+  const count = (pool: CardPool) => draftable.filter(card => card.pool === pool).length;
+  if (count('Base') < 6) errors.push('cards: at least 6 enabled non-Generated Base cards required (4 stable + 2 rotating)');
+  if (count('Chaos') < 4) errors.push('cards: at least 4 enabled non-Generated Chaos cards required');
+  if (count('VP') < 3) errors.push('cards: at least 3 enabled non-Generated VP cards required');
+  if (count('Crypto') < 3) errors.push('cards: at least 3 enabled non-Generated Crypto cards required');
   for (const [identity, type] of Object.entries(STARTING_DECK)) {
     const card = cards.find(item => record(item) && (item.definitionId ?? item.id) === identity);
     if (!record(card) || card.enabled !== true || card.generated === true || card.type !== type) errors.push(`cards: ${identity} is referenced by the starting deck and must remain enabled as ${type}`);
@@ -352,20 +381,37 @@ export function materializeItemRecipes(doc: ContentDocument): ContentDocument {
     if(recipe.scope!==scope)throw new Error(`Recipe ${ref} must have ${scope} scope.`);
     return structuredClone(recipe.effects);
   };
+  const normalizeEffects=(list:EvaluationEffect[]|undefined)=>{
+    if(!list)return list;
+    return list.map(effect=>{
+      if(effect.kind==='damageLoser')return {kind:'drain' as const,amount:effect.amount??1,opponent:true};
+      if(effect.kind==='restorePrimary')return {kind:'restore' as const,amount:effect.amount??1,target:'primary' as const};
+      return effect;
+    });
+  };
   for(const card of copy.cards){
     for(const hook of ['onReveal','onCollapse','recurring'] as const){
       const refs=card.effectRefs?.[hook]??[];
       if(refs.length)card[hook]=[...(card[hook]??[]),...refs.flatMap(ref=>resolve(ref,'card') as EvaluationEffect[])];
+      card[hook]=normalizeEffects(card[hook] as EvaluationEffect[]|undefined);
     }
+    if(Array.isArray(card.schedule))card.schedule=card.schedule.map(entry=>({...entry,effects:normalizeEffects([...entry.effects])??[]}));
     delete card.effectRefs;
   }
   for(const location of copy.locations){
     if(location.effectIds?.length)location.effects=[...location.effects,...location.effectIds.flatMap(ref=>resolve(ref,'location') as LocationRewardEffect[])];
+    location.effects=normalizeEffects([...location.effects]) as LocationRewardEffect[];
+    if(location.ongoing)location.ongoing=normalizeEffects([...location.ongoing]) as LocationRewardEffect[];
+    if(location.onPlay)location.onPlay=normalizeEffects([...location.onPlay]) as LocationRewardEffect[];
+    if(location.schedule)location.schedule=location.schedule.map(entry=>({...entry,effects:normalizeEffects([...entry.effects])??[]}));
     delete location.effectIds;
+    const copyText=deriveLocationText(location, copy.cards);
+    if(copyText){location.rule=copyText;location.reward=copyText;}
   }
   for(const reward of copy.circuitRewards){
     const referenced=reward.effectId?resolve(reward.effectId,'circuit') as CircuitRewardEffect[]:undefined;
     reward.effects=reward.effects!==undefined?reward.effects:referenced??(reward.effect?[reward.effect]:[]);
+    reward.effects=normalizeEffects([...(reward.effects??[])]) as CircuitRewardEffect[];
     if(reward.effects.length)reward.effect=structuredClone(reward.effects[0]);
     delete reward.effectId;
   }
@@ -378,17 +424,13 @@ export function compileContent(doc: ContentDocument): CompiledContent {
   const normalized=materializeItemRecipes(doc);
   const cardsByPool: Record<CardPool, Card[]> = { Base: [], Chaos: [], VP: [], Crypto: [] };
   const cards:CompiledContent['cards']=[];
-  const coreBaseIds: string[] = [], activeVpIds: string[] = [], activeCryptoIds: string[] = [];
   for (const authored of normalized.cards) {
     if (!authored.enabled) continue;
-    const { pool, enabled: _enabled, core, effectRefs, ...card } = structuredClone(authored);
+    const { pool, enabled: _enabled, effectRefs, ...card } = structuredClone(authored);
+    for (const hook of ['onReveal', 'onCollapse', 'recurring'] as const) if (card[hook]) card[hook] = compileChains(card[hook]!);
+    if (card.schedule) card.schedule = card.schedule.map(entry => ({ ...entry, effects: compileChains(entry.effects) }));
     cards.push(card);
-    if(card.generated)continue;
-    cardsByPool[pool].push(card);
-    const identity = card.definitionId ?? card.id;
-    if (core && pool === 'Base') coreBaseIds.push(identity);
-    if (core && pool === 'VP') activeVpIds.push(identity);
-    if (core && pool === 'Crypto') activeCryptoIds.push(identity);
+    if (!card.generated) cardsByPool[pool].push(card);
   }
   const locations = normalized.locations.filter(location => location.enabled).map(authored => {
     const { enabled: _enabled, effectIds, ...location } = structuredClone(authored);
@@ -398,5 +440,5 @@ export function compileContent(doc: ContentDocument): CompiledContent {
     const { enabled: _enabled, effectId, ...reward } = structuredClone(authored);
     return {...reward,effect:reward.effects![0]};
   });
-  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, coreBaseIds, activeVpIds, activeCryptoIds, locations, circuitRewards };
+  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, locations, circuitRewards };
 }

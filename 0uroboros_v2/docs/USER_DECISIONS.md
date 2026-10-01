@@ -11,7 +11,7 @@ The current user request supersedes earlier percentage/weighted-selection decisi
 - The user approved temporary new Character Power = ceil(cost/2), clamped from 1 to 5, and VP Power = VP value. Existing assigned Power stays intact.
 - Allow placements at unopened Nodes; the guide's deferred-reveal rule applies. Current-turn local cards are face up until End Turn; committed cards at unopened Nodes stay concealed until opening.
 - Add a text-only Undo all actions control below the Effect Bank, active after the first placement and unavailable after End Turn.
-- New board direction: cyberpunk/occult geometry, longer player lanes, integrated diamond Power displays, aligned wallet/storage housings, and animated glowing gel Data Centers whose illumination follows integrity. Location award ripples belong only to the winning side, or both sides for a tie.
+- New board direction: cyberpunk/occult geometry, longer player lanes, integrated diamond Power displays, aligned wallet/storage housings, and animated glowing gel Servers whose illumination follows integrity. Location award ripples belong only to the winning side, or both sides for a tie.
 
 Earlier entries below are retained as decision history, not current authority when they conflict with this override.
 
@@ -51,7 +51,7 @@ This approval supersedes the earlier content block for this evaluation pack only
 - User selected: show all five drawn cards together initially, then move Crypto cards to the cache. This changes presentation, not the five-card draw rule or deck composition.
 - Remove redundant per-card reveal/effect narration boxes; keep causal animations and the optional history log.
 - Closed Node plaques use the concept's N1–N5 notation; existing opening schedule and hidden-content rules remain.
-- Crypto cache uses stacked physical card faces. Data Centers use illuminated shader tubes, board lighting, and animated integrity drain/fill.
+- Crypto cache uses stacked physical card faces. Servers use illuminated shader tubes, board lighting, and animated integrity drain/fill.
 
 ## Randomized Node opening and weight placement — 2026-09-23 UTC
 
@@ -59,10 +59,10 @@ User replaces the fixed Nodes 1–3 / Node 4 / Node 5 schedule. At the start of 
 
 ## Resource palette and board HUD — 2026-09-23 UTC
 
-- Gold: VP and Data Center healing. Green: Crypto. Blue: card draws. Cyan: earned Actions.
+- Gold: VP and Server healing. Green: Crypto. Blue: card draws. Cyan: earned Actions.
 - Remove card-type overlays from card art.
 - Node Power shows only its number in the authored socket: no Power icon, equals sign, priority icon, or duplicate overlay frame.
-- Move database icons from the integrity number to the Data Center name, sized to the label. Keep integrity readouts outside the illuminated tube.
+- Move database icons from the integrity number to the Server name, sized to the label. Keep integrity readouts outside the illuminated tube.
 - Player stats run left-to-right Actions, Crypto, VP, with labels underneath each icon/value pair. VP uses supplied icon-volume.svg.
 - During resolution, the Action number displays current plus earned pending Actions; no '+1 next' suffix. This presentation change preserves next-turn Action availability. Crypto updates its counter directly. No additional floating Action/Crypto text appears.
 - Initial three Node openings start 800ms apart in the sampled random order (900, 1700, 2500ms after the deal begins).
@@ -71,13 +71,13 @@ User replaces the fixed Nodes 1–3 / Node 4 / Node 5 schedule. At the start of 
 
 - A dragged card should move seamlessly from the hand and follow the pointer. The entire vertical player-side lane beneath a Node accepts a legal drop; the compact card placement area stays the same.
 - Illuminate only the hovered drop lane and its Location. At rest, illuminate the side currently winning each Location. Remove the red lane lines.
-- Move the board upward, giving the hand and player stats more breathing room. Lower the player's Data Center housings so they clear the percentages.
+- Move the board upward, giving the hand and player stats more breathing room. Lower the player's Server housings so they clear the percentages.
 - Use concept-like percentage plates and restore rhombus Power mounts in place of red circular displays.
 
 ## Card travel, closure and Runtime timers — 2026-09-23 UTC
 
 - Drawn cards physically enter the hand from the left. Crypto first enters the hand, pauses, then moves to the visible Crypto Wallet. At Draft its stacked cards travel to the Crypto stat as their amounts are credited.
-- Lower and space the green Crypto Wallet with its top aligned to the hand's arch. Match both players' Data Center heights and flash attacked centers red. Remove stat-screen shine.
+- Lower and space the green Crypto Wallet with its top aligned to the hand's arch. Match both players' Server heights and flash attacked centers red. Remove stat-screen shine.
 - End Turn is one integrated countdown control, with a concept-like depleted/remaining color split. Runtime duration is configurable/TBD, shared by all three turns; no standard seconds value is authorized. Early End Turn is allowed.
 - A no-input timeout ends the turn and makes the next decision countdown 1.25× faster until input. Two consecutive no-input Runtime turns cause automatic concession. The penalty never accelerates presentation or server resolution.
 - First disconnect: up to 20 seconds of timer pause/Waiting, then forfeit without reconnect. Second disconnect: no pause. Third: forfeit. These are network requirements, not a claim that the offline evaluator implements multiplayer.

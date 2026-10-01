@@ -1,0 +1,208 @@
+{
+  "generatedAt": "2026-10-01T01:01:24.101Z",
+  "base": "http://127.0.0.1:5173",
+  "uncapped": true,
+  "viewport": "1440x900@2x",
+  "rows": [
+    {
+      "id": "baseline",
+      "fps": 114,
+      "frameMs": {
+        "p50": 7.5,
+        "p95": 20.7,
+        "p99": 26.9,
+        "max": 30.9
+      },
+      "gpuMsPerFrame": {
+        "samples": 434,
+        "p50": 19.6,
+        "p95": 30.02,
+        "max": 48.53
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 7.2,
+        "p95": 15.2,
+        "max": 22.5
+      },
+      "drawCalls": {
+        "p50": 206,
+        "max": 429
+      }
+    },
+    {
+      "id": "no-bloom",
+      "fps": 133.7,
+      "frameMs": {
+        "p50": 6.5,
+        "p95": 13.3,
+        "p99": 25.3,
+        "max": 42.4
+      },
+      "gpuMsPerFrame": {
+        "samples": 511,
+        "p50": 12.12,
+        "p95": 17.34,
+        "max": 29.16
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 6.1,
+        "p95": 11.8,
+        "max": 50.8
+      },
+      "drawCalls": {
+        "p50": 193,
+        "max": 416
+      }
+    },
+    {
+      "id": "composer-no-msaa",
+      "fps": 174.6,
+      "frameMs": {
+        "p50": 4.9,
+        "p95": 12.3,
+        "p99": 21.8,
+        "max": 28.4
+      },
+      "gpuMsPerFrame": {
+        "samples": 674,
+        "p50": 11.82,
+        "p95": 21.74,
+        "max": 26.24
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 4.7,
+        "p95": 10.8,
+        "max": 15.9
+      },
+      "drawCalls": {
+        "p50": 206,
+        "max": 429
+      }
+    },
+    {
+      "id": "shadows-frozen",
+      "fps": 119.8,
+      "frameMs": {
+        "p50": 7.2,
+        "p95": 18.5,
+        "p99": 24.8,
+        "max": 30.9
+      },
+      "gpuMsPerFrame": {
+        "samples": 455,
+        "p50": 18.39,
+        "p95": 28.45,
+        "max": 36.69
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 6.9,
+        "p95": 14.1,
+        "max": 24.2
+      },
+      "drawCalls": {
+        "p50": 149,
+        "max": 311
+      }
+    },
+    {
+      "id": "composer-dpr-1",
+      "fps": 116.5,
+      "frameMs": {
+        "p50": 7.2,
+        "p95": 23.4,
+        "p99": 27.3,
+        "max": 29.9
+      },
+      "gpuMsPerFrame": {
+        "samples": 445,
+        "p50": 18.86,
+        "p95": 28.99,
+        "max": 50.1
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 6.8,
+        "p95": 16.8,
+        "max": 23.7
+      },
+      "drawCalls": {
+        "p50": 206,
+        "max": 429
+      }
+    },
+    {
+      "id": "point-lights-off",
+      "fps": 203.1,
+      "frameMs": {
+        "p50": 4,
+        "p95": 13.5,
+        "p99": 19.3,
+        "max": 21.4
+      },
+      "gpuMsPerFrame": {
+        "samples": 791,
+        "p50": 8.58,
+        "p95": 19.59,
+        "max": 40.91
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 3.7,
+        "p95": 10.7,
+        "max": 15.2
+      },
+      "drawCalls": {
+        "p50": 206,
+        "max": 429
+      }
+    },
+    {
+      "id": "rect-lights-off",
+      "fps": 223.3,
+      "frameMs": {
+        "p50": 3.3,
+        "p95": 10.4,
+        "p99": 20.6,
+        "max": 42.1
+      },
+      "gpuMsPerFrame": {
+        "samples": 872,
+        "p50": 7.54,
+        "p95": 18.12,
+        "max": 31.43
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 3,
+        "p95": 9.7,
+        "max": 14.8
+      },
+      "drawCalls": {
+        "p50": 206,
+        "max": 429
+      }
+    },
+    {
+      "id": "low-tier-combined",
+      "fps": 562.8,
+      "frameMs": {
+        "p50": 1.2,
+        "p95": 3.6,
+        "p99": 7,
+        "max": 33.9
+      },
+      "gpuMsPerFrame": {
+        "samples": 2258,
+        "p50": 0.78,
+        "p95": 3.61,
+        "max": 14.63
+      },
+      "mainThreadMsPerFrame": {
+        "p50": 1,
+        "p95": 2.8,
+        "max": 6.8
+      },
+      "drawCalls": {
+        "p50": 136,
+        "max": 298
+      }
+    }
+  ]
+}

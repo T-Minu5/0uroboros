@@ -54,11 +54,11 @@ Browser verification of randomized setup: two complete Cycles (normal then fast 
 
 Gold now identifies VP and healing; green Crypto; blue draws; cyan Actions. This applies to player counters, effect paths, localized pulses, healing tube illumination, card placeholders, Location reward tokens and acquisition prices. VP uses the supplied volume icon. Each console presents Actions / Crypto / VP as three icon-value pairs with labels below. Earned pending Actions are included in the displayed counter during resolution; their spend timing is unchanged. Actions and Crypto no longer add floating text or '+next' suffixes.
 
-Card-type art overlays and Node Power/priority/equality icons were removed. Power numbers now sit directly over the authored sockets. Database icons moved to Data Center names at label size, with the name/value row above the far tubes and below the near tubes, avoiding opaque number plaques over the energy surface.
+Card-type art overlays and Node Power/priority/equality icons were removed. Power numbers now sit directly over the authored sockets. Database icons moved to Server names at label size, with the name/value row above the far tubes and below the near tubes, avoiding opaque number plaques over the energy surface.
 
 The first three randomly chosen Nodes open at 900, 1700 and 2500ms. Browser observation measured adjacent intervals of 794 and 812ms (render-frame variation around the requested 800ms). Two full Cycles passed with 14 deployments, two purchases, all four observed effect color checks, no marker overlap, and zero browser exceptions. All 56 engine/presentation tests and the production build pass. Final visual evidence: resource-hud-final.png.
 
 
 ## Board material and perimeter pass
 
-The client now loads the versioned Blender V2 board with layered perimeter geometry, original procedural surface maps, distinct metal/polymer/glass materials, rectangular Data Center lights, soft contact grounding and restrained bloom. Approved center Node plaques, text and reveal timing remain intact. Smaller-window review corrected far-score clipping with raised physical score mounts. Full work, iteration evidence, source links and validation limits are recorded in `BOARD_LOOKDEV_V2.md`.
+The client now loads the versioned Blender V2 board with layered perimeter geometry, original procedural surface maps, distinct metal/polymer/glass materials, rectangular Server lights, soft contact grounding and restrained bloom. Approved center Node plaques, text and reveal timing remain intact. Smaller-window review corrected far-score clipping with raised physical score mounts. Full work, iteration evidence, source links and validation limits are recorded in `BOARD_LOOKDEV_V2.md`.

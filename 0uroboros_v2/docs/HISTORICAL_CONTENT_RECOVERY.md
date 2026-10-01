@@ -50,9 +50,9 @@ Important recovered implementation semantics: `../0uroboros/src/game/engine/prob
 
 ### Breach relay — `breach_relay`
 
-Exact text: “On collapse, the loser takes 200 Data Center damage.”
+Exact text: “On collapse, the loser takes 200 Server damage.”
 
-Operation: `damageDataCenter`, amount 200, target `nodeLoser`, no explicit Data Center override. Historical implementation uses available Primary first, then Backup, with no overkill spill. A tied Node has no loser, so no target/damage. The damage is winner-dependent and therefore resolves in the reward stage after final comparison, not in initial Location text resolution.
+Operation: `damageServer`, amount 200, target `nodeLoser`, no explicit Server override. Historical implementation uses available Primary first, then Backup, with no overkill spill. A tied Node has no loser, so no target/damage. The damage is winner-dependent and therefore resolves in the reward stage after final comparison, not in initial Location text resolution.
 
 Adoption must include proper Collapse lethal handling: finish this Node including all awards, then stop later Nodes, skip Circuit selection and Draft. The current starter-only engine does not yet implement Location-triggered lethal Collapse.
 
@@ -104,9 +104,9 @@ Dependency: Monolith core is a fixture Base card, Power 9, printed card cost 8, 
 
 ### Integrity patch — `integrity_patch`
 
-Exact text: “Heal 400 to your Primary Data Center.”
+Exact text: “Heal 400 to your Primary Server.”
 
-On-acquire operation: `healDataCenter`, amount 400, target self, explicit `dataCenter: 'primary'`. Destination: claimant's Primary integrity, clamped at maximum. Historical claim cost: 0. Explicit destroyed Primary produces no heal; it does **not** fall back to Backup. Do not silently change this to generic “Restore 400,” which has different targeting under current rules.
+On-acquire operation: `healServer`, amount 400, target self, explicit `server: 'primary'`. Destination: claimant's Primary integrity, clamped at maximum. Historical claim cost: 0. Explicit destroyed Primary produces no heal; it does **not** fall back to Backup. Do not silently change this to generic “Restore 400,” which has different targeting under current rules.
 
 ## Starting selection and pool evidence
 
@@ -126,7 +126,7 @@ Proposed five-Location pool, shuffled once each into the five Nodes every Cycle:
 2. **Occult archive:** “On collapse, the winner gains 2 Victory Points.” Reward phase after final Power; tied players each gain 2 earned VP.
 3. **Quantum commons:** “On collapse, the winner gains 1 Crypto and 1 Victory Point.” Reward phase after final Power; tied players each gain both benefits, Crypto first then earned VP.
 4. **Signal tower:** “On collapse, the winner draws 1 card.” Reward phase after final Power; tied players each draw 1 into Hand, with normal reshuffle and same-Cycle cleanup. Drawn Crypto may enter the upcoming Draft Wallet.
-5. **Breach relay:** “On collapse, the loser takes 200 Data Center damage.” Outcome-dependent reward phase AFTER card onCollapse and final Power comparison, using the final loser. A tie has no loser, therefore no damage. Generic Primary-first/Backup-fallback damage, no spill. No target choice. If this destroys both Data Centers, complete the current Node and awards, stop later Nodes, skip Circuit selection and Draft, score VP.
+5. **Breach relay:** “On collapse, the loser takes 200 Server damage.” Outcome-dependent reward phase AFTER card onCollapse and final Power comparison, using the final loser. A tie has no loser, therefore no damage. Generic Primary-first/Backup-fallback damage, no spill. No target choice. If this destroys both Servers, complete the current Node and awards, stop later Nodes, skip Circuit selection and Draft, score VP.
 
 The exact words “On collapse” in these fixture definitions do not mean they all execute in the initial Location-text stage: historical `dependsOnNodeOutcome` delays winner/loser-dependent operations until the Location Reward phase. Current canonical Location→cards→Power→winner→reward ordering takes precedence. For these five fixtures the initial Location stage can announce its rule; the actual outcome-dependent consequence belongs to the later reward stage.
 
@@ -134,7 +134,7 @@ Proposed three-Circuit-Reward pool, select one randomly each Cycle and offer it 
 
 - **Quantum dividend:** “Gain 5 Crypto for this Draft.” Free claim; +5 to claimant's current Wallet.
 - **Serpent crown:** “Gain 4 Victory Points.” Free claim; +4 persistent earned VP.
-- **Integrity patch:** “Heal 400 to your Primary Data Center.” Free claim; heal claimant's Primary only, clamped at maximum. Destroyed Primary cannot heal and does not redirect to Backup.
+- **Integrity patch:** “Heal 400 to your Primary Server.” Free claim; heal claimant's Primary only, clamped at maximum. Destroyed Primary cannot heal and does not redirect to Backup.
 
 Each eligible player may optionally claim once during the Draft window; ties give both players an independent claim. Reward claims consume no normal market stock and cost 0 in the recovered implementation. The zero claim cost, optionality, multiplicity, random pool selection and shuffled Location assignment should be included explicitly in the evaluation approval.
 

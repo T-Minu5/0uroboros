@@ -18,7 +18,7 @@ Mel's current explicit decision permits unused Actions to carry between Runtime 
 
 Mel has now explicitly approved higher ControlledWeight receiving next reveal priority. Equal ControlledWeight retains current priority. The engine keeps a required policy parameter for deterministic tests; the user-facing session must use `higher`. This current decision resolves the clean-start package's omitted priority direction.
 
-Mel has now explicitly approved Vault Encryption scoring VP = 2, separate from its Power 2. Live total VP counts Vault Encryption in active owned Draw, Hand, Discard and Node zones, plus Data Center destruction awards. Destroyed cards are excluded. Final scoring selects the higher total or reports a tie, including after Data Center destruction.
+Mel has now explicitly approved Vault Encryption scoring VP = 2, separate from its Power 2. Live total VP counts Vault Encryption in active owned Draw, Hand, Discard and Node zones, plus Server destruction awards. Destroyed cards are excluded. Final scoring selects the higher total or reports a tie, including after Server destruction.
 
 ## Verified implemented behavior
 
@@ -31,7 +31,7 @@ Mel has now explicitly approved Vault Encryption scoring VP = 2, separate from i
 - Global priority alternating each player's chronological eligible cards; one reveal followed by its ordered effects before the next reveal.
 - Starter draw, delayed Actions, Crypto, Drain and Restore effects.
 - Generic Drain targets available Primary then Backup, clamps at zero, does not spill over, awards 8 or 12 VP once.
-- Restore uses available Primary then Backup, clamps at maximum, cannot resurrect a destroyed Data Center.
+- Restore uses available Primary then Backup, clamps at maximum, cannot resurrect a destroyed Server.
 - Higher numeric Power controls even when negative; ties split ControlledWeight.
 - Probability transfer preserves total and source floor, half-percent increments; selection chooses one Node and excludes zero-weight Nodes.
 - Collapse event order: each Node's Location stage, card stage, Power/winner stage, Location Reward stage; Effect Bank stage; separate probabilistic Circuit selection.
@@ -70,7 +70,7 @@ This is a local single-process prototype, not secure network isolation. Authorit
 
 Coverage includes three repeated Cycles and the normal sixteen-Cycle end sequence; purchase persistence; mirrored opening; exact cleanup ordering; delayed/expired Actions; clamped source-target effect data; destroyed-center awards; no fabricated empty-market offerings; and 12 seeded three-Cycle play runs with legal deployments by both players.
 
-After every queued event in those seeded runs, tests verify ownership count, unique card instances, four-card capacity, nonnegative Actions, bounded Data Center integrity and hidden-information shape. Snapshot isolation is tested separately.
+After every queued event in those seeded runs, tests verify ownership count, unique card instances, four-card capacity, nonnegative Actions, bounded Server integrity and hidden-information shape. Snapshot isolation is tested separately.
 
 Additional approved-scoring tests cover active zones versus Destroyed, final-Draft Vault acquisition, tied totals, and a lethal attack where the player whose centers were destroyed still wins on VP.
 
@@ -86,6 +86,6 @@ Historic cards have explicit Runtime-turn schedules, including start/end timing.
 
 New implemented primitives: optional exact discard payments; mandatory hand discard/trash; scoped opposing-hand choices; optional inspection/discard of the available top cards; named Coin gains to deck top; own Backup destruction without opponent destruction VP; random listed branches; and own Power transfers. Each choice and scheduled effect uses the same presentation/input barrier. Evaluation-only catalog injection uses unique instances and is unavailable after planning starts.
 
-Targeted Data Center effects now obey existing no-revival and one-time destruction-award rules. Self-destruction of the final surviving center ends Runtime; Collapse still completes its current Node before stopping.
+Targeted Server effects now obey existing no-revival and one-time destruction-award rules. Self-destruction of the final surviving center ends Runtime; Collapse still completes its current Node before stopping.
 
 Verification at this revision: 185 tests pass. Every one of the 74 active definitions executes through four Cycles with legal choices, finite resources, unique instances, complete ownership conservation including generated Coins, Bank capacity, and finite timer expiry checked. Additional tests assert exact delayed Mega-Cache timing, permanent healing, optional-payment completion, scoped hand privacy, trash VP removal, scry order, cross-Cycle scheduled Actions/draws, unopened reveal sequencing, undo fidelity, and Circuit/priority ties. These fixtures validate the local engine; they do not claim multiplayer authority or final card balance.

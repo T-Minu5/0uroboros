@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
+import { openSettings, useSetting } from './settings-menu.mjs';
 import { mkdir } from 'node:fs/promises';
 
 const browser=await chromium.launch({headless:true,channel:'chrome'});
@@ -10,6 +11,7 @@ await page.addInitScript(()=>{let seed=341;Math.random=()=>{seed=(Math.imul(seed
 const handCard=name=>page.locator('.hand-card').filter({has:page.locator('.card-name',{hasText:name})});
 const fieldCard=id=>page.locator(`.field-card[data-card-id="${id}"]`);
 async function add(name,id){
+ await openSettings(page);
  await page.getByRole('button',{name:'Card catalog',exact:true}).click();
  await page.getByRole('searchbox').fill(name);
  await page.locator(`[data-catalog-id="${id}"]`).getByRole('button',{name:'Add to test hand',exact:true}).click();
@@ -36,7 +38,7 @@ try{
  await page.goto('http://127.0.0.1:5173/');
  await page.getByRole('button',{name:/Enter evaluation build/}).click({timeout:60000});
  await page.getByRole('button',{name:'End Turn',exact:true}).waitFor();
- await page.getByRole('button',{name:'Normal pace',exact:true}).click();
+ await useSetting(page,'Normal pace',{exact:true});
  const amplifierId=await add('Signal Amplifier','eval-signal-amplifier');
  await add('Relocation Relay','eval-relocation-relay');
  const node=Number(await page.locator('button.location-plate').first().getAttribute('data-location-node'));

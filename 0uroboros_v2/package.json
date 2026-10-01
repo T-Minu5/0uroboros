@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run depth:check && tsc --noEmit && vite build",
+    "depth:setup": "bash tools/depth/setup.sh",
+    "depth:build": "node scripts/build-depth.ts",
+    "depth:check": "node scripts/build-depth.ts --check",
+    "test:depth-art": "node scripts/depth-art-smoke.mjs",
     "test": "vitest run",
     "test:browser": "node scripts/browser-smoke.mjs",
     "test:pointer": "node scripts/board-pointer-smoke.mjs",
@@ -16,12 +20,16 @@
     "test:draft-layout": "node scripts/draft-layout-smoke.mjs",
     "test:authoring": "node scripts/authoring-browser-smoke.mjs",
     "test:card-effects": "node scripts/card-effects-browser-smoke.mjs",
-    "test:card-styles": "node scripts/card-style-browser-smoke.mjs"
+    "test:card-styles": "node scripts/card-style-browser-smoke.mjs",
+    "test:perf": "node scripts/perf-probe.mjs"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.8.0",
     "@vitejs/plugin-react": "^5.1.1",
+    "gsap": "^3.15.0",
+    "html-to-image": "^1.11.13",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "three": "^0.186.0",

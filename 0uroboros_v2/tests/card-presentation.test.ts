@@ -11,17 +11,18 @@ const sample: Card = { id: 'sample', name: 'Sample Card', type: 'Character', cos
 
 describe('shared card presentation', () => {
   it('uses authored classes and historic printed tags for all six styles', () => {
-    expect(cardPresentation(historic('sudo-demiurge')).style).toBe('hacker');
+    expect(cardPresentation(historic('sudo-demiurge')).style).toBe('horror');
     expect(cardPresentation(historic('atomic-unit')).style).toBe('action');
     expect(cardPresentation(historic('rezz-razor')).style).toBe('attack');
     expect(cardPresentation(historic('night-scythe')).style).toBe('utility');
     expect(cardPresentation(historic('byte-coin')).style).toBe('crypto');
     expect(cardPresentation(historic('basic-encryption')).style).toBe('vp');
-    expect(cardPresentation({ ...sample, cardClass: 'Runtime' }).style).toBe('action');
+    expect(cardPresentation({ ...sample, cardClass: 'Runtime' }).style).toBe('runtime');
     expect(cardPresentation({ ...sample, cardClass: 'Hacker', generated: true }).style).toBe('hacker');
     expect(cardPresentation({ ...sample, type: 'Crypto', cardClass: 'Hacker', generated: true }).style).toBe('crypto');
     expect(cardPresentation({ ...sample, onReveal: [{ kind: 'drain', amount: 50 }] }).style).toBe('utility');
     expect(cardPresentation({ ...sample, cardClass: 'Action' }).icon).toBe('/assets/Icons/icon-runtime.svg');
+    expect(cardPresentation({ ...sample, cardClass: 'Runtime' })).toEqual({ style: 'runtime', icon: '/assets/Icons/icon-runtime-new.svg' });
   });
 
   it('preserves art and shows cost only in Draft', () => {
@@ -38,6 +39,18 @@ describe('shared card presentation', () => {
     const compact = renderToStaticMarkup(createElement(CardFace, { card: sample, compact: true }));
     expect(compact).toContain('cf-card--compact');
     expect(compact).not.toContain('card-name');
+    const badged = renderToStaticMarkup(createElement(CardFace, {
+      card: { ...sample, modifiers: [
+        { id: 'a', kind: 'doublePrintedEffects' },
+        { id: 'b', kind: 'powerAuraAtLocation', amount: 1 },
+        { id: 'c', kind: 'movableEachTurn' },
+      ] },
+      movableCue: true,
+    }));
+    expect(badged).toContain('[x2]');
+    expect(badged).toContain('[+1]');
+    expect(badged).toContain('[↔]');
+    expect(badged).toContain('cf-card--movable');
   });
 
   it('uses explicit remaining Duration including zero and distinguishes changed Power', () => {

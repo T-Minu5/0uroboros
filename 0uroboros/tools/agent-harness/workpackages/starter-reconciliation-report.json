@@ -1,0 +1,393 @@
+{
+  "execution_authorized": false,
+  "execution_status": "NOT_EXECUTED",
+  "readiness": "NOT_READY",
+  "stop_reason": "REVISE_AFTER_FINAL_ROUND",
+  "rounds_used": 3,
+  "rounds": [
+    {
+      "round": 1,
+      "run_id": "run-2026-09-07T18-53-40-954Z-35e345ce",
+      "artifact_dir": "/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros/tools/agent-harness/runs/run-2026-09-07T18-53-40-954Z-35e345ce",
+      "specialists_consulted": [
+        "Lead Engineering",
+        "Systems / Rules"
+      ],
+      "reviewer_invoked": true,
+      "verdict": "REVISE",
+      "summary": "The implementation mismatches are supported, but the WorkPackage is not executable as written because required Drain semantics and Action lifecycle/carryover semantics are absent or unresolved while the package still requires their implementation and testing.",
+      "findings": [
+        {
+          "kind": "MISSING_ACCEPTANCE_CRITERIA",
+          "summary": "Required Action initialization, reset, configurable carryover, and deferred-gain lifecycle behavior are unresolved.",
+          "evidence": [
+            "Dependencies explicitly require approved Action initialization, reset, carryover, and cross-cycle treatment.",
+            "RULE-ACTION-003 makes Runtime-turn carryover configurable and forbids cross-cycle carryover, but no configuration/default behavior is supplied.",
+            "Acceptance criteria require exact turn grants and next-Runtime activation despite these unresolved lifecycle dependencies."
+          ]
+        },
+        {
+          "kind": "MISSING_ACCEPTANCE_CRITERIA",
+          "summary": "Drain implementation cannot be certified from the supplied canonical excerpts.",
+          "evidence": [
+            "The package requires approved Drain 75/100 behavior.",
+            "Systems findings state authoritative Drain rules RULE-DATA-001, RULE-DATA-003, RULE-DATA-004, and RULE-DATA-008 were omitted.",
+            "The WorkPackage itself instructs the executor to obtain approved Drain semantics before implementation or certification."
+          ]
+        },
+        {
+          "kind": "SCOPE_MISMATCH",
+          "summary": "The WorkPackage scope and files_or_domains_allowed arrays include prose requirements rather than only bounded files or domains, weakening enforceable write scope.",
+          "evidence": [
+            "Both arrays contain full implementation instructions alongside file paths.",
+            "The executor STOP condition depends on writes remaining within authorized scope."
+          ]
+        }
+      ],
+      "required_revisions": [
+        "Supply the authoritative Drain rules needed for implementation and tests, or remove Drain implementation from this package and explicitly block completion.",
+        "Resolve and specify Action initialization, reset, configurable carryover/default, cross-cycle clearing, and deferred-gain activation before authorizing execution.",
+        "Normalize scope to explicit files/domains; keep behavioral instructions in objectives or acceptance criteria.",
+        "Remove unresolved full-Primary Restore testing from required completion or obtain the applicable authoritative rule first."
+      ],
+      "packet_error": null,
+      "errors": [],
+      "work_package_id": "wp-run-2026-09-07T18-53-40-954Z-35e345ce-1",
+      "execution_authorized": false
+    },
+    {
+      "round": 2,
+      "run_id": "run-2026-09-07T18-56-10-942Z-9bd0bbce",
+      "artifact_dir": "/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros/tools/agent-harness/runs/run-2026-09-07T18-56-10-942Z-9bd0bbce",
+      "specialists_consulted": [
+        "Lead Engineering",
+        "Systems / Rules"
+      ],
+      "reviewer_invoked": true,
+      "verdict": "REVISE",
+      "summary": "The WorkPackage remains blocked and is not execution-ready. It correctly excludes Drain resolution and full-Primary Restore fallback, but unresolved Action lifecycle semantics remain mandatory, and write scope is still polluted with behavioral prose.",
+      "findings": [
+        {
+          "kind": "MISSING_ACCEPTANCE_CRITERIA",
+          "summary": "Authoritative Action initialization, reset boundaries, carryover default/configuration, cross-cycle clearing, and final-turn deferred-gain disposition remain unresolved.",
+          "evidence": [
+            "RULE-ACTION-003 only states that carryover is configurable and forbidden between Cycles.",
+            "The dependencies explicitly require an authoritative Action lifecycle specification before execution.",
+            "Mandatory tests are conditioned on later authoritative lifecycle resolution."
+          ]
+        },
+        {
+          "kind": "SCOPE_MISMATCH",
+          "summary": "scope and files_or_domains_allowed still contain behavioral requirements rather than bounded files or domains.",
+          "evidence": [
+            "Entries include “Game engine: Action state initialization and lifecycle” and “Tests: Action economy and lifecycle.”"
+          ]
+        },
+        {
+          "kind": "TECHNICAL_RISK",
+          "summary": "Restore fallback cannot be implemented or certified for a destroyed Primary from the supplied excerpts.",
+          "evidence": [
+            "The package depends on an authoritative destroyed-Primary eligibility ruling.",
+            "Full-Primary fallback and overflow tests are excluded, but generic Restore fallback remains in stated scope."
+          ]
+        },
+        {
+          "kind": "NO_MATERIAL_ISSUE",
+          "summary": "Drain resolution is appropriately excluded pending separate authoritative semantics and authorization.",
+          "evidence": [
+            "Tests retain Drain metadata only and explicitly exclude Drain resolution coverage.",
+            "Dependencies require separately authorized Drain implementation before complete starter certification."
+          ]
+        }
+      ],
+      "required_revisions": [
+        "Restrict scope and files_or_domains_allowed to explicit file paths or precisely bounded code domains; move behavioral prose to objectives, acceptance criteria, or tests.",
+        "Keep execution blocked until authoritative Action lifecycle semantics are supplied and converted into unconditional acceptance criteria and tests.",
+        "Remove destroyed-Primary Restore fallback implementation from this package, or supply the applicable authoritative eligibility rule before authorization.",
+        "Clarify that this package can implement starter metadata but cannot claim complete starter behavior certification without Drain resolution."
+      ],
+      "packet_error": null,
+      "errors": [],
+      "work_package_id": "wp-run-2026-09-07T18-56-10-942Z-9bd0bbce-1",
+      "execution_authorized": false
+    },
+    {
+      "round": 3,
+      "run_id": "run-2026-09-07T18-58-47-812Z-1d48994c",
+      "artifact_dir": "/Users/t-minus/Dropbox/00_AI Projects/Card_IO/0uroboros/tools/agent-harness/runs/run-2026-09-07T18-58-47-812Z-1d48994c",
+      "specialists_consulted": [
+        "Lead Engineering",
+        "Systems / Rules"
+      ],
+      "reviewer_invoked": true,
+      "verdict": "REVISE",
+      "summary": "The implementation mismatches are evidenced, but the WorkPackage remains unauthorizable. The approved starter rules enumerate only nine cards against the required ten, Action lifecycle semantics remain incomplete, scope is duplicated and not precisely bounded, and Restore fallback remains included despite its stated exclusion.",
+      "findings": [
+        {
+          "kind": "IMPLEMENTATION_MISMATCH",
+          "summary": "Repository deck composition and starter definitions do not conform to the supplied canonical rules.",
+          "evidence": [
+            "STARTING_DECK is harness-verified as 4 Character / 4 Crypto / 2 VP, conflicting with RULE-DECK-001.",
+            "Approved starter names are absent from harness-verified CARD_DEFINITIONS.",
+            "PlayerState has no Actions field or gainActions operation despite applicable Action and deployment rules."
+          ]
+        },
+        {
+          "kind": "CANONICAL_CONFLICT",
+          "summary": "RULE-DECK-001 requires ten cards, but RULE-STARTER-001 through RULE-STARTER-008 specify only nine: five Characters, three Crypto, and two VP.",
+          "evidence": [
+            "Five singular Characters are specified by RULE-STARTER-001 through RULE-STARTER-005.",
+            "RULE-STARTER-006 specifies two VP; RULE-STARTER-007 and RULE-STARTER-008 specify three Crypto.",
+            "The resulting roster is 5/3/2 by family but totals nine, so the tenth identity or multiplicity cannot be inferred."
+          ]
+        },
+        {
+          "kind": "MISSING_ACCEPTANCE_CRITERIA",
+          "summary": "Action lifecycle behavior is not fully authoritative or expressed as unconditional expected results.",
+          "evidence": [
+            "RULE-ACTION-003 says carryover is configurable but supplies no default or supported configuration contract.",
+            "Initialization, reset boundaries, unused balance handling, cross-cycle clearing mechanics, and final-turn deferred gains remain unresolved.",
+            "Tests explicitly defer these cases to a pre-authorization blocker."
+          ]
+        },
+        {
+          "kind": "SCOPE_MISMATCH",
+          "summary": "Scope and files_or_domains_allowed are duplicated and mix concrete paths with behavioral prose and unresolved entry-point descriptions.",
+          "evidence": [
+            "Both lists repeat paths and descriptions such as “Existing engine card-deployment entry point — Action eligibility and accounting branches only.”",
+            "The package dependency itself requires deterministic mapping to concrete paths and symbols before authorization."
+          ]
+        },
+        {
+          "kind": "SCOPE_MISMATCH",
+          "summary": "Destroyed-Primary Restore fallback remains in acceptance criteria and tests despite being expressly excluded from this revision.",
+          "evidence": [
+            "Acceptance criteria require generic Restore to heal Primary then Backup.",
+            "Required tests include “Generic Restore targets Primary first, then Backup.”",
+            "Dependencies state that no Restore fallback changes are allowed and the Astra summary excludes destroyed-Primary fallback."
+          ]
+        },
+        {
+          "kind": "PRODUCT_RISK",
+          "summary": "The package could overstate complete starter behavior because Drain resolution is excluded.",
+          "evidence": [
+            "Rezz-Razor and Rezz-Blade require Drain effects.",
+            "Tests restrict Drain to metadata and require a certification-boundary check, so complete behavioral certification is unavailable."
+          ]
+        }
+      ],
+      "required_revisions": [
+        "Escalate the nine-versus-ten starter roster contradiction to Mel; do not invent the missing card or multiplicity.",
+        "Replace scope and files_or_domains_allowed with deduplicated concrete paths or precisely bounded symbols only.",
+        "Keep execution blocked until authoritative Action initialization, carryover defaults/configurations, reset boundaries, cross-cycle clearing, and final-turn deferred-gain disposition are supplied and tested unconditionally.",
+        "Remove Restore fallback implementation and behavioral tests from this package unless the applicable destroyed-Primary eligibility rule is supplied.",
+        "State that starter metadata may be implemented, but complete starter behavior cannot be certified while Drain resolution remains excluded.",
+        "Remove claims that RULE-STARTER-008 is missing; its excerpt is supplied."
+      ],
+      "packet_error": null,
+      "errors": [],
+      "work_package_id": "wp-run-2026-09-07T18-58-47-812Z-1d48994c-1",
+      "execution_authorized": false
+    }
+  ],
+  "work_package": {
+    "id": "wp-run-2026-09-07T18-58-47-812Z-1d48994c-1",
+    "objective": "Align CARD_DEFINITIONS and STARTING_DECK with RULE-DECK-001 and RULE-STARTER-001 through RULE-STARTER-008.",
+    "owner_role": "Engineering",
+    "authorized_rule_ids": [
+      "RULE-DECK-001",
+      "RULE-DECK-002",
+      "RULE-DECK-005",
+      "RULE-STARTER-001",
+      "RULE-STARTER-002",
+      "RULE-STARTER-003",
+      "RULE-STARTER-004",
+      "RULE-STARTER-005",
+      "RULE-STARTER-006",
+      "RULE-STARTER-007",
+      "RULE-STARTER-008",
+      "RULE-CARD-003",
+      "RULE-CARD-004",
+      "RULE-CARD-005",
+      "RULE-DATA-002",
+      "RULE-DATA-005",
+      "RULE-ACTION-001",
+      "RULE-ACTION-003",
+      "RULE-ACTION-004"
+    ],
+    "authorized_tech_ids": [],
+    "scope": [
+      "src/game/content/cards.ts",
+      "src/game/types.ts",
+      "src/game/config/defaults.ts",
+      "src/game/engine/actions.ts",
+      "src/game/engine/effects.ts",
+      "src/game/engine/deploy.ts",
+      "src/game/engine/cycle.ts",
+      "src/game/engine/dataCenters.ts",
+      "src/game/OuroborosGame.ts",
+      "tests/zones.test.ts",
+      "tests/startingDeck.test.ts",
+      "tests/dataCenters.test.ts",
+      "tests/actions.test.ts",
+      "tests/deploy.test.ts",
+      "src/game/content/cards.ts — STARTING_DECK and CARD_DEFINITIONS",
+      "src/game/types.ts — PlayerState, EffectOp, and DeployFailure declarations",
+      "Existing engine card-deployment entry point — Action eligibility and accounting branches only",
+      "Existing engine effect-operation dispatcher — gainActions branch only",
+      "Existing engine Runtime-turn and cycle-transition entry points — Action-state transition branches only",
+      "Existing game-state initialization and serialization adapters — Action-state fields only",
+      "Automated test domains — starter registry metadata, STARTING_DECK composition, and placeholder-definition snapshots",
+      "Automated test domains — Action initialization, deployment accounting, gainActions dispatch, Runtime-turn boundaries, cycle boundaries, and Action-state serialization"
+    ],
+    "files_or_domains_allowed": [
+      "src/game/content/cards.ts",
+      "src/game/types.ts",
+      "src/game/config/defaults.ts",
+      "src/game/engine/actions.ts",
+      "src/game/engine/effects.ts",
+      "src/game/engine/deploy.ts",
+      "src/game/engine/cycle.ts",
+      "src/game/engine/dataCenters.ts",
+      "src/game/OuroborosGame.ts",
+      "tests/zones.test.ts",
+      "tests/startingDeck.test.ts",
+      "tests/dataCenters.test.ts",
+      "tests/actions.test.ts",
+      "tests/deploy.test.ts",
+      "src/game/content/cards.ts — STARTING_DECK and CARD_DEFINITIONS",
+      "src/game/types.ts — PlayerState, EffectOp, and DeployFailure declarations",
+      "Existing engine card-deployment entry point — Action eligibility and accounting branches only",
+      "Existing engine effect-operation dispatcher — gainActions branch only",
+      "Existing engine Runtime-turn and cycle-transition entry points — Action-state transition branches only",
+      "Existing game-state initialization and serialization adapters — Action-state fields only",
+      "Automated test domains — starter registry metadata, STARTING_DECK composition, and placeholder-definition snapshots",
+      "Automated test domains — Action initialization, deployment accounting, gainActions dispatch, Runtime-turn boundaries, cycle boundaries, and Action-state serialization"
+    ],
+    "dependencies": [
+      "Harness-verified src/game/content/cards.ts#STARTING_DECK = 4 Character / 4 Crypto / 2 VP",
+      "Harness-verified src/game/content/cards.ts#CARD_DEFINITIONS = STARTING_DECK identities: cipher_runner:Cipher runner:character:power=3:cost=0; echo_analyst:Echo analyst:character:power=2:cost=0; phase_broker:Phase broker:character:power=1:cost=0; breach_daemon:Breach daemon:character:power=2:cost=0; crypto_shard:Crypto shard:crypto:power=0:cost=0; crypto_shard:Crypto shard:crypto:power=0:cost=0; crypto_shard:Crypto shard:crypto:power=0:cost=0; crypto_shard:Crypto shard:crypto:power=0:cost=0; ledger_sigil:Ledger sigil:victoryPoint:power=1:cost=0; ledger_sigil:Ledger sigil:victoryPoint:power=1:cost=0. Approved starter display names present in CARD_DEFINITIONS: none.",
+      "Harness-verified src/game/types.ts#PlayerState/EffectOp = PlayerState.actions=false. gainActions in CARD_DEFINITIONS ops=false. DeployFailure has no insufficient-actions reason.",
+      "Harness-verified src/game/engine/dataCenters.ts#healDataCenter = After Primary destroyed, unnamed healDataCenter(100) healed=0, backup 1500->1500. RULE-DATA-005 requires Primary first then Backup.",
+      "Placeholder STARTING_DECK identities: cipher_runner, echo_analyst, phase_broker, breach_daemon, crypto_shard x4, ledger_sigil x2.",
+      "Approved identities: Slash-Dot, Dash-Dot, Dotkrawler, Rezz-Razor, Rezz-Blade, Byte-Coin x2, Kilo-Coin x1, Vault Encryption x2. IDs: slash_dot, dash_dot, dotkrawler, rezz_razor, rezz_blade, byte_coin, kilo_coin, vault_encryption.",
+      "Keep placeholder CARD_DEFINITIONS for fixtures and MARKET_POOLS. Do not retarget fractal_seed.",
+      "Minimum Action engine: PlayerState.actions, gainActions op, RULE-ACTION-001 turn grants, RULE-CARD-003/004 deploy costs, RULE-ACTION-004 OnReveal timing. No HUD.",
+      "ExecutionPacket caps canonical_ids at 16 and acceptance_criteria at 12. Keep the full rule list on the WorkPackage. Slice only at packet construction.",
+      "Read scope: src/game/content/cards.ts, src/game/types.ts, src/game/config/defaults.ts, src/game/engine/effects.ts, src/game/engine/deploy.ts, src/game/engine/cycle.ts, src/game/engine/dataCenters.ts, src/game/OuroborosGame.ts, tests/zones.test.ts, tests/deploy.test.ts, tests/draft.test.ts, tests/helpers.ts",
+      "Operation: Implement approved RULE-STARTER-001 through RULE-STARTER-008 definitions and RULE-DECK-001 composition, plus the minimum Action-economy and generic Restore engine support those cards require. Keep placeholder fixture cards. Do not invent cards or change canonical rules.",
+      "Permitted commands: npm run typecheck; npx vitest run tests/zones.test.ts; npx vitest run tests/startingDeck.test.ts; npx vitest run tests/dataCenters.test.ts; npx vitest run tests/actions.test.ts; npx vitest run tests/deploy.test.ts; npm test",
+      "Exclusions: canonical mutation, assets, Obsidian, HUD/playerView, swarm, docs, git, host copy-back, inventing cards, market-pool redesign, unrelated cleanup.",
+      "Authoritative RULE-STARTER-008 excerpt and complete starter roster.",
+      "Authoritative Action lifecycle contract, including applicable RULE-ACTION-001 and RULE-ACTION-004 excerpts; referenced IDs alone do not establish their contents.",
+      "Revised unconditional Action acceptance criteria and tests, with applicable authority references added before authorization.",
+      "Deterministic repository mapping of bounded engine and test domains to concrete paths and symbols.",
+      "Gated review of the revised scope, contracts, tests, exclusions, and certification claims.",
+      "Explicit implementation authorization; this intent remains unexecuted."
+    ],
+    "acceptance_criteria": [
+      "STARTING_DECK is 10 cards: 5 Character, 3 Crypto, 2 VP with approved starter identities and counts.",
+      "Structured ops implement RULE-STARTER-001 through RULE-STARTER-008: draw, gainCrypto, Drain, Restore, and gainActions. Display text is not authoritative.",
+      "Byte-Coin and Kilo-Coin are not deployable and credit cryptoValue 2 and 3 at Draft. Costs 3 and 6.",
+      "Vault Encryption is deployable, Power 2, cost 3, Restore 100. No invented static VP number.",
+      "Generic Drain and Restore omit a named Data Center. Restore heals Primary first, then Backup, without overheal.",
+      "Character deploy costs 1 Action. VP deploy costs 0. Insufficient Actions blocks Character deploy.",
+      "Turn 1 grants +2 Actions, Turn 2 +1, Turn 3 +1. OnReveal Action gain is usable on the next Runtime turn.",
+      "Placeholder fixture cards remain. STARTING_DECK no longer uses them. MARKET_POOLS unchanged.",
+      "tests/zones.test.ts no longer asserts 4/4/2. New tests cover identities, Action spend/grants, and Restore fallback.",
+      "RULE-DECK-002 identical Cycle 1 decks are unchanged. HIST-DECK-4-4-2 is not authority.",
+      "No HUD, assets, canonical, or opportunistic cleanup in this package.",
+      "Executor STOP if a required approved starter definition is missing or a write leaves authorized scope."
+    ],
+    "tests_required": [
+      "Starting-deck composition is 10 cards, 5/3/2, with RULE-STARTER identities and counts.",
+      "Starter Power, cost, kind, deployability, and structured ops match the approved starter rules.",
+      "Byte-Coin and Kilo-Coin cannot deploy. Vault Encryption can. Draft credits their cryptoValue.",
+      "Character deploy spends 1 Action. VP spends 0. Insufficient Actions is illegal.",
+      "Turn Action grants match RULE-ACTION-001. OnReveal Action gain is next-turn usable.",
+      "Generic Restore targets Primary first, then Backup, without overheal.",
+      "Cycle 1 still gives both players identical decks.",
+      "Starting-deck composition and identity tests for both players: ten cards, 5/3/2 families, exact authoritative multiplicities, and no placeholder substitution.",
+      "Exact starter metadata assertions against supplied RULE-STARTER-001 through RULE-STARTER-007; add RULE-STARTER-008 assertions only from its authoritative excerpt before authorization.",
+      "Placeholder registry snapshot or equivalent structural-equality regression tests.",
+      "Deployment tests: Character with sufficient Actions spends exactly one; insufficient Actions fails explicitly and atomically; VP deployment consumes zero Actions.",
+      "Pre-authorization blocker: replace all unresolved Action lifecycle cases with unconditional expected-result tests covering initial state, grants, reset boundaries, unused balances, supported carryover configurations, cross-cycle state, and final-turn deferred gains.",
+      "Authoritative timing tests for +1 and +2 Actions, including when gained Actions become spendable and whether pending gains survive each applicable boundary.",
+      "Action-state initialization and serialization round-trip tests for the approved representation, without guessed migration defaults.",
+      "Metadata assertions for Restore 100, Drain 75 and Drain 100; scope-diff checks confirming no Restore fallback or Drain resolver changes.",
+      "Certification-boundary check: pending, skipped, metadata-only, or out-of-scope effect tests cannot be reported as successful complete starter behavior certification."
+    ],
+    "proposed_authority_level": "ADVISORY",
+    "authority_level": "IMPLEMENTATION",
+    "approval_required": true,
+    "execution_tools_allowed": [],
+    "canonical_version": "2.0.0"
+  },
+  "reviewer": {
+    "verdict": "REVISE",
+    "summary": "The implementation mismatches are evidenced, but the WorkPackage remains unauthorizable. The approved starter rules enumerate only nine cards against the required ten, Action lifecycle semantics remain incomplete, scope is duplicated and not precisely bounded, and Restore fallback remains included despite its stated exclusion.",
+    "required_revisions": [
+      "Escalate the nine-versus-ten starter roster contradiction to Mel; do not invent the missing card or multiplicity.",
+      "Replace scope and files_or_domains_allowed with deduplicated concrete paths or precisely bounded symbols only.",
+      "Keep execution blocked until authoritative Action initialization, carryover defaults/configurations, reset boundaries, cross-cycle clearing, and final-turn deferred-gain disposition are supplied and tested unconditionally.",
+      "Remove Restore fallback implementation and behavioral tests from this package unless the applicable destroyed-Primary eligibility rule is supplied.",
+      "State that starter metadata may be implemented, but complete starter behavior cannot be certified while Drain resolution remains excluded.",
+      "Remove claims that RULE-STARTER-008 is missing; its excerpt is supplied."
+    ],
+    "findings": [
+      {
+        "kind": "IMPLEMENTATION_MISMATCH",
+        "summary": "Repository deck composition and starter definitions do not conform to the supplied canonical rules.",
+        "evidence": [
+          "STARTING_DECK is harness-verified as 4 Character / 4 Crypto / 2 VP, conflicting with RULE-DECK-001.",
+          "Approved starter names are absent from harness-verified CARD_DEFINITIONS.",
+          "PlayerState has no Actions field or gainActions operation despite applicable Action and deployment rules."
+        ]
+      },
+      {
+        "kind": "CANONICAL_CONFLICT",
+        "summary": "RULE-DECK-001 requires ten cards, but RULE-STARTER-001 through RULE-STARTER-008 specify only nine: five Characters, three Crypto, and two VP.",
+        "evidence": [
+          "Five singular Characters are specified by RULE-STARTER-001 through RULE-STARTER-005.",
+          "RULE-STARTER-006 specifies two VP; RULE-STARTER-007 and RULE-STARTER-008 specify three Crypto.",
+          "The resulting roster is 5/3/2 by family but totals nine, so the tenth identity or multiplicity cannot be inferred."
+        ]
+      },
+      {
+        "kind": "MISSING_ACCEPTANCE_CRITERIA",
+        "summary": "Action lifecycle behavior is not fully authoritative or expressed as unconditional expected results.",
+        "evidence": [
+          "RULE-ACTION-003 says carryover is configurable but supplies no default or supported configuration contract.",
+          "Initialization, reset boundaries, unused balance handling, cross-cycle clearing mechanics, and final-turn deferred gains remain unresolved.",
+          "Tests explicitly defer these cases to a pre-authorization blocker."
+        ]
+      },
+      {
+        "kind": "SCOPE_MISMATCH",
+        "summary": "Scope and files_or_domains_allowed are duplicated and mix concrete paths with behavioral prose and unresolved entry-point descriptions.",
+        "evidence": [
+          "Both lists repeat paths and descriptions such as “Existing engine card-deployment entry point — Action eligibility and accounting branches only.”",
+          "The package dependency itself requires deterministic mapping to concrete paths and symbols before authorization."
+        ]
+      },
+      {
+        "kind": "SCOPE_MISMATCH",
+        "summary": "Destroyed-Primary Restore fallback remains in acceptance criteria and tests despite being expressly excluded from this revision.",
+        "evidence": [
+          "Acceptance criteria require generic Restore to heal Primary then Backup.",
+          "Required tests include “Generic Restore targets Primary first, then Backup.”",
+          "Dependencies state that no Restore fallback changes are allowed and the Astra summary excludes destroyed-Primary fallback."
+        ]
+      },
+      {
+        "kind": "PRODUCT_RISK",
+        "summary": "The package could overstate complete starter behavior because Drain resolution is excluded.",
+        "evidence": [
+          "Rezz-Razor and Rezz-Blade require Drain effects.",
+          "Tests restrict Drain to metadata and require a certification-boundary check, so complete behavioral certification is unavailable."
+        ]
+      }
+    ]
+  },
+  "canonical_version": "2.0.0"
+}

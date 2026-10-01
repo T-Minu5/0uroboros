@@ -63,7 +63,7 @@ describe('multi-step Circuit reward recipes', () => {
     game.state.draftEndsAt=Date.now()+90_000;
     game.state.circuitEligible=[0,1];
     game.state.circuitReward.definition=content.circuitRewards[0];
-    game.state.players.forEach(player=>{player.hand=[];player.draw=[];player.discard=[];player.centers.primary=1900;});
+    game.state.players.forEach(player=>{player.hand=[];player.draw=[];player.discard=[];player.servers.primary=1900;});
     return {game,content};
   }
 
@@ -80,7 +80,7 @@ describe('multi-step Circuit reward recipes', () => {
     expect(other).toMatchObject({kind:'crypto',owner:1,targetOwner:1,amount:2});
     const opponent=drain(game);
     expect(opponent.map(event=>[event.kind,event.owner,event.targetOwner,event.amount])).toEqual([['vp',1,1,3],['restore',1,1,50]]);
-    expect(game.state.players.map(player=>[player.wallet,player.rewardVP,player.centers.primary])).toEqual([[2,3,1950],[2,3,1950]]);
+    expect(game.state.players.map(player=>[player.wallet,player.rewardVP,player.servers.primary])).toEqual([[2,3,1950],[2,3,1950]]);
     expect(game.state.circuitReward.claimed).toEqual([0,1]);
     expect(()=>game.claimCircuitReward(0)).toThrow(/already claimed/);
     expect(new Set([first,...local,other,...opponent].map(event=>event.id)).size).toBe(6);
@@ -106,11 +106,11 @@ describe('multi-step Circuit reward recipes', () => {
 });
 
 describe('generated cards and card class metadata', () => {
-  it('seeds Hacker from historic power metadata and rejects invalid Hacker and generated core/starters', () => {
+  it('seeds Horror from historic power metadata and rejects invalid Hacker and generated starters', () => {
     const document=createDefaultContent();
-    const hacker=document.cards.find(card=>HISTORIC_SOURCE_METADATA[card.definitionId??card.id]?.types.includes('power'))!;
-    expect(hacker.cardClass).toBe('Hacker');
-    expect(hacker.pool).toBe('Chaos');
+    const horror=document.cards.find(card=>HISTORIC_SOURCE_METADATA[card.definitionId??card.id]?.types.includes('power'))!;
+    expect(horror.cardClass).toBe('Horror');
+    expect(horror.pool).toBe('Chaos');
     const base=document.cards.find(card=>card.definitionId==='eval-relocation-relay')!;
     base.cardClass='Hacker';
     expect(validateContent(document)).toEqual(expect.arrayContaining([expect.stringContaining('Hacker cards must be Chaos Characters')]));
@@ -118,20 +118,31 @@ describe('generated cards and card class metadata', () => {
     const starter=document.cards.find(card=>card.definitionId==='slash-dot')!;
     starter.generated=true;
     expect(validateContent(document)).toEqual(expect.arrayContaining([
-      expect.stringContaining('generated cards cannot be core market cards'),
       expect.stringContaining('starting deck and must remain enabled'),
     ]));
   });
 
+  it('lets Generated cards take any type and class while keeping them out of Draft', () => {
+    const document=createDefaultContent();
+    document.cards.push(
+      {id:'gen-horror',definitionId:'gen-horror',name:'Gen Horror',type:'Character',power:2,cost:0,art:'/x.png',effect:'',onReveal:[],pool:'Chaos',enabled:true,cardClass:'Horror',generated:true},
+      {id:'gen-vp',definitionId:'gen-vp',name:'Gen VP',type:'VP',power:0,vp:-1,cost:0,art:'/x.png',effect:'',pool:'VP',enabled:true,generated:true},
+      {id:'gen-coin',definitionId:'gen-coin',name:'Gen Coin',type:'Crypto',cryptoValue:1,cost:0,art:'/x.png',effect:'',pool:'Crypto',enabled:true,generated:true},
+    );
+    expect(validateContent(document)).toEqual([]);
+    const content=compileContent(document);
+    const ids=['gen-horror','gen-vp','gen-coin'];
+    expect(content.cards.filter(card=>ids.includes(card.definitionId!)).map(card=>card.cardClass??card.type)).toEqual(['Horror','VP','Crypto']);
+    expect([...content.baseCards,...content.chaosCards,...content.vpCards,...content.cryptoCards].some(card=>ids.includes(card.definitionId!))).toBe(false);
+  });
+
   it('retains enabled generated definitions for gain and Morph while excluding every market pool', () => {
     const document=createDefaultContent();
-    const generated:typeof document.cards[number]={...starterCards[0],id:'generated-sentinel',definitionId:'generated-sentinel',name:'Sentinel',art:'/forms/sentinel.png',effect:'Generated sentinel.',onReveal:[],pool:'Base',enabled:true,core:false,cardClass:'Utility',generated:true};
+    const generated:typeof document.cards[number]={...starterCards[0],id:'generated-sentinel',definitionId:'generated-sentinel',name:'Sentinel',art:'/forms/sentinel.png',effect:'Generated sentinel.',onReveal:[],pool:'Base',enabled:true,cardClass:'Utility',generated:true};
     document.cards.push(generated);
     const content=compileContent(document);
     expect(content.cards.find(card=>card.definitionId==='generated-sentinel')).toMatchObject({generated:true,cardClass:'Utility'});
-    expect(content.baseCards.some(card=>card.definitionId==='generated-sentinel')).toBe(false);
     expect([...content.baseCards,...content.chaosCards,...content.vpCards,...content.cryptoCards].some(card=>card.definitionId==='generated-sentinel')).toBe(false);
-    expect(content.coreBaseIds).not.toContain('generated-sentinel');
     const game=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,random:seededRandom(19),content});
     game.state.players.forEach(player=>{player.hand=[];player.draw=[];player.discard=[];});
     expect(game.state.market.some(pile=>pile.card.definitionId==='generated-sentinel')).toBe(false);

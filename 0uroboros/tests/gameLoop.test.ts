@@ -7,113 +7,129 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Client } from 'boardgame.io/client';
-import { Local } from 'boardgame.io/multiplayer';
 
-import { OuroborosGame, setActiveConfig } from '../src/game/OuroborosGame';
-import { DEFAULT_CONFIG } from '../src/game/config/defaults';
-import type { OuroborosState, PlayerID } from '../src/game/types';
-import { resetInstanceCounter } from '../src/game/engine/zones';
-
-type TestClient = ReturnType<typeof Client<OuroborosState>>;
-
-interface Seats {
-  clients: Record<PlayerID, TestClient>;
-  stop: () => void;
-}
-
-/**
- * boardgame.io caches one Local master per game name for the whole process, so
- * every match needs a distinct matchID or tests share state with each other.
- */
-let matchCounter = 0;
-
-function createSeats(): Seats {
-  const multiplayer = Local();
-  matchCounter += 1;
-  const matchID = `test-match-${matchCounter}`;
-  const clients: Record<PlayerID, TestClient> = {
-    '0': Client({ game: OuroborosGame, playerID: '0', multiplayer, numPlayers: 2, matchID }),
-    '1': Client({ game: OuroborosGame, playerID: '1', multiplayer, numPlayers: 2, matchID }),
-  };
-  clients['0'].start();
-  clients['1'].start();
-  return {
-    clients,
-    stop: () => {
-      clients['0'].stop();
-      clients['1'].stop();
-    },
-  };
-}
-
-/** Authoritative-ish read. Player 0's view is enough for phase and Node checks. */
-function readState(seats: Seats): OuroborosState {
-  const state = seats.clients['0'].getState();
-  if (!state) throw new Error('client state not ready');
-  return state.G;
-}
-
-/** The coarse boardgame.io phase, which gates move legality. */
-function readPhase(seats: Seats): string | null {
-  return seats.clients['0'].getState()?.ctx.phase ?? null;
-}
-
-function isGameOver(seats: Seats): boolean {
-  return Boolean(seats.clients['0'].getState()?.ctx.gameover);
-}
-
-/** Both players end the current deployment window. */
-function closeWindow(seats: Seats): void {
-  seats.clients['0'].moves.endDeployment();
-  seats.clients['1'].moves.endDeployment();
-}
-
-/** Both players end Draft. */
-function closeDraft(seats: Seats): void {
-  seats.clients['0'].moves.endDraft();
-  seats.clients['1'].moves.endDraft();
-}
+import { setActiveConfig } from '../src/game/OuroborosGame';
+import { circuitWindowCount, DEFAULT_CONFIG } from '../src/game/config/defaults';
+import { getCardDefinition } from '../src/game/content/cards';
+import {
+  bootstrapMatch,
+  closeDraft,
+  closeWindow,
+  createSeats,
+  isGameOver,
+  readPhase,
+  readState,
+  type Seats,
+} from './helpers/bgiClientSeats';
 
 describe('boardgame.io wiring', () => {
   let seats: Seats;
+  const windows = circuitWindowCount(DEFAULT_CONFIG);
 
   beforeEach(() => {
-    resetInstanceCounter();
-    setActiveConfig(DEFAULT_CONFIG);
-    seats = createSeats();
+    seats = bootstrapMatch();
   });
 
-  it('starts in the Circuit phase with Node 1 open and hands drawn', () => {
+  it('starts in the Circuit phase with Nodes 1–3 open and hands drawn', () => {
     const G = readState(seats);
 
     expect(readPhase(seats)).toBe('circuit');
     // The fine-grained state machine name sits alongside the boardgame.io phase.
     expect(G.phase).toBe('circuitDeploy');
     expect(G.cycle).toBe(1);
-    expect(G.nodes[0].state).toBe('open');
-    expect(G.nodes[1].state).toBe('closed');
+    expect(G.nodes.map((node) => node.state)).toEqual([
+      'open',
+      'open',
+      'open',
+      'closed',
+      'closed',
+    ]);
     expect(G.hands['0']).toHaveLength(DEFAULT_CONFIG.handDrawPerCycle);
+    expect(G.players['0'].actions).toBe(2);
+    expect(G.players['1'].actions).toBe(2);
     // Every Node received a Location during setup.
     G.nodes.forEach((node) => expect(node.locationId).not.toBeNull());
     seats.stop();
   });
 
-  it('opens one Node per closed window in Runtime Mode', () => {
-    for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount - 1; turn += 1) {
-      const before = readState(seats);
-      expect(before.nodes[turn].state).toBe('open');
-      closeWindow(seats);
-      const after = readState(seats);
-      expect(after.nodes[turn + 1].state).toBe('open');
+  it('spends Actions on Character deploy and refuses a third Character on turn 1', () => {
+    const opening = readState(seats);
+    expect(opening.players['0'].actions).toBe(2);
+
+    const characters = opening.hands['0'].filter(
+      (id) => getCardDefinition(opening.cards[id].cardDefId).kind === 'character',
+    );
+    const [first, second, third] = characters;
+    if (!first) {
+      seats.stop();
+      return;
     }
+
+    seats.clients['0'].moves.deployCard(first, 0);
+    expect(readState(seats).players['0'].actions).toBe(1);
+    expect(readState(seats).cards[first].zone).toBe('node');
+
+    if (second) {
+      seats.clients['0'].moves.deployCard(second, 0);
+      expect(readState(seats).players['0'].actions).toBe(0);
+      if (third) {
+        seats.clients['0'].moves.deployCard(third, 1);
+        expect(readState(seats).cards[third].zone).toBe('hand');
+        expect(readState(seats).players['0'].actions).toBe(0);
+      }
+    }
+
+    const afterSpend = readState(seats);
+    const vp = afterSpend.hands['0'].find(
+      (id) => getCardDefinition(afterSpend.cards[id].cardDefId).kind === 'victoryPoint',
+    );
+    if (vp) {
+      const actionsBefore = afterSpend.players['0'].actions;
+      seats.clients['0'].moves.deployCard(vp, 1);
+      expect(readState(seats).cards[vp].zone).toBe('node');
+      expect(readState(seats).players['0'].actions).toBe(actionsBefore);
+    }
+
+    closeWindow(seats);
+    expect(readState(seats).players['0'].actions).toBeGreaterThanOrEqual(1);
+    seats.stop();
+  });
+
+  it('opens Nodes 1–3 on turn 1, Node 4 on turn 2, and Node 5 on turn 3', () => {
+    expect(readState(seats).nodes.map((node) => node.state)).toEqual([
+      'open',
+      'open',
+      'open',
+      'closed',
+      'closed',
+    ]);
+
+    closeWindow(seats);
+    expect(readState(seats).nodes.map((node) => node.state)).toEqual([
+      'open',
+      'open',
+      'open',
+      'open',
+      'closed',
+    ]);
+    expect(readState(seats).turn).toBe(1);
+
+    closeWindow(seats);
+    expect(readState(seats).nodes.map((node) => node.state)).toEqual([
+      'open',
+      'open',
+      'open',
+      'open',
+      'open',
+    ]);
+    expect(readState(seats).turn).toBe(2);
     seats.stop();
   });
 
   it('rejects deploying a Crypto card to a Node', () => {
     const G = readState(seats);
     const crypto = G.hands['0'].find(
-      (id) => G.cards[id].cardDefId === 'crypto_shard',
+      (id) => getCardDefinition(G.cards[id].cardDefId).kind === 'crypto',
     );
     if (!crypto) {
       // The Cycle 1 hand happened not to contain Crypto, so nothing to assert.
@@ -131,7 +147,9 @@ describe('boardgame.io wiring', () => {
 
   it('deploys a legal card and keeps it hidden until reveal', () => {
     const G = readState(seats);
-    const deployable = G.hands['0'].find((id) => G.cards[id].cardDefId !== 'crypto_shard');
+    const deployable = G.hands['0'].find((id) =>
+      getCardDefinition(G.cards[id].cardDefId).deployable,
+    );
     expect(deployable).toBeDefined();
     if (!deployable) return;
 
@@ -145,7 +163,9 @@ describe('boardgame.io wiring', () => {
 
   it('reveals committed cards when the window closes', () => {
     const G = readState(seats);
-    const deployable = G.hands['0'].find((id) => G.cards[id].cardDefId !== 'crypto_shard');
+    const deployable = G.hands['0'].find((id) =>
+      getCardDefinition(G.cards[id].cardDefId).deployable,
+    );
     if (!deployable) return;
 
     seats.clients['0'].moves.deployCard(deployable, 0);
@@ -159,26 +179,66 @@ describe('boardgame.io wiring', () => {
 
   it('reveals a card committed to a closed Node when that Node opens', () => {
     const G = readState(seats);
-    const deployable = G.hands['0'].find((id) => G.cards[id].cardDefId !== 'crypto_shard');
+    const deployable = G.hands['0'].find((id) =>
+      getCardDefinition(G.cards[id].cardDefId).deployable,
+    );
     if (!deployable) return;
 
-    // Commit to Node 2 during turn 1, while Node 2 is still closed.
-    seats.clients['0'].moves.deployCard(deployable, 1);
+    // Commit to Node 4 during turn 1, while Node 4 is still closed.
+    seats.clients['0'].moves.deployCard(deployable, 3);
     expect(readState(seats).cards[deployable].revealed).toBe(false);
 
-    // Closing turn 1 reveals cards at Node 1, then opens Node 2. The card waiting
-    // at Node 2 reveals as part of that opening, before turn 2's deployment.
+    // Closing turn 1 reveals cards at Nodes 1–3, then opens Node 4. The card
+    // waiting at Node 4 reveals as part of that opening, before turn 2.
     closeWindow(seats);
 
     const after = readState(seats);
-    expect(after.nodes[1].state).toBe('open');
+    expect(after.nodes[3].state).toBe('open');
     expect(after.phase).toBe('circuitDeploy');
     expect(after.cards[deployable].revealed).toBe(true);
     seats.stop();
   });
 
-  it('reaches the Draft phase after the fifth window closes', () => {
-    for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount; turn += 1) {
+  it('keeps a card at Node 5 hidden until Node 5 opens on turn 3', () => {
+    const G = readState(seats);
+    const deployable = G.hands['0'].find((id) =>
+      getCardDefinition(G.cards[id].cardDefId).deployable,
+    );
+    if (!deployable) return;
+
+    seats.clients['0'].moves.deployCard(deployable, 4);
+    closeWindow(seats);
+    expect(readState(seats).cards[deployable].revealed).toBe(false);
+    expect(readState(seats).nodes[4].state).toBe('closed');
+
+    closeWindow(seats);
+    const after = readState(seats);
+    expect(after.nodes[4].state).toBe('open');
+    expect(after.cards[deployable].revealed).toBe(true);
+    seats.stop();
+  });
+
+  it('never makes Draft authoritative before Wave Collapse has run in Cycle 1', () => {
+    const seen: string[] = [];
+    seen.push(`${readPhase(seats)}/${readState(seats).phase}`);
+    closeWindow(seats);
+    seen.push(`${readPhase(seats)}/${readState(seats).phase}`);
+    closeWindow(seats);
+    seen.push(`${readPhase(seats)}/${readState(seats).phase}`);
+    closeWindow(seats);
+    seen.push(`${readPhase(seats)}/${readState(seats).phase}`);
+
+    expect(seen[0]).toBe('circuit/circuitDeploy');
+    expect(seen[1]).toBe('circuit/circuitDeploy');
+    expect(seen[2]).toBe('circuit/circuitDeploy');
+    expect(seen[3]).toBe('draft/draft');
+    expect(readState(seats).collapseReport).not.toBeNull();
+    expect(seen.join('>')).not.toMatch(/draft\/draft>.*waveCollapse/i);
+    seats.stop();
+  });
+
+  it('reaches the Draft phase after the third window closes', () => {
+    for (let turn = 0; turn < windows; turn += 1) {
       closeWindow(seats);
     }
 
@@ -191,7 +251,7 @@ describe('boardgame.io wiring', () => {
   });
 
   it('grants Wallet Crypto at the Draft transition', () => {
-    for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount; turn += 1) {
+    for (let turn = 0; turn < windows; turn += 1) {
       closeWindow(seats);
     }
 
@@ -203,8 +263,57 @@ describe('boardgame.io wiring', () => {
     seats.stop();
   });
 
+  it('does not deal another Cycle hand on later Runtime turns', () => {
+    const dealLogs = () =>
+      readState(seats).log.filter((entry) => /Both players drew \d+ cards/.test(entry.message));
+
+    expect(readState(seats).hands['0']).toHaveLength(5);
+    expect(dealLogs()).toHaveLength(1);
+
+    closeWindow(seats);
+    expect(readState(seats).hands['0']).toHaveLength(5);
+    expect(readState(seats).turn).toBe(1);
+    expect(dealLogs()).toHaveLength(1);
+
+    closeWindow(seats);
+    expect(readState(seats).hands['0']).toHaveLength(5);
+    expect(readState(seats).turn).toBe(2);
+    expect(dealLogs()).toHaveLength(1);
+    seats.stop();
+  });
+
+  it('grows the hand only from OnReveal +N Cards, then deals 5 at the next Cycle', () => {
+    const opening = readState(seats);
+    const slash = opening.hands['0'].find(
+      (id) => opening.cards[id].cardDefId === 'slash_dot',
+    );
+    expect(slash).toBeDefined();
+    seats.clients['0'].moves.deployCard(slash!, 0);
+    closeWindow(seats);
+
+    const afterReveal = readState(seats);
+    expect(afterReveal.hands['0']).toHaveLength(7);
+    expect(
+      afterReveal.log.some((entry) => /Slash-Dot revealed/.test(entry.message)),
+    ).toBe(true);
+
+    for (let turn = 1; turn < windows; turn += 1) {
+      closeWindow(seats);
+    }
+    closeDraft(seats);
+
+    const cycle2 = readState(seats);
+    expect(cycle2.cycle).toBe(2);
+    expect(cycle2.hands['0']).toHaveLength(5);
+    expect(cycle2.hands['1']).toHaveLength(5);
+    expect(
+      cycle2.log.filter((entry) => /Both players drew \d+ cards/.test(entry.message)),
+    ).toHaveLength(2);
+    seats.stop();
+  });
+
   it('completes a full Cycle and reaches Cycle 2 with a fresh hand', () => {
-    for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount; turn += 1) {
+    for (let turn = 0; turn < windows; turn += 1) {
       closeWindow(seats);
     }
     expect(readPhase(seats)).toBe('draft');
@@ -216,9 +325,15 @@ describe('boardgame.io wiring', () => {
     expect(readPhase(seats)).toBe('circuit');
     expect(G.turn).toBe(0);
     expect(G.windowsCompleted).toBe(0);
-    // A new Cycle draws a fresh hand and reopens Node 1.
+    // A new Cycle draws a fresh hand and reopens Nodes 1–3.
     expect(G.hands['0']).toHaveLength(DEFAULT_CONFIG.handDrawPerCycle);
-    expect(G.nodes[0].state).toBe('open');
+    expect(G.nodes.map((node) => node.state)).toEqual([
+      'open',
+      'open',
+      'open',
+      'closed',
+      'closed',
+    ]);
     // Probability reset for the new Cycle.
     expect(G.nodes.map((n) => n.probability)).toEqual(DEFAULT_CONFIG.baseProbabilities);
     // Unspent Wallet Crypto disappeared at End of Draft.
@@ -227,7 +342,7 @@ describe('boardgame.io wiring', () => {
   });
 
   it('purchases from the Draft market when the Wallet allows', () => {
-    for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount; turn += 1) {
+    for (let turn = 0; turn < windows; turn += 1) {
       closeWindow(seats);
     }
 
@@ -261,7 +376,7 @@ describe('boardgame.io wiring', () => {
 
     // Play two full Cycles.
     for (let cycle = 0; cycle < 2; cycle += 1) {
-      for (let turn = 0; turn < DEFAULT_CONFIG.nodeCount; turn += 1) {
+      for (let turn = 0; turn < windows; turn += 1) {
         closeWindow(seats);
       }
       closeDraft(seats);
@@ -283,9 +398,7 @@ describe('boardgame.io wiring', () => {
 
 describe('playerView through the client', () => {
   it('hides the opponent hand from each seat', () => {
-    resetInstanceCounter();
-    setActiveConfig(DEFAULT_CONFIG);
-    const seats = createSeats();
+    const seats = bootstrapMatch();
 
     const p0 = seats.clients['0'].getState()?.G;
     const p1 = seats.clients['1'].getState()?.G;

@@ -8,7 +8,7 @@ export type ContentModelModule = {
   validateContent(value: unknown): string[];
 };
 export type StoredContent = { revision: number; document: ContentDocument | null };
-export type ContentApiOptions = { filePath?: string; loadModel: () => Promise<ContentModelModule>; maxBytes?: number };
+export type ContentApiOptions = { filePath?: string; loadModel: () => Promise<ContentModelModule>; maxBytes?: number; onSaved?: (document: ContentDocument) => unknown };
 type Next = (error?: unknown) => void;
 
 const DEFAULT_FILE = resolve(process.cwd(), 'content/authored-content.json');
@@ -115,6 +115,8 @@ export function createContentApi(options: ContentApiOptions) {
       const saved = { revision: current.revision + 1, document: proposed.document as ContentDocument };
       await atomicSave(filePath, saved);
       reply(response, 200, saved);
+      // Follow-up work such as depth generation never fails a save that already succeeded.
+      try { await options.onSaved?.(saved.document); } catch (error) { console.error('[content] onSaved failed', error); }
     }).catch(error => reply(response, 500, { error: error instanceof Error ? error.message : 'Unable to save content.' }));
     writes = operation;
     await operation;

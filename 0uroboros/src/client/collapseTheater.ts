@@ -1,16 +1,32 @@
 /**
  * Wave Collapse theater.
  *
- * The engine has already resolved every Node and selected the Circuit Reward.
- * This walk is presentation only: title, each Node collapsing with its Location
- * award, the probability measurement, then the winner, before Draft appears.
+ * The engine has already resolved. This walks a presentation queue derived from
+ * the public report. A later Cycle cannot inherit "finished" from an earlier one.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
-import type { CollapseNodeReport, CollapseReport, PlayerID } from '../game/types';
+import type { CollapseReport, PlayerID } from '../game/types';
+import { buildCollapseScript, collapseWinnerTitle } from './presentation/collapseScript';
+import {
+  collapseReportId,
+  isReportComplete,
+  presentedCollapseSerial,
+  type PresentationEvent,
+} from './presentation/queue';
+import { resolveTiming, type PresentationSpeed, type PresentationTiming } from './presentation/timing';
+import { usePresentationQueue } from './presentation/usePresentationQueue';
 
-export type CollapseBeatKind = 'title' | 'node' | 'select' | 'winner';
+export type CollapseBeatKind =
+  | 'title'
+  | 'node'
+  | 'select'
+  | 'winner'
+  | 'location'
+  | 'result'
+  | 'reward'
+  | 'measure';
 
 export interface CollapseBeat {
   kind: CollapseBeatKind;
@@ -23,120 +39,61 @@ export interface CollapseBeat {
 export interface CollapseTheater {
   active: boolean;
   beat: CollapseBeat | null;
+  event: PresentationEvent | null;
   focusNode: number | null;
   measuring: boolean;
   selectedNode: number | null;
-  /** True once probability has landed, so the pick is not spoiled earlier. */
   highlightSelection: boolean;
-}
-
-const TITLE_MS = 1000;
-const NODE_MS = 1100;
-const SELECT_MS = 1500;
-const WINNER_MS = 1500;
-const REDUCED_MS = 220;
-
-export function buildCollapseBeats(
-  report: CollapseReport,
-  viewer: PlayerID,
-  reducedMotion: boolean,
-): CollapseBeat[] {
-  const hold = (full: number) => (reducedMotion ? REDUCED_MS : full);
-  const beats: CollapseBeat[] = [
-    {
-      kind: 'title',
-      holdMs: hold(TITLE_MS),
-      title: 'Wave Collapse',
-      subtitle: `Cycle ${report.cycle}`,
-      nodeIndex: null,
-    },
-  ];
-
-  for (const node of report.nodes) {
-    beats.push({
-      kind: 'node',
-      holdMs: hold(NODE_MS),
-      title: `Node ${node.index + 1} collapses`,
-      subtitle: nodeAwardLine(node, viewer),
-      nodeIndex: node.index,
-    });
-  }
-
-  if (!report.endedEarly) {
-    beats.push({
-      kind: 'select',
-      holdMs: hold(SELECT_MS),
-      title:
-        report.selectedNode === null
-          ? 'No Node selected'
-          : `Probability collapses into Node ${report.selectedNode + 1}`,
-      subtitle:
-        report.selectedNode === null
-          ? 'No Circuit Reward this Cycle'
-          : report.nodes.find((node) => node.index === report.selectedNode)?.locationName ??
-            'Circuit Reward',
-      nodeIndex: report.selectedNode,
-    });
-    beats.push({
-      kind: 'winner',
-      holdMs: hold(WINNER_MS),
-      title: collapseWinnerTitle(report.eligible, viewer),
-      subtitle:
-        report.selectedNode === null
-          ? 'Draft follows'
-          : `Circuit Reward · Node ${report.selectedNode + 1}`,
-      nodeIndex: report.selectedNode,
-    });
-  }
-
-  return beats;
+  presentedSerial: number;
+  reportComplete: boolean;
+  advanceNow: () => void;
 }
 
 export function useCollapseTheater(
   report: CollapseReport | null,
   ready: boolean,
   viewer: PlayerID,
+  speed: PresentationSpeed = 'normal',
+  reducedMotion = false,
 ): CollapseTheater {
-  const seen = useRef(0);
-  const [index, setIndex] = useState(-1);
-  const [beats, setBeats] = useState<CollapseBeat[]>([]);
+  const timing = resolveTiming(speed, reducedMotion);
+  const reportId = report ? collapseReportId(report.serial) : null;
+  const events = useMemo(
+    () => (report ? buildCollapseScript(report, viewer, timing) : []),
+    [report, viewer, timing],
+  );
+  const { queue, event, advanceNow } = usePresentationQueue(reportId, events, ready && Boolean(report));
 
-  useEffect(() => {
-    if (!report || !ready) return;
-    if (report.serial <= seen.current) return;
-    seen.current = report.serial;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const next = buildCollapseBeats(report, viewer, reduced);
-    setBeats(next);
-    setIndex(0);
-  }, [report, ready, viewer]);
+  const beat = event ? eventToBeat(event) : null;
+  const reportComplete = isReportComplete(queue, reportId);
 
-  const beat = index >= 0 && index < beats.length ? beats[index] : null;
-
-  useEffect(() => {
-    if (!beat) return;
-    const id = window.setTimeout(() => setIndex((current) => current + 1), beat.holdMs);
-    return () => window.clearTimeout(id);
-  }, [beat]);
-
-  if (!beat) {
+  if (!event || !beat) {
     return {
       active: false,
       beat: null,
+      event: null,
       focusNode: null,
       measuring: false,
       selectedNode: report?.selectedNode ?? null,
       highlightSelection: false,
+      presentedSerial: presentedCollapseSerial(queue),
+      reportComplete,
+      advanceNow,
     };
   }
 
   return {
     active: true,
     beat,
-    focusNode: beat.nodeIndex,
-    measuring: beat.kind === 'select',
+    event,
+    focusNode: event.nodeIndex ?? null,
+    measuring: event.kind === 'collapse_final_probability' || event.kind === 'collapse_selection',
     selectedNode: report?.selectedNode ?? null,
-    highlightSelection: beat.kind === 'select' || beat.kind === 'winner',
+    highlightSelection:
+      event.kind === 'collapse_selection' || event.kind === 'circuit_reward',
+    presentedSerial: presentedCollapseSerial(queue),
+    reportComplete,
+    advanceNow,
   };
 }
 
@@ -169,24 +126,39 @@ export function applyCollapseSnapshot<
   });
 }
 
-function nodeAwardLine(node: CollapseNodeReport, viewer: PlayerID): string {
-  const winner =
-    node.winner === null
-      ? 'Tied'
-      : node.winner === viewer
-        ? 'You win the Node'
-        : 'Opponent wins the Node';
-  const award = node.rewardText
-    ? node.rewardText
-    : node.locationText
-      ? node.locationText
-      : 'No Location reward';
-  return `${winner}. ${node.locationName}. ${award}`;
+export { collapseWinnerTitle, buildCollapseScript };
+
+export function buildCollapseBeats(
+  report: CollapseReport,
+  viewer: PlayerID,
+  reducedMotion: boolean,
+  speed: PresentationSpeed = 'normal',
+): CollapseBeat[] {
+  const timing = resolveTiming(speed, reducedMotion);
+  return buildCollapseScript(report, viewer, timing).map(eventToBeat);
 }
 
-export function collapseWinnerTitle(eligible: PlayerID[], viewer: PlayerID): string {
-  if (eligible.length === 2) return 'Both players share the Wave Collapse';
-  if (eligible[0] === viewer) return 'You win the Wave Collapse';
-  if (eligible[0]) return `Player ${eligible[0]} wins the Wave Collapse`;
-  return 'Wave Collapse ends';
+function eventToBeat(event: PresentationEvent): CollapseBeat {
+  return {
+    kind: beatKindOf(event.kind),
+    holdMs: event.holdMs,
+    title: event.title,
+    subtitle: [event.kicker, ...(event.lines ?? [])].filter(Boolean).join(' · '),
+    nodeIndex: event.nodeIndex ?? null,
+  };
+}
+
+function beatKindOf(kind: PresentationEvent['kind']): CollapseBeatKind {
+  if (kind === 'phase_announcement') return 'title';
+  if (kind === 'location_resolution') return 'location';
+  if (kind === 'node_result') return 'result';
+  if (kind === 'location_reward') return 'reward';
+  if (kind === 'collapse_final_probability') return 'measure';
+  if (kind === 'collapse_selection') return 'select';
+  if (kind === 'circuit_reward') return 'winner';
+  return 'node';
+}
+
+export function timingForCollapse(speed: PresentationSpeed, reducedMotion: boolean): PresentationTiming {
+  return resolveTiming(speed, reducedMotion);
 }

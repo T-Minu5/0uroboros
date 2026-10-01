@@ -1,40 +1,178 @@
-/* These instruments share the board's projected anchors; no screen-space offsets. */
-.bank-dock { position:relative; width:224px; }
+/* These instruments share the board's projected anchors; no screen-space offsets.
+   The board anchor scale makes 1 world unit exactly 64px here, foreshortened to
+   51.74px along z, so the bank mirrors the authored 0.71 x 1.22 bays at 0.82 pitch.
+   The dock spans the 3.56-wide outrigger; only the slot row is in flow, so the
+   anchor point lands on the bay row itself. */
+.bank-dock { position:relative; width:228px; }
 .world-anchor .duration.live-bank {
- width:224px; height:88px; padding:0; display:grid;
- grid-template-rows:12px 62px 10px; gap:2px; text-align:center;
+ position:relative; inset:auto; width:228px; height:65px; padding:0; display:block; text-align:center;
 }
+/* Title and count share one line under both banks' bays. */
 .world-anchor .duration.live-bank>small,
-.world-anchor .duration.live-bank>span { margin:0; transform:none; line-height:1; }
-.world-anchor .duration.live-bank>small { font:600 8px/12px Orbitron,sans-serif; letter-spacing:.6px; }
-.world-anchor .duration.live-bank>div { height:62px; margin:0; justify-content:center; align-items:center; gap:9px; }
-.world-anchor .duration.live-bank>span { font-size:7px; color:#92adbd; }
-.world-anchor .duration.live-bank .bank-slot {
- width:45px!important; height:60px!important; border:1px solid #7cbfc354!important;
- background:#09151dc9!important; border-radius:3px;
+.world-anchor .duration.live-bank>span { position:absolute; margin:0; transform:none; white-space:nowrap; }
+.world-anchor .duration.live-bank>small { left:0; font:600 7px/11px Orbitron,sans-serif; letter-spacing:.5px; }
+.world-anchor .duration.live-bank>span { right:0; font:6.5px/11px Inter,sans-serif; color:#92adbd; }
+.world-anchor .duration.live-bank>div {
+ width:100%; height:65px; margin:0; display:flex; justify-content:center; align-items:center; gap:7px;
 }
-.world-anchor .duration.far.live-bank .bank-slot { border-color:#d379c654!important; }
-.undo-planning {
- position:absolute; top:calc(100% + 13px); left:0; right:0;
- margin:auto; padding:4px 0; border:0; background:none; box-shadow:none;
- font:500 11px/1.4 Inter,sans-serif; color:#aff3eb; text-decoration:underline;
- text-decoration-color:#5c8e8b; text-underline-offset:4px; cursor:pointer;
+.world-anchor .duration.live-bank .bank-slot,
+.world-anchor .bank-slot {
+ position:relative; display:block!important;
+ width:45.4px!important; height:calc(45.4px * 224 / 158)!important;
+ min-width:0; padding:0!important; overflow:visible!important;
+ border:0!important; border-radius:4px; background:transparent!important;
+ box-shadow:0 4px 10px #0009;
 }
-.undo-planning:disabled { color:#638087; text-decoration:none; opacity:.55; cursor:default; }
-.undo-planning:hover:not(:disabled) { color:#efffff; background:none; }
-.undo-planning:focus-visible { outline:1px solid #aff3eb; outline-offset:3px; }
+.world-anchor .duration.far.live-bank .bank-slot { filter:saturate(.92); }
+.world-anchor .bank-slot > .cf-card { width:100%; height:100%; }
+/* Entry: the card rises into its slot shrunk and masked to it, stops, then is pulled out to full bleed. */
+.world-anchor .bank-slot.bank-arriving { animation:bank-mask var(--bank-slide) step-end var(--bank-delay) both; }
+.world-anchor .bank-slot.bank-arriving > .cf-card {
+ animation:bank-slide var(--bank-slide) cubic-bezier(.16,.84,.3,1) var(--bank-delay) both,
+  bank-snap var(--bank-snap) linear calc(var(--bank-delay) + var(--bank-slide)) forwards;
+}
+@keyframes bank-mask { from { clip-path:inset(0 round 4px); } to { clip-path:inset(-100px); } }
+@keyframes bank-slide { from { transform:translateY(96%) scale(.72); } to { transform:translateY(0) scale(.72); } }
+/* A beat of resistance, then the pull: it accelerates into place, overshoots and rings down as if it hit a magnet. */
+@keyframes bank-snap {
+ 0% { transform:scale(.72); filter:none; animation-timing-function:cubic-bezier(.4,0,.6,1); }
+ 18% { transform:scale(.68); animation-timing-function:cubic-bezier(.7,0,.9,.5); }
+ 46% { transform:scale(1.08); filter:brightness(1.45); animation-timing-function:cubic-bezier(.2,.6,.4,1); }
+ 64% { transform:scale(.965); filter:brightness(1.1); animation-timing-function:ease-in-out; }
+ 82% { transform:scale(1.018); animation-timing-function:ease-in-out; }
+ 100% { transform:scale(1); filter:none; }
+}
+/* One lap of light round the slot, after an entry or while its card resolves: two heads with trailing tails over a faint rim, as on the lanes. */
+@property --bank-sweep-angle { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+.world-anchor .bank-slot > .bank-sweep {
+ --sweep:var(--player-base,#ffcc12);
+ position:absolute; z-index:10; inset:-2px; width:auto; height:auto; border:0; border-radius:6px; background:none; pointer-events:none;
+ filter:drop-shadow(0 0 2px var(--sweep)) drop-shadow(0 0 5px var(--sweep));
+ animation:bank-sweep-fade var(--bank-sweep-ms) linear both;
+}
+.world-anchor .bank-slot > .bank-sweep.after-entry { animation-delay:calc(var(--bank-delay) + var(--bank-slide) + var(--bank-snap)); }
+.world-anchor .bank-slot > .bank-sweep::before {
+ content:''; position:absolute; inset:0; padding:2px; border-radius:inherit;
+ background:
+  conic-gradient(from var(--bank-sweep-angle),
+   transparent 0deg 40deg, color-mix(in srgb,var(--sweep) 25%,transparent) 70deg, var(--sweep) 98deg, #fff 106deg, transparent 107deg 220deg,
+   color-mix(in srgb,var(--sweep) 25%,transparent) 250deg, var(--sweep) 278deg, #fff 286deg, transparent 287deg),
+  color-mix(in srgb,var(--sweep) 14%,transparent);
+ mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite:exclude;
+ animation:bank-sweep-run var(--bank-sweep-ms) cubic-bezier(.45,.05,.55,.95) both; animation-delay:inherit;
+}
+@keyframes bank-sweep-run { from { --bank-sweep-angle:0deg; } to { --bank-sweep-angle:360deg; } }
+@keyframes bank-sweep-fade { 0% { opacity:0; } 12%,80% { opacity:1; } 100% { opacity:0; } }
+@media (prefers-reduced-motion:reduce) {
+ .world-anchor .bank-slot.bank-arriving,.world-anchor .bank-slot.bank-arriving > .cf-card { animation:none; }
+ .world-anchor .bank-slot > .bank-sweep::before { animation:none; }
+}
+/* Bank labels line up with the outer slots rather than the wider dock. */
+.bank-dock { --bank-inset:calc((228px - 4 * 45.4px - 3 * 7px) / 2); }
+.world-anchor .duration.live-bank.near>small,.world-anchor .duration.live-bank.far>small,
+.world-anchor .duration.live-bank.near>span,.world-anchor .duration.live-bank.far>span { top:calc(100% + 12px); bottom:auto; transform:none; }
+.world-anchor .duration.live-bank.near>small,.world-anchor .duration.live-bank.far>small { left:var(--bank-inset); }
+.world-anchor .duration.live-bank.near>span,.world-anchor .duration.live-bank.far>span { right:var(--bank-inset); }
+/* Draw, hand and discard counts: 8px left of the bank title, 24px under its line (bays 65 + gap 12 + line 11). */
+.world-anchor .bank-dock>.pile-row { position:absolute; left:calc(var(--bank-inset) - 8px); top:calc(65px + 12px + 11px + 24px); display:flex; gap:6px; padding:0 4px; border-radius:2px; background:#101321a6; }
+/* The opponent's row rides 12px higher in all: 6px with its bank, 6px of its own. */
+.world-anchor .bank-dock.far>.pile-row { top:calc(65px + 12px + 11px + 24px - 6px); }
+.world-anchor .bank-dock .pile,
+.world-anchor .bank-dock .pile:hover:not(:disabled) { position:relative; display:flex; align-items:center; width:auto; height:22px; margin:0; padding:0 5px; gap:5px; border:0; border-radius:0; background:none; box-shadow:none; }
+.world-anchor .bank-dock .pile::after {
+ content:attr(data-tip); position:absolute; z-index:5; left:50%; top:calc(100% + 5px); transform:translate(-50%,-2px);
+ padding:3px 6px; border-radius:3px; background:#060611f0; box-shadow:0 2px 6px #000a;
+ font:500 8px/1.2 Inter,sans-serif; color:#e7ecf5; white-space:nowrap; pointer-events:none;
+ opacity:0; transition:opacity .12s,transform .12s;
+}
+.world-anchor .bank-dock .pile:hover::after,
+.world-anchor .bank-dock .pile[data-tip-open]::after { opacity:1; transform:translate(-50%,0); }
+/* Stat labels stay hidden until the row is hovered or tapped. */
+.world-anchor .resources { pointer-events:auto; }
+.world-anchor .resources small { opacity:0; transition:opacity .3s ease-out; }
+.world-anchor .resources:hover small,
+.world-anchor .resources[data-labels-open] small { opacity:1; }
+/* Next turn's Actions sit in the label slot under the stat and give way to the label while it shows. */
+.world-anchor .resources .stat-foot { display:grid; justify-items:center; }
+.world-anchor .resources .stat-foot > * { grid-area:1 / 1; }
+.world-anchor .resources .stat-pending { transition:opacity .3s ease-out; }
+.world-anchor .resources:hover .stat-pending,
+.world-anchor .resources[data-labels-open] .stat-pending { opacity:0; }
+/* Reveal priority: the dot and label light green while the local player holds priority, and sit dark otherwise. */
+.world-anchor .local-console>.reveal-priority { display:flex; align-items:center; justify-content:center; gap:5px; color:#5b6474; transition:color .2s; }
+.world-anchor .local-console>.reveal-priority>i { width:5px; height:5px; border-radius:50%; background:#343b48; transition:background-color .2s,box-shadow .2s; }
+.world-anchor .local-console>.reveal-priority.active { color:var(--green,#1fffb1); }
+.world-anchor .local-console>.reveal-priority.active>i { background:var(--green,#1fffb1); box-shadow:0 0 6px #1fffb1aa; }
+/* One backing strip behind the bank title and count, spanning the outer slots. */
+.world-anchor .duration.live-bank::after {
+ content:''; position:absolute; z-index:-1; top:calc(100% + 11px); left:calc(var(--bank-inset) - 4px); right:calc(var(--bank-inset) - 4px);
+ height:11px; padding:1px 0; border-radius:2px; background:#101321a6; pointer-events:none;
+}
+.turn-dock > .undo-planning {
+ display:flex; align-items:center; gap:5px; margin:0; padding:6px 8px;
+ border:1px solid #1f3f73; border-radius:4px; background:#0b1e45;
+ font:500 10px/1.4 Inter,sans-serif; letter-spacing:.4px; text-transform:uppercase;
+ color:#cfe0ff; text-decoration:none; white-space:nowrap; cursor:pointer;
+ box-shadow:0 1px 1px #000c;
+ transition:transform .18s ease-out,box-shadow .18s ease-out,background-color .18s,border-color .18s;
+}
+.turn-dock > .undo-planning .icon { width:11px; height:11px; align-self:center; }
+.turn-dock > .undo-planning:hover:not(:disabled) {
+ transform:translateY(-3px); background:#10295c; border-color:#35609f; color:#eef5ff;
+ box-shadow:0 5px 8px #000b,0 12px 22px #0009;
+}
+.turn-dock > .undo-planning:active:not(:disabled) { transform:translateY(-1px); box-shadow:0 2px 4px #000c; }
+.turn-dock > .undo-planning:disabled { opacity:.5; cursor:default; }
+.turn-dock > .undo-planning:focus-visible { outline:1px solid #8fb6ff; outline-offset:3px; }
+@media(prefers-reduced-motion:reduce) { .turn-dock > .undo-planning { transition:none; } }
+
+/* Wallet: stacked full-aspect Crypto cards + green total. */
 .world-anchor .crypto-cache {
- width:174px; min-height:116px; padding:9px 11px 7px; transform:none;
- border:1px solid #35b08788; border-radius:8px;
+ width:168px; min-height:132px; padding:10px 12px 8px; transform:none;
+ border:1px solid #35b08788; border-radius:10px;
  background:linear-gradient(145deg,#08251fe8,#071814ed);
- box-shadow:inset 0 0 20px #0cff8c09,0 5px 15px #0007;
+ box-shadow:inset 0 0 20px #0cff8c09,0 6px 16px #0008;
+ overflow:visible;
 }
-.world-anchor .crypto-cache>.cache-cards { height:68px; min-height:68px; margin:6px 0; }
-.world-anchor .cache-cards .cache-card { overflow:hidden; width:49px; height:65px; left:calc(50% - 27px + var(--stack-index)*5px); }
-.world-anchor .cache-card>.card-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.world-anchor .cache-card>strong,.world-anchor .cache-card>.icon { display:none; }
-.world-anchor .cache-card>span { position:absolute; bottom:3px; right:3px; padding:2px 3px; color:#d0ffe6; background:#04291de8; font:600 10px Orbitron,sans-serif; border:1px solid #54e4a78a; border-radius:3px; }
-.world-anchor .crypto-cache>small { font-size:7px; letter-spacing:.15px; }
+.world-anchor .crypto-cache>div:first-child {
+ display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:4px;
+}
+.world-anchor .crypto-cache>div:first-child b {
+ color:var(--green,#1fffb1); font:600 9px Orbitron,sans-serif; letter-spacing:1px;
+}
+.world-anchor .crypto-cache>.cache-cards {
+ position:relative; height:78px; min-height:78px; margin:6px 0 4px;
+ display:block;
+}
+.world-anchor .cache-cards .cache-card {
+ position:absolute;
+ width:50px; height:calc(50px * 224 / 158);
+ left:calc(50% - 25px + var(--stack-index) * 7px);
+ top:calc(6px - var(--stack-index) * 3px);
+ padding:0; margin:0; overflow:visible;
+ border:0; background:transparent; border-radius:4px;
+ box-shadow:0 6px 12px #000a;
+ transform:none;
+ display:block;
+}
+.world-anchor .cache-cards .cache-card > .cf-card { width:100%; height:100%; }
+.world-anchor .cache-card > strong,
+.world-anchor .cache-card > span,
+.world-anchor .cache-card > .icon { display:none!important; }
+.world-anchor .cache-cards .cache-card.paying { visibility:hidden; }
+.world-anchor .cache-cards .cache-card:hover {
+ transform:translateY(-8px); z-index:20!important; filter:brightness(1.08);
+}
+.world-anchor .crypto-cache > .cache-total {
+ display:block; text-align:center; margin:2px 0 2px;
+ color:var(--green,#1fffb1); font:700 22px/1 Orbitron,sans-serif;
+ text-shadow:0 0 10px #1fffb155;
+}
+.world-anchor .crypto-cache>small {
+ display:block; text-align:center; font-size:7px; letter-spacing:.15px; color:#8abca7;
+}
+.world-anchor .cache-cards>small { color:#8abca7; text-align:center; display:block; padding-top:22px; }
+
 /* Placement stays face up. The End Turn commit supplies the concealment beat. */
 .flying-card:not(.crypto-flight) .flying-face { animation:none; opacity:1; display:grid; }
 .flying-card:not(.crypto-flight) .flying-back { animation:none; opacity:0; }
@@ -50,7 +188,7 @@
 @media(prefers-reduced-motion:reduce) { .world-anchor .field-card.hidden-card {animation:none} }
 
 /* Current board pass: the glass tube is the health bar; the DOM strip stays accessible only. */
-.world-anchor .data-center {
+.world-anchor .server {
  width:188px;
  height:30px;
  padding:0;
@@ -58,7 +196,7 @@
  box-shadow:none;
  overflow:visible;
 }
-.world-anchor .data-center>i {
+.world-anchor .server>i {
  position:absolute!important;
  width:1px!important;
  height:1px!important;
@@ -71,15 +209,15 @@
  margin:-1px!important;
  opacity:0!important;
 }
-.world-anchor .data-center.dc-drain,
-.world-anchor .data-center.dc-restore {
+.world-anchor .server.server-drain,
+.world-anchor .server.server-restore {
  animation:none;
 }
-.world-anchor .data-center.dc-drain .dc-readout b {
+.world-anchor .server.server-drain .server-readout b {
  color:#ff607f;
  text-shadow:0 0 8px #fa0048;
 }
-.world-anchor .data-center.dc-restore .dc-readout b {
+.world-anchor .server.server-restore .server-readout b {
  color:var(--gold);
  text-shadow:0 0 8px #ffcc12;
 }
@@ -97,7 +235,12 @@
  width:59px;
  height:66px;
  grid-template-rows:50px 14px;
- box-shadow:0 2px 0 #8c8496,0 4px 0 #10111b,0 8px 10px #000c;
+ border-radius:4px;
+ box-shadow:0 2px 2px #00000080,0 5px 9px #00000080,0 12px 18px -4px #00000080;
+}
+/* Played cards sit on the board; lifting on hover throws the shadow further and softer. */
+.world-anchor .field-card:hover {
+ box-shadow:0 6px 6px #00000080,0 16px 20px #00000080,0 28px 34px -8px #00000080;
 }
 .world-anchor .field-card>.card-art,
 .world-anchor .field-card>.missing-art {
@@ -122,19 +265,116 @@
 
 .world-anchor .power-badge.winning b,
 .board-canvas .power-badge.winning b {
- color:#e9fbff;
  filter:none;
  text-shadow:0 2px 2px #02030a,0 0 8px currentColor,0 0 18px currentColor;
 }
 .world-anchor .power-badge.local.winning b,
-.board-canvas .power-badge.local.winning b {
- color:#58f7ff;
-}
+.board-canvas .power-badge.local.winning b,
 .world-anchor .power-badge.opponent.winning b,
 .board-canvas .power-badge.opponent.winning b {
- color:#ff3d82;
+ color:#fff;
 }
 .world-anchor .power-badge.local.winning,
 .world-anchor .power-badge.opponent.winning {
- filter:drop-shadow(0 0 8px currentColor) drop-shadow(0 0 18px currentColor);
+ filter:drop-shadow(0 0 8px #ffcc1288) drop-shadow(0 0 14px #ffcc1255);
 }
+
+/* Screen-space wallet + End Turn (no longer projected onto the 3D table). */
+/* The wallet's bottom edge runs through the middle of its cards, which hang below it at their old height. */
+.arena > .crypto-cache.hud-wallet {
+ position:absolute; right:12%; bottom:calc(31px + 46px * 224 / 158 / 2); z-index:24;
+ width:auto; min-width:0; min-height:0; height:auto; padding:16px 16px 0;
+ display:flex; flex-direction:column; align-items:stretch; gap:12px;
+ border:1px solid #35b08788; border-radius:10px;
+ background:linear-gradient(145deg,#08251fe8,#071814ed);
+ box-shadow:inset 0 0 20px #0cff8c09,0 6px 16px #0008;
+ overflow:visible; color:var(--green,#1fffb1);
+}
+/* Head: large icon and total, then the label and card count stacked beside them. */
+.arena > .crypto-cache.hud-wallet > .wallet-head {
+ display:flex; align-items:center; gap:8px; flex:0 0 auto; margin:0;
+}
+.arena > .crypto-cache.hud-wallet > .wallet-head .icon {
+ width:26px; height:26px;
+}
+.arena > .crypto-cache.hud-wallet > .wallet-head .cache-total {
+ margin:0; color:var(--green,#1fffb1); font:700 26px/1 Orbitron,sans-serif;
+ text-shadow:0 0 10px #1fffb155;
+}
+.arena > .crypto-cache.hud-wallet .wallet-label {
+ display:flex; flex-direction:column; gap:3px; margin-left:2px; white-space:nowrap;
+}
+.arena > .crypto-cache.hud-wallet .wallet-label b {
+ color:var(--green,#1fffb1); font:600 8px Orbitron,sans-serif; letter-spacing:1px;
+}
+.arena > .crypto-cache.hud-wallet .wallet-label small {
+ font-size:7px; letter-spacing:.15px; color:#8abca7;
+}
+/* The top half of the fanned cards; card centres sit on this box's bottom edge. */
+.arena > .crypto-cache.hud-wallet > .cache-cards {
+ position:relative; flex:0 0 auto; width:100%; min-width:calc(46px + (var(--count, 1) - 1) * 26px + 8px);
+ height:calc(46px * 224 / 158 / 2 + 4px); min-height:0; margin:0;
+ display:block;
+}
+/* Arched like the hand: each card spreads 26px, tilts with --angle and dips with --lift toward the ends. */
+.arena > .crypto-cache.hud-wallet .cache-card {
+ position:absolute;
+ width:46px; height:calc(46px * 224 / 158);
+ left:calc(50% + var(--fan) * 26px);
+ top:100%;
+ transform:translate(-50%, calc(-50% + var(--lift))) rotate(var(--angle));
+ transform-origin:50% 120%;
+ padding:0; margin:0; overflow:visible;
+ border:0; background:transparent; border-radius:4px;
+ box-shadow:0 6px 12px #000a; display:block;
+}
+.arena > .crypto-cache.hud-wallet .cache-card > .cf-card { width:100%; height:100%; }
+.arena > .crypto-cache.hud-wallet .cache-card > strong,
+.arena > .crypto-cache.hud-wallet .cache-card > span,
+.arena > .crypto-cache.hud-wallet .cache-card > .icon { display:none!important; }
+.arena > .crypto-cache.hud-wallet .cache-card.paying { visibility:hidden; }
+.arena > .crypto-cache.hud-wallet .cache-card:hover {
+ transform:translate(-50%, calc(-50% + var(--lift) - 8px)) rotate(var(--angle)); z-index:20!important; filter:brightness(1.08);
+}
+/* End Turn sits in the corner with Undo centred 64px above it. */
+.arena > .turn-dock {
+ position:absolute; right:40px; bottom:40px; z-index:25;
+ width:128px; display:flex; flex-direction:column; align-items:center; gap:64px;
+}
+.turn-dock > .end-turn {
+ position:relative; inset:auto;
+ width:128px; min-height:52px; padding:0; border-radius:16px;
+ border:2px solid #60dfef; background:linear-gradient(#187288,#0d465b);
+ box-shadow:inset 0 1px 0 #c7f4ff,0 8px 16px #0008;
+ overflow:visible; isolation:isolate; display:block;
+}
+/* The caption fills the button so its turn line can hang 12px below the button's outer edge. */
+.turn-dock > .end-turn .turn-caption {
+ position:relative; z-index:2; color:#d1fbff; font:700 13px Orbitron;
+ text-shadow:0 2px 1px #103e57; padding:0 4px; min-height:48px;
+ display:flex; align-items:center; justify-content:center;
+}
+.turn-dock > .end-turn .turn-caption small {
+ position:absolute; top:calc(100% + 2px + 12px); left:0; right:0; margin:0; line-height:1;
+ color:#a2e6eb; font:7px Inter; letter-spacing:.7px; text-shadow:none; white-space:nowrap; display:block;
+}
+.turn-dock > .end-turn .turn-countdown {
+ position:absolute; inset:3px; border:0; width:auto; background:#0c3243;
+ z-index:0; border-radius:13px; overflow:hidden; display:flex; justify-content:flex-end;
+}
+/* Anchored right, so the fill drains toward the right edge. */
+.turn-dock > .end-turn .turn-countdown em {
+ display:block; flex:0 0 auto; height:100%; width:var(--turn-fill);
+ background:linear-gradient(#48ddec,#1388b0); box-shadow:inset 1px 0 0 #c8ffff;
+ transition:width 100ms linear;
+}
+/* Player colour theme. `--player-*` is only set for a chosen colour, so each fallback is the Classic value. */
+.world-anchor .server .server-readout>small { color:var(--player-label,#9cdae5); }
+.world-anchor .server em {
+ background:linear-gradient(0deg,var(--player-fill-low,#1296b1),var(--player-fill-high,#83e6ef));
+ box-shadow:0 0 5px var(--player-fill-glow,#0adfff66);
+}
+.world-anchor .duration.live-bank>small { color:var(--player-bank-label,#b9a4d0); }
+.world-anchor .bank-slot.active-source { outline-color:var(--player-bank-label,#dfc6ff); }
+.turn-dock > .end-turn:disabled { opacity:.7; }
+.turn-dock > .end-turn.turn-ready:hover { border-color:#d0ffff; filter:brightness(1.12); }

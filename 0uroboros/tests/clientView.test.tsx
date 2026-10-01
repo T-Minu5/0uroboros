@@ -29,6 +29,8 @@ import {
 import { addToHand, createHarness, openNodes, placeCardAtNode, setLocation } from './helpers';
 import type { OuroborosState, PlayerID } from '../src/game/types';
 import { CARD_DEFINITIONS } from '../src/game/content/cards';
+import { nodeOpenPhrase } from '../src/game/config/defaults';
+import { circuitAnnouncement } from '../src/client/hud/PhaseAnnouncement';
 import { damageDataCenter } from '../src/game/engine/dataCenters';
 import { transferProbability } from '../src/game/engine/probability';
 import { playerView } from '../src/game/playerView';
@@ -61,6 +63,8 @@ describe('Node headers', () => {
     expect(html).toContain('>9<');
     expect(html).toContain('>3<');
     expect(html).toContain('You lead');
+    expect(html).toContain('data-lead="self"');
+    expect(html).toContain('node-head__point');
   });
 
   it('reports a tie rather than inventing a winner', () => {
@@ -73,6 +77,20 @@ describe('Node headers', () => {
       <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[]} />,
     );
     expect(html).toContain('Tied');
+    expect(html).toContain('data-lead="tie"');
+  });
+
+  it('points the Location border toward the opponent when they lead', () => {
+    const { state } = createHarness();
+    openNodes(state, [0]);
+    placeCardAtNode(state, '0', 'cipher_runner', 0, { revealed: true });
+    placeCardAtNode(state, '1', 'monolith_core', 0, { revealed: true });
+
+    const html = renderToStaticMarkup(
+      <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[]} />,
+    );
+    expect(html).toContain('Opponent leads');
+    expect(html).toContain('data-lead="rival"');
   });
 
   it('hides the Location of a closed Node', () => {
@@ -96,6 +114,8 @@ describe('Node headers', () => {
     );
     expect(html).toContain('Occult archive');
     expect(html).toContain('On collapse, the winner gains 2 Victory Points.');
+    expect(html).toContain('node-head__mid');
+    expect(html).toContain('node-head__half');
   });
 
   it('names revealed cards on the Node without leaking facedown identity', () => {
@@ -107,9 +127,51 @@ describe('Node headers', () => {
     const html = renderToStaticMarkup(
       <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[]} />,
     );
-    expect(html).toContain('Monolith core 9');
-    expect(html).toContain('1 committed');
+    expect(html).toContain('Monolith core');
+    expect(html).toContain('BASE');
+    expect(html).toContain('Committed');
+    expect(html).toContain('Hidden');
     expect(html).not.toContain('Cipher runner');
+  });
+
+  it('exposes landing slots on the local half of each Node', () => {
+    const { state } = createHarness();
+    const html = renderToStaticMarkup(
+      <NodeHeaders
+        nodes={nodeViews(state, '0')}
+        legalNodes={[0]}
+        dragging
+        hoveredNode={0}
+        ghostName="Rezz-Razor"
+      />,
+    );
+    expect(html).toContain('node-head__slot');
+    expect(html).toContain('Rezz-Razor');
+    expect(html).toContain('node-head__chance');
+  });
+
+  it('names why a hovered Node cannot receive the drop', () => {
+    const { state } = createHarness();
+    const html = renderToStaticMarkup(
+      <NodeHeaders
+        nodes={nodeViews(state, '0')}
+        legalNodes={[]}
+        dragging
+        hoveredNode={0}
+        nodeReasons={{ 0: 'Node full' }}
+      />,
+    );
+    expect(html).toContain('Node full');
+    expect(html).toContain('data-blocked="true"');
+  });
+
+  it('marks a Node that just opened as a local opening region', () => {
+    const { state } = createHarness();
+    const html = renderToStaticMarkup(
+      <NodeHeaders nodes={nodeViews(state, '0')} legalNodes={[4]} openingNodes={[4]} />,
+    );
+    expect(html).toContain('data-opening="true"');
+    expect(html).toContain('Opens this window');
   });
 
   it('marks legal Nodes so legality is taught before the attempt', () => {
@@ -119,6 +181,22 @@ describe('Node headers', () => {
     );
     const legalCount = html.split('data-legal="true"').length - 1;
     expect(legalCount).toBe(2);
+  });
+});
+
+describe('Node opening copy', () => {
+  it('names a consecutive opening range', () => {
+    expect(nodeOpenPhrase([0, 1, 2])).toBe('Nodes 1–3 open');
+  });
+
+  it('names a single Node opening', () => {
+    expect(nodeOpenPhrase([3])).toBe('Node 4 opens');
+    expect(nodeOpenPhrase([4])).toBe('Node 5 opens');
+  });
+
+  it('keeps Node opening off the center announcement', () => {
+    expect(circuitAnnouncement('circuitDeploy', 1, 2, 0)).toBeNull();
+    expect(circuitAnnouncement('reveal', 1, 2, 1)).toBeNull();
   });
 });
 
@@ -152,6 +230,17 @@ describe('Player status', () => {
     expect(html).toContain('Backup DC');
     expect(html).toContain('2000/2000');
     expect(html).toContain('1500/1500');
+    expect(html).toContain('Actions');
+    expect(html).toContain('>2<');
+  });
+
+  it('shows pending Actions gained on reveal', () => {
+    const { state } = createHarness();
+    state.players['0'].pendingActions = 1;
+    const html = renderToStaticMarkup(
+      <PlayerStatus status={statusView(state, '0')} side="local" label="You" showWallet={false} />,
+    );
+    expect(html).toContain('pending 1');
   });
 
   it('marks a destroyed Data Center without merging the pools', () => {
@@ -299,15 +388,18 @@ describe('Full table render', () => {
 
     const html = renderTable(state, '0', 'circuit');
     expect(html).toContain('Cycle 1');
-    expect(html).toContain('Deploy');
-    expect(html).toContain('Window 1 of 5');
+    expect(html).toContain('Runtime');
+    expect(html).toContain('Turn 1');
+    expect(html).toContain('Window 1 of 3');
+    expect(html).toContain('data-phase="runtime"');
     expect(html).toContain('Your bank');
     expect(html).toContain('Opponent bank');
     expect(html).toContain('Player 0 (you)');
     expect(html).toContain('Cipher runner');
     expect(html).toContain('End turn');
-    // The Crypto card is present but explicitly unplayable.
-    expect(html).toContain('Not played at Nodes');
+    expect(html).toContain('data-hud="crypto"');
+    expect(html).toContain('data-stash="true"');
+    expect(html).toContain('Wallet');
   });
 
   it('renders the Draft view with market and Circuit Reward', () => {
@@ -326,12 +418,15 @@ describe('Full table render', () => {
     expect(html).toContain('Serpent crown');
     expect(html).toContain('Base offerings');
     expect(html).toContain('Chaos offerings');
+    expect(html).toContain('draft__heroes');
+    expect(html).toContain('draft__piles');
     expect(html).toContain('Claim');
   });
 
-  it('still renders Draft when a collapse report is present', () => {
+  it('holds Wave Collapse in front of Draft until theater finishes', () => {
     const { state } = createHarness();
     state.phase = 'draft';
+    state.collapseSerial = 1;
     state.collapseReport = {
       serial: 1,
       cycle: 1,
@@ -352,8 +447,15 @@ describe('Full table render', () => {
     };
 
     const html = renderTable(state, '0', 'draft');
-    expect(html).toContain('Draft');
-    expect(html).toContain('Base offerings');
+    expect(html).toContain('Wave Collapse');
+    expect(html).toContain('data-phase="collapse"');
+    expect(html).not.toContain('Base offerings');
+  });
+
+  it('keeps inspect closed until a card is clicked', () => {
+    const { state } = createHarness();
+    const html = renderTable(state, '0', 'circuit');
+    expect(html).not.toContain('data-inspect="true"');
   });
 
   it('does not leak opponent hand contents into the seat markup', () => {

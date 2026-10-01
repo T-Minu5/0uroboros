@@ -34,6 +34,8 @@ import { damageDataCenter, healDataCenter } from './dataCenters';
 import { resolveProbabilityRef, setProbability, transferProbability } from './probability';
 import { addLog } from './log';
 import { pushFx } from './fx';
+import { gainActions } from './actions';
+import { getCardDefinition } from '../content/cards';
 
 /** Context an effect resolves within. */
 export interface EffectContext {
@@ -339,9 +341,10 @@ function applyOp(
       }
       let healedAny = false;
       players.forEach((player) => {
-        const targetId = op.dataCenter ?? 'primary';
+        const targetId = dataCenterTarget(state, player, op.dataCenter);
+        if (!targetId) return;
         const before = state.players[player].dataCenters[targetId].health;
-        const healed = healDataCenter(state, player, op.amount, op.dataCenter);
+        const healed = healDataCenter(state, player, op.amount, targetId);
         if (healed > 0) {
           healedAny = true;
           pushFx(
@@ -362,6 +365,28 @@ function applyOp(
       return;
     }
 
+    case 'gainActions': {
+      const players = resolvePlayerRefs(op.target, ctx);
+      if (players.length === 0) {
+        outcome.noValidTarget = true;
+        return;
+      }
+      const availability = ctx.chapter === 'reveal' ? 'nextTurn' : 'immediate';
+      players.forEach((player) => {
+        gainActions(state, player, op.amount, availability);
+        pushFx(
+          state,
+          {
+            kind: 'actions',
+            player,
+            amount: op.amount,
+          },
+          ctx,
+        );
+      });
+      return;
+    }
+
     case 'draw': {
       const players = resolvePlayerRefs(op.target, ctx);
       if (players.length === 0) {
@@ -371,6 +396,25 @@ function applyOp(
       players.forEach((player) => {
         const drawn = drawCards(state, player, op.amount, random);
         if (drawn.length === 0) outcome.noValidTarget = true;
+        const source = ctx.sourceCard
+          ? getCardDefinition(ctx.sourceCard.cardDefId).name
+          : 'Effect';
+        addLog(
+          state,
+          ctx.chapter === 'reveal' ? 'reveal' : 'phase',
+          `${source}: +${drawn.length} Cards.`,
+        );
+        if (drawn.length > 0) {
+          pushFx(
+            state,
+            {
+              kind: 'draw',
+              player,
+              amount: drawn.length,
+            },
+            ctx,
+          );
+        }
       });
       return;
     }

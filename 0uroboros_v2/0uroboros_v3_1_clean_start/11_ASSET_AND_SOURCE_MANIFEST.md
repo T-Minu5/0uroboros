@@ -25,7 +25,7 @@ Known prior art names included Slash-Dot, Dotkrawler, Rezz-Razor, Glitch-Witch.e
 Historical builds lacked an obvious matched first-party identity-art file. Search the new assets. If absent, record `ART_ASSET_MISSING`; do not invent permanent canon art without Mel.
 
 ## Icons
-Create an icon semantics map. High-confidence concepts include priority, Actions, Crypto, Data Centers/database, deck, discard, hand, Power. Ambiguous icon meaning remains unresolved until evidence clarifies it.
+Create an icon semantics map. High-confidence concepts include priority, Actions, Crypto, Servers/database, deck, discard, hand, Power. Ambiguous icon meaning remains unresolved until evidence clarifies it.
 
 ## References
 Locate Examples of Good/Great, Marvel Snap, Hearthstone, Slay the Spire, Shards of Infinity, other strategic-card references, Three.js effects URLs, and effect-animation media.

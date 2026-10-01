@@ -1,0 +1,35 @@
+---
+description: Always-on Shokunin skill routing for 0uroboros
+alwaysApply: true
+---
+
+# Shokunin routing
+
+This repo always uses the curated Shokunin set in `.cursor/skills/`. Cursor loads those folders automatically. Before doing the work in the left column, read that skill's `SKILL.md` and follow it.
+
+| Work | Skill |
+| --- | --- |
+| Game definition, moves, phases, Local/SocketIO, playerView | `boardgame-io` (always for this project) |
+| Table, HUD, card, or layout UI | `component-forge` |
+| Reveal, collapse, or other motion | `motion-craft` |
+| Design critique or polish | `impeccable` |
+| Visual identity (restrained cyberpunk) | `taste` |
+| Pattern / UX inventory | `ui-ux-pro-max` |
+| Interaction timing and easing | `emil-design-eng` |
+| Layout across viewports | `responsive-engine` |
+| Vitest or rules-engine tests | `test-commander` |
+| Browser verification | `playwright` |
+| Review of a change | `code-review` or `comprehensive-review` |
+| Three.js / render cost | `performance-profiler` |
+| Failure paths and logging | `error-handler` |
+| Multi-step implementation | `plan` |
+| Product or rules docs | `documentation` |
+| Git history or PR shape | `git-workflow` |
+| Auth, matchmaking, or sockets | `auth-architect` then `api-forge` |
+| Client/server trust boundary | `web-security` |
+| YouTube transcript, search, channel, or playlist | `youtube-full` |
+| YouTube visual timeline / watch on screen | `youtube-watch` |
+
+Do not load kubernetes, docker, flutter, finance, kami, or windows-powershell. If a needed skill is missing, use `find-skills`.
+
+0uroboros copy rules still win: sentence case, no em dashes, accents only for state meaning.

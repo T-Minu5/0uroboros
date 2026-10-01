@@ -1,5 +1,5 @@
 /**
- * Wave Collapse presentation beats. The engine has already resolved; this only
+ * Wave Collapse presentation events. The engine has already resolved; this only
  * walks the public report for both seats.
  */
 
@@ -9,6 +9,7 @@ import {
   buildCollapseBeats,
   collapseWinnerTitle,
 } from '../src/client/collapseTheater';
+import { REDUCED_MOTION_MS } from '../src/client/presentation/timing';
 import type { CollapseReport } from '../src/game/types';
 
 const report: CollapseReport = {
@@ -40,35 +41,52 @@ const report: CollapseReport = {
 };
 
 describe('buildCollapseBeats', () => {
-  it('walks title, each Node, the probability pick, then the winner', () => {
+  it('walks Location, result, reward, then the probability pick', () => {
     const beats = buildCollapseBeats(report, '0', false);
-    expect(beats.map((beat) => beat.kind)).toEqual(['title', 'node', 'node', 'select', 'winner']);
-    expect(beats[0]).toMatchObject({ title: 'Wave Collapse', subtitle: 'Cycle 2' });
-    expect(beats[1].title).toBe('Node 1 collapses');
-    expect(beats[1].subtitle).toContain('You win the Node');
-    expect(beats[1].subtitle).toContain('Occult archive');
+    expect(beats.map((beat) => beat.kind)).toEqual([
+      'title',
+      'location',
+      'result',
+      'reward',
+      'location',
+      'result',
+      'measure',
+      'select',
+      'winner',
+    ]);
+    expect(beats[0]).toMatchObject({ title: 'Wave Collapse' });
+    expect(beats[1].title).toBe('Occult archive');
     expect(beats[1].subtitle).toContain('On collapse, the winner gains 2 Victory Points.');
-    expect(beats[2].subtitle).toContain('Tied');
-    expect(beats[2].subtitle).toContain('No Location reward');
-    expect(beats[3].title).toBe('Probability collapses into Node 1');
-    expect(beats[3].subtitle).toBe('Occult archive');
-    expect(beats[4].title).toBe('You win the Wave Collapse');
+    expect(beats[2].title).toBe('You win the Node');
+    expect(beats[5].title).toBe('Tied');
+    expect(beats[7].title).toBe('Node 1 is selected');
+    expect(beats[8].title).toBe('You win the Wave Collapse');
   });
 
   it('names the opponent as the Wave Collapse winner from the other seat', () => {
     const beats = buildCollapseBeats(report, '1', false);
-    expect(beats[1].subtitle).toContain('Opponent wins the Node');
-    expect(beats[4].title).toBe('Player 0 wins the Wave Collapse');
+    expect(beats[2].title).toBe('Opponent wins the Node');
+    expect(beats[8].title).toBe('Player 0 wins the Wave Collapse');
   });
 
   it('skips the pick and winner when Collapse ended early', () => {
     const beats = buildCollapseBeats({ ...report, endedEarly: true, selectedNode: null, eligible: [] }, '0', false);
-    expect(beats.map((beat) => beat.kind)).toEqual(['title', 'node', 'node']);
+    expect(beats.map((beat) => beat.kind)).toEqual([
+      'title',
+      'location',
+      'result',
+      'reward',
+      'location',
+      'result',
+    ]);
   });
 
   it('shortens holds when motion is reduced', () => {
+    const full = buildCollapseBeats(report, '0', false);
     const beats = buildCollapseBeats(report, '0', true);
-    expect(beats.every((beat) => beat.holdMs === 220)).toBe(true);
+    // Caps apply per timing field; Node gap may add one capped beat onto result/reward.
+    expect(beats.every((beat) => beat.holdMs <= REDUCED_MOTION_MS * 2)).toBe(true);
+    expect(beats.every((beat, i) => beat.holdMs <= full[i]!.holdMs)).toBe(true);
   });
 });
 

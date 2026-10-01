@@ -87,9 +87,19 @@ export function healDataCenter(
   amount: number,
   dataCenter?: DataCenterId,
 ): number {
-  const target =
-    state.players[player].dataCenters[dataCenter ?? 'primary'];
-  if (target.destroyed || amount <= 0) return 0;
+  const dcs = state.players[player].dataCenters;
+  let targetId: DataCenterId | null;
+  if (dataCenter) {
+    targetId = dcs[dataCenter].destroyed ? null : dataCenter;
+  } else if (!dcs.primary.destroyed) {
+    targetId = 'primary';
+  } else if (!dcs.backup.destroyed) {
+    targetId = 'backup';
+  } else {
+    targetId = null;
+  }
+  if (!targetId || amount <= 0) return 0;
+  const target = dcs[targetId];
   const healed = Math.min(amount, target.maxHealth - target.health);
   target.health += healed;
   return healed;

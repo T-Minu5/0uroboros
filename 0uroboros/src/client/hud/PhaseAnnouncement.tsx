@@ -8,13 +8,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { PRESENTATION_TIMING } from '../presentation/timing';
+import { getPresentationSpeed } from '../presentation/speed';
+
 export interface PhaseTitle {
   key: string;
   title: string;
   subtitle?: string;
 }
-
-const HOLD_MS = 900;
 
 export function PhaseAnnouncement({ announcement }: { announcement: PhaseTitle | null }) {
   const [current, setCurrent] = useState<PhaseTitle | null>(null);
@@ -28,7 +29,8 @@ export function PhaseAnnouncement({ announcement }: { announcement: PhaseTitle |
 
     setCurrent(announcement);
     if (timer.current !== null) window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCurrent(null), HOLD_MS);
+    const hold = PRESENTATION_TIMING[getPresentationSpeed()].phaseAnnouncementMs;
+    timer.current = window.setTimeout(() => setCurrent(null), hold);
 
     return () => {
       if (timer.current !== null) window.clearTimeout(timer.current);
@@ -51,18 +53,18 @@ export function circuitAnnouncement(
   turn: number,
   revealSerial: number,
 ): PhaseTitle | null {
+  void revealSerial;
+  void turn;
   if (phase === 'startCycleEffects' || phase === 'locationSetup' || phase === 'drawHand') {
     return { key: `cycle:${cycle}`, title: 'Start of Cycle', subtitle: `Cycle ${cycle}` };
   }
-  if (phase === 'circuitDeploy' || phase === 'shortCircuitDeploy') {
-    return {
-      key: `node:${cycle}:${turn}`,
-      title: `Node ${turn + 1} opens`,
-      subtitle: `Cycle ${cycle} · Circuit`,
-    };
+  if (phase === 'shortCircuitDeploy') {
+    return { key: `node:${cycle}:all`, title: 'All Nodes open', subtitle: `Cycle ${cycle} · Circuit` };
   }
-  if (phase === 'reveal') {
-    return { key: `reveal:${cycle}:${revealSerial}`, title: 'Reveal', subtitle: `Cycle ${cycle}` };
+  if (phase === 'circuitDeploy' || phase === 'reveal') {
+    // Clock already owns Cycle / Runtime / turn. Node opening and Reveal
+    // resolve on the board, not as a second center title.
+    return null;
   }
   if (phase === 'draft') {
     return { key: `draft:${cycle}`, title: 'Draft', subtitle: `Cycle ${cycle}` };

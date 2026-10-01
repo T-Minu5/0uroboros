@@ -91,6 +91,16 @@ describe('Data Center healing', () => {
     expect(state.players['0'].dataCenters.primary.health).toBe(2000);
   });
 
+  it('uses Backup for unnamed Restore after Primary is destroyed', () => {
+    const { state, config } = createHarness();
+    damageDataCenter(state, '0', 2000, config);
+    damageDataCenter(state, '0', 400, config);
+    const healed = healDataCenter(state, '0', 100);
+    expect(healed).toBe(100);
+    expect(state.players['0'].dataCenters.backup.health).toBe(1200);
+    expect(state.players['0'].dataCenters.primary.destroyed).toBe(true);
+  });
+
   it('cannot heal a destroyed Data Center', () => {
     const { state, config } = createHarness();
     damageDataCenter(state, '0', 2000, config);

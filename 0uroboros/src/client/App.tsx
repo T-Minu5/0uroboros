@@ -13,6 +13,7 @@
  */
 
 import { useMemo, useState } from 'react';
+import { setPresentationSpeed, usePresentationSpeed } from './presentation/speed';
 import { Client } from 'boardgame.io/react';
 import { Local } from 'boardgame.io/multiplayer';
 
@@ -20,8 +21,6 @@ import { OuroborosGame } from '../game/OuroborosGame';
 import { GameTable } from './GameTable';
 import type { PlayerID } from '../game/types';
 import './styles.css';
-
-const MATCH_ID = 'playtest';
 
 const OuroborosClient = Client({
   game: OuroborosGame,
@@ -34,8 +33,11 @@ const OuroborosClient = Client({
 export function App() {
   const [seat, setSeat] = useState<PlayerID>('0');
   const [split, setSplit] = useState(false);
+  const [matchNonce, setMatchNonce] = useState(0);
+  const speed = usePresentationSpeed();
 
   const seats: PlayerID[] = useMemo(() => (split ? ['0', '1'] : [seat]), [split, seat]);
+  const matchID = `playtest-${matchNonce}`;
 
   return (
     <div className="shell">
@@ -70,11 +72,22 @@ export function App() {
         >
           {split ? 'Hot seat' : 'Split view'}
         </button>
+        <button type="button" className="toggle" onClick={() => setMatchNonce((value) => value + 1)}>
+          New match
+        </button>
+        <button
+          type="button"
+          className="toggle"
+          data-on={speed === 'fast'}
+          onClick={() => setPresentationSpeed(speed === 'fast' ? 'normal' : 'fast')}
+        >
+          {speed === 'fast' ? 'Pace Fast' : 'Pace Normal'}
+        </button>
       </header>
 
       <div className="seats" data-split={split}>
         {seats.map((id) => (
-          <OuroborosClient key={id} playerID={id} matchID={MATCH_ID} />
+          <OuroborosClient key={`${matchID}-${id}`} playerID={id} matchID={matchID} />
         ))}
       </div>
     </div>

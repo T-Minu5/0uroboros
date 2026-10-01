@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "0uroboros Proposal Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "canonical_version",
+    "created_at",
+    "agent",
+    "classification",
+    "authority",
+    "status",
+    "rules_changed",
+    "requirements_touched",
+    "contracts_required",
+    "summary",
+    "rationale",
+    "risks",
+    "provenance",
+    "stale_check_status",
+    "human_approval_required",
+    "queue_target"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "canonical_version": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "agent": {
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "OBSERVATION",
+        "RECOMMENDATION",
+        "PROPOSED_ADDITION",
+        "POTENTIAL_RULE_CONFLICT",
+        "IMPLEMENTATION_DECISION",
+        "CONTRACT_REQUEST",
+        "PROVISIONAL_MOCK"
+      ]
+    },
+    "authority": {
+      "enum": [
+        "RULES",
+        "TECH",
+        "UX",
+        "LOOKDEV",
+        "CONTENT",
+        "WORLD",
+        "RESEARCH",
+        "GOVERNANCE"
+      ]
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "NEEDS_REVIEW",
+        "NEEDS_APPROVAL",
+        "APPROVED",
+        "REJECTED",
+        "HOLD_FOR_PLAYTEST",
+        "IMPLEMENTABLE"
+      ]
+    },
+    "rules_changed": {
+      "type": "boolean"
+    },
+    "requirements_touched": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contracts_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stale_check_status": {
+      "enum": [
+        "CURRENT",
+        "NEEDS_CHECK",
+        "REVALIDATED"
+      ]
+    },
+    "human_approval_required": {
+      "type": "boolean"
+    },
+    "queue_target": {
+      "enum": [
+        "CANDIDATE",
+        "REVIEW",
+        "CONTRACT_REQUEST",
+        "CONFLICT",
+        "IMPLEMENTATION",
+        "APPROVAL",
+        "EXECUTION_RESULT"
+      ]
+    },
+    "authorized_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "contract_request_id": {
+      "type": "string"
+    },
+    "runtime_run_id": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "classification": {
+            "const": "IMPLEMENTATION_DECISION"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "authorized_by"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rules_changed": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "NEEDS_APPROVAL"
+          },
+          "human_approval_required": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "classification": {
+            "const": "PROVISIONAL_MOCK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "contract_request_id"
+        ]
+      }
+    }
+  ]
+}

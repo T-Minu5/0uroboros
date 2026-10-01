@@ -1,10 +1,17 @@
+import { boardScanTotalMs } from './NeonHorizonScan';
 import type { RuntimeEvent } from './runtime';
+
+export function isNoTargetEvent(event: Pick<RuntimeEvent, 'text' | 'amount'>): boolean {
+  return /no target/i.test(event.text);
+}
 
 /** Presentation only: every authoritative event still executes and enters history. */
 export function eventTime(event: RuntimeEvent, fast: boolean): number {
  if(event.text==='No scheduled Runtime effects.')return 0;
- if(event.stage==='node-close')return fast?500:800;
- if(event.stage==='node-award')return fast?350:650;
+ if(isNoTargetEvent(event))return fast?450:700;
+ if(event.stage==='node-close')return fast?1000:1400;
+ if(event.stage==='node-award')return fast?280:500;
+ if(event.kind==='collapse'&&event.text.startsWith('Wave Collapse'))return boardScanTotalMs(fast);
  if(event.kind==='reward'&&!event.target)return 0;
  if(event.target&&event.amount===0)return 0;
  if(event.kind==='collapse'&&(event.text.startsWith('No starter card')||event.text.startsWith('No card onCollapse')||event.text.includes('No Duration cards')))return 0;

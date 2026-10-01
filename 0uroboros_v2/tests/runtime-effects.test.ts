@@ -1,5 +1,5 @@
 import {expect,it} from 'vitest';
-import {createSession,seededRandom,type RuntimeSession} from '../src/runtime';
+import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '../src/runtime';
 import {EVALUATION_ALL_CARDS} from '../src/evaluationMarket';
 import {starterCards,type Card,type EvaluationEffect} from '../src/game';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
@@ -11,9 +11,11 @@ it('optional discard cost is all-or-none and pays the benefit only after the com
  const s=make();s.state.players[0].hand=[card('one'),card('two')];
  play(s,card('payment',[{kind:'handDiscard',amount:2,optional:true,then:[{kind:'crypto',amount:3}]}]));
  expect(s.state.choice?.options.map(o=>o.id)).toEqual(['decline','pay']);
- s.choose('pay');expect(s.state.choice?.options).toHaveLength(2);
- s.choose('one');drain(s);expect(s.state.players[0].wallet).toBe(0);
- s.choose('two');drain(s);expect(s.state.players[0].wallet).toBe(3);
+ s.choose('pay');expect(s.state.choice).toMatchObject({select:{min:2,max:2}});
+ expect(s.state.choice?.options.map(o=>o.card?.id)).toEqual(['one','two']);
+ expect(()=>s.choose(['one'])).toThrow(/Choose 2/);
+ expect(s.state.players[0].hand).toHaveLength(2);
+ s.choose(['one','two']);drain(s);expect(s.state.players[0].wallet).toBe(3);
  expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['one','two']);
 });
 
@@ -27,18 +29,26 @@ it('insufficient optional payment never removes cards or grants the benefit',()=
 it('hand trash removes VP ownership and permits finishing only after the required minimum',()=>{
  const s=make();s.state.players[0].hand=[card('vp',[],{type:'VP',vp:4}),card('keep')];
  play(s,card('trash',[{kind:'handTrash',amount:3,min:1}]));
- expect(s.state.choice?.options.some(o=>o.id==='finish-selection')).toBe(false);
- s.choose('vp');drain(s);expect(s.view().players[0].totalVP).toBe(0);
- expect(s.state.choice?.options.some(o=>o.id==='finish-selection')).toBe(true);
- s.choose('finish-selection');drain(s);expect(s.state.trash.map(c=>c.id)).toEqual(['vp']);expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['keep']);
+ expect(s.state.choice).toMatchObject({select:{min:1,max:2}});
+ expect(()=>s.choose([])).toThrow(/Choose 1–2/);
+ s.choose(['vp']);drain(s);expect(s.view().players[0].totalVP).toBe(0);
+ expect(s.state.choice).toBeNull();
+ expect(s.state.trash.map(c=>c.id)).toEqual(['vp']);expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['keep']);
 });
 
-it('scry keeps retained draw order and removes only explicitly discarded inspected cards',()=>{
+it('scry asks keep, discard, or trash for every inspected card and applies them together',()=>{
  const s=make();s.state.players[0].draw=['a','b','c','d'].map(id=>card(id));
  play(s,card('scry',[{kind:'scry',amount:3}]));
  expect(s.view().players[0].draw.every(c=>c.hidden)).toBe(true);
- s.choose('keep');drain(s);s.choose('discard');drain(s);s.choose('keep');drain(s);
- expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','c','d']);expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['b']);
+ expect(s.state.choice?.groups?.map(g=>g.card?.id)).toEqual(['a','b','c']);
+ expect(s.state.choice?.options.filter(o=>o.group==='a').map(o=>o.label)).toEqual(['Keep','Discard','Trash']);
+ expect(()=>s.choose(['keep:a','discard:b'])).toThrow(/each card/);
+ expect(()=>s.choose(['keep:a','discard:a','trash:c'])).toThrow(/each card/);
+ expect(s.state.players[0].draw).toHaveLength(4);
+ s.choose(['keep:a','discard:b','trash:c']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','d']);
+ expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['b']);
+ expect(s.state.trash.map(c=>c.id)).toEqual(['c']);
 });
 
 it('scoped attacking-owner choice can choose an opposing card without exposing the rest of the hand view',()=>{
@@ -65,11 +75,11 @@ it('Runtime schedules cross Cycle refill, give Actions in the scheduled turn, th
 
 it('self-destruction gives the opponent no destruction VP',()=>{
  const s=make();play(s,card('sacrifice',[{kind:'selfDestroyBackup'}]));
- expect(s.state.players[0].centers.backup).toBe(0);expect(s.state.players[1].destructionVP).toBe(0);
+ expect(s.state.players[0].servers.backup).toBe(0);expect(s.state.players[1].destructionVP).toBe(0);
 });
 
-it('self-destruction of the last surviving center ends Runtime before later card effects',()=>{
- const s=make();s.state.players[0].centers.primary=0;
+it('self-destruction of the last surviving server ends Runtime before later card effects',()=>{
+ const s=make();s.state.players[0].servers.primary=0;
  const events=play(s,card('sacrifice',[{kind:'selfDestroyBackup'},{kind:'crypto',amount:99}]));
  expect(s.state.phase).toBe('gameover');expect(s.state.players[0].wallet).toBe(0);
  expect(events.at(-1)?.kind).toBe('gameover');expect(s.state.players[1].destructionVP).toBe(0);
@@ -89,9 +99,9 @@ it.each(EVALUATION_ALL_CARDS.map(definition=>[definition.name,definition] as con
   expect(cards.length).toBe(initial+generated.size);
   expect(new Set(cards.map(c=>c.id)).size).toBe(cards.length);
   expect(cards.filter(c=>c.id===added.cardId)).toHaveLength(1);
-  s.state.players.forEach(p=>{for(const value of [p.actions,p.pendingActions,p.wallet,p.centers.primary,p.centers.backup,p.totalVP]){expect(Number.isFinite(value)).toBe(true);expect(value).toBeGreaterThanOrEqual(0);}expect(p.bank.length).toBeLessThanOrEqual(4);});
+  s.state.players.forEach(p=>{for(const value of [p.actions,p.pendingActions,p.wallet,p.servers.primary,p.servers.backup,p.totalVP]){expect(Number.isFinite(value)).toBe(true);expect(value).toBeGreaterThanOrEqual(0);}expect(p.bank.length).toBeLessThanOrEqual(4);});
  };
- const pump=()=>{let steps=0;while(s.pendingCount||s.state.choice){const event=s.state.choice?s.choose(s.state.choice.options[0].id):s.step()!.event;if(event.cardId?.includes(':generated-'))generated.add(event.cardId);check();if(++steps>500)throw new Error(`Choice/schedule loop for ${definition.name}`);}};
+ const pump=()=>{let steps=0;while(s.pendingCount||s.state.choice){const event=s.state.choice?s.choose(firstLegalSelection(s.state.choice)):s.step()!.event;if(event.cardId?.includes(':generated-'))generated.add(event.cardId);check();if(++steps>500)throw new Error(`Choice/schedule loop for ${definition.name}`);}};
  if(definition.type!=='Crypto')s.deploy(added.cardId!,0);
  for(let cycle=0;cycle<4;cycle++){
   pump();
@@ -112,12 +122,12 @@ it('Chronos Cache gains exactly one Mega-Cache atop the deck at the end of its t
 });
 
 it('permanent historic storage heals each Runtime turn across the Cycle boundary without reviving destroyed Primary',()=>{
- const s=make();const added=s.addEvaluationCard('bios-archive');s.state.players[0].centers.primary=1000;
- s.deploy(added.cardId!,0);s.endTurn();drain(s);expect(s.state.players[0].centers.primary).toBe(1150);
- s.endTurn();drain(s);expect(s.state.players[0].centers.primary).toBe(1225);
+ const s=make();const added=s.addEvaluationCard('bios-archive');s.state.players[0].servers.primary=1000;
+ s.deploy(added.cardId!,0);s.endTurn();drain(s);expect(s.state.players[0].servers.primary).toBe(1150);
+ s.endTurn();drain(s);expect(s.state.players[0].servers.primary).toBe(1225);
  s.endTurn();drain(s);s.endDraft(0);s.endDraft(1);s.nextCycle();drain(s);
- expect(s.state.players[0].centers.primary).toBe(1300);expect(s.state.players[0].bank[0].card.id).toBe(added.cardId);
- s.state.players[0].centers.primary=0;s.endTurn();drain(s);expect(s.state.players[0].centers.primary).toBe(0);
+ expect(s.state.players[0].servers.primary).toBe(1300);expect(s.state.players[0].bank[0].card.id).toBe(added.cardId);
+ s.state.players[0].servers.primary=0;s.endTurn();drain(s);expect(s.state.players[0].servers.primary).toBe(0);
 });
 
 it('evaluation injection is explicit, unique, and blocked after any planning placement',()=>{
@@ -134,4 +144,47 @@ it('a Runtime duration rejected by a full Bank stops scheduling once it enters D
  play(s,card('rejected',[],{duration:5,durationPeriod:'runtime',schedule:[{at:4,effects:[{kind:'crypto',amount:99}]}]}));
  s.endTurn();drain(s);s.endTurn();drain(s);expect(s.state.players[0].discard.some(c=>c.id==='rejected')).toBe(true);
  s.endDraft(0);s.endDraft(1);s.nextCycle();drain(s);expect(s.state.players[0].wallet).toBe(0);
+});
+
+const shiftFrom=(node:number,effect:EvaluationEffect)=>{const s=make();const source=card('shifter',[effect],{power:6});s.state.players[0].hand.unshift(source);s.deploy('shifter',node);s.endTurn();const events=drain(s);return{s,events};};
+
+it('a rightward shift pushes Power to the next Node without prompting',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'right'});
+ expect(s.state.choice).toBeFalsy();
+ expect(s.state.nodes[2].powers[0]).toBe(4);
+ expect(s.state.nodes[3].powers[0]).toBe(2);
+ expect(s.state.nodes[1].powers[0]).toBe(0);
+});
+
+it('a split shift divides Power across both neighbours and gives the odd point to the left',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:3,direction:'split'});
+ expect(s.state.nodes[1].powers[0]).toBe(2);
+ expect(s.state.nodes[3].powers[0]).toBe(1);
+ expect(s.state.nodes[2].powers[0]).toBe(3);
+});
+
+it('a shift toward a Node that does not exist moves nothing',()=>{
+ const {s,events}=shiftFrom(0,{kind:'transferPower',amount:2,direction:'left'});
+ expect(s.state.nodes[0].powers[0]).toBe(6);
+ expect(events.some(e=>e.text.includes('No Power to shift'))).toBe(true);
+});
+
+it('shift still prompts for a direction when the author left it to the player',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice'});
+ expect(s.state.choice?.options.length).toBeGreaterThan(1);
+});
+
+it('stealing Crypto moves cards from the opponent wallet into your hand',()=>{
+ const s=make();
+ s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('coin-c',[],{type:'Crypto',cryptoValue:3})];
+ play(s,card('thief',[{kind:'stealCrypto',amount:2}]));
+ expect(s.state.players[1].hand.filter(c=>c.type==='Crypto')).toHaveLength(1);
+ expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(2);
+});
+
+it('stealing Crypto from an opponent holding none reports no target',()=>{
+ const s=make();
+ const events=play(s,card('thief',[{kind:'stealCrypto',amount:1}]));
+ expect(events.some(e=>e.kind==='crypto'&&e.text.includes('No target'))).toBe(true);
+ expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(0);
 });

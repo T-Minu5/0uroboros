@@ -98,7 +98,7 @@ Tier 1: Draw, Action, Crypto, small Power.
 
 Tier 2: Drain, Restore, probability movement, move, Trash, reveal.
 
-Tier 3: Node result, large Location reward, Data Center destruction.
+Tier 3: Node result, large Location reward, Server destruction.
 
 Tier 4: Wave Collapse final selection, game-ending event.
 

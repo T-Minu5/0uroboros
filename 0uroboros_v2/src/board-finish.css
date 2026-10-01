@@ -1,36 +1,29 @@
 /* Physical card edges and restrained instruments, alongside the Blender table. */
 .hand-card {
- background:linear-gradient(145deg,#252633,#111520 62%,#0c0e17);
- border-color:#9995a8;
- box-shadow:1px 2px 0 #737485,2px 4px 0 #252735,0 12px 22px #0009;
+ background:transparent;
+ border-color:transparent;
+ box-shadow:0 14px 28px #000a;
 }
-.hand-card::after {
- content:"";
- position:absolute;
- inset:0;
- border-radius:inherit;
- box-shadow:inset 0 1px 0 #ffffff7a,inset 1px 0 0 #dbe5ff24,inset 0 -2px 0 #000a;
- pointer-events:none;
-}
+.hand-card:has(> .cf-card)::after { display:none; }
 .hand-card:hover {
- box-shadow:1px 2px 0 #a8a0b4,2px 4px 0 #343144,0 20px 28px #000a;
+ box-shadow:0 18px 32px #000b;
 }
 .world-anchor .field-card {
  border-color:#9c93a3;
  box-shadow:0 1px 0 #b0a8b5,1px 3px 0 #383443,1px 5px 7px #000b;
 }
-.world-anchor .data-center em {
+.world-anchor .server em {
  background:linear-gradient(0deg,#1296b1,#83e6ef);
  box-shadow:0 0 5px #0adfff66;
 }
-.world-anchor .data-center.dc-restore em {
+.world-anchor .server.server-restore em {
  background:var(--gold);
  box-shadow:0 0 10px #ffcc1270;
 }
 .world-anchor .end-turn {
  background:linear-gradient(155deg,#71e1ef,#26b4d1 65%,#1f91b8);
  border-color:#83dce9;
- box-shadow:inset 0 1px 0 #c7f4ff,inset 0 -3px 0 #08718b,0 3px 6px #0007;
+ box-shadow:inset 0 1px 0 #c7f4ff,0 8px 16px #0008;
 }
 .world-anchor .end-turn:hover:not(:disabled) { background:linear-gradient(155deg,#a5f4fa,#43d3e8 65%,#1dabce); }
 .world-anchor .end-turn i { background:linear-gradient(#cef9ff 0 75%,#1e718e 75%); }

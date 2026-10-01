@@ -14,14 +14,20 @@
  *
  * Runtime and Short-Circuit share this structure entirely. They differ only in
  * how many deployment windows run and when Nodes open, which is configuration
- * rather than a separate rules path.
+ * rather than a separate rules path. Runtime opens Nodes 1–3 together, then
+ * Node 4, then Node 5.
  */
 
 import { INVALID_MOVE, Stage } from 'boardgame.io/core';
 import type { Ctx, Game, Move } from 'boardgame.io';
 
 import type { NodeIndex, OuroborosState, PlayerID } from './types';
-import { DEFAULT_CONFIG, type OuroborosConfig } from './config/defaults';
+import {
+  circuitWindowCount,
+  DEFAULT_CONFIG,
+  nodeOpenPhrase,
+  type OuroborosConfig,
+} from './config/defaults';
 import { fromBoardgameRandom, type RandomAPI } from './engine/random';
 import {
   beginDraft,
@@ -47,6 +53,7 @@ import { isEliminated } from './engine/dataCenters';
 import { finalResult } from './engine/scoring';
 import { playerView } from './playerView';
 import { addLog } from './engine/log';
+import { startRuntimeTurn } from './engine/actions';
 
 /**
  * Active configuration.
@@ -83,7 +90,23 @@ function rng(args: GameArgs): RandomAPI {
 
 /** Total deployment windows in a Cycle. Short-Circuit uses a single window. */
 function totalWindows(G: OuroborosState): number {
-  return G.mode === 'shortCircuit' ? 1 : activeConfig.nodeCount;
+  return G.mode === 'shortCircuit' ? 1 : circuitWindowCount(activeConfig);
+}
+
+/** Open the Nodes scheduled for this window. Returns the indices that newly opened. */
+function openScheduledNodes(G: OuroborosState, turn: number): number[] {
+  const indices =
+    G.mode === 'shortCircuit'
+      ? G.nodes.map((node) => node.index)
+      : (activeConfig.nodeOpenSchedule[turn] ?? []);
+  const opened: number[] = [];
+  for (const index of indices) {
+    const node = G.nodes[index];
+    if (!node || node.state !== 'closed') continue;
+    node.state = 'open';
+    opened.push(index);
+  }
+  return opened;
 }
 
 function bothEndedTurn(G: OuroborosState): boolean {
@@ -216,30 +239,29 @@ function beginCycle(G: OuroborosState, random: RandomAPI): void {
   G.turn = 0;
   G.windowsCompleted = 0;
   resetEndedTurn(G);
+  startRuntimeTurn(G, activeConfig, 0);
 
   if (G.mode === 'shortCircuit') {
     // All Locations reveal at once and a single deployment window runs.
-    G.nodes.forEach((node) => {
-      node.state = 'open';
-    });
+    openScheduledNodes(G, 0);
     G.phase = 'shortCircuitDeploy';
     addLog(G, 'phase', 'Short-Circuit deployment window opens with all Nodes revealed.');
     return;
   }
 
-  G.nodes[0].state = 'open';
+  const opened = openScheduledNodes(G, 0);
   G.phase = 'circuitDeploy';
-  addLog(G, 'phase', 'Node 1 opens.');
+  addLog(G, 'phase', `${nodeOpenPhrase(opened)}.`);
 }
 
 /**
  * Close a deployment window.
  *
  * Two reveal moments exist. First, cards at already-open Nodes reveal once the
- * window closes. Then the next Node opens and any cards previously committed
- * there reveal as its opening sequence, before the next deployment window. That
- * second pass is why a card committed to Node 4 on turn 3 reveals when Node 4
- * opens rather than waiting for turn 4 to finish.
+ * window closes. Then the next scheduled Node(s) open and any cards previously
+ * committed there reveal as the opening sequence, before the next deployment
+ * window. A card committed to Node 5 on turn 1 reveals when Node 5 opens on
+ * turn 3, rather than waiting for that window to finish.
  */
 function closeWindow(G: OuroborosState, random: RandomAPI): void {
   G.phase = 'reveal';
@@ -254,18 +276,18 @@ function closeWindow(G: OuroborosState, random: RandomAPI): void {
   let openingReveals: string[] = [];
   if (G.windowsCompleted < totalWindows(G)) {
     G.turn = G.windowsCompleted;
-    const opening = G.nodes[G.turn];
-    if (opening) {
-      opening.state = 'open';
-      addLog(G, 'phase', `Node ${G.turn + 1} opens.`);
-      // Opening reveal sequence for cards already committed to this Node.
+    startRuntimeTurn(G, activeConfig, G.turn);
+    const opened = openScheduledNodes(G, G.turn);
+    if (opened.length > 0) {
+      addLog(G, 'phase', `${nodeOpenPhrase(opened)}.`);
+      // Opening reveal sequence for cards already committed to newly opened Nodes.
       openingReveals = runRevealSequence(G, random);
     }
     G.phase = 'circuitDeploy';
   }
 
   // One chronological queue for the client. Window-close reveals play first,
-  // then the newly opened Node's waiting cards, never in parallel.
+  // then newly opened Nodes' waiting cards, never in parallel.
   const sequence = [...windowReveals, ...openingReveals];
   if (sequence.length > 0) {
     G.revealQueue = sequence;

@@ -2,8 +2,14 @@ export type Phase = "runtime" | "collapse" | "draft";
 export type CardType = "Character" | "VP" | "Crypto";
 
 export type EffectChoiceOption = { id: string; label: string; effects: readonly EvaluationEffect[] };
+export type CardModifier = {
+  id: string;
+  kind: 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
+  amount?: number;
+  sourceName?: string;
+};
 export type EvaluationEffect = {
-  kind: "draw" | "actions" | "crypto" | "drain" | "restore" | "moveSelf" | "moveCard" | "modifyPower" | "probability" | "trashSelf" | "recover" | "choice" | "mill" | "transferPower" | "handDiscard" | "handTrash" | "scry" | "gain" | "selfDestroyBackup" | "random" | "morph";
+  kind: "draw" | "actions" | "crypto" | "vp" | "drain" | "restore" | "moveSelf" | "moveCard" | "modifyPower" | "probability" | "trashSelf" | "recover" | "choice" | "mill" | "transferPower" | "handDiscard" | "handTrash" | "scry" | "gain" | "selfDestroyBackup" | "random" | "morph" | "attachModifier" | "damageLoser" | "restorePrimary" | "trashLowestAtLocation" | "trashAtLocation" | "destroyAtLocation" | "boostPowerAtLocation" | "stealCrypto" | "destroyCard";
   amount?: number;
   target?: "primary" | "backup";
   options?: readonly EffectChoiceOption[];
@@ -12,14 +18,34 @@ export type EvaluationEffect = {
   chooser?: "owner" | "opponent";
   optional?: boolean;
   min?: number;
+  /** Follow-ups that run only once this effect has resolved (a paid cost, a found target). */
   then?: readonly EvaluationEffect[];
+  /** Authoring marker: every later step in the same list waits on this one. Compiled into `then`. */
+  chain?: boolean;
   cardId?: string;
   destination?: "top" | "discard" | "hand";
   formIds?: readonly string[];
   selection?: "sequential" | "random";
+  /** Location board: which side(s) to take cards from. */
+  boardSide?: "either" | "winner" | "loser" | "both" | "played" | "other";
+  /** Location board: pick the card by UI choice or at random (moves also randomize destination when random). */
+  cardPick?: "choice" | "random";
+  /** Location board trash/destroy: which revealed card(s) here are hit. */
+  rank?: "weakest" | "strongest" | "first";
+  /** Relative play-order target among revealed cards (previous/next to the resolving card). */
+  cardRelation?: "previous" | "next";
+  /** Attach modifier to a revealed board card instead of a Character in deck zones. */
+  boardHost?: boolean;
+  /**
+   * Which way a Power shift runs. "choice" lets the player pick any transfer between this Node
+   * and a neighbour; "left"/"right" push the amount out to that neighbour; "split" divides it
+   * between both, giving the odd point to the left.
+   */
+  direction?: "choice" | "left" | "right" | "split";
+  modifier?: "doublePrintedEffects" | "powerAuraAtLocation" | "movableEachTurn";
 };
 export type Card = {
-  cardClass?: 'Action' | 'Utility' | 'Runtime' | 'Attack' | 'Hacker';
+  cardClass?: 'Action' | 'Utility' | 'Runtime' | 'Attack' | 'Hacker' | 'Horror';
   generated?: boolean;
   definitionId?: string;
   vp?: number;
@@ -30,10 +56,14 @@ export type Card = {
   recurring?: readonly EvaluationEffect[];
   onReveal?: readonly EvaluationEffect[];
   onCollapse?: readonly EvaluationEffect[];
+  modifiers?: CardModifier[];
+  storyText?: string;
   id: string;
   name: string;
   type: CardType;
   power?: number;
+  /** Adds a live count to printed Power: cards in the shared Trash, or cards destroyed by both players. */
+  powerSource?: "trash" | "destroyed";
   basePower?: number;
   cost: number;
   art: string;
@@ -42,8 +72,8 @@ export type Card = {
 
 export const starterCards: Card[] = [
   { id: "slash", name: "Slash-Dot", type: "Character", power: 3, cost: 4, art: "/assets/card_art/base cards/slash-dot.png", effect: "+3 Cards." },
-  { id: "dash", name: "Dash Relay", type: "Character", power: 2, cost: 3, art: "/assets/card_art/image_placeHolder.png", effect: "+1 Card. +1 Action." },
-  { id: "dot", name: "Cache Crawler", type: "Character", power: 1, cost: 3, art: "/assets/card_art/image_placeHolder.png", effect: "+1 Card. +1 Action. +1 Crypto." },
+  { id: "dash-dot", name: "Dash-Dot", type: "Character", power: 2, cost: 3, art: "/assets/card_art/base cards/action/dash-dot.png", effect: "+1 Card. +2 Actions." },
+  { id: "dotkrawler", name: "Dotkrawler", type: "Character", power: 1, cost: 4, art: "/assets/card_art/base cards/action/dotkrawler.png", effect: "+1 Card. Shift 1 power (your choice). +2 Actions." },
   { id: "razor", name: "Rezz-Razor", type: "Character", power: 4, cost: 3, art: "/assets/card_art/chaos cards/rezz-razor.png", effect: "Drain 75. +1 Card. +1 Action." },
   { id: "blade", name: "Rezz-Blade", type: "Character", power: 3, cost: 4, art: "/assets/card_art/chaos cards/rezz-blade.png", effect: "Drain 100. +1 Card. +2 Actions." },
   { id: "byte-1", name: "Byte-Coin", type: "Crypto", cost: 3, art: "/assets/card_art/crypto/byte-coin.png", effect: "+2 Crypto." },
@@ -80,13 +110,17 @@ export function resolvePower(cards: Card[]) {
 // Pure canonical rules. Content-dependent decisions deliberately remain caller-owned.
 export type PlayerId = 0 | 1;
 export type RandomSource = () => number;
-export type DataCenters = { primary: number; backup: number };
+export type Servers = { primary: number; backup: number };
 export type DeckZones = { draw: Card[]; hand: Card[]; discard: Card[] };
-export type Deployment = { card: Card; owner: PlayerId; node: number; order: number; revealed: boolean; powerModifier?: number };
-export function effectiveCardPower(placement: Deployment): number {
-  return Math.max(0, (placement.card.power ?? 0) + (placement.powerModifier ?? 0));
+export type Deployment = { card: Card; owner: PlayerId; node: number; order: number; revealed: boolean; powerModifier?: number; revealSequence?: number };
+/** Changes cannot push a card below zero, but a card printed with negative Power keeps it. */
+export function cardPowerFloor(card: Card): number {
+  return Math.min(0, card.power ?? 0);
 }
-export const dataCenterMaximums: DataCenters = { primary: 2000, backup: 1500 };
+export function effectiveCardPower(placement: Deployment, auraBonus = 0): number {
+  return Math.max(cardPowerFloor(placement.card), (placement.card.power ?? 0) + (placement.powerModifier ?? 0) + auraBonus);
+}
+export const serverMaximums: Servers = { primary: 2000, backup: 1500 };
 
 export function nodeWinner(powers: readonly [number, number]): PlayerId | null {
   return powers[0] === powers[1] ? null : powers[0] > powers[1] ? 0 : 1;
@@ -127,6 +161,26 @@ export function selectCircuitNode(weights: readonly number[], random: RandomSour
   }
   for (let node = weights.length - 1; node >= 0; node--) if (weights[node] > 0) return node;
   throw new Error("Circuit selection failed.");
+}
+
+/** Folds everything after a `chain` step into that step's `then`, so it waits for the step to resolve. */
+export function compileChains(effects: readonly EvaluationEffect[]): EvaluationEffect[] {
+  const compiled: EvaluationEffect[] = [];
+  for (let index = 0; index < effects.length; index++) {
+    const { chain, ...effect } = effects[index];
+    const nested: EvaluationEffect = {
+      ...effect,
+      ...(effect.options ? { options: effect.options.map(option => ({ ...option, effects: compileChains(option.effects) })) } : {}),
+      ...(effect.then ? { then: compileChains(effect.then) } : {}),
+    };
+    const rest = effects.slice(index + 1);
+    if (chain && rest.length) {
+      compiled.push({ ...nested, then: [...(nested.then ?? []), ...compileChains(rest)] });
+      break;
+    }
+    compiled.push(nested);
+  }
+  return compiled;
 }
 
 export function shuffleCards(cards: readonly Card[], random: RandomSource): Card[] {
@@ -175,13 +229,13 @@ export function revealOrder(deployments: readonly Deployment[], turn: number, pr
   return ordered;
 }
 
-export function applyDataCenterEffect(centers: DataCenters, kind: "drain" | "restore", amount: number): { centers: DataCenters; target: keyof DataCenters | null; amount: number; destructionVP: number } {
-  if (!Number.isFinite(amount) || amount < 0) throw new Error("Data Center effect amount must be nonnegative.");
-  const target = centers.primary > 0 ? "primary" : centers.backup > 0 ? "backup" : null;
-  if (!target) return { centers: { ...centers }, target, amount: 0, destructionVP: 0 };
-  const before = centers[target];
-  const after = kind === "drain" ? Math.max(0, before - amount) : Math.min(dataCenterMaximums[target], before + amount);
-  return { centers: { ...centers, [target]: after }, target, amount: Math.abs(after - before), destructionVP: after === 0 ? target === "primary" ? 8 : 12 : 0 };
+export function applyServerEffect(servers: Servers, kind: "drain" | "restore", amount: number): { servers: Servers; target: keyof Servers | null; amount: number; destructionVP: number } {
+  if (!Number.isFinite(amount) || amount < 0) throw new Error("Server effect amount must be nonnegative.");
+  const target = servers.primary > 0 ? "primary" : servers.backup > 0 ? "backup" : null;
+  if (!target) return { servers: { ...servers }, target, amount: 0, destructionVP: 0 };
+  const before = servers[target];
+  const after = kind === "drain" ? Math.max(0, before - amount) : Math.min(serverMaximums[target], before + amount);
+  return { servers: { ...servers, [target]: after }, target, amount: Math.abs(after - before), destructionVP: after === 0 ? target === "primary" ? 8 : 12 : 0 };
 }
 
 // The caller must supply the unresolved turn carryover policy; there is no V1 default.
@@ -190,11 +244,11 @@ export function runtimeActions(turn: number, remaining: number, pendingOnReveal:
   return turn === 1 ? 2 : (carryover ? remaining : 0) + 1 + pendingOnReveal;
 }
 
-export type StarterEffect = { kind: "draw" | "actions" | "crypto" | "drain" | "restore"; amount: number };
+export type StarterEffect = { kind: "draw" | "actions" | "crypto" | "drain" | "restore" | "transferPower"; amount: number };
 export const starterEffects: Readonly<Record<string, readonly StarterEffect[]>> = {
   "Slash-Dot": [{ kind: "draw", amount: 3 }],
-  "Dash Relay": [{ kind: "draw", amount: 1 }, { kind: "actions", amount: 1 }],
-  "Cache Crawler": [{ kind: "draw", amount: 1 }, { kind: "actions", amount: 1 }, { kind: "crypto", amount: 1 }],
+  "Dash-Dot": [{ kind: "draw", amount: 1 }, { kind: "actions", amount: 2 }],
+  "Dotkrawler": [{ kind: "draw", amount: 1 }, { kind: "transferPower", amount: 1 }, { kind: "actions", amount: 2 }],
   "Rezz-Razor": [{ kind: "drain", amount: 75 }, { kind: "draw", amount: 1 }, { kind: "actions", amount: 1 }],
   "Rezz-Blade": [{ kind: "drain", amount: 100 }, { kind: "draw", amount: 1 }, { kind: "actions", amount: 2 }],
   "Byte-Coin": [{ kind: "crypto", amount: 2 }],

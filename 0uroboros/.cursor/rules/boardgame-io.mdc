@@ -1,0 +1,16 @@
+---
+description: Always-on boardgame.io skill for this game project
+globs: src/game/**/*.ts,src/server/**/*.ts,src/client/App.tsx,src/game/**/*.tsx
+alwaysApply: true
+---
+
+# boardgame.io
+
+This project is a boardgame.io game. Always use the `boardgame-io` skill.
+
+Before changing rules, moves, phases, transport, or secret state:
+
+1. Read `.cursor/skills/boardgame-io/SKILL.md`
+2. Keep authority in the game definition and `playerView`, not in React
+3. Keep `G` JSON-serializable. Moves stay pure. RNG goes through the Random plugin
+4. Phase 1 transport is `Local()` with two `playerID` seats. Remote is `SocketIO()` plus `src/server/index.ts`. Do not fork the rules engine for the swap

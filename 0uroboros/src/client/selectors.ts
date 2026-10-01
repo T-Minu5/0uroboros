@@ -17,7 +17,8 @@ import { CARD_DEFINITIONS } from '../game/content/cards';
 import { LOCATION_DEFINITIONS } from '../game/content/locations';
 import { getActiveConfig } from '../game/OuroborosGame';
 import { cardPower } from '../game/engine/power';
-import { legalNodesFor } from '../game/engine/deploy';
+import { canDeploy, legalNodesFor } from '../game/engine/deploy';
+import { actionCostToDeploy, canAffordActions } from '../game/engine/actions';
 import { totalVictoryPoints } from '../game/engine/scoring';
 import { availableSupply, type MarketCategory } from '../game/engine/draft';
 
@@ -72,7 +73,10 @@ export function handView(
       let blockedReason: string | null = null;
       if (!definition.deployable) blockedReason = 'Not played at Nodes';
       else if (!windowOpen) blockedReason = 'Window closed';
-      else if (legalNodes.length === 0) blockedReason = 'No legal Node';
+      else if (legalNodes.length === 0) {
+        const cost = actionCostToDeploy(definition.kind);
+        blockedReason = canAffordActions(G, player, cost) ? 'No legal Node' : 'No Actions';
+      }
 
       return { card, definition, legalNodes, blockedReason };
     });
@@ -144,6 +148,8 @@ export interface StatusView {
   player: PlayerID;
   victoryPoints: number;
   wallet: number;
+  actions: number;
+  pendingActions: number;
   hasRevealPriority: boolean;
   endedTurn: boolean;
   endedDraft: boolean;
@@ -166,6 +172,8 @@ export function statusView(G: OuroborosState, player: PlayerID): StatusView {
     // Prefer the published total, which accounts for cards this seat cannot see.
     victoryPoints: G.publicVictoryPoints?.[player] ?? totalVictoryPoints(G, player),
     wallet: p.wallet,
+    actions: p.actions,
+    pendingActions: p.pendingActions,
     hasRevealPriority: G.revealPriority === player,
     endedTurn: p.endedTurn,
     endedDraft: p.endedDraft,
@@ -269,4 +277,24 @@ export function phaseLabel(phase: string): string {
 
 export function cardPowerOf(card: CardInstance): number {
   return isHidden(card) ? 0 : cardPower(card);
+}
+
+const NODE_BLOCK_LABELS: Record<string, string> = {
+  insufficientActions: 'No Actions',
+  nodeCapacityReached: 'Node full',
+  nodeCollapsed: 'Node closed',
+  notDeployable: 'Not played at Nodes',
+  notInHand: 'Not in hand',
+};
+
+/** Why this Node rejects the selected card. Null when the Node is legal. */
+export function nodeBlockReason(
+  G: OuroborosState,
+  player: PlayerID,
+  instanceId: string,
+  nodeIndex: NodeIndex,
+): string | null {
+  const check = canDeploy(G, player, instanceId, nodeIndex, getActiveConfig());
+  if (check.ok) return null;
+  return NODE_BLOCK_LABELS[check.reason] ?? 'Illegal';
 }

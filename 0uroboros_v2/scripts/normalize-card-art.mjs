@@ -39,7 +39,7 @@ function resolveArtwork(input) {
     : category === 'attack'
       ? `chaos cards/${suffix}`
       : category === 'power'
-        ? `chaos cards/hackers/${posix.basename(suffix)}`
+        ? `chaos cards/horrors/${posix.basename(suffix)}`
         : suffix;
   const groups = [
     { mode: 'exact-preferred', matches: fileSet.has(preferred) ? [preferred] : [] },

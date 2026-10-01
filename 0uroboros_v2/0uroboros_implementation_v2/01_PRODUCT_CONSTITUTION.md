@@ -128,23 +128,23 @@ Then exactly one Node is selected probabilistically from final weights for the s
 
 Location Reward and Circuit Reward are separate systems.
 
-If game-ending Data Center destruction occurs during Collapse, finish the current Node including awards, then stop later Nodes and skip Draft.
+If game-ending Server destruction occurs during Collapse, finish the current Node including awards, then stop later Nodes and skip Draft.
 
-## Data Centers and scoring
+## Servers and scoring
 
 Each player has:
-- Primary Data Center: 2000
-- Backup Data Center: 1500
+- Primary Server: 2000
+- Backup Server: 1500
 
 Generic Drain targets available Primary first, then Backup. No overkill spill unless explicit text says otherwise.
 
-Generic Restore targets available Primary first; if Primary is destroyed/unavailable, Backup. Destroyed Data Centers cannot be restored. No overheal; excess Restore is lost.
+Generic Restore targets available Primary first; if Primary is destroyed/unavailable, Backup. Destroyed Servers cannot be restored. No overheal; excess Restore is lost.
 
 Destroying:
 - Primary awards 8 VP
 - Backup awards 12 VP
 
-Game ends when both Data Centers of a player are destroyed or after Cycle 16 according to canonical scoring flow.
+Game ends when both Servers of a player are destroyed or after Cycle 16 according to canonical scoring flow.
 
 ## Draft
 
@@ -161,7 +161,7 @@ Core approved behavior includes:
 - atomic first-confirmed purchase semantics
 - acquired cards normally go to Discard
 - players may End Draft early
-- final Cycle includes Draft before normal scoring unless the game ended by Data Center destruction
+- final Cycle includes Draft before normal scoring unless the game ended by Server destruction
 
 Use canonical sources for exact supply sizes, timers, cooldowns, and edge cases.
 

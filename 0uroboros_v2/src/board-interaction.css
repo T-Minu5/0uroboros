@@ -12,15 +12,22 @@
  opacity:1;
  cursor:grabbing;
  will-change:transform;
- box-shadow:1px 2px 0 #a8a0b4,2px 4px 0 #343144,0 20px 28px #000a;
+ /* The cast shadow sits on a plane behind the card, so a lean slides it toward the edge nearer the viewer. */
+ box-shadow:calc(var(--lean-x,0) * -18px) calc(20px + var(--lean-y,0) * 18px) calc(28px + var(--lean,0) * 10px) #000a;
+}
+/* Light from the front catches the edge that has swung toward the viewer. */
+.pointer-card-sheen {
+ position:absolute;inset:0;z-index:30;border-radius:inherit;pointer-events:none;
+ background:radial-gradient(farthest-corner circle at calc(50% - var(--lean-x,0) * 60%) calc(50% + var(--lean-y,0) * 60%),#ffffff40,#ffffff12 32%,#fff0 62%);
+ mix-blend-mode:screen;
+ opacity:min(1,calc(var(--lean,0) * 1.4));
 }
 .card-dragging,.card-dragging * { cursor:grabbing!important; user-select:none!important; }
 .pointer-card[data-drop-allowed='true'] { border-color:#ddcaff; }
 
-/* Hit area covers the whole near lane; card placement remains the compact grid. */
+/* Hit area covers the whole column (both lanes and the Node); height is set from the lane geometry. Placement remains the compact grid. */
 .world-anchor .lane-drop-target {
  width:163px;
- height:179px;
  pointer-events:none;
  background:none;
  border:0;
@@ -34,15 +41,16 @@
 }
 
 /* Open up the gap between the physical table, player instruments and the hand. */
-.hand-zone { bottom:15px; }
+.hand-zone { bottom:7px; }
 .world-anchor .duration.far>small { transform:translateY(3px); }
-.world-anchor .data-center.near { height:18px; }
-.world-anchor .data-center.near>i { bottom:0; }
-.world-anchor .data-center.near .dc-readout { padding-top:5px; }
+.world-anchor .server.near { height:18px; }
+.world-anchor .server.near>i { bottom:0; }
+.world-anchor .server.near .server-readout { padding-top:5px; }
 
 /* Blender supplies the rhombus face and peaked probability shoulder. */
 .world-anchor .power-badge b { font-size:20px; text-shadow:0 1px 3px #000; }
-.world-anchor .power-badge.winning b { color:#fff; text-shadow:0 0 7px #cab2f788,0 1px 2px #000; }
+.world-anchor .power-badge.local.winning b,
+.world-anchor .power-badge.opponent.winning b { color:#ffcc12; text-shadow:0 0 7px #ffcc1288,0 1px 2px #000; }
 .world-anchor .power-badge.score-active { outline:0; }
 .world-anchor .node-weight,
 .world-anchor .node-weight.selected {
@@ -63,6 +71,8 @@
 
 /* The face is unchanged until the release flight turns it face down. */
 .flying-card:not(.crypto-flight) { animation-name:pointer-placement; }
+/* Driven frame by frame by the release spring instead. */
+.flying-card.spring-flight { animation:none; }
 @keyframes pointer-placement {
  0% { transform:translate(0,0) rotate(var(--flight-angle,0deg)) scale(1); }
  78% { transform:translate(var(--flight-x),calc(var(--flight-y) - 3px)) scale(calc(var(--flight-scale) * 1.03)); }
@@ -78,3 +88,33 @@
 .flying-face.hand-card.flight-face-card>.missing-art { width:100%;height:100%; }
 
 .world-anchor:has(>.lane-drop-target) { pointer-events:none; }
+
+/* Pending Node choice: selectable columns and their Location plates breathe in gold until one is picked. */
+.world-anchor .lane-drop-target.node-choice-target {
+ display:block;
+ padding:0;
+ pointer-events:auto;
+ cursor:pointer;
+ border:1px solid #ffd36b55;
+ border-radius:16px;
+ background:radial-gradient(ellipse at center,#ffd36b1c,#ffd36b00 72%);
+ animation:node-choice-column 2.4s ease-in-out infinite;
+}
+.world-anchor .lane-drop-target.node-choice-target:hover { border-color:#ffe7a8; background:radial-gradient(ellipse at center,#ffd36b30,#ffd36b00 75%); }
+.world-anchor .location-plate.node-choice {
+ cursor:pointer;
+ border-color:#ffd36b;
+ animation:node-choice-plate 2.4s ease-in-out infinite;
+}
+.board-canvas:has(.node-choice-target) .field-card { pointer-events:none; }
+@keyframes node-choice-column {
+ 0%,100% { box-shadow:inset 0 0 10px #ffd36b10,0 0 0 #ffd36b00; border-color:#ffd36b33; }
+ 50% { box-shadow:inset 0 0 26px #ffd36b30,0 0 22px #ffd36b44; border-color:#ffd36bbb; }
+}
+@keyframes node-choice-plate {
+ 0%,100% { box-shadow:inset 0 0 8px #ffd36b18,0 0 6px #ffd36b33; filter:brightness(1); }
+ 50% { box-shadow:inset 0 0 16px #ffd36b44,0 0 26px #ffd36baa; filter:brightness(1.18); }
+}
+@media(prefers-reduced-motion:reduce){
+ .world-anchor .lane-drop-target.node-choice-target,.world-anchor .location-plate.node-choice { animation:none; box-shadow:0 0 18px #ffd36b77; }
+}

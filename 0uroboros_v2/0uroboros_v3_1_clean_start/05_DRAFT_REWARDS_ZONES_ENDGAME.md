@@ -37,7 +37,7 @@ Both players may End Draft early. If both end, Draft ends. If one ends, that pla
 
 Request received before deadline may complete; after deadline fails. Mandatory choice started before timeout may complete afterward according to approved handling.
 
-Cycle 16 includes final Draft before normal scoring, except game-ending Data Center destruction during Collapse skips Draft.
+Cycle 16 includes final Draft before normal scoring, except game-ending Server destruction during Collapse skips Draft.
 
 ## Effect Bank
 4 slots per player.

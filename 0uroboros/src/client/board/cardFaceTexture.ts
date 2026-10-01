@@ -18,8 +18,8 @@ const KIND_LABELS: Record<CardDefinition['kind'], string> = {
   chaos: 'CHAOS',
 };
 
-const W = 256;
-const H = 360;
+const W = 384;
+const H = 540;
 
 export function createCardFaceTexture(
   definition: CardDefinition,
@@ -47,47 +47,48 @@ function paintCardFace(
   card: CardInstance | undefined,
   playable: boolean,
 ): void {
+  // CARD_READABILITY_V3: larger face raster so board-scale text stays legible.
   ctx.fillStyle = playable ? '#1b2838' : '#141820';
   ctx.fillRect(0, 0, W, H);
 
   ctx.strokeStyle = playable ? '#3fbfe0' : '#3a4554';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(4, 4, W - 8, H - 8);
+  ctx.lineWidth = 8;
+  ctx.strokeRect(6, 6, W - 12, H - 12);
 
   ctx.fillStyle = '#12202e';
-  ctx.fillRect(18, 56, W - 36, 118);
+  ctx.fillRect(24, 78, W - 48, 168);
 
   ctx.fillStyle = playable ? '#3fbfe0' : '#6b7787';
   ctx.globalAlpha = 0.22;
   ctx.beginPath();
-  ctx.arc(W / 2, 118, 42, 0, Math.PI * 2);
+  ctx.arc(W / 2, 160, 58, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = 1;
 
   const power = card ? cardPowerOf(card) : definition.power;
   ctx.fillStyle = '#e8eef6';
-  ctx.font = '700 28px "Chakra Petch", sans-serif';
+  ctx.font = '700 42px "Chakra Petch", sans-serif';
   ctx.textAlign = 'right';
-  if (definition.deployable) ctx.fillText(String(power), W - 22, 40);
+  if (definition.deployable) ctx.fillText(String(power), W - 28, 52);
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#e0a13f';
-  ctx.font = '600 16px "IBM Plex Mono", monospace';
-  ctx.fillText(`${definition.cost}c`, 20, 38);
+  ctx.font = '600 24px "IBM Plex Mono", monospace';
+  ctx.fillText(`${definition.cost}c`, 28, 50);
 
   ctx.fillStyle = '#f2f6fb';
-  ctx.font = '600 22px "Chakra Petch", sans-serif';
-  wrapText(ctx, definition.name, 20, 200, W - 40, 24);
+  ctx.font = '700 36px "Chakra Petch", sans-serif'; // CARD_FACE_LEGIBILITY_V3
+  wrapText(ctx, definition.name, 28, 280, W - 56, 34);
 
   ctx.fillStyle = '#8b99ab';
-  ctx.font = '500 12px "IBM Plex Mono", monospace';
+  ctx.font = '600 18px "IBM Plex Mono", monospace';
   const kind = KIND_LABELS[definition.kind] + (definition.duration ? '  ·  DURATION' : '');
-  ctx.fillText(kind, 20, 248);
+  ctx.fillText(kind, 28, 360);
 
   const rules = definition.effects.map((effect) => effect.text).join(' ');
-  ctx.fillStyle = '#b7c2d0';
-  ctx.font = '400 13px "Chakra Petch", sans-serif';
-  wrapText(ctx, rules, 20, 272, W - 40, 16, 3);
+  ctx.fillStyle = '#d5deea';
+  ctx.font = '600 24px "Chakra Petch", sans-serif';
+  wrapText(ctx, rules, 28, 396, W - 56, 28, 5);
 
   if (!playable) {
     ctx.fillStyle = 'rgba(8, 12, 18, 0.45)';

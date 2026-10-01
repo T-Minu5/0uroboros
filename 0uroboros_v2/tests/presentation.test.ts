@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createSession, seededRandom, type RuntimeEvent } from '../src/runtime';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent } from '../src/runtime';
 import { eventTime } from '../src/presentation';
 
 it('removes empty resolution waits while preserving every real result and ending the Cycle',()=>{
@@ -12,7 +12,7 @@ it('removes empty resolution waits while preserving every real result and ending
     try{session.deploy(card.id,node);break;}catch{/* Try another legal node. */}
    }
   }
-  session.endTurn();while(session.pendingCount)events.push(session.step()!.event);
+  session.endTurn();while(session.pendingCount||session.state.choice)events.push(session.state.choice?session.choose(firstLegalSelection(session.state.choice)):session.step()!.event);
  }
  const previous=events.reduce((total,event)=>total+(event.kind==='circuit'?3000:event.target?1500:event.kind==='reveal'?1100:event.kind==='power'?1050:850),0);
  const current=events.reduce((total,event)=>total+eventTime(event,false),0);

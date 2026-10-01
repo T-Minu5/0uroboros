@@ -30,7 +30,7 @@ The normal persistent VP shelf remains Basic Encryption, Vault Encryption and Qu
 
 ## Numeric and rules adaptation
 
-Previously assigned Node Power stays unchanged for already-live identities. Newly introduced Characters use the approved `ceil(cost / 2)` clamped to 1–5. Newly introduced VP cards use their scoring VP as Node Power. Crypto has no Node Power. Historic positive Power effects are Data Center restoration, not large Node Power bonuses.
+Previously assigned Node Power stays unchanged for already-live identities. Newly introduced Characters use the approved `ceil(cost / 2)` clamped to 1–5. Newly introduced VP cards use their scoring VP as Node Power. Crypto has no Node Power. Historic positive Power effects are Server restoration, not large Node Power bonuses.
 
 Old +1/+2/+3 Draft clauses become transfers of 1/2/3 of the acting player's existing Power between the played Node and one linear adjacent Node, in either legal direction. Total own Power is conserved; opponent Power is never transferred; there is no wraparound. Legacy 5/10/15% evaluation effects map to 1/2/3 own Power. Circuit selection and priority no longer rely on Node weights. Original printed +Draft text stays available alongside the adaptation note.
 

@@ -1,35 +1,42 @@
 /**
  * Three.js board presentation.
  *
- * The 3D layer owns spatial relationships: Node platforms, card placement, and
- * the motion that makes reveal and Collapse legible. All text and numerals live
- * in the 2D overlay, because text density and accessibility are better served
- * there.
- *
- * An orthographic camera keeps the five Node columns evenly spaced in screen
- * space, so the 2D header grid stays aligned with the 3D columns at any size.
+ * One stone table. Five location pads in a row. Cards are the objects.
+ * Power and Location names live in the 2D overlay on those pads.
  */
 
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import type { Group, Mesh, MeshStandardMaterial } from 'three';
 import * as THREE from 'three';
 
-import { useEffect } from 'react';
-import type { CardDefinition, CardInstance } from '../../game/types';
+import type { CardDefinition, CardInstance, FxEvent, PlayerID } from '../../game/types';
 import type { NodeView } from '../selectors';
 import {
+  CAMERA_FOV,
+  CAMERA_LOOK_AT,
   CAMERA_POSITION,
-  CARD_DEPTH_STEP,
   frustumHalfWidth,
   nodeIndexAtX,
   NODE_SPACING,
+  nodeWorldX,
 } from './boardLayout';
-import { clientToBoard, DragGhost, type DragPointer } from './DragGhost';
+import { clientToBoard, type DragPointer } from './DragGhost';
+import { SpatialFx } from './SpatialFx';
+import {
+  dcWorld,
+  LANE_DEPTH,
+  type LaneScreenBox,
+} from './spatialGrammar';
+import { CollapseVisual } from '../visual/CollapseVisual';
+import { DataCenterVisual } from '../visual/DataCenterVisual';
+import { LightingRig } from '../visual/LightingRig';
+import { NodeLaneVisual } from '../visual/NodeLaneVisual';
+import { TableVisual } from '../visual/TableVisual';
+import { WaveField } from '../visual/WaveField';
+import type { Atmosphere } from '../visual/tokens';
 
 export interface Board3DProps {
   nodes: NodeView[];
-  /** Nodes the currently selected or dragged card may legally be deployed to. */
   legalNodes: number[];
   selectedNode: number | null;
   onSelectNode: (index: number) => void;
@@ -41,8 +48,19 @@ export interface Board3DProps {
   } | null;
   visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
   hitCardIds?: ReadonlySet<string>;
+  sourceCardId?: string | null;
   focusNode?: number | null;
   collapsingNode?: number | null;
+  hiddenCardIds?: ReadonlySet<string>;
+  viewer?: PlayerID;
+  fxEvent?: FxEvent | null;
+  sourceName?: string | null;
+  measuring?: boolean;
+  ghostLegal?: boolean;
+  onLaneLayout?: (boxes: LaneScreenBox[]) => void;
+  atmosphere?: Atmosphere;
+  selectedCollapseNode?: number | null;
+  onInspectCard?: (instanceId: string) => void;
 }
 
 export function Board3D({
@@ -54,59 +72,137 @@ export function Board3D({
   ghost,
   visuallyRevealed,
   hitCardIds = new Set(),
+  sourceCardId = null,
   focusNode = null,
   collapsingNode = null,
+  hiddenCardIds = new Set(),
+  viewer = '0',
+  fxEvent = null,
+  sourceName = null,
+  measuring = false,
+  ghostLegal = true,
+  onLaneLayout,
+  atmosphere = 'play',
+  selectedCollapseNode = null,
+  onInspectCard,
 }: Board3DProps) {
   const frustum = frustumHalfWidth(nodes.length);
+  const hovered = selectedNode;
+  const focusX =
+    collapsingNode !== null
+      ? nodeWorldX(collapsingNode, nodes.length)
+      : focusNode !== null
+        ? nodeWorldX(focusNode, nodes.length)
+        : null;
 
   return (
     <Canvas
-      orthographic
-      dpr={[1, 2]}
-      camera={{ position: CAMERA_POSITION, zoom: 1, near: 0.1, far: 100 }}
-      onCreated={({ camera, size, gl }) => {
-        applyFrustum(camera as THREE.OrthographicCamera, size.width, size.height, frustum);
-        camera.lookAt(0, 0, 0);
+      dpr={[1, 1.75]}
+      shadows
+      camera={{ position: CAMERA_POSITION, fov: CAMERA_FOV, near: 0.1, far: 80 }}
+      onCreated={({ camera, gl }) => {
+        camera.lookAt(...CAMERA_LOOK_AT);
         gl.domElement.style.touchAction = 'none';
+        gl.shadowMap.enabled = true;
+        gl.setClearColor('#120814', 0.16);
       }}
       gl={{ antialias: true, alpha: true }}
     >
-      <FrustumKeeper halfWidth={frustum} />
+      <PerspectiveKeeper />
+      <LightingRig atmosphere={atmosphere} focusX={focusX} />
+      <TableVisual width={frustum * 2.35} depth={Math.max(7.2, LANE_DEPTH + 3.4)} />
+      <WaveField
+        width={frustum * 2.2}
+        depth={Math.max(6.4, LANE_DEPTH + 2.6)}
+        active={atmosphere === 'collapse' || measuring}
+      />
+      <CollapseVisual
+        measuring={measuring}
+        selectedNode={selectedCollapseNode}
+        collapsingNode={collapsingNode}
+        nodeCount={nodes.length}
+      />
+      <LaneProjector nodeCount={nodes.length} onLaneLayout={onLaneLayout} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[3, 9, 5]} intensity={0.85} color="#cfe9ff" />
-      <directionalLight position={[-4, 3, -4]} intensity={0.3} color="#ffb066" />
-
-      <GridPlane width={frustum * 2.4} />
-
-      {nodes.map((node, i) => (
-        <NodeColumn
+      {nodes.map((node) => (
+        <NodeLaneVisual
           key={node.index}
           node={node}
-          x={(i - (nodes.length - 1) / 2) * NODE_SPACING}
+          nodeCount={nodes.length}
           isLegal={legalNodes.includes(node.index)}
-          isSelected={selectedNode === node.index}
+          isSelected={hovered === node.index}
           onSelect={() => onSelectNode(node.index)}
+          onInspectCard={onInspectCard}
           visuallyRevealed={visuallyRevealed}
           hitCardIds={hitCardIds}
+          sourceCardId={sourceCardId}
           resolving={focusNode === node.index}
           collapsing={collapsingNode === node.index}
+          subdued={focusNode !== null && focusNode !== node.index}
+          hiddenCardIds={hiddenCardIds}
+          showGhost={Boolean(ghost) && hovered === node.index}
+          ghostLegal={ghostLegal && legalNodes.includes(node.index)}
+          chanceRole={
+            fxEvent?.kind === 'chance'
+              ? fxEvent.fromNode === node.index
+                ? 'from'
+                : fxEvent.toNode === node.index
+                  ? 'to'
+                  : null
+              : null
+          }
+          sourceFamily={
+            fxEvent?.kind === 'damageDc'
+              ? 'drain'
+              : fxEvent?.kind === 'healDc'
+                ? 'restore'
+                : fxEvent?.kind === 'chance'
+                  ? 'chance'
+                  : 'focus'
+          }
         />
       ))}
+
+      {(['1', '0'] as const).flatMap((player) =>
+        (['primary', 'backup'] as const).map((pool) => {
+          const struck = Boolean(
+            fxEvent &&
+              (fxEvent.kind === 'damageDc' || fxEvent.kind === 'healDc') &&
+              fxEvent.player === player &&
+              fxEvent.dataCenter === pool,
+          );
+          return (
+            <DataCenterVisual
+              key={`${player}:${pool}`}
+              position={dcWorld(player, viewer, pool, nodes.length)}
+              pool={pool}
+              side={player === viewer ? 'self' : 'rival'}
+              struck={struck}
+              strike={fxEvent?.kind === 'healDc' ? 'restore' : 'drain'}
+              label={
+                struck && fxEvent?.amount != null
+                  ? `${fxEvent.kind === 'healDc' ? '+' : '-'}${fxEvent.amount}`
+                  : null
+              }
+            />
+          );
+        }),
+      )}
+
+      <SpatialFx
+        event={fxEvent}
+        nodes={nodes}
+        viewer={viewer}
+        sourceName={sourceName}
+        measuring={measuring}
+        focusNode={focusNode ?? collapsingNode ?? null}
+      />
 
       <DropSensor
         pointer={ghost?.pointer ?? null}
         nodeCount={nodes.length}
         onHoverNode={onHoverNode}
       />
-
-      {ghost ? (
-        <DragGhost
-          definition={ghost.definition}
-          card={ghost.card}
-          pointer={ghost.pointer}
-        />
-      ) : null}
     </Canvas>
   );
 }
@@ -127,238 +223,72 @@ function DropSensor({
       onHoverNode(null);
       return;
     }
-    const hit = clientToBoard(pointer.clientX, pointer.clientY, camera, gl.domElement);
-    if (!hit || Math.abs(hit.z) > 2.45) {
-      onHoverNode(null);
-      return;
-    }
-    onHoverNode(nodeIndexAtX(hit.x, nodeCount));
+    const board = clientToBoard(pointer.clientX, pointer.clientY, camera, gl.domElement);
+    const index = board ? nodeIndexAtX(board.x, nodeCount) : null;
+    if (index !== null) onHoverNode(index);
   }, [camera, gl.domElement, nodeCount, onHoverNode, pointer]);
 
   return null;
 }
 
-/** Keep the orthographic frustum locked to the Node row as the canvas resizes. */
-function FrustumKeeper({ halfWidth }: { halfWidth: number }) {
-  useFrame(({ camera, size }) => {
-    applyFrustum(camera as THREE.OrthographicCamera, size.width, size.height, halfWidth);
+function LaneProjector({
+  nodeCount,
+  onLaneLayout,
+}: {
+  nodeCount: number;
+  onLaneLayout?: (boxes: LaneScreenBox[]) => void;
+}) {
+  const { camera, gl } = useThree();
+  const last = useRef('');
+  const scratch = useMemo(() => new THREE.Vector3(), []);
+
+  useFrame(() => {
+    if (!onLaneLayout) return;
+    const canvas = gl.domElement.getBoundingClientRect();
+    const toScreen = (x: number, y: number, z: number) => {
+      scratch.set(x, y, z).project(camera);
+      return {
+        sx: ((scratch.x + 1) / 2) * canvas.width,
+        sy: ((1 - scratch.y) / 2) * canvas.height,
+      };
+    };
+    const boxes: LaneScreenBox[] = [];
+    for (let i = 0; i < nodeCount; i++) {
+      const x = nodeWorldX(i, nodeCount);
+      const leftEdge = toScreen(x - NODE_SPACING / 2, 0.12, 0);
+      const rightEdge = toScreen(x + NODE_SPACING / 2, 0.12, 0);
+      const mid = toScreen(x, 0.34, 0);
+      boxes.push({
+        index: i,
+        left: Math.min(leftEdge.sx, rightEdge.sx),
+        top: 0,
+        width: Math.max(8, Math.abs(rightEdge.sx - leftEdge.sx)),
+        height: canvas.height,
+        midY: mid.sy,
+        selfY: Math.min(canvas.height - 160, mid.sy + 86),
+        rivalY: Math.max(48, mid.sy - 118),
+      });
+    }
+    const key = boxes
+      .map(
+        (box) =>
+          `${box.left | 0}:${box.width | 0}:${box.height | 0}:${box.midY | 0}:${box.selfY | 0}:${box.rivalY | 0}`,
+      )
+      .join('|');
+    if (key === last.current) return;
+    last.current = key;
+    onLaneLayout(boxes);
   });
   return null;
 }
 
-function applyFrustum(
-  camera: THREE.OrthographicCamera,
-  width: number,
-  height: number,
-  halfWidth: number,
-): void {
-  if (!camera.isOrthographicCamera || width === 0 || height === 0) return;
-  const aspect = width / height;
-  camera.left = -halfWidth;
-  camera.right = halfWidth;
-  camera.top = halfWidth / aspect;
-  camera.bottom = -halfWidth / aspect;
-  camera.updateProjectionMatrix();
-}
-
-/** Technical grid ground that reads as circuit substrate rather than decoration. */
-function GridPlane({ width }: { width: number }) {
-  const grid = useMemo(() => {
-    const helper = new THREE.GridHelper(width, Math.round(width * 2), '#2b3d55', '#1d2a3c');
-    helper.position.y = -0.02;
-    return helper;
-  }, [width]);
-
-  return (
-    <>
-      <primitive object={grid} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.04, 0]}>
-        <planeGeometry args={[width, width]} />
-        <meshStandardMaterial color="#0d1522" roughness={0.9} metalness={0.1} />
-      </mesh>
-    </>
-  );
-}
-
-interface NodeColumnProps {
-  node: NodeView;
-  x: number;
-  isLegal: boolean;
-  isSelected: boolean;
-  onSelect: () => void;
-  visuallyRevealed: (instanceId: string, revealed: boolean) => boolean;
-  hitCardIds: ReadonlySet<string>;
-  resolving: boolean;
-  collapsing: boolean;
-}
-
-/**
- * One Node: a platform with the local player's cards toward the camera and the
- * opponent's away from it, so ownership is read from position rather than colour.
- */
-function NodeColumn({
-  node,
-  x,
-  isLegal,
-  isSelected,
-  onSelect,
-  visuallyRevealed,
-  hitCardIds,
-  resolving,
-  collapsing,
-}: NodeColumnProps) {
-  const platform = useRef<Mesh>(null);
-  const group = useRef<Group>(null);
-
-  useFrame((_, delta) => {
-    const material = platform.current?.material as MeshStandardMaterial | undefined;
-    if (!material) return;
-
-    // Motion 1: emissive rise as a Node opens, and a distinct pulse while it is
-    // the Collapse selection, so the probability payoff has its own beat.
-    let target = 0.04;
-    if (node.state === 'open') target = 0.2;
-    if (node.state === 'collapsed') target = 0.1;
-    if (isLegal) target = 0.55;
-    if (resolving) target = 0.72;
-    if (collapsing) target = 0.95;
-    if (isSelected) target = 0.85;
-    if (node.isCollapseSelection) {
-      target = 0.5 + Math.sin(performance.now() / 240) * 0.35;
-    }
-    material.emissiveIntensity = THREE.MathUtils.damp(
-      material.emissiveIntensity,
-      target,
-      6,
-      delta,
-    );
-
-    // Motion 2: closed Nodes sit lower and lift as they open, giving the Node
-    // opening sequence a physical read.
-    if (group.current) {
-      // Closed Nodes still accept commits. They sit slightly lower so "unopened"
-      // is readable, but not so low they look disabled.
-      const restingY = collapsing ? -0.28 : node.state === 'closed' ? -0.14 : 0;
-      group.current.position.y = THREE.MathUtils.damp(
-        group.current.position.y,
-        restingY,
-        7,
-        delta,
-      );
-    }
+function PerspectiveKeeper() {
+  useFrame(({ camera, size }) => {
+    const cam = camera as THREE.PerspectiveCamera;
+    if (!cam.isPerspectiveCamera || size.height === 0) return;
+    cam.aspect = size.width / size.height;
+    cam.lookAt(...CAMERA_LOOK_AT);
+    cam.updateProjectionMatrix();
   });
-
-  const accent = collapsing || node.isCollapseSelection
-    ? '#8b6bd9'
-    : isLegal || isSelected
-      ? '#3fbfe0'
-      : '#2f4a66';
-
-  return (
-    <group ref={group} position={[x, 0, 0]}>
-      <mesh
-        ref={platform}
-        position={[0, 0, 0]}
-        onPointerDown={(event) => {
-          event.stopPropagation();
-          onSelect();
-        }}
-      >
-        <boxGeometry args={[1.85, 0.1, 4.6]} />
-        <meshStandardMaterial
-          color="#16202f"
-          emissive={accent}
-          emissiveIntensity={0.04}
-          roughness={0.55}
-          metalness={0.35}
-        />
-      </mesh>
-
-      {/* Opponent side, away from the camera. */}
-      {node.rivalCards.map((card, i) => (
-        <CardProxy
-          key={card.instanceId}
-          card={card}
-          z={-1.05 - i * CARD_DEPTH_STEP}
-          side="rival"
-          visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
-          impacted={hitCardIds.has(card.instanceId)}
-        />
-      ))}
-
-      {/* Local side, toward the camera. */}
-      {node.selfCards.map((card, i) => (
-        <CardProxy
-          key={card.instanceId}
-          card={card}
-          z={1.05 + i * CARD_DEPTH_STEP}
-          side="self"
-          visualRevealed={visuallyRevealed(card.instanceId, card.revealed)}
-          impacted={hitCardIds.has(card.instanceId)}
-        />
-      ))}
-    </group>
-  );
-}
-
-interface CardProxyProps {
-  card: CardInstance;
-  z: number;
-  side: 'self' | 'rival';
-  visualRevealed: boolean;
-  impacted: boolean;
-}
-
-/**
- * A placed card. Deliberately plain: this is a positional and state proxy, and
- * the readable card face lives in the 2D layer. Final art, frames, and rarity
- * treatments replace the material here without touching layout.
- */
-function CardProxy({ z, side, visualRevealed, impacted }: CardProxyProps) {
-  const mesh = useRef<Mesh>(null);
-  const spawn = useRef(0);
-  const impact = useRef(0);
-
-  useEffect(() => {
-    if (impacted) impact.current = 1;
-  }, [impacted]);
-
-  useFrame((_, delta) => {
-    if (!mesh.current) return;
-
-    // Motion 3: cards flip on reveal rather than swapping state instantly, so
-    // resolution reads as a sequence and causality stays legible.
-    const targetFlip = visualRevealed ? 0 : Math.PI;
-    mesh.current.rotation.z = THREE.MathUtils.damp(
-      mesh.current.rotation.z,
-      targetFlip,
-      8,
-      delta,
-    );
-
-    // Placement settle, so committing a card has weight.
-    spawn.current = Math.min(1, spawn.current + delta * 4);
-    const eased = 1 - (1 - spawn.current) ** 3;
-    impact.current = Math.max(0, impact.current - delta * 3.2);
-    const shake = impact.current * Math.sin(performance.now() / 16) * 0.09;
-    mesh.current.position.y = 0.09 + (1 - eased) * 0.7;
-    mesh.current.position.x = shake;
-    mesh.current.scale.setScalar(0.9 + eased * 0.1 + impact.current * 0.06);
-  });
-
-  const faceColor = visualRevealed ? (side === 'self' ? '#20465c' : '#5c3f20') : '#141d2b';
-  const edgeColor = side === 'self' ? '#3fbfe0' : '#e0a13f';
-
-  return (
-    <mesh ref={mesh} position={[0, 0.09, z]} rotation={[-Math.PI / 2, 0, Math.PI]}>
-      <boxGeometry args={[1.32, 0.05, 0.34]} />
-      <meshStandardMaterial
-        color={faceColor}
-        emissive={edgeColor}
-        emissiveIntensity={visualRevealed ? 0.18 : 0.05}
-        roughness={0.5}
-        metalness={0.3}
-      />
-    </mesh>
-  );
+  return null;
 }

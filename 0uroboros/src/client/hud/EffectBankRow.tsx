@@ -10,11 +10,12 @@ import type { BankSlotView } from '../selectors';
 export interface EffectBankRowProps {
   slots: BankSlotView[];
   label: string;
+  className?: string;
 }
 
-export function EffectBankRow({ slots, label }: EffectBankRowProps) {
+export function EffectBankRow({ slots, label, className = '' }: EffectBankRowProps) {
   return (
-    <div className="bank">
+    <div className={`bank ${className}`.trim()}>
       <span className="bank__label">{label}</span>
       <div className="bank__slots">
         {slots.map((slot) => (

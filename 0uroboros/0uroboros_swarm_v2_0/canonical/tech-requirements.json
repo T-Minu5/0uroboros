@@ -1,0 +1,1149 @@
+{
+  "version": "2.0.0",
+  "items": [
+    {
+      "id": "TECH-SCOPE-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SCOPE-001` V1 is Runtime only.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONFIG-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONFIG-001` Playtest values are data-driven/configurable, including timers, Cycle limit, Action carryover, probabilities, capacities, market counts/supplies, cooldowns, reconnect grace.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SCALE-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SCALE-001` Card classifications, effects, Locations, Mods, rewards, and pools are extensible.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-STACK-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-STACK-001` React Three Fiber required for 3D table/card meshes.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-STACK-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-STACK-002` Three.js is underlying 3D/effects reference layer.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-STACK-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-STACK-003` boardgame.io is primary game-state candidate but must be validated against simultaneous timers, Draft concurrency, reconnect, ordered resolution, and event-stream requirements. Do not force-fit.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-STACK-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-STACK-004` React 19 + TypeScript preferred considerations. Redux Toolkit, Babylon.js, Playroom, spring physics may be evaluated but do not override R3F.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SERVER-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SERVER-001` Server authoritative for legality, Actions, placement, reveals, effects, capacity, Power, probability, RNG, Draft, Wallet, supply, VP, Data Centers, timers, disconnects, endgame, Collapse.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SERVER-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SERVER-002` Gameplay RNG server-side and auditable/reproducible where practical.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SERVER-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SERVER-003` Draft purchases atomic. Optimistic UI only with safe reconciliation.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SERVER-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SERVER-004` Canonical events have stable IDs/sequence numbers.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-001` Systems defines semantics. Lead Engineering owns schema implementation.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-002` UX/LookDev consume contract and cannot invent gameplay state.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-003` Missing authoritative needs use `CONTRACT_REQUEST`.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-004` Contract is versioned. Breaking changes include migration notes.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-EVENT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-EVENT-001` Game Events describe authoritative transitions, not visuals.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-EVENT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-EVENT-002` Presentation Events are client derivations.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-EVENT-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-EVENT-003` No gameplay rules in shaders/UI/animation controllers.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-COLLAPSE-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-COLLAPSE-001` Server resolves ordered Collapse sequence.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-COLLAPSE-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-COLLAPSE-002` Client visually interpolates authoritative results. Presentation timing cannot alter outcomes.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-COLLAPSE-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-COLLAPSE-003` Expose sufficient event granularity for Node, Location/Card effects, Power, winner, rewards, Effect Bank, probability selection, Circuit Reward, Data Center/VP/end changes.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CARD-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CARD-001` Separate card definition from card instance.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CARD-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CARD-002` Stable unique card instance ID.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CARD-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CARD-003` Instance supports zero/one Mod.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CARD-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CARD-004` Track owner and controller separately.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CARD-005",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CARD-005` Track canonical zone and ordering metadata.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-NET-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-NET-001` Implement approved reconnect behavior while preserving authoritative state.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-NET-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-NET-002` Server-authoritative deadlines/timestamps.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-NET-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-NET-003` Critical commands are idempotent or duplicate-protected.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-LOG-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-LOG-001` Logs derive from authoritative events.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-LOG-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-LOG-002` Deterministic concise P1/P2 formatter.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-ACCOUNT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-ACCOUNT-001` Landing: Sign in or Join Game. Join Game accepts game code.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-ACCOUNT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-ACCOUNT-002` Architecture supports Gmail and email login for MVP.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-MEMBER-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-MEMBER-001` Free authenticated players may play but cannot view persistent stats or create/access private games until Membership.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-MEMBER-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-MEMBER-002` Private games are configurable and stats are separate from matchmaking.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-MEMBER-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-MEMBER-003` Membership/payment execution is later, but architecture should avoid rewrite.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-TEST-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-TEST-001` Core rules automated independently of rendering.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-TEST-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-TEST-002` Seeded Collapse fixtures test order, early termination, ties, probability, rewards, RNG.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-TEST-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-TEST-003` Draft concurrency tests include races, cooldowns, depletion, deadlines, reconnect, duplicate requests.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-TEST-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-TEST-004` Contract tests validate UX/LookDev fixtures.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-INT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-INT-001` Lead Engineering may make modular structural implementation decisions without a bespoke rule ID when the decision introduces zero new gameplay semantics, changes no approved rule, changes no externally consumed Game Contract semantics, and remains consistent with existing TECH requirements.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-INT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-INT-002` If an internal choice changes externally consumed contract semantics, gameplay legality, timing semantics, or player-visible outcome, it is not covered by TECH-INT-001 and must follow the normal contract/rule process.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SPIKE-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SPIKE-001` Before substantive implementation commits to boardgame.io, Lead Engineering must run a focused feasibility spike against actual 0uroboros requirements.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SPIKE-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SPIKE-002` The spike must include at minimum:",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SPIKE-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SPIKE-003` Engineering must publish an ADR with one verdict: `ADOPT`, `ADOPT_WITH_EXTENSION_LAYER`, or `REJECT`, with concrete reasons and migration implications.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-SPIKE-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-SPIKE-004` Broad production implementation must not assume boardgame.io is final until the ADR is accepted.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-RNG-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-RNG-001` All gameplay-relevant RNG is deterministic, server-authoritative, seedable, and replayable for V1.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-RNG-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-RNG-002` This includes initial mirrored shuffle, later independent shuffles, Location selection, Chaos selection, timeout random choices, random deck placement, and probabilistic Circuit Reward Node selection.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-RNG-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-RNG-003` Match/event records must retain enough RNG provenance to reconstruct authoritative outcomes for automated tests, debugging, and dispute analysis.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-RNG-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-RNG-004` No production gameplay RNG may rely on an untracked client random source.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-PRESENT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-PRESENT-001` The server computes authoritative phase outcomes independently of visual duration.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-PRESENT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-PRESENT-002` For theatrical sequences such as Wave Collapse, the server emits the ordered event stream plus an authoritative presentation barrier/deadline.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-PRESENT-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-PRESENT-003` The next interactive phase, such as Draft, does not become active and its actionable timer does not begin until the server-owned presentation barrier is reached.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-PRESENT-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-PRESENT-004` Clients may send presentation-complete acknowledgements for telemetry/synchronization, but client acknowledgement is never required to unblock authoritative server progression.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-PRESENT-005",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-PRESENT-005` A slow, disconnected, or malicious client cannot hold the match hostage by withholding an animation-complete acknowledgement.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-005",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-005` UX/LookDev may continue work after submitting a CONTRACT_REQUEST by creating a `PROVISIONAL_MOCK` outside the canonical Game Contract.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-006",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-006` Every provisional mock must cite its Contract Request ID, mark all unapproved fields as provisional, and state the fallback behavior if Engineering rejects or changes the request.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-007",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-007` Provisional mocks never become authoritative merely because components were built against them.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CONTRACT-008",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CONTRACT-008` When the canonical contract resolves the request, dependent mocks/fixtures must be reconciled or invalidated before implementation is considered complete.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-OBS-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-OBS-001` Maintain an append-only authoritative match event log with stable event IDs, sequence numbers, server timestamps, actor, command/request correlation where relevant, and rule/requirement references where practical.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-OBS-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-OBS-002` Support deterministic match replay/debug reconstruction from initial state + canonical config + authoritative commands/events + RNG provenance.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-OBS-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-OBS-003` Presentation logs and gameplay logs are derived views and are not substitutes for the authoritative event record.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CMD-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CMD-001` Critical client commands use explicit request IDs/idempotency keys.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CMD-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CMD-002` Duplicate delivery of the same command must not duplicate gameplay effects.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-CMD-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-CMD-003` Draft purchase commands must return an authoritative acknowledgement referencing the request ID and resulting Wallet/supply state.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-001",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-001` Use the current OpenAI Agents SDK for TypeScript, not the deprecated experimental OpenAI Swarm project.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-002",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-002` Core planning uses manager-style orchestration. Astra remains the conversation owner and invokes specialists as agent tools where appropriate.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-003",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-003` Specialists cannot recursively spawn arbitrary specialists.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-004",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-004` Deterministic workflow transitions belong in application code when judgment is unnecessary.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-005",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-005` Planning agents receive no production filesystem mutation, shell, deployment, Git commit/push, billing, or destructive tools.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-006",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-006` Execution agents may receive sandbox-scoped tools only through approved WorkPackages.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-007",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-007` Structured outputs use Zod or another SDK-supported schema and are revalidated by application code at authority boundaries.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-008",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-008` Built-in SDK tracing remains enabled by default unless explicitly disabled for an operational/privacy reason.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-009",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-009` Local run manifests record only usage metrics actually exposed by the SDK. Never fabricate per-agent token attribution.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-010",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-010` SDK `maxTurns` and application-level RunBudget are both required.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-011",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-011` SDK approval/interruption mechanisms should be used for approval-gated tools where appropriate, while application governance determines whether approval is required.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-012",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-012` Sandbox Agents are gated execution infrastructure, not default planning infrastructure.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-013",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-013` Model IDs and optional model settings are centralized and environment-overridable.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-014",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-014` Astra fallback is explicit and logged. Never silently replace Astra.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "TECH-AGENT-015",
+      "domain": "TECH",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`TECH-AGENT-015` Canonical context is retrieved by relevant IDs/slices rather than injected wholesale into every specialist call.",
+      "tags": [
+        "tech"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "02_PRODUCT_TECH_REQUIREMENTS.md"
+    },
+    {
+      "id": "CONTRACT-001",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-001` Outcome-affecting values come from authoritative state.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-002",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-002` Presentation may own hover, animation progress, interpolation, camera, shader intensity, and temporary emphasis.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-003",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-003` Client presentation never becomes a second rules engine.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-004",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-004` Missing authoritative information requires `CONTRACT_REQUEST`.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-005",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-005` UX/LookDev may use a separately marked `PROVISIONAL_MOCK` while a request is pending.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-006",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-006` Provisional mocks never gain canonical authority by usage.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-007",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-007` Contract versions are explicit and fixtures declare which version they target.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    },
+    {
+      "id": "CONTRACT-008",
+      "domain": "CONTRACT",
+      "status": "current",
+      "version": "2.0.0",
+      "text": "`CONTRACT-008` Node Power is an alias for Node P1 Power and Node P2 Power. Do not add a redundant `node_power` field for UI convenience.",
+      "tags": [
+        "contract"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "document": "03_GAME_CONTRACT.md"
+    }
+  ]
+}

@@ -1,10 +1,16 @@
 /* Card surfaces keep the same face in the editor, hand, Draft and inspection. */
 .hand-card:has(> .cf-card),
 .flying-face.hand-card.flight-face-card:has(> .cf-card) {
- display:block;padding:0;border:0;background:transparent;overflow:visible;
+ display:block !important;padding:0;border:0;background:transparent;overflow:visible;
+ grid-template-rows:none;grid-template-columns:none;text-align:left;
 }
 .hand-card:has(> .cf-card) {border-radius:8px;}
 .hand-card > .cf-card {width:100%;height:100%;}
+.hand-card:has(> .cf-card) .cf-card .cf-title.card-name,
+.flying-face:has(> .cf-card) .cf-card .cf-title.card-name {
+ position:static;inset:auto;top:auto;grid-row:auto;max-width:100%;padding:0;
+ font-size:calc(14 * var(--cf-u) * var(--cf-title-scale,1));line-height:1;letter-spacing:.08em;color:#fff;
+}
 .flying-card:has(.cf-card) {border:0;overflow:visible;background:transparent;}
 .flying-card:not(.crypto-flight) .flying-face:has(> .cf-card) {display:block;}
 .world-anchor .field-card.revealed:has(> .cf-card) {display:block;padding:0;border:0;background:transparent;overflow:visible;}
@@ -14,22 +20,53 @@
 .world-anchor .duration.live-bank button.bank-slot:has(> .cf-card) {padding:0;overflow:visible;border:0!important;background:transparent!important;}
 .bank-slot > .cf-card {width:100%;height:100%;}
 .strategic-draft .market-art:has(> .cf-card) {
- width:100%;height:auto;aspect-ratio:158/224;overflow:visible;border:0;background:none;border-radius:8px;
+ width:100%;height:auto;aspect-ratio:170/236;overflow:visible;border:0;background:none;border-radius:8px;
 }
 .strategic-draft .market-art > .cf-card {width:100%;height:100%;}
-.catalog-art:has(> .cf-card) {height:auto;aspect-ratio:158/224;overflow:visible;background:none;padding:8px;border-radius:8px;}
+.catalog-art:has(> .cf-card) {height:auto;aspect-ratio:170/236;overflow:visible;background:none;padding:8px;border-radius:8px;}
 .catalog-grid article:has(.cf-card) {overflow:visible;}
 .catalog-art > .cf-card {width:100%;height:100%;}
 .inspect:has(.cf-card) {align-items:start;}
 .inspect .inspect-art:has(> .cf-card) {padding:22px 16px;width:100%;height:auto;min-height:0;align-self:start;background:none;}
-.inspect-art > .cf-card {width:100%;height:auto;aspect-ratio:158/224;}
-.authoring-app .au-card-face-wrap {width:100%;aspect-ratio:158/224;min-width:0;}
+.inspect-art > .cf-card {width:100%;height:auto;aspect-ratio:170/236;}
+.inspect .inspect-art {position:relative;}
+.inspect-art > .inspect-sound {display:block;margin:10px auto 0;padding:5px 12px;font:600 9px Orbitron,Inter,sans-serif;letter-spacing:.8px;color:#b6a8d0;background:#0b0b17e6;border-color:#ffffff24;border-radius:999px}
+.inspect-art > .inspect-sound[aria-pressed='true'] {color:#ffe9a8;border-color:#ffcc12aa}
+.authoring-app .au-card-face-wrap {width:100%;aspect-ratio:170/236;min-width:0;}
 .au-card-face-wrap > .cf-card {width:100%;height:100%;}
 .authoring-app .au-preview-modes {display:flex;gap:4px;margin:8px 0 14px;border:1px solid #365263;border-radius:7px;padding:3px;background:#0a1522;}
 .authoring-app .au-preview-modes button {flex:1;padding:5px 8px;font-size:11px;border:0;background:none;color:#9db4c7;}
 .authoring-app .au-preview-modes button[aria-pressed='true'] {color:#dcf8ff;background:#204355;}
 .authoring-app .au-preview-meta {border-top:0;margin-top:12px;}
 .authoring-app .au-preview-meta .au-preview-effect {font-size:12px;line-height:1.6;color:#c9d8e2;white-space:pre-line;}
+/* Modifier badges + movable float cue — anchored to the art panel they sit over. */
+.cf-modifier-badges{position:absolute;z-index:4;left:calc(6 * var(--cf-u));bottom:calc(6 * var(--cf-u));display:flex;flex-wrap:wrap;gap:calc(3 * var(--cf-u));max-width:70%;pointer-events:none}
+.cf-modifier-badge{display:inline-flex;align-items:center;justify-content:center;min-width:calc(22 * var(--cf-u));padding:calc(2 * var(--cf-u)) calc(5 * var(--cf-u));border-radius:calc(4 * var(--cf-u));background:#000c;border:1px solid #ffcc12aa;color:#ffcc12;font:700 calc(10 * var(--cf-u))/1 Orbitron,Inter,sans-serif;letter-spacing:.04em}
+.cf-card--compact .cf-modifier-badges{left:3px;bottom:3px;gap:2px;max-width:90%}
+.cf-card--compact .cf-modifier-badge{min-width:16px;padding:1px 3px;font-size:7px;border-radius:3px}
+/* Played cards drop the gradient edge band; the single-colour line becomes the card's edge. */
+.world-anchor .field-card .cf-card--compact .cf-body{border-width:0}
+.world-anchor .field-card .cf-card--compact .cf-body::after{border-width:2px;border-radius:6px}
+/* A movable card hovers off the table: the face bobs high while its shadow stays on the surface, spreading and thinning as the card rises. */
+.cf-card--movable{animation:cf-movable-float 2.4s ease-in-out infinite}
+.world-anchor .field-card.movable-card{isolation:isolate;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.world-anchor .field-card.movable-card:active{cursor:grabbing}
+.world-anchor .field-card.movable-card img{pointer-events:none;-webkit-user-drag:none}
+.world-anchor .field-card.movable-card::before{content:'';position:absolute;z-index:-1;inset:10% -2% -8%;border-radius:8px;background:#000;box-shadow:0 0 8px 3px #000;pointer-events:none;animation:cf-movable-shadow 2.4s ease-in-out infinite}
+@keyframes cf-movable-float{
+ 0%,100%{transform:translateY(-4px);filter:drop-shadow(0 4px 3px #00000080)}
+ 50%{transform:translateY(-15px);filter:drop-shadow(0 16px 9px #00000080)}
+}
+@keyframes cf-movable-shadow{0%,100%{transform:translateY(5px) scale(1);filter:blur(3px);opacity:.5}50%{transform:translateY(11px) scale(.95);filter:blur(7px);opacity:.45}}
+/* The drag ghost holds the peak of the hover. */
+.pointer-card-host{position:fixed;left:0;top:0;width:0;height:0;z-index:1000;pointer-events:none;transform:none!important}
+.world-anchor .field-card.pointer-card{position:fixed;margin:0;z-index:1000;pointer-events:none;transition:none;animation:none;opacity:1;cursor:grabbing;will-change:transform}
+.world-anchor .field-card.pointer-card>.cf-card{animation:none;transform:translateY(-18px);filter:drop-shadow(calc(var(--lean-x,0) * -10px) calc(18px + var(--lean-y,0) * 10px) 10px #00000080)}
+.world-anchor .field-card.pointer-card::before{animation:none;transform:translateY(12px) scale(.94);filter:blur(8px);opacity:.5}
+@media(prefers-reduced-motion:reduce){
+ .cf-card--movable{animation:none;transform:translateY(-8px);filter:drop-shadow(0 8px 5px #00000080)}
+ .world-anchor .field-card.movable-card::before{animation:none;transform:translateY(7px);filter:blur(5px);opacity:.5}
+}
 @media(max-width:760px){
  .authoring-app .au-card-face-wrap {max-width:240px;margin-inline:auto;}
  .authoring-app .au-preview-modes {max-width:240px;margin-inline:auto;}

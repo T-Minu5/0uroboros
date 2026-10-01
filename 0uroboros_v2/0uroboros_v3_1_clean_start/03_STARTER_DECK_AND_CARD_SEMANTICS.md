@@ -39,7 +39,7 @@ Gain N Crypto for the current Cycle's eventual Draft Wallet.
 Generic Drain targets opponent's available Primary first, then Backup if Primary is destroyed/unavailable. No overkill spill. Explicit Backup/Both targeting overrides generic targeting when approved by text.
 
 ### Restore N
-Generic Restore targets owner's available Primary first, then Backup if Primary is destroyed/unavailable. Destroyed Data Centers cannot be restored. No overheal; excess is lost.
+Generic Restore targets owner's available Primary first, then Backup if Primary is destroyed/unavailable. Destroyed Servers cannot be restored. No overheal; excess is lost.
 
 ### Gain/acquire a card
 Acquisition to the destination defined by the effect. Default Draft acquisition goes to Discard unless text overrides.

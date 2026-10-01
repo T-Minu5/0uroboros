@@ -4,6 +4,8 @@ import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '.
 import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, baseOffer, chaosOffer, createStrategicMarket } from '../src/evaluationMarket';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '../src/cardArtwork';
 import type { EvaluationEffect } from '../src/game';
+import { seededRandom } from '../src/runtime';
+import { bundledContent } from '../src/authoring/contentStore';
 
 const byId=(id:string)=>HISTORIC_CARDS.find(card=>card.definitionId===id)!;
 const retained=EVALUATION_ALL_CARDS.filter(card=>!HISTORIC_CARDS.includes(card));
@@ -34,11 +36,28 @@ describe('Historic catalog activation',()=>{
   expect(EVALUATION_BASE_CARDS.some(card=>card.id==='owl-king')).toBe(true);
   expect(EVALUATION_CHAOS_CARDS.some(card=>card.id==='sudo-demiurge')).toBe(true);
  });
- it('preserves four persistent Base piles, two rotating Base offers, three Chaos offers and prior VP/Crypto shelves',()=>{
-  const market=createStrategicMarket();expect(market.filter(p=>p.category==='Base')).toHaveLength(4);expect(market.filter(p=>p.category==='VP')).toHaveLength(3);expect(market.filter(p=>p.category==='Crypto')).toHaveLength(3);
-  const base=baseOffer(()=>.31),chaos=chaosOffer(()=>.71);expect(base).toHaveLength(2);expect(chaos).toHaveLength(3);
+ it('preserves four persistent Base piles, two rotating Base offers, four Chaos offers and prior VP/Crypto shelves',()=>{
+  const market=createStrategicMarket(()=>0.31);expect(market.filter(p=>p.category==='Base')).toHaveLength(4);expect(market.filter(p=>p.category==='VP')).toHaveLength(3);expect(market.filter(p=>p.category==='Crypto')).toHaveLength(3);
+  const stableIds=new Set(market.filter(p=>p.category==='Base').map(p=>p.card.definitionId??p.card.id));
+  const base=baseOffer(()=>.31,undefined,stableIds),chaos=chaosOffer(()=>.71);expect(base).toHaveLength(2);expect(chaos).toHaveLength(4);
   expect(base.every(p=>p.rotating)).toBe(true);expect(chaos.every(p=>p.remaining?.join() === '2,2')).toBe(true);
   expect(base.every(p=>!market.some(core=>core.id===p.id))).toBe(true);
+  const other=createStrategicMarket(()=>0.77);
+  expect(new Set(market.filter(p=>p.category==='Base').map(p=>p.id))).not.toEqual(new Set(other.filter(p=>p.category==='Base').map(p=>p.id)));
+ });
+ it('samples VP, Crypto and stable Base shelves from every draftable card, never Generated ones',()=>{
+  const seen={VP:new Set<string>(),Crypto:new Set<string>(),Base:new Set<string>()};
+  for(let seed=1;seed<=200;seed++)for(const pile of createStrategicMarket(seededRandom(seed),bundledContent)){
+   if(pile.category!=='Chaos')seen[pile.category].add(pile.card.definitionId??pile.card.id);
+  }
+  const ids=(cards:readonly {id:string;definitionId?:string}[])=>new Set(cards.map(card=>card.definitionId??card.id));
+  expect(seen.VP).toEqual(ids(bundledContent.vpCards));
+  expect(seen.Crypto).toEqual(ids(bundledContent.cryptoCards));
+  expect(seen.Base).toEqual(ids(bundledContent.baseCards));
+  expect(bundledContent.vpCards.length).toBeGreaterThan(3);
+  const generated=bundledContent.cards.filter(card=>card.generated).map(card=>card.definitionId??card.id);
+  expect(generated).toEqual(expect.arrayContaining(['glitch','owl-king']));
+  for(const id of generated)expect(seen.VP.has(id)||seen.Crypto.has(id)||seen.Base.has(id),id).toBe(false);
  });
  it('retains assigned Power and applies approved defaults only to newly introduced identities',()=>{
   expect(byId('slash-dot').power).toBe(3);expect(byId('root-rune').power).toBe(3);expect(byId('chronos-cache').power).toBe(1);

@@ -114,10 +114,14 @@ describe('Public information', () => {
     const { state } = createHarness();
     state.players['1'].wallet = 7;
     state.players['1'].victoryPoints = 5;
+    state.players['1'].actions = 1;
+    state.players['1'].pendingActions = 2;
 
     const view = playerView(state, '0');
     expect(view.players['1'].wallet).toBe(7);
     expect(view.players['1'].victoryPoints).toBe(5);
+    expect(view.players['1'].actions).toBe(1);
+    expect(view.players['1'].pendingActions).toBe(2);
     expect(view.nodes.map((n) => n.probability)).toEqual([30, 25, 20, 15, 10]);
   });
 

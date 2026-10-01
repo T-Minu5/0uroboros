@@ -1,0 +1,49 @@
+{
+  "updated_at": "2026-09-08T05:10:00.000Z",
+  "canonical_version": "2.0.0",
+  "v3_version": "3.0.0",
+  "items": [
+    {
+      "id": "WP-DRAFT-OVERLAY",
+      "canonical_ids": ["RULE-DRAFT-001"],
+      "status": "completed",
+      "note": "Presentation: collapseTheaterReady in draft even with leftover revealQueue. Continue on pending Collapse."
+    },
+    {
+      "id": "WP-FLIGHT-ONDONE",
+      "canonical_ids": [],
+      "status": "completed",
+      "note": "WAAPI cancel now calls onDone so hidden cards unhide."
+    },
+    {
+      "id": "WP-EFFECT-REGISTRY",
+      "canonical_ids": [],
+      "status": "completed",
+      "note": "30 files inspected. Reference only."
+    },
+    {
+      "id": "WP-ORIGINAL-FX",
+      "canonical_ids": [],
+      "status": "completed",
+      "note": "Original sigil + interference SVG. WaveField shader. Provenance recorded."
+    },
+    {
+      "id": "WP-BOARD-CONCEPT",
+      "canonical_ids": ["UX-BOARD-001"],
+      "status": "completed",
+      "note": "Corner pylons and magenta rim from concept art. Five regions remain lanes."
+    },
+    {
+      "id": "WP-FX-STORYTELLING",
+      "canonical_ids": [],
+      "status": "open",
+      "note": "Source-path-target exists. Needs more live Collapse/Location polish."
+    },
+    {
+      "id": "WP-M8",
+      "canonical_ids": [],
+      "status": "open",
+      "note": "Hardening. DEMO_READY is Mel-only."
+    }
+  ]
+}

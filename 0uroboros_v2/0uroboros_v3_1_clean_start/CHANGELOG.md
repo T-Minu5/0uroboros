@@ -4,7 +4,7 @@
 - Rebuilt context for zero prior agent memory.
 - Separated rules, UX, LookDev, effects/reference policy, and development model.
 - Canonicalized current starter deck and deprecated placeholder rosters.
-- Preserved Runtime, reveal, probability, Collapse, Draft, Data Center, Duration, network, and endgame decisions.
+- Preserved Runtime, reveal, probability, Collapse, Draft, Server, Duration, network, and endgame decisions.
 - Added extensible LookDev additions document.
 - Preserved first-party visual authority.
 - Preserved Snap sequencing and Hearthstone motion-weight roles.

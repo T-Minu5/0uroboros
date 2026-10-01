@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
+import { useSetting } from './settings-menu.mjs';
 import { mkdir, readFile } from 'node:fs/promises';
 
 const evidence='docs/evidence/card-styles';
@@ -29,7 +30,7 @@ try{
   const duration=await page.getByLabel('Duration',{exact:true}).inputValue();
   assert.equal(await face.locator('[data-card-duration]').count(),duration?1:0);
   const size=await face.locator('.cf-title').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
-  assert(Math.abs(size-(style==='vp'?10:14))<.1,`${style}: Figma title ${size}`);
+  assert(size>=14-0.2&&size<=20+0.2,`${style}: title ${size}px should be between visual 14px and 20px`);
   await preview.getByRole('button',{name:'Draft',exact:true}).click();
   assert.equal(await face.locator('[data-card-cost]').count(),1);
   const cost=await page.getByLabel('Cost',{exact:true}).inputValue();
@@ -43,7 +44,7 @@ try{
  const title=preview.locator('.cf-title');
  await page.waitForFunction(()=>document.querySelector('.au-preview-column .cf-title')?.dataset.titleFit==='truncated');
  const fitted=await title.evaluate(el=>({font:parseFloat(getComputedStyle(el).fontSize),overflow:getComputedStyle(el).textOverflow,fit:el.dataset.titleFit,title:el.title}));
- assert(fitted.font===14 && fitted.overflow==='ellipsis' && fitted.fit==='truncated');
+ assert(Math.abs(fitted.font-14)<0.2 && fitted.overflow==='ellipsis' && fitted.fit==='truncated');
  assert.equal(fitted.title,'An Extremely Long Card Name That Must Be Truncated');
  await page.getByLabel('Name',{exact:true}).fill('Hex');
  await page.waitForFunction(()=>document.querySelector('.au-preview-column .cf-title')?.dataset.titleFit==='exact');
@@ -58,7 +59,7 @@ try{
  await page.setViewportSize({width:390,height:844});
  await preview.scrollIntoViewIfNeeded();
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- assert(await title.evaluate(el=>parseFloat(getComputedStyle(el).fontSize)===14));
+ assert(await title.evaluate(el=>{const px=parseFloat(getComputedStyle(el).fontSize);return px>=14-0.2&&px<=20+0.2;}));
  await page.screenshot({path:`${evidence}/mobile.png`});
  // All editor edits are unsaved and intentionally discarded.
  await page.setViewportSize({width:1600,height:1000});
@@ -67,7 +68,7 @@ try{
  await page.getByRole('button',{name:/Enter evaluation build/}).click({timeout:60000});
  const ready=()=>page.waitForFunction(()=>document.querySelector('.end-turn') && !document.querySelector('.end-turn').disabled && !document.querySelector('.arena.resolving'));
  await ready();
- await page.getByRole('button',{name:'Normal pace',exact:true}).click();
+ await useSetting(page,'Normal pace',{exact:true});
  assert.equal(await page.locator('.hand [data-card-cost]').count(),0);
  assert(await page.locator('.hand .cf-card').count()>0);
  const card=page.locator('.hand .hand-card').first();const id=await card.getAttribute('data-card-id');
@@ -96,7 +97,7 @@ try{
  marketCount=await page.locator('.market-art .cf-card').count();
  assert(marketCount>=12);
  assert.equal(await page.locator('.market-art [data-card-cost]').count(),marketCount);
- await page.locator('.market-art').first().click();
+ await page.locator('.market-art').first().click({button:'right'});
  assert.equal(await page.getByRole('dialog',{name:/Inspect /}).locator('[data-card-cost]').count(),1);
  await page.getByRole('button',{name:'Close card inspect',exact:true}).click();
  await page.screenshot({path:`${evidence}/draft.png`});

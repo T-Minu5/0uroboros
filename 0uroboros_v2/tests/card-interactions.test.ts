@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveCardPower, starterCards, type Card, type Deployment, type EvaluationEffect, type PlayerId } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
 
 const make = () => {
   const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(7) });
@@ -23,7 +23,7 @@ const finish = (session: RuntimeSession) => {
   const events: RuntimeEvent[] = [];
   for (let i = 0; session.pendingCount || session.state.choice; i++) {
     if (i > 400) throw new Error('Resolution stalled.');
-    events.push(session.state.choice ? session.choose(session.state.choice.options[0].id) : session.step()!.event);
+    events.push(session.state.choice ? session.choose(firstLegalSelection(session.state.choice)) : session.step()!.event);
   }
   return events;
 };
@@ -69,7 +69,7 @@ describe('revealed card movement', () => {
     full.state.players[0].hand = [card('source', [{ kind: 'moveCard', opponent: true }])];
     full.deploy('source', 0); full.endTurn();
     const result = advance(full).find(event => event.kind === 'move');
-    expect(result?.text).toMatch(/no legal revealed card/);
+    expect(result?.text).toMatch(/No target/i);
     expect(full.state.choice).toBeNull();
     expect(full.state.nodes[0].cards[1][0].card.id).toBe('victim');
 
@@ -108,6 +108,15 @@ describe('revealed card movement', () => {
 });
 
 describe('deployment Power changes', () => {
+  it('keeps negative printed Power on the board while buffs still raise it', () => {
+    const target = placed(card('cursed', [], { power: -2 }), 1, 0, 1);
+    expect(effectiveCardPower(target)).toBe(-2);
+    target.powerModifier = -3;
+    expect(effectiveCardPower(target)).toBe(-2);
+    target.powerModifier = 3;
+    expect(effectiveCardPower(target)).toBe(1);
+  });
+
   it('clamps damage at zero, applies a later buff from zero, and exposes only a view copy of adjusted Power', () => {
     const session = make();
     const definition = card('victim', [], { power: 2 });
@@ -156,6 +165,29 @@ describe('deployment Power changes', () => {
     expect(session.state.nodes[0].cards[0][0].powerModifier).toBeUndefined();
   });
 
+  it('moves stolen Power onto the thief and only as much as the victim actually lost', () => {
+    const session = make();
+    const victim = placed(card('victim', [], { power: 2 }), 1, 0, 1);
+    session.state.nodes[0].cards[1].push(victim);
+    session.state.players[0].hand = [card('thief', [{ kind: 'modifyPower', amount: -5, opponent: true }], { power: 3 })];
+    session.deploy('thief', 0); session.endTurn(); advance(session);
+    const event = session.choose('card-victim');
+    expect(event).toMatchObject({ targetCardId: 'victim', targetOwner: 1, before: 2, after: 0 });
+    expect(effectiveCardPower(victim)).toBe(0);
+    // The victim only had 2 to give, so the thief gains 2 rather than the requested 5.
+    expect(effectiveCardPower(session.state.nodes[0].cards[0][0])).toBe(5);
+  });
+
+  it('leaves Power destroyed rather than stolen when a card drains its own side', () => {
+    const session = make();
+    session.state.nodes[0].cards[0].push(placed(card('victim', [], { power: 4 }), 0, 0, 1));
+    session.state.players[0].hand = [card('source', [{ kind: 'modifyPower', amount: -3 }], { power: 3 })];
+    session.deploy('source', 0); session.endTurn(); advance(session);
+    session.choose('card-victim');
+    expect(effectiveCardPower(session.state.nodes[0].cards[0][0])).toBe(1);
+    expect(effectiveCardPower(session.state.nodes[0].cards[0][1])).toBe(3);
+  });
+
   it('keeps a moved Collapse card from resolving onCollapse twice or entering a sealed Node', () => {
     const session = make();
     session.state.players[0].hand = [card('source', [], { onCollapse: [{ kind: 'moveCard' }] })];
@@ -200,9 +232,9 @@ describe('Effect Bank card interactions', () => {
     session.endTurn();
     const events = finish(session);
     expect(events.find(event => event.sourceName === mover.name && event.kind === 'choice')).toMatchObject({ kind: 'choice', owner: 0 });
-    expect(events.find(event => event.sourceName === mover.name && event.kind === 'choice')?.text).toMatch(/no legal option; no effect/);
+    expect(events.find(event => event.sourceName === mover.name && event.kind === 'choice')?.text).toMatch(/No target/i);
     expect(events.find(event => event.cardId === transfer.id)).toMatchObject({ kind: 'power', owner: 0, amount: 0 });
-    expect(events.find(event => event.cardId === transfer.id)?.text).toMatch(/no deployed source Location/);
+    expect(events.find(event => event.cardId === transfer.id)?.text).toMatch(/No target/i);
     expect(session.state.choice).toBeNull();
     expect(session.state.players[0].bank.map(entry => entry.card.id)).toEqual([mover.id, transfer.id]);
     expect(session.state.nodes.every(node => node.powerModifiers[0] === 0)).toBe(true);
