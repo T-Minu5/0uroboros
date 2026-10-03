@@ -1,4 +1,4 @@
-import { LANE_MARK_DX, LANE_MARK_HALF, LANE_MARK_Z, warpFarZ } from './boardLayout';
+import { LANE_MARK_DX, LANE_MARK_HALF, LANE_MARK_Z, LANE_RIM, warpFarZ } from './boardLayout';
 
 /** Lane seal on Node close: the plate slides over the lane in SEAL_SLIDE_S while the placed cards shrink to SEAL_CARD_SCALE. */
 export const SEAL_SLIDE_S = 1.1, SEAL_SCALE_S = .9, SEAL_CARD_SCALE = .75;
@@ -34,13 +34,14 @@ export function laneSealEdgeZ(side: number, slide: number) {
 
 export const SINK_OPACITY = .65;
 /**
- * The dark "sinking" layer under the cards, `t` seconds into a seal. It sits still on the pattern's starting footprint
- * and darkens with the plate's travel, reaching SINK_OPACITY as the plate covers its far edge. `clipZ` is the plate's
- * leading edge, where its visible part begins.
+ * The dark "sinking" layer under the cards, `t` seconds into a seal. It sits still on the lane's starting footprint (the
+ * pattern on Classic, the whole lane outline on Neon) and darkens with the plate's travel, reaching SINK_OPACITY as the
+ * plate covers its far edge. `clipZ` is the plate's leading edge, where its visible part begins.
  */
-export function laneSinkOverlay(side: number, t: number) {
+export function laneSinkOverlay(side: number, t: number, neon = false) {
   const { slide } = laneSealProgress(t), { power, d } = PATTERN_LANES[side], dir = side === 0 ? 1 : -1;
-  const { z0, z1 } = LANE_FIT[side], coveredAt = Math.abs(power + dir * d - (side === 0 ? z0 : z1)) / (z1 - z0);
+  const far = neon ? (side === 0 ? LANE_RIM[0].z1 : LANE_RIM[1].z0) : power + dir * d;
+  const { z0, z1 } = LANE_FIT[side], coveredAt = Math.min(1, Math.abs(far - (side === 0 ? z0 : z1)) / (z1 - z0));
   return {
     clipZ: laneSealEdgeZ(side, slide),
     opacity: SINK_OPACITY * Math.min(1, slide / coveredAt),

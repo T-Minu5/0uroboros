@@ -56,16 +56,24 @@ export function coverCrop(canvasAspect: number, imageAspect: number) {
 }
 
 /**
- * Crop and per-depth shift, in texture coordinates. `verticalGain` scales the up/down shift
- * against the side-to-side one. The crop zooms in just far enough that the largest shift on
- * either axis (eye at ±1) never exposes the edge of the image.
+ * Crop and per-depth shift, in texture coordinates. The crop matches the flat image's
+ * `object-fit: cover`, unzoomed. `verticalGain` scales the up/down shift against the side-to-side one.
  */
 export function viewUniforms(canvasAspect: number, entry: Pick<DepthEntry, 'width' | 'height' | 'focus'>, intensity: number, eye: Eye, verticalGain = 1) {
   const { sx, sy } = coverCrop(canvasAspect, entry.width / entry.height);
-  const margin = BASE_SHIFT * intensity * Math.max(entry.focus, 1 - entry.focus);
-  const zoom = Math.min(1, 1 / (sx * (1 + 2 * margin)), 1 / (sy * (1 + 2 * margin * verticalGain * canvasAspect)));
   const shift = BASE_SHIFT * intensity;
-  return { crop: [sx * zoom, sy * zoom] as const, shift: [eye.x * shift * sx * zoom, eye.y * shift * verticalGain * canvasAspect * sy * zoom] as const, zoom };
+  return { crop: [sx, sy] as const, shift: [eye.x * shift * sx, eye.y * shift * verticalGain * canvasAspect * sy] as const };
+}
+
+/**
+ * The shader's per-axis taper on the shift at a point of the window (`uv` in 0..1). It reaches 1 once a point has
+ * twice the room the full shift needs, and is small enough everywhere that no sample lands past the image's edge.
+ */
+export function edgeFalloff(uv: number, crop: number, shift: number, focus: number) {
+  const room = 0.5 * (1 - crop) + crop * Math.min(uv, 1 - uv);
+  const reach = Math.abs(shift) * Math.max(focus, 1 - focus) + 1e-5;
+  const x = Math.max(0, Math.min(1, room / (2 * reach)));
+  return x * x * (3 - 2 * x);
 }
 
 class Renderer {
@@ -236,7 +244,7 @@ class Renderer {
       this.canvas.width = Math.max(this.canvas.width, w); this.canvas.height = Math.max(this.canvas.height, h);
     }
     const gl = this.gl;
-    const { crop, shift, zoom } = viewUniforms(cw / ch, view.entry, view.intensity, eye, view.verticalGain);
+    const { crop, shift } = viewUniforms(cw / ch, view.entry, view.intensity, eye, view.verticalGain);
     const travel = BASE_SHIFT * view.intensity * w * Math.max(1, view.verticalGain);
     const steps = Math.round(Math.min(this.coarse ? 32 : 64, Math.max(16, travel * 1.5)));
     gl.viewport(0, 0, w, h);
@@ -250,10 +258,7 @@ class Renderer {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     view.ctx.drawImage(this.canvas, 0, this.canvas.height - h, w, h, 0, 0, w, h);
     view.drawnEye = { ...eye }; view.drawnSize = size;
-    if (!view.canvas.hasAttribute('data-ready')) {
-      view.canvas.setAttribute('data-ready', '');
-      view.canvas.parentElement?.style.setProperty('--depth-zoom', String(1 / zoom));
-    }
+    if (!view.canvas.hasAttribute('data-ready')) view.canvas.setAttribute('data-ready', '');
   }
 }
 

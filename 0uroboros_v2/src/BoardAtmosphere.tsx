@@ -1,48 +1,28 @@
-import { useMemo, useEffect, useState, useCallback, useRef, type RefObject } from 'react';
+import { Suspense, useMemo, useEffect, useState, useCallback, useRef, type RefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useTexture, ContactShadows } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
+import { BoardContactShadow } from './BoardContactShadow';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { boardSideHealth, DAMAGED_LIGHT, neonIntensity, PERIMETER_DIM, sideLightScale } from './boardMaterials';
+import { boardSideHealth, DAMAGED_LIGHT, PERIMETER_DIM, sideLightScale } from './boardMaterials';
 import { ENGRAVING_LANES, ENGRAVING_W, FAR_SHIFT, NODE_X, warpFarZ } from './boardLayout';
 import { isBoardBackgroundVideo, NO_BOARD_BACKGROUND } from './boardBackgrounds';
+import { FLOOR_BASE_D, FLOOR_BASE_W, configureFloorMap, useFloorScale } from './floorPlane';
+import { RealLightingFloor } from './RealLightingFloor';
+import { NeonFloorSpill } from './NeonFloorSpill';
+import { DEFAULT_REAL_LIGHTING, useNeonRig, type RealLightingSettings } from './realLighting';
 import { BackdropScan, backdropScanMaterialProps } from './BackdropScan';
 import { BOARD_EXPOSURE, lightingNow, pulseDuration, pulseEnvelope, useBoardLighting } from './boardLighting';
 import { applyLightTuning, boardTuning } from './boardTuning';
+import { useBoardStyle } from './boardStyles';
+import { NEON_HALO_REACH, neonGain, neonTubeGlsl, neonTubeVertex, withTubeAxis } from './neonTubeShading';
 
 const BACKDROP_TINT = new THREE.Color().setScalar(1 / BOARD_EXPOSURE);
 const vertex=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
-
-/** 16:9 floor art — width fills the ortho view; depth follows aspect (no stretch). */
-const FLOOR_ASPECT = 16 / 9;
-const FLOOR_BASE_W = 16;
-const FLOOR_BASE_D = FLOOR_BASE_W / FLOOR_ASPECT;
-
-function useFloorScale(floorRef: RefObject<THREE.Mesh | null>) {
-  const { camera, size } = useThree();
-  useFrame(() => {
-    const mesh = floorRef.current;
-    if (!mesh || !(camera instanceof THREE.OrthographicCamera) || camera.zoom <= 0) return;
-    const viewW = size.width / camera.zoom;
-    const width = viewW * 1.04;
-    const depth = width / FLOOR_ASPECT;
-    mesh.scale.set(width / FLOOR_BASE_W, depth / FLOOR_BASE_D, 1);
-  });
-}
-
-function configureFloorMap(texture: THREE.Texture) {
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.anisotropy = 8;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  texture.needsUpdate = true;
-}
 
 function FloorImage({ url, floorRef }: { url: string; floorRef: RefObject<THREE.Mesh | null> }) {
   const texture = useTexture(url);
@@ -160,15 +140,19 @@ function FloorVideo({ url, floorRef }: { url: string; floorRef: RefObject<THREE.
   );
 }
 
-export function BoardStage({ backgroundUrl }: { backgroundUrl: string }) {
+export function BoardStage({ backgroundUrl, real = false, realLighting = DEFAULT_REAL_LIGHTING }: { backgroundUrl: string; real?: boolean; realLighting?: RealLightingSettings }) {
   const floorRef = useRef<THREE.Mesh>(null);
   const video = isBoardBackgroundVideo(backgroundUrl);
+  // Where the neon rig lights the scene, the floor glow is its spill and the contact shadow follows the Real lighting settings.
+  const rig = useNeonRig();
   return (
     <group userData={{ skipScanDepth: true }}>
-      {backgroundUrl === NO_BOARD_BACKGROUND ? null : video ? <FloorVideo url={backgroundUrl} floorRef={floorRef} /> : <FloorImage url={backgroundUrl} floorRef={floorRef} />}
+      {backgroundUrl === NO_BOARD_BACKGROUND ? null
+        : real ? <Suspense fallback={null}><RealLightingFloor url={backgroundUrl} settings={realLighting} floorRef={floorRef} /></Suspense>
+        : video ? <FloorVideo url={backgroundUrl} floorRef={floorRef} /> : <FloorImage url={backgroundUrl} floorRef={floorRef} />}
       <BackdropScan floorRef={floorRef} />
-      <ContactShadows position={[0, -0.95, 0]} opacity={0.38} scale={26} blur={2.5} far={2.8} resolution={512} frames={1} color="#02040a" />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.942, 0.1]} userData={{ skipScanDepth: true }}>
+      <BoardContactShadow y={-0.95} size={26} far={2.8} blur={2.5} opacity={rig ? rig.contactShadow : 0.38} color="#02040a" />
+      {rig ? <NeonFloorSpill glow={rig.glow} /> : <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.942, 0.1]} userData={{ skipScanDepth: true }}>
         <planeGeometry args={[25, 18]} />
         <shaderMaterial
           transparent
@@ -178,7 +162,7 @@ export function BoardStage({ backgroundUrl }: { backgroundUrl: string }) {
           vertexShader={vertex}
           fragmentShader={`varying vec2 vUv;void main(){vec2 p=(vUv-.5)*vec2(25.,18.);float side=exp(-pow(abs(abs(p.x)-7.9)*1.35,2.))*exp(-pow(abs(p.y)/4.9,6.));float front=exp(-pow(abs(p.y-4.8)*.74,2.))*exp(-pow(abs(p.x)/7.5,6.));vec3 color=mix(vec3(.22,.01,.09),vec3(.01,.16,.2),smoothstep(-3.,3.,p.x));gl_FragColor=vec4(color,side*.32+front*.24);}`}
         />
-      </mesh>
+      </mesh>}
     </group>
   );
 }
@@ -192,6 +176,9 @@ export function FieldEngravings(){
 }
 
 const BLOOM_IDLE={strength:.30,radius:.28,threshold:.85} as const;
+const BLOOM_IDLE_NEON={strength:.24,radius:.1,threshold:.88} as const;
+/** Under the neon rig the glass's escaping light and the tubes carry the glow, so bloom reaches lower and wider. */
+const BLOOM_NEON_RIG={strength:.6,radius:.35,threshold:.8} as const;
 const BLOOM_SCAN={strength:.7,radius:.36,threshold:.9} as const;
 /** Additive bloom-strength bumps at envelope peak; award holds for as long as the award is set. */
 const BLOOM_DRAIN=.25, BLOOM_RESTORE=.15, BLOOM_AWARD=.15, BLOOM_AWARD_RADIUS=.07;
@@ -242,6 +229,9 @@ export const BoardGradeShader={
  *  disk carries its own halo. Pass order: render → [scan] → bloom → [singularity] → grade → output. */
 export function BoardFinish({scanPass,scanning,singularityPass}:{scanPass?:ShaderPass|null;scanning?:boolean;singularityPass?:ShaderPass|null}={}){
  const {gl,scene,camera,size}=useThree();
+ const boardStyle=useBoardStyle();
+ const rig=useNeonRig();
+ const rigRef=useRef(rig);rigRef.current=rig;
  const lighting=useBoardLighting();
  const reduced=useMemo(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,[]);
  const scanningRef=useRef(!!scanning);scanningRef.current=!!scanning;
@@ -292,10 +282,12 @@ export function BoardFinish({scanPass,scanning,singularityPass}:{scanPass?:Shade
    bloom.strength=BLOOM_SCAN.strength;bloom.radius=BLOOM_SCAN.radius;bloom.threshold=BLOOM_SCAN.threshold;
    for(let i=0;i<tints.length;i++)tints[i].set(1,1,1);
   }else{
+   const rigBloom=rigRef.current?.bloom;
+   const idleBloom=rigBloom!==undefined?BLOOM_NEON_RIG:boardStyle==='neon'?BLOOM_IDLE_NEON:BLOOM_IDLE;
    const awardEnv=a.level+awardFlash;
-   bloom.strength=BLOOM_IDLE.strength+BLOOM_DRAIN*drain+BLOOM_RESTORE*restore+BLOOM_AWARD*awardEnv;
-   bloom.radius=BLOOM_IDLE.radius+BLOOM_AWARD_RADIUS*Math.min(1,awardEnv);
-   bloom.threshold=BLOOM_IDLE.threshold;
+   bloom.strength=idleBloom.strength*(rigBloom??1)+BLOOM_DRAIN*drain+BLOOM_RESTORE*restore+BLOOM_AWARD*awardEnv;
+   bloom.radius=idleBloom.radius+BLOOM_AWARD_RADIUS*Math.min(1,awardEnv);
+   bloom.threshold=idleBloom.threshold;
    // Tint only the two widest mips so the outer halo shifts colour without touching materials; resolves to white at env 0.
    if(drain>0)for(let i=3;i<5;i++)tints[i].set(1,.35+.65*(1-drain),.45+.55*(1-drain));
    else for(let i=3;i<5;i++)tints[i].set(1,1-.15*restore,1-.45*restore);
@@ -381,6 +373,29 @@ function RailPulse(){
  </>;
 }
 
+const railTubeFragment=`varying vec2 vUv;varying vec3 vViewNormal,vViewTangent;uniform vec3 uColor;uniform float uLevel,uLength,uTime,uHalo;${neonTubeGlsl}
+void main(){float along=vUv.y*uLength,q=neonTubeQ(vViewNormal,vViewTangent),flick=neonFlicker(along,uTime);
+vec3 rgb=uHalo>.5?neonHalo(uColor,q*${NEON_HALO_REACH.toFixed(2)},${NEON_HALO_REACH.toFixed(2)},.3*uLevel*flick):neonTube(uColor,q,uLevel*flick);
+gl_FragColor=vec4(rgb,1.);}`;
+
+const Y_AXIS=new THREE.Vector3(0,1,0);
+/** One rail neon tube running along z: pale core saturating to its edges, uneven brightness and a thin glow sheath. */
+function RailNeonTube({position,radius,length,color}:{position:[number,number,number];radius:number;length:number;color:string}){
+ const reduced=useMemo(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,[]);
+ const materials=useMemo(()=>[0,1].map(halo=>new THREE.ShaderMaterial({
+  uniforms:{uColor:{value:new THREE.Color(color)},uLevel:{value:.95*PERIMETER_DIM},uLength:{value:length},uTime:{value:0},uHalo:{value:halo},uNeonGain:neonGain},
+  vertexShader:neonTubeVertex,fragmentShader:railTubeFragment,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,
+ })),[color,length]);
+ const geometries=useMemo(()=>[NEON_HALO_REACH,1].map(scale=>withTubeAxis(new THREE.CylinderGeometry(radius*scale,radius*scale,length,scale>1?20:16,1,true),()=>Y_AXIS)),[radius,length]);
+ useEffect(()=>()=>materials.forEach(m=>m.dispose()),[materials]);
+ useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);
+ useFrame(({clock})=>{for(const m of materials)m.uniforms.uTime.value=reduced?0:clock.elapsedTime;});
+ return <group position={position} rotation={[Math.PI/2,0,0]}>
+  <mesh geometry={geometries[0]} material={materials[1]} renderOrder={2}/>
+  <mesh geometry={geometries[1]} material={materials[0]} renderOrder={2}/>
+ </group>;
+}
+
 /** Sleek L/R chassis rails — magenta inner neon + cyan outer edge, no industrial ridges. */
 export function BoardSideEdges(){
  const lights=useRef<(THREE.PointLight|null)[]>([]);
@@ -404,14 +419,8 @@ export function BoardSideEdges(){
      <boxGeometry args={[.05,.14,8.55+FAR_SHIFT]}/>
      <meshStandardMaterial color='#1a2230' metalness={.96} roughness={.18}/>
     </mesh>
-    <mesh position={[x-side*.12,.34,RAIL_Z]}>
-     <boxGeometry args={[.032,.038,8.35+FAR_SHIFT]}/>
-     <meshStandardMaterial color={RAIL_MAGENTA} emissive={RAIL_MAGENTA} emissiveIntensity={neonIntensity(RAIL_MAGENTA)*PERIMETER_DIM} toneMapped={false}/>
-    </mesh>
-    <mesh position={[x+side*.155,.3,RAIL_Z]}>
-     <boxGeometry args={[.018,.022,8.15+FAR_SHIFT]}/>
-     <meshStandardMaterial color={RAIL_CYAN} emissive={RAIL_CYAN} emissiveIntensity={neonIntensity(RAIL_CYAN)*PERIMETER_DIM} toneMapped={false}/>
-    </mesh>
+    <RailNeonTube position={[x-side*.12,.34,RAIL_Z]} radius={.018} length={8.35+FAR_SHIFT} color={RAIL_MAGENTA}/>
+    <RailNeonTube position={[x+side*.155,.3,RAIL_Z]} radius={.011} length={8.15+FAR_SHIFT} color={RAIL_CYAN}/>
     <mesh position={[x-side*.02,.36,RAIL_Z]} rotation={[-Math.PI/2,0,0]}>
      <planeGeometry args={[.25,8.5+FAR_SHIFT]}/>
      <meshBasicMaterial color={RAIL_MAGENTA} transparent opacity={.12*PERIMETER_DIM} depthWrite={false} toneMapped={false} blending={THREE.AdditiveBlending}/>

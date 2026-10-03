@@ -3,8 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { RoundedBox, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
-import { boardDepth } from './boardMaterials';
-import { warpFarZ } from './boardLayout';
+import { SERVER_X, SERVER_Z, serverZ } from './boardLayout';
 import { SERVER_MAX, lightingNow, pulseDuration, pulseEnvelope, useBoardLighting } from './boardLighting';
 import { usePlayerColors } from './playerTheme';
 import { MATCAP_URL } from './NodeSealOrigami';
@@ -25,8 +24,10 @@ const TARGET_L=[.975,1.2,1.05], HUE_CAP=[10,1.05,.675];
 /** Overall server dimming on top of the scene exposure, and the per-state scale on the tube glow and its light: idle, drain, restore. */
 const SERVER_DIM=.765;
 const STATE_BRIGHTNESS=[.9,1,.75].map(k=>k*SERVER_DIM);
+/** Brightness of the glowing tube itself per style (the Classic column and LEDs, the Pulse discs). */
+const TUBE_GLOW:Record<ServerStyle,number>={shield:1,pulse:.5,classic:.5};
 const GLASS_COLOR=new THREE.Color('#7d848c'), GLASS_EMISSIVE=new THREE.Color('#1c1f23');
-const tubeX=(target:Target)=>target==='backup'?-4.6:4.6, tubeZ=(owner:number)=>owner===1?warpFarZ(-4.75):boardDepth(4.75);
+const tubeX=(target:Target)=>target==='backup'?-SERVER_X:SERVER_X, tubeZ=(owner:number)=>serverZ(owner,false);
 /** Per-tube glow, refreshed every frame. `color` = linear tint; `strength` = light multiplier (~.69 idle at full health, 0 dark, ~1.2 at a drain peak). */
 export type ServerGlow={owner:number;target:Target;position:THREE.Vector3;color:THREE.Color;strength:number;health:number;flicker:number;kind:'idle'|'drain'|'restore';pulse:number};
 const glow:ServerGlow[]=[0,1].flatMap(owner=>(['backup','primary'] as const).map(target=>({owner,target,position:new THREE.Vector3(tubeX(target),.43,tubeZ(owner)),color:idleColor.clone(),strength:1,health:1,flicker:0,kind:'idle' as const,pulse:0})));
@@ -99,7 +100,7 @@ function PulseOrigami({uniforms,beams,reduced}:{uniforms:TubeUniforms;beams:{cur
    discs.live[i]=reduced?on:THREE.MathUtils.damp(discs.live[i],on,6,dt);
    const s=discScale(discs.phase[i],i);
    _disc.position.set(0,(a-.5)*TUBE_LENGTH,0);_disc.scale.set(s,1,s);_disc.updateMatrix();mesh.setMatrixAt(i,_disc.matrix);
-   if(i===0)_discLive.copy(DISC_GOLD).multiplyScalar(dim);
+   if(i===0)_discLive.copy(DISC_GOLD).multiplyScalar(dim*TUBE_GLOW.pulse);
    else _discLive.copy(uniforms.tint.value).multiplyScalar(uniforms.gain.value*DISC_GLOW*dim*(1+DISC_PULSE_BOOST*pulseLevel(a,pos,vel)));
    _discColor.copy(DISC_DARK).lerp(_discLive,discs.live[i]);
    for(let k=0;k<SHIELD_HITS;k++){
@@ -112,6 +113,13 @@ function PulseOrigami({uniforms,beams,reduced}:{uniforms:TubeUniforms;beams:{cur
   mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor!.needsUpdate=true;
  });
  return <primitive object={mesh}/>;
+}
+/** A Server tube's metal end cap along its local y axis, .13 thick; `ring` puts its trim ring on the -y or +y face. */
+export function ServerEndCap({ring}:{ring:1|-1}){
+ return <>
+  <mesh castShadow><cylinderGeometry args={[.255,.255,.13,8]}/><meshStandardMaterial color='#52647a' metalness={.9} roughness={.22}/></mesh>
+  <mesh position={[0,ring*.075,0]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.203,.018,6,24]}/><meshStandardMaterial color='#70929f' metalness={.85} roughness={.24}/></mesh>
+ </>;
 }
 function IntegrityTube({owner,target,x,z,ratio,maximum,healing,attacking,power,idle,style}:{owner:number;target:Target;x:number;z:number;ratio:number;maximum:number;healing:ServerPulse|null;attacking:ServerPulse|null;power:number;idle:string;style:ServerStyle}) {
  const light=useRef<THREE.RectAreaLight>(null);
@@ -207,7 +215,7 @@ function IntegrityTube({owner,target,x,z,ratio,maximum,healing,attacking,power,i
   const tint=uniforms.tint.value.lerp(kind===1?attackColor:kind===2?healColor:idleTint,Math.min(1,dt*12));
   e.targetL=THREE.MathUtils.damp(e.targetL,TARGET_L[kind],6,dt);
   e.bright=THREE.MathUtils.damp(e.bright,STATE_BRIGHTNESS[kind],6,dt);
-  uniforms.gain.value=(e.targetL+.2*env)*e.bright/Math.max(.05,lum(tint));
+  uniforms.gain.value=(e.targetL+.2*env)*e.bright*TUBE_GLOW[style]/Math.max(.05,lum(tint));
   e.cap=HUE_CAP[kind]<e.cap?HUE_CAP[kind]:THREE.MathUtils.damp(e.cap,HUE_CAP[kind],4,dt);uniforms.cap.value=e.cap;
   uniforms.health.value=h;
   uniforms.heat.value=Math.min(1,.06+(kind===1?env:env*.35)+(1-h)*.4);
@@ -216,7 +224,7 @@ function IntegrityTube({owner,target,x,z,ratio,maximum,healing,attacking,power,i
   const wobble=kind===1&&!reduced?.3*env*(.5+.5*Math.sin(now*12)):0;
   const strength=(.15+.85*h)*(1-.7*e.flicker)*(1+.6*env)*(1-wobble)*lit*e.bright;
   if(light.current){light.current.intensity=LIGHT_BASE*strength;light.current.color.copy(tint);}
-  const g=glow[index];g.color.copy(tint);g.strength=strength;g.health=h;g.flicker=e.flicker;g.kind=kind===1?'drain':kind===2?'restore':'idle';g.pulse=env;
+  const g=glow[index];g.position.z=z;g.color.copy(tint);g.strength=strength;g.health=h;g.flicker=e.flicker;g.kind=kind===1?'drain':kind===2?'restore':'idle';g.pulse=env;
   if(!reduced&&lit>.1){
    if(fresh&&e.kind===1)spawnSparks(pool,30,meniscus,1,1);
    else if(kind===1&&env>.3&&Math.random()<dt*24)spawnSparks(pool,1,meniscus,.7,.7);
@@ -271,10 +279,7 @@ function IntegrityTube({owner,target,x,z,ratio,maximum,healing,attacking,power,i
     {style==='pulse'&&<PulseOrigami uniforms={uniforms} beams={beams} reduced={reduced}/>}
     <mesh renderOrder={1.5}><cylinderGeometry args={[SHIELD_RADIUS,SHIELD_RADIUS,TUBE_LENGTH,48,1,true]}/><shaderMaterial args={shared} vertexShader={shieldVertex} fragmentShader={SHIELD_FRAGMENT} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} side={THREE.DoubleSide}/></mesh>
    </>}
-   {[-1,1].map(side=><group key={side} position={[0,side*1.54,0]}>
-    <mesh castShadow><cylinderGeometry args={[.255,.255,.13,8]}/><meshStandardMaterial color='#52647a' metalness={.9} roughness={.22}/></mesh>
-    <mesh position={[0,-side*.075,0]} rotation={[Math.PI/2,0,0]}><torusGeometry args={[.203,.018,6,24]}/><meshStandardMaterial color='#70929f' metalness={.85} roughness={.24}/></mesh>
-   </group>)}
+   {[-1,1].map(side=><group key={side} position={[0,side*1.54,0]}><ServerEndCap ring={side===1?-1:1}/></group>)}
   </group>
   {classic&&<>{/* LED rack floats inside the glass, facing the camera; premultiplied blend darkens cell gaps and adds lit cells over the liquid. */}
   <mesh position={[0,-Math.sin(CAM_TILT)*.1,Math.cos(CAM_TILT)*.1]} rotation={[CAM_TILT,0,0]} renderOrder={2}><planeGeometry args={[2.96,.24]}/><shaderMaterial args={shared} vertexShader={vertex} transparent depthWrite={false} blending={THREE.CustomBlending} blendSrc={THREE.OneFactor} blendDst={THREE.OneMinusSrcAlphaFactor} toneMapped={false} fragmentShader={`varying vec2 vUv;uniform float time,fill,health,gain,power,flicker,cap;uniform vec3 tint;${glslHash}${glslCap}
@@ -296,21 +301,21 @@ function IntegrityTube({owner,target,x,z,ratio,maximum,healing,attacking,power,i
   <mesh position={[0,-.13,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[4.08,1.83]}/><shaderMaterial args={shared} vertexShader={vertex} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} fragmentShader={`varying vec2 vUv;uniform float fill,power,flicker;uniform vec3 tint;void main(){float glow=pow(max(0.,1.-length((vUv-.5)*2.)),3.)*(.2+fill)*power*(1.-flicker*.75);gl_FragColor=vec4(tint,glow*${(.18*SERVER_DIM).toFixed(4)});}`}/></mesh>
  </group>;
 }
-export function ServerLights({servers,healing,attacking,power=1,style}:{servers:[ServerValues,ServerValues];healing:ServerPulse|null;attacking:ServerPulse|null;power?:number;style:ServerStyle}) {
+export function ServerLights({servers,healing,attacking,power=1,styles,readoutBacking=true,neon=false}:{servers:[ServerValues,ServerValues];healing:ServerPulse|null;attacking:ServerPulse|null;power?:number;styles:readonly [ServerStyle,ServerStyle];readoutBacking?:boolean;neon?:boolean}) {
  const colors=usePlayerColors();
  return <>{servers.flatMap((server,owner)=>(['backup','primary'] as const).map(target=>{
   const maximum=SERVER_MAX[target];
   const activeAttack=attacking?.owner===owner&&attacking.target===target?attacking:null;
   const activeHeal=healing?.owner===owner&&healing.target===target?healing:null;
-  return <IntegrityTube key={`${owner}-${target}`} owner={owner} target={target} x={tubeX(target)} z={tubeZ(owner)} maximum={maximum} attacking={activeAttack} healing={activeHeal} ratio={server[target]/maximum} power={power} idle={colors[owner].tube} style={style}/>;
+  return <IntegrityTube key={`${owner}-${target}`} owner={owner} target={target} x={tubeX(target)} z={serverZ(owner,neon)} maximum={maximum} attacking={activeAttack} healing={activeHeal} ratio={server[target]/maximum} power={power} idle={colors[owner].tube} style={styles[owner]}/>;
  }))}
- {(['backup','primary'] as const).map(target=><ReadoutBacking key={target} x={tubeX(target)} color={colors[1].tube} power={power}/>)}</>;
+ {readoutBacking&&(['backup','primary'] as const).map(target=><ReadoutBacking key={target} x={tubeX(target)} color={colors[1].tube} power={power}/>)}</>;
 }
 /**
  * The opponent's server readouts sit beyond the server housing, over the backdrop; this graphite plate (the housing's
  * material) backs them the way the housing front backs the local readouts, edged with a strip in the owner's tube colour.
  */
-const BACKING_Z=-6.36, BACKING_W=3.2, BACKING_D=.72;
+const BACKING_Z=SERVER_Z[1]-.8, BACKING_W=3.2, BACKING_D=.72;
 const BACKING_MATERIAL={color:'#202939',metalness:.8,roughness:.32};
 function ReadoutBacking({x,color,power}:{x:number;color:string;power:number}){
  const strip=useMemo(()=>new THREE.Color(color).multiplyScalar(SERVER_DIM),[color]);

@@ -29,7 +29,7 @@ try {
  if(evidence.openingIntervals.some(interval=>interval<650||interval>1050))throw new Error('Opening interval differs from 800ms');
  if(await page.locator('.card-type,.power-badge .icon,.power-status').count())throw new Error('Removed badges/icons remain');
  if(await page.locator('.resources>.stat-vp').count()!==2)throw new Error('Both players need VP stats');
- if(await page.locator('.server-readout>small .icon').count()!==4)throw new Error('Database icons must sit beside Server names');
+ if(await page.locator('.server-readout .icon').count())throw new Error('Server readouts carry no icons');
  const colors=await page.locator('.local-console .resources>span').evaluateAll(els=>els.map(el=>getComputedStyle(el).color));
  if(colors.join('|')!=='rgb(39, 226, 255)|rgb(31, 255, 177)|rgb(255, 204, 18)')throw new Error('Incorrect resource colors');
  evidence.resourceColors=colors;

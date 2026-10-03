@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { useBoardStyle } from './boardStyles';
 
 /** Scan sweep timing — power3.out for a strong ease-out finish. */
 export const BOARD_SCAN_MS = { normal: 3000, fast: 2200 } as const;
@@ -15,6 +16,8 @@ export function boardScanTotalMs(fast: boolean): number {
 /** View-Z span covering the ortho board under camera (0,18,13.8). */
 const DEPTH_NEAR = 18.5;
 const DEPTH_FAR = 28.5;
+/** The HDR scan remains crisp on Neon without flooding its glass and lane signals. */
+const NEON_SCAN_STRENGTH = .12;
 
 const SCAN_SHARED = /* glsl */ `
   float sampleDepth(sampler2D map, vec2 uv){
@@ -230,6 +233,9 @@ export function NeonHorizonScan({
   overlayRef,
 }: Props) {
   const { gl, scene, camera, size } = useThree();
+  const boardStyle = useBoardStyle();
+  const strengthScale = useRef(boardStyle === 'neon' ? NEON_SCAN_STRENGTH : 1);
+  strengthScale.current = boardStyle === 'neon' ? NEON_SCAN_STRENGTH : 1;
   const running = useRef(false);
   const lighting = useRef(false);
   const reduced = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
@@ -440,17 +446,18 @@ export function NeonHorizonScan({
     if (pass) {
       pass.enabled = true;
       pass.uniforms.uProgress.value = 0;
-      pass.uniforms.uStrength.value = 1;
+      pass.uniforms.uStrength.value = strengthScale.current;
       pass.uniforms.uDim.value = 0.5;
     }
+    overlayMaterial.uniforms.uStrength.value = strengthScale.current;
 
     const syncPass = () => {
       if (!passRef.current) return;
       passRef.current.uniforms.uProgress.value = proxy.current.p;
-      passRef.current.uniforms.uStrength.value = proxy.current.strength;
+      passRef.current.uniforms.uStrength.value = proxy.current.strength * strengthScale.current;
       passRef.current.uniforms.uDim.value = proxy.current.dim;
       overlayMaterial.uniforms.uProgress.value = proxy.current.p;
-      overlayMaterial.uniforms.uStrength.value = proxy.current.strength;
+      overlayMaterial.uniforms.uStrength.value = proxy.current.strength * strengthScale.current;
       onPowerRef.current?.(proxy.current.power);
     };
 
@@ -502,6 +509,10 @@ export function NeonHorizonScan({
 
   useFrame(() => {
     const pass = passRef.current;
+    // A style switch during the sweep changes only brightness; the timeline continues.
+    const scaledStrength = proxy.current.strength * strengthScale.current;
+    if (pass) pass.uniforms.uStrength.value = scaledStrength;
+    overlayMaterial.uniforms.uStrength.value = scaledStrength;
     const needDepth = (running.current || lighting.current) && pass && active && !reduced;
     if (!needDepth) return;
 
@@ -566,10 +577,10 @@ export function NeonHorizonScan({
       pass!.uniforms.tDepth.value = depthTarget.texture;
 
       const overlay = overlayRef?.current;
-      if (overlay && proxy.current.strength > 0.01) {
+      if (overlay && scaledStrength > 0.01) {
         overlayMaterial.uniforms.tDepth.value = depthTarget.texture;
         overlayMaterial.uniforms.uProgress.value = proxy.current.p;
-        overlayMaterial.uniforms.uStrength.value = proxy.current.strength;
+        overlayMaterial.uniforms.uStrength.value = scaledStrength;
         gl.setRenderTarget(maskTarget);
         gl.clear();
         gl.render(overlayScene.s, overlayScene.cam);
@@ -602,7 +613,7 @@ export function NeonHorizonScan({
       }
     } else if (lighting.current) {
       const overlay = overlayRef?.current;
-      if (overlay && proxy.current.strength < 0.02) {
+      if (overlay && scaledStrength < 0.02) {
         const ctx = overlay.getContext('2d');
         ctx?.clearRect(0, 0, overlay.width, overlay.height);
       }

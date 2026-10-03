@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { MAX_SIDE_TILT, MAX_VERTICAL_TILT, restingTilt, sampleVelocity, stepTilt, tiltEye, tiltSettled, tiltTarget } from '../src/depthArt/dragTilt';
-import { coverCrop, stepEye, viewUniforms } from '../src/depthArt/DepthArtRenderer';
+import { coverCrop, edgeFalloff, stepEye, viewUniforms } from '../src/depthArt/DepthArtRenderer';
 import { servedArtPath } from '../src/depthArt/depthManifest';
 import manifest from '../assets/card_art/depth/manifest.json';
 import { createDepthApi } from '../server/depthApi';
@@ -68,13 +68,27 @@ describe('parallax uniforms', () => {
     expect(coverCrop(2, 4 / 3).sy).toBeCloseTo(2 / 3);
   });
 
+  it('frames the art exactly like the flat image, at any lean', () => {
+    for (const eye of [{ x: 0, y: 0 }, { x: 1, y: -1 }]) expect(viewUniforms(4 / 3, { width: 400, height: 300, focus: 0.5 }, 3.7, eye, 1.25).crop).toEqual([1, 1]);
+    expect(viewUniforms(1, { width: 400, height: 300, focus: 0.5 }, 3.7, { x: 1, y: 0 }).crop[0]).toBeCloseTo(0.75);
+  });
+
   it('never samples past the edge of the image at full travel', () => {
     for (const aspect of [4 / 3, 0.9, 1.8]) for (const focus of [0.1, 0.5, 0.9]) for (const eye of [{ x: 1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: 1 }]) for (const gain of [1, 1.25]) {
-      const { crop, shift } = viewUniforms(aspect, { width: 400, height: 300, focus }, 3.25, eye, gain);
+      const { crop, shift } = viewUniforms(aspect, { width: 400, height: 300, focus }, 3.7, eye, gain);
       const travel = Math.max(focus, 1 - focus);
-      expect(0.5 + crop[0] / 2 + Math.abs(shift[0]) * travel).toBeLessThanOrEqual(1.0001);
-      expect(0.5 + crop[1] / 2 + Math.abs(shift[1]) * travel).toBeLessThanOrEqual(1.0001);
+      for (let uv = 0; uv <= 1; uv += 0.01) for (const axis of [0, 1]) {
+        const base = 0.5 + (uv - 0.5) * crop[axis]!;
+        const reach = Math.abs(shift[axis]!) * edgeFalloff(uv, crop[axis]!, shift[axis]!, focus) * travel;
+        expect(base - reach).toBeGreaterThanOrEqual(-1e-6);
+        expect(base + reach).toBeLessThanOrEqual(1 + 1e-6);
+      }
     }
+  });
+
+  it('keeps the full shift away from the edges', () => {
+    const { crop, shift } = viewUniforms(4 / 3, { width: 400, height: 300, focus: 0.5 }, 3.7, { x: 0.3, y: 0 });
+    expect(edgeFalloff(0.5, crop[0], shift[0], 0.5)).toBe(1);
   });
 });
 

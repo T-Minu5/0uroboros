@@ -1,45 +1,6 @@
 {
   "errors": [],
-  "checks": [
-    "Idle has no drop highlights",
-    "Dragged card follows pointer delta without lag or re-centering",
-    "Card lifts cleanly out of the hand",
-    "Exactly one Location illuminates on lane hover",
-    "Full lane edge selects its Location",
-    "Hover light transfers without leaving other lanes lit",
-    "Closed lane does not advertise a valid drop",
-    "Immediate re-grab replaces the returning preview with one visible card",
-    "Released card springs home with its swing",
-    "Invalid drop returns the card and preserves the hand",
-    "Invalid drag does not open card inspect",
-    "Escape cancels a drag without deploying or inspecting",
-    "Test release is below the compact card placement grid",
-    "Release flight starts at the dragged card",
-    "Full-lane drop deploys exactly one card into its placement grid",
-    "Successful drag does not open inspect",
-    "Click inspect still works after dragging"
-  ],
-  "viewports": [
-    {
-      "viewport": {
-        "width": 1600,
-        "height": 1000
-      },
-      "layout": {
-        "walletAligned": false,
-        "weightsClear": true,
-        "handGap": 35.8544921875,
-        "scoreGaps": [
-          2.11041259765625,
-          2.11041259765625,
-          3.112640380859375,
-          2.11041259765625,
-          3.112640380859375
-        ],
-        "farDurationTop": 152.04965209960938,
-        "headerBottom": 66
-      }
-    }
-  ],
-  "failure": "Error: Layout keeps percentages, scores, hand and instruments clear at 1600\n    at assert (file:///Users/t-minus/Dropbox/00_AI%20Projects/Card_IO/0uroboros_v2/scripts/_probe.mjs:10:56)\n    at file:///Users/t-minus/Dropbox/00_AI%20Projects/Card_IO/0uroboros_v2/scripts/_probe.mjs:84:3"
+  "checks": [],
+  "viewports": [],
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: 'Enter evaluation build' })\n    - locator resolved to <button disabled class=\"primary-button\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not enabled\n    - retrying click action\n      - waiting 100ms\n\n    at /Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2/scripts/board-pointer-smoke.mjs:26:106"
 }

@@ -3,7 +3,7 @@ export const BACKDROP_DEPTH_W = 320;
 /** Box-blur radii as fractions of the map width: fine form, mid structures, large masses. Two passes each ≈ gaussian. */
 const RELIEF_SCALES: readonly (readonly [radius: number, weight: number])[] = [[.006, .25], [.02, .4], [.055, .35]];
 
-function boxBlur(src: Float32Array, w: number, h: number, r: number): Float32Array {
+export function boxBlur(src: Float32Array, w: number, h: number, r: number): Float32Array {
   const tmp = new Float32Array(src.length), out = new Float32Array(src.length), n = 2 * r + 1;
   for (let y = 0; y < h; y++) {
     let sum = 0;

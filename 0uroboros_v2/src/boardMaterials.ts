@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import type { BoardStyle } from './boardStyles';
+import { neonTrimShading } from './neonTubeShading';
 
 /** Linear luminance weights used by the bloom high-pass; emissive multiplier ≈ targetL / luminance(colour). */
 const LUMA = new THREE.Vector3(.2126, .7152, .0722);
@@ -28,6 +30,8 @@ export const DAMAGED_LIGHT = new THREE.Color('#40587e');
 export const PERIMETER_DIM = .85;
 /** Intensity scale for a side's rim/fill/rail lights at the given health. */
 export const sideLightScale = (health: number) => .22 + .78 * health;
+/** Winning lane fill, in the winner's colour with normal alpha: a radial opacity from the lane centre out to its edge, under the lane pattern. */
+export const WINNER_FILL = { centre: .05, edge: .15 } as const;
 
 /** World projection keeps brushed scale consistent across the joined Blender parts. */
 export function surfaceMaterial(material: THREE.MeshStandardMaterial, texture: THREE.Texture, scale = .7, relief = .018) {
@@ -89,7 +93,7 @@ export function surfaceMaterial(material: THREE.MeshStandardMaterial, texture: T
  return material;
 }
 
-export function boardMaterial(original: THREE.Material, surface: THREE.Texture) {
+export function boardMaterial(original: THREE.Material, surface: THREE.Texture, style: BoardStyle = 'classic') {
  if (!(original instanceof THREE.MeshStandardMaterial)) return original.clone();
  const name = original.name;
  let material:THREE.MeshStandardMaterial;
@@ -104,13 +108,20 @@ export function boardMaterial(original: THREE.Material, surface: THREE.Texture) 
   material=original.clone();
   if(name.includes('obsidian')) { material.color.set('#090d16'); material.roughness=.74; material.metalness=.14; surfaceMaterial(material,surface,1.6,.016); }
   if(name.includes('violet')) {material.color.set('#271a38'); material.roughness=.28;}
-  if(name.includes('magenta')) {material.color.set('#3a1a5c'); material.emissive.set('#b24cff'); material.emissiveIntensity=neonIntensity('#b24cff',1.0)*PERIMETER_DIM;}
-  if(name.includes('cyan') && !name.includes('Server')) {material.color.set('#4a2a0c'); material.emissive.set('#ff8a1f'); material.emissiveIntensity=neonIntensity('#ff8a1f',1.2)*PERIMETER_DIM;}
+  if(name.includes('magenta')) {material.color.set('#3a1a5c'); material.emissive.set('#b24cff'); material.emissiveIntensity=neonIntensity('#b24cff',1.0)*PERIMETER_DIM; neonTrimShading(material);}
+  if(name.includes('cyan') && !name.includes('Server')) {material.color.set('#4a2a0c'); material.emissive.set('#ff8a1f'); material.emissiveIntensity=neonIntensity('#ff8a1f',1.2)*PERIMETER_DIM; neonTrimShading(material);}
   if(name.includes('cyan') && name.includes('Server')) {material.color.set('#073345'); material.emissive.set('#0aa9c7'); material.emissiveIntensity=.35;}
   if(name.includes('red')) {material.color.set('#39111a'); material.emissive.set('#fa0048'); material.emissiveIntensity=.65;}
  }
  material.name=name;
  material.envMapIntensity=name.includes('wine-black')?.32:name.includes('obsidian')?.4:.85;
+ // Keep the node housings, server mounting hardware and inlays exactly as authored.
+ // Neon quiets only the broad field behind its illuminated glass lanes.
+ if(style==='neon'&&name.includes('wine-black')){
+  material.color.set('#060f1a');
+  material.metalness=.26;material.roughness=.42;material.envMapIntensity=.35;
+  if(material instanceof THREE.MeshPhysicalMaterial){material.clearcoat=.65;material.clearcoatRoughness=.28;}
+ }
  return material;
 }
 

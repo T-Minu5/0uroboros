@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-30",
+  "environment": "Local Vite development build, Codex in-app browser, same populated Cycle 1 Turn 3",
+  "canvasCssSize": [894, 701],
+  "pixelRatio": 1.6,
+  "sampleSeconds": 5,
+  "warmupSeconds": 2,
+  "classic": {
+    "frames": 301, "fps": 60, "frameMs": {"p50": 16.7, "p95": 17.6},
+    "drawCalls": 206, "triangles": 134491, "geometries": 194, "textures": 31, "programs": 50
+  },
+  "neon": {
+    "frames": 301, "fps": 60, "frameMs": {"p50": 16.7, "p95": 17.5},
+    "drawCalls": 200, "triangles": 87219, "geometries": 188, "textures": 31, "programs": 49
+  },
+  "neonRevealSample": {
+    "frames": 301, "fps": 60.2, "frameMs": {"p50": 16.7, "p95": 27.6},
+    "drawCalls": 207, "triangles": 91277
+  },
+  "neonCollapseSample": {
+    "frames": 301, "fps": 60, "frameMs": {"p50": 16.7, "p95": 27.4},
+    "drawCalls": 260, "triangles": 128691
+  },
+  "notes": [
+    "Frame pacing is measured using R3F frame deltas, not GPU timer queries.",
+    "Draw calls and triangles include the entire composer, with its existing shadows, bloom and grading.",
+    "Classic and Neon measurements were taken from the same running game without changing the card state.",
+    "These samples are capped by the display refresh and do not establish performance on low-end hardware."
+  ]
+}

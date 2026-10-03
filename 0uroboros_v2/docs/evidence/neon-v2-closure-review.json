@@ -1,0 +1,267 @@
+{
+  "errors": [],
+  "stats": [
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 292,
+      "fps": 58.4,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 31.3
+      },
+      "drawCalls": 243,
+      "triangles": 75847,
+      "geometries": 204,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 292,
+      "fps": 57.9,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 35.9
+      },
+      "drawCalls": 231,
+      "triangles": 67767,
+      "geometries": 204,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 293,
+      "fps": 58.6,
+      "frameMs": {
+        "p50": 16.6,
+        "p95": 34.8
+      },
+      "drawCalls": 232,
+      "triangles": 67787,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 272,
+      "fps": 54.2,
+      "frameMs": {
+        "p50": 16.6,
+        "p95": 51.4
+      },
+      "drawCalls": 231,
+      "triangles": 67767,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 292,
+      "fps": 58.3,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 41.8
+      },
+      "drawCalls": 226,
+      "triangles": 63729,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 298,
+      "fps": 59.4,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 35.7
+      },
+      "drawCalls": 225,
+      "triangles": 63727,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 295,
+      "fps": 58.8,
+      "frameMs": {
+        "p50": 16.6,
+        "p95": 40.4
+      },
+      "drawCalls": 225,
+      "triangles": 63727,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 298,
+      "fps": 59.6,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 34.1
+      },
+      "drawCalls": 225,
+      "triangles": 63727,
+      "geometries": 206,
+      "textures": 33,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 278,
+      "fps": 55.6,
+      "frameMs": {
+        "p50": 16.7,
+        "p95": 40.6
+      },
+      "drawCalls": 252,
+      "triangles": 80637,
+      "geometries": 213,
+      "textures": 34,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 290,
+      "fps": 57.9,
+      "frameMs": {
+        "p50": 16.6,
+        "p95": 38
+      },
+      "drawCalls": 282,
+      "triangles": 100109,
+      "geometries": 219,
+      "textures": 34,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 257,
+      "fps": 51.3,
+      "frameMs": {
+        "p50": 16.6,
+        "p95": 62.9
+      },
+      "drawCalls": 294,
+      "triangles": 108367,
+      "geometries": 219,
+      "textures": 34,
+      "programs": 53,
+      "viewport": [
+        1600,
+        898
+      ],
+      "pixelRatio": 1
+    }
+  ],
+  "checks": [
+    "Whole-lane hover highlights exactly one Node; Escape cancels",
+    "Deployed through the real UI on turn 1",
+    "Deployed through the real UI on turn 2",
+    "Deployed through the real UI on turn 3",
+    "Populated closure, settled seals and settled Draft captured"
+  ],
+  "events": [
+    {
+      "turn": 1,
+      "kind": "drain"
+    },
+    {
+      "turn": 2,
+      "kind": "drain"
+    },
+    {
+      "turn": 2,
+      "kind": "restore"
+    },
+    {
+      "turn": 3,
+      "kind": "collapse"
+    },
+    {
+      "turn": 3,
+      "kind": "settled-seal",
+      "closed": 2
+    }
+  ],
+  "screenshots": [
+    "docs/evidence/neon-v2-closure-empty.png",
+    "docs/evidence/neon-v2-closure-hover.png",
+    "docs/evidence/neon-v2-closure-drain-turn-1.png",
+    "docs/evidence/neon-v2-closure-drain-turn-2.png",
+    "docs/evidence/neon-v2-closure-restore-turn-2.png",
+    "docs/evidence/neon-v2-closure-collapse.png",
+    "docs/evidence/neon-v2-closure-award.png",
+    "docs/evidence/neon-v2-closure-settled-seal.png",
+    "docs/evidence/neon-v2-closure-all-sealed.png",
+    "docs/evidence/neon-v2-closure-draft.png"
+  ]
+}

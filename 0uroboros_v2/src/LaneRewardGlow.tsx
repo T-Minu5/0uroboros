@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { ENGRAVING_LANES, ENGRAVING_W, LANE_RIM, LANE_RIM_HX, LANE_RIM_RADIUS } from './boardLayout';
+import { ENGRAVING_LANES, ENGRAVING_W, LANE_RIM, LANE_RIM_HX, LANE_RIM_RADIUS, NEON_FIELD_SHIFT } from './boardLayout';
 import { lightingNow, useBoardLighting } from './boardLighting';
-import { PATTERN_LANES, PATTERN_W, laneSealEdgeZ, laneSealProgress } from './laneSeal';
+import { PATTERN_LANES, PATTERN_W, SEAL_SLIDE_S, laneSealEdgeZ, laneSealProgress } from './laneSeal';
+import { useBoardStyle } from './boardStyles';
+import { neonLanePolygon } from './neonGeometry';
 
 /**
  * Lane payout glow: emissive-map engraving panel, HDR instanced shapes, a perimeter sweep and one pooled point light.
@@ -29,6 +31,11 @@ const UNCLIPPED = 100;
 const ENGRAVE_L = .17;
 const PANEL_L = 1.8, PANEL_OPACITY = .55, SWEEP_L = 2.4, ORB_L = 3.2, GEM_L = 2.6, LIGHT_I = 7;
 const ORBS = 8, GEMS = 4, WARM_FRAMES = 3;
+const NEON_SWEEP_POINTS = 24;
+/** On Neon the win sweep rides the closing lane down onto its plate, then holds this long before fading. */
+const NEON_CLOSE_HOLD_S = 1.4;
+/** Sweep outline in the sweep plane's frame: the far lane's plane is turned half a revolution. */
+const NEON_SWEEP_POLYS = [0, 1].map(side => neonLanePolygon(side).map(([x, y]) => side === 0 ? new THREE.Vector2(x, y) : new THREE.Vector2(-x, -y)));
 
 /**
  * Normalising luminance, floored at .4: dark hues (violet .27, blue .25) would otherwise need a dominant channel so hot
@@ -57,11 +64,20 @@ const O = new THREE.Object3D(), C = new THREE.Color(), HSL = { h: 0, s: 0, l: 0 
 
 const SWEEP_VERT = `varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
 // Local +y is the lane's power end on both sides, so it takes the border's tight corners and -y the rounder outer ones.
-const SWEEP_FRAG = `varying vec2 vUv;uniform vec3 uColor;uniform vec2 uSize,uHalf,uRadius;uniform float uLevel,uPhase,uHead,uRim;
+// On Neon the rim is the lane's own HUD outline; uScale keeps its falloff the same width in the world as the lane shrinks.
+const SWEEP_FRAG = `varying vec2 vUv;uniform vec3 uColor;uniform vec2 uSize,uHalf,uRadius;uniform float uLevel,uPhase,uHead,uRim,uNeon,uScale;
+uniform vec2 uPoly[${NEON_SWEEP_POINTS}];uniform int uCount;
+float seg(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}
+float polyDist(vec2 p){
+ float d=1e5;
+ for(int i=0;i<${NEON_SWEEP_POINTS};i++){if(i>=uCount)break;d=min(d,seg(p,uPoly[i],uPoly[i+1<uCount?i+1:0]));}
+ return d;
+}
 void main(){
  vec2 p=(vUv-.5)*uSize;
  float r=p.y>0.?uRadius.x:uRadius.y;
  vec2 q=abs(p)-uHalf+r;float sd=length(max(q,0.))+min(max(q.x,q.y),0.)-r;
+ if(uNeon>.5)sd=polyDist(p)*uScale;
  float rim=exp(-abs(sd)*42.)+exp(-abs(sd)*12.)*.18;
  float s=atan(p.y,p.x)*.1591549+.5;
  float a=fract(s-uPhase),b=fract(s-uPhase+.5);
@@ -70,6 +86,9 @@ void main(){
 }`;
 
 export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, closed = false }: LaneRewardGlowProps) {
+  const neon = useBoardStyle() === 'neon';
+  /** Clip planes are in world space; on Neon the node regions sit this much further out. */
+  const fieldShift = neon ? NEON_FIELD_SHIFT : 0;
   const scene = useThree(s => s.scene);
   const lighting = useBoardLighting();
   const map = useTexture(ENGRAVING);
@@ -87,12 +106,29 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
   /** Per-lane clip at the seal plate's leading edge: side 0 keeps z beyond it, side 1 keeps z before it. */
   const clips = useMemo(() => LANES.map((_, side) => new THREE.Plane(new THREE.Vector3(0, 0, side === 0 ? 1 : -1), UNCLIPPED)), []);
   const clipLists = useMemo(() => clips.map(clip => [clip]), [clips]);
+  const neonPanels = useMemo(() => neon ? PATTERN_LANES.map(lane => {
+    const x = PATTERN_W / 2, y = lane.d / 2, c = .17;
+    const shape = new THREE.Shape([
+      new THREE.Vector2(-x+c,-y),new THREE.Vector2(x-c,-y),new THREE.Vector2(x,-y+c),new THREE.Vector2(x,y-c),
+      new THREE.Vector2(x-c,y),new THREE.Vector2(-x+c,y),new THREE.Vector2(-x,y-c),new THREE.Vector2(-x,-y+c),
+    ]);
+    shape.closePath();
+    const geometry = new THREE.ShapeGeometry(shape);
+    const p = geometry.getAttribute('position'), uv = geometry.getAttribute('uv');
+    for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i)/PATTERN_W+.5, p.getY(i)/lane.d+.5);
+    return geometry;
+  }) : null, [neon]);
+  useEffect(() => () => neonPanels?.forEach(geometry => geometry.dispose()), [neonPanels]);
   const sweeps = useRef<(THREE.Mesh | null)[]>([]);
-  const sweepUniforms = useMemo(() => RIMS.map(rim => ({
+  const sweepUniforms = useMemo(() => RIMS.map((rim, side) => ({
     uColor: { value: new THREE.Color() }, uLevel: { value: 0 }, uPhase: { value: 0 }, uHead: { value: reduced ? 0 : 1.6 }, uRim: { value: reduced ? .6 : .3 },
     uSize: { value: new THREE.Vector2(LANE_RIM_HX * 2 + SWEEP_MARGIN * 2, rim.d + SWEEP_MARGIN * 2) }, uHalf: { value: new THREE.Vector2(LANE_RIM_HX, rim.d / 2) },
     uRadius: { value: new THREE.Vector2(LANE_RIM_RADIUS.power, LANE_RIM_RADIUS.outer) },
-  })), [reduced]);
+    uNeon: { value: neon ? 1 : 0 },
+    uScale: { value: 1 },
+    uPoly: { value: Array.from({ length: NEON_SWEEP_POINTS }, (_, i) => NEON_SWEEP_POLYS[side][i] ?? new THREE.Vector2()) },
+    uCount: { value: NEON_SWEEP_POLYS[side].length },
+  })), [reduced, neon]);
   // R3F copies each entry of a `uniforms` prop (freezing number uniforms); constructor args keep these objects live.
   const sweepArgs = useMemo(() => sweepUniforms.map(uniforms => [{ uniforms, vertexShader: SWEEP_VERT, fragmentShader: SWEEP_FRAG }] as [THREE.ShaderMaterialParameters]), [sweepUniforms]);
   const shapes = useMemo(() => {
@@ -127,20 +163,25 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
     if (slot.intensity > 0) { l.position.set(slot.x, slot.y, slot.z); l.distance = slot.distance; l.color.copy(slot.color); }
     slot.intensity = 0;
   };
-  const st = useRef({ on: false, stamp: -1, start: 0, from: 0, fade: 0, hold: 0, level: 0, warm: 0, hidden: false, sealStart: closed ? -Infinity : 0, sealDone: closed });
+  const st = useRef({ on: false, stamp: -1, start: 0, from: 0, fade: 0, hold: 0, level: 0, warm: 0, hidden: false, sealStart: closed ? -Infinity : 0, sealDone: closed, closeHold: -Infinity });
   // Closing starts the lane seal; the engraving shrinks with the cards and is covered by the plate as they are.
   const wasClosed = useRef(closed);
-  useEffect(() => {
+  // Layout effect so the seal clock starts before the next frame renders with `closed`.
+  useLayoutEffect(() => {
     const s = st.current;
-    // A glow that has already faded out has nothing to carry under the plate.
-    if (closed && !wasClosed.current) { s.sealStart = lightingNow(); s.sealDone = false; if (s.level === 0) s.hold = 0; }
-    if (!closed) s.sealDone = false;
+    // A glow that has already faded out has nothing to carry under the plate; only a live award rides onto it.
+    if (closed && !wasClosed.current) {
+      s.sealStart = lightingNow(); s.sealDone = false;
+      if (s.level === 0) s.hold = 0;
+      else if (neon && s.on) s.closeHold = s.sealStart + SEAL_SLIDE_S + NEON_CLOSE_HOLD_S;
+    }
+    if (!closed) { s.sealDone = false; s.closeHold = -Infinity; }
     wasClosed.current = closed;
-  }, [closed]);
+  }, [closed, neon]);
   useFrame((_, rawDelta) => {
     const s = st.current;
     const award = lighting.current.award, storeOn = award?.node === index;
-    const on = awarding || storeOn;
+    const on = awarding || storeOn || (closed && lightingNow() < s.closeHold);
     const sealing = closed && !s.sealDone && s.hold > 0;
     // Idle and already hidden: the host still serves other lanes' light requests, everyone else does nothing.
     if (!on && !sealing && s.level === 0 && s.hidden) { s.on = false; s.stamp = -1; applyLight(); return; }
@@ -158,7 +199,7 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
       s.hold = THREE.MathUtils.lerp(s.from, 1, attack) + .4 * attack * Math.exp(-Math.max(0, age - .14) * 4.5) + .12 * Math.sin(age * 5.2) * smooth((age - .35) / .6);
       s.fade = 1; s.level = s.hold;
     } else {
-      s.fade = THREE.MathUtils.damp(s.fade, 0, closed ? 7 : 3.5, dt);
+      s.fade = THREE.MathUtils.damp(s.fade, 0, closed && !neon ? 7 : 3.5, dt);
       s.level = s.fade < .003 ? 0 : s.fade * s.hold;
     }
     const level = s.level, tie = winnerSide === 'tie';
@@ -166,9 +207,11 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
     // While the seal runs the engraving holds its last level; the plate's edge hides it rather than a fade.
     const seal = sealing ? laneSealProgress(reduced ? Infinity : now - s.sealStart) : null;
     if (seal && seal.slide >= 1) { s.sealDone = true; s.hold = 0; }
-    const patternLevel = seal ? (s.sealDone ? 0 : s.hold) : level;
+    const patternLevel = seal ? (s.sealDone ? 0 : s.hold) : closed && s.sealDone ? 0 : level;
     const show = level > 0 || patternLevel > 0 || warming;
     const lum = luminance(tint);
+    // Neon: the sweep shrinks with the cards about their block and settles on the plate, above its clip.
+    const sweepScale = neon && closed ? laneSealProgress(reduced ? Infinity : now - s.sealStart).scale : 1;
 
     for (let side = 0; side < 2; side++) {
       const share = tie ? .75 : winnerSide === side ? 1 : 0;
@@ -179,7 +222,7 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
         const scale = seal ? seal.scale : 1;
         panel.scale.setScalar(scale);
         panel.position.z = CARD_BLOCK_Z[side] + (PATTERN_LANES[side].z - CARD_BLOCK_Z[side]) * scale;
-        clips[side].constant = seal ? (side === 0 ? -1 : 1) * laneSealEdgeZ(side, seal.slide) : UNCLIPPED;
+        clips[side].constant = seal ? (side === 0 ? -1 : 1) * (laneSealEdgeZ(side, seal.slide) + fieldShift) : UNCLIPPED;
         mat.opacity = PANEL_OPACITY * Math.min(1, panelLevel);
         mat.emissive.copy(tint);
         mat.emissiveIntensity = panelLevel * PANEL_L / (lum * ENGRAVE_L * Math.max(mat.opacity, 1e-3));
@@ -189,6 +232,9 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
         u.uColor.value.copy(tint).multiplyScalar(SWEEP_L / lum);
         u.uLevel.value = sideLevel;
         u.uPhase.value = mt * .55;
+        u.uScale.value = sweepScale;
+        sweep.scale.setScalar(sweepScale);
+        sweep.position.z = CARD_BLOCK_Z[side] + (RIMS[side].z - CARD_BLOCK_Z[side]) * sweepScale;
       }
     }
 
@@ -236,7 +282,7 @@ export function LaneRewardGlow({ x, index, awarding, winnerSide, reward, kind, c
     {host && <pointLight ref={light} intensity={0} distance={2.4} decay={2}/>}
     {LANES.map((lane, side) => <group key={side}>
       <mesh ref={m => { panels.current[side] = m; }} position={[x, .226, PATTERN_LANES[side].z]} rotation={[-Math.PI / 2, 0, lane.rz]} visible={false} renderOrder={2}>
-        <planeGeometry args={[PATTERN_W, PATTERN_LANES[side].d]}/>
+        {neonPanels ? <primitive object={neonPanels[side]} attach='geometry'/> : <planeGeometry args={[PATTERN_W, PATTERN_LANES[side].d]}/>}
         <meshStandardMaterial ref={m => { panelMats.current[side] = m; }} color='#05070c' roughness={.4} metalness={.6} emissiveMap={map} emissive='#000000' emissiveIntensity={0} transparent opacity={0} depthWrite={false} clippingPlanes={clipLists[side]}/>
       </mesh>
       <mesh ref={m => { sweeps.current[side] = m; }} position={[x, .232, RIMS[side].z]} rotation={[-Math.PI / 2, 0, lane.rz]} visible={false} renderOrder={3}>

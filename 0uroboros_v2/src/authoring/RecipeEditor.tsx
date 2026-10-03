@@ -4,10 +4,11 @@ import type { AuthoredCard } from './contentModel';
 import {
   cardDefinitionId, changeRecipeCount, changeRecipeOperation, changeRecipeTarget, createRecipe, enabledCards,
   operationChoices, recipeCount, recipeCountEditable, recipeCountMaximum, recipeCountMinimum,
-  recipeOperation, recipeSummary, recipeTarget, shiftDirections, targetChoices, boardSideChoices, changeRecipeBoardSide,
+  recipeOperation, recipeSummary, recipeTarget, shiftDirections, transferFlows, bumpPicks, targetChoices, boardSideChoices, changeRecipeBoardSide,
   type CatalogCard, type Recipe, type RecipeScope,
 } from './recipeModel';
 import { NumberInput } from './NumberInput';
+import { transferFlow } from '../transferText';
 import { useEditorFocus } from './editorContext';
 import './recipe-editor.css';
 
@@ -162,11 +163,27 @@ export function RecipeRows({ title, description, field, recipes, scope, cards, o
             {sides.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
           </select>
         </label>}
-        {operation === 'transferPower' && <label className="au-recipe-field"><span>Direction</span>
-          <select aria-label="Direction" value={recipe.direction ?? 'choice'} onChange={event => replace(index, { ...recipe, direction: event.target.value as Recipe['direction'] })}>
-            {shiftDirections.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
-          </select>
-        </label>}
+        {operation === 'transferPower' && <div className="au-recipe-advanced-fields">
+          <label className="au-recipe-field"><span>Direction</span>
+            <select aria-label="Direction" value={recipe.direction ?? 'choice'} onChange={event => replace(index, { ...recipe, direction: event.target.value as Recipe['direction'], flow: transferFlow(recipe) })}>
+              {shiftDirections.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
+            </select>
+          </label>
+          <label className="au-recipe-field"><span>Push / pull</span>
+            <select aria-label="Push or pull" value={transferFlow(recipe)} onChange={event => replace(index, { ...recipe, flow: event.target.value as Recipe['flow'] })}>
+              {transferFlows.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
+            </select>
+          </label>
+          <p className="au-recipe-help">Push moves your Power out of this Location; pull draws it in from a neighbor. A Location can go negative.</p>
+        </div>}
+        {operation === 'bump' && <div className="au-recipe-advanced-fields">
+          <label className="au-recipe-field"><span>Card pick</span>
+            <select aria-label="Bump card pick" value={recipe.cardPick ?? 'choice'} onChange={event => replace(index, { ...recipe, cardPick: event.target.value as 'choice' | 'random' })}>
+              {bumpPicks.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
+            </select>
+          </label>
+          <p className="au-recipe-help">Bumped cards go to their owner's discard pile. A bumped Effect Bank card stops its ongoing effects.</p>
+        </div>}
         {operation === 'gain' && <CardDefinitionPicker key={`${index}-gain`} cards={cards} value={recipe.cardId} onChange={cardId => replace(index, { ...recipe, cardId })} />}
         {operation === 'attachModifier' && <div className="au-recipe-advanced-fields">
           <label className="au-recipe-field"><span>Modifier</span><select aria-label="Modifier" value={recipe.modifier ?? 'doublePrintedEffects'} onChange={event => {

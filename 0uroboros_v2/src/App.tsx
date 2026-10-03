@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, type BoardNode } from './BoardScene';
+import { SERVER_X, serverZ } from './boardLayout';
+import { BOARD_DROP, BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, NEAR_BANK_FORMER_DROP, type BoardNode } from './BoardScene';
 import type { BoardScanTone } from './NeonHorizonScan';
 import { SINGULARITY_MS } from './Singularity';
-import { BOARD_BACKGROUNDS, DEFAULT_BOARD_BACKGROUND, boardBackgroundLabel } from './boardBackgrounds';
-import { LANE_PATTERNS, loadLanePattern, saveLanePattern, type LanePattern } from './lanePatterns';
-import { SERVER_STYLES, loadServerStyle, saveServerStyle, type ServerStyle } from './serverStyles';
-import { CLASSIC_THEME, PLAYER_COLOR_CHOICES, colorChoiceLabel, colorTaken, isClassicTheme, loadColorTheme, playerColor, playerColorVars, resolveColorTheme, saveColorTheme, withPlayerColor, type ColorTheme, type PlayerColor } from './playerTheme';
+import { boardBackgroundLabel, loadBackgroundChoice, saveBackgroundChoice, stepBackground, type BackgroundChoice } from './boardBackgrounds';
+import { floorLighting, loadRealLightingStore, saveRealLightingStore, updateFloorLighting, type RealLightingAction } from './realLighting';
+import { LANE_PATTERNS, loadLanePatterns, saveLanePatterns, type LanePattern } from './lanePatterns';
+import { BoardStylePicker, loadBoardStyle, saveBoardStyle, type BoardStyle } from './boardStyles';
+import { SERVER_STYLES, loadServerStyles, saveServerStyles, type ServerStyle } from './serverStyles';
+import { NEON_SURFACES, loadNeonSurface, saveNeonSurface, type NeonSurface } from './neonSurfaces';
+import { PLAYER_COLOR_IDS, colorChoiceLabel, colorTaken, loadColorTheme, playerColor, playerColorVars, resolveColorTheme, saveColorTheme, withPlayerColor, type ColorTheme, type PlayerColor } from './playerTheme';
+import { withPlayer, type PerPlayer } from './playerSettings';
+import { CARD_BACKS, cardBackSrc, loadCardBacks, saveCardBacks, type CardBackId } from './cardBacks';
 import { canDeploy, type Card } from './game';
 import { createSession, type RuntimeSession, type RuntimeEvent, type SessionView } from './runtime';
 import { EffectPath, CardEffectMotion } from './Effects';
@@ -14,8 +20,6 @@ import { DraftPanel } from './DraftPanel';
 import { GameSummary } from './GameSummary';
 import { CardCatalog } from './CardCatalog';
 import { CardFace } from './CardFace';
-import { CARD_BACK } from './cardArtwork';
-import { servedArtPath } from './depthArt/depthManifest';
 import { cardInspectVideo } from './cardVideos';
 import { cardsInPlay, warmCardMedia } from './cardPreload';
 import './card-surfaces.css';
@@ -26,7 +30,7 @@ import { useCardPointerDrag, type CardOrigin } from './useCardPointerDrag';
 import { springRelease } from './cardSpring';
 import { bundledContent } from './authoring/contentStore';
 import { loadGameContent } from './authoring/loadGameContent';
-import { BoardTuningPanel } from './boardTuning';
+import { BoardLightSliders, BoardTuningPanel } from './boardTuning';
 import { handOverlap, useHandSpan } from './handFan';
 
 const blankNodes:BoardNode[]=Array.from({length:5},(_,i)=>({cards:[[],[]],powers:[0,0],weight:[30,25,20,15,10][i],title:'Location pending',text:'Approved content required'}));
@@ -60,9 +64,13 @@ export function App(){
  const [selected,setSelected]=useState<Card|null>(null);
  const [catalogOpen,setCatalogOpen]=useState(false);
  const [settingsOpen,setSettingsOpen]=useState(false);
- const [settingsTab,setSettingsTab]=useState<'general'|'visuals'>('general');
- const [lanePattern,setLanePattern]=useState<LanePattern>(loadLanePattern);
- const [serverStyle,setServerStyle]=useState<ServerStyle>(loadServerStyle);
+ const [settingsTab,setSettingsTab]=useState<SettingsTab>('players');
+ const [playerTab,setPlayerTab]=useState<0|1>(0);
+ const [lanePatterns,setLanePatterns]=useState<PerPlayer<LanePattern>>(loadLanePatterns);
+ const [serverStyles,setServerStyles]=useState<PerPlayer<ServerStyle>>(loadServerStyles);
+ const [cardBacks,setCardBacks]=useState<PerPlayer<CardBackId>>(loadCardBacks);
+ const [boardStyle,setBoardStyle]=useState<BoardStyle>(loadBoardStyle);
+ const [neonSurface,setNeonSurface]=useState<NeonSurface>(loadNeonSurface);
  const [locationInspect,setLocationInspect]=useState<number|null>(null);
  const [arrivals,setArrivals]=useState<string[]>([]);
  const [bankArrivals,setBankArrivals]=useState<string[]>([]);
@@ -74,7 +82,11 @@ export function App(){
  /** Session-end beat: cyan sweep, then the singularity, then the result card. */
  const [collapsing,setCollapsing]=useState(false);
  const [ended,setEnded]=useState(false);
- const [bgIndex,setBgIndex]=useState(DEFAULT_BOARD_BACKGROUND);
+ const [backgroundChoice,setBackgroundChoice]=useState<BackgroundChoice>(loadBackgroundChoice);
+ const [lightingStore,setLightingStore]=useState(loadRealLightingStore);
+ const lightingMode=backgroundChoice.mode, floorBackground=backgroundChoice.background[lightingMode];
+ const realLighting=useMemo(()=>floorLighting(lightingStore,floorBackground),[lightingStore,floorBackground]);
+ const changeLighting=(action:RealLightingAction)=>setLightingStore(store=>updateFloorLighting(store,floorBackground,action));
  const [colorTheme,setColorTheme]=useState<ColorTheme>(loadColorTheme);
  const [videoSound,setVideoSound]=useState(false);
  const [closedNodes,setClosedNodes]=useState<number[]>([]);
@@ -321,32 +333,42 @@ export function App(){
   if(event){record(event);setView(engine.current.view());}
  },[now,view?.phase,view?.draftEnded,busy]);
  const playerColors=useMemo(()=>resolveColorTheme(colorTheme),[colorTheme]);
+ const cardBackUrls=useMemo<PerPlayer<string>>(()=>[cardBackSrc(cardBacks[0],playerColors[0]),cardBackSrc(cardBacks[1],playerColors[1])],[cardBacks,playerColors]);
  useEffect(()=>saveColorTheme(colorTheme),[colorTheme]);
- useEffect(()=>saveLanePattern(lanePattern),[lanePattern]);
- useEffect(()=>saveServerStyle(serverStyle),[serverStyle]);
+ useEffect(()=>saveLanePatterns(lanePatterns),[lanePatterns]);
+ useEffect(()=>saveServerStyles(serverStyles),[serverStyles]);
+ useEffect(()=>saveCardBacks(cardBacks),[cardBacks]);
+ useEffect(()=>saveBoardStyle(boardStyle),[boardStyle]);
+ useEffect(()=>saveNeonSurface(neonSurface),[neonSurface]);
+ useEffect(()=>saveRealLightingStore(lightingStore),[lightingStore]);
+ useEffect(()=>saveBackgroundChoice(backgroundChoice),[backgroundChoice]);
  const pileCounts=(owner:0|1)=>({deck:view?.players[owner].draw.length??5,hand:view?.players[owner].hand.length??5,discard:view?.players[owner].discard.length??0});
  const hudAnchors:NonNullable<React.ComponentProps<typeof BoardScene>['hudAnchors']>=[
- {id:'opponent-console',position:[0,.52,-4.6],content:<div className='opponent-console'><Resources owner={1} actions={view?.players[1].actions??2} crypto={view?.players[1].wallet??0} pending={view?.players[1].pendingActions??0} vp={view?.players[1].totalVP??0}/>{opponentDraw>0&&<div className='opponent-arrivals' aria-label={`Opponent draws ${opponentDraw} cards`}>{Array.from({length:opponentDraw},(_,i)=><img key={i} style={{'--arrival-delay':`${i*100}ms`} as CSSProperties} src={servedArtPath(CARD_BACK)} alt='Face-down drawn card'/>)}</div>}</div>},
- {id:'local-console',position:[0,.52,4.6],content:<div className='local-console'><small className={`reveal-priority ${view?.priority===0?'active':''}`}><i aria-hidden='true'/>REVEAL PRIORITY</small><Resources owner={0} actions={local?.actions??2} crypto={local?.wallet??0} pending={local?.pendingActions??0} vp={local?.totalVP??0}/></div>},
- ...([1,0] as const).flatMap(owner=>(['backup','primary'] as const).map(target=>({id:`server-${owner}-${target}`,position:[target==='backup'?-4.6:4.6,.35,owner?-4.75:4.75] as [number,number,number],content:<Server owner={owner} target={target} color={playerColors[owner]} value={view?.players[owner].servers[target]??(target==='primary'?2000:1500)} active={active?.target===target&&active.targetOwner===owner?active:null} duration={active?eventTime(active,fast):1500}/>}))),
+ {id:'opponent-console',position:[0,.52,-4.6],content:<div className='opponent-console' style={{'--console-accent':playerColors[1].accent} as CSSProperties}><small className={`reveal-priority ${view?.priority===1?'active':''}`}><i aria-hidden='true'/>REVEAL PRIORITY</small><Resources owner={1} actions={view?.players[1].actions??2} crypto={view?.players[1].wallet??0} pending={view?.players[1].pendingActions??0} vp={view?.players[1].totalVP??0}/>{opponentDraw>0&&<div className='opponent-arrivals' aria-label={`Opponent draws ${opponentDraw} cards`}>{Array.from({length:opponentDraw},(_,i)=><img key={i} style={{'--arrival-delay':`${i*100}ms`} as CSSProperties} src={cardBackUrls[1]} alt='Face-down drawn card'/>)}</div>}</div>},
+ {id:'local-console',position:[0,.52,4.6],content:<div className='local-console' style={{'--console-accent':playerColors[0].accent} as CSSProperties}><small className={`reveal-priority ${view?.priority===0?'active':''}`}><i aria-hidden='true'/>REVEAL PRIORITY</small><Resources owner={0} actions={local?.actions??2} crypto={local?.wallet??0} pending={local?.pendingActions??0} vp={local?.totalVP??0}/></div>},
+ ...([1,0] as const).flatMap(owner=>(['backup','primary'] as const).map(target=>({id:`server-${owner}-${target}`,position:[target==='backup'?-SERVER_X:SERVER_X,.35,serverZ(owner,boardStyle==='neon')] as [number,number,number],content:<Server owner={owner} target={target} color={playerColors[owner]} value={view?.players[owner].servers[target]??(target==='primary'?2000:1500)} active={active?.target===target&&active.targetOwner===owner?active:null} duration={active?eventTime(active,fast):1500}/>}))),
  ...([1,0] as const).map(owner=>({id:`duration-${owner}`,position:[BANK_BAY_X,-.02,owner?-BANK_BAY_Z-FAR_BANK_LIFT:BANK_BAY_Z+NEAR_BANK_DROP] as [number,number,number],content:<div className={`bank-dock ${owner?'far':'near'}`}><Duration owner={owner} color={playerColors[owner]} cycle={view?.cycle??1} entries={view?.players[owner].bank??[]} activeCard={active?.cardId} activeEvent={active?.id} arriving={bankArrivals} inspect={setSelected}/><Piles owner={owner} counts={pileCounts(owner)}/></div>})),
+ {id:'undo-planning',position:[BANK_BAY_X,-.02,BANK_BAY_Z+NEAR_BANK_FORMER_DROP-BOARD_DROP],content:<div className='undo-dock'><button className='undo-planning' disabled={!view?.canUndoPlanning||busy} onClick={undoPlanning}><Icon name='undo'/>Undo all actions</button></div>},
  ];
  return <main className='app' data-event-id={active?.id} data-event-kind={active?.kind} data-event-stage={active?.stage} data-event-node={active?.node}>
-  <BoardTuningPanel/>
-  <header className='topline'><div className='brand'><span>0</span>UROBOROS<small>THE CIRCUIT AND THE SERPENT</small></div><div className='phase-stack'><div className='phase-label'>{view?`CYCLE ${String(view.cycle).padStart(2,'0')} / ${phase==='runtime'?`RUNTIME ${view.turn} OF 3`:phase.toUpperCase()}`:'THE CIRCUIT AWAITS'}</div>{view&&<div className='cycle-track' aria-label='Cycle progress'>{['Turn 1','Turn 2','Turn 3','Collapse','Draft'].map((label,index)=>{const step=phase==='draft'?4:phase==='collapse'?3:view.turn-1;return <span key={label} className={index===step?'current':index<step?'complete':''} aria-current={index===step?'step':undefined}><i/>{label}</span>;})}{phase==='collapse'&&active?.node!==undefined&&<b>{active.kind==='circuit'&&!circuitLanded?'CIRCUIT SELECTION':`N${active.node+1} / N5`}</b>}</div>}</div><nav><div className='settings-cluster'><button className='settings-toggle' aria-haspopup='true' aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(open=>!open)}>Settings</button>{settingsOpen&&<><span className='settings-scrim' onClick={()=>setSettingsOpen(false)}/><div className='settings-popover' aria-label='Session settings'><div className='settings-tabs' role='tablist'>{(['general','visuals'] as const).map(tab=><button key={tab} type='button' role='tab' aria-selected={settingsTab===tab} onClick={()=>setSettingsTab(tab)}>{tab==='general'?'General':'Visuals'}</button>)}</div>{settingsTab==='general'?<div className='settings-panel' role='tabpanel' aria-label='General'><button onClick={()=>{setSettingsOpen(false);setCatalogOpen(true);}}>Card catalog</button><a className='authoring-link' href='/author' target='_blank' rel='noreferrer' onClick={()=>setSettingsOpen(false)}>Content Studio</a><button onClick={()=>{setSettingsOpen(false);setPanel('practice');}}>Evaluation build</button><button aria-pressed={fast} disabled={busy} onClick={()=>setFast(!fast)}>{fast?'Fast':'Normal'} pace</button><button aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>Card video sound: {videoSound?'On':'Off'}</button></div>:<div className='settings-panel' role='tabpanel' aria-label='Visuals'><span className='bg-picker' role='group' aria-label='Floor background'><small>Background</small><button type='button' className='bg-picker-btn' aria-label='Previous floor background' onClick={()=>setBgIndex(i=>(i-1+BOARD_BACKGROUNDS.length)%BOARD_BACKGROUNDS.length)}>‹</button><span className='bg-picker-label'>{boardBackgroundLabel(BOARD_BACKGROUNDS[bgIndex])}</span><button type='button' className='bg-picker-btn' aria-label='Next floor background' onClick={()=>setBgIndex(i=>(i+1)%BOARD_BACKGROUNDS.length)}>›</button></span><div className='lane-pattern-picker' role='radiogroup' aria-label='Lane pattern'><small>Lane pattern</small><div>{LANE_PATTERNS.map(option=><button key={option.id} type='button' role='radio' aria-checked={lanePattern===option.id} onClick={()=>setLanePattern(option.id)}>{option.label}</button>)}</div></div><div className='lane-pattern-picker' role='radiogroup' aria-label='Server tubes'><small>Server tubes</small><div>{SERVER_STYLES.map(option=><button key={option.id} type='button' role='radio' aria-checked={serverStyle===option.id} onClick={()=>setServerStyle(option.id)}>{option.label}</button>)}</div></div><ThemePicker theme={colorTheme} setTheme={setColorTheme}/></div>}</div></>}</div>{view&&<><button className='zone-count' data-resource='trash' title='Shared Trash' aria-label={`Shared Trash, ${view.trash.length} cards`} onClick={()=>setPanel('trash')}><Icon name='trash'/><b>{view.trash.length}</b></button><span className='zone-count' data-resource='destroyed' title='Destroyed cards' aria-label={`Destroyed, ${destroyedCount} cards`}><Icon name='destroyed'/><b>{destroyedCount}</b></span></>}<button onClick={()=>setPanel('log')}>Log <span>{history.length}</span></button></nav></header>
+  <BoardTuningPanel lighting={lightingMode==='real'?{floor:boardBackgroundLabel(floorBackground),value:realLighting,saved:lightingStore[floorBackground]?.saved,change:changeLighting,neon:boardStyle==='neon'}:undefined} paint={boardStyle==='neon'?{active:neonSurface==='paint',enable:()=>setNeonSurface('paint')}:undefined}/>
+  <header className='topline'><div className='brand'><span>0</span>UROBOROS<small>THE CIRCUIT AND THE SERPENT</small></div><div className='phase-stack'><div className='phase-label'>{view?`CYCLE ${String(view.cycle).padStart(2,'0')} / ${phase==='runtime'?`RUNTIME ${view.turn} OF 3`:phase.toUpperCase()}`:'THE CIRCUIT AWAITS'}</div>{view&&<div className='cycle-track' aria-label='Cycle progress'>{['Turn 1','Turn 2','Turn 3','Collapse','Draft'].map((label,index)=>{const step=phase==='draft'?4:phase==='collapse'?3:view.turn-1;return <span key={label} className={index===step?'current':index<step?'complete':''} aria-current={index===step?'step':undefined}><i/>{label}</span>;})}{phase==='collapse'&&active?.node!==undefined&&<b>{active.kind==='circuit'&&!circuitLanded?'CIRCUIT SELECTION':`N${active.node+1} / N5`}</b>}</div>}</div><nav><div className='settings-cluster'><button className='settings-toggle' aria-haspopup='true' aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(open=>!open)}>Settings</button>{settingsOpen&&<><span className='settings-scrim' onClick={()=>setSettingsOpen(false)}/><div className='settings-popover' aria-label='Session settings'><div className='settings-tabs' role='tablist'>{SETTINGS_TABS.map(tab=><button key={tab.id} type='button' role='tab' aria-selected={settingsTab===tab.id} onClick={()=>setSettingsTab(tab.id)}>{tab.label}</button>)}</div>
+   {settingsTab==='players'&&<div className='settings-panel' role='tabpanel' aria-label='Players'><div className='player-tabs' role='tablist' aria-label='Player'>{([0,1] as const).map(owner=><button key={owner} type='button' role='tab' aria-selected={playerTab===owner} style={{'--swatch':playerColors[owner].accent} as CSSProperties} onClick={()=>setPlayerTab(owner)}><i aria-hidden='true'/>Player {owner+1}<small>{owner?'Opponent':'You'}</small></button>)}</div><PlayerSettings key={playerTab} owner={playerTab} colors={colorTheme} setColors={setColorTheme} lanes={lanePatterns} setLanes={setLanePatterns} servers={serverStyles} setServers={setServerStyles} backs={cardBacks} setBacks={setCardBacks}/></div>}
+   {settingsTab==='board'&&<div className='settings-panel' role='tabpanel' aria-label='Board'><span className='bg-picker' role='group' aria-label='Floor background'><small>Background</small><button type='button' className='bg-picker-btn' aria-label='Previous floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,-1))}>‹</button><span className='bg-picker-label'>{boardBackgroundLabel(floorBackground)}</span><button type='button' className='bg-picker-btn' aria-label='Next floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,1))}>›</button></span><BoardStylePicker value={boardStyle} onChange={setBoardStyle}/>{boardStyle==='neon'&&<OptionPicker className='neon-surface-picker' label='Surface' name='Neon table surface' options={NEON_SURFACES} value={neonSurface} onChange={setNeonSurface}/>}<BoardLightSliders/></div>}
+   {settingsTab==='general'&&<div className='settings-panel' role='tabpanel' aria-label='General'><button onClick={()=>{setSettingsOpen(false);setCatalogOpen(true);}}>Card catalog</button><a className='authoring-link' href='/author' target='_blank' rel='noreferrer' onClick={()=>setSettingsOpen(false)}>Content Studio</a><button onClick={()=>{setSettingsOpen(false);setPanel('practice');}}>Evaluation build</button><button aria-pressed={fast} disabled={busy} onClick={()=>setFast(!fast)}>{fast?'Fast':'Normal'} pace</button><button aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>Card video sound: {videoSound?'On':'Off'}</button><OptionPicker label='Lighting' name='Lighting' options={LIGHTING_MODES} value={lightingMode} onChange={mode=>setBackgroundChoice(choice=>({...choice,mode}))}/></div>}
+  </div></>}</div>{view&&<><button className='zone-count' data-resource='trash' title='Shared Trash' aria-label={`Shared Trash, ${view.trash.length} cards`} onClick={()=>setPanel('trash')}><Icon name='trash'/><b>{view.trash.length}</b></button><span className='zone-count' data-resource='destroyed' title='Destroyed cards' aria-label={`Destroyed, ${destroyedCount} cards`}><Icon name='destroyed'/><b>{destroyedCount}</b></span></>}<button onClick={()=>setPanel('log')}>Log <span>{history.length}</span></button></nav></header>
   <section className={`arena ${busy?'resolving':''}`} aria-label='Three-dimensional Circuit board'>
-    <BoardScene planning={phase==='runtime'} gameover={collapsing} winner={view?.winner} playerColors={playerColors} videoSound={videoSound} floorBackground={BOARD_BACKGROUNDS[bgIndex]} lanePattern={lanePattern} serverStyle={serverStyle} boardScan={boardScan} boardScanTone={boardScanTone} boardScanDuration={fast?BOARD_SCAN_MS.fast:BOARD_SCAN_MS.normal} cycle={view?.cycle??1} closedNodes={closedNodes} collapseNode={collapseNode} awardNode={awardNode} selectionNode={selectionNode} onReady={()=>setBoardReady(true)} openNodes={dealing?(view?.openNodes??[]).slice(0,openingNodeCount):view?.openNodes??[]} servers={[view?.players[0].servers??{primary:2000,backup:1500},view?.players[1].servers??{primary:2000,backup:1500}]} hudAnchors={hudAnchors} nodes={nodes} turn={view?.turn??1} phase={phase} priority={view?.priority??0} dragged={dragged} hoveredNode={hoveredNode} legal={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocateLegal(node):legal(node)} drop={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocate(node):deploy(node)} inspect={c=>!isDragging.current&&setSelected(c)} onLocationInspect={index=>{if(view?.nodes[index].location)setLocationInspect(index);}} onFieldDrag={beginFieldDrag} effect={active&&(active.kind!=='circuit'||circuitLanded)?{...active,player:active.owner,sourceCardId:active.cardId}:null} selectedNode={view?.selectedNode??null} choiceNodes={selectableNodes} chooseNode={chooseNode}/>
+    <BoardScene boardStyle={boardStyle} neonSurface={neonSurface} planning={phase==='runtime'} gameover={collapsing} winner={view?.winner} playerColors={playerColors} videoSound={videoSound} floorBackground={floorBackground} lightingMode={lightingMode} realLighting={realLighting} lanePatterns={lanePatterns} serverStyles={serverStyles} cardBacks={cardBackUrls} boardScan={boardScan} boardScanTone={boardScanTone} boardScanDuration={fast?BOARD_SCAN_MS.fast:BOARD_SCAN_MS.normal} cycle={view?.cycle??1} closedNodes={closedNodes} collapseNode={collapseNode} awardNode={awardNode} selectionNode={selectionNode} onReady={()=>setBoardReady(true)} openNodes={dealing?(view?.openNodes??[]).slice(0,openingNodeCount):view?.openNodes??[]} servers={[view?.players[0].servers??{primary:2000,backup:1500},view?.players[1].servers??{primary:2000,backup:1500}]} hudAnchors={hudAnchors} nodes={nodes} turn={view?.turn??1} phase={phase} priority={view?.priority??0} dragged={dragged} hoveredNode={hoveredNode} legal={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocateLegal(node):legal(node)} drop={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocate(node):deploy(node)} inspect={c=>!isDragging.current&&setSelected(c)} onLocationInspect={index=>{if(view?.nodes[index].location)setLocationInspect(index);}} onFieldDrag={beginFieldDrag} effect={active&&(active.kind!=='circuit'||circuitLanded)?{...active,player:active.owner,sourceCardId:active.cardId}:null} selectedNode={view?.selectedNode??null} choiceNodes={selectableNodes} chooseNode={chooseNode}/>
    <aside className='crypto-cache hud-wallet' aria-label={`Crypto wallet, ${cacheValue} total, ${cache.length} cards`}>
     <div className='wallet-head'><Icon name='crypto'/><b className='cache-total'>{cacheValue}</b><div className='wallet-label'><b>CRYPTO WALLET</b><small>{cache.length} {cache.length===1?'card':'cards'}</small></div></div>
     <div className='cache-cards' style={{'--count':cache.length} as CSSProperties}>{cache.map((card,index)=><button className={`cache-card ${cashFlight?.card.id===card.id?'paying':''}`} data-card-id={card.id} style={{'--stack-index':index,'--fan':index-(cache.length-1)/2,'--angle':`${(index-(cache.length-1)/2)*Math.min(4,20/cache.length)}deg`,'--lift':`${Math.abs(index-(cache.length-1)/2)*2}px`,'zIndex':index+1} as CSSProperties} key={card.id} onClick={()=>setSelected(card)} title={card.name} aria-label={card.name}><CardFace card={card} compact/></button>)}</div>   </aside>
    <div className='turn-dock'>
-    <button className='undo-planning' disabled={!view?.canUndoPlanning||busy} onClick={undoPlanning}><Icon name='undo'/>Undo all actions</button>
     <EndTurnControl key={view?'playing':'setup'} seconds={runtimeSeconds} onConcede={()=>act(()=>engine.current!.concedeForInactivity())} cycle={view?.cycle??0} turn={view?.turn??1} enabled={!!view&&!busy&&phase==='runtime'} busy={busy} dealing={dealing} onEnd={endTurn}/>
    </div>
    <div ref={handZone} className='hand-zone' data-resource='0-hand' style={handSpan?{left:handSpan.left,right:handSpan.right}:undefined}><div className='hand-instruction'>{dealing?'Five-card deal · Crypto moves to cache':fieldHand.length?'Drag to deploy · Click to inspect':phase==='runtime'?'Your hand is empty':'The Circuit is resolving'}</div><div className='hand' style={{'--hand-overlap':`${handOverlap(fieldHand.length,handSpan?.room??0,handSpan?.cardWidth??120,handSpan?.cardHeight??168)}px`} as CSSProperties}>{fieldHand.map((card,i)=><button key={card.id} data-card-id={card.id} className={`hand-card ${arrivals.includes(card.id)?'drawing-card':''} ${dragged?.id===card.id||flight?.card.id===card.id?'dragging':''}`} style={{'--angle':`${(i-(fieldHand.length-1)/2)*Math.min(4,20/fieldHand.length)}deg`,'--lift':`${Math.abs(i-(fieldHand.length-1)/2)*5}px`,'--index':i,'--arrival-delay':`${Math.max(0,arrivals.indexOf(card.id))*110}ms`} as CSSProperties} draggable={false} aria-label={`Inspect ${card.name}`} onDragStart={e=>e.preventDefault()} onPointerDown={e=>beginCardDrag(e,card)} onClick={()=>{if(!isDragging.current)setSelected(card);}}><HandCardFace card={card}/></button>)}</div></div>
   </section>
   {cashFlight&&<div className='cash-flight' data-cash-flight={cashFlight.card.id} style={{left:cashFlight.x,top:cashFlight.y,width:cashFlight.w,height:cashFlight.h,'--cash-x':`${cashFlight.dx}px`,'--cash-y':`${cashFlight.dy}px`,'--cash-duration':`${cashFlight.duration*.72}ms`} as CSSProperties}><Icon name='crypto'/><strong>{cashFlight.card.name}</strong><b>+{cashFlight.card.cryptoValue??Number(cashFlight.card.effect.match(/\+(\d+) Crypto/)?.[1]??0)}</b></div>}
-  {flight&&<div ref={flightRef} className={`flying-card ${flight.crypto?'crypto-flight':''} ${flight.release?'spring-flight':''}`} style={{left:flight.x,top:flight.y,width:flight.w,height:flight.h,'--flight-x':`${flight.dx}px`,'--flight-y':`${flight.dy}px`,'--flight-scale':flight.scale,'--flight-angle':`${flight.angle??0}deg`} as CSSProperties}><div className='flying-face hand-card flight-face-card'><HandCardFace card={flight.card}/></div><img className='flying-back' src={servedArtPath(CARD_BACK)} alt=''/></div>}
+  {flight&&<div ref={flightRef} className={`flying-card ${flight.crypto?'crypto-flight':''} ${flight.release?'spring-flight':''}`} style={{left:flight.x,top:flight.y,width:flight.w,height:flight.h,'--flight-x':`${flight.dx}px`,'--flight-y':`${flight.dy}px`,'--flight-scale':flight.scale,'--flight-angle':`${flight.angle??0}deg`} as CSSProperties}><div className='flying-face hand-card flight-face-card'><HandCardFace card={flight.card}/></div><img className='flying-back' src={cardBackUrls[0]} alt=''/></div>}
   {active&&<EffectPath key={`path-${active.id}`} event={active.source==='circuit'&&active.owner===1?{...active,node:view?.selectedNode??undefined}:active} duration={eventTime(active,fast)}/>}
   {(active?.kind==='move'||active?.kind==='morph')&&<CardEffectMotion key={`card-effect-${active.id}`} event={active} duration={eventTime(active,fast)}/>}
   {globalEvent&&<div className={`global-event ${active.kind==='circuit'?'circuit-event':''}`} key={`global-${active.id}`}><small>{active.kind==='circuit'?'CIRCUIT REWARD':'CIRCUIT TRANSMISSION'}</small><p>{active.text}</p></div>}
@@ -367,22 +389,28 @@ function Resources({owner,actions,crypto,pending,vp}:{owner:number;actions:numbe
  const [labels,setLabels]=useState(false);
  useEffect(()=>{if(!labels)return;const timer=setTimeout(()=>setLabels(false),PILE_TIP_MS);return()=>clearTimeout(timer);},[labels]);
  return <div className='resources' data-labels-open={labels||undefined} onClick={()=>setLabels(true)}>{[{key:'actions',icon:'actions',value:actions,label:'Actions'},{key:'wallet',icon:'crypto',value:crypto,label:'Crypto'},{key:'vp',icon:'volume',value:vp,label:'VP'}].map(stat=><span className={`stat-${stat.key}`} data-resource={`${owner}-${stat.key}`} key={stat.key}><span className='stat-pair'><Icon name={stat.icon}/><b key={stat.value}>{stat.value}</b></span><span className='stat-foot'><small>{stat.label}</small>{stat.key==='actions'&&pending>0&&<em className='stat-pending' title={`+${pending} Action${pending===1?'':'s'} next Runtime turn`}>+{pending} next</em>}</span></span>)}</div>;}
-/** Classic leaves the stylesheet colours untouched; a chosen colour overrides them through `--player-*`. */
-const themeVars=(color:PlayerColor)=>color.id==='classic'?undefined:playerColorVars(color);
-function ThemePicker({theme,setTheme}:{theme:ColorTheme;setTheme:(update:(theme:ColorTheme)=>ColorTheme)=>void}){
- return <div className='theme-picker' role='group' aria-label='Color theme'>
-  <div className='theme-picker-head'><small>Color theme</small><button type='button' className='theme-classic' aria-pressed={isClassicTheme(theme)} onClick={()=>setTheme(()=>CLASSIC_THEME)}>Classic</button></div>
-  {([0,1] as const).map(owner=><div className='theme-row' key={owner} role='radiogroup' aria-label={`Player ${owner+1} color`}>
-   <span>{owner?'Player 2':'Player 1'}<small>{owner?'Opponent':'You'}</small></span>
-   <div className='theme-swatches'>{PLAYER_COLOR_CHOICES.map(choice=>{
-    const taken=colorTaken(theme,owner,choice);
-    const label=`Player ${owner+1}: ${colorChoiceLabel(choice)}${taken?' (in use by the other player)':''}`;
-    return <button type='button' key={choice} role='radio' aria-checked={theme[owner]===choice} aria-label={label} title={label} disabled={taken} className='theme-swatch' data-choice={choice} style={{'--swatch':playerColor(choice,owner).accent} as CSSProperties} onClick={()=>setTheme(current=>withPlayerColor(current,owner,choice))}/>;
-   })}</div>
-  </div>)}
- </div>;
+type SettingsTab='players'|'board'|'general';
+const SETTINGS_TABS:{id:SettingsTab;label:string}[]=[{id:'players',label:'Players'},{id:'board',label:'Board'},{id:'general',label:'General'}];
+const LIGHTING_MODES=[{id:'real',label:'Real lighting'},{id:'studio',label:'Studio'}] as const;
+function OptionPicker<T extends string>({label,name,options,value,onChange,className=''}:{label:string;name:string;options:readonly {id:T;label:string}[];value:T;onChange:(id:T)=>void;className?:string}){
+ return <div className={`lane-pattern-picker ${className}`} role='radiogroup' aria-label={name}><small>{label}</small><div>{options.map(option=><button key={option.id} type='button' role='radio' aria-checked={value===option.id} onClick={()=>onChange(option.id)}>{option.label}</button>)}</div></div>;
 }
-function Server({owner,target,color,value,active,duration,children}:{owner:number;target:'primary'|'backup';color:PlayerColor;value:number;active:RuntimeEvent|null;duration:number;children?:ReactNode}){const max=target==='primary'?2000:1500;return <div data-server={`${owner}-${target}`} style={{'--server-duration':`${duration}ms`,...themeVars(color)} as CSSProperties} className={`server ${owner===1?'far':'near'} ${active?`server-${active.kind}`:''} ${value===0?'destroyed':''}`}><div className='server-readout'><small><Icon name='database'/>{target.toUpperCase()}</small><div><b>{value.toLocaleString()}</b><span>/ {max.toLocaleString()}</span></div>{children}</div><i role='progressbar' aria-label={`${target} integrity`} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value}><em style={{width:`${value/max*100}%`}}/></i>{active&&<span className='server-delta'>{active.kind==='drain'?'−':'+'}{active.amount}</span>}</div>;}
+type Update<T>=(update:(current:T)=>T)=>void;
+/** One player's look on the Players tab: neon colour, lane pattern, Server tubes and card back. */
+function PlayerSettings({owner,colors,setColors,lanes,setLanes,servers,setServers,backs,setBacks}:{owner:0|1;colors:ColorTheme;setColors:Update<ColorTheme>;lanes:PerPlayer<LanePattern>;setLanes:Update<PerPlayer<LanePattern>>;servers:PerPlayer<ServerStyle>;setServers:Update<PerPlayer<ServerStyle>>;backs:PerPlayer<CardBackId>;setBacks:Update<PerPlayer<CardBackId>>}){
+ const who=`Player ${owner+1}`, color=playerColor(colors[owner]);
+ return <section className='player-settings' role='tabpanel' aria-label={who} style={{'--swatch':color.accent} as CSSProperties}>
+  <div className='lane-pattern-picker' role='radiogroup' aria-label={`${who} neon color`}><small>Neon color</small><div className='theme-swatches'>{PLAYER_COLOR_IDS.map(choice=>{
+   const taken=colorTaken(colors,owner,choice);
+   const label=`${who}: ${colorChoiceLabel(choice)}${taken?' (in use by the other player)':''}`;
+   return <button type='button' key={choice} role='radio' aria-checked={colors[owner]===choice} aria-label={label} title={label} disabled={taken} className='theme-swatch' data-choice={choice} style={{'--swatch':playerColor(choice).accent} as CSSProperties} onClick={()=>setColors(current=>withPlayerColor(current,owner,choice))}/>;
+  })}</div></div>
+  <OptionPicker label='Lane pattern' name={`${who} lane pattern`} options={LANE_PATTERNS} value={lanes[owner]} onChange={id=>setLanes(current=>withPlayer(current,owner,id))}/>
+  <OptionPicker label='Server tubes' name={`${who} server tubes`} options={SERVER_STYLES} value={servers[owner]} onChange={id=>setServers(current=>withPlayer(current,owner,id))}/>
+  <div className='lane-pattern-picker card-back-picker' role='radiogroup' aria-label={`${who} card back`}><small>Card back</small><div>{CARD_BACKS.map(back=><button key={back.id} type='button' role='radio' aria-checked={backs[owner]===back.id} aria-label={`${who}: ${back.label}`} title={back.label} onClick={()=>setBacks(current=>withPlayer(current,owner,back.id))}><img src={cardBackSrc(back.id,color)} alt=''/></button>)}</div></div>
+ </section>;
+}
+function Server({owner,target,color,value,active,duration,children}:{owner:number;target:'primary'|'backup';color:PlayerColor;value:number;active:RuntimeEvent|null;duration:number;children?:ReactNode}){const max=target==='primary'?2000:1500;return <div data-server={`${owner}-${target}`} style={{'--server-duration':`${duration}ms`,...playerColorVars(color)} as CSSProperties} className={`server ${owner===1?'far':'near'} ${active?`server-${active.kind}`:''} ${value===0?'destroyed':''}`}><div className='server-readout'><small>{target.toUpperCase()}</small><b>{value.toLocaleString()}</b>{children}</div><i role='progressbar' aria-label={`${target} integrity`} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value}><em style={{width:`${value/max*100}%`}}/></i>{active&&<span className='server-delta'>{active.kind==='drain'?'−':'+'}{active.amount}</span>}</div>;}
 /** Effect Bank entry: slide in, magnetic snap to full bleed, then one lap of light around the slot. The CSS reads these as custom properties. */
 const BANK_SLIDE_MS=800, BANK_SNAP_MS=460, BANK_SWEEP_MS=750, BANK_STAGGER_MS=140;
 /** How long an entry of `count` cards into one bank runs, lights included; 0 for none. */
@@ -396,8 +424,8 @@ function newlyBanked(before:SessionView,after:SessionView){
 }
 function Duration({owner,color,cycle,entries,activeCard,activeEvent,arriving,inspect}:{owner:0|1;color:PlayerColor;cycle:number;entries:SessionView['players'][0]['bank'];activeCard?:string;activeEvent?:number;arriving:string[];inspect:(card:Card)=>void}){
  const entering=entries.filter(entry=>arriving.includes(entry.card.id)).map(entry=>entry.card.id);
- return <aside className={`duration live-bank ${owner===1?'far':'near'}`} style={themeVars(color)} data-owner={owner} data-player-color={color.id} data-bank-count={entries.length}>
-  <small>{owner===1?'OPPONENT':'YOUR'} EFFECT BANK</small>
+ return <aside className={`duration live-bank ${owner===1?'far':'near'}`} style={playerColorVars(color)} data-owner={owner} data-player-color={color.id} data-bank-count={entries.length}>
+  <small>{owner===1?'OPPONENT\'S':'YOUR'} EFFECT BANK</small>
   <div>{Array.from({length:4},(_,index)=>{
    const entry=entries[index];
    if(!entry)return <i className='bank-slot' key={index}/>;
@@ -411,7 +439,6 @@ function Duration({owner,color,cycle,entries,activeCard,activeEvent,arriving,ins
     {resolving&&<i className='bank-sweep' key={activeEvent} aria-hidden='true'/>}
    </button>;
   })}</div>
-  <span>{entries.length}/4 active</span>
  </aside>;
 }
 const PILES=[{name:'deck',label:'Draw',icon:'deck'},{name:'hand',label:'Hand',icon:'hand'},{name:'discard',label:'Discard',icon:'discard-pile'}] as const;

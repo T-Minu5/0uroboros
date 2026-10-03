@@ -9,7 +9,7 @@ export type CardModifier = {
   sourceName?: string;
 };
 export type EvaluationEffect = {
-  kind: "draw" | "actions" | "crypto" | "vp" | "drain" | "restore" | "moveSelf" | "moveCard" | "modifyPower" | "probability" | "trashSelf" | "recover" | "choice" | "mill" | "transferPower" | "handDiscard" | "handTrash" | "scry" | "gain" | "selfDestroyBackup" | "random" | "morph" | "attachModifier" | "damageLoser" | "restorePrimary" | "trashLowestAtLocation" | "trashAtLocation" | "destroyAtLocation" | "boostPowerAtLocation" | "stealCrypto" | "destroyCard";
+  kind: "draw" | "actions" | "crypto" | "vp" | "drain" | "restore" | "moveSelf" | "moveCard" | "modifyPower" | "probability" | "trashSelf" | "recover" | "choice" | "mill" | "transferPower" | "handDiscard" | "handTrash" | "scry" | "gain" | "selfDestroyBackup" | "random" | "morph" | "attachModifier" | "damageLoser" | "restorePrimary" | "trashLowestAtLocation" | "trashAtLocation" | "destroyAtLocation" | "boostPowerAtLocation" | "stealCrypto" | "destroyCard" | "bump";
   amount?: number;
   target?: "primary" | "backup";
   options?: readonly EffectChoiceOption[];
@@ -37,11 +37,15 @@ export type EvaluationEffect = {
   /** Attach modifier to a revealed board card instead of a Character in deck zones. */
   boardHost?: boolean;
   /**
-   * Which way a Power shift runs. "choice" lets the player pick any transfer between this Node
-   * and a neighbour; "left"/"right" push the amount out to that neighbour; "split" divides it
-   * between both, giving the odd point to the left.
+   * Which neighbour(s) a Power transfer uses. "choice" lets the player pick a side; "left"/"right"
+   * fix the side; "split" divides the amount between both, giving the odd point to the left.
+   * At an edge Node, "split" uses the one neighbour for the whole amount.
    */
   direction?: "choice" | "left" | "right" | "split";
+  /** Push moves Power out of this Node, pull draws it in. Defaults to "either" for "choice", else "push". */
+  flow?: "either" | "push" | "pull";
+  /** Bump: the opponent zone a card leaves for its owner's Discard. */
+  zone?: "bank" | "wallet" | "either";
   modifier?: "doublePrintedEffects" | "powerAuraAtLocation" | "movableEachTurn";
 };
 export type Card = {

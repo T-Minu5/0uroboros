@@ -52,17 +52,17 @@ function seededCardClass(card:Card,pool:CardPool):CardClass|undefined {
   return pool==='Chaos'?'Attack':'Utility';
 }
 const STARTING_DECK: Record<string, Card['type']> = { 'slash-dot': 'Character', 'dash-dot': 'Character', dotkrawler: 'Character', 'rezz-razor': 'Character', 'rezz-blade': 'Character', 'byte-coin': 'Crypto', 'kilo-coin': 'Crypto', 'vault-encryption': 'VP' };
-const EVAL_KINDS = new Set(['draw', 'actions', 'crypto', 'vp', 'drain', 'restore', 'moveSelf', 'moveCard', 'modifyPower', 'probability', 'trashSelf', 'recover', 'choice', 'mill', 'transferPower', 'handDiscard', 'handTrash', 'scry', 'gain', 'selfDestroyBackup', 'random', 'morph', 'attachModifier', 'damageLoser', 'restorePrimary', 'trashLowestAtLocation', 'trashAtLocation', 'destroyAtLocation', 'boostPowerAtLocation', 'stealCrypto', 'destroyCard']);
+const EVAL_KINDS = new Set(['draw', 'actions', 'crypto', 'vp', 'drain', 'restore', 'moveSelf', 'moveCard', 'modifyPower', 'probability', 'trashSelf', 'recover', 'choice', 'mill', 'transferPower', 'handDiscard', 'handTrash', 'scry', 'gain', 'selfDestroyBackup', 'random', 'morph', 'attachModifier', 'damageLoser', 'restorePrimary', 'trashLowestAtLocation', 'trashAtLocation', 'destroyAtLocation', 'boostPowerAtLocation', 'stealCrypto', 'destroyCard', 'bump']);
 const CARD_KINDS = EVAL_KINDS;
 const LOCATION_KINDS = EVAL_KINDS;
 const CIRCUIT_KINDS = EVAL_KINDS;
 const CARD_EFFECT_FIELDS: Record<string, string[]> = {
   draw: ['amount', 'opponent'], actions: ['amount', 'opponent'], crypto: ['amount', 'opponent'], vp: ['amount', 'opponent'],
   drain: ['amount', 'target', 'opponent'], restore: ['amount', 'target', 'opponent'],
-  moveSelf: [], moveCard: ['opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], modifyPower: ['amount', 'opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], probability: ['amount', 'direction'],
+  moveSelf: [], moveCard: ['opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], modifyPower: ['amount', 'opponent', 'optional', 'boardSide', 'cardPick', 'cardRelation'], probability: ['amount', 'direction', 'flow'],
   destroyCard: ['opponent', 'optional', 'cardRelation'],
   trashSelf: [], recover: [], choice: ['prompt', 'options'], mill: ['amount', 'opponent'],
-  transferPower: ['amount', 'direction'], stealCrypto: ['amount'],
+  transferPower: ['amount', 'direction', 'flow'], stealCrypto: ['amount'], bump: ['amount', 'zone', 'cardPick'],
   handDiscard: ['amount', 'opponent', 'chooser', 'optional', 'min', 'then'],
   handTrash: ['amount', 'opponent', 'chooser', 'optional', 'min', 'then'],
   scry: ['amount', 'optional', 'opponent'], gain: ['amount', 'cardId', 'destination', 'opponent'], selfDestroyBackup: ['opponent'], random: ['options'],
@@ -174,6 +174,8 @@ function effectList(value: unknown, path: string, scope: AuthoredEffect['scope']
     if (item.cardRelation !== undefined && !['previous', 'next'].includes(String(item.cardRelation))) errors.push(`${p}.cardRelation: expected previous or next`);
     if (item.boardHost !== undefined && typeof item.boardHost !== 'boolean') errors.push(`${p}.boardHost: expected boolean`);
     if (item.direction !== undefined && !['choice', 'left', 'right', 'split'].includes(String(item.direction))) errors.push(`${p}.direction: expected choice, left, right or split`);
+    if (item.flow !== undefined && !['either', 'push', 'pull'].includes(String(item.flow))) errors.push(`${p}.flow: expected either, push or pull`);
+    if (item.zone !== undefined && !['bank', 'wallet', 'either'].includes(String(item.zone))) errors.push(`${p}.zone: expected bank, wallet or either`);
     if (kind === 'attachModifier') {
       if (!['doublePrintedEffects', 'powerAuraAtLocation', 'movableEachTurn'].includes(String(item.modifier))) errors.push(`${p}.modifier: expected doublePrintedEffects, powerAuraAtLocation or movableEachTurn`);
       if (item.modifier === 'powerAuraAtLocation' && item.amount === undefined) errors.push(`${p}.amount: required for powerAuraAtLocation`);

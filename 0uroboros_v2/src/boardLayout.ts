@@ -64,6 +64,31 @@ export function warpFarZ(z: number) {
   return -(u + FAR_SHIFT);
 }
 
+/** Authored Server tube centres (±x, ±z) and the Server mounting beds around them. */
+export const AUTHORED_SERVER = { x: 4.6, z: 4.75, bedHalfX: 1.74, bedZ: [4.35, 5.15] } as const;
+/**
+ * Servers move halfway toward the Stats housings; the near pair lifts 16px and the far pair drops 24px
+ * on screen at 1920x1080 (56.5px per world unit of depth).
+ */
+export const SERVER_SHIFT = { x: -.67, near: -16 / 56.5, far: 24 / 56.5 } as const;
+export const SERVER_X = AUTHORED_SERVER.x + SERVER_SHIFT.x;
+/** World z of the near and far Server tube centres. */
+export const SERVER_Z = [boardDepth(AUTHORED_SERVER.z) + SERVER_SHIFT.near, warpFarZ(-AUTHORED_SERVER.z) + SERVER_SHIFT.far] as const;
+/**
+ * Neon only: the near Servers sit out past the deck edge like the far pair. The tubes stand .43 above the glass, which
+ * the camera tilt pushes up the screen, so the near pair moves further out than the far pair to read the same.
+ */
+export const NEON_SERVER_DROP = .5;
+/** Neon only: the far Servers, stats panel and the table edge behind them sit 12px further up the screen. */
+export const NEON_FAR_RAISE = 12 / 56.5;
+export const NEON_SERVER_Z = [SERVER_Z[0] + NEON_SERVER_DROP, SERVER_Z[1] - NEON_FAR_RAISE] as const;
+export const serverZ = (owner: number, neon: boolean) => (neon ? NEON_SERVER_Z : SERVER_Z)[owner === 1 ? 1 : 0];
+
+/** Neon only: lanes, Nodes and their HUD slide toward the player, 8px past the point where the deck margin is equal above and below them (56.5px per world unit along z). */
+export const NEON_FIELD_SHIFT = .14 + 8 / 56.5;
+/** Neon only: the local stats chassis (housing, readout and its HUD) sits 10px nearer the player, clear of the lane. */
+export const NEON_STATS_DROP = 10 / 56.5;
+
 /** Lane engraving panels (shared by the idle engraving and the reward glow): width, and each owner's centre and depth. */
 export const ENGRAVING_W = 2.29 * LANE_SCALE;
 export const ENGRAVING_LANES = [

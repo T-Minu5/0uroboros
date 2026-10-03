@@ -17,7 +17,7 @@ for (const [path, url] of Object.entries(files)) {
  * Cards whose effect clip plays as the local player sets the card down in a lane, rather than when its effects
  * resolve. The opponent's copies play no clip.
  */
-const PLAYS_ON_PLACEMENT = new Set(['rezz-blade'].map(cardNameKey));
+const PLAYS_ON_PLACEMENT = new Set(([] as string[]).map(cardNameKey));
 /** Playback speed and the hold after the landing flip, for clips that play on placement. */
 export const PLACEMENT_CLIP_RATE = 1.5;
 export const PLACEMENT_CLIP_DELAY_MS = 200;

@@ -54,6 +54,20 @@ try {
   await ghost.locator('canvas.cf-art-depth[data-ready]').waitFor({ timeout: 5000 }).catch(() => fail('A card dragged from the hand shows no depth layer'));
   const depthHash = () => ghost.locator('canvas.cf-art-depth').evaluate(canvas => { const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data; let h = 0; for (let i = 0; i < data.length; i += 997) h = (h * 31 + data[i]) >>> 0; return h; });
   const restingDepth = await depthHash();
+  // At rest the depth layer is a pixel-for-pixel stand-in for the flat image: same box, no zoom, same picture.
+  result.handoff = await ghost.evaluate(async element => {
+    const image = element.querySelector('img.cf-art'), canvas = element.querySelector('canvas.cf-art-depth');
+    const a = image.getBoundingClientRect(), b = canvas.getBoundingClientRect();
+    const flat = document.createElement('canvas'); flat.width = canvas.width; flat.height = canvas.height;
+    const ctx = flat.getContext('2d'), scale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+    const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+    ctx.drawImage(image, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    const p = ctx.getImageData(0, 0, flat.width, flat.height).data, q = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let diff = 0, n = 0; for (let i = 0; i < p.length; i += 4 * 53) { diff += Math.abs(p[i] - q[i]) + Math.abs(p[i + 1] - q[i + 1]) + Math.abs(p[i + 2] - q[i + 2]); n += 3; }
+    return { imageTransform: getComputedStyle(image).transform, boxDelta: Math.max(Math.abs(a.width - b.width), Math.abs(a.height - b.height), Math.abs(a.x - b.x), Math.abs(a.y - b.y)), meanDiff: diff / n };
+  });
+  if (result.handoff.imageTransform !== 'none' || result.handoff.boxDelta > 1) fail(`Lifting a card resizes its art: ${JSON.stringify(result.handoff)}`);
+  if (result.handoff.meanDiff > 8) fail(`Resting depth layer does not match the flat image: ${JSON.stringify(result.handoff)}`);
   result.leans = {};
   for (const [name, dx, dy] of [['right', 26, 0], ['left', -26, 0], ['up', 0, -18], ['down', 0, 18]]) {
     const peak = { rx: 0, ry: 0 };

@@ -1,0 +1,784 @@
+{
+  "errors": [],
+  "stats": [
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 92,
+      "fps": 17.8,
+      "frameMs": {
+        "p50": 49.4,
+        "p95": 147.4
+      },
+      "drawCalls": 270,
+      "triangles": 176551,
+      "geometries": 220,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 96,
+      "fps": 18.9,
+      "frameMs": {
+        "p50": 46.8,
+        "p95": 183.5
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 220,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 92,
+      "fps": 18.3,
+      "frameMs": {
+        "p50": 47,
+        "p95": 158.6
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 220,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 98,
+      "fps": 19.2,
+      "frameMs": {
+        "p50": 42.3,
+        "p95": 181.9
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 220,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 95,
+      "fps": 18.9,
+      "frameMs": {
+        "p50": 46.4,
+        "p95": 130.4
+      },
+      "drawCalls": 253,
+      "triangles": 168261,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 96,
+      "fps": 19.1,
+      "frameMs": {
+        "p50": 47.7,
+        "p95": 155.6
+      },
+      "drawCalls": 246,
+      "triangles": 164179,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 101,
+      "fps": 20.2,
+      "frameMs": {
+        "p50": 45,
+        "p95": 106.7
+      },
+      "drawCalls": 247,
+      "triangles": 164191,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 101,
+      "fps": 20.1,
+      "frameMs": {
+        "p50": 45.1,
+        "p95": 103.7
+      },
+      "drawCalls": 246,
+      "triangles": 164179,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "reveal",
+      "frames": 98,
+      "fps": 19.3,
+      "frameMs": {
+        "p50": 43.9,
+        "p95": 195.8
+      },
+      "drawCalls": 246,
+      "triangles": 164179,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 108,
+      "fps": 21.5,
+      "frameMs": {
+        "p50": 46.3,
+        "p95": 73.1
+      },
+      "drawCalls": 240,
+      "triangles": 160139,
+      "geometries": 222,
+      "textures": 54,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "classic",
+      "phase": "runtime",
+      "frames": 121,
+      "fps": 24.1,
+      "frameMs": {
+        "p50": 40.7,
+        "p95": 60.9
+      },
+      "drawCalls": 214,
+      "triangles": 134739,
+      "geometries": 190,
+      "textures": 33,
+      "programs": 57,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 109,
+      "fps": 21.7,
+      "frameMs": {
+        "p50": 45.7,
+        "p95": 64.6
+      },
+      "drawCalls": 240,
+      "triangles": 160139,
+      "geometries": 212,
+      "textures": 34,
+      "programs": 62,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 109,
+      "fps": 21.7,
+      "frameMs": {
+        "p50": 45.7,
+        "p95": 64.6
+      },
+      "drawCalls": 240,
+      "triangles": 160139,
+      "geometries": 212,
+      "textures": 34,
+      "programs": 62,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 108,
+      "fps": 21.5,
+      "frameMs": {
+        "p50": 46.1,
+        "p95": 67.1
+      },
+      "drawCalls": 240,
+      "triangles": 160139,
+      "geometries": 212,
+      "textures": 34,
+      "programs": 62,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 94,
+      "fps": 18.7,
+      "frameMs": {
+        "p50": 45.5,
+        "p95": 160.1
+      },
+      "drawCalls": 261,
+      "triangles": 171345,
+      "geometries": 221,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 94,
+      "fps": 18.8,
+      "frameMs": {
+        "p50": 50.6,
+        "p95": 104.6
+      },
+      "drawCalls": 296,
+      "triangles": 192325,
+      "geometries": 229,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "collapse",
+      "frames": 92,
+      "fps": 18.3,
+      "frameMs": {
+        "p50": 48.3,
+        "p95": 153.9
+      },
+      "drawCalls": 322,
+      "triangles": 211749,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 94,
+      "fps": 18.7,
+      "frameMs": {
+        "p50": 49.5,
+        "p95": 92.4
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 97,
+      "fps": 19.3,
+      "frameMs": {
+        "p50": 47.9,
+        "p95": 84.8
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 99,
+      "fps": 19.7,
+      "frameMs": {
+        "p50": 49.1,
+        "p95": 72.2
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 95,
+      "fps": 18.9,
+      "frameMs": {
+        "p50": 51.1,
+        "p95": 77.1
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 98,
+      "fps": 19.5,
+      "frameMs": {
+        "p50": 49.2,
+        "p95": 78.9
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 99,
+      "fps": 19.7,
+      "frameMs": {
+        "p50": 49.2,
+        "p95": 90.9
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 97,
+      "fps": 19.2,
+      "frameMs": {
+        "p50": 50.3,
+        "p95": 77
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 98,
+      "fps": 19.5,
+      "frameMs": {
+        "p50": 49.7,
+        "p95": 86.2
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "draft",
+      "frames": 99,
+      "fps": 19.7,
+      "frameMs": {
+        "p50": 49.4,
+        "p95": 86.9
+      },
+      "drawCalls": 315,
+      "triangles": 208799,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 104,
+      "fps": 20.6,
+      "frameMs": {
+        "p50": 43.2,
+        "p95": 142.8
+      },
+      "drawCalls": 270,
+      "triangles": 176299,
+      "geometries": 232,
+      "textures": 37,
+      "programs": 64,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 91,
+      "fps": 18.1,
+      "frameMs": {
+        "p50": 44.2,
+        "p95": 134.8
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 232,
+      "textures": 57,
+      "programs": 63,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 93,
+      "fps": 18.5,
+      "frameMs": {
+        "p50": 43.5,
+        "p95": 170.1
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 232,
+      "textures": 58,
+      "programs": 63,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    },
+    {
+      "style": "neon",
+      "phase": "runtime",
+      "frames": 142,
+      "fps": 28,
+      "frameMs": {
+        "p50": 29,
+        "p95": 71.6
+      },
+      "drawCalls": 252,
+      "triangles": 168219,
+      "geometries": 204,
+      "textures": 60,
+      "programs": 74,
+      "viewport": [
+        1600,
+        964
+      ],
+      "pixelRatio": 1
+    }
+  ],
+  "checks": [
+    "Whole-lane hover highlights exactly one Node; Escape cancels",
+    "Deployed through the real UI on turn 1",
+    "Deployed through the real UI on turn 2",
+    "Deployed through the real UI on turn 3",
+    "Classic/Neon preserve identical populated gameplay; Neon shifts the play field down uniformly",
+    "Repeated style switches completed",
+    "Draft purchase completed",
+    "Populated Cycle completed through Collapse and Draft into Cycle 2",
+    "All Real lighting floors and Studio image, video and None backgrounds switch with Neon",
+    "Neon selection persists across reload"
+  ],
+  "events": [
+    {
+      "turn": 1,
+      "kind": "drain"
+    },
+    {
+      "turn": 2,
+      "kind": "drain"
+    },
+    {
+      "turn": 2,
+      "kind": "restore"
+    },
+    {
+      "turn": 3,
+      "kind": "drain"
+    },
+    {
+      "turn": 3,
+      "kind": "collapse"
+    }
+  ],
+  "screenshots": [
+    "docs/evidence/neon-v2-empty.png",
+    "docs/evidence/neon-v2-hover.png",
+    "docs/evidence/neon-v2-drain-turn-1.png",
+    "docs/evidence/neon-v2-drain-turn-2.png",
+    "docs/evidence/neon-v2-restore-turn-2.png",
+    "docs/evidence/neon-v2-populated.png",
+    "docs/evidence/neon-v2-classic-populated.png",
+    "docs/evidence/neon-v2-populated-1366.png",
+    "docs/evidence/neon-v2-populated-1600.png",
+    "docs/evidence/neon-v2-drain-turn-3.png",
+    "docs/evidence/neon-v2-collapse.png",
+    "docs/evidence/neon-v2-draft.png",
+    "docs/evidence/neon-v2-next-cycle.png",
+    "docs/evidence/neon-v2-background-real-back-07.png",
+    "docs/evidence/neon-v2-background-real-back-01.png",
+    "docs/evidence/neon-v2-background-real-back-02.png",
+    "docs/evidence/neon-v2-background-studio-None.png",
+    "docs/evidence/neon-v2-background-studio-background-01.png"
+  ],
+  "populatedState": {
+    "phase": "CYCLE 01 / RUNTIME 3 OF 3",
+    "cards": [
+      {
+        "id": "1:slash",
+        "owner": "1",
+        "node": "0"
+      },
+      {
+        "id": "1:vault-1",
+        "owner": "1",
+        "node": "0"
+      },
+      {
+        "id": "1:vault-2",
+        "owner": "1",
+        "node": "0"
+      },
+      {
+        "id": "0:razor",
+        "owner": "0",
+        "node": "0"
+      },
+      {
+        "id": "0:slash",
+        "owner": "0",
+        "node": "0"
+      },
+      {
+        "id": "1:razor",
+        "owner": "1",
+        "node": "1"
+      },
+      {
+        "id": "0:blade",
+        "owner": "0",
+        "node": "1"
+      },
+      {
+        "id": "0:dash-dot",
+        "owner": "0",
+        "node": "1"
+      },
+      {
+        "id": "0:evaluation-3",
+        "owner": "0",
+        "node": "2"
+      },
+      {
+        "id": "0:vault-2",
+        "owner": "0",
+        "node": "2"
+      },
+      {
+        "id": "1:dash-dot",
+        "owner": "1",
+        "node": "3"
+      },
+      {
+        "id": "0:evaluation-1",
+        "owner": "0",
+        "node": "3"
+      },
+      {
+        "id": "0:dotkrawler",
+        "owner": "0",
+        "node": "3"
+      },
+      {
+        "id": "1:blade",
+        "owner": "1",
+        "node": "4"
+      },
+      {
+        "id": "0:vault-1",
+        "owner": "0",
+        "node": "4"
+      }
+    ],
+    "servers": [
+      [
+        "1-backup",
+        "1,500"
+      ],
+      [
+        "1-primary",
+        "1,950"
+      ],
+      [
+        "0-backup",
+        "1,500"
+      ],
+      [
+        "0-primary",
+        "2,000"
+      ]
+    ],
+    "locations": [
+      {
+        "node": "0",
+        "x": 332.3713073730469,
+        "y": 346.7890930175781
+      },
+      {
+        "node": "1",
+        "x": 525.5952758789062,
+        "y": 346.7890930175781
+      },
+      {
+        "node": "2",
+        "x": 718.8192138671875,
+        "y": 346.7890930175781
+      },
+      {
+        "node": "3",
+        "x": 912.0431518554688,
+        "y": 346.7890930175781
+      },
+      {
+        "node": "4",
+        "x": 1105.26708984375,
+        "y": 346.7890930175781
+      }
+    ]
+  }
+}

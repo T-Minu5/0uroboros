@@ -34,7 +34,28 @@ describe('recipe editor model', () => {
     expect(recipeOperation(legacy, 'card')).toBe('transferPower');
     expect(recipeCount(legacy, 'card')).toBe(3);
     expect(legacy).toEqual({ kind: 'probability', amount: 15 });
-    expect(changeRecipeCount(legacy, 4, 'card')).toEqual({ kind: 'transferPower', amount: 4 });
+    expect(recipeSummary(legacy, 'card', cards)).toBe('Push 3 power to a nearby location.');
+    expect(changeRecipeCount(legacy, 4, 'card')).toEqual({ kind: 'transferPower', amount: 4, flow: 'push' });
+  });
+
+  it('describes Transfer with push and pull wording for every direction', () => {
+    expect(recipeSummary({ kind: 'transferPower', amount: 2 }, 'card', cards)).toBe('Push or pull 2 power to or from nearby locations.');
+    expect(recipeSummary({ kind: 'transferPower', amount: 2, flow: 'push' }, 'card', cards)).toBe('Push 2 power to a nearby location.');
+    expect(recipeSummary({ kind: 'transferPower', amount: 1, direction: 'left', flow: 'pull' }, 'card', cards)).toBe('Pull 1 power from the location on the left.');
+    expect(recipeSummary({ kind: 'transferPower', amount: 3, direction: 'split' }, 'card', cards)).toBe('Push 3 power, split to both nearby locations.');
+    expect(operationChoices('location', cards).some(choice => choice.value === 'transferPower')).toBe(false);
+  });
+
+  it('offers Bump in every scope and always aims it at the other player', () => {
+    for (const scope of ['card', 'location', 'circuit', 'locationPlay'] as const) expect(operationChoices(scope, cards).some(choice => choice.value === 'bump')).toBe(true);
+    const bump = createRecipe('bump', 'card', cards);
+    expect(bump).toEqual({ kind: 'bump', amount: 1, zone: 'bank', cardPick: 'choice' });
+    expect(recipeTarget(bump, 'card')).toBe('opponent-bank');
+    expect(targetChoices(bump, 'card').map(choice => choice.value)).toEqual(['opponent-bank', 'opponent-wallet', 'opponent-either']);
+    expect(targetChoices(bump, 'location')[0].label).toBe("Losing player's Effect Bank");
+    expect(changeRecipeTarget(bump, 'opponent-wallet', 'card')).toEqual({ ...bump, zone: 'wallet' });
+    expect(recipeSummary(bump, 'card', cards)).toBe("Bump a chosen card from the opponent's Effect Bank to their discard pile.");
+    expect(recipeSummary({ ...bump, zone: 'either', cardPick: 'random', amount: 2 }, 'card', cards)).toBe("Bump 2 random cards from the opponent's Effect Bank or Crypto wallet to their discard pile.");
   });
 
   it('preserves optional, follow-up, and nested branch data through unrelated edits', () => {

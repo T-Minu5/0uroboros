@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { writeFileSync } from 'node:fs';
-import { openSettings, closeSettings } from './settings-menu.mjs';
+import { openSettings, closeSettings, chooseLighting } from './settings-menu.mjs';
 
 // Reproducible, live UI evaluation. No authoritative game state is injected.
 const closureOnly = process.argv.includes('--closure');
@@ -29,7 +29,7 @@ const shot = async name => {
 };
 const ready = () => page.waitForFunction(() => !!document.querySelector('.end-turn') && !document.querySelector('.end-turn').disabled);
 async function visuals() {
-  await openSettings(page); await page.getByRole('tab', { name: 'Visuals', exact: true }).click();
+  await openSettings(page); await page.getByRole('tab', { name: 'Board', exact: true }).click();
 }
 async function style(name) {
   await visuals(); await page.getByRole('radiogroup', { name: 'Board style', exact: true }).getByRole('radio', { name, exact: true }).click(); await closeSettings(page);
@@ -145,9 +145,17 @@ try {
       report.populatedState = before;
       await page.waitForTimeout(7000); await shot('populated');
       await style('Classic'); await page.waitForTimeout(7000); await shot('classic-populated');
-      assert.deepEqual(await snapshot(), before);
+      const classic = await snapshot();
+      assert.deepEqual({ ...classic, locations: null }, { ...before, locations: null });
+      // Neon's play field sits lower on its deck: every Node keeps its x and moves down by the same amount.
+      const shift = before.locations[0].y - classic.locations[0].y;
+      assert(shift > 0);
+      classic.locations.forEach((l, i) => {
+        assert.equal(l.node, before.locations[i].node); assert.equal(l.x, before.locations[i].x);
+        assert(Math.abs(before.locations[i].y - l.y - shift) < .5);
+      });
       await style('Neon'); assert.deepEqual(await snapshot(), before);
-      report.checks.push('Classic/Neon preserve identical populated gameplay and HUD anchors');
+      report.checks.push('Classic/Neon preserve identical populated gameplay; Neon shifts the play field down uniformly');
       for (const width of [1366, 1600]) {
         await page.setViewportSize({ width, height: width === 1366 ? 900 : 1000 }); await page.waitForTimeout(700); await shot(`populated-${width}`);
       }
@@ -170,14 +178,19 @@ try {
   await page.waitForFunction(() => document.querySelector('.phase-label')?.textContent?.includes('CYCLE 02'), null, { timeout: 90000 }); await ready();
   await shot('next-cycle');
   report.checks.push('Populated Cycle completed through Collapse and Draft into Cycle 2');
-  await visuals();
-  for (let i = 0; i < 8; i++) {
-    const label = await page.locator('.bg-picker-label').innerText();
-    await closeSettings(page); await page.waitForTimeout(label.includes('background') ? 1500 : 500);
-    if (label === 'None' || label.includes('background')) await shot(`background-${label}`);
-    await visuals(); await page.getByRole('button', { name: 'Next floor background', exact: true }).click();
+  // Real lighting cycles its three lit floors; Studio cycles the video, every image and None.
+  for (const [mode, count] of [['Real lighting', 3], ['Studio', 10]]) {
+    await chooseLighting(page, mode); await visuals();
+    for (let i = 0; i < count; i++) {
+      const label = await page.locator('.bg-picker-label').innerText();
+      await closeSettings(page); await page.waitForTimeout(mode === 'Real lighting' || label.includes('background') ? 1500 : 500);
+      if (mode === 'Real lighting' || label === 'None' || label.includes('background')) await shot(`background-${mode === 'Studio' ? 'studio' : 'real'}-${label}`);
+      await visuals(); await page.getByRole('button', { name: 'Next floor background', exact: true }).click();
+    }
+    await closeSettings(page);
   }
-  await closeSettings(page); report.checks.push('All image, video and None backgrounds switch with Neon');
+  await chooseLighting(page, 'Real lighting');
+  report.checks.push('All Real lighting floors and Studio image, video and None backgrounds switch with Neon');
   assert.equal(await page.evaluate(() => localStorage.getItem('ouroboros.boardStyle')), 'neon');
   await page.reload(); await page.getByRole('button', { name: 'Enter evaluation build' }).waitFor();
   assert.equal(await page.locator('.board-canvas').getAttribute('data-board-style'), 'neon');

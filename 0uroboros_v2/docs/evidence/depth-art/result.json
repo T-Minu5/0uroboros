@@ -8,21 +8,26 @@
     "/assets/card_art/depth/617caf0f844814705cce-v2.color.webp",
     "/assets/card_art/depth/2e85b7787a7f69e2d0f3-v2.color.webp"
   ],
+  "handoff": {
+    "imageTransform": "none",
+    "boxDelta": 0,
+    "meanDiff": 4.085925925925926
+  },
   "leans": {
     "right": {
-      "rx": 0.28,
-      "ry": 18.47
+      "rx": 0.11,
+      "ry": 15.61
     },
     "left": {
       "rx": 0,
-      "ry": -19.95
+      "ry": -20.47
     },
     "up": {
-      "rx": 22.79,
+      "rx": 14.36,
       "ry": -0.16
     },
     "down": {
-      "rx": -23.55,
+      "rx": -13.46,
       "ry": 0
     }
   },

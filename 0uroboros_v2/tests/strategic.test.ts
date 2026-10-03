@@ -110,15 +110,15 @@ describe("Strategic card systems", () => {
     drain(session); expect(session.state.phase).toBe("runtime"); expect(session.state.turn).toBe(2);
   });
 
-  it("transfers only own available Power to a linear neighbor and preserves modifier sum", () => {
+  it("legacy probability pushes its full amount to a linear neighbor and preserves modifier sum", () => {
     const session = make(); empty(session); session.state.nodeOrder=[0,1,2,3,4];
     session.state.players[0].hand = [{...card("Signal Surveyor", "telemetry"), power:2, onReveal:[{kind:"probability",amount:15}]}];
     session.deploy("telemetry", 2); session.endTurn();drain(session,false);
-    expect(session.state.choice?.options.map(option=>option.id)).toEqual(["power-2-1","power-2-3"]);
-    const event=session.choose("power-2-3");
-    expect(event).toMatchObject({kind:"power",amount:2,sourceNode:2,targetNode:3});
-    expect(session.state.nodes[2].powers[0]).toBe(0);
-    expect(session.state.nodes[3].powers[0]).toBe(2);
+    expect(session.state.choice?.options.map(option=>option.id)).toEqual(["push-left","push-right"]);
+    const event=session.choose("push-right");
+    expect(event).toMatchObject({kind:"power",amount:3,sourceNode:2,targetNode:3});
+    expect(session.state.nodes[2].powers[0]).toBe(-1);
+    expect(session.state.nodes[3].powers[0]).toBe(3);
     expect(session.state.nodes.reduce((sum,node)=>sum+node.powerModifiers[0],0)).toBe(0);
     expect(session.state.nodes.every(node=>node.powerModifiers[1]===0)).toBe(true);
     drain(session);

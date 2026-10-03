@@ -174,6 +174,89 @@ it('shift still prompts for a direction when the author left it to the player',(
  expect(s.state.choice?.options.length).toBeGreaterThan(1);
 });
 
+it('a player-choice transfer offers push and pull on both sides with the diamond layout',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice'});
+ expect(s.state.choice?.prompt).toBe('Push or pull 2 power to or from nearby locations.');
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['push-left','push-right','pull-left','pull-right']);
+ expect(s.state.choice?.transfer).toMatchObject({amount:2,center:2,nodes:[{node:1,power:0},{node:2,power:6},{node:3,power:0}]});
+});
+
+it('pulling draws Power in from a neighbour, which may go negative',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice'});
+ const event=s.choose('pull-left');
+ expect(event).toMatchObject({kind:'power',sourceNode:1,targetNode:2,amount:2});
+ expect(s.state.nodes[1].powers[0]).toBe(-2);
+ expect(s.state.nodes[2].powers[0]).toBe(8);
+});
+
+it('pushing is not capped by the Power on the source Location',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:9,direction:'right'});
+ expect(s.state.nodes[2].powers[0]).toBe(-3);
+ expect(s.state.nodes[3].powers[0]).toBe(9);
+});
+
+it('push-only and pull-only player choices offer just that verb',()=>{
+ const push=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice',flow:'push'}).s;
+ expect(push.state.choice?.prompt).toBe('Push 2 power to a nearby location.');
+ expect(push.state.choice?.options.map(o=>o.id)).toEqual(['push-left','push-right']);
+ const pull=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice',flow:'pull'}).s;
+ expect(pull.state.choice?.options.map(o=>o.id)).toEqual(['pull-left','pull-right']);
+});
+
+it('an automatic one-sided pull resolves without prompting',()=>{
+ const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'right',flow:'pull'});
+ expect(s.state.choice).toBeFalsy();
+ expect(s.state.nodes[3].powers[0]).toBe(-2);
+ expect(s.state.nodes[2].powers[0]).toBe(8);
+});
+
+it('a split at the edge sends the whole amount to the only neighbour',()=>{
+ const {s}=shiftFrom(0,{kind:'transferPower',amount:3,direction:'split'});
+ expect(s.state.nodes[1].powers[0]).toBe(3);
+ expect(s.state.nodes[0].powers[0]).toBe(3);
+});
+
+const banked=(...ids:string[])=>ids.map((id,order)=>({card:card(id,[],{duration:5}),enteredCycle:1,order}));
+
+it('a random bump moves an opponent Effect Bank card to their discard pile',()=>{
+ const s=make();s.state.players[1].bank=banked('bank-a','bank-b');
+ const events=play(s,card('bumper',[{kind:'bump',amount:1,zone:'bank',cardPick:'random'}]));
+ expect(s.state.choice).toBeFalsy();
+ expect(s.state.players[1].bank).toHaveLength(1);
+ expect(s.state.players[1].discard).toHaveLength(1);
+ expect(events.find(e=>e.text.includes('bumps'))).toMatchObject({kind:'trash',target:'discard',targetOwner:1,amount:1});
+});
+
+it('a chosen bump lets the player pick from the opponent Crypto wallet',()=>{
+ const s=make();
+ s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('not-crypto')];
+ s.state.players[1].bank=banked('bank-a');
+ play(s,card('bumper',[{kind:'bump',amount:1,zone:'wallet',cardPick:'choice'}]));
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['coin-a','coin-b']);
+ expect(s.state.choice?.options[0].card?.id).toBe('coin-a');
+ s.choose('coin-b');
+ expect(s.state.players[1].hand.filter(c=>c.type==='Crypto').map(c=>c.id)).toEqual(['coin-a']);
+ expect(s.state.players[1].discard.map(c=>c.id)).toEqual(['coin-b']);
+ expect(s.state.players[1].bank).toHaveLength(1);
+});
+
+it('a bump from either zone offers bank and wallet cards together',()=>{
+ const s=make();
+ s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1})];
+ s.state.players[1].bank=banked('bank-a');
+ play(s,card('bumper',[{kind:'bump',amount:2,zone:'either'}]));
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['bank-a','coin-a']);
+ s.choose(['bank-a','coin-a']);
+ expect(s.state.players[1].discard.map(c=>c.id).sort()).toEqual(['bank-a','coin-a']);
+});
+
+it('a bump with nothing to hit reports no target',()=>{
+ const s=make();
+ const events=play(s,card('bumper',[{kind:'bump',amount:1,zone:'either',cardPick:'random'}]));
+ expect(events.some(e=>e.text==='bumper: No target.'||e.text.endsWith(': No target.'))).toBe(true);
+ expect(s.state.players[1].discard).toHaveLength(0);
+});
+
 it('stealing Crypto moves cards from the opponent wallet into your hand',()=>{
  const s=make();
  s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('coin-c',[],{type:'Crypto',cryptoValue:3})];

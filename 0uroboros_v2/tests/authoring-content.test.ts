@@ -118,6 +118,15 @@ describe('authored content', () => {
     expect(validateContent(invalid)).toEqual(expect.arrayContaining([expect.stringContaining('expected sequential or random')]));
   });
 
+  it('accepts Transfer flow and Bump zones and rejects unknown values', () => {
+    const document = createDefaultContent();
+    document.effects[0].effects = [{ kind: 'transferPower', amount: 2, direction: 'split', flow: 'pull' }, { kind: 'bump', amount: 1, zone: 'wallet', cardPick: 'random' }];
+    expect(validateContent(document)).toEqual([]);
+    const invalid = JSON.parse(JSON.stringify(document));
+    invalid.effects[0].effects = [{ kind: 'transferPower', amount: 2, flow: 'sideways' }, { kind: 'bump', amount: 1, zone: 'deck' }];
+    expect(validateContent(invalid)).toEqual(expect.arrayContaining([expect.stringContaining('expected either, push or pull'), expect.stringContaining('expected bank, wallet or either')]));
+  });
+
   it('rejects unsupported gain counts and recurring references without a Runtime duration', () => {
     const document = createDefaultContent();
     document.cards.find(card => card.definitionId === 'eval-relocation-relay')!.onReveal = [{kind:'gain',cardId:'byte-coin',amount:101}];

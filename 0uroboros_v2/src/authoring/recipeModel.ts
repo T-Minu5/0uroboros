@@ -1,6 +1,7 @@
 import type { Card } from '../game';
 import type { AuthoredCard } from './contentModel';
 import { locationTriggerPrefix } from '../locationTriggers';
+import { transferFlow, transferText, type TransferDirection, type TransferFlow } from '../transferText';
 
 export type RecipeScope = 'card' | 'location' | 'circuit' | 'locationPlay';
 export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
@@ -27,13 +28,24 @@ export type Recipe = {
   boardHost?: boolean;
   modifier?: ModifierKind;
   rank?: 'weakest' | 'strongest' | 'first';
-  direction?: 'choice' | 'left' | 'right' | 'split';
+  direction?: TransferDirection;
+  flow?: TransferFlow;
+  zone?: 'bank' | 'wallet' | 'either';
 };
 export const shiftDirections: Choice[] = [
-  { value: 'choice', label: 'Your choice' },
-  { value: 'left', label: 'Left' },
-  { value: 'right', label: 'Right' },
-  { value: 'split', label: 'Left + right' },
+  { value: 'choice', label: 'Player chooses a side' },
+  { value: 'left', label: 'Left only' },
+  { value: 'right', label: 'Right only' },
+  { value: 'split', label: 'Both sides (split)' },
+];
+export const transferFlows: Choice[] = [
+  { value: 'either', label: 'Push or pull (player chooses)' },
+  { value: 'push', label: 'Push only' },
+  { value: 'pull', label: 'Pull only' },
+];
+export const bumpPicks: Choice[] = [
+  { value: 'choice', label: 'Player chooses' },
+  { value: 'random', label: 'At random' },
 ];
 export type CatalogCard = Card | AuthoredCard;
 export type Choice = { value: string; label: string };
@@ -44,6 +56,7 @@ const sharedOperations: Choice[] = [
   { value: 'actions', label: 'Gain Action' },
   { value: 'crypto', label: 'Gain Crypto' },
   { value: 'stealCrypto', label: 'Steal Crypto' },
+  { value: 'bump', label: 'Bump Card' },
   { value: 'vp', label: 'Gain Victory Point' },
   { value: 'gain', label: 'Gain Card' },
   { value: 'move', label: 'Move' },
@@ -149,11 +162,12 @@ export function recipeCountEditable(recipe: Recipe, scope: RecipeScope): boolean
 export function recipeCountMinimum(recipe: Recipe, scope: RecipeScope): number {
   const operation = recipeOperation(recipe, scope);
   if (operation === 'vp') return -1_000_000;
-  return operation === 'gainPower' || operation === 'drainPower' || isRankedRemoval(recipe) || operation === 'boostPowerAtLocation' || (operation === 'attachModifier' && recipe.modifier === 'powerAuraAtLocation') ? 1 : 0;
+  return operation === 'bump' || operation === 'gainPower' || operation === 'drainPower' || isRankedRemoval(recipe) || operation === 'boostPowerAtLocation' || (operation === 'attachModifier' && recipe.modifier === 'powerAuraAtLocation') ? 1 : 0;
 }
 
 export function recipeCountMaximum(recipe: Recipe, scope: RecipeScope): number {
   const operation = recipeOperation(recipe, scope);
+  if (operation === 'bump') return 10;
   return operation === 'gain' ? 100 : operation === 'gainPower' || operation === 'drainPower' || operation === 'attachModifier' ? 1000 : 1_000_000;
 }
 
@@ -183,6 +197,7 @@ export function recipeTarget(recipe: Recipe, scope: RecipeScope): string {
     case 'actions': return `${actor}-actions`;
     case 'crypto': return `${actor}-wallet`;
     case 'stealCrypto': return 'opponent-wallet';
+    case 'bump': return `${actorLabel(scope, true).prefix}-${recipe.zone ?? 'either'}`;
     case 'vp': return `${actor}-vp`;
     case 'gain': return `${actor}-${recipe.destination ?? 'top'}`;
     case 'move': {
@@ -242,9 +257,21 @@ function attachModifierTargetChoices(selfLabel: string, opponentLabel: string, d
   ];
 }
 
+/** Bump always hits the other player; only the zone varies. */
+function bumpTargetChoices(scope: RecipeScope): Choice[] {
+  const prefix = actorLabel(scope, true).prefix;
+  const whose = scope === 'card' ? "Opponent's" : scope === 'location' ? "Losing player's" : "Other player's";
+  return [
+    { value: `${prefix}-bank`, label: `${whose} Effect Bank` },
+    { value: `${prefix}-wallet`, label: `${whose} Crypto wallet` },
+    { value: `${prefix}-either`, label: `${whose} Effect Bank or Crypto wallet` },
+  ];
+}
+
 export function targetChoices(recipe: Recipe, scope: RecipeScope): Choice[] {
   if (isRankedRemoval(recipe)) return rankChoices;
   const op = recipeOperation(recipe, scope);
+  if (op === 'bump') return bumpTargetChoices(scope);
   if (scope === 'locationPlay') {
     switch (op) {
       case 'draw': case 'handDiscard': case 'handTrash':
@@ -472,6 +499,7 @@ export function createRecipe(operation: string, scope: RecipeScope, cards: reado
     case 'gainPower': return { kind: 'modifyPower', amount: 1, ...(locationBoard ? { boardSide: 'either' as const, cardPick: 'random' as const } : {}) };
     case 'drainPower': return { kind: 'modifyPower', amount: -1, ...(locationBoard ? { boardSide: 'either' as const, cardPick: 'random' as const } : {}) };
     case 'transferPower': return { kind: 'transferPower', amount: 1 };
+    case 'bump': return { kind: 'bump', amount: 1, zone: 'bank', cardPick: 'choice' };
     case 'destroyCard': return locationBoard ? { kind: 'destroyAtLocation', rank: 'weakest', amount: 1, boardSide: 'either' } : { kind: 'destroyCard', opponent: true };
     case 'trashAtLocation': return { kind: 'trashAtLocation', rank: 'weakest', amount: 1, boardSide: 'either' };
     case 'trashSelf': case 'recover': case 'selfDestroyBackup': return { kind: operation };
@@ -504,7 +532,7 @@ export function changeRecipeCount(recipe: Recipe, count: number, scope: RecipeSc
   const minimum = recipeCountMinimum(recipe, scope);
   const maximum = recipeCountMaximum(recipe, scope);
   const amount = Math.min(maximum, Math.max(minimum, recipeOperation(recipe, scope) === 'transferPower' ? count : Math.trunc(count)));
-  if (recipe.kind === 'probability') return { ...recipe, kind: 'transferPower', amount };
+  if (recipe.kind === 'probability') return { ...recipe, kind: 'transferPower', amount, flow: transferFlow(recipe) };
   if (recipeOperation(recipe, scope) === 'drainPower') return { ...recipe, amount: -amount };
   if (recipe.kind === 'handDiscard' || recipe.kind === 'handTrash') return { ...recipe, amount, ...(recipe.min !== undefined && recipe.min > amount ? { min: amount } : {}) };
   return { ...recipe, amount };
@@ -558,6 +586,7 @@ export function changeRecipeTarget(recipe: Recipe, value: string, scope: RecipeS
     case 'boostPowerAtLocation':
       if (boardSides.has(value)) return { ...recipe, boardSide: value as Recipe['boardSide'] };
       return recipe;
+    case 'bump': return { ...recipe, zone: value.slice(value.lastIndexOf('-') + 1) as Recipe['zone'] };
     case 'drain': case 'restore': {
       const server = value.endsWith('automatic') ? undefined : value.endsWith('primary') ? 'primary' : 'backup';
       return { ...recipe, opponent: isOpponentTarget(value), target: server };
@@ -584,6 +613,7 @@ export function changeRecipeTarget(recipe: Recipe, value: string, scope: RecipeS
 }
 
 const plural = (count: number, noun: string) => `${count} ${noun}${count === 1 ? '' : 's'}`;
+const bumpZone = (zone: Recipe['zone']) => zone === 'bank' ? 'Effect Bank' : zone === 'wallet' ? 'Crypto wallet' : 'Effect Bank or Crypto wallet';
 
 function boardSidePhrase(side: Recipe['boardSide'] | undefined, scope: RecipeScope): string {
   switch (side) {
@@ -683,13 +713,14 @@ export function recipeSummary(recipe: Recipe, scope: RecipeScope, cards: readonl
         return `Remove ${count} Power from ${opp ? `an opponent ${relation}` : `your ${relation}`} card.`;
       }
     }
-    case 'transferPower': {
-      if (recipe.direction === 'left' || recipe.direction === 'right') return `Shift ${count} of your Power to the Node on the ${recipe.direction}.`;
-      if (recipe.direction === 'split') return `Split ${count} of your Power between the Nodes either side.`;
-      return `Transfer up to ${count} of your Power between neighboring Nodes.`;
-    }
+    case 'transferPower': return `${transferText(count, recipe.direction, transferFlow(recipe))}.`;
     // Always taken from the card owner's opponent; the engine has no other direction for it.
     case 'stealCrypto': return `Steal ${plural(count, 'random Crypto card')} from the opponent's wallet.`;
+    case 'bump': {
+      const owner = scope === 'card' ? "the opponent's" : scope === 'location' ? "the losing player's" : "the other player's";
+      const picked = recipe.cardPick === 'random' ? 'random ' : 'chosen ';
+      return `Bump ${count === 1 ? `a ${picked}card` : `${count} ${picked}cards`} from ${owner} ${bumpZone(recipe.zone)} to their discard pile.`;
+    }
     case 'drain': return `Drain ${count} from ${whose} ${recipe.target ?? 'available'} Server.`;
     case 'restore': return `Restore ${count} to ${whose} ${recipe.target ?? 'available'} Server.`;
     case 'handDiscard': return `Discard up to ${plural(count, 'card')} from ${whose} hand.`;
@@ -761,8 +792,9 @@ function printedRecipeText(recipe: Recipe): string | null {
     case 'vp': return `${signed(amount, `Victory Point${Math.abs(amount) === 1 ? '' : 's'}`)}${recipientSuffix(recipe, amount)}`;
     case 'drain': return `-${count} ${sentenceCase(`enemy ${serverNoun(recipe.target)}`)}`;
     case 'restore': return `Restore ${serverNoun(recipe.target)} +${count}`;
-    case 'transferPower': return `Shift ${count} power (${shiftDirections.find(entry => entry.value === (recipe.direction ?? 'choice'))!.label.toLowerCase()})`;
+    case 'transferPower': return transferText(count, recipe.direction, transferFlow(recipe));
     case 'stealCrypto': return `Steal ${count === 1 ? 'a Crypto card' : `${count} Crypto cards`} from enemy wallet`;
+    case 'bump': return `Bump ${count === 1 ? `a ${recipe.cardPick === 'random' ? 'random ' : ''}card` : `${count} ${recipe.cardPick === 'random' ? 'random ' : ''}cards`} from enemy ${bumpZone(recipe.zone)} to discard`;
     // Card-scope mill always empties the opponent's deck, so the printed side is fixed.
     case 'mill': return `Mill ${plural(count, 'card')} from enemy deck`;
     case 'gainPower': return `${signed(count, 'Power')} to ${cardTargetPhrase(recipe)}`;

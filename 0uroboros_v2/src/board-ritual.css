@@ -11,4 +11,13 @@
 .board-canvas .field-card.active-source {filter:brightness(1.18) drop-shadow(0 0 7px #87caff);}
 /* A field card is too small to read its effect clip in place, so it lifts above its neighbours while the clip runs. */
 .board-canvas .field-card:has(> .cf-card--fx) {position:relative;z-index:6;scale:1.8;filter:drop-shadow(0 6px 14px #00000080);}
+.board-canvas .field-card.active-source {position:relative;z-index:6;}
+/* A resolving card rises above the rest of the UI: the HUD layer stops stacking on its own so the card's anchor can
+   pass the hand, wallet, header and effect paths, while every other anchor holds the HUD layer's usual place above
+   the board canvas and below that UI. Modal dialogs (80) stay above the card. */
+.board-hud-portal:has(.field-card.active-source, .cf-card--fx) {z-index:auto;}
+.board-hud-portal:has(.field-card.active-source, .cf-card--fx) > div {z-index:3 !important;}
+.board-hud-portal > div:has(.field-card.active-source, .cf-card--fx) {z-index:79 !important;}
+/* Neon closing: cards darken as they shrink into the lane (LaneTurnover drives --sink on the grid). */
+.board-canvas[data-board-style=neon] .deployment-grid .field-card::after {content:'';position:absolute;inset:0;z-index:8;border-radius:inherit;background:#000;opacity:var(--sink,0);pointer-events:none;}
 @media (prefers-reduced-motion:reduce){.board-canvas .field-card{transition:none;}.board-canvas .field-card:has(> .cf-card--fx){scale:1.4;}}

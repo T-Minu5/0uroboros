@@ -62,13 +62,13 @@ async function waitForSample(page, predicate, label, timeout = 12000) {
   return value;
 }
 
-async function openVisuals(page) {
+async function openBoardTab(page) {
   await openSettings(page);
-  await page.getByRole('tab', { name: 'Visuals', exact: true }).click();
+  await page.getByRole('tab', { name: 'Board', exact: true }).click();
 }
 
 async function chooseStyle(page, name) {
-  await openVisuals(page);
+  await openBoardTab(page);
   await page.getByRole('radiogroup', { name: 'Board style' }).getByRole('radio', { name, exact: true }).click();
   await closeSettings(page);
   await page.waitForTimeout(600);
@@ -76,8 +76,8 @@ async function chooseStyle(page, name) {
 }
 
 async function chooseBackground(page, label) {
-  for (let i = 0; i < 8; i++) {
-    await openVisuals(page);
+  for (let i = 0; i < 14; i++) {
+    await openBoardTab(page);
     const current = (await page.locator('.bg-picker-label').innerText()).trim();
     if (current === label) { await closeSettings(page); return; }
     await page.getByRole('button', { name: 'Next floor background', exact: true }).click();
@@ -98,7 +98,8 @@ async function fieldState(page) {
 let page;
 try {
   const context = await browser.newContext({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: 1 });
-  await context.addInitScript(() => localStorage.setItem('ouroboros.boardStyle', 'neon'));
+  // The image, video and None floors this checks are the Studio lighting list.
+  await context.addInitScript(() => { localStorage.setItem('ouroboros.boardStyle', 'neon'); localStorage.setItem('ouroboros.lightingMode', 'studio'); });
   page = await context.newPage();
   watchErrors(page);
   await page.goto(URL);

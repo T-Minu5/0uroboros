@@ -1,0 +1,28 @@
+.choice-dialog.has-transfer{width:auto;min-width:480px;max-height:min(520px,80vh)}
+.choice-dialog.has-transfer h2{font-size:15px;line-height:1.35}
+.transfer-stage{width:432px;margin:10px auto 6px;display:flex;flex-direction:column;align-items:center}
+.transfer-row{width:432px;display:grid;grid-template-columns:repeat(3,144px);justify-items:center;align-items:center}
+.transfer-push-row,.transfer-pull-row{min-height:40px}
+.transfer-arcs{display:block;overflow:visible}
+.transfer-arcs path{fill:none;stroke:#52eaff66;stroke-width:2;stroke-linecap:round;transition:stroke .15s,stroke-width .15s}
+.transfer-arcs marker path{fill:#52eaff;stroke:none}
+.transfer-arcs path.is-active{stroke:#52eaff;stroke-width:3}
+.transfer-pull-arcs path{stroke-dasharray:6 5}
+.transfer-pull-arcs path.is-active{stroke-dasharray:none}
+.choice-dialog .transfer-action{min-width:104px;min-height:34px;padding:7px 14px;border:1px solid #27e2ff88;border-radius:6px;background:#0f2a36;color:#dff9ff;font:600 12px Orbitron,Inter,sans-serif;letter-spacing:.5px}
+.choice-dialog .transfer-action:hover:not(:disabled),.choice-dialog .transfer-action:focus-visible{border-color:#52eaff;background:#17485a;color:#fff}
+.choice-dialog .transfer-pull{border-style:dashed}
+.transfer-diamonds{min-height:118px;align-items:start}
+.transfer-node{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;width:136px;text-align:center}
+.transfer-node.is-empty{visibility:hidden}
+.transfer-diamond{display:grid;place-items:center;width:52px;height:52px;margin:9px 0 6px;transform:rotate(45deg);border:2px solid #27e2ffaa;border-radius:6px;background:#0b1d27;box-shadow:0 4px 12px #0009;transition:border-color .15s,background .15s}
+.transfer-diamond b{transform:rotate(-45deg);font:600 19px Orbitron,Inter,sans-serif;color:#dff9ff}
+.is-center .transfer-diamond{border-color:#52eaff;background:#123342}
+.transfer-diamond.is-gaining{border-color:#1fffb1;background:#0d2b24}
+.transfer-diamond.is-losing{border-color:#ff7a95;background:#2b1219}
+.transfer-delta{position:absolute;top:0;right:22px;font:700 11px Orbitron,Inter,sans-serif;font-style:normal;color:#1fffb1}
+.transfer-diamond.is-losing+.transfer-delta{color:#ff7a95}
+.transfer-node small{max-width:136px;overflow:hidden;font-size:11px;line-height:1.3;color:#d5d9e6;text-overflow:ellipsis;white-space:nowrap}
+.transfer-node i{font-size:10px;font-style:normal;color:#8fd9e8}
+@media (prefers-reduced-motion:reduce){.transfer-arcs path,.transfer-diamond{transition:none}}
+@media (max-width:520px){.choice-dialog.has-transfer{min-width:0}.transfer-stage{transform:scale(.82);transform-origin:top center;margin-bottom:-40px}}

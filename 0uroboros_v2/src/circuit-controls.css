@@ -7,11 +7,11 @@
 .world-anchor .duration.live-bank {
  position:relative; inset:auto; width:228px; height:65px; padding:0; display:block; text-align:center;
 }
-/* Title and count share one line under both banks' bays. */
-.world-anchor .duration.live-bank>small,
-.world-anchor .duration.live-bank>span { position:absolute; margin:0; transform:none; white-space:nowrap; }
-.world-anchor .duration.live-bank>small { left:0; font:600 7px/11px Orbitron,sans-serif; letter-spacing:.5px; }
-.world-anchor .duration.live-bank>span { right:0; font:6.5px/11px Inter,sans-serif; color:#92adbd; }
+/* Bank titles sit on their own backing strip, beside the bays. */
+.world-anchor .duration.live-bank>small {
+ position:absolute; left:0; margin:0; transform:none; white-space:nowrap; font:600 7px/11px Orbitron,sans-serif; letter-spacing:.5px;
+ padding:1px 4px; border-radius:2px; background:#101321a6;
+}
 .world-anchor .duration.live-bank>div {
  width:100%; height:65px; margin:0; display:flex; justify-content:center; align-items:center; gap:7px;
 }
@@ -24,6 +24,11 @@
  box-shadow:0 4px 10px #0009;
 }
 .world-anchor .duration.far.live-bank .bank-slot { filter:saturate(.92); }
+/* Empty bays: the Undo button's dark blue at 80%, inset so the bay's glowing rim stays clear, and sunk by an inner shadow. */
+.world-anchor .duration.live-bank i.bank-slot::before {
+ content:''; position:absolute; inset:3px; border-radius:2px; background:#0b1e45cc; pointer-events:none;
+ box-shadow:inset 0 3px 7px #000000d9, inset 0 0 3px #000000b3;
+}
 .world-anchor .bank-slot > .cf-card { width:100%; height:100%; }
 /* Entry: the card rises into its slot shrunk and masked to it, stops, then is pulled out to full bleed. */
 .world-anchor .bank-slot.bank-arriving { animation:bank-mask var(--bank-slide) step-end var(--bank-delay) both; }
@@ -67,16 +72,18 @@
  .world-anchor .bank-slot.bank-arriving,.world-anchor .bank-slot.bank-arriving > .cf-card { animation:none; }
  .world-anchor .bank-slot > .bank-sweep::before { animation:none; }
 }
-/* Bank labels line up with the outer slots rather than the wider dock. */
-.bank-dock { --bank-inset:calc((228px - 4 * 45.4px - 3 * 7px) / 2); }
-.world-anchor .duration.live-bank.near>small,.world-anchor .duration.live-bank.far>small,
-.world-anchor .duration.live-bank.near>span,.world-anchor .duration.live-bank.far>span { top:calc(100% + 12px); bottom:auto; transform:none; }
-.world-anchor .duration.live-bank.near>small,.world-anchor .duration.live-bank.far>small { left:var(--bank-inset); }
-.world-anchor .duration.live-bank.near>span,.world-anchor .duration.live-bank.far>span { right:var(--bank-inset); }
-/* Draw, hand and discard counts: 8px left of the bank title, 24px under its line (bays 65 + gap 12 + line 11). */
-.world-anchor .bank-dock>.pile-row { position:absolute; left:calc(var(--bank-inset) - 8px); top:calc(65px + 12px + 11px + 24px); display:flex; gap:6px; padding:0 4px; border-radius:2px; background:#101321a6; }
-/* The opponent's row rides 12px higher in all: 6px with its bank, 6px of its own. */
-.world-anchor .bank-dock.far>.pile-row { top:calc(65px + 12px + 11px + 24px - 6px); }
+/* Bank labels line up with the outer slots rather than the wider dock: the opponent's under its bays, yours above. */
+.bank-dock,.undo-dock { --bank-inset:calc((228px - 4 * 45.4px - 3 * 7px) / 2); }
+/* The Undo button shares the bank's anchor and dock width, so its left edge lines up with the bays'. */
+.world-anchor .undo-dock { display:flex; width:228px; padding-left:var(--bank-inset); pointer-events:none; }
+.world-anchor .undo-dock>.undo-planning { pointer-events:auto; }
+.world-anchor .duration.live-bank.near>small,.world-anchor .duration.live-bank.far>small { left:calc(var(--bank-inset) - 4px); transform:none; }
+.world-anchor .duration.live-bank.far>small { top:calc(100% + 11px); bottom:auto; }
+.world-anchor .duration.live-bank.near>small { top:auto; bottom:calc(100% + 8px); }
+/* Draw, hand and discard counts, 8px left of the outer slot. Yours take the title's old place under your bays. */
+.world-anchor .bank-dock>.pile-row { position:absolute; left:calc(var(--bank-inset) - 8px); top:calc(65px + 7px); display:flex; gap:6px; padding:0 4px; border-radius:2px; background:#101321a6; }
+/* The opponent's row sits 18px under its title (bays 65 + gap 12 + line 11). */
+.world-anchor .bank-dock.far>.pile-row { top:calc(65px + 12px + 11px + 18px); }
 .world-anchor .bank-dock .pile,
 .world-anchor .bank-dock .pile:hover:not(:disabled) { position:relative; display:flex; align-items:center; width:auto; height:22px; margin:0; padding:0 5px; gap:5px; border:0; border-radius:0; background:none; box-shadow:none; }
 .world-anchor .bank-dock .pile::after {
@@ -98,17 +105,45 @@
 .world-anchor .resources .stat-pending { transition:opacity .3s ease-out; }
 .world-anchor .resources:hover .stat-pending,
 .world-anchor .resources[data-labels-open] .stat-pending { opacity:0; }
-/* Reveal priority: the dot and label light green while the local player holds priority, and sit dark otherwise. */
-.world-anchor .local-console>.reveal-priority { display:flex; align-items:center; justify-content:center; gap:5px; color:#5b6474; transition:color .2s; }
-.world-anchor .local-console>.reveal-priority>i { width:5px; height:5px; border-radius:50%; background:#343b48; transition:background-color .2s,box-shadow .2s; }
-.world-anchor .local-console>.reveal-priority.active { color:var(--green,#1fffb1); }
-.world-anchor .local-console>.reveal-priority.active>i { background:var(--green,#1fffb1); box-shadow:0 0 6px #1fffb1aa; }
-/* One backing strip behind the bank title and count, spanning the outer slots. */
-.world-anchor .duration.live-bank::after {
- content:''; position:absolute; z-index:-1; top:calc(100% + 11px); left:calc(var(--bank-inset) - 4px); right:calc(var(--bank-inset) - 4px);
- height:11px; padding:1px 0; border-radius:2px; background:#101321a6; pointer-events:none;
+/* Reveal priority: the dot and label light in the owner's colour on whichever panel holds priority, and sit dark otherwise. */
+.world-anchor :is(.local-console,.opponent-console)>.reveal-priority { display:flex; align-items:center; justify-content:center; gap:5px; color:#5b6474; transition:color .2s; }
+.world-anchor :is(.local-console,.opponent-console)>.reveal-priority>i { width:5px; height:5px; border-radius:50%; background:#343b48; transition:background-color .2s,box-shadow .2s; }
+.world-anchor :is(.local-console,.opponent-console)>.reveal-priority.active { color:var(--console-accent,#1fffb1); }
+.world-anchor :is(.local-console,.opponent-console)>.reveal-priority.active>i { background:var(--console-accent,#1fffb1); box-shadow:0 0 6px color-mix(in srgb,var(--console-accent,#1fffb1) 67%,transparent); }
+/* Neon: the local stats panel takes a footed, chamfered plate. Its stats sit centred on the near neon line, which
+   threads through it level with the Server tubes, entering and leaving by 3D end caps at either side (NeonServerBases). */
+.board-canvas[data-board-style=neon] .world-anchor .local-console {
+ position:relative; left:auto; isolation:isolate; width:211px; height:88px; translate:0 31.5px;
+ justify-content:flex-start; padding:13px 24px 0; background:none; border-radius:0;
 }
-.turn-dock > .undo-planning {
+/* The opponent's panel takes the same plate and spacing, feet down like yours, with its stats centred on the far neon line. */
+.board-canvas[data-board-style=neon] .world-anchor .opponent-console {
+ position:relative; left:auto; isolation:isolate; display:flex; flex-direction:column; justify-content:flex-start;
+ width:211px; height:88px; translate:0 21px; padding:13px 24px 0; background:none; border-radius:0;
+}
+.board-canvas[data-board-style=neon] .world-anchor :is(.local-console,.opponent-console)::before {
+ content:''; position:absolute; z-index:-1; inset:0; pointer-events:none;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 211 88' preserveAspectRatio='none'%3E%3Cdefs%3E%3CclipPath id='p'%3E%3Cpolygon points='12,0 199,0 211,12 211,71 194,88 150,88 138,76 73,76 61,88 17,88 0,71 0,12'/%3E%3C/clipPath%3E%3C/defs%3E%3Cpolygon points='12,0 199,0 211,12 211,71 194,88 150,88 138,76 73,76 61,88 17,88 0,71 0,12' fill='%230a0f18' stroke='%230c2747' stroke-width='12' stroke-linejoin='miter' clip-path='url(%23p)'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+/* Each plate's screen, inside its border, in the owner's colour at 90% brightness: a 1px stroke along the border edge,
+   a 17% honeycomb of pointy-topped cells like the lane pattern, 8px tall, and an inner glow that peaks at 58% on the
+   edge, falling off fast then trailing out about 14px. The first mask (the plate interior) clips the union of the rest.
+   The glow blurs everything outside the screen twice, tight and wide, so half of each layer's alpha reaches the edge. */
+.board-canvas[data-board-style=neon] .world-anchor :is(.local-console,.opponent-console)::after {
+ content:''; position:absolute; z-index:-1; inset:0; pointer-events:none;
+ background:color-mix(in srgb, var(--console-accent) 90%, #000);
+ mask:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 211 88' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Cpolygon points='12,0 199,0 211,12 211,71 194,88 150,88 138,76 73,76 61,88 17,88 0,71 0,12' fill='%23fff' stroke='%23000' stroke-width='12'/%3E%3C/mask%3E%3C/defs%3E%3Crect width='211' height='88' mask='url(%23m)'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 211 88' preserveAspectRatio='none'%3E%3Cpolygon points='12,0 199,0 211,12 211,71 194,88 150,88 138,76 73,76 61,88 17,88 0,71 0,12' fill='none' stroke='%23000' stroke-width='14'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 12'%3E%3Cpath d='M3.5 0V2L7 4V8L3.5 10L0 8V4L3.5 2M3.5 10V12' fill='none' stroke='%23000' stroke-opacity='.17' stroke-width='.8'/%3E%3C/svg%3E") 0 0 / 7px 12px repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 211 88' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='w' filterUnits='userSpaceOnUse' x='-50' y='-50' width='311' height='188'%3E%3CfeGaussianBlur stdDeviation='7'/%3E%3C/filter%3E%3Cfilter id='t' filterUnits='userSpaceOnUse' x='-50' y='-50' width='311' height='188'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Cpath id='o' d='M-40-40H251V128H-40ZM12 0H199L211 12V71L194 88H150L138 76H73L61 88H17L0 71V12Z' fill-rule='evenodd' stroke='%23000' stroke-width='12'/%3E%3C/defs%3E%3Cuse href='%23o' opacity='.78' filter='url(%23w)'/%3E%3Cuse href='%23o' opacity='.62' filter='url(%23t)'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+ mask-composite:intersect, add, add, add;
+}
+/* The stats and the priority label cast a drop shadow onto the screen; a filter so the masked icons cast one too. */
+.board-canvas[data-board-style=neon] .world-anchor :is(.local-console,.opponent-console) :is(.stat-pair,.reveal-priority) {
+ filter:drop-shadow(0 2px 2px #000d);
+}
+.world-anchor .undo-planning {
  display:flex; align-items:center; gap:5px; margin:0; padding:6px 8px;
  border:1px solid #1f3f73; border-radius:4px; background:#0b1e45;
  font:500 10px/1.4 Inter,sans-serif; letter-spacing:.4px; text-transform:uppercase;
@@ -116,15 +151,15 @@
  box-shadow:0 1px 1px #000c;
  transition:transform .18s ease-out,box-shadow .18s ease-out,background-color .18s,border-color .18s;
 }
-.turn-dock > .undo-planning .icon { width:11px; height:11px; align-self:center; }
-.turn-dock > .undo-planning:hover:not(:disabled) {
+.world-anchor .undo-planning .icon { width:11px; height:11px; align-self:center; }
+.world-anchor .undo-planning:hover:not(:disabled) {
  transform:translateY(-3px); background:#10295c; border-color:#35609f; color:#eef5ff;
  box-shadow:0 5px 8px #000b,0 12px 22px #0009;
 }
-.turn-dock > .undo-planning:active:not(:disabled) { transform:translateY(-1px); box-shadow:0 2px 4px #000c; }
-.turn-dock > .undo-planning:disabled { opacity:.5; cursor:default; }
-.turn-dock > .undo-planning:focus-visible { outline:1px solid #8fb6ff; outline-offset:3px; }
-@media(prefers-reduced-motion:reduce) { .turn-dock > .undo-planning { transition:none; } }
+.world-anchor .undo-planning:active:not(:disabled) { transform:translateY(-1px); box-shadow:0 2px 4px #000c; }
+.world-anchor .undo-planning:disabled { opacity:.5; cursor:default; }
+.world-anchor .undo-planning:focus-visible { outline:1px solid #8fb6ff; outline-offset:3px; }
+@media(prefers-reduced-motion:reduce) { .world-anchor .undo-planning { transition:none; } }
 
 /* Wallet: stacked full-aspect Crypto cards + green total. */
 .world-anchor .crypto-cache {
@@ -336,10 +371,10 @@
 .arena > .crypto-cache.hud-wallet .cache-card:hover {
  transform:translate(-50%, calc(-50% + var(--lift) - 8px)) rotate(var(--angle)); z-index:20!important; filter:brightness(1.08);
 }
-/* End Turn sits in the corner with Undo centred 64px above it. */
+/* End Turn sits in the corner. */
 .arena > .turn-dock {
  position:absolute; right:40px; bottom:40px; z-index:25;
- width:128px; display:flex; flex-direction:column; align-items:center; gap:64px;
+ width:128px; display:flex; flex-direction:column; align-items:center;
 }
 .turn-dock > .end-turn {
  position:relative; inset:auto;

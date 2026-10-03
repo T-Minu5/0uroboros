@@ -1,0 +1,8 @@
+{
+  "checks": [],
+  "samples": {},
+  "resources": [],
+  "errors": [],
+  "failure": "page.waitForFunction: Timeout 12000ms exceeded.\n    at waitForSample (/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2/scripts/neon-surface-smoke.mjs:58:14)\n    at /Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2/scripts/neon-surface-smoke.mjs:123:23",
+  "passed": false
+}

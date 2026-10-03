@@ -8,6 +8,7 @@ import {
   revealOrder, runtimeActions, starterEffects, canDeploy, compileChains,
   shuffleCards, effectiveCardPower, cardPowerFloor,
 } from "./game";
+import { formatAmount, transferFlow, transferText } from "./transferText";
 
 export type SessionPhase = "runtime" | "reveal" | "collapse" | "draft" | "gameover";
 export type LocationDefinition = {
@@ -40,8 +41,11 @@ export type ChoiceGroup = { id: string; label: string; card?: Card };
  * min..max options; with `groups` exactly one option per group. Either way nothing resolves
  * until the whole selection is submitted.
  */
-export type RuntimeChoice = { id: number; owner: PlayerId; prompt: string; sourceName: string; node?: number; icon?: string; options: ChoiceOption[]; select?: { min: number; max: number }; groups?: ChoiceGroup[] };
-type ChoiceRequest = { prompt: string; options: ChoiceOption[]; icon?: string; select?: { min: number; max: number }; groups?: ChoiceGroup[]; resolve: (ids: string[]) => RuntimeEvent };
+export type TransferMove = { from: number; to: number; amount: number };
+/** A Power transfer drawn as the chooser's Power at this Node and its neighbours; each option id maps to the moves it makes. */
+export type TransferChoice = { amount: number; center: number; nodes: { node: number; name: string; power: number }[]; moves: Record<string, TransferMove[]> };
+export type RuntimeChoice = { id: number; owner: PlayerId; prompt: string; sourceName: string; node?: number; icon?: string; options: ChoiceOption[]; select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice };
+type ChoiceRequest = { prompt: string; options: ChoiceOption[]; icon?: string; select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice; resolve: (ids: string[]) => RuntimeEvent };
 export type PlayerState = {
   bank: BankEntry[];
   draw: Card[]; hand: Card[]; discard: Card[]; destroyed: Card[];
@@ -840,7 +844,7 @@ export class RuntimeSession {
       return this.event("choice", `Opponent chooses: ${labels.join(", ") || "nothing"}.`, { node: placement.node, owner: 1, source: "card", sourceName: placement.card.name });
     }
     this.choiceResolver = resolve;
-    this.state.choice = { id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node, ...(icon ? { icon } : {}), ...shape };
+    this.state.choice = { id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node, ...(icon ? { icon } : {}), ...shape, ...(request.transfer ? { transfer: request.transfer } : {}) };
     return this.event("choice", prompt, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
   }
 
@@ -1037,39 +1041,52 @@ export class RuntimeSession {
     if (effect.kind === "probability" || effect.kind === "transferPower") {
       if(!this.state.nodes[node]?.cards[owner].some(item=>item.card.id===card.id))return this.event("power",`${card.name}: No target.`,{...base,amount:0});
       const amount = effect.kind === "probability" ? (effect.amount ?? 5) / 5 : effect.amount ?? 1;
-      this.recalculate();
-      // A stated direction pushes Power outward with no prompt; "split" gives the odd point left.
-      if (effect.direction && effect.direction !== "choice") {
-        const shares: [number, number][] = effect.direction === "split"
-          ? [[node - 1, Math.ceil(amount / 2)], [node + 1, Math.floor(amount / 2)]]
-          : [[effect.direction === "left" ? node - 1 : node + 1, amount]];
-        let moved = 0;
-        const reached: number[] = [];
-        for (const [destination, share] of shares) {
-          if (destination < 0 || destination > 4 || share <= 0) continue;
-          const available = Math.min(share, Math.max(0, this.state.nodes[node].powers[owner] - moved));
-          if (available <= 0) continue;
-          this.state.nodes[node].powerModifiers[owner] -= available;
-          this.state.nodes[destination].powerModifiers[owner] += available;
-          moved += available;
-          reached.push(destination + 1);
+      const direction = effect.direction ?? "choice";
+      const flow = transferFlow(effect);
+      const left = node > 0 ? node - 1 : null, right = node < 4 ? node + 1 : null;
+      const neighbors = [left, right].filter((value): value is number => value !== null);
+      const shares: Record<"left" | "right" | "both", [number, number][]> = {
+        left: left === null ? [] : [[left, amount]],
+        right: right === null ? [] : [[right, amount]],
+        both: neighbors.length === 2 ? [[left!, Math.ceil(amount / 2)], [right!, Math.floor(amount / 2)]] : neighbors.map((neighbor): [number, number] => [neighbor, amount]),
+      };
+      const sides: ("left" | "right" | "both")[] = direction === "choice" ? ["left", "right"] : direction === "split" ? ["both"] : [direction];
+      const modes: ("push" | "pull")[] = flow === "either" ? ["push", "pull"] : [flow];
+      // Power moves in full: a Node may go negative for its owner.
+      const moves: Record<string, TransferMove[]> = {};
+      for (const mode of modes) for (const side of sides) {
+        const legs = shares[side].filter(([, share]) => share > 0).map(([neighbor, share]) => mode === "push" ? { from: node, to: neighbor, amount: share } : { from: neighbor, to: node, amount: share });
+        if (legs.length) moves[`${mode}-${side}`] = legs;
+      }
+      const ids = Object.keys(moves);
+      if (!ids.length) return this.event("power", `${card.name}: No Power to shift.`, { ...base, amount: 0 });
+      const nodeName = (target: number) => this.state.nodes[target].location?.name ?? `Node ${target + 1}`;
+      const describe = (id: string) => {
+        const legs = moves[id], pushed = id.startsWith("push-");
+        const total = legs.reduce((sum, leg) => sum + leg.amount, 0);
+        return { legs, pushed, total, others: legs.map(leg => pushed ? leg.to : leg.from) };
+      };
+      const apply = (id: string) => {
+        const { legs, pushed, total, others } = describe(id);
+        for (const leg of legs) {
+          this.state.nodes[leg.from].powerModifiers[owner] -= leg.amount;
+          this.state.nodes[leg.to].powerModifiers[owner] += leg.amount;
         }
         this.recalculate();
-        if (!moved) return this.event("power", `${card.name}: No Power to shift.`, { ...base, amount: 0 });
-        return this.event("power", `${card.name}: shift ${moved} of your Power from Node ${node + 1} to Node ${reached.join(" and ")}.`, { ...base, sourceNode: node, targetNode: reached[0] - 1, amount: moved });
-      }
-      const neighbors = [node - 1, node + 1].filter(target => target >= 0 && target < 5);
-      const directions = neighbors.flatMap(neighbor => [[node, neighbor], [neighbor, node]]);
-      return this.requestChoice(placement, `Transfer up to ${amount} of your Power between this Node and a neighbor.`, directions.filter(([source]) => this.state.nodes[source].powers[owner] > 0).map(([source, target]) => ({
-        id: `power-${source}-${target}`, label: `${Math.min(amount, this.state.nodes[source].powers[owner])} Power: Node ${source + 1} → Node ${target + 1}`, resolve: () => {
-          this.recalculate();
-          const moved = Math.min(amount, Math.max(0, this.state.nodes[source].powers[owner]));
-          this.state.nodes[source].powerModifiers[owner] -= moved;
-          this.state.nodes[target].powerModifiers[owner] += moved;
-          this.recalculate();
-          return this.event("power", `${card.name}: transfer ${moved} of your Power from Node ${source + 1} to Node ${target + 1}.`, {...base, sourceNode:source, targetNode:target, amount:moved});
-        },
-      })));
+        const away = others.map(target => `Node ${target + 1}`).join(" and ");
+        return this.event("power", `${card.name}: ${pushed ? `push ${formatAmount(total)} power from Node ${node + 1} to ${away}` : `pull ${formatAmount(total)} power from ${away} to Node ${node + 1}`}.`, { ...base, sourceNode: legs[0].from, targetNode: legs[0].to, amount: total });
+      };
+      if (ids.length === 1) return apply(ids[0]);
+      this.recalculate();
+      return this.openChoice(placement, {
+        prompt: `${transferText(amount, direction, flow)}.`,
+        options: ids.map(id => {
+          const { pushed, total, others } = describe(id);
+          return { id, label: `${pushed ? "Push" : "Pull"} ${formatAmount(total)} power ${pushed ? "to" : "from"} ${others.map(nodeName).join(" and ")}` };
+        }),
+        transfer: { amount, center: node, nodes: [left, node, right].filter((value): value is number => value !== null).map(target => ({ node: target, name: nodeName(target), power: this.state.nodes[target].powers[owner] })), moves },
+        resolve: ([id]) => apply(id),
+      });
     }
     if (effect.kind === "trashSelf") {
       const lane=this.state.nodes[node]?.cards[owner];
@@ -1100,6 +1117,45 @@ export class RuntimeSession {
       this.state.players[owner].hand.push(...taken);
       this.refreshScores();
       return this.event("crypto", `${card.name} steals ${taken.map(item => item.name).join(", ")} from ${victim === 0 ? "your" : "opponent"} wallet.`, { ...base, target: "hand", targetOwner: owner, amount: taken.length });
+    }
+    if (effect.kind === "bump") {
+      // The Crypto wallet is the Crypto cards held in hand, as for Steal Crypto.
+      const victim = (1 - owner) as PlayerId;
+      const player = this.state.players[victim];
+      const zone = effect.zone ?? "either";
+      const zoneLabel = zone === "bank" ? "Effect Bank" : zone === "wallet" ? "Crypto wallet" : "Effect Bank or Crypto wallet";
+      const whose = victim === 0 ? "your" : "the opponent's";
+      const candidates = [
+        ...(zone !== "wallet" ? player.bank.map(entry => ({ card: entry.card, from: "Effect Bank" })) : []),
+        ...(zone !== "bank" ? player.hand.filter(item => item.type === "Crypto").map(item => ({ card: item, from: "Crypto wallet" })) : []),
+      ];
+      if (!candidates.length) return this.event("trash", `${card.name}: No target.`, { ...base, target: "discard", targetOwner: victim, amount: 0 });
+      const count = Math.min(Math.max(1, effect.amount ?? 1), candidates.length);
+      const bump = (ids: readonly string[]) => {
+        const bumped: { name: string; from: string }[] = [];
+        for (const id of ids) {
+          const bankIndex = player.bank.findIndex(entry => entry.card.id === id);
+          const handIndex = player.hand.findIndex(item => item.id === id);
+          const removed = bankIndex >= 0 ? player.bank.splice(bankIndex, 1)[0].card : handIndex >= 0 ? player.hand.splice(handIndex, 1)[0] : null;
+          if (!removed) continue;
+          this.stripModifiers(removed);
+          this.retire(removed, victim, "discard");
+          bumped.push({ name: removed.name, from: bankIndex >= 0 ? "Effect Bank" : "Crypto wallet" });
+        }
+        this.recalculate(); this.refreshScores();
+        if (!bumped.length) return this.event("trash", `${card.name}: No target.`, { ...base, target: "discard", targetOwner: victim, amount: 0 });
+        return this.event("trash", `${card.name} bumps ${bumped.map(entry => `${entry.name} from ${whose} ${entry.from}`).join(", ")} to Discard.`, { ...base, target: "discard", targetOwner: victim, amount: bumped.length });
+      };
+      if (effect.cardPick === "random") {
+        const pool = [...candidates];
+        return bump(Array.from({ length: count }, () => pool.splice(Math.floor(this.config.random() * pool.length), 1)[0].card.id));
+      }
+      return this.openChoice(placement, {
+        prompt: `${card.name}: choose ${count === 1 ? "a card" : `${count} cards`} to bump from ${whose} ${zoneLabel} to Discard.`,
+        options: candidates.map(entry => ({ id: entry.card.id, label: `${entry.card.name} · ${entry.from}`, card: structuredClone(entry.card) })),
+        select: { min: count, max: count },
+        resolve: ids => bump(ids),
+      });
     }
     if (effect.kind === "mill") {
       const opponent = (1 - owner) as PlayerId;
