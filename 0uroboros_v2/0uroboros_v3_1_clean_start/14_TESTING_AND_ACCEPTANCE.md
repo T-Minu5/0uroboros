@@ -12,6 +12,14 @@ with real deployments/effects where possible.
 
 Verify deploy, reveal, source/target effects, unobstructed Power, Collapse never skipped, Draft never early, purchases/End Draft, next-Cycle initialization, no presentation accumulation/stall.
 
+## Networked play gate
+Before any online playtest or public build, two clients on separate machines (or two browser profiles against a real server process, never an in-memory shortcut) must complete at least three Cycles against the authoritative server:
+`Lobby -> Cycle 1 Runtime -> Collapse -> Draft -> Cycle 2 -> Collapse -> Draft -> Cycle 3`.
+
+Required evidence on the wire, not only on screen: each socket receives only its own seat's view and redacted, mirrored events; the opponent's hand, draw, and unrevealed placements never appear in any frame; illegal or stale commands are refused by ack with the server's view; one client reloads mid-Draft and rejoins by seat token without the server pausing the other seat; both seats agree on Nodes, VP and Log after every event; disconnect rules from `06_NETWORK_TIMERS_AND_FUTURE_SCOPE.md` fire on the server clock.
+
+The automated form is `npm run test:online` (`scripts/online-two-browser-smoke.mjs`): it builds and starts the server bundle, runs two Chromium contexts, inspects every WebSocket frame for hidden information, and writes `docs/evidence/online-report.json` plus screenshots. `tests/game-server.test.ts` must pass alongside it. A checkpoint that claims networked play is invalid without a passing report from the current commit.
+
 ## UX acceptance
 Node is one perceptual region; Power belongs to player sides; Location belongs to Node; target/landing preview works; drag never opens full inspect; click/tap inspect works; face-down info hidden; phase/turn always knowable; local resolution local; important text readable.
 

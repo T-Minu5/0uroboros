@@ -26,3 +26,8 @@
 - Confirmed archived sources defer exact nonstarter effects/costs, Location catalog/rewards, and Circuit Reward pool.
 - Marked unsupported exact content `SOURCE_REQUIRED` to prevent agent invention.
 
+## V3.1 publishing supplement — 2026-10-04
+
+- Added roadmap steps 12-14 (seat-symmetric engine + authoritative server, shippable client, distribution and operations) to `13_IMPLEMENTATION_ROADMAP.md`.
+- Added the asset folder authority note (`assets/library`, `assets/source`, `assets/reference` are studio-only; the art manifest decides what ships).
+- Added the networked play gate (`npm run test:online`, wire-level hidden-information checks, three Cycles across two clients, mid-Draft rejoin) to `14_TESTING_AND_ACCEPTANCE.md`.
