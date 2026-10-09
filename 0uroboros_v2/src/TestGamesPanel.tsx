@@ -3,7 +3,7 @@ import { AgentReader } from './AgentReader';
 import { Fold, ReportControl } from './AgentsPanel';
 import { AGENT_NAMES, AgentAvatar, type AgentId } from './agentAvatars';
 import { cohortPhaseLabel, type AgentsApi, type ProfileChange } from './agentsApi';
-import { loadGameSource } from './authoring/loadGameContent';
+import { loadGameSource } from './contentPack/loadGameContent';
 
 const COHORT_GAMES = [10, 20, 30, 50] as const;
 const LEAGUE_ROUNDS = [1, 3, 5] as const;

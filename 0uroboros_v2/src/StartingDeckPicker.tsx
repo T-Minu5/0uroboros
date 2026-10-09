@@ -1,5 +1,5 @@
 import { MIN_STARTING_DECK_SIZE } from '@0uroboros/engine/game';
-import type { DeckOption } from './authoring/loadGameContent';
+import type { DeckOption } from './contentPack/loadGameContent';
 
 /** Setup-screen choice of the deck both players are dealt. Short decks stay listed so it is clear why they cannot start; empty ones are hidden. */
 export function StartingDeckPicker({decks,value,onChange,disabled}:{decks:DeckOption[]|null;value:string|undefined;onChange:(id:string)=>void;disabled?:boolean}){

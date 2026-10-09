@@ -6,7 +6,7 @@ import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArt
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
 import { seededRandom } from '@0uroboros/engine/runtime';
-import { bundledContent } from '../src/authoring/contentStore';
+import { bundledContent } from '../src/contentPack/contentStore';
 
 const byId=(id:string)=>HISTORIC_CARDS.find(card=>card.definitionId===id)!;
 const retained=EVALUATION_ALL_CARDS.filter(card=>!HISTORIC_CARDS.includes(card));

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { OPPONENTS, opponentName, type OpponentId } from './ai/strategistClient';
-import type { DeckOption } from './authoring/loadGameContent';
+import type { DeckOption } from './contentPack/loadGameContent';
 import { defaultServerVP, type Servers } from '@0uroboros/engine/game';
 import { SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
 import { StartingDeckPicker } from './StartingDeckPicker';

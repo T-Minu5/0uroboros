@@ -17,7 +17,7 @@ import {
   type ContentDocument,
   type StartingDeck,
 } from '@0uroboros/engine/authoring/contentModel';
-import { getBundledDocument } from './contentStore';
+import { getBundledDocument } from '../contentPack/contentStore';
 import { ModsContext, StepList } from './StepEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
 import { DeckEditor } from './DeckEditor';

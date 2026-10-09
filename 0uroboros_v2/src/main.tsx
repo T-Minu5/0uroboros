@@ -7,7 +7,7 @@ import "./cycle-motion.css";
 import "./strategic-evaluation.css";
 import "./circuit-controls.css";
 
+// Game client entry. The Content Studio has its own page (`studio.html`, served at /author in dev) so the
+// shipped client never bundles authoring code.
 const Game = lazy(() => import('./App').then(module => ({default:module.App})));
-const Authoring = lazy(() => import('./authoring/AuthoringApp').then(module => ({default:module.AuthoringApp})));
-const authoring = window.location.pathname === '/author' || window.location.pathname.startsWith('/author/');
-createRoot(document.getElementById("root")!).render(<StrictMode><Suspense fallback={<p style={{padding:32,color:'#b7c8da'}}>Opening {authoring?'content studio':'the Circuit'}…</p>}>{authoring?<Authoring/>:<Game/>}</Suspense></StrictMode>);
+createRoot(document.getElementById("root")!).render(<StrictMode><Suspense fallback={<p style={{padding:32,color:'#b7c8da'}}>Opening the Circuit…</p>}><Game/></Suspense></StrictMode>);

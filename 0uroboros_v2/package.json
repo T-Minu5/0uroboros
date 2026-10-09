@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "dev": "node --watch-path=server --watch-path=packages/engine/src/ai/strategy.ts --watch-path=packages/engine/src/effects/migrate.ts --watch-preserve-output node_modules/vite/bin/vite.js",
-    "build": "npm run depth:check && tsc --noEmit && vite build",
+    "build": "npm run depth:check && tsc --noEmit && npm run lint:boundaries && vite build",
+    "build:client": "tsc --noEmit && npm run lint:boundaries && OUROBOROS_TARGET=client vite build && node scripts/check-client-bundle.mjs dist/client",
+    "lint:boundaries": "node scripts/check-boundaries.mjs",
     "depth:setup": "bash tools/depth/setup.sh",
     "depth:build": "node scripts/build-depth.ts",
     "depth:check": "node scripts/build-depth.ts --check",

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SERVER_X, serverZ } from './boardLayout';
 import { BOARD_DROP, BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, NEAR_BANK_FORMER_DROP, type BoardNode } from './BoardScene';
 import { LocationText } from './LocationText';
@@ -34,17 +34,19 @@ import { EndTurnControl } from './EndTurnControl';
 import { eventTime, isNoTargetEvent } from './presentation';
 import { useCardPointerDrag, type CardOrigin } from './useCardPointerDrag';
 import { springRelease } from './cardSpring';
-import { bundledContent } from './authoring/contentStore';
-import { compileForDeck, loadGameContent, loadGameSource, type GameContentSource } from './authoring/loadGameContent';
+import { bundledContent } from './contentPack/contentStore';
+import { compileForDeck, loadGameContent, loadGameSource, type GameContentSource } from './contentPack/loadGameContent';
 import { GameConfigure } from './GameConfigure';
 import { loadGameSetup, saveGameSetup, type GameSetup } from './gameSetup';
-import { SetupAgentsWindow } from './SetupAgentsWindow';
+import { STUDIO_TOOLS } from './studioTools';
+// Studio-only: the agents window and dev game log drop out of `build:client` with the flag.
+const SetupAgentsWindow = STUDIO_TOOLS ? lazy(() => import('./SetupAgentsWindow').then(m => ({ default: m.SetupAgentsWindow }))) : null;
+const devGameLog = STUDIO_TOOLS ? import('./devGameLog') : null;
 import './setup-screen.css';
 import { BoardLightSliders, BoardTuningPanel } from './boardTuning';
 import { handOverlap, useHandSpan } from './handFan';
 import { DEFAULT_OPPONENT, isOpponent, loadStrategist, opponentName, reportCycle, reportGame, type OpponentId } from './ai/strategistClient';
 import { versionLabel } from '@0uroboros/engine/ai/strategy';
-import { logGameEvent } from './devGameLog';
 const blankNodes:BoardNode[]=Array.from({length:5},(_,i)=>({cards:[[],[]],powers:[0,0],weight:[30,25,20,15,10][i],title:'Location pending',text:'Approved content required'}));
 /** Centre of the authored `*_duration_*` bay row on the table outrigger; the effect bank docks onto it. */
 const BANK_BAY_X=-8.07, BANK_BAY_Z=5.90;
@@ -145,7 +147,7 @@ export function App(){
  useEffect(()=>{let cancelled=false;loadGameSource().then(source=>{if(cancelled)return;setDeckSource(source);setContent(compileForDeck(source.document,localStorage.getItem(DECK_KEY)??undefined));}).catch(error=>{if(!cancelled)setContentError(error instanceof Error?error.message:'Content unavailable.');});return()=>{cancelled=true;};},[]);
  useEffect(()=>{if(view)warmCardMedia(cardsInPlay([view,engine.current?.deckList(0)],content.cards));},[view,content]);
  function later(callback:()=>void,time:number){const id=window.setTimeout(()=>{timers.current=timers.current.filter(timer=>timer!==id);callback();},time);timers.current.push(id);}
- function record(event:RuntimeEvent){logGameEvent(logGame.current,engine.current,event);setHistory(h=>[...h,event].slice(-6000));}
+ function record(event:RuntimeEvent){if(devGameLog){const id=logGame.current,session=engine.current;void devGameLog.then(m=>m.logGameEvent(id,session,event));}setHistory(h=>[...h,event].slice(-6000));}
  function pump(){
   let before=engine.current?.view();
   let next=engine.current?.step();
@@ -417,7 +419,7 @@ export function App(){
   {(active?.kind==='move'||active?.kind==='morph')&&<CardEffectMotion key={`card-effect-${active.id}`} event={active} duration={eventTime(active,fast)}/>}
   {globalEvent&&<EventMessage key={`global-${active.id}`} event={active}/>}
   <footer className='status-bar'><span className='status-dot'/><span>{notice}</span><span className='session-policy'>Actions carry over · Control Locations to earn the Circuit</span></footer>
-  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section><SetupAgentsWindow/></div>}
+  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section>{SetupAgentsWindow&&<Suspense fallback={null}><SetupAgentsWindow/></Suspense>}</div>}
   {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>engine.current!.endDraft())} undo={()=>act(()=>engine.current!.undoEndDraft())}/>}
   {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p><LocationText text={view.nodes[locationInspect].location!.rule}/></p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p><LocationText text={view.nodes[locationInspect].location!.reward}/></p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
   {catalogOpen&&<CardCatalog content={content} canTest={!!view&&phase==='runtime'&&!busy&&!view.canUndoPlanning} close={()=>setCatalogOpen(false)} inspect={setSelected} add={addTestCard}/>}

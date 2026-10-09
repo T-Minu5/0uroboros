@@ -7,11 +7,35 @@ import { extname, resolve } from 'node:path';
 // and each in-process restart leaks the previous server's memory. `npm run dev` restarts the whole process instead (see package.json).
 const load = <T>(server: ViteDevServer, path: string) => server.ssrLoadModule(path) as Promise<T>;
 
+/**
+ * Build targets. `client` is what ships to players: the game page only, studio UI compiled out (`__STUDIO__ = false`),
+ * written to dist/client. The default (`studio`) builds the game and the Content Studio together for local use.
+ */
+const TARGET = process.env.OUROBOROS_TARGET === 'client' ? 'client' : 'studio';
+const CLIENT = TARGET === 'client';
+const OUT_DIR = CLIENT ? 'dist/client' : 'dist';
+
 // Reference animations, concept art and Blender sources are never production assets.
 export default defineConfig({
  // Workspace packages resolve from source; the alias keeps Vite, Vitest and scripts independent of the node_modules symlink.
  resolve: { alias: [{ find: /^@0uroboros\/engine\/(.*)$/, replacement: `${resolve('packages/engine/src')}/$1` }] },
+ define: { __STUDIO__: JSON.stringify(!CLIENT) },
+ build: {
+  outDir: OUT_DIR,
+  emptyOutDir: true,
+  rollupOptions: { input: CLIENT ? { index: resolve('index.html') } : { index: resolve('index.html'), studio: resolve('studio.html') } },
+ },
  plugins: [react(), {
+  name: 'studio-page-route',
+  configureServer(server) {
+   // The Content Studio keeps its /author URL in dev; it is a separate page so the client build can leave it out.
+   server.middlewares.use((request, _response, next) => {
+    const path = (request.url ?? '').split('?')[0];
+    if (path === '/author' || path.startsWith('/author/')) request.url = '/studio.html';
+    next();
+   });
+  },
+ }, {
   name: 'first-party-production-assets',
   configureServer(server) {
    server.middlewares.use('/assets', (request, response, next) => {
@@ -45,9 +69,9 @@ export default defineConfig({
    });
   },
   closeBundle() {
-   for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve('dist/assets', folder), { recursive: true });
-   mkdirSync(resolve('dist/assets/models'), { recursive: true });
-   cpSync(resolve('assets/models/ouroboros-board-v4.glb'), resolve('dist/assets/models/ouroboros-board-v4.glb'));
+   for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve(OUT_DIR, 'assets', folder), { recursive: true });
+   mkdirSync(resolve(OUT_DIR, 'assets/models'), { recursive: true });
+   cpSync(resolve('assets/models/ouroboros-board-v4.glb'), resolve(OUT_DIR, 'assets/models/ouroboros-board-v4.glb'));
   },
  }, {
   name: 'local-authoring-content-api',

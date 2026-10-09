@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { DEFAULT_GLASS_SCRATCH, GLASS_SCRATCH_TEXTURES, glassScratch, setGlassScratch, type GlassScratchSettings } from './neonGlassScratch';
 import { CAR_PAINT_COLORS, CAR_PAINT_SLIDERS, DEFAULT_CAR_PAINT, carPaint, carPaintDefaults, sameCarPaint, saveCarPaintDefaults, setCarPaint, type CarPaintSettings } from './neonCarPaint';
 import { CORE_HUDS, setCoreHud, useHudTuning } from './hudTuning';
-import { AgentsPanel } from './AgentsPanel';
+import { STUDIO_TOOLS } from './studioTools';
+const AgentsPanel = STUDIO_TOOLS ? lazy(() => import('./AgentsPanel').then(m => ({ default: m.AgentsPanel }))) : null;
 import { neonGain } from './neonTubeShading';
 import { REAL_LIGHTING_SLIDERS, realLightingDefaults, type RealLightingAction, type RealLightingSettings } from './realLighting';
 import './board-tuning.css';
@@ -236,7 +237,7 @@ export function BoardTuningPanel({ lighting, paint, endGame }: { lighting?: Ligh
       </section>
       <section className='tuning-section flush'>
         <h3>Agents</h3>
-        <Disclosure id='tuning-agents' title='Strat-G and Eco-Strat'><AgentsPanel /></Disclosure>
+        {AgentsPanel && <Disclosure id='tuning-agents' title='Strat-G and Eco-Strat'><Suspense fallback={null}><AgentsPanel /></Suspense></Disclosure>}
       </section>
     </aside>
   </>;
