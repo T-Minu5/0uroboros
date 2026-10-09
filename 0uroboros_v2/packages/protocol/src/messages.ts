@@ -8,7 +8,7 @@
  */
 import { z } from "zod";
 import type { PlayerId } from "@0uroboros/engine/game";
-import type { RuntimeEvent, SessionView } from "@0uroboros/engine/runtime";
+import type { CycleRecord, RuntimeEvent, SessionView } from "@0uroboros/engine/runtime";
 
 export const PROTOCOL_VERSION = 1;
 
@@ -95,16 +95,16 @@ export type ServerMessage =
   | { type: "roomJoined"; code: string; seat: PlayerId; seatToken: string; mode: RoomMode; settings: RoomSettings }
   | { type: "lobby"; code: string; status: RoomStatus; seats: [SeatSummary, SeatSummary]; mode: RoomMode; settings: RoomSettings }
   | { type: "left" }
-  /** The seat's whole table on join or resume: the view and the Log so far, both as that seat may see them. */
-  | { type: "snapshot"; view: SessionView; log: RuntimeEvent[]; timers: Timers }
-  /** One Log event and the view after it, as this seat may see them. */
-  | { type: "event"; event: RuntimeEvent; view: SessionView; timers: Timers }
+  /** The seat's whole table on join or resume: the view, the Log so far and the Cycle records, all as that seat may see them. */
+  | { type: "snapshot"; view: SessionView; log: RuntimeEvent[]; cycles: CycleRecord[]; timers: Timers }
+  /** One Log event and the view after it, as this seat may see them. Draft events carry the Cycle records so far. */
+  | { type: "event"; event: RuntimeEvent; view: SessionView; timers: Timers; cycles?: CycleRecord[] }
   /** The result of this seat's own command; the event, if any, is also the first of the events that follow. */
   | { type: "ack"; requestId: string; ok: true; event: RuntimeEvent | null; view: SessionView; timers: Timers }
   | { type: "ack"; requestId: string; ok: false; message: string }
   | { type: "timers"; timers: Timers }
   | { type: "presence"; seat: PlayerId; connected: boolean }
-  | { type: "gameOver"; result: GameResult; view: SessionView }
+  | { type: "gameOver"; result: GameResult; view: SessionView; cycles: CycleRecord[] }
   | { type: "error"; code: "protocol" | "auth" | "room" | "rate"; message: string }
   | { type: "pong"; at: number; serverTime: number };
 

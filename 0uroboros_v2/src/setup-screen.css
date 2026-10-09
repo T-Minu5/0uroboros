@@ -115,3 +115,22 @@
 .agents-panel .agents-actions button.primary:hover:not(:disabled){border-color:#1fffb1;background:#1fffb124}
 @media(prefers-reduced-motion:reduce){.setup-agents .setup-agents-roll svg{transition:none}}
 @media(max-width:1100px){.setup-backdrop{flex-wrap:wrap}.setup-backdrop>.setup-card{margin:0}}
+
+/* Online: create a table for a friend, join one by code, or play the server's AI. Sits under the solo entry button. */
+.online-lobby{display:flex;flex-direction:column;gap:10px;margin:18px 0 14px;padding:14px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff06}
+.online-lobby>small{font-size:10px;letter-spacing:1.6px;color:#8b93a7}
+.online-lobby p{margin:0;font-size:12px;line-height:1.5;color:#c4bfd2}
+.online-field{display:flex;flex-direction:column;gap:4px;font-size:10px;color:#7f899e}
+.online-lobby input{padding:7px 9px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit;font-size:12px}
+.online-lobby input::placeholder{color:#5f6b80}
+.online-actions{display:flex;flex-wrap:wrap;gap:8px}
+.online-actions>button,.online-join button,.online-lobby .online-resume,.online-lobby>button{padding:8px 12px;border:1px solid #ffffff24;border-radius:7px;background:#ffffff08;color:#e8ecf4;font:600 12px Inter,sans-serif}
+.online-actions>button:hover:not(:disabled),.online-join button:hover:not(:disabled),.online-resume:hover{border-color:var(--green,#1fffb1);background:#1fffb114}
+.online-actions>button:disabled,.online-join button:disabled{opacity:.45}
+.online-join{display:flex;gap:6px;flex:1 1 180px}
+.online-join input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:2px}
+.online-code{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #1fffb166;border-radius:7px;background:#1fffb10f}
+.online-code span{font-size:11px;color:#9ff5d6}
+.online-code b{font:700 22px Orbitron,Inter,sans-serif;letter-spacing:5px;color:#e8fff6}
+.online-status{color:#8b93a7}
+.online-error{color:#ff9d9d}

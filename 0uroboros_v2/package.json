@@ -32,7 +32,8 @@
     "test:perf": "node scripts/perf-probe.mjs",
     "server:build": "vite build -c vite.server.config.ts",
     "server:start": "node dist/server/main.mjs",
-    "server:dev": "npm run server:build && OUROBOROS_DB=.data/0uroboros.sqlite node dist/server/main.mjs"
+    "server:dev": "npm run server:build && OUROBOROS_DB=.data/0uroboros.sqlite node dist/server/main.mjs",
+    "test:online": "node scripts/online-two-browser-smoke.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

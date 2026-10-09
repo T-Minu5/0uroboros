@@ -220,7 +220,7 @@ export class Room {
     if (command.type === "concede") this.result = this.resultFrom("concession");
     if (event) this.events.push(event);
     if (requestId) reply({ type: "ack", requestId, ok: true, event: event ? this.forSeat(event, seat) : null, view: session.view(seat), timers: this.timers() });
-    if (event) this.broadcast(null, seat, other => ({ type: "event", event: this.forSeat(event!, other), view: session.view(other), timers: this.timers() }));
+    if (event) this.broadcast(null, seat, other => this.eventMessage(event!, other));
     this.afterChange();
     return true;
   }
@@ -256,7 +256,7 @@ export class Room {
     this.record(null, { type: "system", action, ...(seat !== undefined ? { seat } : {}), ...(reason ? { reason } : {}) });
     if (event) {
       this.events.push(event);
-      this.broadcast(null, undefined, other => ({ type: "event", event: this.forSeat(event!, other), view: session.view(other), timers: this.timers() }));
+      this.broadcast(null, undefined, other => this.eventMessage(event!, other));
     }
     this.afterChange();
   }
@@ -269,7 +269,7 @@ export class Room {
       if (guard > 10_000) throw new Error(`Room ${this.code}: resolution failed to terminate.`);
       const { event } = session.step()!;
       this.events.push(event);
-      this.broadcast(null, undefined, other => ({ type: "event", event: this.forSeat(event, other), view: session.view(other), timers: this.timers() }));
+      this.broadcast(null, undefined, other => this.eventMessage(event, other));
     }
     if (session.state.phase === "gameover") { this.finish(); return; }
     this.armTimers();
@@ -423,7 +423,7 @@ export class Room {
       this.config.store.saveResult({ code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result });
       this.config.store.saveReplay(this.replay());
     } catch (error) { this.log({ event: "store-error", message: error instanceof Error ? error.message : String(error) }); }
-    for (const seat of this.humanSeats()) this.seats[seat]!.connection?.send({ type: "gameOver", result, view: session.view(seat) });
+    for (const seat of this.humanSeats()) this.seats[seat]!.connection?.send({ type: "gameOver", result, view: session.view(seat), cycles: session.cycleHistory() });
     this.broadcastLobby();
     this.cancelDispose = this.config.scheduler.after(FINISHED_TTL_MS, () => this.close());
   }
@@ -451,6 +451,12 @@ export class Room {
     return { serverTime: this.now, turnEndsAt: this.turnEndsAt, choiceEndsAt: this.choiceEndsAt, draftEndsAt: state?.phase === "draft" && !state.draftEnded ? state.draftEndsAt : null, pausedUntil: this.pausedUntil };
   }
 
+  /** An `event` message for `seat`; Draft events carry the Cycle records so the client's Log can show the Cycle summaries. */
+  private eventMessage(event: RuntimeEvent, seat: PlayerId): ServerMessage {
+    const session = this.session!;
+    return { type: "event", event: this.forSeat(event, seat), view: session.view(seat), timers: this.timers(), ...(event.kind === "draft" || event.kind === "cycle" ? { cycles: session.cycleHistory() } : {}) };
+  }
+
   /** The event as `seat` may see it: redacted to what it knows and, for seat 1, mirrored. */
   private forSeat(event: RuntimeEvent, seat: PlayerId): RuntimeEvent {
     const redacted = redactEvent(event, seat);
@@ -462,8 +468,8 @@ export class Room {
   private sendSnapshot(seat: PlayerId) {
     const session = this.session, connection = this.seats[seat]?.connection;
     if (!session || !connection) return;
-    connection.send({ type: "snapshot", view: session.view(seat), log: this.events.map(event => this.forSeat(event, seat)), timers: this.timers() });
-    if (this.status === "finished" && this.result) connection.send({ type: "gameOver", result: this.result, view: session.view(seat) });
+    connection.send({ type: "snapshot", view: session.view(seat), log: this.events.map(event => this.forSeat(event, seat)), cycles: session.cycleHistory(), timers: this.timers() });
+    if (this.status === "finished" && this.result) connection.send({ type: "gameOver", result: this.result, view: session.view(seat), cycles: session.cycleHistory() });
   }
 
   /** Sends `message` (or `build(seat)`) to every connected human seat except `except`. */

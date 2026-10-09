@@ -413,3 +413,10 @@
 .world-anchor .bank-slot.active-source { outline-color:var(--player-bank-label,#dfc6ff); }
 .turn-dock > .end-turn:disabled { opacity:.7; }
 .turn-dock > .end-turn.turn-ready:hover { border-color:#d0ffff; filter:brightness(1.12); }
+
+/* Online: this seat has committed; the button waits for the other seat and takes the commit back on click. */
+.turn-dock > .end-turn.turn-waiting { border-color:#f0c86a; background:linear-gradient(#6b5420,#3a2d0e); }
+.turn-dock > .end-turn.turn-waiting .turn-caption { color:#ffe9b3; }
+.turn-dock > .end-turn.turn-waiting .turn-caption small { color:#e2c07a; }
+.status-bar .status-dot.away { background:#f0c86a; box-shadow:0 0 8px #f0c86a; }
+.status-bar .session-online { margin-left:auto; font-size:10px; letter-spacing:1.2px; color:#9ff5d6; }

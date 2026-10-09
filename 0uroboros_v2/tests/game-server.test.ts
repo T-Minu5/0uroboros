@@ -102,8 +102,10 @@ describe("game server rooms", () => {
     expect(room.session!.state.cycle).toBe(4);
     expect(room.status).toBe("playing");
 
-    // Both seats received every Log event, each from its own side of the table.
+    // Both seats received every Log event, each from its own side of the table, and no event twice.
     const total = room.events.length;
+    expect(new Set(room.events.map(e => e.id)).size).toBe(total);
+    expect(new Set(a.events().map(e => e.id)).size).toBe(total);
     expect(a.events().length).toBe(total);
     expect(b.events().length).toBe(total);
     const deployA = a.events().find(e => e.kind === "deploy" && e.owner === 0)!;

@@ -1,0 +1,173 @@
+{
+  "cycles": [
+    {
+      "cycle": 1,
+      "turns": [
+        {
+          "turn": 1,
+          "placedA": {
+            "id": "0:basic-encryption-1",
+            "node": "2"
+          },
+          "placedB": {
+            "id": "1:basic-encryption-1",
+            "node": "2"
+          }
+        },
+        {
+          "turn": 2,
+          "placedA": {
+            "id": "0:rezz-blade-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:rezz-blade-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:night-scythe-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:night-scythe-1",
+            "node": "0"
+          }
+        }
+      ],
+      "score": {
+        "ada": [
+          2,
+          2
+        ],
+        "bo": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "cycle": 2,
+      "turns": [
+        {
+          "turn": 1,
+          "placedA": {
+            "id": "0:basic-encryption-2",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:basic-encryption-2",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 2,
+          "placedA": {
+            "id": "0:slash-dot-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:slash-dot-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:night-scythe-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:basic-encryption-1",
+            "node": "0"
+          }
+        }
+      ],
+      "score": {
+        "ada": [
+          2,
+          2
+        ],
+        "bo": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "cycle": 3,
+      "turns": [
+        {
+          "turn": 1,
+          "placedA": {
+            "id": "0:basic-encryption-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:dotkrawler-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 2,
+          "placedA": {
+            "id": "0:basic-encryption-2",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:night-scythe-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:night-scythe-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:rezz-blade-1",
+            "node": "0"
+          }
+        }
+      ],
+      "score": {
+        "ada": [
+          3,
+          3
+        ],
+        "bo": [
+          3,
+          3
+        ]
+      }
+    }
+  ],
+  "wire": {
+    "framesChecked": 535,
+    "hiddenInfoViolations": []
+  },
+  "log": {
+    "faceDownSeen": "NODE 3Ada deployed a face-down card."
+  },
+  "errors": [],
+  "reconnect": {
+    "cycle": 1,
+    "ok": true,
+    "phase": "CYCLE 01 / DRAFT"
+  },
+  "coverage": {
+    "undoCommit": true,
+    "choice": 6
+  },
+  "code": "QA62J3",
+  "health": {
+    "ok": true,
+    "protocol": 1,
+    "rooms": 1,
+    "clients": 2
+  },
+  "ok": true
+}

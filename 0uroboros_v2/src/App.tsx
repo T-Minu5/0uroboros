@@ -16,7 +16,11 @@ import { CARD_BACKS, cardBackSrc, loadCardBacks, saveCardBacks, type CardBackId 
 import { canDeploy, isCharacterCard, type Card, type CardModifier } from '@0uroboros/engine/game';
 import { describeMod } from '@0uroboros/engine/effects/catalog';
 import { builtinMod } from '@0uroboros/engine/builtinMods';
-import { createSession, type RuntimeSession, type RuntimeEvent, type SessionView } from '@0uroboros/engine/runtime';
+import { createSession, type RuntimeEvent, type SessionView } from '@0uroboros/engine/runtime';
+import { LocalClient, attempt, type GameClient } from './net/GameClient';
+import { OnlineClient, savedSeat, type LobbyState, type SavedSeat } from './net/OnlineClient';
+import { OnlineLobby } from './net/OnlineLobby';
+import type { RoomMode } from '@0uroboros/protocol/messages';
 import { EffectPath, CardEffectMotion } from './Effects';
 import { EffectChoice, EventMessage, TransferBadge, choiceNodes } from './EffectChoice';
 import { useTransferDrag } from './transferDrag';
@@ -54,7 +58,12 @@ const BANK_BAY_X=-8.07, BANK_BAY_Z=5.90;
 const ZONE_BUTTONS_POSITION:[number,number,number]=[-8.6,.04,0];
 
 export function App(){
- const engine=useRef<RuntimeSession|null>(null);
+ /** The table the UI drives: a local session or the online seat. */
+ const client=useRef<GameClient|null>(null);
+ const online=useRef<OnlineClient|null>(null);
+ const [lobby,setLobby]=useState<LobbyState|null>(null);
+ const [savedOnlineSeat]=useState<SavedSeat|null>(savedSeat);
+ const [opponentAway,setOpponentAway]=useState(false);
  /** The opponent agent's notes for this session are filed under this id; null once the debrief is sent. */
  const strategistGame=useRef<string|null>(null);
  /** Which agent plays this session's opponent; it receives the session's notes and debrief. */
@@ -145,14 +154,19 @@ export function App(){
  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),500);return()=>{clearInterval(timer);timers.current.forEach(clearTimeout);};},[]);
  useEffect(()=>{const esc=(e:KeyboardEvent)=>{if(e.key==='Escape'){setSelected(null);setCatalogOpen(false);setLocationInspect(null);setPanel(null);setDrawer(null);setSettingsOpen(false);}};window.addEventListener('keydown',esc);return()=>window.removeEventListener('keydown',esc);},[]);
  useEffect(()=>{let cancelled=false;loadGameSource().then(source=>{if(cancelled)return;setDeckSource(source);setContent(compileForDeck(source.document,localStorage.getItem(DECK_KEY)??undefined));}).catch(error=>{if(!cancelled)setContentError(error instanceof Error?error.message:'Content unavailable.');});return()=>{cancelled=true;};},[]);
- useEffect(()=>{if(view)warmCardMedia(cardsInPlay([view,engine.current?.deckList(0)],content.cards));},[view,content]);
+ useEffect(()=>{if(view)warmCardMedia(cardsInPlay([view,client.current?.deckList()],content.cards));},[view,content]);
  function later(callback:()=>void,time:number){const id=window.setTimeout(()=>{timers.current=timers.current.filter(timer=>timer!==id);callback();},time);timers.current.push(id);}
- function record(event:RuntimeEvent){if(devGameLog){const id=logGame.current,session=engine.current;void devGameLog.then(m=>m.logGameEvent(id,session,event));}setHistory(h=>[...h,event].slice(-6000));}
+ function record(event:RuntimeEvent){if(devGameLog){const id=logGame.current,session=client.current instanceof LocalClient?client.current.session:null;void devGameLog.then(m=>m.logGameEvent(id,session,event));}setHistory(h=>[...h,event].slice(-6000));}
+ /** Online, the other seat's planning placements and commits show in the Log and on the board without a presentation beat. */
+ const quiet=(event:RuntimeEvent)=>client.current?.mode==='online'&&event.owner===1&&event.phase==='runtime'&&(event.kind==='deploy'||event.kind==='turn');
+ /** Starts presenting events the client holds, unless a presentation or a drag is already under way. */
+ function kick(){if(client.current?.pendingCount&&!resolvingRef.current&&!isDragging.current){resolvingRef.current=true;setBusy(true);pump();}}
  function pump(){
-  let before=engine.current?.view();
-  let next=engine.current?.step();
-  while(next&&eventTime(next.event,fastRef.current)===0){record(next.event);setView(next.view);before=engine.current?.view();next=engine.current?.step();}
-  if(!next){resolvingRef.current=false;isDragging.current=false;setBusy(false);setActive(null);if(engine.current){const snapshot=engine.current.view();setView(snapshot);if(snapshot.phase==='draft')setNotice(`Draft ready · ${snapshot.players[0].wallet} Crypto to spend${snapshot.circuitEligible.includes(0)?' · Your free Circuit privilege is available.':'.'}`);if(snapshot.phase==='runtime')setNotice(`Turn ${snapshot.turn} · ${snapshot.players[0].actions} Actions available · ${snapshot.priority===0?'You reveal first':'Opponent reveals first'}.`);}return;}
+  let before=client.current?.view()??undefined;
+  let next=client.current?.step();
+  while(next&&next.event.kind!=='cycle'&&(quiet(next.event)||eventTime(next.event,fastRef.current)===0)){record(next.event);setView(next.view);before=client.current?.view()??undefined;next=client.current?.step();}
+  if(next?.event.kind==='cycle'){record(next.event);setNotice(next.event.text);setView(next.view);showOpening(next.view);return;}
+  if(!next){resolvingRef.current=false;isDragging.current=false;setBusy(false);setActive(null);if(client.current?.view()){const snapshot=client.current.view()!;setView(snapshot);if(snapshot.phase==='draft')setNotice(`Draft ready · ${snapshot.players[0].wallet} Crypto to spend${snapshot.circuitEligible.includes(0)?' · Your free Circuit privilege is available.':'.'}`);if(snapshot.phase==='runtime')setNotice(`Turn ${snapshot.turn} · ${snapshot.players[0].actions} Actions available · ${snapshot.priority===0?'You reveal first':'Opponent reveals first'}.`);}return;}
   presentResolved(before,next);
  }
  function presentResolved(before:SessionView|undefined,resolved:{event:RuntimeEvent;view:SessionView}){
@@ -211,7 +225,7 @@ export function App(){
   setNotice(`${snapshot.players[0].hand.length} cards drawn. Crypto will move to your cache.`);
   setArrivals(snapshot.players[0].hand.map(card=>card.id));later(()=>setArrivals([]),1100);
   setCashed([]);setClosedNodes([]);setCollapseNode(null);setAwardNode(null);setSelectionNode(null);
-  later(()=>transferCrypto(crypto,0,()=>{setDealing(false);if(engine.current?.pendingCount){pump();return;}setBusy(false);resolvingRef.current=false;setNotice(`${snapshot.players[0].hand.length} cards dealt · ${snapshot.players[0].hand.length-crypto.length} in hand · ${crypto.length} in Crypto wallet.`);}),scanTotal+2100);
+  later(()=>transferCrypto(crypto,0,()=>{setDealing(false);if(client.current?.pendingCount){pump();return;}setBusy(false);resolvingRef.current=false;setNotice(`${snapshot.players[0].hand.length} cards dealt · ${snapshot.players[0].hand.length-crypto.length} in hand · ${crypto.length} in Crypto wallet.`);}),scanTotal+2100);
  }
  function transferCrypto(cards:Card[],index:number,done:()=>void){
   const card=cards[index];if(!card){done();return;}
@@ -219,39 +233,71 @@ export function App(){
   if(source&&target){const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();setFlight({card,x:a.x,y:a.y,w:a.width,h:a.height,dx:b.x+b.width/2-a.x-a.width/2,dy:b.y+b.height/2-a.y-a.height/2,scale:67/a.width,crypto:true});}
   later(()=>{setOpeningCrypto(ids=>ids.filter(id=>id!==card.id));setFlight(null);later(()=>transferCrypto(cards,index+1,done),160);},500);
  }
- async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(opponent)]);setContent(snapshot);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});engine.current=session;logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=opponent;strategistActive.current=!!brief&&!brief.disabled;if(brief&&!brief.disabled)record({id:-Date.now(),kind:'cycle',text:`${opponentName(opponent)} ${versionLabel(brief.version)} plan: ${brief.plan}`});setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
- function act(action:()=>RuntimeEvent|void|null){try{const event=action();if(event){record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);}if(engine.current){const snapshot=engine.current.view();setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}}catch(error){setNotice(error instanceof Error?error.message:'Action unavailable.');}}
+ async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(opponent)]);setContent(snapshot);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});client.current=new LocalClient(session);logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=opponent;strategistActive.current=!!brief&&!brief.disabled;if(brief&&!brief.disabled)record({id:-Date.now(),kind:'cycle',text:`${opponentName(opponent)} ${versionLabel(brief.version)} plan: ${brief.plan}`});setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
+ /** Runs one command on either client; the continuation is immediate for a local table and follows the ack online. */
+ function act(action:()=>RuntimeEvent|void|null|Promise<RuntimeEvent|void|null>,after?:()=>void,failed?:()=>void){
+  attempt(action,event=>{if(event){record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);}const snapshot=client.current?.view();if(snapshot){setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}after?.();kick();},error=>{setNotice(error instanceof Error?error.message:'Action unavailable.');failed?.();kick();});
+ }
  function acquire(pileId:string){
-  if(!engine.current||busy)return;
-  try{const event=engine.current.buy(pileId);record(event);setNotice(event.text);setView(engine.current.view());setAcquired(previous=>({...previous,[pileId]:{at:Date.now(),count:(previous[pileId]?.count??0)+1}}));}catch(error){setNotice(error instanceof Error?error.message:'Acquisition unavailable.');}
+  if(!client.current||busy)return;
+  attempt(()=>client.current!.buy(pileId),event=>{record(event);setNotice(event.text);setView(client.current!.view()!);setAcquired(previous=>({...previous,[pileId]:{at:Date.now(),count:(previous[pileId]?.count??0)+1}}));kick();},error=>{setNotice(error instanceof Error?error.message:'Acquisition unavailable.');kick();});
  }
  function claimPrivilege(){
-  if(!engine.current||resolvingRef.current)return;
-  try{const event=engine.current.claimCircuitReward();const next=engine.current.view();resolvingRef.current=true;setBusy(true);setActive(event);record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);const duration=eventTime(event,fastRef.current);later(()=>setView(next),duration*.6);later(()=>{if(engine.current?.pendingCount)pump();else{setActive(null);setBusy(false);resolvingRef.current=false;}},duration);}catch(error){setNotice(error instanceof Error?error.message:'Privilege unavailable.');}
+  if(!client.current||resolvingRef.current)return;
+  resolvingRef.current=true;
+  attempt(()=>client.current!.claimCircuitReward(),event=>{const next=client.current!.view()!;setBusy(true);setActive(event);record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);const duration=eventTime(event,fastRef.current);later(()=>setView(next),duration*.6);later(()=>{if(client.current?.pendingCount)pump();else{setActive(null);setBusy(false);resolvingRef.current=false;}},duration);},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Privilege unavailable.');});
  }
  function choose(selection:string|string[]){
-  if(!engine.current||resolvingRef.current)return;
-  try{const before=engine.current.view();const event=engine.current.choose(selection);setNotice(isNoTargetEvent(event)?'No target':event.text);resolvingRef.current=true;setBusy(true);presentResolved(before,{event,view:engine.current.view()});}catch(error){setNotice(error instanceof Error?error.message:'Choice unavailable.');}
+  if(!client.current||resolvingRef.current)return;
+  const before=client.current.view()!;resolvingRef.current=true;
+  attempt(()=>client.current!.choose(selection),event=>{setNotice(isNoTargetEvent(event)?'No target':event.text);setBusy(true);presentResolved(before,{event,view:client.current!.view()!});},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Choice unavailable.');});
  }
  function endTurn(){
-  if(!engine.current||resolvingRef.current)return;
-  resolvingRef.current=true;setSelected(null);act(()=>engine.current!.endTurn());
-  if(engine.current.pendingCount){setBusy(true);later(pump,400);}else resolvingRef.current=false;
+  if(!client.current||resolvingRef.current)return;
+  resolvingRef.current=true;setSelected(null);
+  act(()=>client.current!.endTurn(),()=>{if(client.current?.pendingCount){setBusy(true);later(pump,400);}else resolvingRef.current=false;},()=>{resolvingRef.current=false;});
  }
  function undoPlanning(){
-  if(!engine.current||busy||resolvingRef.current)return;
+  if(!client.current||busy||resolvingRef.current)return;
   setSelected(null);setDragged(null);setHoveredNode(null);
-  act(()=>engine.current!.undoAllPlanning());
+  act(()=>client.current!.undoAllPlanning());
  }
  function addTestCard(id:string,owner:0|1){
-  if(!engine.current||busy||resolvingRef.current)return false;
+  if(!client.current?.addEvaluationCard||busy||resolvingRef.current)return false;
   try{
-   const before=engine.current.view();
-   const event=engine.current.addEvaluationCard(id,owner);
+   const before=client.current.view()!;
+   const event=client.current.addEvaluationCard(id,owner);
    resolvingRef.current=true;setBusy(true);
-   presentResolved(before,{event,view:engine.current.view()});
+   presentResolved(before,{event,view:client.current.view()!});
    return true;
   }catch(error){setNotice(error instanceof Error?error.message:'Test card unavailable.');return false;}
+ }
+ /** The online seat: one client for the lobby and the game, subscribed for pushed events, snapshots and presence. */
+ function onlineClient(){
+  if(online.current)return online.current;
+  const next=new OnlineClient();
+  online.current=next;
+  next.onLobby(setLobby);
+  next.subscribe(change=>{
+   if(change.kind==='pending'){kick();return;}
+   if(change.kind==='snapshot'){
+    const snapshot=next.view()!;const opening=!client.current&&snapshot.cycle===1&&snapshot.turn===1&&snapshot.phase==='runtime';
+    client.current=next;logGame.current=null;strategistGame.current=null;setHistory(change.log);setView(snapshot);setOpponentAway(false);
+    if(opening)showOpening(snapshot);else{setCycleStart({vp:snapshot.players[0].totalVP,integrity:snapshot.players[0].servers.primary+snapshot.players[0].servers.backup});setNotice('Back at the table.');kick();}
+    return;
+   }
+   if(change.kind==='presence'&&change.seat===1){setOpponentAway(!change.connected);setNotice(change.connected?`${next.seatNames?.[1]??'Opponent'} is back.`:`${next.seatNames?.[1]??'Opponent'} disconnected · waiting up to 20 s.`);return;}
+   if(change.kind==='connection'){if(change.state==='reconnecting')setNotice('Connection lost · reconnecting…');return;}
+   if(change.kind==='error'){setNotice(change.message);return;}
+  });
+  return next;
+ }
+ const createOnline=(mode:RoomMode,name:string)=>{void onlineClient().createRoom(mode,name,{turnSeconds:setup.turnSeconds??0}).catch(()=>undefined);};
+ const joinOnline=(code:string,name:string)=>{void onlineClient().joinRoom(code,name).catch(()=>undefined);};
+ const resumeOnline=(saved:SavedSeat)=>{void onlineClient().resume(saved).catch(()=>undefined);};
+ function leaveTable(){
+  if(client.current?.mode==='online'||lobby?.status==='waiting')online.current?.leave();
+  client.current?.close();client.current=null;setOpponentAway(false);
  }
  function legal(node:number,card=dragged){if(!view||!card)return 'Select a card.';if(busy||view.phase!=='runtime')return 'Wait for Runtime.';return canDeploy(card,view.players[0].actions,view.turn,node,view.nodes[node].cards[0].length,view.openNodes);}
  function relocateLegal(node:number,card=dragged){
@@ -266,26 +312,27 @@ export function App(){
   return null;
  }
  function deploy(node:number,card=dragged,origin?:CardOrigin){
-  if(!card||!engine.current||resolvingRef.current)return;
+  if(!card||!client.current||resolvingRef.current)return;
   const reason=legal(node,card);if(reason){setNotice(reason);setDragged(null);return;}
   const source=document.querySelector(`[data-card-id="${CSS.escape(card.id)}"]`),target=document.querySelector(`[data-node-drop="${node}"]`);
   setDragged(null);setSelected(null);
-  if((!source&&!origin)||!target){act(()=>engine.current!.deploy(card.id,node));return;}
+  if((!source&&!origin)||!target){act(()=>client.current!.deploy(card.id,node));return;}
   const a=origin??source!.getBoundingClientRect(),b=target.getBoundingClientRect(),slot=view!.nodes[node].cards[0].length,scale=b.width/124;
   const x=b.x+b.width/2+(slot%2?27:-27)*scale,y=b.y+b.height/2+(slot<2?-27.5:27.5)*scale;
   resolvingRef.current=true;isDragging.current=true;setBusy(true);
   setFlight({card,x:a.x,y:a.y,w:a.width,h:a.height,dx:x-a.x-a.width/2,dy:y-a.y-a.height/2,scale:46*scale/a.width,angle:origin?.angle??0,release:origin?.release});
-  later(()=>{act(()=>engine.current!.deploy(card.id,node));setFlight(null);setBusy(false);resolvingRef.current=false;isDragging.current=false;},FLIGHT_MS);
+  const land=()=>{setFlight(null);setBusy(false);resolvingRef.current=false;isDragging.current=false;};
+  later(()=>act(()=>client.current!.deploy(card.id,node),land,land),FLIGHT_MS);
  }
  function relocate(node:number,card=dragged,origin?:CardOrigin){
-  if(!card||!engine.current||resolvingRef.current)return;
+  if(!card||!client.current||resolvingRef.current)return;
   const reason=relocateLegal(node,card);if(reason){setNotice(reason);setDragged(null);return;}
   setDragged(null);setSelected(null);
-  let event;
-  try{event=engine.current.relocateCard(card.id,node);}catch(error){setNotice(error instanceof Error?error.message:'That card cannot move.');return;}
-  record(event);setView(engine.current.view());setNotice(event.text);
-  if(!origin)return;
-  // The board commits through its own renderer, so wait for the card to mount in its new Node. It is already face up, so skip the reveal flip and glide it in from the drop point.
+  attempt(()=>client.current!.relocateCard(card.id,node),event=>{record(event);setView(client.current!.view()!);setNotice(event.text);if(origin)glideRelocated(node,card,origin);},error=>setNotice(error instanceof Error?error.message:'That card cannot move.'));
+ }
+ /** The board commits through its own renderer, so wait for the card to mount in its new Node, then glide it in from the drop point. */
+ function glideRelocated(node:number,card:Card,origin:CardOrigin){
+  // It is already face up, so skip the reveal flip.
   const glide=(frames:number)=>requestAnimationFrame(()=>{
    const landed=document.querySelector<HTMLElement>(`[data-node-drop="${node}"] .field-card[data-card-id="${CSS.escape(card.id)}"]`);
    landed?.getAnimations().forEach(animation=>{if((animation as CSSAnimation).animationName==='card-reveal')animation.finish();});
@@ -307,7 +354,7 @@ export function App(){
   enabled:!!view&&view.phase==='runtime'&&!busy,
   onStart:card=>{isDragging.current=true;setSelected(null);setDragged(card);},
   onHover:setHoveredNode,
-  onEnd:()=>{setDragged(null);setHoveredNode(null);later(()=>{if(!resolvingRef.current)isDragging.current=false;},80);},
+  onEnd:()=>{setDragged(null);setHoveredNode(null);later(()=>{if(!resolvingRef.current){isDragging.current=false;kick();}},80);},
   onDrop:(node,card,origin)=>deploy(node,card,origin),
   canDrop:(node,card)=>!legal(node,card),
  });
@@ -315,7 +362,7 @@ export function App(){
   enabled:!!view&&view.phase==='runtime'&&!busy,
   onStart:card=>{isDragging.current=true;setSelected(null);setDragged(card);},
   onHover:setHoveredNode,
-  onEnd:()=>{setDragged(null);setHoveredNode(null);later(()=>{if(!resolvingRef.current)isDragging.current=false;},80);},
+  onEnd:()=>{setDragged(null);setHoveredNode(null);later(()=>{if(!resolvingRef.current){isDragging.current=false;kick();}},80);},
   onDrop:(node,card,origin)=>relocate(node,card,origin),
   canDrop:(node,card)=>!relocateLegal(node,card),
  });
@@ -345,9 +392,10 @@ export function App(){
  // The opponent agent takes notes after every Draft and debriefs once the session ends.
  useEffect(()=>{
   const id=strategistGame.current;
-  if(!id||!engine.current||!view)return;
-  if(view.phase==='gameover'){strategistGame.current=null;void reportGame(id,engine.current.matchReport(),strategistAgent.current);return;}
-  if(view.cycle>1&&strategistActive.current)reportCycle(id,engine.current.matchReport(),strategistAgent.current);
+  const report=client.current?.matchReport();
+  if(!id||!report||!view)return;
+  if(view.phase==='gameover'){strategistGame.current=null;void reportGame(id,report,strategistAgent.current);return;}
+  if(view.cycle>1&&strategistActive.current)reportCycle(id,report,strategistAgent.current);
  },[view?.cycle,view?.phase==='gameover']);
  // Lookdev handle: `__endSession()` plays the closing beat without finishing a session.
  useEffect(()=>{
@@ -372,11 +420,11 @@ export function App(){
  const seconds=view?.draftEndsAt?Math.max(0,Math.ceil((view.draftEndsAt-now)/1000)):0;
  const draftOpen=phase==='draft'&&(!busy||(active?.source==='circuit'&&active.owner===0));
  useEffect(()=>{
-  if(view?.phase!=='draft'||busy||resolvingRef.current||!engine.current)return;
-  if(view.draftEnded){act(()=>engine.current!.nextCycle());return;}
-  if(view.draftEndsAt!==null&&now>=view.draftEndsAt){act(()=>engine.current!.expireDraft(now));return;}
-  const event=engine.current.opponentDraftStep(now);
-  if(event){record(event);setView(engine.current.view());}
+  if(view?.phase!=='draft'||busy||resolvingRef.current||!client.current)return;
+  const event=client.current.tickDraft(now);
+  if(!event)return;
+  record(event);const snapshot=client.current.view()!;setView(snapshot);
+  if(event.kind==='cycle'){setNotice(event.text);showOpening(snapshot);}
  },[now,view?.phase,view?.draftEnded,busy]);
  const playerColors=useMemo(()=>resolveColorTheme(colorTheme),[colorTheme]);
  const cardBackUrls=useMemo<PerPlayer<string>>(()=>[cardBackSrc(cardBacks[0],playerColors[0]),cardBackSrc(cardBacks[1],playerColors[1])],[cardBacks,playerColors]);
@@ -398,7 +446,7 @@ export function App(){
  ...(view?[{id:'zone-buttons',position:ZONE_BUTTONS_POSITION,content:<ZoneButtons trash={view.trash.length} destroyed={destroyedCount} open={drawerZone} toggle={zone=>setDrawer(current=>current===zone?null:zone)}/>}]:[]),
  ];
  return <main className='app' data-event-id={active?.id} data-event-kind={active?.kind} data-event-stage={active?.stage} data-event-node={active?.node}>
-  <BoardTuningPanel endGame={view&&phase!=='gameover'?{run:()=>act(()=>engine.current!.endSessionNow()),disabled:busy}:undefined} lighting={lightingMode==='real'?{floor:boardBackgroundLabel(floorBackground),value:realLighting,saved:lightingStore[floorBackground]?.saved,change:changeLighting,neon:boardStyle==='neon'}:undefined} paint={boardStyle==='neon'?{active:neonSurface==='paint',enable:()=>setNeonSurface('paint')}:undefined}/>
+  <BoardTuningPanel endGame={view&&phase!=='gameover'&&client.current?.endSessionNow?{run:()=>act(()=>client.current!.endSessionNow!()),disabled:busy}:undefined} lighting={lightingMode==='real'?{floor:boardBackgroundLabel(floorBackground),value:realLighting,saved:lightingStore[floorBackground]?.saved,change:changeLighting,neon:boardStyle==='neon'}:undefined} paint={boardStyle==='neon'?{active:neonSurface==='paint',enable:()=>setNeonSurface('paint')}:undefined}/>
   <header className='topline'><div className='brand'><span>0</span>UROBOROS<small>THE CIRCUIT AND THE SERPENT</small></div><div className='phase-stack'><div className='phase-label'>{view?`CYCLE ${String(view.cycle).padStart(2,'0')} / ${phase==='runtime'?`RUNTIME ${view.turn} OF 3`:phase.toUpperCase()}`:'THE CIRCUIT AWAITS'}</div>{view&&<div className='cycle-track' aria-label='Cycle progress'>{['Turn 1','Turn 2','Turn 3','Collapse','Draft'].map((label,index)=>{const step=phase==='draft'?4:phase==='collapse'?3:view.turn-1;return <span key={label} className={index===step?'current':index<step?'complete':''} aria-current={index===step?'step':undefined}><i/>{label}{label==='Collapse'&&phase==='collapse'&&active?.node!==undefined&&<b className='cycle-step-detail'>{active.kind==='circuit'&&!circuitLanded?'CIRCUIT SELECTION':`N${active.node+1} / N5`}</b>}</span>;})}</div>}</div><nav><div className='settings-cluster'><button className='settings-toggle' aria-haspopup='true' aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(open=>!open)}>Settings</button>{settingsOpen&&<><span className='settings-scrim' onClick={()=>setSettingsOpen(false)}/><div className='settings-popover' aria-label='Session settings'><div className='settings-tabs' role='tablist'>{SETTINGS_TABS.map(tab=><button key={tab.id} type='button' role='tab' aria-selected={settingsTab===tab.id} onClick={()=>setSettingsTab(tab.id)}>{tab.label}</button>)}</div>
    {settingsTab==='players'&&<div className='settings-panel' role='tabpanel' aria-label='Players'><div className='player-tabs' role='tablist' aria-label='Player'>{([0,1] as const).map(owner=><button key={owner} type='button' role='tab' aria-selected={playerTab===owner} style={{'--swatch':playerColors[owner].accent} as CSSProperties} onClick={()=>setPlayerTab(owner)}><i aria-hidden='true'/>Player {owner+1}<small>{owner?'Opponent':'You'}</small></button>)}</div><PlayerSettings key={playerTab} owner={playerTab} colors={colorTheme} setColors={setColorTheme} lanes={lanePatterns} setLanes={setLanePatterns} servers={serverStyles} setServers={setServerStyles} backs={cardBacks} setBacks={setCardBacks}/></div>}
    {settingsTab==='board'&&<div className='settings-panel' role='tabpanel' aria-label='Board'><span className='bg-picker' role='group' aria-label='Floor background'><small>Background</small><button type='button' className='bg-picker-btn' aria-label='Previous floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,-1))}>‹</button><span className='bg-picker-label'>{boardBackgroundLabel(floorBackground)}</span><button type='button' className='bg-picker-btn' aria-label='Next floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,1))}>›</button></span><BoardStylePicker value={boardStyle} onChange={setBoardStyle}/>{boardStyle==='neon'&&<OptionPicker className='neon-surface-picker' label='Surface' name='Neon table surface' options={NEON_SURFACES} value={neonSurface} onChange={setNeonSurface}/>}<BoardLightSliders/></div>}
@@ -409,7 +457,7 @@ export function App(){
     <div className='wallet-head'><Icon name='crypto'/><b className='cache-total'>{cacheValue}</b><div className='wallet-label'><b>CRYPTO WALLET</b><small>{cache.length} {cache.length===1?'card':'cards'}</small></div></div>
     <div className='cache-cards' style={{'--count':cache.length} as CSSProperties}>{cache.map((card,index)=><button className={`cache-card ${cashFlight?.card.id===card.id?'paying':''}`} data-card-id={card.id} style={{'--stack-index':index,'--fan':index-(cache.length-1)/2,'--angle':`${(index-(cache.length-1)/2)*Math.min(4,20/cache.length)}deg`,'--lift':`${Math.abs(index-(cache.length-1)/2)*2}px`,'zIndex':index+1} as CSSProperties} key={card.id} onClick={()=>setSelected(card)} title={card.name} aria-label={card.name}><CardFace card={card} compact/></button>)}</div>   </aside>
    <div className='turn-dock'>
-    <EndTurnControl key={view?'playing':'setup'} seconds={runtimeSeconds} onConcede={()=>act(()=>engine.current!.concedeForInactivity())} cycle={view?.cycle??0} turn={view?.turn??1} enabled={!!view&&!busy&&phase==='runtime'} busy={busy} dealing={dealing} onEnd={endTurn}/>
+    <EndTurnControl key={view?'playing':'setup'} seconds={client.current?.mode==='online'?lobby?.settings?.turnSeconds||null:runtimeSeconds} onConcede={()=>{if(client.current?.mode==='local')act(()=>client.current!.concede());}} cycle={view?.cycle??0} turn={view?.turn??1} enabled={!!view&&!busy&&phase==='runtime'&&!view.turnReady[0]} busy={busy} dealing={dealing} onEnd={endTurn} waiting={view&&phase==='runtime'&&view.turnReady[0]&&!busy?{undo:()=>act(()=>client.current!.undoEndTurn()),opponent:client.current?.seatNames?.[1]??'opponent'}:null}/>
    </div>
    <div ref={handZone} className='hand-zone' data-resource='0-hand' style={handSpan?{left:handSpan.left,right:handSpan.right}:undefined}><div className='hand-instruction'>{dealing?'Five-card deal · Crypto moves to cache':fieldHand.length?'Drag to deploy · Click to inspect':phase==='runtime'?'Your hand is empty':'The Circuit is resolving'}</div><div className='hand' style={{'--hand-overlap':`${handOverlap(fieldHand.length,handSpan?.room??0,handSpan?.cardWidth??120,handSpan?.cardHeight??168)}px`} as CSSProperties}>{fieldHand.map((card,i)=><button key={card.id} data-card-id={card.id} className={`hand-card ${arrivals.includes(card.id)?'drawing-card':''} ${dragged?.id===card.id||flight?.card.id===card.id?'dragging':''}`} style={{'--angle':`${(i-(fieldHand.length-1)/2)*Math.min(4,20/fieldHand.length)}deg`,'--lift':`${Math.abs(i-(fieldHand.length-1)/2)*5}px`,'--index':i,'--arrival-delay':`${Math.max(0,arrivals.indexOf(card.id))*110}ms`} as CSSProperties} draggable={false} aria-label={`Inspect ${card.name}`} onDragStart={e=>e.preventDefault()} onPointerDown={e=>beginCardDrag(e,card)} onClick={()=>{if(!isDragging.current)setSelected(card);}}><HandCardFace card={card}/></button>)}</div></div>
   </section>
@@ -418,18 +466,18 @@ export function App(){
   {active&&<EffectPath key={`path-${active.id}`} event={active.source==='circuit'&&active.owner===1?{...active,node:view?.selectedNode??undefined}:active} duration={eventTime(active,fast)}/>}
   {(active?.kind==='move'||active?.kind==='morph')&&<CardEffectMotion key={`card-effect-${active.id}`} event={active} duration={eventTime(active,fast)}/>}
   {globalEvent&&<EventMessage key={`global-${active.id}`} event={active}/>}
-  <footer className='status-bar'><span className='status-dot'/><span>{notice}</span><span className='session-policy'>Actions carry over · Control Locations to earn the Circuit</span></footer>
-  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section>{SetupAgentsWindow&&<Suspense fallback={null}><SetupAgentsWindow/></Suspense>}</div>}
-  {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>engine.current!.endDraft())} undo={()=>act(()=>engine.current!.undoEndDraft())}/>}
+  <footer className='status-bar'><span className={`status-dot ${opponentAway?'away':''}`}/><span>{notice}</span>{client.current?.mode==='online'&&lobby?.code&&<span className='session-online' data-room-code={lobby.code}>Table {lobby.code}{opponentAway?' · opponent away':''}</span>}<span className='session-policy'>Actions carry over · Control Locations to earn the Circuit</span></footer>
+  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading||lobby?.status==='waiting'} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<OnlineLobby lobby={lobby??IDLE_LOBBY} saved={savedOnlineSeat} turnSeconds={setup.turnSeconds} disabled={!boardReady||contentLoading} onCreate={createOnline} onJoin={joinOnline} onResume={resumeOnline} onLeave={leaveTable}/><a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section>{SetupAgentsWindow&&<Suspense fallback={null}><SetupAgentsWindow/></Suspense>}</div>}
+  {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>client.current!.endDraft())} undo={()=>act(()=>client.current!.undoEndDraft())}/>}
   {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p><LocationText text={view.nodes[locationInspect].location!.rule}/></p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p><LocationText text={view.nodes[locationInspect].location!.reward}/></p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
   {catalogOpen&&<CardCatalog content={content} canTest={!!view&&phase==='runtime'&&!busy&&!view.canUndoPlanning} close={()=>setCatalogOpen(false)} inspect={setSelected} add={addTestCard}/>}
   {selected&&!dragged&&<div className='modal-backdrop' onClick={()=>setSelected(null)}><section className='inspect' role='dialog' aria-modal='true' aria-label={`Inspect ${selected.name}`} onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close card inspect' onClick={()=>setSelected(null)}>×</button><div className='inspect-art'><CardFace card={selected} context={phase==='draft'?'draft':'runtime'} video={selectedClip?{src:selectedClip,loop:true,sound:videoSound}:undefined}/>{selectedClip&&<button className='inspect-sound' aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>{videoSound?'Sound on':'Sound off'}</button>}</div><div className='inspect-copy'><small>{selected.type}</small><h2>{selected.name}</h2><div className='inspect-stats'><span>POWER <b className={selected.power===undefined||selected.basePower===undefined||selected.power===selected.basePower?undefined:selected.power>selected.basePower?'power-boosted':'power-reduced'}>{selected.power??'—'}</b></span>{phase==='draft'&&<span>DRAFT COST <b>{selected.cost}</b></span>}</div><p>{selected.effect}</p>{selected.storyText&&<div className='source-card-text'><small>STORY</small><p>{selected.storyText}</p></div>}{selected.modifiers?.length?<div className='source-card-text'><small>MODS</small><ul>{selected.modifiers.map(modifier=><li key={modifier.id}>{modifierText(modifier,content?.cards??[])}{modifier.sourceName&&<em> · from {modifier.sourceName}</em>}</li>)}</ul></div>:null}{sourceCard&&<div className='source-card-text'><small>ORIGINAL CARD EFFECTS</small><ul>{sourceCard.effects.map((text,index)=><li key={index}>{text}</li>)}</ul>{sourceCard.effects.some(text=>/draft/i.test(text))&&<p className='content-note'>Each +Draft now transfers 1 of your Power between this Location and a neighbor.</p>}</div>}<small>{selected.type==='Crypto'?'Held Crypto resolves automatically for Draft.':`Runtime deployment: ${isCharacterCard(selected)?'1 Action':'0 Actions'}.`}</small>{selected.type==='VP'&&<p className='content-note'>{selected.vp??2} scoring VP while owned in an active zone.</p>}{selected.duration&&<p className='content-note'>Duration {selected.duration===99?'∞':selected.duration}. {selected.durationPeriod==='runtime'?'Measured in Runtime turns; scheduled effects follow the card text.':'The deployment Cycle counts as the first Cycle.'}</p>}{!busy&&phase==='runtime'&&local?.hand.some(c=>c.id===selected.id)&&selected.type!=='Crypto'&&<div className='inspect-deploy'><span>Deploy to Node</span>{[0,1,2,3,4].map(n=><button key={n} disabled={!!legal(n,selected)} title={legal(n,selected)??`Deploy to Node ${n+1}`} onClick={()=>deploy(n,selected)}>{n+1}</button>)}</div>}</div></section></div>}
-  {panel==='log'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><LogDrawer events={history} cycles={engine.current?.cycleHistory()??[]} live={view?{cycle:view.cycle,turn:view.turn,phase:view.phase}:null} colors={[playerColors[0].accent,playerColors[1].accent]} close={()=>setPanel(null)}/></div>}
+  {panel==='log'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><LogDrawer events={history} cycles={client.current?.cycleHistory()??[]} live={view?{cycle:view.cycle,turn:view.turn,phase:view.phase}:null} colors={[playerColors[0].accent,playerColors[1].accent]} close={()=>setPanel(null)}/></div>}
   {panel==='practice'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><aside className='side-panel' onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close panel' onClick={()=>setPanel(null)}>×</button><small>0UROBOROS / EVALUATION SCOPE</small><h2>Evaluation build</h2><p>This session uses a ten-card starter deck, real draw and discard zones, and alternating reveals. Win more Locations to earn the Circuit Reward; equal win counts reward both players.</p><p>Five approved evaluation Locations and three Circuit privileges are enabled. The market includes four core Base piles, two rotating Base offers, three VP piles, three Crypto piles and three rotating Chaos offers. New definitions are provisional evaluation content.</p><p>Unused Actions carry forward. Controlling more Locations earns next reveal priority; ties retain priority.</p><p>The local opponent deploys and purchases using its own cards, Wallet and public board information. Both players compete for shared supply. This is a local evaluation, not online multiplayer.</p></aside></div>}
   {view&&<ZoneDrawer zone={drawerZone} view={view} choice={recovering} choose={choose} inspect={setSelected} close={()=>setDrawer(null)}/>}
   {pendingChoice&&!recovering&&<EffectChoice choice={pendingChoice} choose={choose} transferView={transferView} transferHover={setTransferHover}/>}
   {transferDrag&&transferView&&<TransferBadge drag={transferDrag} amount={transferView.amount}/>}
-  {phase==='gameover'&&ended&&!busy&&view&&<GameSummary view={view} colors={playerColors} inspect={setSelected} onTallied={markTallied} restart={()=>{engine.current=null;setView(null);setHistory([]);setActive(null);}}/>}
+  {phase==='gameover'&&ended&&!busy&&view&&<GameSummary view={view} colors={playerColors} inspect={setSelected} onTallied={markTallied} restart={()=>{leaveTable();setView(null);setHistory([]);setActive(null);}}/>}
  </main>;
 }
 function HandCardFace({card}:{card:Card}){return <CardFace card={card}/>;}
@@ -439,6 +487,7 @@ function Resources({owner,actions,crypto,pending,vp}:{owner:number;actions:numbe
  useEffect(()=>{if(!labels)return;const timer=setTimeout(()=>setLabels(false),PILE_TIP_MS);return()=>clearTimeout(timer);},[labels]);
  return <div className='resources' data-labels-open={labels||undefined} onClick={()=>setLabels(true)}>{[{key:'actions',icon:'actions',value:actions,label:'Actions'},{key:'wallet',icon:'crypto',value:crypto,label:'Crypto'},{key:'vp',icon:'volume',value:vp,label:'VP'}].map(stat=><span className={`stat-${stat.key}`} data-resource={`${owner}-${stat.key}`} key={stat.key}><span className='stat-pair'><Icon name={stat.icon}/><b key={stat.value}>{stat.value}</b></span><span className='stat-foot'><small>{stat.label}</small>{stat.key==='actions'&&pending>0&&<em className='stat-pending' title={`+${pending} Action${pending===1?'':'s'} next Runtime turn`}>+{pending} next</em>}</span></span>)}</div>;}
 const DECK_KEY='ouroboros.startingDeck';
+const IDLE_LOBBY:LobbyState={status:'idle',connection:'offline',code:null,seat:null,seats:[null,null],mode:null,settings:null,result:null,error:null};
 const OPPONENT_KEY='ouroboros.opponent';
 type SettingsTab='players'|'board'|'general';
 const SETTINGS_TABS:{id:SettingsTab;label:string}[]=[{id:'players',label:'Players'},{id:'board',label:'Board'},{id:'general',label:'General'}];
