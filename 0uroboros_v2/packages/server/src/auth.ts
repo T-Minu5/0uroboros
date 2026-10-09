@@ -9,7 +9,7 @@
  * Tokens are stored hashed; the plain token only ever travels to the player.
  */
 import { createHash, randomBytes } from "node:crypto";
-import type { Account, Store } from "./store";
+import type { Account, IdentityProvider, Store } from "./store";
 
 export const MAGIC_LINK_TTL_MS = 15 * 60_000;
 export const SESSION_TTL_MS = 30 * 24 * 3_600_000;
@@ -43,11 +43,75 @@ export class ResendMailer implements Mailer {
   }
 }
 
+/** Checks a native credential with its provider and returns the stable subject (Steam id, Apple `sub`). */
+export interface IdentityVerifier {
+  verify(credential: string): Promise<{ subject: string; name?: string; email?: string | null }>;
+}
+
+/**
+ * Steam session tickets (`steamworks.js` `auth.getSessionTicketWithSteamId`) are checked with the Steam Web API.
+ * Needs a publisher Web API key and the app id from the Steamworks partner site.
+ */
+export class SteamVerifier implements IdentityVerifier {
+  constructor(private readonly webApiKey: string, private readonly appId: string, private readonly fetchImpl: typeof fetch = fetch) {}
+  async verify(ticket: string) {
+    if (!/^[0-9a-fA-F]{40,4096}$/.test(ticket)) throw new AuthError(400, "That is not a Steam session ticket.");
+    const url = `https://partner.steam-api.com/ISteamUserAuth/AuthenticateUserTicket/v1/?key=${encodeURIComponent(this.webApiKey)}&appid=${encodeURIComponent(this.appId)}&ticket=${ticket}`;
+    const response = await this.fetchImpl(url);
+    if (!response.ok) throw new AuthError(502, `Steam answered ${response.status}.`);
+    const body = await response.json() as { response?: { params?: { result?: string; steamid?: string; vacbanned?: boolean; publisherbanned?: boolean }; error?: { errorcode: number; errordesc: string } } };
+    const params = body.response?.params;
+    if (!params || params.result !== "OK" || !params.steamid) throw new AuthError(401, body.response?.error?.errordesc ?? "Steam did not accept the ticket.");
+    if (params.publisherbanned) throw new AuthError(403, "This Steam account is banned from 0uroboros.");
+    return { subject: params.steamid };
+  }
+}
+
+/**
+ * Sign in with Apple identity tokens are RS256 JWTs; the key comes from Apple's JWKS, the audience is the app's bundle id
+ * (or Services id on the web). Only the `sub` is stored.
+ */
+export class AppleVerifier implements IdentityVerifier {
+  private keys: { kid: string; key: import("node:crypto").KeyObject }[] = [];
+  private fetchedAt = 0;
+  constructor(private readonly audiences: string[], private readonly fetchImpl: typeof fetch = fetch, private readonly now: () => number = Date.now) {}
+  async verify(identityToken: string) {
+    const [h, p, s] = identityToken.split(".");
+    if (!h || !p || !s) throw new AuthError(400, "That is not an Apple identity token.");
+    const header = JSON.parse(Buffer.from(h, "base64url").toString()) as { alg?: string; kid?: string };
+    const payload = JSON.parse(Buffer.from(p, "base64url").toString()) as { iss?: string; aud?: string | string[]; exp?: number; sub?: string; email?: string };
+    if (header.alg !== "RS256" || !header.kid) throw new AuthError(400, "Unsupported Apple token.");
+    const key = await this.keyFor(header.kid);
+    const { createVerify } = await import("node:crypto");
+    const valid = createVerify("RSA-SHA256").update(`${h}.${p}`).verify(key, Buffer.from(s, "base64url"));
+    const audience = Array.isArray(payload.aud) ? payload.aud : [payload.aud ?? ""];
+    if (!valid || payload.iss !== "https://appleid.apple.com" || !audience.some(a => this.audiences.includes(a)) || !payload.exp || payload.exp * 1000 < this.now() || !payload.sub) {
+      throw new AuthError(401, "Apple did not accept the sign-in.");
+    }
+    return { subject: payload.sub, email: payload.email ?? null };
+  }
+  private async keyFor(kid: string) {
+    if (!this.keys.some(k => k.kid === kid) || this.now() - this.fetchedAt > 3_600_000) {
+      const response = await this.fetchImpl("https://appleid.apple.com/auth/keys");
+      if (!response.ok) throw new AuthError(502, `Apple answered ${response.status}.`);
+      const { keys } = await response.json() as { keys: ({ kid: string } & Record<string, unknown>)[] };
+      const { createPublicKey } = await import("node:crypto");
+      this.keys = keys.map(jwk => ({ kid: jwk.kid, key: createPublicKey({ key: jwk as unknown as JsonWebKey, format: "jwk" }) }));
+      this.fetchedAt = this.now();
+    }
+    const found = this.keys.find(k => k.kid === kid);
+    if (!found) throw new AuthError(401, "Apple did not accept the sign-in.");
+    return found.key;
+  }
+}
+
 export type AuthConfig = {
   store: Store;
   mailer: Mailer;
   /** Where the server is reachable from the player's browser, e.g. https://play-api.example.com. */
   publicUrl: string;
+  /** Native identity providers available on this server; absent providers answer 404. */
+  identities?: Partial<Record<IdentityProvider, IdentityVerifier>>;
   now?: () => number;
 };
 
@@ -83,13 +147,38 @@ export class Auth {
     const email = token ? this.config.store.consumeMagicToken(hashToken(token), now) : null;
     if (!email) throw new AuthError(400, "That sign-in link has expired or was already used. Request a new one.");
     let account = this.config.store.accountByEmail(email);
+    if (!account) account = this.createAccount(email, nameFromEmail(email));
+    return { session: this.openSession(account), account };
+  }
+
+  /**
+   * Native sign-in (Steam on desktop, Apple on iPad): the host's credential is checked with the provider and mapped to
+   * an account. A signed-in player (`linkTo`) gets the identity attached to their existing account instead; otherwise the
+   * identity's e-mail (Apple) joins an existing e-mail account, and failing that a new account is created.
+   */
+  async signInWith(provider: IdentityProvider, credential: string, suggestedName?: string, linkTo?: Account | null): Promise<{ session: string; account: Account }> {
+    const verifier = this.config.identities?.[provider];
+    if (!verifier) throw new AuthError(404, `${provider} sign-in is not enabled on this server.`);
+    const identity = await verifier.verify(credential);
+    let account = this.config.store.accountByIdentity(provider, identity.subject);
     if (!account) {
-      account = { id: `acct_${randomBytes(12).toString("base64url")}`, email, name: nameFromEmail(email), createdAt: now };
-      this.config.store.createAccount(account);
+      const email = identity.email ? normaliseEmail(identity.email) : null;
+      account = linkTo ?? (email ? this.config.store.accountByEmail(email) : null)
+        ?? this.createAccount(email, (suggestedName ?? identity.name ?? "").trim().slice(0, 24) || (email ? nameFromEmail(email) : "Player"));
+      this.config.store.linkIdentity(provider, identity.subject, account.id);
     }
+    return { session: this.openSession(account), account };
+  }
+
+  private createAccount(email: string | null, name: string): Account {
+    const account = { id: `acct_${randomBytes(12).toString("base64url")}`, email, name, createdAt: this.now() };
+    this.config.store.createAccount(account);
+    return account;
+  }
+  private openSession(account: Account): string {
     const session = newToken();
-    this.config.store.saveSession(hashToken(session), account.id, now + SESSION_TTL_MS);
-    return { session, account };
+    this.config.store.saveSession(hashToken(session), account.id, this.now() + SESSION_TTL_MS);
+    return session;
   }
 
   authenticate(session: string | null | undefined): Account | null {

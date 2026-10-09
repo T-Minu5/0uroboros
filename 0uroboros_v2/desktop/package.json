@@ -1,0 +1,27 @@
+{
+  "name": "@0uroboros/desktop",
+  "productName": "0uroboros",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron wrapper for the 0uroboros client: Windows and macOS builds for the website (electron-updater) and Steam (steamworks.js).",
+  "main": "dist/main.js",
+  "scripts": {
+    "stage": "node scripts/stage-client.mjs",
+    "compile": "tsc -p tsconfig.json",
+    "start": "npm run compile && electron .",
+    "pack": "npm run compile && electron-builder --dir",
+    "dist": "npm run compile && electron-builder --publish never",
+    "dist:steam": "npm run compile && electron-builder --publish never -c.extraMetadata.steamBuild=true -c.extraMetadata.steamAppId=$STEAM_APP_ID",
+    "release": "npm run compile && electron-builder --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9",
+    "steamworks.js": "^0.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.0"
+  }
+}

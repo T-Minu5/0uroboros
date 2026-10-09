@@ -4,6 +4,8 @@
  * HTTP:  GET  /healthz                 liveness
  *        POST /auth/magic-link {email} mail a one-time sign-in link
  *        GET  /auth/verify?token=      exchange the link for a session; redirects to the web client with `#session=`
+ *        POST /auth/steam {ticket,name} Steam session ticket -> session (desktop build)
+ *        POST /auth/apple {identityToken,name} Sign in with Apple -> session (iPad build)
  *        GET  /auth/me                 bearer session -> account
  *        POST /auth/name {name}        rename the signed-in account
  *        POST /auth/sign-out           end the bearer session
@@ -101,6 +103,14 @@ export class GameServer {
               response.end();
               return;
             }
+            return json(response, 200, { session, account: summary(account) });
+          }
+          case "POST /auth/steam": case "POST /auth/apple": {
+            const provider = url.pathname.endsWith("steam") ? "steam" : "apple";
+            const body = await readJson(request) as { ticket?: unknown; identityToken?: unknown; name?: unknown };
+            const credential = provider === "steam" ? body.ticket : body.identityToken;
+            const linkTo = auth.authenticate(bearer(request));
+            const { session, account } = await auth.signInWith(provider, typeof credential === "string" ? credential : "", typeof body.name === "string" ? body.name : undefined, linkTo);
             return json(response, 200, { session, account: summary(account) });
           }
           case "GET /auth/me": {

@@ -1,0 +1,50 @@
+# electron-builder configuration. Run from desktop/ after `npm run stage` has copied the client build into app/.
+# Signing: macOS reads CSC_LINK / CSC_KEY_PASSWORD (Developer ID Application .p12) and notarises with
+# APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID; Windows reads CSC_LINK / CSC_KEY_PASSWORD (code-signing .pfx)
+# or WIN_CSC_LINK when both platforms build on one machine. Unsigned builds still produce artefacts for local testing.
+appId: com.ouroboros.game
+productName: 0uroboros
+copyright: © 0uroboros
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**
+  - package.json
+  - "!**/*.map"
+extraResources:
+  - from: app
+    to: app
+asarUnpack:
+  - "**/node_modules/steamworks.js/**"
+npmRebuild: false
+publish:
+  provider: github
+  owner: OWNER
+  repo: REPO
+  releaseType: release
+mac:
+  category: public.app-category.strategy-games
+  target:
+    - target: dmg
+      arch: [universal]
+    - target: zip
+      arch: [universal]
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: true
+  artifactName: "${productName}-${version}-mac.${ext}"
+dmg:
+  sign: false
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: "${productName}-${version}-win.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false

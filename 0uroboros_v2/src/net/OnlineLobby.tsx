@@ -45,6 +45,12 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
     finally { setAuthBusy(false); }
   };
   const signOut = async () => { await host.auth.signOut(); setAuthNote(null); };
+  const signInNative = async () => {
+    if (!host.auth.signInNative || authBusy) return;
+    setAuthBusy(true); setAuthNote(null);
+    try { await host.auth.signInNative(); } catch (error) { setAuthNote(error instanceof Error ? error.message : 'Sign-in failed.'); }
+    finally { setAuthBusy(false); }
+  };
 
   if (lobby.status === 'waiting' && lobby.code) {
     return <section className='online-lobby' aria-label='Online table' data-online-status='waiting'>
@@ -66,13 +72,14 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
       </form>
     </div>
     {saved && lobby.status === 'idle' && <button type='button' className='online-resume' onClick={() => onResume(saved)}>Rejoin table {saved.code}</button>}
-    {host.auth.methods.includes('email') && (session
+    {session
       ? <p className='online-account' data-signed-in={session.account.id}>Signed in as <b>{session.account.name}</b>{session.account.email ? ` (${session.account.email})` : ''}. <button type='button' className='online-link' onClick={() => void signOut()}>Sign out</button></p>
       : <form className='online-signin' onSubmit={requestLink}>
+          {host.auth.signInNative && <button type='button' className='online-native' disabled={authBusy} onClick={() => void signInNative()}>{authBusy ? 'Signing in…' : `Sign in with ${host.auth.methods[0] === 'steam' ? 'Steam' : 'Apple'}`}</button>}
           <input type='email' value={email} placeholder='you@example.com' aria-label='E-mail for sign-in link' autoComplete='email' onChange={event => setEmail(event.target.value)} disabled={authBusy}/>
           <button type='submit' disabled={!email.trim() || authBusy}>{authBusy ? 'Sending…' : 'E-mail me a sign-in link'}</button>
           <span>Optional. Signing in keeps your name and lets friends recognise you.</span>
-        </form>)}
+        </form>}
     {authNote && <p className='online-status' role='status'>{authNote}</p>}
     {lobby.status === 'connecting' && <p className='online-status'>Connecting to the game server…</p>}
     {lobby.connection === 'reconnecting' && <p className='online-status'>Reconnecting…</p>}

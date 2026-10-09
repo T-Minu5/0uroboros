@@ -9,7 +9,7 @@ import { join } from "node:path";
 import WebSocket from "ws";
 import { publishedContent, PACK_REVISION } from "@0uroboros/content/document";
 import { PROTOCOL_VERSION, type ClientMessage, type ServerMessage } from "@0uroboros/protocol/messages";
-import { Auth, AuthError, ConsoleMailer, MAGIC_LINKS_PER_EMAIL, MAGIC_LINK_TTL_MS, ResendMailer, SESSION_TTL_MS } from "@0uroboros/server/auth";
+import { AppleVerifier, Auth, AuthError, ConsoleMailer, MAGIC_LINKS_PER_EMAIL, MAGIC_LINK_TTL_MS, ResendMailer, SESSION_TTL_MS, SteamVerifier } from "@0uroboros/server/auth";
 import { GameServer } from "@0uroboros/server/gameServer";
 import { MemoryStore, SqliteStore, type ResultRecord, type Store } from "@0uroboros/server/store";
 import { createOnlineEvidence, evidenceFromOnline, type OnlineResult } from "../server/agents/onlineEvidence";
@@ -86,6 +86,90 @@ describe("magic-link auth", () => {
     expect(body.text).toContain("token=abc");
     const down = new ResendMailer("key", "x", async () => new Response("nope", { status: 503 }));
     await expect(down.sendMagicLink("a@b.co", "l")).rejects.toThrow(/503/);
+  });
+});
+
+describe("native identities", () => {
+  const scheduler = { now: () => Date.now(), after: (ms: number, fn: () => void) => { const h = setTimeout(fn, ms); return () => clearTimeout(h); } };
+
+  it("Steam: verifies the ticket with the Web API, creates or finds the account, and links to a signed-in account", async () => {
+    const store = new MemoryStore();
+    const calls: string[] = [];
+    const steam = new SteamVerifier("KEY", "480", (async (url: string | URL | Request) => {
+      calls.push(String(url));
+      const ticket = new URL(String(url)).searchParams.get("ticket");
+      if (ticket === "ab".repeat(20)) return new Response(JSON.stringify({ response: { params: { result: "OK", steamid: "7656119", ownersteamid: "7656119", vacbanned: false, publisherbanned: false } } }));
+      if (ticket === "cd".repeat(20)) return new Response(JSON.stringify({ response: { params: { result: "OK", steamid: "7656120", publisherbanned: true } } }));
+      return new Response(JSON.stringify({ response: { error: { errorcode: 101, errordesc: "Invalid ticket" } } }));
+    }) as typeof fetch);
+    const auth = new Auth({ store, mailer: new ConsoleMailer(), publicUrl: "http://api", identities: { steam } });
+
+    const first = await auth.signInWith("steam", "ab".repeat(20), "Gamer Ada");
+    expect(first.account).toMatchObject({ name: "Gamer Ada", email: null });
+    expect(calls[0]).toMatch(/^https:\/\/partner\.steam-api\.com\/ISteamUserAuth\/AuthenticateUserTicket\/v1\/\?key=KEY&appid=480&ticket=abab/);
+    const again = await auth.signInWith("steam", "ab".repeat(20), "Renamed");
+    expect(again.account.id).toBe(first.account.id);
+    expect(again.account.name).toBe("Gamer Ada");
+    await expect(auth.signInWith("steam", "ef".repeat(20))).rejects.toMatchObject({ status: 401 });
+    await expect(auth.signInWith("steam", "cd".repeat(20))).rejects.toMatchObject({ status: 403 });
+    await expect(auth.signInWith("steam", "not hex")).rejects.toMatchObject({ status: 400 });
+    await expect(auth.signInWith("apple", "x")).rejects.toMatchObject({ status: 404 });
+
+    // An e-mail account that signs in on Steam while already signed in gets the Steam id linked, not a second account.
+    const mailer = new ConsoleMailer();
+    const emailAuth = new Auth({ store, mailer, publicUrl: "http://api", identities: { steam: { verify: async () => ({ subject: "steam-2" }) } } });
+    await emailAuth.requestLink("bo@example.com");
+    const bo = emailAuth.verify(tokenOf(mailer.lastLink!));
+    const linked = await emailAuth.signInWith("steam", "whatever", "Bo on Steam", bo.account);
+    expect(linked.account.id).toBe(bo.account.id);
+    expect(store.accountByIdentity("steam", "steam-2")?.id).toBe(bo.account.id);
+  });
+
+  it("Apple: accepts only an RS256 token signed by Apple's published key for one of our audiences, and joins by e-mail", async () => {
+    const { generateKeyPairSync, createSign } = await import("node:crypto");
+    const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+    const jwk = { ...publicKey.export({ format: "jwk" }), kid: "k1", alg: "RS256", use: "sig" };
+    const now = 1_700_000_000_000;
+    const token = (payload: Record<string, unknown>, kid = "k1") => {
+      const enc = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
+      const body = `${enc({ alg: "RS256", kid })}.${enc(payload)}`;
+      return `${body}.${createSign("RSA-SHA256").update(body).sign(privateKey).toString("base64url")}`;
+    };
+    const apple = new AppleVerifier(["com.example.ouroboros"], (async () => new Response(JSON.stringify({ keys: [jwk] }))) as typeof fetch, () => now);
+    const store = new MemoryStore();
+    const mailer = new ConsoleMailer();
+    const auth = new Auth({ store, mailer, publicUrl: "http://api", identities: { apple }, now: () => now });
+
+    await auth.requestLink("ada@example.com");
+    const ada = auth.verify(tokenOf(mailer.lastLink!));
+    const good = { iss: "https://appleid.apple.com", aud: "com.example.ouroboros", exp: now / 1000 + 300, sub: "001234.abc", email: "ada@example.com" };
+    const signedIn = await auth.signInWith("apple", token(good));
+    expect(signedIn.account.id).toBe(ada.account.id);
+    expect(store.accountByIdentity("apple", "001234.abc")?.id).toBe(ada.account.id);
+
+    await expect(auth.signInWith("apple", token({ ...good, aud: "com.other" }))).rejects.toMatchObject({ status: 401 });
+    await expect(auth.signInWith("apple", token({ ...good, exp: now / 1000 - 1 }))).rejects.toMatchObject({ status: 401 });
+    await expect(auth.signInWith("apple", token({ ...good, iss: "https://evil" }))).rejects.toMatchObject({ status: 401 });
+    await expect(auth.signInWith("apple", token(good, "unknown-kid"))).rejects.toMatchObject({ status: 401 });
+    const [h, p] = token(good).split(".");
+    await expect(auth.signInWith("apple", `${h}.${p}.AAAA`)).rejects.toMatchObject({ status: 401 });
+    const fresh = await auth.signInWith("apple", token({ ...good, sub: "009.new", email: undefined }), "New Player");
+    expect(fresh.account).toMatchObject({ name: "New Player", email: null });
+  });
+
+  it("exposes /auth/steam over HTTP", async () => {
+    const store = new MemoryStore();
+    const server = new GameServer({ content, contentRevision: PACK_REVISION, scheduler, store, auth: new Auth({ store, mailer: new ConsoleMailer(), publicUrl: "http://api", identities: { steam: { verify: async ticket => { if (ticket !== "good") throw new AuthError(401, "no"); return { subject: "s1", name: "Steam Ada" }; } } } }) });
+    const port = await server.listen(0, "127.0.0.1");
+    try {
+      const base = `http://127.0.0.1:${port}`;
+      const post = (path: string, body: unknown) => fetch(`${base}${path}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      const ok = await (await post("/auth/steam", { ticket: "good" })).json() as { session: string; account: { name: string } };
+      expect(ok.account.name).toBe("Steam Ada");
+      expect((await fetch(`${base}/auth/me`, { headers: { authorization: `Bearer ${ok.session}` } })).status).toBe(200);
+      expect((await post("/auth/steam", { ticket: "bad" })).status).toBe(401);
+      expect((await post("/auth/apple", { identityToken: "x" })).status).toBe(404);
+    } finally { await server.close(); }
   });
 });
 

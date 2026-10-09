@@ -34,6 +34,7 @@
     "server:build": "vite build -c vite.server.config.ts",
     "server:start": "node dist/server/main.mjs",
     "server:dev": "npm run server:build && OUROBOROS_DB=.data/0uroboros.sqlite node dist/server/main.mjs",
+    "test:desktop": "cd desktop && npm run compile && electron . --smoke",
     "test:online": "node scripts/online-two-browser-smoke.mjs"
   },
   "dependencies": {

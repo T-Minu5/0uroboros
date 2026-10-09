@@ -1,0 +1,107 @@
+# Desktop builds for Windows and macOS. Every push builds unsigned artefacts and runs the Electron smoke; a `v*` tag
+# signs, notarises, publishes the website downloads to GitHub Releases, and uploads the Steam build with steamcmd.
+#
+# Secrets (Settings > Secrets): CSC_LINK / CSC_KEY_PASSWORD (macOS Developer ID .p12), WIN_CSC_LINK / WIN_CSC_KEY_PASSWORD
+# (Windows code-signing .pfx), APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID (notarisation),
+# STEAM_USERNAME / STEAM_CONFIG_VDF (steamcmd login; see https://github.com/game-ci/steam-deploy).
+# Variables: GAME_SERVER_URL (wss://...), STEAM_APP_ID.
+name: Desktop
+on:
+  push:
+    branches: [main, client_server_arch]
+    tags: ['v*']
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            platform: mac
+          - os: windows-2022
+            platform: win
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: 0uroboros_v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            0uroboros_v2/package-lock.json
+            0uroboros_v2/desktop/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: 0uroboros_v2/desktop
+      - name: Stage client
+        run: npm run stage
+        working-directory: 0uroboros_v2/desktop
+        env:
+          VITE_GAME_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
+          VITE_APP_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+      - name: Electron smoke
+        run: npm run compile && npx electron . --smoke
+        working-directory: 0uroboros_v2/desktop
+      - name: Package (website build)
+        run: npm run ${{ github.ref_type == 'tag' && 'release' || 'pack' }}
+        working-directory: 0uroboros_v2/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ matrix.platform == 'mac' && secrets.CSC_LINK || secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ matrix.platform == 'mac' && secrets.CSC_KEY_PASSWORD || secrets.WIN_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Package (Steam build)
+        if: github.ref_type == 'tag' && vars.STEAM_APP_ID != ''
+        run: npm run dist:steam
+        working-directory: 0uroboros_v2/desktop
+        env:
+          STEAM_APP_ID: ${{ vars.STEAM_APP_ID }}
+          CSC_LINK: ${{ matrix.platform == 'mac' && secrets.CSC_LINK || secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ matrix.platform == 'mac' && secrets.CSC_KEY_PASSWORD || secrets.WIN_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: |
+            0uroboros_v2/desktop/release/*.dmg
+            0uroboros_v2/desktop/release/*.zip
+            0uroboros_v2/desktop/release/*.exe
+            0uroboros_v2/desktop/release/*-unpacked/**
+            0uroboros_v2/desktop/release/mac-universal/**
+            0uroboros_v2/desktop/release/latest*.yml
+          retention-days: 14
+
+  steam:
+    # Steam depots take the unpacked directories; steamcmd uploads both platforms in one build to the `internal` branch.
+    needs: build
+    if: github.ref_type == 'tag' && vars.STEAM_APP_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: desktop-win
+          path: steam/win
+      - uses: actions/download-artifact@v4
+        with:
+          name: desktop-mac
+          path: steam/mac
+      - uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ vars.STEAM_APP_ID }}
+          buildDescription: ${{ github.ref_name }}
+          rootPath: steam
+          depot1Path: win/win-unpacked
+          depot2Path: mac/mac-universal
+          releaseBranch: internal

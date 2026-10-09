@@ -21,6 +21,7 @@ import { LocalClient, attempt, type GameClient } from './net/GameClient';
 import { OnlineClient, savedSeat, type LobbyState, type SavedSeat } from './net/OnlineClient';
 import { OnlineLobby } from './net/OnlineLobby';
 import { platform } from './platform';
+import { awardAchievements, presenceText } from './platform/achievements';
 import type { RoomMode } from '@0uroboros/protocol/messages';
 import { EffectPath, CardEffectMotion } from './Effects';
 import { EffectChoice, EventMessage, TransferBadge, choiceNodes } from './EffectChoice';
@@ -280,9 +281,10 @@ export function App(){
   if(online.current)return online.current;
   const next=new OnlineClient();
   online.current=next;
-  next.onLobby(setLobby);
+  next.onLobby(state=>{setLobby(state);void platform().store.setPresence(presenceText(state,next.view()?.cycle));});
   next.subscribe(change=>{
    if(change.kind==='pending'){kick();return;}
+   if(change.kind==='gameOver'){const {result,seat,mode}=next.lobby;if(result&&seat!==null)awardAchievements(platform(),result,seat,mode);return;}
    if(change.kind==='snapshot'){
     const snapshot=next.view()!;const opening=!client.current&&snapshot.cycle===1&&snapshot.turn===1&&snapshot.phase==='runtime';
     client.current=next;logGame.current=null;strategistGame.current=null;setHistory(change.log);setView(snapshot);setOpponentAway(false);

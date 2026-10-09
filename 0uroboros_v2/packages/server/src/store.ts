@@ -28,6 +28,7 @@ export type ResultRecord = {
 };
 
 export type Account = { id: string; email: string | null; name: string; createdAt: number };
+export type IdentityProvider = "steam" | "apple";
 
 export interface Store {
   saveResult(record: ResultRecord): void;
@@ -41,6 +42,9 @@ export interface Store {
   accountById(id: string): Account | null;
   createAccount(account: Account): void;
   renameAccount(id: string, name: string): void;
+  /** External identities (Steam id, Apple subject) that map onto an account. */
+  accountByIdentity(provider: IdentityProvider, subject: string): Account | null;
+  linkIdentity(provider: IdentityProvider, subject: string, accountId: string): void;
 
   saveMagicToken(tokenHash: string, email: string, expiresAt: number): void;
   /** Returns the e-mail the token was issued to and deletes it; null when unknown or expired. */
@@ -59,6 +63,7 @@ export class MemoryStore implements Store {
   readonly results: ResultRecord[] = [];
   readonly replays = new Map<string, ReplayRecord>();
   readonly accounts = new Map<string, Account>();
+  private readonly identities = new Map<string, string>();
   private readonly magic = new Map<string, { email: string; expiresAt: number }>();
   private readonly sessions = new Map<string, { accountId: string; expiresAt: number }>();
 
@@ -72,6 +77,8 @@ export class MemoryStore implements Store {
   accountById(id: string) { return this.accounts.get(id) ?? null; }
   createAccount(account: Account) { this.accounts.set(account.id, account); }
   renameAccount(id: string, name: string) { const account = this.accounts.get(id); if (account) this.accounts.set(id, { ...account, name }); }
+  accountByIdentity(provider: IdentityProvider, subject: string) { const id = this.identities.get(`${provider}:${subject}`); return id ? this.accounts.get(id) ?? null : null; }
+  linkIdentity(provider: IdentityProvider, subject: string, accountId: string) { this.identities.set(`${provider}:${subject}`, accountId); }
 
   saveMagicToken(tokenHash: string, email: string, expiresAt: number) { this.magic.set(tokenHash, { email, expiresAt }); }
   consumeMagicToken(tokenHash: string, now: number) {
@@ -120,6 +127,7 @@ export class SqliteStore implements Store {
       CREATE TABLE IF NOT EXISTS magic_tokens (token_hash TEXT PRIMARY KEY, email TEXT NOT NULL, expires_at INTEGER NOT NULL);
       CREATE INDEX IF NOT EXISTS magic_tokens_email ON magic_tokens (email);
       CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires_at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS identities (provider TEXT NOT NULL, subject TEXT NOT NULL, account_id TEXT NOT NULL, PRIMARY KEY (provider, subject));
     `);
     // Columns added after the first release; SQLite has no ADD COLUMN IF NOT EXISTS.
     for (const column of ["account_ids TEXT", "report TEXT"]) {
@@ -149,6 +157,10 @@ export class SqliteStore implements Store {
   accountById(id: string) { return rowToAccount(this.db.prepare(`SELECT * FROM accounts WHERE id = ?`).get(id)); }
   createAccount(account: Account) { this.db.prepare(`INSERT INTO accounts (id, email, name, created_at) VALUES (?, ?, ?, ?)`).run(account.id, account.email, account.name, account.createdAt); }
   renameAccount(id: string, name: string) { this.db.prepare(`UPDATE accounts SET name = ? WHERE id = ?`).run(name, id); }
+  accountByIdentity(provider: IdentityProvider, subject: string) {
+    return rowToAccount(this.db.prepare(`SELECT a.* FROM identities i JOIN accounts a ON a.id = i.account_id WHERE i.provider = ? AND i.subject = ?`).get(provider, subject));
+  }
+  linkIdentity(provider: IdentityProvider, subject: string, accountId: string) { this.db.prepare(`INSERT OR REPLACE INTO identities (provider, subject, account_id) VALUES (?, ?, ?)`).run(provider, subject, accountId); }
 
   saveMagicToken(tokenHash: string, email: string, expiresAt: number) { this.db.prepare(`INSERT INTO magic_tokens (token_hash, email, expires_at) VALUES (?, ?, ?)`).run(tokenHash, email, expiresAt); }
   consumeMagicToken(tokenHash: string, now: number) {

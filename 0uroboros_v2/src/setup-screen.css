@@ -140,6 +140,7 @@
 .online-signin button:hover:not(:disabled){border-color:var(--green,#1fffb1);background:#1fffb114}
 .online-signin button:disabled{opacity:.45}
 .online-signin span{flex-basis:100%;font-size:10px;color:#7f899e}
+.online-signin .online-native{flex-basis:100%;border-color:#1fffb166;background:#1fffb110}
 .online-account{padding-top:8px;border-top:1px solid #ffffff12;color:#c4bfd2}
 .online-account b{color:#e8fff6}
 .online-link{padding:0;border:0;background:none;color:#9ff5d6;font:inherit;text-decoration:underline;cursor:pointer}

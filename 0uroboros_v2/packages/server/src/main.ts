@@ -12,9 +12,11 @@
  *   RESEND_API_KEY        mail provider key; unset logs magic links to stdout instead of mailing them (dev only)
  *   MAIL_FROM             sender address for magic links, e.g. "0uroboros <play@0uroboros.example>"
  *   OUROBOROS_ADMIN_TOKEN bearer token for /evidence (the studio's Eco-Strat pull); unset disables the route
+ *   STEAM_WEB_API_KEY, STEAM_APP_ID   enable /auth/steam (desktop build)
+ *   APPLE_AUDIENCES       comma-separated bundle / Services ids; enables /auth/apple (iPad build)
  */
 import { PACK_REVISION, publishedContent } from "@0uroboros/content/document";
-import { Auth, ConsoleMailer, ResendMailer } from "./auth";
+import { AppleVerifier, Auth, ConsoleMailer, ResendMailer, SteamVerifier } from "./auth";
 import { GameServer } from "./gameServer";
 import { realScheduler } from "./scheduler";
 import { MemoryStore, openSqliteStore } from "./store";
@@ -34,13 +36,16 @@ async function main() {
   const server = new GameServer({
     content: publishedContent(), contentRevision: PACK_REVISION, scheduler: realScheduler, store, log,
     maxRooms: Number(env.OUROBOROS_MAX_ROOMS ?? 500),
-    auth: authOn ? new Auth({ store, mailer, publicUrl }) : undefined,
+    auth: authOn ? new Auth({ store, mailer, publicUrl, identities: {
+      ...(env.STEAM_WEB_API_KEY && env.STEAM_APP_ID ? { steam: new SteamVerifier(env.STEAM_WEB_API_KEY, env.STEAM_APP_ID) } : {}),
+      ...(env.APPLE_AUDIENCES ? { apple: new AppleVerifier(env.APPLE_AUDIENCES.split(",").map(a => a.trim()).filter(Boolean)) } : {}),
+    } }) : undefined,
     allowedOrigins: origins.length ? origins : ["*"],
     webOrigin: origins[0],
     adminToken: env.OUROBOROS_ADMIN_TOKEN,
   });
   const bound = await server.listen(port, host);
-  log({ event: "listening", host, port: bound, contentRevision: PACK_REVISION, store: env.OUROBOROS_DB ? "sqlite" : "memory", auth: authOn, mail: env.RESEND_API_KEY ? "resend" : "console", evidence: !!env.OUROBOROS_ADMIN_TOKEN });
+  log({ event: "listening", host, port: bound, contentRevision: PACK_REVISION, store: env.OUROBOROS_DB ? "sqlite" : "memory", auth: authOn, mail: env.RESEND_API_KEY ? "resend" : "console", evidence: !!env.OUROBOROS_ADMIN_TOKEN, steam: !!(env.STEAM_WEB_API_KEY && env.STEAM_APP_ID), apple: !!env.APPLE_AUDIENCES });
   const shutdown = async (signal: string) => {
     log({ event: "shutdown", signal });
     await server.close();

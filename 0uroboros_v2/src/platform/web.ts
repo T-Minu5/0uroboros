@@ -3,7 +3,7 @@
  * reload-to-update, no store.
  */
 import type { AccountSummary } from '@0uroboros/protocol/messages';
-import type { AuthProvider, Platform, Session, StoreProvider, UpdateProvider } from './Platform';
+import type { AuthProvider, HostBridge, Platform, Session, StoreProvider, UpdateProvider } from './Platform';
 
 const SESSION_KEY = 'ouroboros.session';
 
@@ -23,12 +23,27 @@ const storage = {
   remove: (key: string) => { try { localStorage.removeItem(key); } catch { /* private mode */ } },
 };
 
+/**
+ * Sign-in against the game server's /auth routes. E-mail magic links work on every platform; a host bridge adds its
+ * native identity (Steam, Apple), which the server exchanges for the same kind of session.
+ */
 export class WebAuth implements AuthProvider {
-  readonly methods = ['email'] as const satisfies AuthProvider['methods'];
+  readonly methods: AuthProvider['methods'];
+  readonly signInNative?: () => Promise<Session>;
   private current: Session | null;
   private listeners = new Set<(session: Session | null) => void>();
-  constructor(private readonly httpUrl: string) {
+  constructor(private readonly httpUrl: string, private readonly native?: Pick<HostBridge, 'nativeAuth' | 'nativeCredential'>) {
     this.current = readSession();
+    this.methods = native?.nativeAuth ? [native.nativeAuth, 'email'] : ['email'];
+    if (native?.nativeAuth) this.signInNative = async () => {
+      const credential = await native.nativeCredential();
+      const path = credential.provider === 'steam' ? '/auth/steam' : '/auth/apple';
+      // A player already signed in by e-mail links the native identity to that account.
+      const body = await this.call('POST', path, credential, this.current?.token) as { session: string; account: AccountSummary };
+      const session = { token: body.session, account: body.account };
+      this.set(session);
+      return session;
+    };
   }
   session() { return this.current; }
   onChange(listener: (session: Session | null) => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }

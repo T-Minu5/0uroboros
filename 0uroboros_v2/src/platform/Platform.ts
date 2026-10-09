@@ -2,8 +2,9 @@
  * What the game client needs from the thing that hosts it. The web page, the Electron desktop app (Steam) and the
  * Capacitor iPad app each provide one; the game code only ever talks to this interface, so it stays platform-neutral.
  *
- * A wrapper exposes its implementation as `window.ouroborosPlatform` from its preload / bridge before the page
- * scripts run; `src/platform/index.ts` falls back to the web implementation.
+ * A wrapper does not implement all of this itself: it exposes a small `HostBridge` as `window.ouroborosHost` from its
+ * preload / native bridge before the page scripts run, and `src/platform/host.ts` builds the Platform from it (the
+ * e-mail sign-in and session handling are shared with the web). `src/platform/index.ts` falls back to the web.
  */
 import type { AccountSummary } from '@0uroboros/protocol/messages';
 
@@ -58,6 +59,26 @@ export interface Platform {
   openExternal(url: string): void;
 }
 
+/** A native credential the host obtained; the server exchanges it for a session (`/auth/steam`, `/auth/apple`). */
+export type NativeCredential = { provider: 'steam'; ticket: string; name?: string } | { provider: 'apple'; identityToken: string; name?: string };
+
+/** The minimum a wrapper (Electron preload, Capacitor plugin) exposes; everything else is built on top in TypeScript. */
+export interface HostBridge {
+  readonly kind: Exclude<PlatformKind, 'web'>;
+  readonly version: string;
+  /** Overrides the built-in server URL (ws/wss) when the host knows better, e.g. a Steam launch option. */
+  readonly serverUrl?: string;
+  /** Native identity available on this host, if any. */
+  readonly nativeAuth: 'steam' | 'apple' | null;
+  nativeCredential(): Promise<NativeCredential>;
+  openExternal(url: string): Promise<void>;
+  checkForUpdate(): Promise<{ available: boolean; version?: string }>;
+  applyUpdate?(): Promise<void>;
+  readonly storeName: StoreProvider['name'];
+  unlockAchievement(id: string): Promise<void>;
+  setPresence(text: string): Promise<void>;
+}
+
 declare global {
-  interface Window { ouroborosPlatform?: Platform }
+  interface Window { ouroborosHost?: HostBridge }
 }
