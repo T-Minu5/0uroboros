@@ -157,7 +157,8 @@ export function useCardPointerDrag(callbacks:Callbacks){
   const move=(event:PointerEvent)=>{
    const drag=gesture.current;if(!drag||drag.pointer!==event.pointerId)return;
    const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
-   if(!drag.ghost&&Math.hypot(dx,dy)<5)return;
+   // A finger wobbles more than a mouse: a touch tap stays a tap (inspect) unless it travels further.
+   if(!drag.ghost&&Math.hypot(dx,dy)<(event.pointerType==='touch'?12:5))return;
    if(!latest.current.enabled){end(true);return;}
    event.preventDefault();
    if(!drag.ghost){

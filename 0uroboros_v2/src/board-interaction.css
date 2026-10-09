@@ -147,3 +147,11 @@
 @media(prefers-reduced-motion:reduce){
  .world-anchor .lane-drop-target.transfer-target:is(.is-source,.is-target),.world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { animation:none; box-shadow:0 0 18px #ffd36b77; }
 }
+
+/* Touch hosts (iPad, touch laptops): 44px minimum hit targets for the controls a finger has to find mid-match; hover-only lifts stay off. */
+.app[data-input=touch] .end-turn>span{padding:16px 18px}
+.app[data-input=touch] .topline nav button,.app[data-input=touch] .inspect-deploy>button,.app[data-input=touch] .cache-cards button{min-height:44px;min-width:44px}
+.app[data-input=touch] .choice-dialog button[data-choice-option],.app[data-input=touch] .market-card>button:last-child,.app[data-input=touch] .online-actions>button,.app[data-input=touch] .online-join button{min-height:44px}
+.app[data-input=touch] .hand-card:hover{transform:translateY(var(--lift)) rotate(var(--angle))}
+.app[data-input=touch] .field-card:hover{transform:none}
+.app[data-input=touch] .close{width:44px;height:44px;top:4px;right:6px}

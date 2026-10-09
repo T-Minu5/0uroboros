@@ -1,0 +1,28 @@
+{
+  "name": "@0uroboros/ipad",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capacitor wrapper for the 0uroboros client on iPad: Sign in with Apple, touch-first, App Store distribution.",
+  "type": "module",
+  "scripts": {
+    "stage": "node scripts/stage-client.mjs",
+    "bridge": "esbuild src/host.ts --bundle --format=iife --platform=browser --target=safari16 --outfile=app/host-ipad.js",
+    "add:ios": "npx cap add ios",
+    "sync": "npm run bridge && npx cap sync ios",
+    "open": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor-community/apple-sign-in": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/browser": "^6.0.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/ios": "^6.1.0",
+    "@capacitor/status-bar": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0",
+    "esbuild": "^0.24.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.7.0"
+  }
+}
