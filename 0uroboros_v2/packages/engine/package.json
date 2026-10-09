@@ -1,0 +1,12 @@
+{
+  "name": "@0uroboros/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "0uroboros rules engine: game state, runtime session, effect language, content compiler and AI strategies. Pure TypeScript with no browser or Node dependencies; consumed unchanged by the server, the client and the studio.",
+  "exports": {
+    "./*": "./src/*.ts",
+    "./cardArtwork.json": "./src/cardArtwork.json"
+  },
+  "sideEffects": false
+}

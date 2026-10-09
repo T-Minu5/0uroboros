@@ -1,4 +1,4 @@
-import type { MatchReport } from '../../src/runtime';
+import type { MatchReport } from '@0uroboros/engine/runtime';
 
 /**
  * Evidence flows one way: games (and Strat-G's own record of them) go out to evaluators as

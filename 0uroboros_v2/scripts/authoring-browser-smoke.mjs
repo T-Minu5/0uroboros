@@ -15,7 +15,7 @@ const server=await createServer({cacheDir:join(directory,'vite'),server:{host:'1
   vite.middlewares.use(async(req,res,next)=>{
    if(req.url?.split('?')[0]!=='/api/content')return next();
    try{
-    if(!middleware){const {createContentApi}=await vite.ssrLoadModule('/server/contentApi.ts');middleware=createContentApi({filePath,loadModel:()=>vite.ssrLoadModule('/src/authoring/contentModel.ts')});}
+    if(!middleware){const {createContentApi}=await vite.ssrLoadModule('/server/contentApi.ts');middleware=createContentApi({filePath,loadModel:()=>vite.ssrLoadModule('/packages/engine/src/authoring/contentModel.ts')});}
     await middleware(req,res,next);
    }catch(error){next(error);}
   });

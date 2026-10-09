@@ -1,8 +1,8 @@
 import {expect,it} from 'vitest';
-import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '../src/runtime';
-import {EVALUATION_ALL_CARDS} from '../src/evaluationMarket';
-import {starterCards,type Card,type EvaluationEffect} from '../src/game';
-import {transferText} from '../src/transferText';
+import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '@0uroboros/engine/runtime';
+import {EVALUATION_ALL_CARDS} from '@0uroboros/engine/evaluationMarket';
+import {starterCards,type Card,type EvaluationEffect} from '@0uroboros/engine/game';
+import {transferText} from '@0uroboros/engine/transferText';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
 const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>({...starterCards[0],id,onReveal:effects,...extra});
 function drain(session:RuntimeSession){const events=[];while(session.pendingCount){events.push(session.step()!.event);if(events.length>200)throw new Error('stalled');}return events;}

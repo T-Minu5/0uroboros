@@ -1,9 +1,9 @@
 import { Icon } from './BoardScene';
 import { CardFace } from './CardFace';
-import type { Card } from './game';
-import { DRAFT_COPIES_PER_PLAYER, type MarketPile } from './evaluationMarket';
-import type { SessionView } from './runtime';
-import { isStep, type AnyEffect } from './effects/types';
+import type { Card } from '@0uroboros/engine/game';
+import { DRAFT_COPIES_PER_PLAYER, type MarketPile } from '@0uroboros/engine/evaluationMarket';
+import type { SessionView } from '@0uroboros/engine/runtime';
+import { isStep, type AnyEffect } from '@0uroboros/engine/effects/types';
 
 /** Theme class for a Circuit Reward, matching the `.circuit-privilege.*` styles. */
 const privilegeTheme=(effect:AnyEffect)=>{

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import source from '../assets/card_art/cards.json';
-import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '../src/historicCatalog';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, draftOffer, draftPhase, createStrategicMarket } from '../src/evaluationMarket';
-import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '../src/cardArtwork';
-import { migrateEffects } from '../src/effects/migrate';
-import type { AnyEffect, EffectStep } from '../src/effects/types';
-import { seededRandom } from '../src/runtime';
+import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, draftOffer, draftPhase, createStrategicMarket } from '@0uroboros/engine/evaluationMarket';
+import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
+import { seededRandom } from '@0uroboros/engine/runtime';
 import { bundledContent } from '../src/authoring/contentStore';
 
 const byId=(id:string)=>HISTORIC_CARDS.find(card=>card.definitionId===id)!;

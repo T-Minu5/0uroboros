@@ -1,6 +1,6 @@
-import type { ContentDocument } from './contentModel';
-import { builtinMod } from '../builtinMods';
-import type { ModifierKind } from '../effects/types';
+import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
+import { builtinMod } from '@0uroboros/engine/builtinMods';
+import type { ModifierKind } from '@0uroboros/engine/effects/types';
 
 export type IssueSection = 'cards' | 'locations' | 'circuitRewards' | 'mods' | 'startingDecks';
 /** One save-blocking problem from `validateContent`, located on an item, field and recipe step where possible. */

@@ -1,5 +1,5 @@
-import { isSolarMonk, type Card } from './game';
-import { HISTORIC_SOURCE_METADATA } from './historicCatalog';
+import { isSolarMonk, type Card } from '@0uroboros/engine/game';
+import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
 
 export type CardStyle = 'hacker' | 'action' | 'runtime' | 'attack' | 'utility' | 'crypto' | 'vp' | 'solar' | 'horror';
 export type CardWithPresentation = Card & {

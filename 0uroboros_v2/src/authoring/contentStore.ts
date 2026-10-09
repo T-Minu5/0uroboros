@@ -1,6 +1,6 @@
 import saved from '../../content/authored-content.json';
-import { setBuiltinModDetails } from '../builtinMods';
-import { compileContent, createDefaultContent, upgradeDocument, validateContent, type ContentDocument } from './contentModel';
+import { setBuiltinModDetails } from '@0uroboros/engine/builtinMods';
+import { compileContent, createDefaultContent, upgradeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 
 export type StoredContent = { revision: number; document: ContentDocument | null };
 const savedContent = saved as unknown as StoredContent;

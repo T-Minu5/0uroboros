@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import { starterCards, type Card, type EvaluationEffect, type PlayerId } from '../src/game';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { starterCards, type Card, type EvaluationEffect, type PlayerId } from '@0uroboros/engine/game';
 
 const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, onReveal: effects, ...extra });

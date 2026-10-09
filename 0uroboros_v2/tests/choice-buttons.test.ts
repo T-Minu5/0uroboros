@@ -4,8 +4,8 @@ import { createElement } from 'react';
 vi.mock('../src/BoardScene', () => ({ Icon: () => null }));
 import { renderToStaticMarkup } from 'react-dom/server';
 import { EffectChoice, confirmLabel, declineLabel } from '../src/EffectChoice';
-import { starterCards } from '../src/game';
-import type { SessionView } from '../src/runtime';
+import { starterCards } from '@0uroboros/engine/game';
+import type { SessionView } from '@0uroboros/engine/runtime';
 
 type Choice = NonNullable<SessionView['choice']>;
 const card = (id: string) => ({ id, label: id, card: { ...starterCards[0], id } });

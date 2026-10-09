@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent } from '../src/authoring/contentModel';
-import { starterCards, type Card, type EvaluationEffect } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { compileContent, createDefaultContent } from '@0uroboros/engine/authoring/contentModel';
+import { starterCards, type Card, type EvaluationEffect } from '@0uroboros/engine/game';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 const card = (id: string, extra: Partial<Card> = {}): Card => ({
   ...starterCards[0], id, definitionId: id, name: id, art: `/forms/${id}.png`, effect: id,

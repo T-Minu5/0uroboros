@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { cardNameKey } from './cardArtwork';
+import { cardNameKey } from '@0uroboros/engine/cardArtwork';
 
 /**
  * Clips are named after their card. A plain name plays in the inspect view; the `_onFX` suffix marks the clip

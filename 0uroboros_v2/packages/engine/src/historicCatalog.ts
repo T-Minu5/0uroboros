@@ -1,4 +1,4 @@
-import source from '../assets/card_art/cards.json';
+import source from '../../../assets/card_art/cards.json';
 import { type Card, type LegacyEffect as Effect } from './game';
 import { migrateCard } from './effects/migrate';
 

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import { compileChains, starterCards, type Card, type EvaluationEffect } from '../src/game';
-import { compileContent, createDefaultContent, validateContent } from '../src/authoring/contentModel';
-import { describeSteps } from '../src/effects/catalog';
-import { migrateEffects } from '../src/effects/migrate';
-import type { EffectStep } from '../src/effects/types';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { compileChains, starterCards, type Card, type EvaluationEffect } from '@0uroboros/engine/game';
+import { compileContent, createDefaultContent, validateContent } from '@0uroboros/engine/authoring/contentModel';
+import { describeSteps } from '@0uroboros/engine/effects/catalog';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
 
 const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, power: 2, onReveal: effects, ...extra });

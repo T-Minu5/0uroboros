@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import authored from "../content/authored-content.json";
-import { compileForSelfPlay } from "../src/ai/selfPlay";
-import { validateContent, type ContentDocument } from "../src/authoring/contentModel";
+import { compileForSelfPlay } from "@0uroboros/engine/ai/selfPlay";
+import { validateContent, type ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import { serverVPNote } from "../server/aiStrategist";
 import { withTrailing } from "../src/authoring/modRewards";
-import { projectedVP, starterCards, trailingPlayer, type PlayerId } from "../src/game";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "../src/runtime";
+import { projectedVP, starterCards, trailingPlayer, type PlayerId } from "@0uroboros/engine/game";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
 
 const document = (authored as unknown as { document: ContentDocument }).document;
 const trailingContent = compileForSelfPlay({ ...document, circuitRewards: document.circuitRewards.map(reward => withTrailing(reward, true)) });

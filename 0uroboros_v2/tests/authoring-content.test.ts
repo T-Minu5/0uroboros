@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, validateContent, withStartingDecks, DEFAULT_DECK_ID } from '../src/authoring/contentModel';
-import { DEFAULT_STARTING_DECK } from '../src/game';
-import { migrateEffects } from '../src/effects/migrate';
-import type { EffectStep } from '../src/effects/types';
+import { compileContent, createDefaultContent, validateContent, withStartingDecks, DEFAULT_DECK_ID } from '@0uroboros/engine/authoring/contentModel';
+import { DEFAULT_STARTING_DECK } from '@0uroboros/engine/game';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
 
 const you = { type: 'player', who: 'self' } as const;
 const steps = (effects: Parameters<typeof migrateEffects>[0]) => migrateEffects(effects, 'card');

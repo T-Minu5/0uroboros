@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canDeploy, initialWeights, legalNodes, resolvePower, starterCards } from "../src/game";
+import { canDeploy, initialWeights, legalNodes, resolvePower, starterCards } from "@0uroboros/engine/game";
 
 describe("Runtime V1 rules", () => {
   it("uses the canonical 5 / 3 / 2 starter deck", () => {
@@ -31,7 +31,7 @@ describe("Runtime V1 rules", () => {
   });
 });
 
-import { applyServerEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, runtimeActions, selectCircuitNode, transferProbability, type Deployment } from "../src/game";
+import { applyServerEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, runtimeActions, selectCircuitNode, transferProbability, type Deployment } from "@0uroboros/engine/game";
 
 describe("Canonical engine primitives", () => {
   it("mirrors the five-card opening and remaining deck while keeping distinct owned instances", () => {

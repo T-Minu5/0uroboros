@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { Card } from '../src/game';
+import type { Card } from '@0uroboros/engine/game';
 import {
   ACTIONS, ACTION_IDS, SCOPES, actionsFor, changeAction, createStep, describeStep, targetsFor, validateSteps, whoChoices, type ValidationCards,
-} from '../src/effects/catalog';
-import type { EffectStep } from '../src/effects/types';
+} from '@0uroboros/engine/effects/catalog';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
 
 const cards: (Card & { enabled?: boolean })[] = [
   { id: 'alpha', definitionId: 'alpha-definition', name: 'Alpha Relay', type: 'Character', cost: 2, art: '/alpha.png', effect: '' },

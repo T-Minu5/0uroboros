@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent } from '../src/runtime';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent } from '@0uroboros/engine/runtime';
 import { eventTime } from '../src/presentation';
 
 it('removes empty resolution waits while preserving every real result and ending the Cycle',()=>{

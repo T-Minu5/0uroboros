@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, chaosClassOf, createStrategicMarket } from "../src/evaluationMarket";
-import { createDefaultContent } from "../src/authoring/contentModel";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "../src/runtime";
-import { legalNodes, canDeploy, type Card } from "../src/game";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, chaosClassOf, createStrategicMarket } from "@0uroboros/engine/evaluationMarket";
+import { createDefaultContent } from "@0uroboros/engine/authoring/contentModel";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
+import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
 
 const make = (seed = 41) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
 const card = (name: string, id = name): Card => ({ ...EVALUATION_BASE_CARDS.find(card => card.name === name)!, id });

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AGENT_NAMES, AgentAvatar, type AgentId } from './agentAvatars';
 import { AgentReader } from './AgentReader';
 import { cohortPhaseLabel, useAgents, type AgentsApi, type AgentsStatus, type LearnerStatus } from './agentsApi';
-import { versionLabel } from './ai/strategy';
+import { versionLabel } from '@0uroboros/engine/ai/strategy';
 
 const REPORT_CADENCE = [5, 10, 20] as const;
 const ADVERSARIES = {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS } from "../src/content";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "../src/runtime";
-import { starterCards } from "../src/game";
+import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS } from "@0uroboros/engine/content";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
+import { starterCards } from "@0uroboros/engine/game";
 
 const make = (seed = 17) => createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
 function drain(session: RuntimeSession) {

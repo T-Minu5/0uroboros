@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { builtinMod } from './builtinMods';
-import { CARD_ART_PLACEHOLDER, cardArtworkPath } from './cardArtwork';
+import { builtinMod } from '@0uroboros/engine/builtinMods';
+import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { cardPresentation, type CardWithPresentation } from './cardPresentation';
 import { servedArtPath } from './depthArt/depthManifest';
 import './card-face.css';

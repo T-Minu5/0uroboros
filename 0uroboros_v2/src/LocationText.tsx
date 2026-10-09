@@ -1,4 +1,4 @@
-import { splitLocationText } from './locationTriggers';
+import { splitLocationText } from '@0uroboros/engine/locationTriggers';
 
 /** Location copy in white, with trigger prefixes in bold and effect phrases in their colour. */
 export function LocationText({text}:{text:string}){

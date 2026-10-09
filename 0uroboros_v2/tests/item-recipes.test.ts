@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, upgradeDocument, validateContent, type ContentDocument } from '../src/authoring/contentModel';
-import { migrateEffects } from '../src/effects/migrate';
-import { HISTORIC_SOURCE_METADATA } from '../src/historicCatalog';
-import { starterCards, type Card } from '../src/game';
-import { createSession, seededRandom, type RuntimeSession } from '../src/runtime';
+import { compileContent, createDefaultContent, upgradeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
+import { starterCards, type Card } from '@0uroboros/engine/game';
+import { createSession, seededRandom, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 function drain(game: RuntimeSession) {
   const events = [];

@@ -28,7 +28,7 @@ export const DEFAULT_RESEARCH_URLS = [
 ];
 export const DEFAULT_ECO_MODELS = ['gpt-5', 'gpt-4.1', 'gpt-4o'];
 /** Files whose contents define the rules; any change to them is a new build for evaluation purposes. */
-const RULE_SOURCES = ['src/game.ts', 'src/runtime.ts', 'src/evaluationMarket.ts', 'src/content.ts'];
+const RULE_SOURCES = ['packages/engine/src/game.ts', 'packages/engine/src/runtime.ts', 'packages/engine/src/evaluationMarket.ts', 'packages/engine/src/content.ts'];
 const STUDY_DOCS = [
   '0uroboros_v3_1_clean_start/02_CANONICAL_GAME_RULES.md', '0uroboros_v3_1_clean_start/03_STARTER_DECK_AND_CARD_SEMANTICS.md',
   '0uroboros_v3_1_clean_start/05_DRAFT_REWARDS_ZONES_ENDGAME.md', '0uroboros_v3_1_clean_start/07_UX_PRODUCT_CONTRACT.md',

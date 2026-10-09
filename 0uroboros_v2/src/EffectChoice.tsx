@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import type { ChoiceOption, RuntimeEvent, SessionView } from './runtime';
+import type { ChoiceOption, RuntimeEvent, SessionView } from '@0uroboros/engine/runtime';
 import { Icon } from './BoardScene';
 import { CardFace } from './CardFace';
-import { formatAmount } from './transferText';
+import { formatAmount } from '@0uroboros/engine/transferText';
 import type { TransferDrag, TransferView } from './transferDrag';
 import './transfer-choice.css';
 

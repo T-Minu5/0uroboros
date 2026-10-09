@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import { starterCards, type Card } from '../src/game';
-import type { ChoiceOption, EffectStep } from '../src/effects/types';
-import type { ContentDocument } from '../src/authoring/contentModel';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { starterCards, type Card } from '@0uroboros/engine/game';
+import type { ChoiceOption, EffectStep } from '@0uroboros/engine/effects/types';
+import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import authored from '../content/authored-content.json';
 
 const you = { type: 'player', who: 'self' } as const;

@@ -1,4 +1,4 @@
-import { DEFAULT_STRATEGY, sanitizeProfile, type StrategyProfile, type StrategyWeights } from '../../src/ai/strategy';
+import { DEFAULT_STRATEGY, sanitizeProfile, type StrategyProfile, type StrategyWeights } from '@0uroboros/engine/ai/strategy';
 
 /**
  * The league's players. Each has its own baseline, playbook and style envelope: every

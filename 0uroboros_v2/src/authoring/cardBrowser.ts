@@ -1,6 +1,6 @@
-import { HISTORIC_SOURCE_METADATA } from '../historicCatalog';
-import { CARD_CLASSES, VP_CLASSES, type CardClass } from '../game';
-import type { AuthoredCard } from './contentModel';
+import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
+import { CARD_CLASSES, VP_CLASSES, type CardClass } from '@0uroboros/engine/game';
+import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 
 export const primaryCardFilters = ['All', 'Base', 'Chaos', 'VP', 'Crypto', 'Generated', 'Disabled'] as const;
 export type PrimaryCardFilter = typeof primaryCardFilters[number];

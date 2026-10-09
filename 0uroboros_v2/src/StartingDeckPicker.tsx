@@ -1,4 +1,4 @@
-import { MIN_STARTING_DECK_SIZE } from './game';
+import { MIN_STARTING_DECK_SIZE } from '@0uroboros/engine/game';
 import type { DeckOption } from './authoring/loadGameContent';
 
 /** Setup-screen choice of the deck both players are dealt. Short decks stay listed so it is clear why they cannot start; empty ones are hidden. */

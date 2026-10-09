@@ -3,8 +3,8 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import authored from "../content/authored-content.json";
-import { DEFAULT_STRATEGY, type StrategyProfile } from "../src/ai/strategy";
-import { serverMaximums } from "../src/game";
+import { DEFAULT_STRATEGY, type StrategyProfile } from "@0uroboros/engine/ai/strategy";
+import { serverMaximums } from "@0uroboros/engine/game";
 import { createStrategist, type LeagueOutcome, type Snapshot } from "../server/aiStrategist";
 import { createLeague, eloUpdate, expectedScore, kFactor, leagueGameCount, sampleOpponent, type LeagueMember } from "../server/agents/league";
 import { clampToEnvelope, DV_8, STRAT_G, T_5, VP_DOG, type StrategistIdentity, type StyleEnvelope } from "../server/agents/roster";
@@ -211,7 +211,7 @@ describe("league runs", () => {
       }));
       const league = createLeague({
         root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined,
-        harness: async () => await import("../src/ai/selfPlay") as never,
+        harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never,
         document: async () => (authored as unknown as { document: unknown }).document,
         settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: true }),
         publish: evidence => published.push(evidence),
@@ -262,7 +262,7 @@ describe("league runs", () => {
         "t-5@v1.1": { agent: "t-5", elo: 1300, games: 50, wins: 40, losses: 10, ties: 0, since: "2026-10-08T00:00:00.000Z" },
       } }));
       const member: LeagueMember = { id: "t-5", name: "T-5", active: () => true, start: async () => undefined, snapshots: () => [{ label: "t-5@v1.2", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "unused" }), concludeTrial: async () => "" };
-      const league = createLeague({ root: join(root, "league"), members: [member], log: () => undefined, harness: async () => await import("../src/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
+      const league = createLeague({ root: join(root, "league"), members: [member], log: () => undefined, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
       await new Promise(done => setTimeout(done, 20));
       expect(league.status().table[0]).toMatchObject({ agent: "t-5", label: "t-5@v1.2", elo: 1300 });
     } finally { await rm(root, { recursive: true, force: true }); }
@@ -277,7 +277,7 @@ describe("league runs", () => {
         id: identity.id, name: identity.name, active: () => true, start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms,
         concludeTrial: (id, outcome) => { concluded.push(id); return agent.concludeLeagueTrial(id, outcome); },
       }));
-      const league = createLeague({ root: join(root, "league"), members, log: () => undefined, harness: async () => await import("../src/ai/selfPlay") as never, document: async () => (authored as unknown as { document: unknown }).document, settings: () => ({ rounds: 3, seedsPerBlock: 2, ecoObserves: false }) });
+      const league = createLeague({ root: join(root, "league"), members, log: () => undefined, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => (authored as unknown as { document: unknown }).document, settings: () => ({ rounds: 3, seedsPerBlock: 2, ecoObserves: false }) });
       league.run();
       // One pairing × 2 seeds × 2 seats of rating games, then stop two games into the first trial.
       while (!(league.status().phase === "trial" && league.status().games >= 6)) await new Promise(done => setTimeout(done, 10));

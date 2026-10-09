@@ -1,5 +1,5 @@
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react';
-import type { Card } from './game';
+import type { Card } from '@0uroboros/engine/game';
 import { depthRenderer, type DepthArtHandle } from './depthArt/DepthArtRenderer';
 import { depthEntry } from './depthArt/depthManifest';
 import { SIDE_GAIN, VERTICAL_GAIN, leanFraction, restingTilt, sampleVelocity, stepTilt, tiltEye, type DragTilt } from './depthArt/dragTilt';

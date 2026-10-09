@@ -4,8 +4,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { CardFace } from '../src/CardFace';
 import { cardPresentation } from '../src/cardPresentation';
-import { HISTORIC_CARDS } from '../src/historicCatalog';
-import type { Card } from '../src/game';
+import { HISTORIC_CARDS } from '@0uroboros/engine/historicCatalog';
+import type { Card } from '@0uroboros/engine/game';
 
 const historic = (id: string) => HISTORIC_CARDS.find(card => card.id === id)!;
 const sample: Card = { id: 'sample', name: 'Sample Card', type: 'Character', cost: 3, power: 2, art: '/sample.png', effect: '' };

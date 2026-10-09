@@ -2,7 +2,7 @@
  * Deterministic economy metrics. Eco-Strat reasons over these numbers; it never computes them.
  * Pure functions over match reports: no I/O, no game code, no randomness.
  */
-import type { DecisionRecord, MatchReport, PurchaseRecord } from '../../src/runtime';
+import type { DecisionRecord, MatchReport, PurchaseRecord } from '@0uroboros/engine/runtime';
 
 type Pair = [number, number];
 type Seat = 0 | 1;

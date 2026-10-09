@@ -1,5 +1,5 @@
-import { sanitizeProfile, type StrategyProfile } from './strategy';
-import type { MatchReport } from '../runtime';
+import { sanitizeProfile, type StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import type { MatchReport } from '@0uroboros/engine/runtime';
 
 /** `disabled` means the agent is switched off in Settings > Agents and the opponent plays the default profile. */
 /** `experiment` is set when `profile` is the arm of an experiment rather than the agent's current best. */

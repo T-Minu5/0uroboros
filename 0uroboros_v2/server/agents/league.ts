@@ -1,7 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { SelfPlayResult } from '../../src/ai/selfPlay';
-import type { StrategyProfile } from '../../src/ai/strategy';
+import type { SelfPlayResult } from '@0uroboros/engine/ai/selfPlay';
+import type { StrategyProfile } from '@0uroboros/engine/ai/strategy';
 import type { LeagueArms, LeagueOutcome, Snapshot } from '../aiStrategist';
 import type { GameEvidence } from './evidence';
 

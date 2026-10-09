@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '../cardArtwork';
+import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { servedArtPath } from '../depthArt/depthManifest';
-import { MIN_STARTING_DECK_SIZE } from '../game';
-import { deckSize, type AuthoredCard, type StartingDeck } from './contentModel';
+import { MIN_STARTING_DECK_SIZE } from '@0uroboros/engine/game';
+import { deckSize, type AuthoredCard, type StartingDeck } from '@0uroboros/engine/authoring/contentModel';
 import { cardCategoryLabel } from './cardBrowser';
 import { useEditorFocus } from './editorContext';
 

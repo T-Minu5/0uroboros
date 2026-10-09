@@ -1,5 +1,5 @@
 import { boardScanTotalMs } from './NeonHorizonScan';
-import type { RuntimeEvent } from './runtime';
+import type { RuntimeEvent } from '@0uroboros/engine/runtime';
 
 export function isNoTargetEvent(event: Pick<RuntimeEvent, 'text' | 'amount'>): boolean {
   return /no target/i.test(event.text);

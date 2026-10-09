@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, validateContent, type AuthoredCard } from '../src/authoring/contentModel';
+import { compileContent, createDefaultContent, validateContent, type AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 import { cardCategoryLabel, matchesCardFilter } from '../src/authoring/cardBrowser';
 import { cardPresentation } from '../src/cardPresentation';
-import { createStrategicMarket, draftOffer } from '../src/evaluationMarket';
-import { canDeploy, isCharacterCard, starterCards, type Card } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import type { EffectStep } from '../src/effects/types';
-import { describeCard, targetsFor, whoChoices, whoLabel } from '../src/effects/catalog';
+import { createStrategicMarket, draftOffer } from '@0uroboros/engine/evaluationMarket';
+import { canDeploy, isCharacterCard, starterCards, type Card } from '@0uroboros/engine/game';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
+import { describeCard, targetsFor, whoChoices, whoLabel } from '@0uroboros/engine/effects/catalog';
 
 const reset = (who: 'self' | 'opponent'): EffectStep => ({ action: 'restoreCard', target: { type: 'card', who, where: 'thisNode' }, pick: { mode: 'all' } });
 const monk = (extra: Partial<Card> = {}): Card => ({

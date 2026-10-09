@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { effectiveCardPower, starterCards, type Card, type Deployment, type EvaluationEffect, type PlayerId } from '../src/game';
-import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { effectiveCardPower, starterCards, type Card, type Deployment, type EvaluationEffect, type PlayerId } from '@0uroboros/engine/game';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 const make = () => {
   const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(7) });

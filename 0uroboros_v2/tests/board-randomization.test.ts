@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { createSession, seededRandom } from '../src/runtime';
-import { initialWeights, starterCards, selectCircuitNode } from '../src/game';
+import { createSession, seededRandom } from '@0uroboros/engine/runtime';
+import { initialWeights, starterCards, selectCircuitNode } from '@0uroboros/engine/game';
 
 it('randomizes reveal order and weight placement independently while preserving legality and secrecy',()=>{
  const openings=new Set<string>(),weights=new Set<string>();

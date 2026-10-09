@@ -1,12 +1,12 @@
 import { copyFile, mkdir, readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { DEFAULT_STRATEGY, effectTotal, handValue, hasAction, locationRead, sanitizeProfile, versionLabel, type LocationRules, type StrategyProfile, type StrategyWeights } from '../src/ai/strategy';
-import { migrateCard } from '../src/effects/migrate';
-import type { SelfPlayResult } from '../src/ai/selfPlay';
-import { CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_OFFER_COUNT, DRAFT_PHASE_SUMMARY, GAME_BASE_COUNT, GAME_CHAOS_COUNT, GAME_CHAOS_MIX, GAME_PILE_SUPPLY, GAME_VP_COUNT, GAME_VP_SUPPLY, DRAFT_SOLAR_MONK_COUNT } from '../src/evaluationMarket';
-import { defaultServerVP, serverMaximums, type Card, type Servers } from '../src/game';
-import type { MatchReport } from '../src/runtime';
+import { DEFAULT_STRATEGY, effectTotal, handValue, hasAction, locationRead, sanitizeProfile, versionLabel, type LocationRules, type StrategyProfile, type StrategyWeights } from '@0uroboros/engine/ai/strategy';
+import { migrateCard } from '@0uroboros/engine/effects/migrate';
+import type { SelfPlayResult } from '@0uroboros/engine/ai/selfPlay';
+import { CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_OFFER_COUNT, DRAFT_PHASE_SUMMARY, GAME_BASE_COUNT, GAME_CHAOS_COUNT, GAME_CHAOS_MIX, GAME_PILE_SUPPLY, GAME_VP_COUNT, GAME_VP_SUPPLY, DRAFT_SOLAR_MONK_COUNT } from '@0uroboros/engine/evaluationMarket';
+import { defaultServerVP, serverMaximums, type Card, type Servers } from '@0uroboros/engine/game';
+import type { MatchReport } from '@0uroboros/engine/runtime';
 import { isLocalRequest } from './contentApi';
 import { withChange, type BaselineTips, type Tip } from './agents/mentoring';
 import { clampToEnvelope, describeEnvelope, type StrategistIdentity } from './agents/roster';

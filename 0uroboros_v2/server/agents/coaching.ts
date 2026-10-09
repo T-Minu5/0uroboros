@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import type { StrategyProfile, StrategyWeights } from '../../src/ai/strategy';
+import type { StrategyProfile, StrategyWeights } from '@0uroboros/engine/ai/strategy';
 import type { ProfileChange } from '../aiStrategist';
 import { diffProfiles, type BaselineTips } from './mentoring';
 import { clampToEnvelope, type LeagueAgentId, type StyleEnvelope } from './roster';

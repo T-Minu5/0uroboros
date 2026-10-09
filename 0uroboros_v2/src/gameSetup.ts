@@ -1,4 +1,4 @@
-import { defaultServerVP, type Servers } from './game';
+import { defaultServerVP, type Servers } from '@0uroboros/engine/game';
 
 /** Runtime turn countdown choices in seconds; null leaves turns untimed. */
 export const TURN_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);

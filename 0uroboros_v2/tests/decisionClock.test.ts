@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import {DecisionClock} from '../src/decisionClock';
-import {createSession,seededRandom} from '../src/runtime';
+import {createSession,seededRandom} from '@0uroboros/engine/runtime';
 it('has no invented deadline when unconfigured',()=>{const c=new DecisionClock();c.begin('1-1',null);expect(c.tick(999999)).toBeNull();});
 it('uses configured duration and increases only the next no-input decision countdown',()=>{
  const c=new DecisionClock();c.begin('1-1',20);expect(c.tick(19000)).toBeNull();expect(c.tick(1000)).toBe('turn');

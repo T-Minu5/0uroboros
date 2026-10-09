@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, type ContentDocument } from '../src/authoring/contentModel';
-import { starterCards, type Card } from '../src/game';
-import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import { migrateEffects } from '../src/effects/migrate';
+import { compileContent, createDefaultContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
+import { starterCards, type Card } from '@0uroboros/engine/game';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 
 const you = { type: 'player', who: 'self' } as const;
 

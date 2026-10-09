@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { actionsFor, createStep, describeLocation, describeStep, describeSteps, targetsFor, whoChoices } from '../src/effects/catalog';
-import { migrateEffects } from '../src/effects/migrate';
-import type { EffectStep, Scope } from '../src/effects/types';
-import { compileContent, createDefaultContent, normalizeDocument, validateContent } from '../src/authoring/contentModel';
+import { actionsFor, createStep, describeLocation, describeStep, describeSteps, targetsFor, whoChoices } from '@0uroboros/engine/effects/catalog';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { EffectStep, Scope } from '@0uroboros/engine/effects/types';
+import { compileContent, createDefaultContent, normalizeDocument, validateContent } from '@0uroboros/engine/authoring/contentModel';
 import { isGeneratedCard, newCardCategory, poolForClass } from '../src/authoring/cardBrowser';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 import { isNoTargetEvent, eventTime } from '../src/presentation';
-import { starterCards, type Card, type EvaluationEffect, type PlayerId } from '../src/game';
+import { starterCards, type Card, type EvaluationEffect, type PlayerId } from '@0uroboros/engine/game';
 
 const catalog: Card[] = [
   { id: 'alpha', definitionId: 'alpha-definition', name: 'Alpha Relay', type: 'Character', power: 2, cost: 2, art: '/alpha.png', effect: '' },

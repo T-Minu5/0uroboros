@@ -1,7 +1,7 @@
-import type { Card } from '../game';
-import { describeSteps } from '../effects/catalog';
-import type { EffectStep } from '../effects/types';
-import type { AuthoredCircuitReward, AuthoredMod, ContentDocument } from './contentModel';
+import type { Card } from '@0uroboros/engine/game';
+import { describeSteps } from '@0uroboros/engine/effects/catalog';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
+import type { AuthoredCircuitReward, AuthoredMod, ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 
 /** Attach the mod to a random Character in the claiming player's deck, Discard or hand. */
 export function modRewardEffects(modId: string): EffectStep[] {

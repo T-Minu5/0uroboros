@@ -1,16 +1,16 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { CARD_CLASSES, VP_CLASSES, type Card, type CardType } from '../game';
-import { builtinMod } from '../builtinMods';
+import { CARD_CLASSES, VP_CLASSES, type Card, type CardType } from '@0uroboros/engine/game';
+import { builtinMod } from '@0uroboros/engine/builtinMods';
 import {
   ACTIONS, COST_ACTIONS, DESTINATION_LABELS, EDITOR_ENTRIES, EDITOR_GROUPS, MAX_DEPTH, PICK_LABELS, RELATION_LABELS, SERVER_LABELS,
   TARGET_TYPE_LABELS, WHERE_LABELS, ZONE_LABELS,
   actionsFor, applyEditorEntry, applyTargetChoice, clampAmount, currentTargetChoice, editorEntryFor, targetChoicesFor, createStep, defaultTarget, describeStep, matchTargetSpec, targetsFor, whoChoices, whoLabel,
   type TargetSpec,
-} from '../effects/catalog';
+} from '@0uroboros/engine/effects/catalog';
 import {
   BUILTIN_MODIFIERS, DECK_ENDS, filterClasses, isBuiltinModifier, scopedWho,
   type CardClass, type CardFilter, type ChoiceOption, type EffectStep, type ModDefinition, type PickMode, type Relation, type Scope, type Target, type Who,
-} from '../effects/types';
+} from '@0uroboros/engine/effects/types';
 import { NumberInput } from './NumberInput';
 import { useEditorFocus } from './editorContext';
 import './recipe-editor.css';

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import { versionLabel, type StrategyProfile } from '../../src/ai/strategy';
-import type { SelfPlayResult } from '../../src/ai/selfPlay';
-import type { CompiledContent, ContentDocument } from '../../src/authoring/contentModel';
+import { versionLabel, type StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import type { SelfPlayResult } from '@0uroboros/engine/ai/selfPlay';
+import type { CompiledContent, ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import { sealEvidence, type GameEvidence, type StratGEvidence } from './evidence';
 import type { EcoStrat } from './ecoStrat';
 

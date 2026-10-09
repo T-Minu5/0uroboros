@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
-import type { TransferChoice as Transfer } from './runtime';
+import type { TransferChoice as Transfer } from '@0uroboros/engine/runtime';
 
 type Legs = Transfer['moves'][string];
 export type TransferDrag = { from: number; over: number | null; x: number; y: number };

@@ -2,11 +2,11 @@ import { Suspense, useMemo, useRef, useEffect, useLayoutEffect, useState, create
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, useGLTF, Environment, Lightformer, RoundedBox, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import type { Card } from './game';
+import type { Card } from '@0uroboros/engine/game';
 import { CardFace, type CardFaceProps } from './CardFace';
 import './board-ritual.css';
 import './neon-node.css';
-import { CARD_ART_PLACEHOLDER, CARD_BACK, cardArtworkPath } from './cardArtwork';
+import { CARD_ART_PLACEHOLDER, CARD_BACK, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { servedArtPath } from './depthArt/depthManifest';
 import { PLACEMENT_CLIP_DELAY_MS, PLACEMENT_CLIP_RATE, cardEffectVideo, effectVideoOnPlacement } from './cardVideos';
 import { LocationText } from './LocationText';
@@ -36,7 +36,7 @@ import { NEAR_SLOPE, offsetOutline, slabGeometry, type TablePath } from './neonT
 import { neonLaneDimensions, neonLaneShape } from './neonGeometry';
 import { BoardDiagnostics } from './BoardDiagnostics';
 import type { TransferView } from './transferDrag';
-import { formatAmount } from './transferText';
+import { formatAmount } from '@0uroboros/engine/transferText';
 import { neonTrimShading, useNeonTrimClock } from './neonTubeShading';
 import { Singularity, SingularityContext, useSingularityPass, useSingularityField, singularityTransform, type SingularityField } from './Singularity';
 import { AUTHORED_NODE_X, AUTHORED_SERVER, SERVER_SHIFT, FAR_SHIFT, LANE_MARK_DX, LANE_MARK_HALF, LANE_MARK_Z, LANE_RIM, LANE_RIM_HX, LANE_RIM_RADIUS, LANE_SCALE, NEON_FAR_RAISE, NEON_FIELD_SHIFT, NEON_STATS_DROP, NODE_GROW, NODE_X, boardZ, warpFarZ, warpX } from './boardLayout';

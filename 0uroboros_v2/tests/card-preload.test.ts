@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Card } from '../src/game';
+import type { Card } from '@0uroboros/engine/game';
 import { cardsInPlay } from '../src/cardPreload';
 
 const card = (id: string, extra: Partial<Card> = {}): Card => ({ id, definitionId: id, name: id, type: 'Character', cost: 1, art: `/art/${id}.png`, effect: '', ...extra });

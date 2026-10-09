@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { LOCATION_EFFECT_COLORS, LOCATION_TRIGGER_COLOR, splitLocationText } from '../src/locationTriggers';
-import { describeStep } from '../src/effects/catalog';
-import type { CardWhere, EffectStep, Scope, Who } from '../src/effects/types';
+import { LOCATION_EFFECT_COLORS, LOCATION_TRIGGER_COLOR, splitLocationText } from '@0uroboros/engine/locationTriggers';
+import { describeStep } from '@0uroboros/engine/effects/catalog';
+import type { CardWhere, EffectStep, Scope, Who } from '@0uroboros/engine/effects/types';
 
 const coloured = (text: string) => splitLocationText(text).filter(part => part.color).map(part => [part.text, part.trigger ?? part.effect]);
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Card } from './game';
-import type { SessionView } from './runtime';
+import type { Card } from '@0uroboros/engine/game';
+import type { SessionView } from '@0uroboros/engine/runtime';
 import { Icon } from './BoardScene';
 import { CardFace } from './CardFace';
 import './zone-drawer.css';

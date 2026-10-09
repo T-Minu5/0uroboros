@@ -9,6 +9,8 @@ const load = <T>(server: ViteDevServer, path: string) => server.ssrLoadModule(pa
 
 // Reference animations, concept art and Blender sources are never production assets.
 export default defineConfig({
+ // Workspace packages resolve from source; the alias keeps Vite, Vitest and scripts independent of the node_modules symlink.
+ resolve: { alias: [{ find: /^@0uroboros\/engine\/(.*)$/, replacement: `${resolve('packages/engine/src')}/$1` }] },
  plugins: [react(), {
   name: 'first-party-production-assets',
   configureServer(server) {
@@ -56,7 +58,7 @@ export default defineConfig({
    const { createGameLogApi } = await load<typeof import('./server/gameLogApi')>(server, '/server/gameLogApi.ts');
    const depth = createDepthApi();
    server.middlewares.use(createContentApi({
-    loadModel: () => server.ssrLoadModule('/src/authoring/contentModel.ts'),
+    loadModel: () => server.ssrLoadModule('/packages/engine/src/authoring/contentModel.ts'),
     onSaved: document => depth.enqueue(document),
    }));
    server.middlewares.use(createArtworkApi());

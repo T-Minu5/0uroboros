@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   EDITOR_ENTRIES, EDITOR_GROUPS, applyEditorEntry, applyTargetChoice, createStep, currentTargetChoice, describeStep, editorEntryFor, targetChoicesFor,
-} from '../src/effects/catalog';
-import type { EffectStep } from '../src/effects/types';
+} from '@0uroboros/engine/effects/catalog';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
 
 const entry = (key: string) => EDITOR_ENTRIES.find(item => item.key === key)!;
 const choice = (key: string, choiceKey: string) => entry(key).targets!.find(item => item.key === choiceKey)!;

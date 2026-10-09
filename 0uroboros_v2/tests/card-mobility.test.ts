@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession, type VisiblePlacement } from '../src/runtime';
-import { starterCards, type Card, type PlayerId } from '../src/game';
-import { describeCard, describeStep } from '../src/effects/catalog';
-import { builtinMod, setBuiltinModDetails } from '../src/builtinMods';
-import { createDefaultContent, validateContent } from '../src/authoring/contentModel';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession, type VisiblePlacement } from '@0uroboros/engine/runtime';
+import { starterCards, type Card, type PlayerId } from '@0uroboros/engine/game';
+import { describeCard, describeStep } from '@0uroboros/engine/effects/catalog';
+import { builtinMod, setBuiltinModDetails } from '@0uroboros/engine/builtinMods';
+import { createDefaultContent, validateContent } from '@0uroboros/engine/authoring/contentModel';
 import { CardFace } from '../src/CardFace';
 
 const card = (id: string, extra: Partial<Card> = {}): Card => ({ ...starterCards[0], id, name: id, power: 2, onReveal: [], ...extra });

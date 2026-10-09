@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { CardFace } from './CardFace';
-import type { Card, PlayerId } from './game';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS } from './evaluationMarket';
-import type { CompiledContent } from './authoring/contentModel';
+import type { Card, PlayerId } from '@0uroboros/engine/game';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS } from '@0uroboros/engine/evaluationMarket';
+import type { CompiledContent } from '@0uroboros/engine/authoring/contentModel';
 import './card-catalog.css';
 
 type Props = {content?:CompiledContent;canTest:boolean; inspect:(card:Card)=>void; add:(id:string,owner:PlayerId)=>boolean; close:()=>void};

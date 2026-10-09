@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "../src/runtime";
-import { starterCards } from "../src/game";
+import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
+import { starterCards } from "@0uroboros/engine/game";
 
 const make = (seed = 7) => createSession({ carryover: false, priorityPreference: "higher", random: seededRandom(seed), practiceMarket: [starterCards[0], starterCards[1]] });
 function drain(session: RuntimeSession) {

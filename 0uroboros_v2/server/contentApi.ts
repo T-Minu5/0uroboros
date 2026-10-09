@@ -1,7 +1,7 @@
 import { copyFile, mkdir, open, readFile, rename, unlink } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { ContentDocument } from '../src/authoring/contentModel';
+import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 
 export type ContentModelModule = {
   createDefaultContent(): ContentDocument;

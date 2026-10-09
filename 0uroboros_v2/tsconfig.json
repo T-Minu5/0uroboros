@@ -13,7 +13,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@0uroboros/engine/*": ["packages/engine/src/*"]
+    }
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "packages/engine/src"]
 }

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState, type CSSProperties } from 'react';
-import type { RuntimeEvent } from './runtime';
+import type { RuntimeEvent } from '@0uroboros/engine/runtime';
 import './card-effect-motion.css';
 type Geometry={path:string;sx:number;sy:number;tx:number;ty:number};
 export function EffectPath({event,duration}:{event:RuntimeEvent;duration:number}){

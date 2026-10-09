@@ -7,7 +7,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const artRoot = resolve(root, 'assets/card_art');
 const sourcePath = resolve(artRoot, 'cards.json');
 const manifestPath = resolve(root, 'docs/generated/CARD_ART_IMPORT.json');
-const mappingPath = resolve(root, 'src/cardArtwork.json');
+const mappingPath = resolve(root, 'packages/engine/src/cardArtwork.json');
 const placeholder = '/assets/card_art/image_placeHolder.png';
 const check = process.argv.includes('--check');
 const json = value => `${JSON.stringify(value, null, 2)}\n`;
@@ -72,7 +72,7 @@ if (JSON.stringify(source.cards.map(({ artwork, ...rest }) => rest)) !== beforeM
 const manifest = {
   schemaVersion: 1,
   source: 'assets/card_art/cards.json',
-  mapping: 'src/cardArtwork.json',
+  mapping: 'packages/engine/src/cardArtwork.json',
   policy: 'Artwork paths only. Exact category folder first, then unique supplied suffix/filename. No mechanics or video changes; no video use.',
   placeholder,
   cardCount: cards.length,

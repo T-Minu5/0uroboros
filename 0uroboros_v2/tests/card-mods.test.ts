@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, validateContent, type AuthoredMod } from '../src/authoring/contentModel';
+import { compileContent, createDefaultContent, validateContent, type AuthoredMod } from '@0uroboros/engine/authoring/contentModel';
 import { describeIssues } from '../src/authoring/validationIssues';
-import { describeMod, describeStep, modBadge } from '../src/effects/catalog';
-import type { EffectStep } from '../src/effects/types';
-import { starterCards, type Card, type CardModifier } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { describeMod, describeStep, modBadge } from '@0uroboros/engine/effects/catalog';
+import type { EffectStep } from '@0uroboros/engine/effects/types';
+import { starterCards, type Card, type CardModifier } from '@0uroboros/engine/game';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 const you = { type: 'player', who: 'self' } as const;
 const crypto = (amount: number): EffectStep => ({ action: 'gainCrypto', amount, target: you });

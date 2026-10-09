@@ -86,7 +86,7 @@ export function documentArt(document: unknown): string[] {
  */
 export async function allArtUrls(paths: DepthPaths): Promise<string[]> {
   const urls = new Set<string>();
-  const mapping = JSON.parse(await readFile(resolve(paths.root, 'src/cardArtwork.json'), 'utf8')) as { placeholder: string; byId: Record<string, string>; byName: Record<string, string> };
+  const mapping = JSON.parse(await readFile(resolve(paths.root, 'packages/engine/src/cardArtwork.json'), 'utf8')) as { placeholder: string; byId: Record<string, string>; byName: Record<string, string> };
   urls.add(mapping.placeholder);
   for (const url of [...Object.values(mapping.byId), ...Object.values(mapping.byName)]) urls.add(url);
   const content = await readFile(resolve(paths.root, 'content/authored-content.json'), 'utf8').catch(() => null);

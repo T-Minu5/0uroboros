@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultContent, compileContent, normalizeDocument, upgradeDocument, validateContent, type ContentDocument } from '../src/authoring/contentModel';
-import { createSession, latestRevealSlot, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
-import { starterCards, type Card, type EvaluationEffect } from '../src/game';
-import { EVALUATION_LOCATIONS } from '../src/content';
-import { migrateEffects } from '../src/effects/migrate';
-import type { AnyEffect, EffectStep, Scope } from '../src/effects/types';
-import { describeStep, targetsFor, whoChoices } from '../src/effects/catalog';
+import { createDefaultContent, compileContent, normalizeDocument, upgradeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
+import { createSession, latestRevealSlot, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { starterCards, type Card, type EvaluationEffect } from '@0uroboros/engine/game';
+import { EVALUATION_LOCATIONS } from '@0uroboros/engine/content';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { AnyEffect, EffectStep, Scope } from '@0uroboros/engine/effects/types';
+import { describeStep, targetsFor, whoChoices } from '@0uroboros/engine/effects/catalog';
 
 const steps = (effects: AnyEffect[], scope: Scope = 'location') => migrateEffects(effects, scope);
 

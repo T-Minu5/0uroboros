@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import saved from '../content/authored-content.json';
-import { EVALUATION_CIRCUIT_REWARDS, EVALUATION_LOCATIONS } from '../src/content';
-import { ACTION_IDS, collectActions, describeSteps, validateSteps, type ValidationCards } from '../src/effects/catalog';
-import { migrateEffects } from '../src/effects/migrate';
-import type { AnyEffect, EffectStep, Scope } from '../src/effects/types';
-import { EVALUATION_ALL_CARDS } from '../src/evaluationMarket';
-import type { Card, LegacyEffect } from '../src/game';
+import { EVALUATION_CIRCUIT_REWARDS, EVALUATION_LOCATIONS } from '@0uroboros/engine/content';
+import { ACTION_IDS, collectActions, describeSteps, validateSteps, type ValidationCards } from '@0uroboros/engine/effects/catalog';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
+import type { AnyEffect, EffectStep, Scope } from '@0uroboros/engine/effects/types';
+import { EVALUATION_ALL_CARDS } from '@0uroboros/engine/evaluationMarket';
+import type { Card, LegacyEffect } from '@0uroboros/engine/game';
 
 type Source = { label: string; scope: Scope; effects: readonly AnyEffect[] };
 type LooseLocation = { id: string; effects?: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[]; schedule?: readonly { at: number; effects: readonly AnyEffect[] }[] };

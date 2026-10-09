@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_STRATEGY, draftScore, effectTotal, handValue, optionValue, planDraft, sanitizeProfile, type StrategyContext } from "../src/ai/strategy";
-import { createSession, firstLegalSelection, seededRandom, type MatchReport, type RuntimeSession } from "../src/runtime";
-import { canDeploy, legalNodes, type Card } from "../src/game";
+import { DEFAULT_STRATEGY, draftScore, effectTotal, handValue, optionValue, planDraft, sanitizeProfile, type StrategyContext } from "@0uroboros/engine/ai/strategy";
+import { createSession, firstLegalSelection, seededRandom, type MatchReport, type RuntimeSession } from "@0uroboros/engine/runtime";
+import { canDeploy, legalNodes, type Card } from "@0uroboros/engine/game";
 import { createStrategist } from "../server/aiStrategist";
-import { playSelfPlayGame } from "../src/ai/selfPlay";
-import { emptyTelemetry } from "../src/ai/telemetry";
-import { compileContent, type ContentDocument } from "../src/authoring/contentModel";
+import { playSelfPlayGame } from "@0uroboros/engine/ai/selfPlay";
+import { emptyTelemetry } from "@0uroboros/engine/ai/telemetry";
+import { compileContent, type ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import authored from "../content/authored-content.json";
 
 const cards = (authored as unknown as { document: { cards: (Card & { pool: string })[] } }).document.cards;
@@ -283,7 +283,7 @@ describe("strategist agent", () => {
     const { root, contentFile, done } = await scratch();
     try {
       await writeFile(contentFile, JSON.stringify(authored));
-      const agent = createStrategist({ root, contentFile, log: () => undefined, labSeeds: 2, loadSelfPlay: async () => await import("../src/ai/selfPlay") as never });
+      const agent = createStrategist({ root, contentFile, log: () => undefined, labSeeds: 2, loadSelfPlay: async () => await import("@0uroboros/engine/ai/selfPlay") as never });
       await agent.ready; await agent.idle();
       const memory = agent.memory();
       const screened = [...memory.experiments, ...(memory.experiment ? [memory.experiment] : [])].filter(item => item.lab);

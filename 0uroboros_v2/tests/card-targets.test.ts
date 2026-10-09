@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent } from '../src/authoring/contentModel';
-import { describeStep, validateSteps, type ValidationCards } from '../src/effects/catalog';
-import type { CardWhere, EffectStep, PickMode, Who } from '../src/effects/types';
-import { starterCards, type Card } from '../src/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { compileContent, createDefaultContent } from '@0uroboros/engine/authoring/contentModel';
+import { describeStep, validateSteps, type ValidationCards } from '@0uroboros/engine/effects/catalog';
+import type { CardWhere, EffectStep, PickMode, Who } from '@0uroboros/engine/effects/types';
+import { starterCards, type Card } from '@0uroboros/engine/game';
+import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 const card = (id: string, extra: Partial<Card> = {}): Card => ({ ...starterCards[0], id, name: id, type: 'Character', power: 2, onReveal: [], ...extra });
 const coin = (id: string): Card => ({ ...starterCards[0], id, name: id, type: 'Crypto', cryptoValue: 1, power: undefined, onReveal: [] });

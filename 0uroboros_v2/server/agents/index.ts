@@ -1,9 +1,9 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { relative, resolve } from 'node:path';
-import { DEFAULT_STRATEGY, sanitizeProfile, versionLabel, type StrategyProfile } from '../../src/ai/strategy';
-import type { ContentDocument } from '../../src/authoring/contentModel';
-import type { MatchReport } from '../../src/runtime';
+import { DEFAULT_STRATEGY, sanitizeProfile, versionLabel, type StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
+import type { MatchReport } from '@0uroboros/engine/runtime';
 import { createStrategist, type StratGGameRecord } from '../aiStrategist';
 import { isLocalRequest } from '../contentApi';
 import { runCohort, type SelfPlayHarness } from './cohortRunner';
@@ -43,12 +43,12 @@ export function createAgentSystem(options: AgentSystemOptions) {
   const contentFile = resolve(cwd, 'content/authored-content.json');
   const readDocument = async () => {
     const stored = (JSON.parse(await readFile(contentFile, 'utf8')) as { document: unknown }).document;
-    const model = await options.loadModule('/src/authoring/contentModel.ts') as { upgradeDocument: (value: unknown) => unknown };
+    const model = await options.loadModule('/packages/engine/src/authoring/contentModel.ts') as { upgradeDocument: (value: unknown) => unknown };
     return model.upgradeDocument(stored) as ContentDocument;
   };
 
   const strategistKey = env.AI_STRATEGIST_DISABLE_MODEL ? undefined : env.OPENAI_API_KEY;
-  const loadSelfPlay = () => options.loadModule('/src/ai/selfPlay.ts') as never;
+  const loadSelfPlay = () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as never;
   const mentoringStore = createMentoringStore(resolve(cwd, 'ai-agents/league/mentoring.json'));
   const coachingStore = createCoachingStore(resolve(cwd, 'ai-agents/league/coaching.json'));
   const recordDecisions = () => settings.read().stratG.recordDecisions;
@@ -98,7 +98,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
     apiKey: env.ECO_STRAT_DISABLE_MODEL ? undefined : env.OPENAI_API_KEY,
     models: env.ECO_STRAT_MODEL?.split(',').map(model => model.trim()).filter(Boolean),
     loadFacts: async () => {
-      const module = await options.loadModule('/src/ai/systemFacts.ts') as { systemFacts: (document: ContentDocument) => object };
+      const module = await options.loadModule('/packages/engine/src/ai/systemFacts.ts') as { systemFacts: (document: ContentDocument) => object };
       return module.systemFacts(await readDocument());
     },
     settings: () => { const s = settings.read(); return { active: ecoStratActive(s), observeHumanGames: s.ecoStrat.observeHumanGames, continuous: s.ecoStrat.continuous, reportEvery: s.ecoStrat.reportEvery, baselineGames: s.ecoStrat.baselineGames }; },
@@ -132,7 +132,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
       cohort.phase = 'playing';
       await runCohort({
         kind, target, eco,
-        harness: () => options.loadModule('/src/ai/selfPlay.ts') as unknown as Promise<SelfPlayHarness>,
+        harness: () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as unknown as Promise<SelfPlayHarness>,
         document: readDocument, stratG: await stratGProfile(), seedBase, log: message => log(`Eco-Strat cohort ${message}`),
         shouldStop: () => cohort.stop || !ecoStratActive(settings.read()),
         onProgress: state => { cohort = { ...cohort, ...state }; },

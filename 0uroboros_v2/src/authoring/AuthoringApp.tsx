@@ -1,9 +1,9 @@
 import { useContext, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
-import { POWER_SOURCES, type Card, type CardModifier, type PowerSource } from '../game';
-import { MOD_HOOK_LABELS, createStep, describeCard, describeLocation, describeMod, describeSteps, modBadge } from '../effects/catalog';
-import { BUILTIN_MODIFIERS, type EffectStep, type ModDefinition, type ModifierKind } from '../effects/types';
-import { BUILTIN_MOD_FIELDS, DEFAULT_BUILTIN_MODS, builtinMod, setBuiltinModDetails, type BuiltinModDetails } from '../builtinMods';
-import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '../cardArtwork';
+import { POWER_SOURCES, type Card, type CardModifier, type PowerSource } from '@0uroboros/engine/game';
+import { MOD_HOOK_LABELS, createStep, describeCard, describeLocation, describeMod, describeSteps, modBadge } from '@0uroboros/engine/effects/catalog';
+import { BUILTIN_MODIFIERS, type EffectStep, type ModDefinition, type ModifierKind } from '@0uroboros/engine/effects/types';
+import { BUILTIN_MOD_FIELDS, DEFAULT_BUILTIN_MODS, builtinMod, setBuiltinModDetails, type BuiltinModDetails } from '@0uroboros/engine/builtinMods';
+import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import {
   validateContent,
   normalizeDocument,
@@ -16,7 +16,7 @@ import {
   type AuthoredMod,
   type ContentDocument,
   type StartingDeck,
-} from './contentModel';
+} from '@0uroboros/engine/authoring/contentModel';
 import { getBundledDocument } from './contentStore';
 import { ModsContext, StepList } from './StepEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
@@ -28,7 +28,7 @@ import { describeIssues, type Issue } from './validationIssues';
 import { CardFace } from '../CardFace';
 import { CARD_STYLE_COLORS, CARD_STYLE_ICONS, type CardStyle } from '../cardPresentation';
 import { refreshDepthStatus, regenerateDepth, servedArtPath, useDepthEntry, useDepthJob } from '../depthArt/depthManifest';
-import { isSolarMonk } from '../game';
+import { isSolarMonk } from '@0uroboros/engine/game';
 import { cardClasses, vpClasses, cardClassOf, cardCategoryLabel, matchesCardFilter, newCardCategory, sortCards, primaryCardFilters, primaryFilterOf, secondaryFiltersFor, isGeneratedCard, poolForClass, type CardClass, type CardFilter, type CardSort } from './cardBrowser';
 import './authoring.css';
 import './authoring-workbench.css';

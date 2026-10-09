@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
-import { serverMaximums, type PlayerId } from './game';
-import type { CycleRecord, RuntimeEvent, SessionPhase } from './runtime';
+import { serverMaximums, type PlayerId } from '@0uroboros/engine/game';
+import type { CycleRecord, RuntimeEvent, SessionPhase } from '@0uroboros/engine/runtime';
 import './log-drawer.css';
 
 type SectionId = 'turn-1'|'turn-2'|'turn-3'|'collapse'|'draft'|'end';

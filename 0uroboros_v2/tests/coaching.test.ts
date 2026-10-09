@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import authored from "../content/authored-content.json";
-import { compileForSelfPlay } from "../src/ai/selfPlay";
-import { DEFAULT_STRATEGY, draftScore, locationRead, locationStakes, sanitizeProfile, strategyPhase, type StrategyContext, type StrategyProfile } from "../src/ai/strategy";
-import { systemFacts } from "../src/ai/systemFacts";
-import type { ContentDocument } from "../src/authoring/contentModel";
+import { compileForSelfPlay } from "@0uroboros/engine/ai/selfPlay";
+import { DEFAULT_STRATEGY, draftScore, locationRead, locationStakes, sanitizeProfile, strategyPhase, type StrategyContext, type StrategyProfile } from "@0uroboros/engine/ai/strategy";
+import { systemFacts } from "@0uroboros/engine/ai/systemFacts";
+import type { ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import { baselineOf } from "../server/aiStrategist";
 import { coach, coachingTips, combineTips, mirrorProfile, withoutCoaching } from "../server/agents/coaching";
 import { clampToEnvelope, DV_8, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from "../server/agents/roster";

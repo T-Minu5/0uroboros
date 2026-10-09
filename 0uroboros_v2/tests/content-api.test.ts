@@ -5,7 +5,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createContentApi } from '../server/contentApi';
-import { createDefaultContent, validateContent } from '../src/authoring/contentModel';
+import { createDefaultContent, validateContent } from '@0uroboros/engine/authoring/contentModel';
 
 const cleanup: (() => Promise<void>)[] = [];
 afterEach(async () => { await Promise.all(cleanup.splice(0).map(fn => fn())); });

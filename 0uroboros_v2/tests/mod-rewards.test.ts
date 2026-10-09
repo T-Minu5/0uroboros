@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { AuthoredMod, ContentDocument } from '../src/authoring/contentModel';
+import type { AuthoredMod, ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import { createModReward, followModRename, isModReward } from '../src/authoring/modRewards';
-import { createStep } from '../src/effects/catalog';
+import { createStep } from '@0uroboros/engine/effects/catalog';
 
 const mod = (name: string): AuthoredMod => ({ id: 'mod-test', name, enabled: true, onReveal: [createStep('gainCrypto', 'card')] });
 const doc = (mods: AuthoredMod[], circuitRewards: ContentDocument['circuitRewards'] = []): ContentDocument => ({ version: 2, cards: [], locations: [], circuitRewards, mods });

@@ -1,8 +1,8 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Icon } from './BoardScene';
 import { CardFace } from './CardFace';
-import type { Card, PlayerId } from './game';
-import type { ScoreBreakdown, SessionView } from './runtime';
+import type { Card, PlayerId } from '@0uroboros/engine/game';
+import type { ScoreBreakdown, SessionView } from '@0uroboros/engine/runtime';
 import type { PlayerColor, ResolvedColorTheme } from './playerTheme';
 import './game-summary.css';
 

@@ -1,4 +1,4 @@
-import type { RuntimeEvent, RuntimeSession } from './runtime';
+import type { RuntimeEvent, RuntimeSession } from '@0uroboros/engine/runtime';
 
 let sequence = 0;
 

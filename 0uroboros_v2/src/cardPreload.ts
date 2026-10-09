@@ -1,5 +1,5 @@
-import type { Card } from './game';
-import { cardArtworkPath } from './cardArtwork';
+import type { Card } from '@0uroboros/engine/game';
+import { cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { warmCardVideos } from './cardVideos';
 import { depthRenderer } from './depthArt/DepthArtRenderer';
 import { depthEntry, servedArtPath } from './depthArt/depthManifest';

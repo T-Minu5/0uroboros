@@ -1,7 +1,7 @@
-import { MIN_STARTING_DECK_SIZE } from '../game';
-import { compileContent, deckSize, upgradeDocument, validateContent, withStartingDecks, type ContentDocument, type CompiledContent } from './contentModel';
+import { MIN_STARTING_DECK_SIZE } from '@0uroboros/engine/game';
+import { compileContent, deckSize, upgradeDocument, validateContent, withStartingDecks, type ContentDocument, type CompiledContent } from '@0uroboros/engine/authoring/contentModel';
 import { getBundledDocument } from './contentStore';
-import { setBuiltinModDetails } from '../builtinMods';
+import { setBuiltinModDetails } from '@0uroboros/engine/builtinMods';
 
 /** A starting deck as the setup screen lists it; `playable` decks have enough cards for the opening hand. */
 export type DeckOption = { id: string; name: string; size: number; cards: { name: string; count: number }[]; playable: boolean };

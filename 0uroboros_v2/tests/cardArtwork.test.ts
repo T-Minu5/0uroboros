@@ -1,8 +1,8 @@
 import { expect, it } from 'vitest';
 import catalog from '../assets/card_art/cards.json';
-import artwork from '../src/cardArtwork.json';
-import { cardArtworkPath, CARD_ART_PLACEHOLDER } from '../src/cardArtwork';
-import { starterCards } from '../src/game';
+import artwork from '@0uroboros/engine/cardArtwork.json';
+import { cardArtworkPath, CARD_ART_PLACEHOLDER } from '@0uroboros/engine/cardArtwork';
+import { starterCards } from '@0uroboros/engine/game';
 
 it('covers every supplied catalog image in the normalized artwork registry',()=>{
  expect(catalog.cards).toHaveLength(catalog.cardCount);
