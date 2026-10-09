@@ -3,9 +3,11 @@
  * Import-boundary lint for the publishing architecture.
  *
  *   packages/engine   pure rules: relative imports inside the package only; no react/three/node/browser modules.
- *   src (client)      may import the engine and other client modules; never src/authoring, server, tools or node:* statically.
+ *   packages/protocol zod and engine types only.
+ *   packages/server   the game server: node, ws, zod and the engine, protocol and content packages; never client UI or studio.
+ *   src (client)      may import the engine, protocol and other client modules; never src/authoring, server, tools or node:* statically.
  *   src/authoring     studio code; may import anything (it is never shipped).
- *   server            may import the engine; never src UI.
+ *   server            studio-side dev middleware and agents; may import the engine; never src UI.
  *
  * Studio UI that the client hosts in dev (agents panels, dev game log) must be loaded through a dynamic import guarded
  * by STUDIO_TOOLS so `build:client` can drop it; static imports of those files from client code are rejected here.
@@ -45,6 +47,27 @@ for (const file of walk(resolve(root, 'packages/engine/src'))) {
       const dataException = /assets\/card_art\/cards\.json$/.test(target);
       if (!inside && !dataException) fail(file, spec, 'leaves packages/engine');
     } else fail(file, spec, 'engine must not depend on external packages');
+  }
+}
+
+// Protocol: zod and engine types only
+for (const file of walk(resolve(root, 'packages/protocol/src'))) {
+  for (const spec of staticImports(readFileSync(file, 'utf8'))) {
+    const ok = spec === 'zod' || spec.startsWith('.') || spec.startsWith('@0uroboros/engine/');
+    if (!ok) fail(file, spec, 'protocol may import only zod and engine types');
+  }
+}
+
+// Game server: engine, protocol, content, node and ws; never the client UI or the studio
+for (const file of walk(resolve(root, 'packages/server/src'))) {
+  for (const spec of staticImports(readFileSync(file, 'utf8'))) {
+    if (spec.startsWith('.')) {
+      const target = rel(resolve(dirname(file), spec));
+      if (!target.startsWith('packages/server/')) fail(file, spec, 'leaves packages/server (use @0uroboros/* packages)');
+      continue;
+    }
+    const ok = spec.startsWith('node:') || spec === 'ws' || spec === 'zod' || /^@0uroboros\/(engine|protocol|content)\//.test(spec);
+    if (!ok) fail(file, spec, 'game server may import only node, ws, zod and the engine, protocol and content packages');
   }
 }
 

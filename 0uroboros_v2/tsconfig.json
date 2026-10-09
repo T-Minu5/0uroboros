@@ -17,8 +17,10 @@
     "baseUrl": ".",
     "paths": {
       "@0uroboros/engine/*": ["packages/engine/src/*"],
-      "@0uroboros/content/*": ["packages/content/*"]
+      "@0uroboros/content/*": ["packages/content/*"],
+      "@0uroboros/protocol/*": ["packages/protocol/src/*"],
+      "@0uroboros/server/*": ["packages/server/src/*"]
     }
   },
-  "include": ["src", "tests", "packages/engine/src", "packages/content"]
+  "include": ["src", "tests", "packages/engine/src", "packages/content", "packages/protocol/src", "packages/server/src"]
 }

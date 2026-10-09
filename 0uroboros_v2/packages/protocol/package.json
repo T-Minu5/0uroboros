@@ -1,0 +1,11 @@
+{
+  "name": "@0uroboros/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The wire protocol between the game client and the game server: lobby and game commands (validated with zod on the server) and the messages the server sends back (seat views, redacted events, timers).",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "sideEffects": false
+}

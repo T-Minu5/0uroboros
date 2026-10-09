@@ -2490,6 +2490,12 @@ export class RuntimeSession {
     return this.event("draft", `${this.say(owner, "You resume", "resumes")} Draft.`, { owner });
   }
 
+  /** Pushes the Draft deadline back by `ms`, for a table that paused while a seat reconnected. */
+  extendDraft(ms: number): void {
+    if (this.state.phase !== "draft" || this.state.draftEndsAt === null || ms <= 0) return;
+    this.state.draftEndsAt += ms;
+  }
+
   expireDraft(now = this.now()): RuntimeEvent | null {
     if (this.state.phase !== "draft" || this.state.draftEnded || this.queue.length || this.state.draftEndsAt === null || now < this.state.draftEndsAt || this.state.choice) return null;
     this.state.draftReady = [true, true]; this.state.draftEnded = true;
@@ -2583,9 +2589,17 @@ export class RuntimeSession {
 
   concedeForInactivity(owner:PlayerId=0):RuntimeEvent {
     if(this.state.phase!=="runtime"||this.queue.length)throw new Error("Concession is only available at a Runtime decision boundary.");
-    this.state.phase="gameover";this.state.winner=(1-owner) as PlayerId;
-    this.state.endedReason="Automatic concession after two consecutive no-input Runtime turns.";
-    return this.event("gameover",this.state.endedReason,{owner});
+    return this.resign(owner, "Automatic concession after two consecutive no-input Runtime turns.");
+  }
+
+  /** `owner` gives up the game in any phase: the other seat wins whatever the score. Concessions and forfeits use this. */
+  resign(owner: PlayerId, reason = `${this.subject(owner)} ${this.config.seatNames || owner !== 0 ? "concedes" : "concede"}.`): RuntimeEvent {
+    if (this.state.phase === "gameover") throw new Error("The session has already ended.");
+    this.refreshScores();
+    this.state.phase = "gameover"; this.state.winner = (1 - owner) as PlayerId;
+    this.state.endedReason = reason;
+    this.queue = []; this.state.choice = null; this.choiceResolver = null;
+    return this.event("gameover", this.state.endedReason, { owner });
   }
 
   /** Evaluation shortcut: scores the session as it stands and ends it, whatever the phase. */

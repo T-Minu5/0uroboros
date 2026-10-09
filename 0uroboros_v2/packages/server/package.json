@@ -1,0 +1,10 @@
+{
+  "name": "@0uroboros/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The authoritative game server: rooms with invite codes, seat tokens for reconnect, one RuntimeSession per room, server-owned timers, the disconnect rules from guide 06, results and replays.",
+  "exports": {
+    "./*": "./src/*.ts"
+  }
+}

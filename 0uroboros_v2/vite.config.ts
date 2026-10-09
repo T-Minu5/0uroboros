@@ -23,6 +23,8 @@ export default defineConfig({
  resolve: { alias: [
   { find: /^@0uroboros\/engine\/(.*)$/, replacement: `${resolve('packages/engine/src')}/$1` },
   { find: /^@0uroboros\/content\/(.*)$/, replacement: `${resolve('packages/content')}/$1` },
+  { find: /^@0uroboros\/protocol\/(.*)$/, replacement: `${resolve('packages/protocol/src')}/$1` },
+  { find: /^@0uroboros\/server\/(.*)$/, replacement: `${resolve('packages/server/src')}/$1` },
  ] },
  define: { __STUDIO__: JSON.stringify(!CLIENT) },
  build: {
