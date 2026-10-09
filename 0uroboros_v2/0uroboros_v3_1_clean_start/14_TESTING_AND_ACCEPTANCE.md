@@ -20,6 +20,11 @@ Required evidence on the wire, not only on screen: each socket receives only its
 
 The automated form is `npm run test:online` (`scripts/online-two-browser-smoke.mjs`): it builds and starts the server bundle, runs two Chromium contexts, inspects every WebSocket frame for hidden information, and writes `docs/evidence/online-report.json` plus screenshots. `tests/game-server.test.ts` must pass alongside it. A checkpoint that claims networked play is invalid without a passing report from the current commit.
 
+Hardening (roadmap step 14, last part) adds to the gate: `tests/hardening.test.ts` must pass — per-address socket and
+auth limits refuse the excess with `error.code = "rate"`; two signed-in players quick-match into one rated pvp table;
+`POST /errors` forwards a client crash report and refuses the eleventh in a minute; `/pack/<hash>` serves the current
+and previous pack immutably and a client whose bundled hash differs loads the server's pack before playing.
+
 ## UX acceptance
 Node is one perceptual region; Power belongs to player sides; Location belongs to Node; target/landing preview works; drag never opens full inspect; click/tap inspect works; face-down info hidden; phase/turn always knowable; local resolution local; important text readable.
 

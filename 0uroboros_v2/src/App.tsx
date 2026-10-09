@@ -21,6 +21,7 @@ import { LocalClient, attempt, type GameClient } from './net/GameClient';
 import { OnlineClient, savedSeat, type LobbyState, type SavedSeat } from './net/OnlineClient';
 import { OnlineLobby } from './net/OnlineLobby';
 import { platform } from './platform';
+import { resolvePack } from './contentPack/packByHash';
 import { awardAchievements, presenceText } from './platform/achievements';
 import type { RoomMode } from '@0uroboros/protocol/messages';
 import { EffectPath, CardEffectMotion } from './Effects';
@@ -63,6 +64,8 @@ export function App(){
  /** The table the UI drives: a local session or the online seat. */
  const client=useRef<GameClient|null>(null);
  const online=useRef<OnlineClient|null>(null);
+ /** Hash of the server pack already resolved, so each welcome fetches at most once. */
+ const serverPack=useRef<string|null>(null);
  const [lobby,setLobby]=useState<LobbyState|null>(null);
  const [savedOnlineSeat]=useState<SavedSeat|null>(savedSeat);
  // A magic link lands here with `#session=`; the platform exchanges it for the account before any table is joined.
@@ -281,7 +284,7 @@ export function App(){
   if(online.current)return online.current;
   const next=new OnlineClient();
   online.current=next;
-  next.onLobby(state=>{setLobby(state);void platform().store.setPresence(presenceText(state,next.view()?.cycle));});
+  next.onLobby(state=>{setLobby(state);void platform().store.setPresence(presenceText(state,next.view()?.cycle));if(state.pack&&state.pack.hash!==serverPack.current){serverPack.current=state.pack.hash;resolvePack(state.pack,next.url).then(pack=>{if(pack&&online.current===next){setContent(pack.compiled);record({id:-Date.now(),kind:'cycle',text:`Content pack ${pack.hash.slice(0,8)} (${pack.source}) loaded to match the server.`});}}).catch(error=>setNotice(error instanceof Error?error.message:'The server\'s content pack could not be loaded.'));}});
   next.subscribe(change=>{
    if(change.kind==='pending'){kick();return;}
    if(change.kind==='gameOver'){const {result,seat,mode}=next.lobby;if(result&&seat!==null)awardAchievements(platform(),result,seat,mode);return;}
@@ -298,10 +301,12 @@ export function App(){
   return next;
  }
  const createOnline=(mode:RoomMode,name:string)=>{void onlineClient().createRoom(mode,name,{turnSeconds:setup.turnSeconds??0}).catch(()=>undefined);};
+ const quickMatch=(name:string)=>{void onlineClient().quickMatch(name,{turnSeconds:setup.turnSeconds??0}).catch(()=>undefined);};
+ const cancelQuickMatch=()=>{online.current?.cancelQuickMatch();};
  const joinOnline=(code:string,name:string)=>{void onlineClient().joinRoom(code,name).catch(()=>undefined);};
  const resumeOnline=(saved:SavedSeat)=>{void onlineClient().resume(saved).catch(()=>undefined);};
  function leaveTable(){
-  if(client.current?.mode==='online'||lobby?.status==='waiting')online.current?.leave();
+  if(client.current?.mode==='online'||lobby?.status==='waiting'||lobby?.status==='queued')online.current?.leave();
   client.current?.close();client.current=null;setOpponentAway(false);
  }
  function legal(node:number,card=dragged){if(!view||!card)return 'Select a card.';if(busy||view.phase!=='runtime')return 'Wait for Runtime.';return canDeploy(card,view.players[0].actions,view.turn,node,view.nodes[node].cards[0].length,view.openNodes);}
@@ -472,7 +477,7 @@ export function App(){
   {(active?.kind==='move'||active?.kind==='morph')&&<CardEffectMotion key={`card-effect-${active.id}`} event={active} duration={eventTime(active,fast)}/>}
   {globalEvent&&<EventMessage key={`global-${active.id}`} event={active}/>}
   <footer className='status-bar'><span className={`status-dot ${opponentAway?'away':''}`}/><span>{notice}</span>{client.current?.mode==='online'&&lobby?.code&&<span className='session-online' data-room-code={lobby.code}>Table {lobby.code}{opponentAway?' · opponent away':''}</span>}<span className='session-policy'>Actions carry over · Control Locations to earn the Circuit</span></footer>
-  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading||lobby?.status==='waiting'} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<OnlineLobby lobby={lobby??IDLE_LOBBY} saved={savedOnlineSeat} turnSeconds={setup.turnSeconds} disabled={!boardReady||contentLoading} onCreate={createOnline} onJoin={joinOnline} onResume={resumeOnline} onLeave={leaveTable}/>{STUDIO_TOOLS?<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a>:platform().kind==='web'&&<a className='setup-authoring-link' href='/download/'>Download for desktop ↗</a>}<p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section>{SetupAgentsWindow&&<Suspense fallback={null}><SetupAgentsWindow/></Suspense>}</div>}
+  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading||lobby?.status==='waiting'||lobby?.status==='queued'} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<OnlineLobby lobby={lobby??IDLE_LOBBY} saved={savedOnlineSeat} turnSeconds={setup.turnSeconds} disabled={!boardReady||contentLoading} onCreate={createOnline} onQuickMatch={quickMatch} onCancelQuickMatch={cancelQuickMatch} onJoin={joinOnline} onResume={resumeOnline} onLeave={leaveTable}/>{STUDIO_TOOLS?<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a>:platform().kind==='web'&&<a className='setup-authoring-link' href='/download/'>Download for desktop ↗</a>}<p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section>{SetupAgentsWindow&&<Suspense fallback={null}><SetupAgentsWindow/></Suspense>}</div>}
   {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>client.current!.endDraft())} undo={()=>act(()=>client.current!.undoEndDraft())}/>}
   {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p><LocationText text={view.nodes[locationInspect].location!.rule}/></p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p><LocationText text={view.nodes[locationInspect].location!.reward}/></p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
   {catalogOpen&&<CardCatalog content={content} canTest={!!view&&phase==='runtime'&&!busy&&!view.canUndoPlanning} close={()=>setCatalogOpen(false)} inspect={setSelected} add={addTestCard}/>}
@@ -492,7 +497,7 @@ function Resources({owner,actions,crypto,pending,vp}:{owner:number;actions:numbe
  useEffect(()=>{if(!labels)return;const timer=setTimeout(()=>setLabels(false),PILE_TIP_MS);return()=>clearTimeout(timer);},[labels]);
  return <div className='resources' data-labels-open={labels||undefined} onClick={()=>setLabels(true)}>{[{key:'actions',icon:'actions',value:actions,label:'Actions'},{key:'wallet',icon:'crypto',value:crypto,label:'Crypto'},{key:'vp',icon:'volume',value:vp,label:'VP'}].map(stat=><span className={`stat-${stat.key}`} data-resource={`${owner}-${stat.key}`} key={stat.key}><span className='stat-pair'><Icon name={stat.icon}/><b key={stat.value}>{stat.value}</b></span><span className='stat-foot'><small>{stat.label}</small>{stat.key==='actions'&&pending>0&&<em className='stat-pending' title={`+${pending} Action${pending===1?'':'s'} next Runtime turn`}>+{pending} next</em>}</span></span>)}</div>;}
 const DECK_KEY='ouroboros.startingDeck';
-const IDLE_LOBBY:LobbyState={status:'idle',connection:'offline',code:null,seat:null,seats:[null,null],mode:null,settings:null,result:null,error:null,account:null};
+const IDLE_LOBBY:LobbyState={status:'idle',connection:'offline',code:null,seat:null,seats:[null,null],mode:null,settings:null,result:null,error:null,account:null,rating:null,pack:null,queue:null};
 const OPPONENT_KEY='ouroboros.opponent';
 type SettingsTab='players'|'board'|'general';
 const SETTINGS_TABS:{id:SettingsTab;label:string}[]=[{id:'players',label:'Players'},{id:'board',label:'Board'},{id:'general',label:'General'}];

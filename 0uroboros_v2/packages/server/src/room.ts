@@ -14,7 +14,7 @@ import { createSession, mirrorEvent, redactEvent, seededRandom, type RuntimeEven
 import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
 import type { Command, GameResult, RoomMode, RoomSettings, RoomStatus, SeatSummary, ServerMessage, Timers } from "@0uroboros/protocol/messages";
 import type { Scheduler } from "./scheduler";
-import type { CommandRecord, ReplayRecord, Store, SystemCommand } from "./store";
+import type { CommandRecord, ReplayRecord, ResultRecord, Store, SystemCommand } from "./store";
 
 export type Connection = { send(message: ServerMessage): void };
 
@@ -32,6 +32,8 @@ export type RoomConfig = {
   log?: (entry: Record<string, unknown>) => void;
   /** Called once the room has nothing left to do, so the registry can drop it. */
   onClose?: (room: Room) => void;
+  /** Called with the saved result when a game ends (ratings, metrics). */
+  onFinish?: (record: ResultRecord, room: Room) => void;
 };
 
 type Seat = {
@@ -421,13 +423,15 @@ export class Room {
     const names = [this.seats[0]!.name, this.seats[1]!.name] as [string, string];
     const aiSeats = this.aiSeats();
     this.log({ event: "finish", ...result });
+    const record: ResultRecord = {
+      code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result,
+      accountIds: [this.seats[0]!.accountId, this.seats[1]!.accountId], report: session.matchReport(),
+    };
     try {
-      this.config.store.saveResult({
-        code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result,
-        accountIds: [this.seats[0]!.accountId, this.seats[1]!.accountId], report: session.matchReport(),
-      });
+      this.config.store.saveResult(record);
       this.config.store.saveReplay(this.replay());
     } catch (error) { this.log({ event: "store-error", message: error instanceof Error ? error.message : String(error) }); }
+    try { this.config.onFinish?.(record, this); } catch (error) { this.log({ event: "finish-hook-error", message: error instanceof Error ? error.message : String(error) }); }
     for (const seat of this.humanSeats()) this.seats[seat]!.connection?.send({ type: "gameOver", result, view: session.view(seat), cycles: session.cycleHistory() });
     this.broadcastLobby();
     this.cancelDispose = this.config.scheduler.after(FINISHED_TTL_MS, () => this.close());

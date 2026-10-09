@@ -61,6 +61,9 @@ export const ClientMessageSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("joinRoom"), code: roomCode, name: displayName }),
   z.object({ type: z.literal("resumeSeat"), code: roomCode, seatToken }),
   z.object({ type: z.literal("leaveRoom") }),
+  /** Quick match: wait for an opponent of similar rating; the server seats both at a fresh pvp table. */
+  z.object({ type: z.literal("quickMatch"), name: displayName, settings: RoomSettingsSchema.partial().optional() }),
+  z.object({ type: z.literal("cancelQuickMatch") }),
   z.object({ type: z.literal("command"), requestId: z.string().min(1).max(64), command: CommandSchema }),
   z.object({ type: z.literal("ping"), at: z.number() }),
 ]);
@@ -72,6 +75,10 @@ export type SeatSummary = { name: string; connected: boolean; ai: boolean } | nu
 /** The signed-in player, as the client may know it. */
 export type AccountSummary = { id: string; name: string; email: string | null };
 export type RoomStatus = "waiting" | "playing" | "finished";
+/** Which content pack the server plays; a client holding a different `hash` fetches this one from `url`. */
+export type PackInfo = { hash: string; revision: number | null; url: string | null };
+/** A player's standing from rated online games (Elo, 1200 to start); `games` under 10 is provisional. */
+export type RatingSummary = { elo: number; games: number; wins: number; losses: number; ties: number };
 
 /** Server-owned deadlines, as server timestamps (ms). The client shows countdowns against `serverTime`. */
 export type Timers = {
@@ -94,7 +101,9 @@ export type GameResult = {
 };
 
 export type ServerMessage =
-  | { type: "welcome"; protocol: number; serverTime: number; account: AccountSummary | null }
+  | { type: "welcome"; protocol: number; serverTime: number; account: AccountSummary | null; pack: PackInfo; rating: RatingSummary | null }
+  /** The player is in the quick-match queue; `window` is the rating gap the server currently accepts. */
+  | { type: "queued"; since: number; rating: number; window: number; waiting: number }
   | { type: "roomJoined"; code: string; seat: PlayerId; seatToken: string; mode: RoomMode; settings: RoomSettings }
   | { type: "lobby"; code: string; status: RoomStatus; seats: [SeatSummary, SeatSummary]; mode: RoomMode; settings: RoomSettings }
   | { type: "left" }

@@ -29,6 +29,10 @@ export type ResultRecord = {
 
 export type Account = { id: string; email: string | null; name: string; createdAt: number };
 export type IdentityProvider = "steam" | "apple";
+/** An account's Elo standing from rated (pvp, both signed in) games. */
+export type Rating = { accountId: string; elo: number; games: number; wins: number; losses: number; ties: number; updatedAt: number };
+/** A published content pack the server has played, kept so clients and replays can fetch it by hash. */
+export type PackRecord = { hash: string; revision: number | null; document: unknown; publishedAt: number };
 
 export interface Store {
   saveResult(record: ResultRecord): void;
@@ -56,6 +60,16 @@ export interface Store {
   sessionAccount(tokenHash: string, now: number): Account | null;
   deleteSession(tokenHash: string): void;
 
+  rating(accountId: string): Rating | null;
+  saveRating(rating: Rating): void;
+
+  savePack(pack: PackRecord): void;
+  pack(hash: string): PackRecord | null;
+  /** Newest first. */
+  listPacks(): PackRecord[];
+  /** Drops every pack but the newest `keep` (the current and its predecessor by default). */
+  prunePacks(keep: number): void;
+
   close(): void;
 }
 
@@ -66,6 +80,8 @@ export class MemoryStore implements Store {
   private readonly identities = new Map<string, string>();
   private readonly magic = new Map<string, { email: string; expiresAt: number }>();
   private readonly sessions = new Map<string, { accountId: string; expiresAt: number }>();
+  private readonly ratings = new Map<string, Rating>();
+  private readonly packs = new Map<string, PackRecord>();
 
   saveResult(record: ResultRecord) { this.results.push(record); }
   saveReplay(replay: ReplayRecord) { this.replays.set(replay.code, replay); }
@@ -96,6 +112,14 @@ export class MemoryStore implements Store {
     return this.accounts.get(session.accountId) ?? null;
   }
   deleteSession(tokenHash: string) { this.sessions.delete(tokenHash); }
+
+  rating(accountId: string) { return this.ratings.get(accountId) ?? null; }
+  saveRating(rating: Rating) { this.ratings.set(rating.accountId, rating); }
+
+  savePack(pack: PackRecord) { this.packs.set(pack.hash, pack); }
+  pack(hash: string) { return this.packs.get(hash) ?? null; }
+  listPacks() { return [...this.packs.values()].sort((a, b) => b.publishedAt - a.publishedAt); }
+  prunePacks(keep: number) { for (const stale of this.listPacks().slice(keep)) this.packs.delete(stale.hash); }
   close() { /* nothing to release */ }
 }
 
@@ -128,6 +152,8 @@ export class SqliteStore implements Store {
       CREATE INDEX IF NOT EXISTS magic_tokens_email ON magic_tokens (email);
       CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires_at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS identities (provider TEXT NOT NULL, subject TEXT NOT NULL, account_id TEXT NOT NULL, PRIMARY KEY (provider, subject));
+      CREATE TABLE IF NOT EXISTS ratings (account_id TEXT PRIMARY KEY, elo REAL NOT NULL, games INTEGER NOT NULL, wins INTEGER NOT NULL, losses INTEGER NOT NULL, ties INTEGER NOT NULL, updated_at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS packs (hash TEXT PRIMARY KEY, revision INTEGER, document TEXT NOT NULL, published_at INTEGER NOT NULL);
     `);
     // Columns added after the first release; SQLite has no ADD COLUMN IF NOT EXISTS.
     for (const column of ["account_ids TEXT", "report TEXT"]) {
@@ -178,7 +204,31 @@ export class SqliteStore implements Store {
     return rowToAccount(row);
   }
   deleteSession(tokenHash: string) { this.db.prepare(`DELETE FROM sessions WHERE token_hash = ?`).run(tokenHash); }
+
+  rating(accountId: string) {
+    const r = this.db.prepare(`SELECT * FROM ratings WHERE account_id = ?`).get(accountId) as Record<string, unknown> | undefined;
+    return r ? { accountId: r.account_id as string, elo: r.elo as number, games: r.games as number, wins: r.wins as number, losses: r.losses as number, ties: r.ties as number, updatedAt: r.updated_at as number } : null;
+  }
+  saveRating(rating: Rating) {
+    this.db.prepare(`INSERT OR REPLACE INTO ratings (account_id, elo, games, wins, losses, ties, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .run(rating.accountId, rating.elo, rating.games, rating.wins, rating.losses, rating.ties, rating.updatedAt);
+  }
+
+  savePack(pack: PackRecord) {
+    this.db.prepare(`INSERT OR REPLACE INTO packs (hash, revision, document, published_at) VALUES (?, ?, ?, ?)`).run(pack.hash, pack.revision, JSON.stringify(pack.document), pack.publishedAt);
+  }
+  pack(hash: string) { return rowToPack(this.db.prepare(`SELECT * FROM packs WHERE hash = ?`).get(hash)); }
+  listPacks() { return (this.db.prepare(`SELECT * FROM packs ORDER BY published_at DESC`).all() as unknown[]).map(rowToPack).filter((pack): pack is PackRecord => pack !== null); }
+  prunePacks(keep: number) {
+    this.db.prepare(`DELETE FROM packs WHERE hash NOT IN (SELECT hash FROM packs ORDER BY published_at DESC LIMIT ?)`).run(keep);
+  }
   close() { this.db.close(); }
+}
+
+function rowToPack(row: unknown): PackRecord | null {
+  if (!row) return null;
+  const r = row as Record<string, unknown>;
+  return { hash: r.hash as string, revision: (r.revision as number | null) ?? null, document: JSON.parse(r.document as string), publishedAt: r.published_at as number };
 }
 
 function rowToResult(row: Record<string, unknown>): ResultRecord {

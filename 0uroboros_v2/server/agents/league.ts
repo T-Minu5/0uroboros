@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { ELO_START, expectedScore, kFactor, eloUpdate } from '@0uroboros/engine/elo';
 import type { SelfPlayResult } from '@0uroboros/engine/ai/selfPlay';
 import type { StrategyProfile } from '@0uroboros/engine/ai/strategy';
 import type { LeagueArms, LeagueOutcome, Snapshot } from '../aiStrategist';
@@ -20,20 +21,12 @@ import type { GameEvidence } from './evidence';
  * opponent's profile, plan or notes, and nothing an agent writes is shared with another.
  */
 
-export const ELO_START = 1200;
 export const WINDOW = 5;
 export const LATEST_RATIO = 0.5;
 export const BLOCKS_PER_TRIAL = 3;
-const PROVISIONAL_GAMES = 30;
 
-export const expectedScore = (rating: number, opponent: number) => 1 / (1 + 10 ** ((opponent - rating) / 400));
-/** K = 32 while a snapshot's rating is provisional (first 30 games), then 16. */
-export const kFactor = (games: number) => games < PROVISIONAL_GAMES ? 32 : 16;
-/** New ratings after one game; `scoreA` is 1 for a win by A, ½ for a tie, 0 for a loss. */
-export function eloUpdate(ratingA: number, ratingB: number, scoreA: number, kA = 16, kB = kA): [number, number] {
-  const expectedA = expectedScore(ratingA, ratingB);
-  return [ratingA + kA * (scoreA - expectedA), ratingB + kB * ((1 - scoreA) - (1 - expectedA))];
-}
+// The Elo maths lives in the engine so the game server rates online players the same way (see packages/engine/src/elo.ts).
+export { ELO_START, expectedScore, kFactor, eloUpdate };
 
 export type PoolEntry = { agent: string; label: string; profile: StrategyProfile };
 /** Picks the next opponent for `learner`, whose current snapshot is `learnerLabel`. */

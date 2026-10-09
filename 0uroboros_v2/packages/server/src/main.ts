@@ -14,9 +14,14 @@
  *   OUROBOROS_ADMIN_TOKEN bearer token for /evidence (the studio's Eco-Strat pull); unset disables the route
  *   STEAM_WEB_API_KEY, STEAM_APP_ID   enable /auth/steam (desktop build)
  *   APPLE_AUDIENCES       comma-separated bundle / Services ids; enables /auth/apple (iPad build)
+ *   SENTRY_DSN            error reporting for the server and for client crash reports posted to /errors; unset logs them
+ *   OUROBOROS_RELEASE     release label on error reports (CI sets it to the git sha)
+ *   OUROBOROS_PACK_URL    CDN base for content packs by hash (e.g. https://cdn.0uroboros.example/pack); unset, /pack/ here
+ *   OUROBOROS_TRUST_PROXY "off" to read client addresses from the socket instead of Fly/Cloudflare headers (default on)
  */
-import { PACK_REVISION, publishedContent } from "@0uroboros/content/document";
+import { PACK_HASH, PACK_REVISION, publishedContent, publishedRawDocument } from "@0uroboros/content/document";
 import { AppleVerifier, Auth, ConsoleMailer, ResendMailer, SteamVerifier } from "./auth";
+import { createReporter, watchProcess } from "./errorReporting";
 import { GameServer } from "./gameServer";
 import { realScheduler } from "./scheduler";
 import { MemoryStore, openSqliteStore } from "./store";
@@ -33,6 +38,8 @@ async function main() {
   const authOn = env.OUROBOROS_AUTH ? env.OUROBOROS_AUTH !== "off" : !!env.OUROBOROS_PUBLIC_URL;
   const mailer = env.RESEND_API_KEY ? new ResendMailer(env.RESEND_API_KEY, env.MAIL_FROM ?? "0uroboros <onboarding@resend.dev>") : new ConsoleMailer(log);
   if (authOn && !env.RESEND_API_KEY) log({ event: "warning", message: "RESEND_API_KEY unset: magic links are logged, not mailed" });
+  const reporter = createReporter({ dsn: env.SENTRY_DSN, release: env.OUROBOROS_RELEASE, environment: env.FLY_APP_NAME ? "production" : "development", log });
+  watchProcess(reporter);
   const server = new GameServer({
     content: publishedContent(), contentRevision: PACK_REVISION, scheduler: realScheduler, store, log,
     maxRooms: Number(env.OUROBOROS_MAX_ROOMS ?? 500),
@@ -43,12 +50,17 @@ async function main() {
     allowedOrigins: origins.length ? origins : ["*"],
     webOrigin: origins[0],
     adminToken: env.OUROBOROS_ADMIN_TOKEN,
+    pack: { hash: PACK_HASH, revision: PACK_REVISION, document: publishedRawDocument() },
+    packUrl: env.OUROBOROS_PACK_URL,
+    reporter,
+    trustProxy: env.OUROBOROS_TRUST_PROXY !== "off",
   });
   const bound = await server.listen(port, host);
-  log({ event: "listening", host, port: bound, contentRevision: PACK_REVISION, store: env.OUROBOROS_DB ? "sqlite" : "memory", auth: authOn, mail: env.RESEND_API_KEY ? "resend" : "console", evidence: !!env.OUROBOROS_ADMIN_TOKEN, steam: !!(env.STEAM_WEB_API_KEY && env.STEAM_APP_ID), apple: !!env.APPLE_AUDIENCES });
+  log({ event: "listening", host, port: bound, contentRevision: PACK_REVISION, packHash: PACK_HASH, errors: env.SENTRY_DSN ? "sentry" : "log", store: env.OUROBOROS_DB ? "sqlite" : "memory", auth: authOn, mail: env.RESEND_API_KEY ? "resend" : "console", evidence: !!env.OUROBOROS_ADMIN_TOKEN, steam: !!(env.STEAM_WEB_API_KEY && env.STEAM_APP_ID), apple: !!env.APPLE_AUDIENCES });
   const shutdown = async (signal: string) => {
     log({ event: "shutdown", signal });
     await server.close();
+    await reporter.flush();
     store.close();
     process.exit(0);
   };

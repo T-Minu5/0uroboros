@@ -5,7 +5,7 @@ import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
 import { RoomSettingsSchema, type RoomMode, type RoomSettings } from "@0uroboros/protocol/messages";
 import { Room } from "./room";
 import type { Scheduler } from "./scheduler";
-import type { Store } from "./store";
+import type { ResultRecord, Store } from "./store";
 
 /** No 0/O or 1/I, so a code read aloud survives the trip. */
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -20,6 +20,8 @@ export type LobbyConfig = {
   log?: (entry: Record<string, unknown>) => void;
   /** Most rooms alive at once; `createRoom` fails beyond it. */
   maxRooms?: number;
+  /** Called with each saved result (ratings, metrics). */
+  onFinish?: (record: ResultRecord, room: Room) => void;
 };
 
 export class Lobby {
@@ -45,6 +47,7 @@ export class Lobby {
       scheduler: this.config.scheduler, store: this.config.store, log: this.config.log,
       ...(this.config.strategy ? { strategy: this.config.strategy } : {}),
       onClose: closed => { if (this.rooms.get(closed.code) === closed) this.rooms.delete(closed.code); },
+      ...(this.config.onFinish ? { onFinish: this.config.onFinish } : {}),
     });
     this.rooms.set(room.code, room);
     return room;

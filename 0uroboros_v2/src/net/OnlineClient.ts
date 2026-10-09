@@ -7,12 +7,12 @@
  */
 import type { Card } from '@0uroboros/engine/game';
 import type { CycleRecord, RuntimeEvent, SessionView } from '@0uroboros/engine/runtime';
-import { PROTOCOL_VERSION, type AccountSummary, type ClientMessage, type Command, type GameResult, type RoomMode, type RoomSettings, type SeatSummary, type ServerMessage, type Timers } from '@0uroboros/protocol/messages';
+import { PROTOCOL_VERSION, type AccountSummary, type ClientMessage, type Command, type GameResult, type PackInfo, type RatingSummary, type RoomMode, type RoomSettings, type SeatSummary, type ServerMessage, type Timers } from '@0uroboros/protocol/messages';
 import type { ClientChange, ConnectionState, GameClient, Presented } from './GameClient';
 import { platform } from '../platform';
 
 export type LobbyState = {
-  status: 'idle' | 'connecting' | 'waiting' | 'playing' | 'finished';
+  status: 'idle' | 'connecting' | 'queued' | 'waiting' | 'playing' | 'finished';
   connection: ConnectionState;
   code: string | null;
   seat: 0 | 1 | null;
@@ -23,6 +23,12 @@ export type LobbyState = {
   error: string | null;
   /** The account the server recognised from the session sent in `hello`; null for guests. */
   account: AccountSummary | null;
+  /** The signed-in player's rating from rated online games; null for guests and unrated accounts. */
+  rating: RatingSummary | null;
+  /** The content pack the server plays; the client fetches it by hash when its bundled pack differs. */
+  pack: PackInfo | null;
+  /** Quick-match progress while `status` is 'queued'. */
+  queue: { since: number; rating: number; window: number; waiting: number } | null;
 };
 
 type QueueItem = Presented;
@@ -40,7 +46,7 @@ export class OnlineClient implements GameClient {
   readonly mode = 'online' as const;
   readonly url: string;
   seatNames: [string, string] | null = null;
-  lobby: LobbyState = { status: 'idle', connection: 'offline', code: null, seat: null, seats: [null, null], mode: null, settings: null, result: null, error: null, account: null };
+  lobby: LobbyState = { status: 'idle', connection: 'offline', code: null, seat: null, seats: [null, null], mode: null, settings: null, result: null, error: null, account: null, rating: null, pack: null, queue: null };
   private socket: WebSocket | null = null;
   private current: SessionView | null = null;
   private queue: QueueItem[] = [];
@@ -80,7 +86,7 @@ export class OnlineClient implements GameClient {
         if (message.type === 'welcome' && !settled) {
           settled = true; this.reconnectAttempt = 0;
           this.clockOffset = message.serverTime - Date.now();
-          this.setLobby({ connection: 'online', status: this.lobby.status === 'connecting' ? 'idle' : this.lobby.status, account: message.account });
+          this.setLobby({ connection: 'online', status: this.lobby.status === 'connecting' ? 'idle' : this.lobby.status, account: message.account, rating: message.rating, pack: message.pack });
           this.emit({ kind: 'connection', state: 'online' });
           resolve();
         }
@@ -123,6 +129,16 @@ export class OnlineClient implements GameClient {
     this.name = name;
     this.send({ type: 'joinRoom', code: code.trim().toUpperCase(), name });
   }
+  /** Waits for an opponent of similar rating; the server seats both at a fresh table. */
+  async quickMatch(name: string, settings: Partial<RoomSettings> = {}) {
+    await this.connect();
+    this.name = name;
+    this.send({ type: 'quickMatch', name, settings });
+  }
+  cancelQuickMatch() {
+    if (this.socket?.readyState === WebSocket.OPEN) this.send({ type: 'cancelQuickMatch' });
+    this.setLobby({ status: 'idle', queue: null });
+  }
   /** Reclaims a seat saved from an earlier page, e.g. after a reload. */
   async resume(saved: SavedSeat) {
     await this.connect();
@@ -134,7 +150,7 @@ export class OnlineClient implements GameClient {
     if (this.socket?.readyState === WebSocket.OPEN) this.send({ type: 'leaveRoom' });
     this.seatToken = null; saveSeat(null);
     this.current = null; this.queue = []; this.log = []; this.cycles = []; this.seatNames = null;
-    this.setLobby({ status: this.socket ? 'idle' : this.lobby.status, code: null, seat: null, seats: [null, null], result: null, error: null });
+    this.setLobby({ status: this.socket ? 'idle' : this.lobby.status, code: null, seat: null, seats: [null, null], result: null, error: null, queue: null });
   }
 
   // --- Receiving -----------------------------------------------------------------------------------------------------
@@ -142,9 +158,12 @@ export class OnlineClient implements GameClient {
   private receive(message: ServerMessage) {
     switch (message.type) {
       case 'welcome': case 'pong': return;
+      case 'queued':
+        this.setLobby({ status: 'queued', queue: { since: message.since, rating: message.rating, window: message.window, waiting: message.waiting }, error: null });
+        return;
       case 'roomJoined': {
         this.seatToken = message.seatToken;
-        this.setLobby({ code: message.code, seat: message.seat, mode: message.mode, settings: message.settings, error: null, status: this.lobby.status === 'idle' || this.lobby.status === 'connecting' ? 'waiting' : this.lobby.status });
+        this.setLobby({ code: message.code, seat: message.seat, mode: message.mode, settings: message.settings, error: null, queue: null, status: this.lobby.status === 'idle' || this.lobby.status === 'connecting' || this.lobby.status === 'queued' ? 'waiting' : this.lobby.status });
         saveSeat({ url: this.url, code: message.code, seatToken: message.seatToken, seat: message.seat, name: this.name });
         return;
       }
@@ -197,7 +216,7 @@ export class OnlineClient implements GameClient {
         saveSeat(null);
         this.emit({ kind: 'gameOver' });
         return;
-      case 'left': this.setLobby({ status: 'idle', code: null, seat: null, seats: [null, null] }); return;
+      case 'left': this.setLobby({ status: 'idle', code: null, seat: null, seats: [null, null], queue: null }); return;
       case 'error':
         if (message.code === 'auth') { this.seatToken = null; saveSeat(null); this.setLobby({ status: 'idle', code: null, seat: null }); }
         this.setLobby({ error: message.message });

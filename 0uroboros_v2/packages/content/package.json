@@ -7,6 +7,7 @@
   "exports": {
     "./art-manifest.json": "./art-manifest.json",
     "./pack": "./pack.ts",
-    "./document": "./document.ts"
+    "./document": "./document.ts",
+    "./hash": "./hash.ts"
   }
 }

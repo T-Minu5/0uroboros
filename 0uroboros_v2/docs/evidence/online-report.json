@@ -6,17 +6,6 @@
         {
           "turn": 1,
           "placedA": {
-            "id": "0:dotkrawler-1",
-            "node": "0"
-          },
-          "placedB": {
-            "id": "1:dotkrawler-1",
-            "node": "0"
-          }
-        },
-        {
-          "turn": 2,
-          "placedA": {
             "id": "0:basic-encryption-2",
             "node": "0"
           },
@@ -26,13 +15,24 @@
           }
         },
         {
-          "turn": 3,
+          "turn": 2,
           "placedA": {
-            "id": "0:rezz-blade-1",
+            "id": "0:night-scythe-1",
             "node": "0"
           },
           "placedB": {
-            "id": "1:rezz-blade-1",
+            "id": "1:night-scythe-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:basic-encryption-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:basic-encryption-1",
             "node": "0"
           }
         }
@@ -47,10 +47,106 @@
           2
         ]
       }
+    },
+    {
+      "cycle": 2,
+      "turns": [
+        {
+          "turn": 1,
+          "placedA": {
+            "id": "0:dotkrawler-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:dotkrawler-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 2,
+          "placedA": {
+            "id": "0:night-scythe-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:rezz-blade-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:slash-dot-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:slash-dot-1",
+            "node": "0"
+          }
+        }
+      ],
+      "score": {
+        "ada": [
+          1,
+          2
+        ],
+        "bo": [
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "cycle": 3,
+      "turns": [
+        {
+          "turn": 1,
+          "placedA": {
+            "id": "0:slash-dot-1",
+            "node": "1"
+          },
+          "placedB": {
+            "id": "1:basic-encryption-2",
+            "node": "1"
+          }
+        },
+        {
+          "turn": 2,
+          "placedA": {
+            "id": "0:basic-encryption-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:night-scythe-1",
+            "node": "0"
+          }
+        },
+        {
+          "turn": 3,
+          "placedA": {
+            "id": "0:night-scythe-1",
+            "node": "0"
+          },
+          "placedB": {
+            "id": "1:slash-dot-1",
+            "node": "0"
+          }
+        }
+      ],
+      "score": {
+        "ada": [
+          0,
+          2
+        ],
+        "bo": [
+          2,
+          0
+        ]
+      }
     }
   ],
   "wire": {
-    "framesChecked": 177,
+    "framesChecked": 511,
     "hiddenInfoViolations": []
   },
   "log": {
@@ -65,15 +161,21 @@
   "coverage": {
     "signIn": "Ada Lovelace",
     "undoCommit": true,
-    "choice": 2
+    "choice": 9
   },
-  "code": "7MVCVZ",
+  "code": "D4WY4K",
   "health": {
     "ok": true,
     "protocol": 1,
     "rooms": 1,
     "clients": 2,
-    "auth": true
+    "queued": 0,
+    "auth": true,
+    "pack": {
+      "hash": "7a71766378cd0be4",
+      "revision": 274,
+      "url": null
+    }
   },
   "ok": true
 }

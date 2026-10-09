@@ -310,8 +310,8 @@ describe("game server over WebSocket", () => {
     close() { this.socket.close(); }
   }
 
-  async function serve() {
-    const server = new GameServer({ content, contentRevision: PACK_REVISION, scheduler: { now: () => Date.now(), after: (ms, fn) => { const h = setTimeout(fn, ms); return () => clearTimeout(h); } }, store: new MemoryStore() });
+  async function serve(options: Partial<ConstructorParameters<typeof GameServer>[0]> = {}) {
+    const server = new GameServer({ content, contentRevision: PACK_REVISION, scheduler: { now: () => Date.now(), after: (ms, fn) => { const h = setTimeout(fn, ms); return () => clearTimeout(h); } }, store: new MemoryStore(), ...options });
     servers.push(server);
     const port = await server.listen(0, "127.0.0.1");
     return { server, port };
@@ -385,7 +385,8 @@ describe("game server over WebSocket", () => {
   });
 
   it("opens 50 rooms over real sockets and moves each through a deploy", async () => {
-    const { server, port } = await serve();
+    // Every socket here shares 127.0.0.1, so the per-address limit (Phase 6) is lifted for the load test.
+    const { server, port } = await serve({ limits: { socketsPerIp: 1000 } });
     const pairs = await Promise.all(Array.from({ length: 50 }, async (_, i) => {
       const a = await WireClient.connect(port), b = await WireClient.connect(port);
       a.send({ type: "createRoom", mode: "pvp", name: `A${i}`, settings: { seed: 500 + i } });

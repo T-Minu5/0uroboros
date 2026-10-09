@@ -29,7 +29,8 @@ Edit `deploy/fly.toml` `[env]` first:
 - `OUROBOROS_WEB_ORIGIN` — the website origin, e.g. `https://play.your-domain`. CORS and the post-sign-in redirect use it.
 
 Then `fly deploy --config deploy/fly.toml --dockerfile deploy/Dockerfile`. `GET /healthz` must answer `{"ok":true,...,"auth":true}`.
-One machine only (`max_machines_running = 1`): rooms live in memory until Phase 6 adds a shared lobby.
+One machine only (`max_machines_running = 1`): rooms and the quick-match queue live in memory; a second machine would
+split them. Scale the machine, not the count.
 
 Mail: [Resend](https://resend.com) needs a verified sending domain. Without `RESEND_API_KEY` the server logs magic
 links instead of mailing them (`fly logs` shows `"event":"magic-link"`), which is enough for a first private test.
@@ -80,14 +81,31 @@ While Eco-Strat is active the dev server pulls finished PvP games every five min
 `source: 'online-pvp'`, and keeps its cursor in `ai-agents/online-evidence.json`. AI tables and games without a match
 report are skipped; e-mails never leave the server.
 
-## 6. Friends playtest checklist
+## 6. Hardening (Phase 6)
+
+Optional secrets and vars, all read by `packages/server/src/main.ts`:
+
+- `SENTRY_DSN` — server errors and client crash reports (`POST /errors`, rate limited per address) go to Sentry; unset,
+  they are logged as `"event":"error-report"`. `OUROBOROS_RELEASE` tags them (the deploy workflow sets it to the git sha).
+- `OUROBOROS_TRUST_PROXY` — on by default: client addresses come from `Fly-Client-IP` / `CF-Connecting-IP` /
+  `X-Forwarded-For` for the per-address limits (8 sockets, 30 auth calls/min, 10 magic links/hour, 10 crash reports/min).
+  Set `off` when the server is reached directly.
+- `OUROBOROS_PACK_URL` — CDN base for content packs by hash. The server announces its pack hash in `welcome`; a client
+  whose bundled pack differs fetches `<base>/<hash>` (default: the server's own `/pack/<hash>`, immutable-cached).
+  The server keeps the current and previous pack in SQLite, so older clients keep playing through a rollout.
+  To front it with Cloudflare, add a cache rule for `/pack/*` on the server's hostname — the responses are already
+  `immutable`.
+- Ratings: pvp games between two signed-in players are rated (Elo, 1200 start, K 32 for ten games then 16). Quick match
+  pairs players within 100 points, widening by 50 every 10 s. Guests queue at 1200 and are never rated.
+
+## 7. Friends playtest checklist
 
 Before inviting anyone:
 
 - `npm run test:online` passes on the commit being deployed (guide 14, networked play gate).
 - `/healthz` on the deployed server reports `auth: true`; a magic link to your own address arrives within a minute.
 - Two machines on different networks complete three Cycles; one reloads mid-Draft and rejoins.
-- `fly logs` shows no `dispatch-error` / `store-error` entries during the session.
+- `fly logs` shows no `dispatch-error` / `store-error` / `error-report` entries during the session.
 
 During the session:
 

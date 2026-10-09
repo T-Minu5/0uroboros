@@ -18,3 +18,5 @@ const bundledDocument = getBundledDocument();
 setBuiltinModDetails(bundledDocument.builtinMods);
 export const bundledContent = compileContent(bundledDocument);
 export const bundledRevision = savedContent.revision;
+/** The stored document exactly as bundled, for hashing against the server's pack (see packByHash.ts). */
+export const bundledRawDocument: unknown = savedContent.document;

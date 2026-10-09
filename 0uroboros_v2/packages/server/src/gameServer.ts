@@ -10,18 +10,27 @@
  *        POST /auth/name {name}        rename the signed-in account
  *        POST /auth/sign-out           end the bearer session
  *        GET  /evidence?since=<ms>     finished games with match reports (admin bearer token), for Eco-Strat
+ *        GET  /pack/<hash>             a content pack this server has played, immutable; `/pack/current` -> metadata
+ *        POST /errors                  a client's crash report, forwarded to the error reporter
  * WS:    one connection per client, at most one seat at a time. `hello` may carry a session token.
+ *
+ * Limits (Phase 6): per-IP sockets, per-IP HTTP calls on /auth and /errors, per-connection room creation, plus the
+ * per-connection message budget. Behind a proxy set `trustProxy` so the client address comes from the proxy headers.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { timingSafeEqual } from "node:crypto";
 import { WebSocketServer, type WebSocket } from "ws";
-import { PROTOCOL_VERSION, parseClientMessage, type AccountSummary, type ClientMessage, type ServerMessage } from "@0uroboros/protocol/messages";
+import { PROTOCOL_VERSION, parseClientMessage, type AccountSummary, type ClientMessage, type PackInfo, type RoomSettings, type ServerMessage } from "@0uroboros/protocol/messages";
 import { Lobby, type LobbyConfig } from "./lobby";
 import type { Room } from "./room";
 import type { PlayerId } from "@0uroboros/engine/game";
 import { Auth, AuthError } from "./auth";
-import type { Account, ResultRecord } from "./store";
+import type { Account, PackRecord, ResultRecord } from "./store";
+import { ConcurrencyLimiter, RateLimiter, clientIp } from "./rateLimit";
+import { MatchQueue, matchWindow, rateResult, summariseRating } from "./matchmaking";
+import { LogReporter, parseClientError, type ErrorReporter } from "./errorReporting";
+import { PACK_HASH_PATTERN } from "@0uroboros/content/hash";
 
 export type GameServerConfig = LobbyConfig & {
   /** Messages per connection per 10 s before the server drops the sender. */
@@ -34,11 +43,37 @@ export type GameServerConfig = LobbyConfig & {
   webOrigin?: string;
   /** Bearer token for /evidence; unset disables the route. */
   adminToken?: string;
+  /** The content pack this server plays, as `{hash, revision, document}`; stored so clients can fetch it by hash. */
+  pack?: { hash: string; revision: number | null; document: unknown };
+  /** Where clients fetch packs by hash (a CDN in front of /pack/); unset, the client uses this server's HTTP twin. */
+  packUrl?: string;
+  /** Crash reports from the server and from clients (`POST /errors`); defaults to the log. */
+  reporter?: ErrorReporter;
+  /** Read the client address from Fly/Cloudflare headers. */
+  trustProxy?: boolean;
+  limits?: Partial<Limits>;
 };
 
-type Client = { socket: WebSocket; room: Room | null; seat: PlayerId | null; hello: boolean; account: Account | null; budget: number; budgetAt: number };
+export type Limits = {
+  /** Open sockets per IP. */
+  socketsPerIp: number;
+  /** HTTP calls to /auth/* per IP per minute. */
+  authPerMinute: number;
+  /** Magic links requested per IP per hour. */
+  magicLinksPerHour: number;
+  /** Client crash reports per IP per minute. */
+  errorsPerMinute: number;
+  /** Rooms a connection may create (or quick matches it may start) per 10 minutes. */
+  roomsPer10Minutes: number;
+  /** How often the quick-match queue is swept (ms). */
+  matchTickMs: number;
+};
+export const DEFAULT_LIMITS: Limits = { socketsPerIp: 8, authPerMinute: 30, magicLinksPerHour: 10, errorsPerMinute: 10, roomsPer10Minutes: 12, matchTickMs: 2_000 };
+
+type Client = { socket: WebSocket; ip: string; room: Room | null; seat: PlayerId | null; hello: boolean; account: Account | null; budget: number; budgetAt: number; rooms: number; roomsAt: number; queueName: string; queueSettings: Partial<RoomSettings> };
 
 const MAX_BODY = 4 * 1024;
+const PACKS_KEPT = 2;
 const summary = (account: Account): AccountSummary => ({ id: account.id, name: account.name, email: account.email });
 
 export class GameServer {
@@ -47,13 +82,43 @@ export class GameServer {
   readonly wss: WebSocketServer;
   private readonly clients = new Set<Client>();
   private readonly config: GameServerConfig;
+  private readonly limits: Limits;
+  private readonly sockets: ConcurrencyLimiter;
+  private readonly authCalls: RateLimiter;
+  private readonly magicLinks: RateLimiter;
+  private readonly errorReports: RateLimiter;
+  private readonly queue: MatchQueue<Client>;
+  private cancelMatchTick: (() => void) | null = null;
+  readonly reporter: ErrorReporter;
 
   constructor(config: GameServerConfig) {
     this.config = config;
-    this.lobby = new Lobby(config);
+    this.limits = { ...DEFAULT_LIMITS, ...config.limits };
+    const now = () => config.scheduler.now();
+    this.sockets = new ConcurrencyLimiter(this.limits.socketsPerIp);
+    this.authCalls = new RateLimiter(this.limits.authPerMinute, 60_000, now);
+    this.magicLinks = new RateLimiter(this.limits.magicLinksPerHour, 3_600_000, now);
+    this.errorReports = new RateLimiter(this.limits.errorsPerMinute, 60_000, now);
+    this.queue = new MatchQueue<Client>(now);
+    this.reporter = config.reporter ?? new LogReporter(entry => config.log?.(entry));
+    this.lobby = new Lobby({ ...config, onFinish: record => this.finished(record) });
+    if (config.pack) {
+      config.store.savePack({ ...config.pack, publishedAt: now() });
+      config.store.prunePacks(PACKS_KEPT);
+    }
     this.http = createServer((request, response) => { this.handleHttp(request, response).catch(error => this.fail(response, error)); });
     this.wss = new WebSocketServer({ server: this.http, maxPayload: 64 * 1024 });
-    this.wss.on("connection", socket => this.accept(socket));
+    this.wss.on("connection", (socket, request) => this.accept(socket, request));
+  }
+
+  /** The pack clients should hold to match this server. */
+  packInfo(): PackInfo {
+    return { hash: this.config.pack?.hash ?? "", revision: this.config.pack?.revision ?? null, url: this.config.packUrl ?? null };
+  }
+
+  private finished(record: ResultRecord) {
+    const rated = rateResult(this.config.store, record, this.config.scheduler.now());
+    if (rated) this.config.log?.({ event: "rated", code: record.code, elo: rated.map(rating => Math.round(rating.elo)) });
   }
 
   listen(port: number, host = "0.0.0.0"): Promise<number> {
@@ -64,6 +129,7 @@ export class GameServer {
   }
 
   async close() {
+    this.cancelMatchTick?.(); this.cancelMatchTick = null;
     for (const client of this.clients) client.socket.close(1001, "Server shutting down");
     this.lobby.closeAll();
     await new Promise<void>(resolve => this.wss.close(() => resolve()));
@@ -77,7 +143,32 @@ export class GameServer {
     this.cors(request, response);
     if (request.method === "OPTIONS") { response.writeHead(204); response.end(); return; }
 
-    if (url.pathname === "/healthz") return json(response, 200, { ok: true, protocol: PROTOCOL_VERSION, rooms: this.lobby.rooms.size, clients: this.clients.size, auth: !!this.config.auth });
+    if (url.pathname === "/healthz") return json(response, 200, { ok: true, protocol: PROTOCOL_VERSION, rooms: this.lobby.rooms.size, clients: this.clients.size, queued: this.queue.size, auth: !!this.config.auth, pack: this.packInfo() });
+
+    if (url.pathname.startsWith("/pack/")) {
+      const hash = url.pathname.slice("/pack/".length);
+      if (hash === "current") return json(response, 200, this.packInfo());
+      if (!PACK_HASH_PATTERN.test(hash)) return json(response, 400, { error: "Pack hashes are 16 hex characters." });
+      const pack = this.config.store.pack(hash);
+      if (!pack) return json(response, 404, { error: "This server does not have that pack." });
+      response.writeHead(200, { "content-type": "application/json", "cache-control": "public, max-age=31536000, immutable" });
+      response.end(JSON.stringify(exportPack(pack)));
+      return;
+    }
+
+    const ip = clientIp(request.headers, request.socket.remoteAddress, this.config.trustProxy ?? false);
+
+    if (url.pathname === "/errors") {
+      if (request.method !== "POST") return json(response, 405, { error: "POST a crash report." });
+      if (!this.errorReports.take(ip)) return json(response, 429, { error: "Too many reports." });
+      const report = parseClientError(await readJson(request));
+      if (!report) return json(response, 400, { error: "A report needs a message." });
+      const error = new Error(report.message);
+      // The client's own stack, or none: this server's frames would only mislead.
+      error.stack = report.stack ?? `Error: ${report.message}`;
+      this.reporter.report(error, { source: "client", tags: { platform: report.platform ?? "unknown", version: report.version ?? "unknown" }, extra: { url: report.url } });
+      return json(response, 202, { ok: true });
+    }
 
     if (url.pathname === "/evidence") {
       if (!this.config.adminToken || !sameToken(bearer(request), this.config.adminToken)) return json(response, this.config.adminToken ? 401 : 404, { error: "not available" });
@@ -89,9 +180,11 @@ export class GameServer {
     const auth = this.config.auth;
     if (url.pathname.startsWith("/auth/")) {
       if (!auth) return json(response, 404, { error: "Sign-in is not enabled on this server." });
+      if (!this.authCalls.take(ip)) return json(response, 429, { error: "Too many requests; try again in a minute." });
       try {
         switch (`${request.method} ${url.pathname}`) {
           case "POST /auth/magic-link": {
+            if (!this.magicLinks.take(ip)) return json(response, 429, { error: "Too many sign-in links requested; try again later." });
             const body = await readJson(request) as { email?: unknown };
             await auth.requestLink(typeof body.email === "string" ? body.email : "");
             return json(response, 200, { ok: true, message: "Check your e-mail for the sign-in link." });
@@ -115,7 +208,7 @@ export class GameServer {
           }
           case "GET /auth/me": {
             const account = auth.authenticate(bearer(request));
-            return account ? json(response, 200, { account: summary(account) }) : json(response, 401, { error: "Signed out." });
+            return account ? json(response, 200, { account: summary(account), rating: summariseRating(this.config.store.rating(account.id)) }) : json(response, 401, { error: "Signed out." });
           }
           case "POST /auth/name": {
             const account = auth.authenticate(bearer(request));
@@ -154,27 +247,39 @@ export class GameServer {
 
   private fail(response: ServerResponse, error: unknown) {
     this.config.log?.({ event: "http-error", message: error instanceof Error ? error.message : String(error) });
+    if (!(error instanceof HttpError)) this.reporter.report(error, { source: "server", tags: { origin: "http" } });
     if (!response.headersSent) json(response, error instanceof HttpError ? error.status : 500, { error: error instanceof HttpError ? error.message : "Request failed." });
     else response.end();
   }
 
   // --- WebSocket -----------------------------------------------------------------------------------------------------
 
-  private accept(socket: WebSocket) {
-    const client: Client = { socket, room: null, seat: null, hello: false, account: null, budget: 0, budgetAt: this.config.scheduler.now() };
-    this.clients.add(client);
+  private accept(socket: WebSocket, request: IncomingMessage) {
+    const ip = clientIp(request.headers, request.socket.remoteAddress, this.config.trustProxy ?? false);
     const send = (message: ServerMessage) => { if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(message)); };
+    if (!this.sockets.hold(ip)) {
+      this.config.log?.({ event: "socket-limit", ip });
+      send({ type: "error", code: "rate", message: "Too many connections from your address." });
+      socket.close(1008, "connection limit");
+      return;
+    }
+    const now = this.config.scheduler.now();
+    const client: Client = { socket, ip, room: null, seat: null, hello: false, account: null, budget: 0, budgetAt: now, rooms: 0, roomsAt: now, queueName: "", queueSettings: {} };
+    this.clients.add(client);
     socket.on("message", data => {
       if (!this.withinBudget(client)) { send({ type: "error", code: "rate", message: "Too many messages." }); socket.close(1008, "rate limit"); return; }
       const parsed = parseClientMessage(data as Buffer);
       if ("error" in parsed) { send({ type: "error", code: "protocol", message: parsed.error }); return; }
       try { this.dispatch(client, parsed, send); } catch (error) {
         this.config.log?.({ event: "dispatch-error", message: error instanceof Error ? error.message : String(error) });
+        this.reporter.report(error, { source: "server", tags: { origin: "dispatch", message: parsed.type } });
         send({ type: "error", code: "room", message: error instanceof Error ? error.message : "Request failed." });
       }
     });
     socket.on("close", () => {
       this.clients.delete(client);
+      this.sockets.release(ip);
+      this.queue.leave(client);
       if (client.room && client.seat !== null) client.room.disconnect(client.seat);
       client.room = null; client.seat = null;
     });
@@ -187,6 +292,56 @@ export class GameServer {
     return ++client.budget <= (this.config.messageBudget ?? 400);
   }
 
+  /** Room creation and quick-match entry share one per-connection allowance. */
+  private mayCreateRoom(client: Client): boolean {
+    const now = this.config.scheduler.now();
+    if (now - client.roomsAt >= 600_000) { client.rooms = 0; client.roomsAt = now; }
+    return ++client.rooms <= this.limits.roomsPer10Minutes;
+  }
+
+  // --- Quick match ---------------------------------------------------------------------------------------------------
+
+  private ratingOf(client: Client) { return client.account ? this.config.store.rating(client.account.id)?.elo ?? 1200 : 1200; }
+
+  private enqueue(client: Client, send: (message: ServerMessage) => void) {
+    const ticket = this.queue.join(client, client.account?.id ?? null, this.ratingOf(client));
+    send({ type: "queued", since: ticket.since, rating: Math.round(ticket.rating), window: 100, waiting: this.queue.size });
+    this.sweepQueue();
+    if (this.queue.size && !this.cancelMatchTick) this.scheduleMatchTick();
+  }
+
+  private scheduleMatchTick() {
+    this.cancelMatchTick = this.config.scheduler.after(this.limits.matchTickMs, () => {
+      this.cancelMatchTick = null;
+      this.sweepQueue();
+      if (this.queue.size) this.scheduleMatchTick();
+    });
+  }
+
+  /** Pairs what can be paired and tells everyone still waiting how wide their window has grown. */
+  private sweepQueue() {
+    for (const [a, b] of this.queue.match()) this.seatPair(a.player, b.player);
+    const now = this.config.scheduler.now();
+    for (const client of this.clients) {
+      const ticket = this.queue.ticket(client);
+      if (ticket && now > ticket.since) this.sendTo(client, { type: "queued", since: ticket.since, rating: Math.round(ticket.rating), window: matchWindow(now - ticket.since), waiting: this.queue.size });
+    }
+  }
+
+  private seatPair(a: Client, b: Client) {
+    const connection = (client: Client) => ({ send: (message: ServerMessage) => this.sendTo(client, message) });
+    // The longer-waiting player's table rules apply; both must still be unseated and connected.
+    for (const client of [a, b]) if (client.room || client.socket.readyState !== client.socket.OPEN) { this.sendTo(client, { type: "error", code: "room", message: "Quick match fell through; try again." }); return; }
+    const room = this.lobby.createRoom("pvp", a.queueSettings);
+    for (const client of [a, b]) {
+      const seated = room.join(this.seatName(client, client.queueName), connection(client), client.account?.id ?? null)!;
+      client.room = room; client.seat = seated.seat;
+    }
+    this.config.log?.({ event: "quick-match", code: room.code, ratings: [this.ratingOf(a), this.ratingOf(b)].map(Math.round) });
+  }
+
+  private sendTo(client: Client, message: ServerMessage) { if (client.socket.readyState === client.socket.OPEN) client.socket.send(JSON.stringify(message)); }
+
   private dispatch(client: Client, message: ClientMessage, send: (message: ServerMessage) => void) {
     const connection = { send };
     if (!client.hello && message.type !== "hello") { send({ type: "error", code: "protocol", message: "Say hello first." }); return; }
@@ -194,7 +349,7 @@ export class GameServer {
       case "hello":
         client.hello = true;
         client.account = this.config.auth?.authenticate(message.session) ?? null;
-        send({ type: "welcome", protocol: PROTOCOL_VERSION, serverTime: this.config.scheduler.now(), account: client.account ? summary(client.account) : null });
+        send({ type: "welcome", protocol: PROTOCOL_VERSION, serverTime: this.config.scheduler.now(), account: client.account ? summary(client.account) : null, pack: this.packInfo(), rating: client.account ? summariseRating(this.config.store.rating(client.account.id)) : null });
         if (message.protocol !== PROTOCOL_VERSION) send({ type: "error", code: "protocol", message: `This server speaks protocol ${PROTOCOL_VERSION}; update the game.` });
         return;
       case "ping":
@@ -202,6 +357,8 @@ export class GameServer {
         return;
       case "createRoom": {
         if (client.room) { send({ type: "error", code: "room", message: "Leave your current room first." }); return; }
+        if (this.queue.has(client)) this.queue.leave(client);
+        if (!this.mayCreateRoom(client)) { send({ type: "error", code: "rate", message: "You are opening tables too quickly; wait a few minutes." }); return; }
         const room = this.lobby.createRoom(message.mode, message.settings ?? {});
         const seated = room.join(this.seatName(client, message.name), connection, client.account?.id ?? null)!;
         client.room = room; client.seat = seated.seat;
@@ -227,6 +384,17 @@ export class GameServer {
       case "leaveRoom":
         if (client.room && client.seat !== null) client.room.leave(client.seat);
         client.room = null; client.seat = null;
+        this.queue.leave(client);
+        send({ type: "left" });
+        return;
+      case "quickMatch":
+        if (client.room) { send({ type: "error", code: "room", message: "Leave your current room first." }); return; }
+        if (!this.mayCreateRoom(client)) { send({ type: "error", code: "rate", message: "You are starting matches too quickly; wait a few minutes." }); return; }
+        client.queueName = message.name; client.queueSettings = message.settings ?? {};
+        this.enqueue(client, send);
+        return;
+      case "cancelQuickMatch":
+        this.queue.leave(client);
         send({ type: "left" });
         return;
       case "command":
@@ -273,6 +441,9 @@ function readJson(request: IncomingMessage): Promise<unknown> {
     request.on("error", reject);
   });
 }
+
+/** A pack as clients fetch it: the stored document plus its hash so the client can verify what it got. */
+function exportPack(pack: PackRecord) { return { hash: pack.hash, revision: pack.revision, document: pack.document }; }
 
 /** What /evidence hands to the studio: the result and match report, never account e-mails or seat tokens. */
 function exportResult(record: ResultRecord) {

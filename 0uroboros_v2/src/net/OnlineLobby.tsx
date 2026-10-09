@@ -10,6 +10,8 @@ type Props = {
   saved: SavedSeat | null;
   turnSeconds: number | null;
   onCreate: (mode: RoomMode, name: string) => void;
+  onQuickMatch: (name: string) => void;
+  onCancelQuickMatch: () => void;
   onJoin: (code: string, name: string) => void;
   onResume: (saved: SavedSeat) => void;
   onLeave: () => void;
@@ -17,7 +19,7 @@ type Props = {
 };
 
 /** The setup card's online section: sign in (optional), create a table for a friend, join one by code, or play the server's AI. */
-export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onResume, onLeave, disabled }: Props) {
+export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onQuickMatch, onCancelQuickMatch, onJoin, onResume, onLeave, disabled }: Props) {
   const host = platform();
   const [session, setSession] = useState<Session | null>(() => host.auth.session());
   const [name, setName] = useState(() => host.auth.session()?.account.name ?? host.storage.get(NAME_KEY) ?? '');
@@ -52,6 +54,13 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
     finally { setAuthBusy(false); }
   };
 
+  if (lobby.status === 'queued' && lobby.queue) {
+    return <section className='online-lobby' aria-label='Quick match' data-online-status='queued'>
+      <small>QUICK MATCH</small>
+      <p role='status'>Looking for an opponent near {lobby.queue.rating} (±{lobby.queue.window}){lobby.queue.waiting > 1 ? `, ${lobby.queue.waiting} in the queue` : ''}…</p>
+      <button type='button' onClick={onCancelQuickMatch}>Cancel</button>
+    </section>;
+  }
   if (lobby.status === 'waiting' && lobby.code) {
     return <section className='online-lobby' aria-label='Online table' data-online-status='waiting'>
       <small>ONLINE TABLE</small>
@@ -64,6 +73,7 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
     <small>PLAY ONLINE</small>
     <label className='online-field'><span>Your name</span><input value={name} maxLength={24} placeholder='Name at the table' onChange={event => keepName(event.target.value)} onBlur={() => void commitName()} disabled={disabled}/></label>
     <div className='online-actions'>
+      <button type='button' disabled={!ready} onClick={() => onQuickMatch(name.trim())}>Quick match</button>
       <button type='button' disabled={!ready} onClick={() => onCreate('pvp', name.trim())}>Create table</button>
       <button type='button' disabled={!ready} onClick={() => onCreate('ai', name.trim())}>Play the server AI</button>
       <form className='online-join' onSubmit={join}>
@@ -73,7 +83,7 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
     </div>
     {saved && lobby.status === 'idle' && <button type='button' className='online-resume' onClick={() => onResume(saved)}>Rejoin table {saved.code}</button>}
     {session
-      ? <p className='online-account' data-signed-in={session.account.id}>Signed in as <b>{session.account.name}</b>{session.account.email ? ` (${session.account.email})` : ''}. <button type='button' className='online-link' onClick={() => void signOut()}>Sign out</button></p>
+      ? <p className='online-account' data-signed-in={session.account.id}>Signed in as <b>{session.account.name}</b>{session.account.email ? ` (${session.account.email})` : ''}.{lobby.rating ? <> Rating <b data-rating={lobby.rating.elo}>{lobby.rating.elo}</b>{lobby.rating.games < 10 ? ' (provisional)' : ''}, {lobby.rating.wins}–{lobby.rating.losses}{lobby.rating.ties ? `–${lobby.rating.ties}` : ''}.</> : ''} <button type='button' className='online-link' onClick={() => void signOut()}>Sign out</button></p>
       : <form className='online-signin' onSubmit={requestLink}>
           {host.auth.signInNative && <button type='button' className='online-native' disabled={authBusy} onClick={() => void signInNative()}>{authBusy ? 'Signing in…' : `Sign in with ${host.auth.methods[0] === 'steam' ? 'Steam' : 'Apple'}`}</button>}
           <input type='email' value={email} placeholder='you@example.com' aria-label='E-mail for sign-in link' autoComplete='email' onChange={event => setEmail(event.target.value)} disabled={authBusy}/>

@@ -30,8 +30,9 @@ jobs:
           cache: npm
           cache-dependency-path: 0uroboros_v2/package-lock.json
       - run: npm ci
-      - run: npx vitest run tests/game-server.test.ts --reporter=dot
+      - run: npx vitest run tests/game-server.test.ts tests/hardening.test.ts --reporter=dot
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only --config deploy/fly.toml --dockerfile deploy/Dockerfile
+      # OUROBOROS_RELEASE labels error reports with the deployed commit.
+      - run: flyctl deploy --remote-only --config deploy/fly.toml --dockerfile deploy/Dockerfile --env OUROBOROS_RELEASE=${{ github.sha }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
