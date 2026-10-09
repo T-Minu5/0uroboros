@@ -433,7 +433,7 @@
         "+1 Card",
         "+1 Action"
       ],
-      "artwork": "/assets/card_art/chaos cards/attack/glitch-witch.png",
+      "artwork": "/assets/library/card_art/chaos cards/attack/glitch-witch.png",
       "video": [
         "public/assets/cards/attack/glitch-witch.mp4"
       ]
@@ -481,7 +481,7 @@
       "effects": [
         "Mary deals exponential damage each time she's played. Draining from -75 up to -600 power"
       ],
-      "artwork": "/assets/card_art/chaos cards/attack/mary-mallon.png",
+      "artwork": "/assets/library/card_art/chaos cards/attack/mary-mallon.png",
       "video": [
         "public/assets/cards/attack/mary-mallon.mp4"
       ]
@@ -498,7 +498,7 @@
         "Drain -150",
         "Mary is changing. Do you see?"
       ],
-      "artwork": "/assets/card_art/chaos cards/attack/mary-malice.png"
+      "artwork": "/assets/library/card_art/chaos cards/attack/mary-malice.png"
     },
     {
       "id": "maryMalware",
@@ -512,7 +512,7 @@
         "Drain -300",
         "Mary is becoming. Do you see?"
       ],
-      "artwork": "/assets/card_art/chaos cards/attack/mary-malware.png"
+      "artwork": "/assets/library/card_art/chaos cards/attack/mary-malware.png"
     },
     {
       "id": "typhoidMary",
@@ -526,7 +526,7 @@
         "Drain -600",
         "Mary is reborn. Do you see?"
       ],
-      "artwork": "/assets/card_art/chaos cards/attack/typhoid-mary.png"
+      "artwork": "/assets/library/card_art/chaos cards/attack/typhoid-mary.png"
     },
     {
       "id": "delta-wave",
@@ -604,7 +604,7 @@
       "effects": [
         "Morphs into a powerful form, draining between 75-300 power from your opponent."
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/skinwalker.png",
+      "artwork": "/assets/library/card_art/chaos cards/horrors/skinwalker.png",
       "video": [
         "public/assets/cards/power/skinwalker.mp4"
       ]
@@ -620,7 +620,7 @@
       "effects": [
         "Drain -300"
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/leviathan-form.png"
+      "artwork": "/assets/library/card_art/chaos cards/horrors/leviathan-form.png"
     },
     {
       "id": "spider-form",
@@ -635,7 +635,7 @@
         "+1 Action",
         "+2 Cards"
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/spider-form.png"
+      "artwork": "/assets/library/card_art/chaos cards/horrors/spider-form.png"
     },
     {
       "id": "wasp-form",
@@ -650,7 +650,7 @@
         "+2 Actions",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/wasp-form.png"
+      "artwork": "/assets/library/card_art/chaos cards/horrors/wasp-form.png"
     },
     {
       "id": "viper-form",
@@ -665,7 +665,7 @@
         "+1 Action",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/viper-form.png"
+      "artwork": "/assets/library/card_art/chaos cards/horrors/viper-form.png"
     },
     {
       "id": "wolf-form",
@@ -680,7 +680,7 @@
         "+1 Draft",
         "+1 Crypto"
       ],
-      "artwork": "/assets/card_art/chaos cards/horrors/wolf-form.png"
+      "artwork": "/assets/library/card_art/chaos cards/horrors/wolf-form.png"
     },
     {
       "id": "subroutine_succubus",
@@ -918,7 +918,7 @@
         "Gain a Schrödinger's Box with either a dead cat in it, or a live cat with a unquie effect",
         "+1 Action"
       ],
-      "artwork": "/assets/card_art/base cards/utility/the-heisenberg-hag.png",
+      "artwork": "/assets/library/card_art/base cards/utility/the-heisenberg-hag.png",
       "video": [
         "public/assets/cards/utility/heisenberg-hag.mp4",
         "public/assets/cards/utility/the-heisenberg-hag.mp4"
@@ -954,7 +954,7 @@
       "effects": [
         "Moprhs into +1, +2, +3 or +5 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/crypto-alchemist.png"
+      "artwork": "/assets/library/card_art/base cards/utility/crypto-alchemist.png"
     },
     {
       "id": "code-sniper",
@@ -1002,7 +1002,7 @@
       "effects": [
         "Cycles between team Alpha, Bravo, and Charlie. Each team offers a choice-based effect"
       ],
-      "artwork": "/assets/card_art/base cards/utility/entropic-infantry.png"
+      "artwork": "/assets/library/card_art/base cards/utility/entropic-infantry.png"
     },
     {
       "id": "chronos-cache",
@@ -1031,7 +1031,7 @@
       "effects": [
         "Add a random Widget (1VP) to the bottom of your deck. Each Widget has a unique effect"
       ],
-      "artwork": "/assets/card_art/base cards/utility/merchant-of-chaos.png"
+      "artwork": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png"
     },
     {
       "id": "alchemic-shyte",
@@ -1044,7 +1044,7 @@
       "effects": [
         "+1 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/alchemic-shyte.png"
+      "artwork": "/assets/library/card_art/base cards/utility/alchemic-shyte.png"
     },
     {
       "id": "alchemic-byte",
@@ -1057,7 +1057,7 @@
       "effects": [
         "+2 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/alchemic-byte.png"
+      "artwork": "/assets/library/card_art/base cards/utility/alchemic-byte.png"
     },
     {
       "id": "alchemic-kilo",
@@ -1070,7 +1070,7 @@
       "effects": [
         "+3 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/alchemic-kilo.png"
+      "artwork": "/assets/library/card_art/base cards/utility/alchemic-kilo.png"
     },
     {
       "id": "alchemic-mega",
@@ -1083,7 +1083,7 @@
       "effects": [
         "+5 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/alchemic-mega.png"
+      "artwork": "/assets/library/card_art/base cards/utility/alchemic-mega.png"
     },
     {
       "id": "alphaTeam",
@@ -1096,7 +1096,7 @@
       "effects": [
         "Choose: +2 Actions & +1 Card or +1 Draft & +2 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/alpha-team.png"
+      "artwork": "/assets/library/card_art/base cards/utility/alpha-team.png"
     },
     {
       "id": "bravoTeam",
@@ -1109,7 +1109,7 @@
       "effects": [
         "Choose: +1 Action & +2 Cards or +3 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/utility/bravo-team.png"
+      "artwork": "/assets/library/card_art/base cards/utility/bravo-team.png"
     },
     {
       "id": "charlieTeam",
@@ -1122,7 +1122,7 @@
       "effects": [
         "Choose: +3 Cards or Drain -150"
       ],
-      "artwork": "/assets/card_art/base cards/utility/charlie-team.png"
+      "artwork": "/assets/library/card_art/base cards/utility/charlie-team.png"
     },
     {
       "id": "shyte-coin",
@@ -1302,7 +1302,7 @@
       "effects": [
         "what's in the box?"
       ],
-      "artwork": "/assets/card_art/base cards/cats/schrodinger-box.png"
+      "artwork": "/assets/library/card_art/base cards/cats/schrodinger-box.png"
     },
     {
       "id": "cat-attack",
@@ -1316,7 +1316,7 @@
       "effects": [
         "Drain -150"
       ],
-      "artwork": "/assets/card_art/base cards/cats/cat-attack.png"
+      "artwork": "/assets/library/card_art/base cards/cats/cat-attack.png"
     },
     {
       "id": "big-cat",
@@ -1333,7 +1333,7 @@
         "+1 Crypto",
         "+100 Power"
       ],
-      "artwork": "/assets/card_art/base cards/cats/big-cat.png"
+      "artwork": "/assets/library/card_art/base cards/cats/big-cat.png"
     },
     {
       "id": "mad-cat",
@@ -1348,7 +1348,7 @@
         "+1 Action",
         "+2 Cards"
       ],
-      "artwork": "/assets/card_art/base cards/cats/mad-cat.png"
+      "artwork": "/assets/library/card_art/base cards/cats/mad-cat.png"
     },
     {
       "id": "cat-pounce",
@@ -1363,7 +1363,7 @@
         "+1 Action",
         "Drain -50"
       ],
-      "artwork": "/assets/card_art/base cards/cats/cat-pounce.png"
+      "artwork": "/assets/library/card_art/base cards/cats/cat-pounce.png"
     },
     {
       "id": "cat-run",
@@ -1378,7 +1378,7 @@
         "+1 Draft",
         "+2 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/cats/cat-run.png"
+      "artwork": "/assets/library/card_art/base cards/cats/cat-run.png"
     },
     {
       "id": "cat-hack",
@@ -1393,7 +1393,7 @@
         "+1 Action",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/base cards/cats/cat-hack.png"
+      "artwork": "/assets/library/card_art/base cards/cats/cat-hack.png"
     },
     {
       "id": "dead-cat-01",
@@ -1407,7 +1407,7 @@
       "effects": [
         "I'm dead"
       ],
-      "artwork": "/assets/card_art/base cards/cats/dead-cat-01.png"
+      "artwork": "/assets/library/card_art/base cards/cats/dead-cat-01.png"
     },
     {
       "id": "dead-cat-02",
@@ -1421,7 +1421,7 @@
       "effects": [
         "I'm dead"
       ],
-      "artwork": "/assets/card_art/base cards/cats/dead-cat-02.png"
+      "artwork": "/assets/library/card_art/base cards/cats/dead-cat-02.png"
     },
     {
       "id": "dead-cat-03",
@@ -1435,7 +1435,7 @@
       "effects": [
         "I'm dead"
       ],
-      "artwork": "/assets/card_art/base cards/cats/dead-cat-03.png"
+      "artwork": "/assets/library/card_art/base cards/cats/dead-cat-03.png"
     },
     {
       "id": "dead-cat-04",
@@ -1449,7 +1449,7 @@
       "effects": [
         "I'm dead"
       ],
-      "artwork": "/assets/card_art/base cards/cats/dead-cat-04.png"
+      "artwork": "/assets/library/card_art/base cards/cats/dead-cat-04.png"
     },
     {
       "id": "quark",
@@ -1464,7 +1464,7 @@
         "1vp",
         "+1 Action"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/quark.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/quark.png"
     },
     {
       "id": "charm-quark",
@@ -1480,7 +1480,7 @@
         "+1 Card",
         "Sets Background"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/charm-quark.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/charm-quark.png"
     },
     {
       "id": "tachyon",
@@ -1496,7 +1496,7 @@
         "+1 Action",
         "+1 Card"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/tachyon.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/tachyon.png"
     },
     {
       "id": "neutrino",
@@ -1511,7 +1511,7 @@
         "1vp",
         "+1 Crypto"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/neutrino.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/neutrino.png"
     },
     {
       "id": "tau",
@@ -1527,7 +1527,7 @@
         "+1 Card",
         "Sets Background"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/tau.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/tau.png"
     },
     {
       "id": "photon",
@@ -1542,7 +1542,7 @@
         "1vp",
         "+50 Power"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/photon.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/photon.png"
     },
     {
       "id": "strange-quark",
@@ -1558,7 +1558,7 @@
         "+1 Card",
         "Plays Song"
       ],
-      "artwork": "/assets/card_art/base cards/widgets/strange-quark.png"
+      "artwork": "/assets/library/card_art/base cards/widgets/strange-quark.png"
     },
     {
       "id": "razor-blade-jade",

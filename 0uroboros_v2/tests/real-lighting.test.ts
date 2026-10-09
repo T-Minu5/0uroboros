@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BOARD_BACKGROUNDS, NO_BOARD_BACKGROUND, REAL_LIGHTING_FLOORS, backgroundsFor, loadBackgroundChoice, saveBackgroundChoice, stepBackground } from '../src/boardBackgrounds';
 import { DEFAULT_REAL_LIGHTING, REAL_LIGHTING_SLIDERS, floorLighting, loadRealLightingStore, realLightingDefaults, saveRealLightingStore, updateFloorLighting } from '../src/realLighting';
 
-const floor = (n: string) => `/assets/board/backgrounds/back-${n}.png`;
+const floor = (n: string) => `/assets/board/backgrounds/back-${n}.webp`;
 let store: Map<string, string>;
 beforeEach(() => {
   store = new Map();
@@ -68,6 +68,13 @@ describe('real lighting settings', () => {
     expect(floorLighting(factory, floor('07'))).toEqual(realLightingDefaults(floor('07')));
     expect(factory[floor('07')].saved?.neon).toBe(2);
     expect(floorLighting(updateFloorLighting(lights, floor('01'), { type: 'reset' }), floor('01'))).toEqual(realLightingDefaults(floor('01')));
+  });
+
+  it('follows looks and choices saved against the old PNG floors to their WebP builds', () => {
+    store.set('ouroboros.realLighting.v2', JSON.stringify({ '/assets/board/backgrounds/back-01.png': { current: { neon: 2 } } }));
+    expect(loadRealLightingStore()[floor('01')]?.current.neon).toBe(2);
+    store.set('ouroboros.boardBackground', JSON.stringify({ real: '/assets/board/backgrounds/back-02.png', studio: '/assets/board/backgrounds/back-08.png' }));
+    expect(loadBackgroundChoice().background).toEqual({ real: floor('02'), studio: floor('08') });
   });
 
   it('migrates the single pre-v2 look to back-07, clamping out-of-range values and dropping invalid ones', () => {

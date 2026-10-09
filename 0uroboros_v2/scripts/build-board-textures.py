@@ -31,7 +31,7 @@ cloud = Image.fromarray(np.uint8(rng.uniform(70, 170, (32, 32)))).resize((size, 
 cloud = np.asarray(cloud).astype(float)
 fine = rng.normal(0, 2.4, (size, size))
 resin = np.stack((168 + (cloud - 128) * .45 + fine, 224 + fine, 128 + (cloud - 128) * .18 + fine), axis=-1)
-Image.fromarray(np.uint8(np.clip(resin, 0, 255))).save(OUT / 'resin-surface.png', optimize=True)
+Image.fromarray(np.uint8(np.clip(resin, 0, 255))).save(OUT.parent / 'library/materials/resin-surface.png', optimize=True)
 
 # Field glass engraving: architectural routing and an understated orbital seal.
 # Alpha is physical etching strength, not a full luminous overlay.

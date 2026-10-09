@@ -15,9 +15,16 @@ const source = JSON.parse(readFileSync(sourcePath, 'utf8'));
 if (!Array.isArray(source.cards)) throw new Error('Expected a cards array in assets/card_art/cards.json');
 if (source.cardCount !== source.cards.length) throw new Error('Source cardCount does not match cards array');
 const beforeMechanics = JSON.stringify(source.cards.map(({ artwork, ...rest }) => rest));
-const files = readdirSync(artRoot, { recursive: true, withFileTypes: true })
-  .filter(entry => entry.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(entry.name))
-  .map(entry => relative(artRoot, resolve(entry.parentPath, entry.name)).split('\\').join('/')).sort();
+// Art the content pack uses lives in assets/card_art; unshipped art the studio can still pick lives in assets/library/card_art.
+// Both are matched by the same relative name; the URL keeps whichever folder the file is in.
+const libraryRoot = resolve(root, 'assets/library/card_art');
+const urlOf = new Map();
+const listArt = (dir, urlBase) => existsSync(dir)
+  ? readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter(entry => entry.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(entry.name))
+    .map(entry => { const rel = relative(dir, resolve(entry.parentPath, entry.name)).split('\\').join('/'); if (!urlOf.has(rel)) urlOf.set(rel, `${urlBase}/${rel}`); return rel; })
+  : [];
+const files = [...new Set([...listArt(artRoot, '/assets/card_art'), ...listArt(libraryRoot, '/assets/library/card_art')])].sort();
 const fileSet = new Set(files);
 if (!fileSet.has('image_placeHolder.png')) throw new Error('Exact required root placeholder is missing');
 const previous = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
@@ -51,7 +58,7 @@ function resolveArtwork(input) {
   for (const { mode, matches } of groups) {
     if (!matches.length) continue;
     if (matches.length > 1) return { artwork: placeholder, status: 'ambiguous', reason: mode, candidates: matches };
-    return { artwork: `/assets/card_art/${matches[0]}`, status: matches[0] === 'image_placeHolder.png' ? 'placeholder' : 'resolved', reason: mode, candidates: matches };
+    return { artwork: urlOf.get(matches[0]), status: matches[0] === 'image_placeHolder.png' ? 'placeholder' : 'resolved', reason: mode, candidates: matches };
   }
   return { artwork: placeholder, status: 'missing', reason: 'No matching supplied image', candidates: [] };
 }

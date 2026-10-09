@@ -5,7 +5,7 @@ import bpy, math, json, struct, re
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
-OUT=ROOT/'assets/models'
+OUT=ROOT/'assets/source/models'
 source=OUT/'ouroboros-board-v3-base.glb'
 scene=bpy.data.scenes.new('Ouroboros_Perimeter_V3')
 bpy.context.window.scene=scene

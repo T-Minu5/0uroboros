@@ -7,7 +7,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
-OUT = ROOT / 'assets/models'
+OUT = ROOT / 'assets/source/models'
 OUT.mkdir(parents=True, exist_ok=True)
 # Prior builds are retained, but release semantic names for the latest export.
 for previous in bpy.data.scenes:

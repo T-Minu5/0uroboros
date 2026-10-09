@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import { shippedFloorUrl } from './boardBackgrounds';
 
 /**
  * Tuning for Real lighting (the bottom-left Lighting panel): lit, depth-mapped steel under the board. On the Neon
@@ -94,10 +95,10 @@ export const REAL_LIGHTING_SLIDERS: { group: 'Lighting' | 'Floor' | 'Glass'; sli
   },
 ];
 
-/** Per-floor factory looks. */
+/** Per-floor factory looks, keyed by the shipped floor URL (see shippedFloorUrl in boardBackgrounds). */
 const FLOOR_DEFAULTS: Record<string, Partial<RealLightingSettings>> = {
-  '/assets/board/backgrounds/back-01.png': { reflections: 1.55, metalness: .82, tone: .59, roughness: .53, artMix: .96, depth: .81, bump: 1.9, brushing: .86 },
-  '/assets/board/backgrounds/back-02.png': { reflections: 1.65, metalness: 1, tone: 1.29, roughness: .84, artMix: .95, depth: .51, bump: 2.2, brushing: 0 },
+  '/assets/board/backgrounds/back-01.webp': { reflections: 1.55, metalness: .82, tone: .59, roughness: .53, artMix: .96, depth: .81, bump: 1.9, brushing: .86 },
+  '/assets/board/backgrounds/back-02.webp': { reflections: 1.65, metalness: 1, tone: 1.29, roughness: .84, artMix: .95, depth: .51, bump: 2.2, brushing: 0 },
 };
 
 export function realLightingDefaults(floor: string): RealLightingSettings {
@@ -121,7 +122,7 @@ export type RealLightingStore = Record<string, FloorLighting>;
 const STORAGE_KEY = 'ouroboros.realLighting.v2';
 const LEGACY_KEY = 'ouroboros.realLighting';
 /** The single pre-v2 look belonged to the only lit floor then, back-07. */
-const LEGACY_FLOOR = '/assets/board/backgrounds/back-07.png';
+const LEGACY_FLOOR = '/assets/board/backgrounds/back-07.webp';
 
 export function loadRealLightingStore(): RealLightingStore {
   const store: RealLightingStore = {};
@@ -133,8 +134,9 @@ export function loadRealLightingStore(): RealLightingStore {
       return store;
     }
     const saved = JSON.parse(raw) as Record<string, { current?: unknown; saved?: unknown } | null>;
-    for (const [floor, entry] of Object.entries(saved ?? {})) {
+    for (const [savedFloor, entry] of Object.entries(saved ?? {})) {
       if (!entry || typeof entry !== 'object') continue;
+      const floor = shippedFloorUrl(savedFloor);
       const defaults = realLightingDefaults(floor);
       store[floor] = { current: clampSettings(entry.current, defaults) };
       if (entry.saved) store[floor].saved = clampSettings(entry.saved, defaults);

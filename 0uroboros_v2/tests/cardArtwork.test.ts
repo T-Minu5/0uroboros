@@ -8,7 +8,8 @@ it('covers every supplied catalog image in the normalized artwork registry',()=>
  expect(catalog.cards).toHaveLength(catalog.cardCount);
  expect(Object.keys(artwork.byId)).toHaveLength(catalog.cards.length);
  for(const card of catalog.cards){
-  expect(card.artwork).toMatch(/^\/assets\/card_art\//);
+  // Shipped art lives in card_art; art no pack card uses waits in library/card_art and never reaches the client build.
+  expect(card.artwork).toMatch(/^\/assets\/(library\/)?card_art\//);
   expect(Object.values(artwork.byId),card.id).toContain(card.artwork);
  }
 });

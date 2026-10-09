@@ -1,7 +1,7 @@
 """Validate the exported versioned geometry contract; no external dependencies."""
 import json,struct
 from pathlib import Path
-root=Path(__file__).resolve().parents[1]/'assets/models'
+root=Path(__file__).resolve().parents[1]/'assets/source/models'
 def read(p):
  data=p.read_bytes();length=struct.unpack_from('<I',data,12)[0];return json.loads(data[20:20+length])
 a=read(root/'ouroboros-board-v2.glb');b=read(root/'ouroboros-board-v3.glb')

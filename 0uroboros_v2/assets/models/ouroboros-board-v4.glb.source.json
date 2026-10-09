@@ -1,0 +1,5 @@
+{
+  "source": "assets/source/models/ouroboros-board-v4.glb",
+  "sha": "0dcea6d897d5aee87913b9e9727b91a54eaaf0f1ae2a012e4e3131ab3dce5833",
+  "settings": "gltf-transform meshopt medium, position 16 bits"
+}

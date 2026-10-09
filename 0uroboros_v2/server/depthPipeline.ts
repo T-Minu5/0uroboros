@@ -22,22 +22,24 @@ export type DepthEntry = { sha: string; v: number; color: string; depth: string;
 export type DepthManifest = { version: number; entries: Record<string, DepthEntry> };
 export type DepthStatus = 'queued' | 'processing' | 'ready' | 'failed';
 
-export type DepthPaths = { root: string; assets: string; cardArt: string; depthDir: string; manifest: string };
+/** `cardArt` holds art the content pack uses; `libraryArt` holds unshipped art the studio can still pick from. */
+export type DepthPaths = { root: string; assets: string; cardArt: string; libraryArt: string; depthDir: string; manifest: string };
 export function depthPaths(root = process.cwd()): DepthPaths {
   const assets = resolve(root, 'assets'), cardArt = resolve(assets, 'card_art'), depthDir = resolve(cardArt, 'depth');
-  return { root, assets, cardArt, depthDir, manifest: resolve(depthDir, 'manifest.json') };
+  return { root, assets, cardArt, libraryArt: resolve(assets, 'library/card_art'), depthDir, manifest: resolve(depthDir, 'manifest.json') };
 }
 
 const DEPTH_HOME = process.env.DEPTH_HOME ?? join(homedir(), '.cache', '0uroboros-depth');
 export const PYTHON = process.env.DEPTH_PYTHON ?? join(DEPTH_HOME, 'venv', 'bin', 'python');
 
-/** `/assets/card_art/x.png` to an absolute file, or null when it falls outside the card art folder. */
+/** `/assets/card_art/x.png` or `/assets/library/card_art/x.png` to an absolute file, or null when it falls outside the card art folders. */
 export function artFile(paths: DepthPaths, url: string): string | null {
   if (!url.startsWith('/assets/')) return null;
   let decoded: string;
   try { decoded = decodeURIComponent(url.split('?')[0]!); } catch { return null; }
   const file = resolve(paths.assets, decoded.slice('/assets/'.length));
-  if (!file.startsWith(paths.cardArt + sep) || file.startsWith(paths.depthDir + sep)) return null;
+  const inArt = file.startsWith(paths.cardArt + sep) || file.startsWith(paths.libraryArt + sep);
+  if (!inArt || file.startsWith(paths.depthDir + sep)) return null;
   return file;
 }
 export const artUrl = (paths: DepthPaths, file: string) => `/assets/${relative(paths.assets, file).split(sep).join('/')}`;
@@ -82,7 +84,7 @@ export function documentArt(document: unknown): string[] {
 
 /**
  * Every piece of card art in the project: the default mapping, the authored content, and
- * every image file in the card art folder (uploads and card backs included).
+ * every image file in the card art and library folders (uploads and card backs included).
  */
 export async function allArtUrls(paths: DepthPaths): Promise<string[]> {
   const urls = new Set<string>();
@@ -91,7 +93,10 @@ export async function allArtUrls(paths: DepthPaths): Promise<string[]> {
   for (const url of [...Object.values(mapping.byId), ...Object.values(mapping.byName)]) urls.add(url);
   const content = await readFile(resolve(paths.root, 'content/authored-content.json'), 'utf8').catch(() => null);
   if (content) for (const url of documentArt(JSON.parse(content).document)) urls.add(url);
-  for (const file of await walk(paths.cardArt, paths.depthDir)) if (await isImageFile(file)) urls.add(artUrl(paths, file));
+  for (const dir of [paths.cardArt, paths.libraryArt]) {
+    if (!existsSync(dir)) continue;
+    for (const file of await walk(dir, paths.depthDir)) if (await isImageFile(file)) urls.add(artUrl(paths, file));
+  }
   const usable: string[] = [];
   for (const url of urls) {
     const file = artFile(paths, url);

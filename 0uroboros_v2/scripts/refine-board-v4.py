@@ -5,7 +5,7 @@ import bpy, math, json, struct, re
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path('/Users/t-minus/Dropbox/00_AI Projects/0uroboros_ProjectFolder/0uroboros_v2')
-OUT=ROOT/'assets/models'
+OUT=ROOT/'assets/source/models'
 source=OUT/'ouroboros-board-v4-base.glb'
 scene=bpy.data.scenes.new('Ouroboros_Perimeter_V4')
 bpy.context.window.scene=scene
@@ -107,7 +107,7 @@ bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bp
 for o in scene.objects:
  if o.type=='MESH':o.name='V4_Table_'+re.sub(r'\.\d{3}$','',o.active_material.name).split(' / ')[-1].replace(' ','_')
 bpy.ops.object.select_all(action='SELECT')
-target=OUT/'ouroboros-board-v4.glb'
+target=ROOT/'assets/models/ouroboros-board-v4.glb'  # the one GLB the client ships; everything else stays in assets/source/models
 bpy.ops.export_scene.gltf(filepath=str(target),export_format='GLB',use_selection=True,use_active_scene=True,export_yup=True,export_apply=True,export_animations=False,export_extras=True)
 # Keep v1 semantic export names even when Blender has identically named old scenes.
 b=target.read_bytes();length,kind=struct.unpack_from('<II',b,12);g=json.loads(b[20:20+length])

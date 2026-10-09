@@ -4,7 +4,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { isLocalRequest } from './contentApi';
 
 export type ArtworkImage = { path: string; folder: string; name: string };
-export type ArtworkApiOptions = { root?: string; urlBase?: string; maxBytes?: number };
+/** `library` is browsed alongside `root`: art the content pack does not use, kept out of the client build. */
+export type ArtworkApiOptions = { root?: string; urlBase?: string; library?: { root: string; urlBase: string } | null; maxBytes?: number };
 type Next = (error?: unknown) => void;
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
@@ -23,7 +24,7 @@ function reply(response: ServerResponse, status: number, value: unknown) {
   response.end(JSON.stringify(value));
 }
 
-async function listImages(root: string, urlBase: string): Promise<ArtworkImage[]> {
+async function listImages(root: string, urlBase: string, folderPrefix = ''): Promise<ArtworkImage[]> {
   const images: ArtworkImage[] = [];
   async function walk(directory: string) {
     let entries;
@@ -36,13 +37,15 @@ async function listImages(root: string, urlBase: string): Promise<ArtworkImage[]
       else if (entry.isFile() && IMAGE_EXTENSIONS.has(extname(entry.name).toLowerCase())) {
         const rel = relative(root, full).split(sep).join('/');
         const folder = rel.includes('/') ? rel.slice(0, rel.lastIndexOf('/')) : '';
-        images.push({ path: `${urlBase}/${rel}`, folder, name: entry.name.slice(0, -extname(entry.name).length) });
+        images.push({ path: `${urlBase}/${rel}`, folder: folder ? `${folderPrefix}${folder}` : folderPrefix.replace(/\/$/, ''), name: entry.name.slice(0, -extname(entry.name).length) });
       }
     }
   }
   await walk(root);
-  return images.sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name));
+  return images;
 }
+
+const sortImages = (images: ArtworkImage[]) => images.sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name));
 
 async function readBytes(request: IncomingMessage, maxBytes: number): Promise<Buffer> {
   let size = 0;
@@ -66,12 +69,20 @@ function uploadBaseName(header: string | string[] | undefined) {
 export function createArtworkApi(options: ArtworkApiOptions = {}) {
   const root = options.root ?? resolve(process.cwd(), 'assets/card_art');
   const urlBase = options.urlBase ?? '/assets/card_art';
+  // The project library is browsed by default; a custom root (tests, other projects) opts in explicitly.
+  const library = options.library !== undefined ? options.library
+    : options.root ? null
+    : { root: resolve(process.cwd(), 'assets/library/card_art'), urlBase: '/assets/library/card_art' };
   const maxBytes = options.maxBytes ?? 8 * 1024 * 1024;
   return async (request: IncomingMessage, response: ServerResponse, next: Next) => {
     if ((request.url ?? '').split('?')[0] !== '/api/artwork') return next();
     if (!isLocalRequest(request)) { reply(response, 403, { error: 'Artwork API is available only from this local app.' }); return; }
     if (request.method === 'GET') {
-      try { reply(response, 200, { images: await listImages(root, urlBase) }); }
+      try {
+        const images = await listImages(root, urlBase);
+        if (library) images.push(...await listImages(library.root, library.urlBase, 'library/'));
+        reply(response, 200, { images: sortImages(images) });
+      }
       catch (error) { reply(response, 500, { error: error instanceof Error ? error.message : 'Unable to list artwork.' }); }
       return;
     }
