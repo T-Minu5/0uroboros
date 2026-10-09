@@ -14,3 +14,10 @@ Rules:
 - No imports from the client, the studio or the server. No `window`, `document`, `process` or filesystem access.
 - The same module graph runs in the browser (client), in Node (server, league, Eco-Strat) and in Vitest.
 - Import with subpaths: `import { createSession } from '@0uroboros/engine/runtime'`.
+
+Seats:
+
+- Every seat-specific call takes the acting seat (`deploy(cardId, node, seat)`, `endTurn(seat)`, `undoAllPlanning(seat)`, `choose(selection, seat)`, `buy(pileId, now, seat)`, `endDraft(seat)`…). `aiSeats` names the seats the engine plays; `[]` seats two humans, `[0, 1]` runs headless self-play.
+- `view(seat)` is everything that seat may see, re-indexed so the viewer is index 0; a seat-1 view is the mirror of the table. The other seat's hand, draw order and face-down cards are never in it.
+- `redactEvent(event, seat)` is the Log line a seat may read; `mirrorEvent` swaps seats for a mirrored reader. Servers send `view(seat)` and redacted events; they never send `state`.
+- `endTurn(seat)` commits a plan; the reveal starts when every human seat has committed (`turnReady`). `seatNames` switches Log text to third person for shared tables; `now` injects the clock.

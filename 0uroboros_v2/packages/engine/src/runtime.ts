@@ -49,10 +49,17 @@ export type SessionConfig = {
   seatStrategies?: Partial<Record<PlayerId, StrategyProfile>>;
   /** The Strat-G experiment `strategy` belongs to, echoed in the match report; null for its current best profile. */
   strategyExperiment?: string | null;
-  /** Seats played by the AI; the local seat 0 is human unless listed. Defaults to [1]. */
+  /** Seats played by the AI; every other seat is human. Defaults to [1]; `[]` seats two humans. */
   aiSeats?: PlayerId[];
   /** Keep a log of the AI's Draft, deploy and choice decisions for later review. Defaults to true. */
   recordDecisions?: boolean;
+  /**
+   * How the Log names the seats. Unset, events speak to seat 0 ("You acquire…", "Opponent acquires…"), as the solo
+   * client expects. Set, events name both seats in the third person so one text serves every reader.
+   */
+  seatNames?: [string, string];
+  /** The clock Draft deadlines and purchase cooldowns read; defaults to Date.now. Inject for tests and servers. */
+  now?: () => number;
 };
 export type PurchaseRecord = { cycle: number; owner: PlayerId; definitionId: string; name: string; category: MarketPile["category"]; cost: number };
 export type CycleRecord = {
@@ -126,6 +133,8 @@ export type SessionState = {
   circuitReward: { definition: CircuitRewardDefinition | null; claimed: PlayerId[] };
   market: MarketPile[];
   trash: Card[]; choice: RuntimeChoice | null; draftReady: [boolean, boolean];
+  /** Human seats that have committed their Runtime plan; the reveal starts once every human seat has. */
+  turnReady: [boolean, boolean];
   unresolved: string[]; endedReason: string | null; winner: PlayerId | null;
   draftEndsAt: number | null; draftEnded: boolean;
   /** Cards moved this game by anyone, Location effects included. */
@@ -134,6 +143,8 @@ export type SessionState = {
 export type RuntimeEvent = {
   id: number; kind: "move" | "probability" | "trash" | "bank" | "choice" | "vp" | "deploy" | "reveal" | "draw" | "actions" | "crypto" | "drain" | "restore" | "morph" | "turn" | "collapse" | "location" | "power" | "reward" | "circuit" | "draft" | "purchase" | "cycle" | "gameover";
   text: string; node?: number; owner?: PlayerId; cardId?: string; targetCardId?: string; definitionId?: string;
+  /** The text other seats see when `text` names something only `owner` may know (a face-down placement); see redactEvent. */
+  publicText?: string;
   sourceNode?: number; targetNode?: number;
   source?: "card" | "location" | "circuit"; sourceName?: string;
   target?: "primary" | "backup" | "hand" | "actions" | "wallet" | "vp" | "trash" | "discard";
@@ -151,7 +162,13 @@ export type ScoreBreakdown = {
   vpCards: Card[];
   cardVP: number; locationVP: number; circuitVP: number; effectVP: number; destructionVP: number;
 };
+/**
+ * What one seat may see, with that seat at index 0 everywhere a value is indexed by seat (players, node cards and
+ * Powers, priority, winners, readiness) and the other seat at index 1. `seat` records whose view it is; a seat-1 view
+ * is the mirror of the table, so one client renders either seat. See RuntimeSession.view.
+ */
 export type SessionView = Omit<SessionState, "players" | "nodes" | "nodeOrder"> & {
+  seat: PlayerId;
   /** Only populated once the session is over. */
   finalScore: [ScoreBreakdown, ScoreBreakdown] | null;
   openNodes: number[];
@@ -224,6 +241,48 @@ export function firstLegalSelection(choice: Pick<RuntimeChoice, "options" | "sel
   return choice.options.filter(option => !option.disabled).slice(0, count).map(option => option.id);
 }
 
+const otherSeat = (seat: PlayerId): PlayerId => (1 - seat) as PlayerId;
+const swapPair = <T>(pair: [T, T]): [T, T] => [pair[1], pair[0]];
+
+/**
+ * `event` as `seat` may see it. A human seat's face-down placement names its card only to that seat; everyone else
+ * reads the public wording. Events are otherwise public: reveals, Powers, purchases and choices are table knowledge.
+ */
+export function redactEvent(event: RuntimeEvent, seat: PlayerId): RuntimeEvent {
+  if (event.publicText === undefined) return event;
+  const { publicText, cardId, ...rest } = event;
+  if (event.owner === seat) return { ...rest, ...(cardId !== undefined ? { cardId } : {}) };
+  return { ...rest, text: publicText };
+}
+
+/** `event` with the seats swapped, for a reader whose view puts seat 1 at index 0 (see SessionView). */
+export function mirrorEvent(event: RuntimeEvent): RuntimeEvent {
+  const flipped = { ...event };
+  if (event.owner !== undefined) flipped.owner = otherSeat(event.owner);
+  if (event.targetOwner !== undefined) flipped.targetOwner = otherSeat(event.targetOwner);
+  return flipped;
+}
+
+/** A seat-0-indexed view re-indexed so the other seat sits at index 0. Node order and card data are unchanged. */
+export function mirrorView(view: SessionView): SessionView {
+  const flip = (seat: PlayerId | null) => seat === null ? null : otherSeat(seat);
+  return {
+    ...view,
+    seat: otherSeat(view.seat),
+    priority: otherSeat(view.priority),
+    winner: flip(view.winner),
+    players: [view.players[1], view.players[0]] as unknown as SessionView["players"],
+    nodes: view.nodes.map(node => ({ ...node, cards: swapPair(node.cards), powerModifiers: swapPair(node.powerModifiers), powers: swapPair(node.powers), winner: flip(node.winner) })),
+    circuitEligible: view.circuitEligible.map(otherSeat),
+    circuitReward: { ...view.circuitReward, claimed: view.circuitReward.claimed.map(otherSeat) },
+    draftReady: swapPair(view.draftReady),
+    turnReady: swapPair(view.turnReady),
+    finalScore: view.finalScore ? swapPair(view.finalScore) : null,
+    choice: view.choice ? { ...view.choice, owner: otherSeat(view.choice.owner) } : null,
+    market: view.market.map(pile => pile.remaining ? { ...pile, remaining: swapPair(pile.remaining) } : pile),
+  };
+}
+
 const cardVP = (card: Card) => card.vp ?? (card.name === "Vault Encryption" ? 2 : 0);
 /** Below this keep value the opponent treats a card as deck clutter (Shyte-Coin, Glitch). */
 const AI_JUNK_VALUE = 1.5;
@@ -231,9 +290,10 @@ const AI_JUNK_VALUE = 1.5;
 const LOCATION_POINT = 3;
 const LOCATION_SCORE_CAP = 45;
 
-// One local session is the sole authority. Presentation advances one queued event at
-// a time; input cannot bypass a reveal/Collapse barrier. No networking is implied.
-/** The local seat's planning state at its first placement or move of the turn, restored by Undo all actions. */
+// One session is the sole authority, whether it runs in the player's browser or on a game server. Presentation
+// advances one queued event at a time; input cannot bypass a reveal/Collapse barrier. Every seat-specific entry point
+// takes the acting seat, and `view(seat)` / `redactEvent` decide what each seat may see.
+/** A seat's planning state at its first placement or move of the turn, restored by Undo all actions. */
 type PlanningSnapshot = {
   hand: Card[]; actions: number; nodes: Deployment[][]; order: number;
   relocatedThisTurn: string[]; relocatedThisCycle: string[]; moved: number; movedTotal: number;
@@ -256,7 +316,7 @@ export class RuntimeSession {
   private collapseStartedNodes = new Set<number>();
   private collapseResolvedNodes = new Set<number>();
   private collapseEffectCards = new Set<string>();
-  private planningSnapshot: PlanningSnapshot | null = null;
+  private planningSnapshot: [PlanningSnapshot | null, PlanningSnapshot | null] = [null, null];
   private relocatedThisTurn = new Set<string>();
   private relocatedThisCycle = new Set<string>();
   private nextRevealTriggers: NextRevealTrigger[] = [];
@@ -284,7 +344,7 @@ export class RuntimeSession {
       nodes: Array.from({ length: 5 }, (_, i) => ({ cards: [[], []], location: config.locations?.[i] ?? null, powerModifiers: [0, 0], powers: [0, 0], winner: null })),
       nodeOrder: [0,1,2,3,4], weights: [...initialWeights], selectedNode: null, circuitEligible: [], circuitReward: { definition: null, claimed: [] },
       market: config.strategicMarket ? [] : (config.practiceMarket ?? []).map((card, i) => ({ id: `practice-${i}`, card: { ...card }, category: "Base" as const, supply: 8 })),
-      trash: [], choice: null, draftReady: [false, false],
+      trash: [], choice: null, draftReady: [false, false], turnReady: [false, false],
       unresolved: [...(config.strategicMarket ? ["Market additions are provisional evaluation content, not final balance."] : ["Complete approved market content is unavailable."]), ...(config.evaluationContent ? [] : ["Location mechanics and Location Rewards are not implemented without approved content.", "Circuit Reward content is unavailable; only eligibility is computed."])],
       endedReason: null, winner: null, draftEndsAt: null, draftEnded: false, movedTotal: 0,
     };
@@ -300,6 +360,27 @@ export class RuntimeSession {
   }
 
   private get aiSeats(): PlayerId[] { return this.config.aiSeats ?? [1]; }
+  private get humanSeats(): PlayerId[] { return ([0, 1] as PlayerId[]).filter(seat => !this.aiSeats.includes(seat)); }
+  private now(): number { return this.config.now?.() ?? Date.now(); }
+  private assertHuman(owner: PlayerId) { if (this.aiSeats.includes(owner)) throw new Error("That seat is played by the AI."); }
+
+  // Log narration. Unnamed, texts speak to seat 0 as the solo client always has; named, they use the names.
+  /** The seat as a sentence subject: "You", "Opponent" or its name. */
+  private subject(owner: PlayerId): string { return this.config.seatNames?.[owner] ?? (owner === 0 ? "You" : "Opponent"); }
+  /** `firstPerson` for an unnamed seat 0 ("You acquire"); otherwise the subject with `thirdPerson` ("Ada acquires"). */
+  private say(owner: PlayerId, firstPerson: string, thirdPerson: string): string {
+    return !this.config.seatNames && owner === 0 ? firstPerson : `${this.subject(owner)} ${thirdPerson}`;
+  }
+  /** Possessive for `owner` as read by `reader`: "your", the seat's name with 's, or `other` for an unnamed opponent. */
+  private whose(owner: PlayerId, reader: PlayerId = 0, other = "the opponent's"): string {
+    if (owner === reader) return "your";
+    return this.config.seatNames ? `${this.config.seatNames[owner]}'s` : other;
+  }
+  /** The Circuit Reward's name is public only when every reader may know it: unnamed, seat 0; named, both seats. */
+  private circuitNamePublic(): boolean {
+    const eligible = this.state.circuitEligible;
+    return this.config.seatNames ? eligible.length === 2 : eligible.includes(0);
+  }
 
   private findCard(cardId: string): Card | undefined {
     const zones = [...this.activeCards(0), ...this.activeCards(1), ...this.state.trash, ...this.state.players.flatMap(player => player.destroyed)];
@@ -349,21 +430,29 @@ export class RuntimeSession {
     return [...player.draw, ...player.hand, ...player.discard].map(card => this.shownCard(card)).sort((a, b) => a.id.localeCompare(b.id));
   }
 
-  view(): SessionView {
+  /**
+   * The table as `seat` may see it, with `seat` at index 0 (see SessionView). Only this seat's hand, face-down
+   * placements and planning are shown; the other seat's hand, draw order and face-down cards are hidden, as is a
+   * Circuit Reward this seat is not eligible for.
+   */
+  view(seat: PlayerId = 0): SessionView {
     this.refreshScores();
+    const me = seat, them = (1 - seat) as PlayerId;
     const {nodeOrder, ...snapshot} = structuredClone(this.state);
-    const movableCardIds = this.state.phase === "runtime" && !this.queue.length && !this.state.choice
-      ? this.state.nodes.flatMap(node => node.cards[0]).filter(placement =>
+    const planning = this.planningSnapshot[me];
+    const movableCardIds = this.state.phase === "runtime" && !this.queue.length && !this.state.choice && !this.state.turnReady[me]
+      ? this.state.nodes.flatMap(node => node.cards[me]).filter(placement =>
         !this.relocateBlocker(placement) && this.moveDestinations(placement).length > 0).map(placement => placement.card.id)
       : [];
-    const view = {...snapshot, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: legalNodes(this.state.turn,nodeOrder), canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !!this.planningSnapshot, planningCardIds: this.planningSnapshot ? this.state.nodes.flatMap(node => node.cards[0]).filter(card => card.order > this.planningSnapshot!.order).map(card => card.card.id) : [], movableCardIds} as unknown as SessionView;
-    if (!this.state.circuitEligible.includes(0)) view.circuitReward.definition = null;
+    // Built seat-0-indexed with `me` redaction; a seat-1 reader gets the mirror below.
+    const view = {...snapshot, seat: 0 as PlayerId, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: legalNodes(this.state.turn,nodeOrder), canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !this.state.turnReady[me] && !!planning, planningCardIds: planning ? this.state.nodes.flatMap(node => node.cards[me]).filter(card => card.order > planning.order).map(card => card.card.id) : [], movableCardIds} as unknown as SessionView;
+    if (!this.state.circuitEligible.includes(me)) view.circuitReward.definition = null;
     view.players.forEach((player,owner)=>player.bank.forEach((entry,index)=>{const timer=this.runtimeTimers.get(entry.card.id);if(timer&&Number.isFinite(this.timerUntil(timer)))entry.remainingTurns=Math.max(0,this.timerUntil(timer)-timer.age);entry.effectsLeft=this.bankEffectsLeft(this.state.players[owner].bank[index]);}));
     const hidden = (_card: Card, index: number) => ({ id: `hidden-${index}`, hidden: true as const });
     view.players[0].draw = this.state.players[0].draw.map(hidden);
     view.players[1].draw = this.state.players[1].draw.map(hidden);
-    view.players[1].hand = this.state.players[1].hand.map(hidden);
-    view.players[0].hand = this.state.players[0].hand.map(card => this.shownCard(card));
+    (view.players[them] as { hand: VisibleCard[] }).hand = this.state.players[them].hand.map(hidden);
+    (view.players[me] as { hand: VisibleCard[] }).hand = this.state.players[me].hand.map(card => this.shownCard(card));
     view.players.forEach((player, owner) => {
       const state = this.state.players[owner];
       player.discard = state.discard.map(card => this.shownCard(card));
@@ -378,10 +467,10 @@ export class RuntimeSession {
     view.nodes.forEach((node, i) => {
       // Closed Nodes reveal neither Location identity nor its rules/rewards to the client.
       if (!legalNodes(this.state.turn, this.state.nodeOrder).includes(i)) node.location = null;
-      node.cards[0] = this.state.nodes[i].cards[0].map(placement => placement.revealed ? visiblePower(placement) : { ...structuredClone(placement), card: this.shownCard(placement.card) });
-      node.cards[1] = this.state.nodes[i].cards[1].map(visiblePower);
+      node.cards[me] = this.state.nodes[i].cards[me].map(placement => placement.revealed ? visiblePower(placement) : { ...structuredClone(placement), card: this.shownCard(placement.card) });
+      node.cards[them] = this.state.nodes[i].cards[them].map(visiblePower);
     });
-    return view;
+    return seat === 0 ? view : mirrorView(view);
   }
 
   private event(kind: RuntimeEvent["kind"], text: string, detail: Omit<RuntimeEvent, "id" | "kind" | "text"> = {}): RuntimeEvent {
@@ -576,7 +665,7 @@ export class RuntimeSession {
   }
 
   addEvaluationCard(definitionId: string, owner:PlayerId=0): RuntimeEvent {
-    if(!this.config.strategicMarket || this.state.phase!=="runtime" || this.queue.length || this.state.choice || this.planningSnapshot)throw new Error("Add evaluation cards only before planning placements at a Runtime boundary.");
+    if(!this.config.strategicMarket || this.state.phase!=="runtime" || this.queue.length || this.state.choice || this.planningSnapshot.some(Boolean))throw new Error("Add evaluation cards only before planning placements at a Runtime boundary.");
     const definition=(this.config.content?.cards??EVALUATION_ALL_CARDS).find(card=>(card.definitionId ?? card.id)===definitionId);
     if(!definition)throw new Error("Unknown evaluation card.");
     const card={...structuredClone(definition),id:`${owner}:evaluation-${++this.acquired}`};
@@ -585,40 +674,46 @@ export class RuntimeSession {
     return this.event("draw",`Added ${card.name} to evaluation hand.`,{owner,targetOwner:owner,cardId:card.id,definitionId,target:"hand",amount:1,before,after:player.hand.length});
   }
 
-  deploy(cardId: string, node: number): RuntimeEvent {
+  /** A human seat places a card from its hand face down; reversible with undoAllPlanning until the seat commits. */
+  deploy(cardId: string, node: number, owner: PlayerId = 0): RuntimeEvent {
     if (this.state.phase !== "runtime" || this.queue.length) throw new Error("Deployment is only available during Runtime.");
-    const snapshot = this.planningSnapshot ?? this.takePlanningSnapshot();
-    const event = this.place(0, cardId, node);
-    this.planningSnapshot = snapshot;
+    this.assertHuman(owner);
+    if (this.state.turnReady[owner]) throw new Error("This seat has committed its turn.");
+    const snapshot = this.planningSnapshot[owner] ?? this.takePlanningSnapshot(owner);
+    const event = this.place(owner, cardId, node);
+    this.planningSnapshot[owner] = snapshot;
     return event;
   }
 
-  private takePlanningSnapshot(): PlanningSnapshot {
+  private takePlanningSnapshot(owner: PlayerId): PlanningSnapshot {
+    const player = this.state.players[owner];
     return {
-      hand: [...this.state.players[0].hand], actions: this.state.players[0].actions,
-      nodes: this.state.nodes.map(node => [...node.cards[0]]), order: this.order,
+      hand: [...player.hand], actions: player.actions,
+      nodes: this.state.nodes.map(node => [...node.cards[owner]]), order: this.order,
       relocatedThisTurn: [...this.relocatedThisTurn], relocatedThisCycle: [...this.relocatedThisCycle],
-      moved: this.state.players[0].moved, movedTotal: this.state.movedTotal,
+      moved: player.moved, movedTotal: this.state.movedTotal,
     };
   }
 
-  undoAllPlanning(): RuntimeEvent {
-    const snapshot = this.planningSnapshot;
-    if (this.state.phase !== "runtime" || this.queue.length || this.state.choice || !snapshot) throw new Error("No reversible planning actions are available.");
-    this.state.players[0].hand = [...snapshot.hand];
-    this.state.players[0].actions = snapshot.actions;
+  undoAllPlanning(owner: PlayerId = 0): RuntimeEvent {
+    const snapshot = this.planningSnapshot[owner];
+    if (this.state.phase !== "runtime" || this.queue.length || this.state.choice || !snapshot || this.state.turnReady[owner]) throw new Error("No reversible planning actions are available.");
+    const player = this.state.players[owner];
+    player.hand = [...snapshot.hand];
+    player.actions = snapshot.actions;
     this.state.nodes.forEach((node, index) => {
-      node.cards[0] = [...snapshot.nodes[index]];
-      node.cards[0].forEach(placement => { placement.node = index; });
+      node.cards[owner] = [...snapshot.nodes[index]];
+      node.cards[owner].forEach(placement => { placement.node = index; });
     });
-    this.order = snapshot.order;
+    // `order` only rewinds while no later placement by the other seat depends on it.
+    if (!this.state.nodes.some(node => node.cards[1 - owner].some(placement => placement.order > snapshot.order))) this.order = snapshot.order;
     this.relocatedThisTurn = new Set(snapshot.relocatedThisTurn);
     this.relocatedThisCycle = new Set(snapshot.relocatedThisCycle);
-    this.state.players[0].moved = snapshot.moved;
+    player.moved = snapshot.moved;
     this.state.movedTotal = snapshot.movedTotal;
-    this.planningSnapshot = null;
+    this.planningSnapshot[owner] = null;
     this.recalculate();
-    return this.event("turn", "All planning actions undone. Moved cards return, and hand order and Actions are restored.", {owner: 0});
+    return this.event("turn", "All planning actions undone. Moved cards return, and hand order and Actions are restored.", {owner});
   }
 
   /** Why a board card cannot relocate itself now, or null when it can. The movable mod allows once per Runtime turn;
@@ -640,11 +735,13 @@ export class RuntimeSession {
     const blocker = this.relocateBlocker(placement);
     if (blocker) throw new Error(blocker);
     if (!this.moveDestinations(placement).includes(destination)) throw new Error("Destination Node is unavailable.");
-    const snapshot = owner === 0 ? this.planningSnapshot ?? this.takePlanningSnapshot() : null;
+    if (this.state.turnReady[owner]) throw new Error("This seat has committed its turn.");
+    const human = !this.aiSeats.includes(owner);
+    const snapshot = human ? this.planningSnapshot[owner] ?? this.takePlanningSnapshot(owner) : null;
     const event = this.movePlacement(placement, destination, placement);
     this.relocatedThisTurn.add(cardId);
     this.relocatedThisCycle.add(cardId);
-    if (snapshot) this.planningSnapshot = snapshot;
+    if (snapshot) this.planningSnapshot[owner] = snapshot;
     return { ...event, text: `${placement.card.name} relocates to Node ${destination + 1}.` };
   }
 
@@ -658,7 +755,11 @@ export class RuntimeSession {
     player.hand = player.hand.filter(item => item.id !== cardId);
     if (isCharacterCard(card)) player.actions--;
     this.state.nodes[node].cards[owner].push({ card, owner, node, order: ++this.order, revealed: false });
-    return this.event("deploy", owner === 0 ? `${card.name} placed. End Turn to commit your plan.` : "Opponent deployed a face-down card.", { node, owner, ...(owner === 0 ? { cardId } : {}) });
+    // The card's identity is the owner's secret until it reveals: the AI's placements are announced face down, and a
+    // human's placement carries the public wording for the other seat (see redactEvent).
+    const publicText = `${this.subject(owner)} deployed a face-down card.`;
+    if (this.aiSeats.includes(owner)) return this.event("deploy", publicText, { node, owner });
+    return this.event("deploy", `${card.name} placed. End Turn to commit your plan.`, { node, owner, cardId, publicText });
   }
 
   private get strategy(): StrategyProfile { return this.config.strategy ?? DEFAULT_STRATEGY; }
@@ -710,9 +811,22 @@ export class RuntimeSession {
     }
   }
 
-  endTurn(): void {
+  /**
+   * A human seat commits its Runtime plan. The reveal starts once every human seat has committed and the AI seats have
+   * placed; until then the committed seat waits and may undoEndTurn. Returns the waiting event, or null when the reveal
+   * window begins (its events follow through step()).
+   */
+  endTurn(owner: PlayerId = 0): RuntimeEvent | null {
     if (this.state.phase !== "runtime" || this.queue.length) throw new Error("Finish the current resolution first.");
-    this.planningSnapshot = null;
+    // With no human seat (headless self-play) the caller is the table clock and the turn ends at once.
+    if (this.humanSeats.length) {
+      this.assertHuman(owner);
+      if (this.state.turnReady[owner]) throw new Error("This seat has already committed its turn.");
+      this.state.turnReady[owner] = true;
+      const waiting = this.humanSeats.filter(seat => !this.state.turnReady[seat]);
+      if (waiting.length) return this.event("turn", `${this.say(owner, "You commit", "commits")} the turn; waiting for ${this.subject(waiting[0])}.`, { owner });
+    }
+    this.planningSnapshot = [null, null];
     for (const seat of this.aiSeats) this.aiDeploy(seat);
     this.state.phase = "reveal";
     this.enqueueRevealWindow();
@@ -735,6 +849,7 @@ export class RuntimeSession {
         this.enqueueRevealWindow();
         this.queue.push(() => {
           this.state.phase = "runtime";
+          this.state.turnReady = [false, false];
           return this.event("turn", `Runtime turn ${this.state.turn} planning begins.`);
         });
         return this.event("turn", `Runtime turn ${this.state.turn}. Node ${this.state.nodeOrder[this.state.turn + 1] + 1} opens.`);
@@ -744,6 +859,14 @@ export class RuntimeSession {
       this.enqueueCollapse();
       return this.event("collapse", "Wave Collapse begins. Resolve Nodes 1 through 5.");
     });
+    return null;
+  }
+
+  /** A committed seat takes its turn back while the other human seat is still planning. */
+  undoEndTurn(owner: PlayerId = 0): RuntimeEvent {
+    if (this.state.phase !== "runtime" || this.queue.length || !this.state.turnReady[owner]) throw new Error("This seat has not committed a turn to take back.");
+    this.state.turnReady[owner] = false;
+    return this.event("turn", `${this.say(owner, "You resume", "resumes")} planning.`, { owner });
   }
 
   private enqueueRevealWindow() {
@@ -877,7 +1000,7 @@ export class RuntimeSession {
       this.queue.unshift(() => resolve(ids));
       const labels = ids.map(id => options.find(option => option.id === id)!.label);
       this.recordDecision({ kind: "choice", cycle: this.state.cycle, turn: this.state.turn, owner: placement.owner, source: placement.card.name, prompt, picked: labels, method: request.aiPick ? "strategy" : "random" });
-      return this.event("choice", `${placement.owner === 1 ? "Opponent" : "AI"} chooses: ${labels.join(", ") || "nothing"}.`, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
+      return this.event("choice", `${this.config.seatNames ? this.subject(placement.owner) : placement.owner === 1 ? "Opponent" : "AI"} chooses: ${labels.join(", ") || "nothing"}.`, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
     }
     this.choiceResolver = resolve;
     this.state.choice = { id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node, ...(icon ? { icon } : {}), ...shape, ...(request.transfer ? { transfer: request.transfer } : {}), ...(request.zone ? { zone: request.zone } : {}), ...(request.verb ? { verb: request.verb } : {}) };
@@ -1245,7 +1368,7 @@ export class RuntimeSession {
     const player = this.state.players[targetOwner], before = player.servers[slot];
     player.servers[slot] = 0;
     if (player.servers.primary === 0 && player.servers.backup === 0 && this.state.phase !== "collapse") this.queue = [() => this.gameOver(targetOwner === owner ? "Both Servers destroyed by own effect." : "Both Servers destroyed.")];
-    return this.event("drain", `${card.name}: destroy ${targetOwner === owner ? "your own" : "opponent"} ${slot === "backup" ? "Backup" : "Primary"}; no destruction VP.`, { owner, targetOwner, target: slot, amount: before, before, after: 0, source: "card", sourceName: card.name, cardId: card.id });
+    return this.event("drain", `${card.name}: destroy ${targetOwner === owner ? `${this.whose(owner)} own` : this.whose(targetOwner, owner, "opponent")} ${slot === "backup" ? "Backup" : "Primary"}; no destruction VP.`, { owner, targetOwner, target: slot, amount: before, before, after: 0, source: "card", sourceName: card.name, cardId: card.id });
   }
 
   /* ---------------------------------------------------------------- zones */
@@ -1272,7 +1395,7 @@ export class RuntimeSession {
     const milled = this.millCards(targetOwner, step.amount ?? 0, toTrash);
     const target = toTrash ? "trash" as const : "discard" as const;
     if (!milled) return this.noTarget(ctx, step, { target, targetOwner });
-    return this.event("trash", `${ctx.source.card.name}: mill ${milled} from ${targetOwner === 0 ? "your" : "opponent"} deck${toTrash ? " to shared Trash" : ""}.`, { ...this.base(ctx), target, targetOwner, amount: milled });
+    return this.event("trash", `${ctx.source.card.name}: mill ${milled} from ${this.whose(targetOwner, 0, "opponent")} deck${toTrash ? " to shared Trash" : ""}.`, { ...this.base(ctx), target, targetOwner, amount: milled });
   }
 
   private millCards(owner: PlayerId, count: number, toTrash = false) {
@@ -1306,7 +1429,7 @@ export class RuntimeSession {
       if (!taken.length) return this.noTarget(ctx, step, { target: "hand", targetOwner: victim });
       this.state.players[owner].hand.push(...taken);
       this.refreshScores();
-      return this.event("crypto", `${card.name} steals ${taken.map(item => item.name).join(", ")} from ${victim === 0 ? "your" : "opponent"} wallet.`, { ...base, target: "hand", targetOwner: owner, amount: taken.length });
+      return this.event("crypto", `${card.name} steals ${taken.map(item => item.name).join(", ")} from ${this.whose(victim, 0, "opponent")} wallet.`, { ...base, target: "hand", targetOwner: owner, amount: taken.length });
     };
     if (step.pick?.mode !== "choose") {
       const pool = [...holdings];
@@ -1315,7 +1438,7 @@ export class RuntimeSession {
     const chooser = step.pick.chooser === "opponent" ? victim : owner;
     const cards = count === 1 ? "a Crypto card" : `${count} Crypto cards`;
     return this.openChoice({ ...ctx.source, owner: chooser }, {
-      prompt: chooser === owner ? `${card.name}: choose ${cards} to steal from the opponent's wallet.` : `${card.name}: choose ${cards} from your wallet to give to the opponent.`,
+      prompt: chooser === owner ? `${card.name}: choose ${cards} to steal from ${this.whose(victim, chooser)} wallet.` : `${card.name}: choose ${cards} from your wallet to give to ${this.config.seatNames ? this.subject(owner) : "the opponent"}.`,
       options: holdings.map(item => ({ id: item.id, label: item.name, card: structuredClone(item) })),
       select: { min: count, max: count }, verb: "Steal",
       resolve: ids => steal(ids),
@@ -1328,7 +1451,8 @@ export class RuntimeSession {
     const player = this.state.players[victim];
     const zone = step.target?.type === "zone" ? step.target.zone : "bankOrWallet";
     const zoneLabel = zone === "bank" ? "Effect Bank" : zone === "wallet" ? "Crypto wallet" : "Effect Bank or Crypto wallet";
-    const whose = victim === 0 ? "your" : "the opponent's";
+    const chooser = step.pick?.chooser === "opponent" ? victim : ctx.source.owner;
+    const whose = this.whose(victim, chooser);
     const candidates = [
       ...(zone !== "wallet" ? player.bank.map(entry => ({ card: entry.card, from: "Effect Bank" })) : []),
       ...(zone !== "bank" ? player.hand.filter(item => item.type === "Crypto").map(item => ({ card: item, from: "Crypto wallet" })) : []),
@@ -1354,7 +1478,6 @@ export class RuntimeSession {
       const pool = [...candidates];
       return bump(Array.from({ length: count }, () => pool.splice(Math.floor(this.config.random() * pool.length), 1)[0].card.id));
     }
-    const chooser = step.pick?.chooser === "opponent" ? victim : ctx.source.owner;
     return this.openChoice({ ...ctx.source, owner: chooser }, {
       prompt: `${card.name}: choose ${count === 1 ? "a card" : `${count} cards`} to bump from ${whose} ${zoneLabel} to Discard.`,
       options: candidates.map(entry => ({ id: entry.card.id, label: `${entry.card.name} · ${entry.from}`, card: structuredClone(entry.card) })),
@@ -1373,7 +1496,7 @@ export class RuntimeSession {
     const destination = step.destination ?? "discard";
     if (!candidates.length) return this.noTarget(ctx, step, { target: "trash" });
     const count = Math.min(Math.max(1, step.amount ?? 1), candidates.length);
-    const whose = recipient === 0 ? "your" : "opponent";
+    const whose = this.whose(recipient, 0, "opponent");
     const placeName = destination === "hand" ? "hand" : destination === "top" ? "deck" : "Discard";
     const recover = (ids: readonly string[]) => {
       const names: string[] = [];
@@ -1658,7 +1781,7 @@ export class RuntimeSession {
         const kept = this.retire(card, owner, zone);
         this.recalculate();
         this.refreshScores();
-        const whose = owner === source.owner ? "its owner's" : owner === 0 ? "your" : "the opponent's";
+        const whose = owner === source.owner ? "its owner's" : this.whose(owner);
         return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${card.name} from ${whose} ${from}.` : `${source.card.name}: ${card.name} is removed from the game.`, { ...detail, ...(kept && zone === "trash" ? { target: "trash" as const } : {}), amount: 1 });
       }
       case "attachModifier": return this.attachModifier(ctx, step, card);
@@ -1826,7 +1949,7 @@ export class RuntimeSession {
 
   private awaitNextReveal(ctx: EffectContext, step: EffectStep, owners: PlayerId[]): RuntimeEvent {
     this.nextRevealTriggers.push({ ctx, step, owners });
-    const whose = owners.length !== 1 ? "the" : owners[0] === 0 ? "your" : "the opponent's";
+    const whose = owners.length !== 1 ? "the" : this.whose(owners[0]);
     return this.event("choice", `${ctx.source.card.name}: waiting for ${whose} next revealed card.`, {
       ...this.base(ctx), ...(owners.length === 1 ? { targetOwner: owners[0] } : {}),
     });
@@ -2169,7 +2292,7 @@ export class RuntimeSession {
       this.queue.push(() => {
         this.recalculate();
         const winner = this.state.nodes[node].winner;
-        return this.event("power", winner === null ? "Node tied." : `${winner === 0 ? "You" : "Opponent"} control this Node.`, { node, ...(winner !== null ? { owner: winner } : {}) });
+        return this.event("power", winner === null ? "Node tied." : `${this.say(winner, "You control", "controls")} this Node.`, { node, ...(winner !== null ? { owner: winner } : {}) });
       });
       this.queue.push(() => {
         const location = this.state.nodes[node].location;
@@ -2187,7 +2310,7 @@ export class RuntimeSession {
           return this.event("reward", location?.effects ? `${location.name} resolved.` : "Location Reward unresolved: approved content required.", { node, source: "location", sourceName: location?.name, stage: "node-close" });
         });
         this.queue.unshift(...events);
-        return this.event("reward", location?.effects ? `${location.name}: ${winner === null ? "tied Node" : winner === 0 ? "your reward" : "opponent reward"}.` : "Location Reward requires approved content.", { node, source: "location", sourceName: location?.name, stage: "node-award" });
+        return this.event("reward", location?.effects ? `${location.name}: ${winner === null ? "tied Node" : `${this.whose(winner, 0, "opponent")} reward`}.` : "Location Reward requires approved content.", { node, source: "location", sourceName: location?.name, stage: "node-award" });
       });
     }
     this.queue.push(() => {
@@ -2214,8 +2337,8 @@ export class RuntimeSession {
       this.state.circuitEligible = winner === null ? [0, 1] : [winner];
       this.state.circuitReward = { definition, claimed: [] };
       if (this.telemetry) { this.telemetry.circuitId = definition?.id ?? null; this.telemetry.circuitName = definition?.name ?? null; }
-      const visibleName = this.state.circuitEligible.includes(0) ? definition?.name : undefined;
-      const basis = definition?.awardTrailing ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : winner === 0 ? "You trail and are eligible" : "Opponent trails and is eligible"}` : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
+      const visibleName = this.circuitNamePublic() ? definition?.name : undefined;
+      const basis = definition?.awardTrailing ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}` : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
       return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}`, { source: "circuit", sourceName: visibleName });
     });
     this.queue.push(() => {
@@ -2281,9 +2404,9 @@ export class RuntimeSession {
       circuit: this.state.circuitReward.definition ? { rewardId: this.state.circuitReward.definition.id, name: this.state.circuitReward.definition.name, eligible: [...this.state.circuitEligible], claimed: [] } : null,
       deckSize: [local, opponent].map(player => player.draw.length + player.hand.length + player.discard.length + player.bank.length) as [number, number],
     });
-    this.state.draftEndsAt = Date.now() + 90_000;
+    this.state.draftEndsAt = this.now() + 90_000;
     this.state.draftEnded = false;
-    this.state.draftReady = [false, !this.config.strategicMarket];
+    this.state.draftReady = [0, 1].map(seat => !this.config.strategicMarket && this.aiSeats.includes(seat as PlayerId)) as [boolean, boolean];
     this.purchaseTimes.clear(); this.botDraftAt = [0, 0];
     if (this.config.strategicMarket) {
       const identity = (pile: MarketPile) => pile.card.definitionId ?? pile.card.id;
@@ -2308,7 +2431,7 @@ export class RuntimeSession {
     return { event, view: this.view() };
   }
 
-  claimCircuitReward(owner: PlayerId = 0, now = Date.now()): RuntimeEvent {
+  claimCircuitReward(owner: PlayerId = 0, now = this.now()): RuntimeEvent {
     if(this.state.phase==="draft"&&this.state.circuitReward.claimed.includes(owner))throw new Error("This player already claimed the Circuit Reward.");
     if (this.state.phase !== "draft" || this.queue.length || this.state.draftEnded || this.state.draftReady[owner]) throw new Error("Circuit claims require an active Draft.");
     if (this.state.draftEndsAt !== null && now > this.state.draftEndsAt) throw new Error("Draft deadline has passed.");
@@ -2326,12 +2449,12 @@ export class RuntimeSession {
     const record = this.cycleRecords[this.cycleRecords.length - 1];
     if (record?.cycle === this.state.cycle && record.circuit) record.circuit.claimed.push(owner);
     if (this.aiSeats.includes(owner)) this.recordDecision({ kind: "circuit", cycle: this.state.cycle, owner, rewardId: slot.definition.id, name: slot.definition.name });
-    const name = this.state.circuitEligible.includes(0) ? slot.definition.name : "a private Circuit Reward";
+    const name = this.circuitNamePublic() ? slot.definition.name : "a private Circuit Reward";
     this.queue.unshift(...effects.slice(1).map(effect=>()=>this.resolveCircuitEffect(owner,name,effect)));
     return this.resolveCircuitEffect(owner,name,effects[0]);
   }
 
-  buy(pileId: string, now = Date.now(), owner: PlayerId = 0): RuntimeEvent {
+  buy(pileId: string, now = this.now(), owner: PlayerId = 0): RuntimeEvent {
     if (this.state.phase !== "draft" || this.queue.length || this.state.draftEnded || this.state.draftReady[owner]) throw new Error("Purchases require an active Draft.");
     if (this.state.draftEndsAt !== null && now > this.state.draftEndsAt) throw new Error("Draft deadline has passed.");
     const pile = this.state.market.find(item => item.id === pileId);
@@ -2349,30 +2472,31 @@ export class RuntimeSession {
     this.purchaseTimes.set(cooldownKey, now);
     this.purchases.push({ cycle: this.state.cycle, owner, definitionId: pile.card.definitionId ?? pile.card.id, name: pile.card.name, category: pile.category, cost });
     this.refreshScores();
-    return this.event("purchase", `${owner === 0 ? "You acquire" : "Opponent acquires"} ${pile.card.name} to Discard for ${cost} Crypto.`, { owner, targetOwner: owner, cardId: card.id, definitionId: card.definitionId, target: "wallet", amount: cost, before: player.wallet + cost, after: player.wallet });
+    return this.event("purchase", `${this.say(owner, "You acquire", "acquires")} ${pile.card.name} to Discard for ${cost} Crypto.`, { owner, targetOwner: owner, cardId: card.id, definitionId: card.definitionId, target: "wallet", amount: cost, before: player.wallet + cost, after: player.wallet });
   }
 
   endDraft(owner: PlayerId = 0): RuntimeEvent {
     if (this.state.phase !== "draft" || this.queue.length) throw new Error("Draft is not active.");
     this.state.draftReady[owner] = true;
-    if (!this.config.strategicMarket) this.state.draftReady[1] = true;
+    // Without a strategic market the AI seats have nothing to draft and are ready at once.
+    if (!this.config.strategicMarket) for (const seat of this.aiSeats) this.state.draftReady[seat] = true;
     this.state.draftEnded = this.state.draftReady.every(Boolean);
-    return this.event("draft", this.state.draftEnded ? "Both players ended Draft." : `${owner === 0 ? "You ended" : "Opponent ended"} Draft.`, { owner });
+    return this.event("draft", this.state.draftEnded ? "Both players ended Draft." : `${this.say(owner, "You ended", "ended")} Draft.`, { owner });
   }
 
-  undoEndDraft(owner: PlayerId = 0, now = Date.now()): RuntimeEvent {
+  undoEndDraft(owner: PlayerId = 0, now = this.now()): RuntimeEvent {
     if (this.state.phase !== "draft" || !this.state.draftReady[owner] || this.state.draftReady[1 - owner] || this.state.draftEndsAt === null || now >= this.state.draftEndsAt) throw new Error("Draft readiness can no longer be undone.");
     this.state.draftReady[owner] = false; this.state.draftEnded = false;
-    return this.event("draft", `${owner === 0 ? "You resume" : "Opponent resumes"} Draft.`, { owner });
+    return this.event("draft", `${this.say(owner, "You resume", "resumes")} Draft.`, { owner });
   }
 
-  expireDraft(now = Date.now()): RuntimeEvent | null {
+  expireDraft(now = this.now()): RuntimeEvent | null {
     if (this.state.phase !== "draft" || this.state.draftEnded || this.queue.length || this.state.draftEndsAt === null || now < this.state.draftEndsAt || this.state.choice) return null;
     this.state.draftReady = [true, true]; this.state.draftEnded = true;
     return this.event("draft", "Draft time expired. Both players are ready for the next Cycle.");
   }
 
-  opponentDraftStep(now = Date.now(), owner: PlayerId = 1): RuntimeEvent | null {
+  opponentDraftStep(now = this.now(), owner: PlayerId = 1): RuntimeEvent | null {
     if (!this.config.strategicMarket || this.state.phase !== "draft" || this.queue.length || this.state.choice || this.state.draftReady[owner] || now < this.botDraftAt[owner]) return null;
     const expired = this.expireDraft(now); if (expired) return expired;
     this.botDraftAt[owner] = now + 1400;
@@ -2439,6 +2563,8 @@ export class RuntimeSession {
     this.state.draftEndsAt = null;
     this.state.draftEnded = false;
     this.state.draftReady = [false, false];
+    this.state.turnReady = [false, false];
+    this.planningSnapshot = [null, null];
     this.state.players.forEach(player => {
       player.wallet = 0;
       player.actions = 2;
@@ -2473,7 +2599,7 @@ export class RuntimeSession {
     this.state.phase = "gameover";
     const [local, opponent] = this.state.players.map(player => player.totalVP);
     this.state.winner = nodeWinner([local, opponent]);
-    this.state.endedReason = `${reason} ${local === opponent ? "Tie" : local > opponent ? "You win" : "Opponent wins"}, ${local} to ${opponent} VP.`;
+    this.state.endedReason = `${reason} ${local === opponent ? "Tie" : this.say(local > opponent ? 0 : 1, "You win", "wins")}, ${local} to ${opponent} VP.`;
     this.queue = []; this.state.choice = null; this.choiceResolver = null;
     return this.event("gameover", this.state.endedReason);
   }
