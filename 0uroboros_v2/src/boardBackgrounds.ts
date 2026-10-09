@@ -8,9 +8,8 @@ export const BOARD_BACKGROUNDS = [
   '/assets/board/backgrounds/back-02.png',
   '/assets/board/backgrounds/back-03.png',
   '/assets/board/backgrounds/back-04.png',
-  '/assets/board/backgrounds/back-05.png',
-  '/assets/board/backgrounds/back-06.png',
   '/assets/board/backgrounds/back-07.png',
+  '/assets/board/backgrounds/back-08.png',
   NO_BOARD_BACKGROUND,
 ] as const;
 

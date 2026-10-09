@@ -16,8 +16,9 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@0uroboros/engine/*": ["packages/engine/src/*"]
+      "@0uroboros/engine/*": ["packages/engine/src/*"],
+      "@0uroboros/content/*": ["packages/content/*"]
     }
   },
-  "include": ["src", "tests", "packages/engine/src"]
+  "include": ["src", "tests", "packages/engine/src", "packages/content"]
 }

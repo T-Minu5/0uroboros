@@ -1,16 +1,18 @@
-/// <reference types="vite/client" />
 import { cardNameKey } from '@0uroboros/engine/cardArtwork';
+import { shippedUnder } from '@0uroboros/content/pack';
 
 /**
  * Clips are named after their card. A plain name plays in the inspect view; the `_onFX` suffix marks the clip
- * played on the board card while its effects resolve. `Board` holds table backdrops, not card clips.
+ * played on the board card while its effects resolve. Only clips for cards in the content pack are listed in the
+ * art manifest, so a clip for a card that left the pack drops out of the client without a code change.
  */
-const files = import.meta.glob(['/assets/videos/**/*.mp4', '!/assets/videos/Board/**'], {query: '?url', import: 'default', eager: true}) as Record<string, string>;
+const files = shippedUnder('assets/videos').filter(url => /\.mp4$/i.test(url) && !url.startsWith('/assets/videos/Board/'));
 const ON_FX = /_onfx$/i;
 /** Cards whose `_onFX` clip is switched off; the file stays in place and their inspect clip still plays. */
 const EFFECT_CLIPS_OFF = new Set(['rezz-blade'].map(cardNameKey));
 const inspectClips = new Map<string, string>(), effectClips = new Map<string, string>();
-for (const [path, url] of Object.entries(files)) {
+for (const url of files) {
+ const path = decodeURIComponent(url);
  const stem = path.slice(path.lastIndexOf('/') + 1).replace(/\.mp4$/i, '');
  const key = cardNameKey(stem.replace(ON_FX, ''));
  if (!ON_FX.test(stem)) inspectClips.set(key, url);

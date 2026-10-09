@@ -4,7 +4,8 @@ import { loadPerPlayer, savePerPlayer, type PerPlayer } from './playerSettings';
 import type { PlayerColor } from './playerTheme';
 
 const FOLDER = '/assets/card_art/card backs/';
-const SOURCES = import.meta.glob('/assets/card_art/card backs/*.svg', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+/** The emblem sheets' markup, inlined so backs compose without a fetch. Only files named in CARD_BACKS are bundled. */
+const SOURCES = import.meta.glob(['/assets/card_art/card backs/Ouro-01.svg', '/assets/card_art/card backs/Ouro-small-01.svg', '/assets/card_art/card backs/Ouro-small-06.svg'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 /** The palette's black, which replaces the art's own near-black. */
 const BACKING = '#030012';

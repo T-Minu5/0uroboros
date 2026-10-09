@@ -1,7 +1,9 @@
 import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
-import { createReadStream, cpSync, existsSync, mkdirSync, statSync } from 'node:fs';
-import { extname, resolve } from 'node:path';
+import { createReadStream, cpSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, extname, resolve } from 'node:path';
+
+const ART_MANIFEST = JSON.parse(readFileSync(resolve('packages/content/art-manifest.json'), 'utf8')) as { files: string[] };
 
 // Server code is loaded through Vite, never imported here: importing it would make Vite restart in-process on every server edit,
 // and each in-process restart leaks the previous server's memory. `npm run dev` restarts the whole process instead (see package.json).
@@ -18,7 +20,10 @@ const OUT_DIR = CLIENT ? 'dist/client' : 'dist';
 // Reference animations, concept art and Blender sources are never production assets.
 export default defineConfig({
  // Workspace packages resolve from source; the alias keeps Vite, Vitest and scripts independent of the node_modules symlink.
- resolve: { alias: [{ find: /^@0uroboros\/engine\/(.*)$/, replacement: `${resolve('packages/engine/src')}/$1` }] },
+ resolve: { alias: [
+  { find: /^@0uroboros\/engine\/(.*)$/, replacement: `${resolve('packages/engine/src')}/$1` },
+  { find: /^@0uroboros\/content\/(.*)$/, replacement: `${resolve('packages/content')}/$1` },
+ ] },
  define: { __STUDIO__: JSON.stringify(!CLIENT) },
  build: {
   outDir: OUT_DIR,
@@ -69,9 +74,13 @@ export default defineConfig({
    });
   },
   closeBundle() {
-   for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve(OUT_DIR, 'assets', folder), { recursive: true });
-   mkdirSync(resolve(OUT_DIR, 'assets/models'), { recursive: true });
-   cpSync(resolve('assets/models/ouroboros-board-v4.glb'), resolve(OUT_DIR, 'assets/models/ouroboros-board-v4.glb'));
+   // The client ships exactly the files in art-manifest.json (scripts/build-art-manifest.mjs); the studio build also
+   // keeps the whole art folders so its browsers can show unshipped work.
+   for (const file of ART_MANIFEST.files) {
+    mkdirSync(dirname(resolve(OUT_DIR, file)), { recursive: true });
+    cpSync(resolve(file), resolve(OUT_DIR, file));
+   }
+   if (!CLIENT) for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve(OUT_DIR, 'assets', folder), { recursive: true });
   },
  }, {
   name: 'local-authoring-content-api',

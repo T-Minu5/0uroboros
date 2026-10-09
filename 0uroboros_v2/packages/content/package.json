@@ -1,0 +1,11 @@
+{
+  "name": "@0uroboros/content",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The published content pack: which assets the game client ships (art-manifest.json) and the pack version both server and client check. The authored document itself lives at content/authored-content.json and is written only by the Content Studio.",
+  "exports": {
+    "./art-manifest.json": "./art-manifest.json",
+    "./pack": "./pack.ts"
+  }
+}
