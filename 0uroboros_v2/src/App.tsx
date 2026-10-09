@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SERVER_X, serverZ } from './boardLayout';
 import { BOARD_DROP, BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, NEAR_BANK_FORMER_DROP, type BoardNode } from './BoardScene';
+import { LocationText } from './LocationText';
 import type { BoardScanTone } from './NeonHorizonScan';
 import { SINGULARITY_MS } from './Singularity';
 import { boardBackgroundLabel, loadBackgroundChoice, saveBackgroundChoice, stepBackground, type BackgroundChoice } from './boardBackgrounds';
@@ -12,12 +13,17 @@ import { NEON_SURFACES, loadNeonSurface, saveNeonSurface, type NeonSurface } fro
 import { PLAYER_COLOR_IDS, colorChoiceLabel, colorTaken, loadColorTheme, playerColor, playerColorVars, resolveColorTheme, saveColorTheme, withPlayerColor, type ColorTheme, type PlayerColor } from './playerTheme';
 import { withPlayer, type PerPlayer } from './playerSettings';
 import { CARD_BACKS, cardBackSrc, loadCardBacks, saveCardBacks, type CardBackId } from './cardBacks';
-import { canDeploy, type Card } from './game';
+import { canDeploy, isCharacterCard, type Card, type CardModifier } from './game';
+import { describeMod } from './effects/catalog';
+import { builtinMod } from './builtinMods';
 import { createSession, type RuntimeSession, type RuntimeEvent, type SessionView } from './runtime';
 import { EffectPath, CardEffectMotion } from './Effects';
-import { EffectChoice, choiceNodes } from './EffectChoice';
+import { EffectChoice, EventMessage, TransferBadge, choiceNodes } from './EffectChoice';
+import { useTransferDrag } from './transferDrag';
+import { ZoneButtons, ZoneDrawer, type Zone } from './ZoneDrawer';
 import { DraftPanel } from './DraftPanel';
 import { GameSummary } from './GameSummary';
+import { LogDrawer } from './LogDrawer';
 import { CardCatalog } from './CardCatalog';
 import { CardFace } from './CardFace';
 import { cardInspectVideo } from './cardVideos';
@@ -29,21 +35,44 @@ import { eventTime, isNoTargetEvent } from './presentation';
 import { useCardPointerDrag, type CardOrigin } from './useCardPointerDrag';
 import { springRelease } from './cardSpring';
 import { bundledContent } from './authoring/contentStore';
-import { loadGameContent } from './authoring/loadGameContent';
+import { compileForDeck, loadGameContent, loadGameSource, type GameContentSource } from './authoring/loadGameContent';
+import { GameConfigure } from './GameConfigure';
+import { loadGameSetup, saveGameSetup, type GameSetup } from './gameSetup';
+import { SetupAgentsWindow } from './SetupAgentsWindow';
+import './setup-screen.css';
 import { BoardLightSliders, BoardTuningPanel } from './boardTuning';
 import { handOverlap, useHandSpan } from './handFan';
-
+import { DEFAULT_OPPONENT, isOpponent, loadStrategist, opponentName, reportCycle, reportGame, type OpponentId } from './ai/strategistClient';
+import { versionLabel } from './ai/strategy';
+import { logGameEvent } from './devGameLog';
 const blankNodes:BoardNode[]=Array.from({length:5},(_,i)=>({cards:[[],[]],powers:[0,0],weight:[30,25,20,15,10][i],title:'Location pending',text:'Approved content required'}));
 /** Centre of the authored `*_duration_*` bay row on the table outrigger; the effect bank docks onto it. */
 const BANK_BAY_X=-8.07, BANK_BAY_Z=5.90;
+/** Middle of the frame's left wing, between the table's outer edge and the deck, level with its side notch. */
+const ZONE_BUTTONS_POSITION:[number,number,number]=[-8.6,.04,0];
 
 export function App(){
  const engine=useRef<RuntimeSession|null>(null);
+ /** The opponent agent's notes for this session are filed under this id; null once the debrief is sent. */
+ const strategistGame=useRef<string|null>(null);
+ /** Which agent plays this session's opponent; it receives the session's notes and debrief. */
+ const strategistAgent=useRef<OpponentId>(DEFAULT_OPPONENT);
+ const logGame=useRef<string|null>(null);
+ /** False when the opponent agent is switched off: the finished game is still reported for observers, per-Cycle notes are not. */
+ const strategistActive=useRef(false);
  const [content,setContent]=useState(bundledContent);
  const [contentLoading,setContentLoading]=useState(false);
  const [contentError,setContentError]=useState('');
+ const [deckSource,setDeckSource]=useState<GameContentSource|null>(null);
+ const [deckChoice,setDeckChoice]=useState(()=>localStorage.getItem(DECK_KEY));
+ const startingDeck=deckSource?deckSource.decks.find(deck=>deck.id===deckChoice&&deck.playable)??deckSource.decks.find(deck=>deck.id===deckSource.defaultDeckId):undefined;
+ const [opponent,setOpponent]=useState<OpponentId>(()=>{const saved=localStorage.getItem(OPPONENT_KEY);return isOpponent(saved)?saved:DEFAULT_OPPONENT;});
+ const chooseOpponent=(id:OpponentId)=>{setOpponent(id);localStorage.setItem(OPPONENT_KEY,id);};
+ const chooseDeck=(id:string)=>{setDeckChoice(id);localStorage.setItem(DECK_KEY,id);if(deckSource)setContent(compileForDeck(deckSource.document,id));};
  const [view,setView]=useState<SessionView|null>(null);
- const [runtimeSeconds,setRuntimeSeconds]=useState<number|null>(null);
+ const [setup,setSetup]=useState<GameSetup>(loadGameSetup);
+ const changeSetup=(next:GameSetup)=>{setSetup(next);saveGameSetup(next);};
+ const runtimeSeconds=setup.turnSeconds;
  const [boardReady,setBoardReady]=useState(false);
  const [priority]=useState<'higher'|'lower'>('higher');
  const [active,setActive]=useState<RuntimeEvent|null>(null);
@@ -82,6 +111,8 @@ export function App(){
  /** Session-end beat: cyan sweep, then the singularity, then the result card. */
  const [collapsing,setCollapsing]=useState(false);
  const [ended,setEnded]=useState(false);
+ const [tallied,setTallied]=useState(false);
+ const markTallied=useCallback(()=>setTallied(true),[]);
  const [backgroundChoice,setBackgroundChoice]=useState<BackgroundChoice>(loadBackgroundChoice);
  const [lightingStore,setLightingStore]=useState(loadRealLightingStore);
  const lightingMode=backgroundChoice.mode, floorBackground=backgroundChoice.background[lightingMode];
@@ -100,7 +131,8 @@ export function App(){
  const [hoveredNode,setHoveredNode]=useState<number|null>(null);
  const [notice,setNotice]=useState('Enter the evaluation Circuit to begin.');
  const [history,setHistory]=useState<RuntimeEvent[]>([]);
- const [panel,setPanel]=useState<'log'|'practice'|'trash'|null>(null);
+ const [panel,setPanel]=useState<'log'|'practice'|null>(null);
+ const [drawer,setDrawer]=useState<Zone|null>(null);
  const [cycleStart,setCycleStart]=useState<{vp:number;integrity:number}|null>(null);
  const [acquired,setAcquired]=useState<Record<string,{at:number;count:number}>>({});
  const [now,setNow]=useState(Date.now());
@@ -109,11 +141,11 @@ export function App(){
  const handSpan=useHandSpan(handZone);
  const isDragging=useRef(false);
  useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),500);return()=>{clearInterval(timer);timers.current.forEach(clearTimeout);};},[]);
- useEffect(()=>{const esc=(e:KeyboardEvent)=>{if(e.key==='Escape'){setSelected(null);setCatalogOpen(false);setLocationInspect(null);setPanel(null);setSettingsOpen(false);}};window.addEventListener('keydown',esc);return()=>window.removeEventListener('keydown',esc);},[]);
- useEffect(()=>{let cancelled=false;loadGameContent().then(next=>{if(!cancelled)setContent(next);}).catch(error=>{if(!cancelled)setContentError(error instanceof Error?error.message:'Content unavailable.');});return()=>{cancelled=true;};},[]);
+ useEffect(()=>{const esc=(e:KeyboardEvent)=>{if(e.key==='Escape'){setSelected(null);setCatalogOpen(false);setLocationInspect(null);setPanel(null);setDrawer(null);setSettingsOpen(false);}};window.addEventListener('keydown',esc);return()=>window.removeEventListener('keydown',esc);},[]);
+ useEffect(()=>{let cancelled=false;loadGameSource().then(source=>{if(cancelled)return;setDeckSource(source);setContent(compileForDeck(source.document,localStorage.getItem(DECK_KEY)??undefined));}).catch(error=>{if(!cancelled)setContentError(error instanceof Error?error.message:'Content unavailable.');});return()=>{cancelled=true;};},[]);
  useEffect(()=>{if(view)warmCardMedia(cardsInPlay([view,engine.current?.deckList(0)],content.cards));},[view,content]);
  function later(callback:()=>void,time:number){const id=window.setTimeout(()=>{timers.current=timers.current.filter(timer=>timer!==id);callback();},time);timers.current.push(id);}
- function record(event:RuntimeEvent){setHistory(h=>[...h,event].slice(-150));}
+ function record(event:RuntimeEvent){logGameEvent(logGame.current,engine.current,event);setHistory(h=>[...h,event].slice(-6000));}
  function pump(){
   let before=engine.current?.view();
   let next=engine.current?.step();
@@ -185,7 +217,7 @@ export function App(){
   if(source&&target){const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();setFlight({card,x:a.x,y:a.y,w:a.width,h:a.height,dx:b.x+b.width/2-a.x-a.width/2,dy:b.y+b.height/2-a.y-a.height/2,scale:67/a.width,crypto:true});}
   later(()=>{setOpeningCrypto(ids=>ids.filter(id=>id!==card.id));setFlight(null);later(()=>transferCrypto(cards,index+1,done),160);},500);
  }
- async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const snapshot=await loadGameContent();setContent(snapshot);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,strategicMarket:true,evaluationContent:true,content:snapshot});engine.current=session;setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
+ async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(opponent)]);setContent(snapshot);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});engine.current=session;logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=opponent;strategistActive.current=!!brief&&!brief.disabled;if(brief&&!brief.disabled)record({id:-Date.now(),kind:'cycle',text:`${opponentName(opponent)} ${versionLabel(brief.version)} plan: ${brief.plan}`});setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
  function act(action:()=>RuntimeEvent|void|null){try{const event=action();if(event){record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);}if(engine.current){const snapshot=engine.current.view();setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}}catch(error){setNotice(error instanceof Error?error.message:'Action unavailable.');}}
  function acquire(pileId:string){
   if(!engine.current||busy)return;
@@ -305,9 +337,16 @@ export function App(){
   return()=>ids.forEach(clearTimeout);
  },[]);
  useEffect(()=>{
-  if(phase!=='gameover'){setCollapsing(false);setEnded(false);return;}
+  if(phase!=='gameover'){setCollapsing(false);setEnded(false);setTallied(false);return;}
   return runEndSequence();
  },[phase,runEndSequence]);
+ // The opponent agent takes notes after every Draft and debriefs once the session ends.
+ useEffect(()=>{
+  const id=strategistGame.current;
+  if(!id||!engine.current||!view)return;
+  if(view.phase==='gameover'){strategistGame.current=null;void reportGame(id,engine.current.matchReport(),strategistAgent.current);return;}
+  if(view.cycle>1&&strategistActive.current)reportCycle(id,engine.current.matchReport(),strategistAgent.current);
+ },[view?.cycle,view?.phase==='gameover']);
  // Lookdev handle: `__endSession()` plays the closing beat without finishing a session.
  useEffect(()=>{
   if(!(import.meta as ImportMeta&{env?:{DEV?:boolean}}).env?.DEV)return;
@@ -317,7 +356,12 @@ export function App(){
  },[runEndSequence]);
  const destroyedCount=view?view.players[0].destroyed.length+view.players[1].destroyed.length:0;
  const pendingChoice=view?.choice&&view.choice.owner===0&&!busy?view.choice:null;
+ const recovering=pendingChoice?.zone==='trash'?pendingChoice:null;
+ const drawerZone=recovering?'trash':drawer;
  const selectableNodes=pendingChoice?choiceNodes(pendingChoice):[];
+ const [transferHover,setTransferHover]=useState<string|null>(null);
+ useEffect(()=>setTransferHover(null),[pendingChoice?.id]);
+ const {view:transferView,drag:transferDrag}=useTransferDrag(recovering?undefined:pendingChoice?.transfer,pendingChoice?.id,id=>choose(id),transferHover);
  const chooseNode=(node:number)=>{const option=pendingChoice?.options.find(entry=>entry.node===node);if(option)choose(option.id);};
  const sourceCard=selected?HISTORIC_SOURCE_METADATA[selected.definitionId??selected.id]:null;
  const selectedClip=selected?cardInspectVideo(selected):undefined;
@@ -349,16 +393,16 @@ export function App(){
  ...([1,0] as const).flatMap(owner=>(['backup','primary'] as const).map(target=>({id:`server-${owner}-${target}`,position:[target==='backup'?-SERVER_X:SERVER_X,.35,serverZ(owner,boardStyle==='neon')] as [number,number,number],content:<Server owner={owner} target={target} color={playerColors[owner]} value={view?.players[owner].servers[target]??(target==='primary'?2000:1500)} active={active?.target===target&&active.targetOwner===owner?active:null} duration={active?eventTime(active,fast):1500}/>}))),
  ...([1,0] as const).map(owner=>({id:`duration-${owner}`,position:[BANK_BAY_X,-.02,owner?-BANK_BAY_Z-FAR_BANK_LIFT:BANK_BAY_Z+NEAR_BANK_DROP] as [number,number,number],content:<div className={`bank-dock ${owner?'far':'near'}`}><Duration owner={owner} color={playerColors[owner]} cycle={view?.cycle??1} entries={view?.players[owner].bank??[]} activeCard={active?.cardId} activeEvent={active?.id} arriving={bankArrivals} inspect={setSelected}/><Piles owner={owner} counts={pileCounts(owner)}/></div>})),
  {id:'undo-planning',position:[BANK_BAY_X,-.02,BANK_BAY_Z+NEAR_BANK_FORMER_DROP-BOARD_DROP],content:<div className='undo-dock'><button className='undo-planning' disabled={!view?.canUndoPlanning||busy} onClick={undoPlanning}><Icon name='undo'/>Undo all actions</button></div>},
+ ...(view?[{id:'zone-buttons',position:ZONE_BUTTONS_POSITION,content:<ZoneButtons trash={view.trash.length} destroyed={destroyedCount} open={drawerZone} toggle={zone=>setDrawer(current=>current===zone?null:zone)}/>}]:[]),
  ];
  return <main className='app' data-event-id={active?.id} data-event-kind={active?.kind} data-event-stage={active?.stage} data-event-node={active?.node}>
-  <BoardTuningPanel lighting={lightingMode==='real'?{floor:boardBackgroundLabel(floorBackground),value:realLighting,saved:lightingStore[floorBackground]?.saved,change:changeLighting,neon:boardStyle==='neon'}:undefined} paint={boardStyle==='neon'?{active:neonSurface==='paint',enable:()=>setNeonSurface('paint')}:undefined}/>
-  <header className='topline'><div className='brand'><span>0</span>UROBOROS<small>THE CIRCUIT AND THE SERPENT</small></div><div className='phase-stack'><div className='phase-label'>{view?`CYCLE ${String(view.cycle).padStart(2,'0')} / ${phase==='runtime'?`RUNTIME ${view.turn} OF 3`:phase.toUpperCase()}`:'THE CIRCUIT AWAITS'}</div>{view&&<div className='cycle-track' aria-label='Cycle progress'>{['Turn 1','Turn 2','Turn 3','Collapse','Draft'].map((label,index)=>{const step=phase==='draft'?4:phase==='collapse'?3:view.turn-1;return <span key={label} className={index===step?'current':index<step?'complete':''} aria-current={index===step?'step':undefined}><i/>{label}</span>;})}{phase==='collapse'&&active?.node!==undefined&&<b>{active.kind==='circuit'&&!circuitLanded?'CIRCUIT SELECTION':`N${active.node+1} / N5`}</b>}</div>}</div><nav><div className='settings-cluster'><button className='settings-toggle' aria-haspopup='true' aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(open=>!open)}>Settings</button>{settingsOpen&&<><span className='settings-scrim' onClick={()=>setSettingsOpen(false)}/><div className='settings-popover' aria-label='Session settings'><div className='settings-tabs' role='tablist'>{SETTINGS_TABS.map(tab=><button key={tab.id} type='button' role='tab' aria-selected={settingsTab===tab.id} onClick={()=>setSettingsTab(tab.id)}>{tab.label}</button>)}</div>
+  <BoardTuningPanel endGame={view&&phase!=='gameover'?{run:()=>act(()=>engine.current!.endSessionNow()),disabled:busy}:undefined} lighting={lightingMode==='real'?{floor:boardBackgroundLabel(floorBackground),value:realLighting,saved:lightingStore[floorBackground]?.saved,change:changeLighting,neon:boardStyle==='neon'}:undefined} paint={boardStyle==='neon'?{active:neonSurface==='paint',enable:()=>setNeonSurface('paint')}:undefined}/>
+  <header className='topline'><div className='brand'><span>0</span>UROBOROS<small>THE CIRCUIT AND THE SERPENT</small></div><div className='phase-stack'><div className='phase-label'>{view?`CYCLE ${String(view.cycle).padStart(2,'0')} / ${phase==='runtime'?`RUNTIME ${view.turn} OF 3`:phase.toUpperCase()}`:'THE CIRCUIT AWAITS'}</div>{view&&<div className='cycle-track' aria-label='Cycle progress'>{['Turn 1','Turn 2','Turn 3','Collapse','Draft'].map((label,index)=>{const step=phase==='draft'?4:phase==='collapse'?3:view.turn-1;return <span key={label} className={index===step?'current':index<step?'complete':''} aria-current={index===step?'step':undefined}><i/>{label}{label==='Collapse'&&phase==='collapse'&&active?.node!==undefined&&<b className='cycle-step-detail'>{active.kind==='circuit'&&!circuitLanded?'CIRCUIT SELECTION':`N${active.node+1} / N5`}</b>}</span>;})}</div>}</div><nav><div className='settings-cluster'><button className='settings-toggle' aria-haspopup='true' aria-expanded={settingsOpen} onClick={()=>setSettingsOpen(open=>!open)}>Settings</button>{settingsOpen&&<><span className='settings-scrim' onClick={()=>setSettingsOpen(false)}/><div className='settings-popover' aria-label='Session settings'><div className='settings-tabs' role='tablist'>{SETTINGS_TABS.map(tab=><button key={tab.id} type='button' role='tab' aria-selected={settingsTab===tab.id} onClick={()=>setSettingsTab(tab.id)}>{tab.label}</button>)}</div>
    {settingsTab==='players'&&<div className='settings-panel' role='tabpanel' aria-label='Players'><div className='player-tabs' role='tablist' aria-label='Player'>{([0,1] as const).map(owner=><button key={owner} type='button' role='tab' aria-selected={playerTab===owner} style={{'--swatch':playerColors[owner].accent} as CSSProperties} onClick={()=>setPlayerTab(owner)}><i aria-hidden='true'/>Player {owner+1}<small>{owner?'Opponent':'You'}</small></button>)}</div><PlayerSettings key={playerTab} owner={playerTab} colors={colorTheme} setColors={setColorTheme} lanes={lanePatterns} setLanes={setLanePatterns} servers={serverStyles} setServers={setServerStyles} backs={cardBacks} setBacks={setCardBacks}/></div>}
    {settingsTab==='board'&&<div className='settings-panel' role='tabpanel' aria-label='Board'><span className='bg-picker' role='group' aria-label='Floor background'><small>Background</small><button type='button' className='bg-picker-btn' aria-label='Previous floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,-1))}>‹</button><span className='bg-picker-label'>{boardBackgroundLabel(floorBackground)}</span><button type='button' className='bg-picker-btn' aria-label='Next floor background' onClick={()=>setBackgroundChoice(choice=>stepBackground(choice,1))}>›</button></span><BoardStylePicker value={boardStyle} onChange={setBoardStyle}/>{boardStyle==='neon'&&<OptionPicker className='neon-surface-picker' label='Surface' name='Neon table surface' options={NEON_SURFACES} value={neonSurface} onChange={setNeonSurface}/>}<BoardLightSliders/></div>}
-   {settingsTab==='general'&&<div className='settings-panel' role='tabpanel' aria-label='General'><button onClick={()=>{setSettingsOpen(false);setCatalogOpen(true);}}>Card catalog</button><a className='authoring-link' href='/author' target='_blank' rel='noreferrer' onClick={()=>setSettingsOpen(false)}>Content Studio</a><button onClick={()=>{setSettingsOpen(false);setPanel('practice');}}>Evaluation build</button><button aria-pressed={fast} disabled={busy} onClick={()=>setFast(!fast)}>{fast?'Fast':'Normal'} pace</button><button aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>Card video sound: {videoSound?'On':'Off'}</button><OptionPicker label='Lighting' name='Lighting' options={LIGHTING_MODES} value={lightingMode} onChange={mode=>setBackgroundChoice(choice=>({...choice,mode}))}/></div>}
-  </div></>}</div>{view&&<><button className='zone-count' data-resource='trash' title='Shared Trash' aria-label={`Shared Trash, ${view.trash.length} cards`} onClick={()=>setPanel('trash')}><Icon name='trash'/><b>{view.trash.length}</b></button><span className='zone-count' data-resource='destroyed' title='Destroyed cards' aria-label={`Destroyed, ${destroyedCount} cards`}><Icon name='destroyed'/><b>{destroyedCount}</b></span></>}<button onClick={()=>setPanel('log')}>Log <span>{history.length}</span></button></nav></header>
+   {settingsTab==='general'&&<div className='settings-panel' role='tabpanel' aria-label='General'><button onClick={()=>{setSettingsOpen(false);setCatalogOpen(true);}}>Card catalog</button><a className='authoring-link' href='/author' target='_blank' rel='noreferrer' onClick={()=>setSettingsOpen(false)}>Content Studio</a><button onClick={()=>{setSettingsOpen(false);setPanel('practice');}}>Evaluation build</button><button aria-pressed={fast} disabled={busy} onClick={()=>setFast(!fast)}>{fast?'Fast':'Normal'} pace</button><button aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>Card video sound: {videoSound?'On':'Off'}</button><OptionPicker label='Lighting' name='Lighting' options={LIGHTING_MODES} value={lightingMode} onChange={mode=>setBackgroundChoice(choice=>({...choice,mode}))}/></div>}  </div></>}</div><button onClick={()=>setPanel('log')}>Log <span>{history.length}</span></button></nav></header>
   <section className={`arena ${busy?'resolving':''}`} aria-label='Three-dimensional Circuit board'>
-    <BoardScene boardStyle={boardStyle} neonSurface={neonSurface} planning={phase==='runtime'} gameover={collapsing} winner={view?.winner} playerColors={playerColors} videoSound={videoSound} floorBackground={floorBackground} lightingMode={lightingMode} realLighting={realLighting} lanePatterns={lanePatterns} serverStyles={serverStyles} cardBacks={cardBackUrls} boardScan={boardScan} boardScanTone={boardScanTone} boardScanDuration={fast?BOARD_SCAN_MS.fast:BOARD_SCAN_MS.normal} cycle={view?.cycle??1} closedNodes={closedNodes} collapseNode={collapseNode} awardNode={awardNode} selectionNode={selectionNode} onReady={()=>setBoardReady(true)} openNodes={dealing?(view?.openNodes??[]).slice(0,openingNodeCount):view?.openNodes??[]} servers={[view?.players[0].servers??{primary:2000,backup:1500},view?.players[1].servers??{primary:2000,backup:1500}]} hudAnchors={hudAnchors} nodes={nodes} turn={view?.turn??1} phase={phase} priority={view?.priority??0} dragged={dragged} hoveredNode={hoveredNode} legal={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocateLegal(node):legal(node)} drop={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocate(node):deploy(node)} inspect={c=>!isDragging.current&&setSelected(c)} onLocationInspect={index=>{if(view?.nodes[index].location)setLocationInspect(index);}} onFieldDrag={beginFieldDrag} effect={active&&(active.kind!=='circuit'||circuitLanded)?{...active,player:active.owner,sourceCardId:active.cardId}:null} selectedNode={view?.selectedNode??null} choiceNodes={selectableNodes} chooseNode={chooseNode}/>
+    <BoardScene boardStyle={boardStyle} neonSurface={neonSurface} planning={phase==='runtime'} gameover={collapsing} hudFollow={collapsing&&tallied} winner={view?.winner} playerColors={playerColors} videoSound={videoSound} floorBackground={floorBackground} lightingMode={lightingMode} realLighting={realLighting} lanePatterns={lanePatterns} serverStyles={serverStyles} cardBacks={cardBackUrls} boardScan={boardScan} boardScanTone={boardScanTone} boardScanDuration={fast?BOARD_SCAN_MS.fast:BOARD_SCAN_MS.normal} cycle={view?.cycle??1} closedNodes={closedNodes} collapseNode={collapseNode} awardNode={awardNode} selectionNode={selectionNode} onReady={()=>setBoardReady(true)} openNodes={dealing?(view?.openNodes??[]).slice(0,openingNodeCount):view?.openNodes??[]} servers={[view?.players[0].servers??{primary:2000,backup:1500},view?.players[1].servers??{primary:2000,backup:1500}]} hudAnchors={hudAnchors} nodes={nodes} turn={view?.turn??1} phase={phase} priority={view?.priority??0} dragged={dragged} hoveredNode={hoveredNode} legal={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocateLegal(node):legal(node)} drop={node=>dragged&&view?.movableCardIds.includes(dragged.id)?relocate(node):deploy(node)} inspect={c=>!isDragging.current&&setSelected(c)} onLocationInspect={index=>{if(view?.nodes[index].location)setLocationInspect(index);}} onFieldDrag={beginFieldDrag} effect={active&&(active.kind!=='circuit'||circuitLanded)?{...active,player:active.owner,sourceCardId:active.cardId}:null} selectedNode={view?.selectedNode??null} choiceNodes={selectableNodes} chooseNode={chooseNode} transfer={transferView}/>
    <aside className='crypto-cache hud-wallet' aria-label={`Crypto wallet, ${cacheValue} total, ${cache.length} cards`}>
     <div className='wallet-head'><Icon name='crypto'/><b className='cache-total'>{cacheValue}</b><div className='wallet-label'><b>CRYPTO WALLET</b><small>{cache.length} {cache.length===1?'card':'cards'}</small></div></div>
     <div className='cache-cards' style={{'--count':cache.length} as CSSProperties}>{cache.map((card,index)=><button className={`cache-card ${cashFlight?.card.id===card.id?'paying':''}`} data-card-id={card.id} style={{'--stack-index':index,'--fan':index-(cache.length-1)/2,'--angle':`${(index-(cache.length-1)/2)*Math.min(4,20/cache.length)}deg`,'--lift':`${Math.abs(index-(cache.length-1)/2)*2}px`,'zIndex':index+1} as CSSProperties} key={card.id} onClick={()=>setSelected(card)} title={card.name} aria-label={card.name}><CardFace card={card} compact/></button>)}</div>   </aside>
@@ -371,16 +415,19 @@ export function App(){
   {flight&&<div ref={flightRef} className={`flying-card ${flight.crypto?'crypto-flight':''} ${flight.release?'spring-flight':''}`} style={{left:flight.x,top:flight.y,width:flight.w,height:flight.h,'--flight-x':`${flight.dx}px`,'--flight-y':`${flight.dy}px`,'--flight-scale':flight.scale,'--flight-angle':`${flight.angle??0}deg`} as CSSProperties}><div className='flying-face hand-card flight-face-card'><HandCardFace card={flight.card}/></div><img className='flying-back' src={cardBackUrls[0]} alt=''/></div>}
   {active&&<EffectPath key={`path-${active.id}`} event={active.source==='circuit'&&active.owner===1?{...active,node:view?.selectedNode??undefined}:active} duration={eventTime(active,fast)}/>}
   {(active?.kind==='move'||active?.kind==='morph')&&<CardEffectMotion key={`card-effect-${active.id}`} event={active} duration={eventTime(active,fast)}/>}
-  {globalEvent&&<div className={`global-event ${active.kind==='circuit'?'circuit-event':''}`} key={`global-${active.id}`}><small>{active.kind==='circuit'?'CIRCUIT REWARD':'CIRCUIT TRANSMISSION'}</small><p>{active.text}</p></div>}
+  {globalEvent&&<EventMessage key={`global-${active.id}`} event={active}/>}
   <footer className='status-bar'><span className='status-dot'/><span>{notice}</span><span className='session-policy'>Actions carry over · Control Locations to earn the Circuit</span></footer>
-  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><label className='runtime-timer-setting'>Runtime countdown <input aria-label='Runtime timer seconds' type='number' min='1' max='3600' placeholder='Seconds (optional)' value={runtimeSeconds??''} onChange={event=>setRuntimeSeconds(event.target.value?Math.min(3600,Math.max(1,Number(event.target.value))):null)}/><small>Optional. The standard turn duration is not set.</small></label><button className='primary-button' disabled={!priority||!boardReady||contentLoading} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section></div>}
+  {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a><p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section><SetupAgentsWindow/></div>}
   {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>engine.current!.endDraft())} undo={()=>act(()=>engine.current!.undoEndDraft())}/>}
-  {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p>{view.nodes[locationInspect].location!.rule}</p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p>{view.nodes[locationInspect].location!.reward}</p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
+  {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p><LocationText text={view.nodes[locationInspect].location!.rule}/></p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p><LocationText text={view.nodes[locationInspect].location!.reward}/></p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
   {catalogOpen&&<CardCatalog content={content} canTest={!!view&&phase==='runtime'&&!busy&&!view.canUndoPlanning} close={()=>setCatalogOpen(false)} inspect={setSelected} add={addTestCard}/>}
-  {selected&&!dragged&&<div className='modal-backdrop' onClick={()=>setSelected(null)}><section className='inspect' role='dialog' aria-modal='true' aria-label={`Inspect ${selected.name}`} onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close card inspect' onClick={()=>setSelected(null)}>×</button><div className='inspect-art'><CardFace card={selected} context={phase==='draft'?'draft':'runtime'} video={selectedClip?{src:selectedClip,loop:true,sound:videoSound}:undefined}/>{selectedClip&&<button className='inspect-sound' aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>{videoSound?'Sound on':'Sound off'}</button>}</div><div className='inspect-copy'><small>{selected.type}</small><h2>{selected.name}</h2><div className='inspect-stats'><span>POWER <b>{selected.power??'—'}</b></span>{phase==='draft'&&<span>DRAFT COST <b>{selected.cost}</b></span>}</div><p>{selected.effect}</p>{selected.storyText&&<div className='source-card-text'><small>STORY</small><p>{selected.storyText}</p></div>}{sourceCard&&<div className='source-card-text'><small>ORIGINAL CARD EFFECTS</small><ul>{sourceCard.effects.map((text,index)=><li key={index}>{text}</li>)}</ul>{sourceCard.effects.some(text=>/draft/i.test(text))&&<p className='content-note'>Each +Draft now transfers 1 of your Power between this Location and a neighbor.</p>}</div>}<small>{selected.type==='Crypto'?'Held Crypto resolves automatically for Draft.':`Runtime deployment: ${selected.type==='Character'?'1 Action':'0 Actions'}.`}</small>{selected.type==='VP'&&<p className='content-note'>{selected.vp??2} scoring VP while owned in an active zone.</p>}{selected.duration&&<p className='content-note'>Duration {selected.duration===99?'∞':selected.duration}. {selected.durationPeriod==='runtime'?'Measured in Runtime turns; scheduled effects follow the card text.':'The deployment Cycle counts as the first Cycle.'}</p>}{!busy&&phase==='runtime'&&local?.hand.some(c=>c.id===selected.id)&&selected.type!=='Crypto'&&<div className='inspect-deploy'><span>Deploy to Node</span>{[0,1,2,3,4].map(n=><button key={n} disabled={!!legal(n,selected)} title={legal(n,selected)??`Deploy to Node ${n+1}`} onClick={()=>deploy(n,selected)}>{n+1}</button>)}</div>}</div></section></div>}
-  {panel&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><aside className='side-panel' onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close panel' onClick={()=>setPanel(null)}>×</button><small>0UROBOROS / {panel==='log'?'HISTORY':panel==='trash'?'SHARED ZONE':'EVALUATION SCOPE'}</small><h2>{panel==='log'?'Circuit log':panel==='trash'?'Shared Trash':'Evaluation build'}</h2>{panel==='log'?<ol>{history.length?history.map(e=><li key={e.id} data-event-kind={e.kind} data-owner={e.owner} data-card-id={e.cardId} data-event-id={e.id}><small>{e.node!==undefined?`NODE ${e.node+1}`:e.kind.toUpperCase()}</small>{e.text}</li>):<p>Your first deployment starts the record.</p>}</ol>:panel==='trash'?<><p>Cards here are unowned. Recovery effects can acquire them; they do not contribute to either player's VP.</p><div className='trash-list'>{view?.trash.map(card=><button key={card.id} onClick={()=>{setPanel(null);setSelected(card);}}><b>{card.name}</b><small>{card.effect}</small></button>)}</div>{!view?.trash.length&&<p>No cards have entered Trash.</p>}</>:<><p>This session uses a ten-card starter deck, real draw and discard zones, and alternating reveals. Win more Locations to earn the Circuit Reward; equal win counts reward both players.</p><p>Five approved evaluation Locations and three Circuit privileges are enabled. The market includes four core Base piles, two rotating Base offers, three VP piles, three Crypto piles and three rotating Chaos offers. New definitions are provisional evaluation content.</p><p>Unused Actions carry forward. Controlling more Locations earns next reveal priority; ties retain priority.</p><p>The local opponent deploys and purchases using its own cards, Wallet and public board information. Both players compete for shared supply. This is a local evaluation, not online multiplayer.</p></>}</aside></div>}
-  {pendingChoice&&<EffectChoice choice={pendingChoice} choose={choose}/>}
-  {phase==='gameover'&&ended&&!busy&&view&&<GameSummary view={view} colors={playerColors} inspect={setSelected} restart={()=>{engine.current=null;setView(null);setHistory([]);setActive(null);}}/>}
+  {selected&&!dragged&&<div className='modal-backdrop' onClick={()=>setSelected(null)}><section className='inspect' role='dialog' aria-modal='true' aria-label={`Inspect ${selected.name}`} onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close card inspect' onClick={()=>setSelected(null)}>×</button><div className='inspect-art'><CardFace card={selected} context={phase==='draft'?'draft':'runtime'} video={selectedClip?{src:selectedClip,loop:true,sound:videoSound}:undefined}/>{selectedClip&&<button className='inspect-sound' aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>{videoSound?'Sound on':'Sound off'}</button>}</div><div className='inspect-copy'><small>{selected.type}</small><h2>{selected.name}</h2><div className='inspect-stats'><span>POWER <b className={selected.power===undefined||selected.basePower===undefined||selected.power===selected.basePower?undefined:selected.power>selected.basePower?'power-boosted':'power-reduced'}>{selected.power??'—'}</b></span>{phase==='draft'&&<span>DRAFT COST <b>{selected.cost}</b></span>}</div><p>{selected.effect}</p>{selected.storyText&&<div className='source-card-text'><small>STORY</small><p>{selected.storyText}</p></div>}{selected.modifiers?.length?<div className='source-card-text'><small>MODS</small><ul>{selected.modifiers.map(modifier=><li key={modifier.id}>{modifierText(modifier,content?.cards??[])}{modifier.sourceName&&<em> · from {modifier.sourceName}</em>}</li>)}</ul></div>:null}{sourceCard&&<div className='source-card-text'><small>ORIGINAL CARD EFFECTS</small><ul>{sourceCard.effects.map((text,index)=><li key={index}>{text}</li>)}</ul>{sourceCard.effects.some(text=>/draft/i.test(text))&&<p className='content-note'>Each +Draft now transfers 1 of your Power between this Location and a neighbor.</p>}</div>}<small>{selected.type==='Crypto'?'Held Crypto resolves automatically for Draft.':`Runtime deployment: ${isCharacterCard(selected)?'1 Action':'0 Actions'}.`}</small>{selected.type==='VP'&&<p className='content-note'>{selected.vp??2} scoring VP while owned in an active zone.</p>}{selected.duration&&<p className='content-note'>Duration {selected.duration===99?'∞':selected.duration}. {selected.durationPeriod==='runtime'?'Measured in Runtime turns; scheduled effects follow the card text.':'The deployment Cycle counts as the first Cycle.'}</p>}{!busy&&phase==='runtime'&&local?.hand.some(c=>c.id===selected.id)&&selected.type!=='Crypto'&&<div className='inspect-deploy'><span>Deploy to Node</span>{[0,1,2,3,4].map(n=><button key={n} disabled={!!legal(n,selected)} title={legal(n,selected)??`Deploy to Node ${n+1}`} onClick={()=>deploy(n,selected)}>{n+1}</button>)}</div>}</div></section></div>}
+  {panel==='log'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><LogDrawer events={history} cycles={engine.current?.cycleHistory()??[]} live={view?{cycle:view.cycle,turn:view.turn,phase:view.phase}:null} colors={[playerColors[0].accent,playerColors[1].accent]} close={()=>setPanel(null)}/></div>}
+  {panel==='practice'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><aside className='side-panel' onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close panel' onClick={()=>setPanel(null)}>×</button><small>0UROBOROS / EVALUATION SCOPE</small><h2>Evaluation build</h2><p>This session uses a ten-card starter deck, real draw and discard zones, and alternating reveals. Win more Locations to earn the Circuit Reward; equal win counts reward both players.</p><p>Five approved evaluation Locations and three Circuit privileges are enabled. The market includes four core Base piles, two rotating Base offers, three VP piles, three Crypto piles and three rotating Chaos offers. New definitions are provisional evaluation content.</p><p>Unused Actions carry forward. Controlling more Locations earns next reveal priority; ties retain priority.</p><p>The local opponent deploys and purchases using its own cards, Wallet and public board information. Both players compete for shared supply. This is a local evaluation, not online multiplayer.</p></aside></div>}
+  {view&&<ZoneDrawer zone={drawerZone} view={view} choice={recovering} choose={choose} inspect={setSelected} close={()=>setDrawer(null)}/>}
+  {pendingChoice&&!recovering&&<EffectChoice choice={pendingChoice} choose={choose} transferView={transferView} transferHover={setTransferHover}/>}
+  {transferDrag&&transferView&&<TransferBadge drag={transferDrag} amount={transferView.amount}/>}
+  {phase==='gameover'&&ended&&!busy&&view&&<GameSummary view={view} colors={playerColors} inspect={setSelected} onTallied={markTallied} restart={()=>{engine.current=null;setView(null);setHistory([]);setActive(null);}}/>}
  </main>;
 }
 function HandCardFace({card}:{card:Card}){return <CardFace card={card}/>;}
@@ -389,6 +436,8 @@ function Resources({owner,actions,crypto,pending,vp}:{owner:number;actions:numbe
  const [labels,setLabels]=useState(false);
  useEffect(()=>{if(!labels)return;const timer=setTimeout(()=>setLabels(false),PILE_TIP_MS);return()=>clearTimeout(timer);},[labels]);
  return <div className='resources' data-labels-open={labels||undefined} onClick={()=>setLabels(true)}>{[{key:'actions',icon:'actions',value:actions,label:'Actions'},{key:'wallet',icon:'crypto',value:crypto,label:'Crypto'},{key:'vp',icon:'volume',value:vp,label:'VP'}].map(stat=><span className={`stat-${stat.key}`} data-resource={`${owner}-${stat.key}`} key={stat.key}><span className='stat-pair'><Icon name={stat.icon}/><b key={stat.value}>{stat.value}</b></span><span className='stat-foot'><small>{stat.label}</small>{stat.key==='actions'&&pending>0&&<em className='stat-pending' title={`+${pending} Action${pending===1?'':'s'} next Runtime turn`}>+{pending} next</em>}</span></span>)}</div>;}
+const DECK_KEY='ouroboros.startingDeck';
+const OPPONENT_KEY='ouroboros.opponent';
 type SettingsTab='players'|'board'|'general';
 const SETTINGS_TABS:{id:SettingsTab;label:string}[]=[{id:'players',label:'Players'},{id:'board',label:'Board'},{id:'general',label:'General'}];
 const LIGHTING_MODES=[{id:'real',label:'Real lighting'},{id:'studio',label:'Studio'}] as const;
@@ -422,6 +471,12 @@ function newlyBanked(before:SessionView,after:SessionView){
   return after.players[owner].bank.filter(entry=>!held.has(entry.card.id)).map(entry=>entry.card.id);
  });
 }
+function modifierText(modifier:CardModifier,cards:readonly Card[]){
+ if(modifier.kind==='authored')return `${modifier.name??'Card mod'}: ${describeMod(modifier,cards)}`;
+ const details=builtinMod(modifier.kind,modifier.kind==='powerAuraAtLocation'?modifier.amount??1:undefined);
+ return `${details.name}: ${details.text}`;
+}
+
 function Duration({owner,color,cycle,entries,activeCard,activeEvent,arriving,inspect}:{owner:0|1;color:PlayerColor;cycle:number;entries:SessionView['players'][0]['bank'];activeCard?:string;activeEvent?:number;arriving:string[];inspect:(card:Card)=>void}){
  const entering=entries.filter(entry=>arriving.includes(entry.card.id)).map(entry=>entry.card.id);
  return <aside className={`duration live-bank ${owner===1?'far':'near'}`} style={playerColorVars(color)} data-owner={owner} data-player-color={color.id} data-bank-count={entries.length}>
@@ -430,11 +485,12 @@ function Duration({owner,color,cycle,entries,activeCard,activeEvent,arriving,ins
    const entry=entries[index];
    if(!entry)return <i className='bank-slot' key={index}/>;
    const remaining=entry.remainingTurns??(entry.expiresCycle===undefined?null:Math.max(0,entry.expiresCycle-cycle+1));
-   const label=remaining===null?'permanent':`${remaining} ${entry.remainingTurns!==undefined?'turns':'Cycles'} left`;
+   const effectsLeft=entry.effectsLeft??null;
+   const label=`${remaining===null?'permanent':`${remaining} ${entry.remainingTurns!==undefined?'turns':'Cycles'} left`}, ${effectsLeft===null?'effects never run out':`${effectsLeft} ${effectsLeft===1?'effect':'effects'} left to resolve`}`;
    const arrival=entering.indexOf(entry.card.id), resolving=activeCard===entry.card.id;
    const timing={'--bank-delay':`${Math.max(0,arrival)*BANK_STAGGER_MS}ms`,'--bank-slide':`${BANK_SLIDE_MS}ms`,'--bank-snap':`${BANK_SNAP_MS}ms`,'--bank-sweep-ms':`${BANK_SWEEP_MS}ms`} as CSSProperties;
    return <button key={entry.card.id} data-card-id={entry.card.id} className={`bank-slot ${resolving?'active-source':''} ${arrival>=0?'bank-arriving':''}`} style={timing} aria-label={`Inspect ${entry.card.name}, ${label}`} onClick={()=>inspect(entry.card)}>
-    <CardFace card={entry.card} compact remainingDuration={remaining??99}/>
+    <CardFace card={entry.card} compact remainingDuration={remaining??99} bankEffects={effectsLeft}/>
     {arrival>=0&&<i className='bank-sweep after-entry' aria-hidden='true'/>}
     {resolving&&<i className='bank-sweep' key={activeEvent} aria-hidden='true'/>}
    </button>;

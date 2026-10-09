@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, createStrategicMarket } from "../src/evaluationMarket";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, chaosClassOf, createStrategicMarket } from "../src/evaluationMarket";
+import { createDefaultContent } from "../src/authoring/contentModel";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "../src/runtime";
 import { legalNodes, canDeploy, type Card } from "../src/game";
 
@@ -33,48 +34,67 @@ function cycle(session: RuntimeSession, play = false) {
 function draft(session: RuntimeSession) { cycle(session); return Date.now(); }
 
 describe("Strategic evaluation Draft", () => {
-  it("has four persistent Base piles, two rotating Base offers, and four rotating Chaos offers", () => {
+  it("deals 2 Base and 2 Chaos game cards (1 Attack or Hacker, 1 Horror) and three VP game cards plus the currencies, then adds a Draft offer of three Base/Chaos cards and any Solar-monk", () => {
     expect(EVALUATION_BASE_CARDS.length).toBeGreaterThan(12); expect(EVALUATION_VP_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CRYPTO_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CHAOS_CARDS.length).toBeGreaterThanOrEqual(5);
     const piles = createStrategicMarket(seededRandom(41));
-    expect(piles.filter(pile => pile.category === "Base")).toHaveLength(4);
-    expect(piles.filter(pile => pile.category !== "Crypto").every(pile => pile.supply === 8)).toBe(true);
-    expect(piles.filter(pile => pile.category === "Crypto").every(pile => pile.supply === 16)).toBe(true);
+    const characters = (list: typeof piles) => list.filter(pile => pile.category === "Base" || pile.category === "Chaos");
+    expect(characters(piles)).toHaveLength(4);
+    expect(piles.filter(pile => pile.category === "Base").every(pile => pile.card.cardClass !== "Runtime")).toBe(true);
+    expect(piles.filter(pile => pile.category === "VP")).toHaveLength(3);
+    expect(characters(piles).every(pile => pile.supply === 8)).toBe(true);
+    expect(piles.filter(pile => pile.category === "VP").every(pile => pile.supply === 4 && pile.card.cardClass !== "Solar-monk")).toBe(true);
+    expect(piles.filter(pile => pile.category === "Crypto").map(pile => [pile.card.name, pile.supply])).toEqual([["Byte-Coin", 16], ["Kilo-Coin", 16], ["Mega-Cache", 8]]);
     const other = createStrategicMarket(seededRandom(99));
-    expect(other.filter(pile => pile.category === "Base")).toHaveLength(4);
-    expect(new Set(piles.filter(pile => pile.category === "Base").map(pile => pile.id))).not.toEqual(new Set(other.filter(pile => pile.category === "Base").map(pile => pile.id)));
+    expect(new Set(characters(piles).map(pile => pile.id))).not.toEqual(new Set(characters(other).map(pile => pile.id)));
     const session = make(); draft(session);
-    expect(session.state.market.filter(pile => pile.category === "Base")).toHaveLength(6);
-    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating)).toHaveLength(2);
-    expect(session.state.market.filter(pile => pile.category === "Chaos")).toHaveLength(4);
-    expect(session.state.market.filter(pile => pile.category === "Chaos").every(pile => pile.remaining?.join() === "2,2")).toBe(true);
-    const stableIds = new Set(session.state.market.filter(pile => pile.category === "Base" && !pile.rotating).map(pile => pile.id));
-    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating).every(pile => !stableIds.has(pile.id))).toBe(true);
+    const offer = session.state.market.filter(pile => pile.rotating);
+    expect(characters(offer)).toHaveLength(3);
+    expect(offer.filter(pile => pile.category === "VP").every(pile => pile.card.cardClass === "Solar-monk")).toBe(true);
+    expect(offer.every(pile => pile.supply === 4 && pile.remaining?.join() === "2,2")).toBe(true);
+    const game = session.state.market.filter(pile => !pile.rotating);
+    expect(game).toHaveLength(10);
+    expect(offer.every(pile => !game.some(fixed => fixed.card.definitionId === pile.card.definitionId))).toBe(true);
   });
 
-  it("keeps shared purchases atomic while Chaos stock and cooldowns belong to each player", () => {
+  it("keeps shared game-card purchases atomic while Draft offer stock and cooldowns belong to each player", () => {
     const session = make(); const now = draft(session);
     session.state.players.forEach(player => { player.wallet = 80; });
-    const shared = session.state.market.find(pile => pile.category === "Base" && !pile.rotating && pile.card.cost <= 30) ?? session.state.market[0];
+    const shared = session.state.market.find(pile => !pile.rotating && pile.category !== "Crypto")!;
     shared.supply = 1;
     session.buy(shared.id, now, 0);
     const untouched = session.state.players[1].wallet;
     expect(() => session.buy(shared.id, now, 1)).toThrow(/unavailable/);
     expect(session.state.players[1].wallet).toBe(untouched);
-    const chaos = session.state.market.find(pile => pile.category === "Chaos" && (pile.card.cost ?? 0) <= 40)!;
+    const offered = session.state.market.find(pile => pile.rotating)!;
     session.state.players.forEach(player => { player.wallet = Math.max(player.wallet, 80); });
-    session.buy(chaos.id, now, 0); session.buy(chaos.id, now, 1);
-    expect(chaos.remaining).toEqual([1, 1]);
-    expect(() => session.buy(chaos.id, now + 1999, 0)).toThrow(/cooldown/);
-    session.buy(chaos.id, now + 2000, 0);
-    expect(chaos.remaining).toEqual([0, 1]);
-    expect(() => session.buy(chaos.id, now + 4000, 0)).toThrow(/unavailable/);
-    const baseOffers = session.state.market.filter(pile => pile.category === "Base" && pile.rotating).map(pile => pile.id);
+    session.buy(offered.id, now, 0); session.buy(offered.id, now, 1);
+    expect(offered.remaining).toEqual([1, 1]);
+    expect(() => session.buy(offered.id, now + 1999, 0)).toThrow(/cooldown/);
+    session.buy(offered.id, now + 2000, 0);
+    expect(offered.remaining).toEqual([0, 1]);
+    expect(() => session.buy(offered.id, now + 4000, 0)).toThrow(/unavailable/);
+    const previousOffer = session.state.market.filter(pile => pile.rotating).map(pile => pile.id);
     session.endDraft(0); session.endDraft(1); session.nextCycle(); cycle(session);
     expect(session.state.market.find(pile => pile.id === shared.id)!.supply).toBe(0);
-    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating)).toHaveLength(2);
-    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating).every(pile => pile.supply === 8)).toBe(true);
-    expect(session.state.market.filter(pile => pile.category === "Base" && pile.rotating).some(pile => !baseOffers.includes(pile.id)) || EVALUATION_BASE_CARDS.length <= 6).toBe(true);
-    expect(session.state.market.filter(pile => pile.category === "Chaos").every(pile => pile.remaining?.join() === "2,2")).toBe(true);
+    const offer = session.state.market.filter(pile => pile.rotating);
+    expect(offer).toHaveLength(3);
+    expect(offer.every(pile => pile.supply === 4 && pile.remaining?.join() === "2,2")).toBe(true);
+    expect(offer.every(pile => !previousOffer.includes(pile.id))).toBe(true);
+  });
+
+  it("deals one Attack or Hacker and one Horror Chaos game card on every seed, from built-in and authored content", () => {
+    const classes = (piles: ReturnType<typeof createStrategicMarket>) => piles.filter(pile => pile.category === "Chaos").map(pile => chaosClassOf(pile.card));
+    const content = { baseCards: EVALUATION_BASE_CARDS, vpCards: EVALUATION_VP_CARDS, cryptoCards: EVALUATION_CRYPTO_CARDS, chaosCards: createDefaultContent().cards.filter(card => card.pool === "Chaos").map(({ pool: _pool, enabled: _enabled, ...card }) => card as Card) };
+    for (let seed = 1; seed <= 40; seed++) {
+      for (const piles of [createStrategicMarket(seededRandom(seed)), createStrategicMarket(seededRandom(seed), content)]) {
+        const [first, second] = classes(piles);
+        expect(classes(piles)).toHaveLength(2);
+        expect(["Attack", "Hacker"]).toContain(first);
+        expect(second).toBe("Horror");
+      }
+    }
+    expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Veil of Cthulhu")!)).toBe("Horror");
+    expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Nyx Luna")!)).toBe("Attack");
   });
 
   it("supports separate End Draft, undo until both finish, and authoritative expiry", () => {
@@ -326,13 +346,13 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(events.some(event => event.node !== undefined && event.node > node)).toBe(false);
     expect(events.some(event => event.cardId === "bank-must-not-fire")).toBe(false);
     expect(events.some(event => ["circuit", "draft"].includes(event.kind))).toBe(false);
-    expect(session.state.players[0].destructionVP).toBe(12);
+    expect(session.state.players[0].destructionVP).toBe(20);
     expect(session.state.players[0].rewardVP).toBeGreaterThanOrEqual(2);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
     expect(session.state.phase).toBe("gameover");
     const score = session.view().finalScore![0];
     expect(score.locationVP).toBe(2);
-    expect(score.destructionVP).toBe(12);
+    expect(score.destructionVP).toBe(20);
     expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
   });
 
@@ -359,6 +379,7 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(session.view().players.map(player => player.totalVP)).toEqual([0, 0]);
     session.deploy("seance", node); session.endTurn(); drain(session, false);
     expect(session.state.choice?.options.map(option => option.id)).toEqual(["1:formerly-owned-mass"]);
+    expect(session.view().choice?.zone).toBe("trash");
     session.choose("1:formerly-owned-mass");
     expect(session.view().players.map(player => player.totalVP)).toEqual([3, 0]);
     expect(session.state.players[0].discard.map(card => card.id)).toEqual(["1:formerly-owned-mass"]);
@@ -367,6 +388,16 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(session.state.market.map(pile => ({ id: pile.id, supply: pile.supply }))).toEqual(stock);
     drain(session);
     expect(session.view().players.map(player => player.totalVP)).toEqual([3, 0]);
+  });
+
+  it("ends the session early on request, scored as it stands", () => {
+    const session = make();
+    expect(session.view().finalScore).toBeNull();
+    expect(session.endSessionNow().kind).toBe("gameover");
+    const view = session.view();
+    expect(view.phase).toBe("gameover");
+    expect(view.finalScore?.map(score => score.total)).toEqual(view.players.map(player => player.totalVP));
+    expect(() => session.endSessionNow()).toThrow();
   });
 
   it("counts actual VP market purchases in the final Draft before scoring", () => {

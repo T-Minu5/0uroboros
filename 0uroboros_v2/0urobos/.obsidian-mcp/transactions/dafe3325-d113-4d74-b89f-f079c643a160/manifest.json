@@ -1,0 +1,18 @@
+{
+  "id": "dafe3325-d113-4d74-b89f-f079c643a160",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:12.198Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Cards/Duration.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "18e63c596a551e02da2c5598dc106374a37fcee2786083be16179924f202e480",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "18e63c596a551e02da2c5598dc106374a37fcee2786083be16179924f202e480"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:12.239Z"
+}

@@ -1,0 +1,932 @@
+{
+  "gameId": "game-mv0ae360",
+  "version": 7,
+  "startedAt": "2026-10-09T01:30:43.793Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 2-2 (human-me), Servers 3375/3500, Locations won 0-5, Draft wallets 2/6. Human bought nothing; I bought Summon the Acolytes, Atomic Unit."
+  ],
+  "report": {
+    "strategyVersion": 7,
+    "strategyExperiment": null,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      2,
+      2
+    ],
+    "servers": [
+      3375,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "summon-the-acolytes",
+        "name": "Summon the Acolytes",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "atomic-unit",
+        "name": "Atomic Unit",
+        "category": "Base",
+        "cost": 2
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3375,
+          3500
+        ],
+        "wallet": [
+          2,
+          6
+        ],
+        "locationsWon": [
+          0,
+          5
+        ],
+        "locations": [
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 1
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          },
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "integrity_patch",
+          "name": "Integrity Patch",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          10,
+          10
+        ],
+        "market": [
+          {
+            "id": "dash-dot",
+            "name": "Dash-Dot",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "summon-the-acolytes",
+            "name": "Summon the Acolytes",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "atomic-unit",
+            "name": "Atomic Unit",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "sacrifical-sigil",
+            "name": "Sacrifical Sigil",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "opulent-void",
+            "name": "Opulent Void",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "qubit-kid",
+            "name": "The Qubit Kid",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "tihkal-hound",
+            "name": "Tihkal Hound",
+            "category": "Chaos",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 4,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 5,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "night-scythe": 1,
+        "shyte-coin": 2,
+        "basic-encryption": 2,
+        "byte-coin": 2,
+        "rezz-blade": 1,
+        "dotkrawler": 1,
+        "slash-dot": 1
+      },
+      {
+        "atomic-unit": 1,
+        "byte-coin": 2,
+        "shyte-coin": 2,
+        "dotkrawler": 1,
+        "rezz-blade": 1,
+        "basic-encryption": 2,
+        "slash-dot": 1,
+        "night-scythe": 1,
+        "summon-the-acolytes": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 84,
+      "drainDealt": [
+        0,
+        125
+      ],
+      "restoreDone": [
+        0,
+        0
+      ],
+      "drainBySource": {
+        "card": [
+          0,
+          125
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          0,
+          0
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        0,
+        3
+      ],
+      "restoreEvents": [
+        0,
+        3
+      ],
+      "drainEvents": [
+        0,
+        2
+      ],
+      "drawn": [
+        0,
+        5
+      ],
+      "actionsGained": [
+        0,
+        4
+      ],
+      "cryptoGained": [
+        2,
+        6
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [],
+      "cards": {
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 3,
+          "type": "VP",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            2,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            2
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "signal_tower": {
+          "name": "Signal tower",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {},
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            0,
+            125
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 83
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 1
+        }
+      ],
+      "failedOutcomes": [
+        0,
+        0
+      ],
+      "randomResults": 0,
+      "choices": [
+        0,
+        5
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 4,
+        "location": "Signal tower",
+        "priority": 10.5,
+        "nodeScore": 89.76,
+        "locationStake": 9.92,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 9.5,
+        "nodeScore": 85.08,
+        "locationStake": 8.36,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Ritual mine",
+        "priority": 9,
+        "nodeScore": 60,
+        "locationStake": 0,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power.",
+        "picked": [
+          "Push 1 power to Hit 'em"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 2,
+        "location": "Hit 'em",
+        "priority": 7.5,
+        "nodeScore": 60.75,
+        "locationStake": 0,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 0.5,
+        "nodeScore": 3.25,
+        "locationStake": 8.36,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "locationStake": 0,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 2 cards to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "integrity_patch",
+        "name": "Integrity Patch"
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Summon the Acolytes",
+        "cost": 3,
+        "plan": [
+          "Summon the Acolytes",
+          "Atomic Unit"
+        ],
+        "alternatives": [
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 6.81
+          },
+          {
+            "name": "Sacrifical Sigil",
+            "cost": 4,
+            "score": 5.35
+          },
+          {
+            "name": "Atomic Unit",
+            "cost": 2,
+            "score": 5.03
+          },
+          {
+            "name": "Kilo-Coin",
+            "cost": 5,
+            "score": 4.52
+          },
+          {
+            "name": "Opulent Void",
+            "cost": 4,
+            "score": 4.06
+          }
+        ],
+        "offered": [
+          {
+            "id": "dash-dot",
+            "score": 3.25
+          },
+          {
+            "id": "summon-the-acolytes",
+            "score": 6.81
+          },
+          {
+            "id": "atomic-unit",
+            "score": 5.03
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 0.02
+          },
+          {
+            "id": "sacrifical-sigil",
+            "score": 5.35
+          },
+          {
+            "id": "opulent-void",
+            "score": 4.06
+          },
+          {
+            "id": "qubit-kid",
+            "score": -1.12
+          },
+          {
+            "id": "basic-encryption",
+            "score": -2.93
+          },
+          {
+            "id": "vault-encryption",
+            "score": -1.53
+          },
+          {
+            "id": "esoteric-encryption",
+            "score": 0.46
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.6
+          },
+          {
+            "id": "kilo-coin",
+            "score": 4.52
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Atomic Unit",
+        "cost": 2,
+        "plan": [
+          "Atomic Unit"
+        ],
+        "alternatives": [
+          {
+            "name": "Atomic Unit",
+            "cost": 2,
+            "score": 4.59
+          },
+          {
+            "name": "Dash-Dot",
+            "cost": 3,
+            "score": 2.81
+          },
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 2.69
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.27
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 3,
+            "score": -3.37
+          }
+        ],
+        "offered": [
+          {
+            "id": "dash-dot",
+            "score": 2.81
+          },
+          {
+            "id": "summon-the-acolytes",
+            "score": 2.69
+          },
+          {
+            "id": "atomic-unit",
+            "score": 4.59
+          },
+          {
+            "id": "basic-encryption",
+            "score": -3.37
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.27
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      }
+    ]
+  }
+}

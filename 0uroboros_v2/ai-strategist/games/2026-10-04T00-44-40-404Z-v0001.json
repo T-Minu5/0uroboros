@@ -1,0 +1,123 @@
+{
+  "gameId": "game-mut3j3z4",
+  "version": 1,
+  "startedAt": "2026-10-04T00:44:40.404Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 4-4 (human-me), Servers 3375/3200, Locations won 2-2, Draft wallets 7/7. Human bought Kilo-Coin; I bought Opulent Void, Tin Coin."
+  ],
+  "report": {
+    "strategyVersion": 1,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      4,
+      4
+    ],
+    "servers": [
+      3375,
+      3200
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "opulent-void",
+        "name": "Opulent Void",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "card-728y2mjz",
+        "name": "Tin Coin",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          4,
+          4
+        ],
+        "servers": [
+          3375,
+          3200
+        ],
+        "wallet": [
+          7,
+          7
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": null
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 1
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Kull kode",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 0
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "vault-encryption": 2,
+        "slash-dot": 1,
+        "rezz-blade": 1,
+        "kilo-coin": 2,
+        "dotkrawler": 1,
+        "rezz-razor": 1,
+        "the-inbetweener": 1,
+        "byte-coin": 2,
+        "dash-dot": 1
+      },
+      {
+        "vault-encryption": 2,
+        "dash-dot": 1,
+        "rezz-razor": 1,
+        "card-728y2mjz": 1,
+        "kilo-coin": 1,
+        "byte-coin": 2,
+        "the-inbetweener": 1,
+        "opulent-void": 1,
+        "slash-dot": 1,
+        "rezz-blade": 1
+      }
+    ]
+  }
+}

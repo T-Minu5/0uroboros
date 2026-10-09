@@ -64,6 +64,9 @@
 .au-recipe-advanced-fields .au-recipe-help { grid-column: 1 / -1; }
 .au-recipe-check { display: flex; align-items: center; gap: 8px; color: var(--au-text); font-size: 12px; cursor: pointer; }
 .au-recipe-check input { margin: 0; accent-color: var(--au-accent); }
+.au-class-checks { display: flex; flex-wrap: wrap; gap: 8px 16px; min-width: 0; margin: 0; padding: 8px 10px; border: 1px solid var(--au-line); border-radius: 7px; }
+.au-class-checks legend { padding: 0 4px; color: var(--au-text); font-size: 12px; font-weight: 600; }
+.au-class-checks legend small { color: var(--au-dim); font-weight: 400; }
 .au-recipe-chain-toggle { margin-top: 12px; color: var(--au-muted); }
 .au-recipe-chain-toggle.is-disabled { opacity: .6; cursor: default; }
 
@@ -80,3 +83,19 @@
   .au-recipe-columns { grid-template-columns: minmax(0, 1fr); }
   .au-recipe-advanced-fields { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Step editor: catalog-driven fields, Choice options and nested follow-ups */
+.au-step-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; gap: 10px; margin-top: 10px; }
+.au-step-wide { grid-column: 1 / -1; }
+.au-step-body > .au-recipe-help { margin: 8px 0 0; }
+.au-step-options { display: grid; gap: 10px; margin-top: 14px; }
+.au-step-options-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--au-muted); font-size: 12px; }
+.au-step-option { padding: 10px 12px 12px; border: 1px solid var(--au-line); border-left: 3px solid var(--au-accent); border-radius: 8px; background: var(--au-surface); }
+.au-step-option-head { display: flex; align-items: end; gap: 10px; }
+.au-step-option-head > .au-recipe-field { flex: 1; }
+.au-step-option-head > .au-recipe-step { margin-bottom: 7px; }
+.au-step-option .au-recipe-editor { margin-top: 10px; padding-top: 10px; }
+.au-step-nested { margin-top: 14px; padding: 10px 0 0 12px; border-top: 0; border-left: 2px solid #6b5431; }
+.au-step-nested .au-recipe-editor-heading h3 { color: var(--au-warn); font-size: 13px; }
+.au-step-depth .au-recipe-editor-row { background: var(--au-surface); }
+.au-step-then-empty { margin-top: 12px; }

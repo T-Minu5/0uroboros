@@ -1,0 +1,696 @@
+{
+  "gameId": "game-muu9y99m",
+  "version": 2,
+  "startedAt": "2026-10-04T20:33:04.925Z",
+  "finished": true,
+  "notes": [
+    "Cycle 1: VP 3-3 (human-me), Servers 3400/3500, Locations won 2-2, Draft wallets 2/2. Human bought nothing; I bought nothing.",
+    "Cycle 2: VP 3-3 (human-me), Servers 3500/3475, Locations won 5-0, Draft wallets 5/2. Human bought Sudo Demiurge; I bought nothing.",
+    "I lost most Locations this Cycle (BumperBall, FX Bumper, Get out, Boost Juice, Hit 'em); my board Power is too low.",
+    "Cycle 3: VP 2-3 (human-me), Servers 3175/3200, Locations won 3-1, Draft wallets 5/3. Human bought Byte-Coin, Superpositioning; I bought Rezz Razor.",
+    "Cycle 4: VP 2-3 (human-me), Servers 3199/2923, Locations won 4-0, Draft wallets 8/1. Human bought Infernal Kernel; I bought nothing.",
+    "Observation: the human's Draft wallet (8) outpaces mine (1). Their economy is ahead.",
+    "I lost most Locations this Cycle (Healing hands, Data Breach, Boost Juice, Trash collector); my board Power is too low.",
+    "Cycle 5: VP 2-3 (human-me), Servers 3074/2648, Locations won 2-1, Draft wallets 11/1. Human bought Mega-Cache, Infernal Kernel; I bought nothing.",
+    "Observation: the human's Draft wallet (11) outpaces mine (1). Their economy is ahead.",
+    "Cycle 6: VP 2-3 (human-me), Servers 2999/2598, Locations won 2-2, Draft wallets 9/2. Human bought Iterative Incubus; I bought Razor Blade Jade, Razor Blade Jade.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 6 - an early-aggression line. Watch my Servers.",
+    "Observation: the human's Draft wallet (9) outpaces mine (2). Their economy is ahead.",
+    "Cycle 7: VP 2-3 (human-me), Servers 2824/2023, Locations won 3-2, Draft wallets 13/1. Human bought ∆-Wave, Temporal Rift; I bought nothing.",
+    "Observation: the human's Draft wallet (13) outpaces mine (1). Their economy is ahead.",
+    "Cycle 8: VP 11-3 (human-me), Servers 2549/1500, Locations won 2-3, Draft wallets 13/1. Human bought Root Rune, BIOS Archive; I bought Timed Bomb.",
+    "Observation: the human's Draft wallet (13) outpaces mine (1). Their economy is ahead.",
+    "Cycle 9: VP 15-3 (human-me), Servers 2174/975, Locations won 3-2, Draft wallets 10/0. Human bought Mega-Cache; I bought nothing.",
+    "Observation: the human's Draft wallet (10) outpaces mine (0). Their economy is ahead.",
+    "Warning: my Servers are at 975. Defense (Restore) matters now.",
+    "Cycle 10: VP 15-3 (human-me), Servers 1949/1125, Locations won 2-2, Draft wallets 7/2. Human bought Zenith Wetware; I bought Slash-Dot, Bumpster.",
+    "Observation: the human's Draft wallet (7) outpaces mine (2). Their economy is ahead.",
+    "Warning: my Servers are at 1125. Defense (Restore) matters now.",
+    "Cycle 10: VP 15-3 (human-me), Servers 1949/1125, Locations won 2-2, Draft wallets 7/2. Human bought nothing; I bought nothing.",
+    "Observation: the human's Draft wallet (7) outpaces mine (2). Their economy is ahead.",
+    "Warning: my Servers are at 1125. Defense (Restore) matters now."
+  ],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 11,
+    "phase": "gameover",
+    "winner": 0,
+    "endedReason": "Both Servers destroyed. You win, 35 to 3 VP.",
+    "finalVP": [
+      35,
+      3
+    ],
+    "servers": [
+      2249,
+      0
+    ],
+    "purchases": [
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "sudo-demiurge",
+        "name": "Sudo Demiurge",
+        "category": "Chaos",
+        "cost": 5
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "rezz-razor",
+        "name": "Rezz Razor",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "byte-coin",
+        "name": "Byte-Coin",
+        "category": "Crypto",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "superpositioning",
+        "name": "Superpositioning",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 4,
+        "owner": 0,
+        "definitionId": "infernal-kernel",
+        "name": "Infernal Kernel",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 5,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 5,
+        "owner": 0,
+        "definitionId": "infernal-kernel",
+        "name": "Infernal Kernel",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 6,
+        "owner": 1,
+        "definitionId": "razor-blade-jade",
+        "name": "Razor Blade Jade",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 6,
+        "owner": 1,
+        "definitionId": "razor-blade-jade",
+        "name": "Razor Blade Jade",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "iterative-incubus",
+        "name": "Iterative Incubus",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "delta-wave",
+        "name": "∆-Wave",
+        "category": "Chaos",
+        "cost": 9
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "temporal-rift",
+        "name": "Temporal Rift",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 8,
+        "owner": 1,
+        "definitionId": "card-3c9ng7g8",
+        "name": "Timed Bomb",
+        "category": "Base",
+        "cost": 1
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "root-rune",
+        "name": "Root Rune",
+        "category": "Base",
+        "cost": 7
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "bios-archive",
+        "name": "BIOS Archive",
+        "category": "VP",
+        "cost": 6
+      },
+      {
+        "cycle": 9,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 10,
+        "owner": 1,
+        "definitionId": "slash-dot",
+        "name": "Slash-Dot",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 10,
+        "owner": 1,
+        "definitionId": "card-m7dztzir",
+        "name": "Bumpster",
+        "category": "Chaos",
+        "cost": 2
+      },
+      {
+        "cycle": 10,
+        "owner": 0,
+        "definitionId": "zenith-wetware",
+        "name": "Zenith Wetware",
+        "category": "VP",
+        "cost": 11
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3400,
+          3500
+        ],
+        "wallet": [
+          2,
+          2
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": null
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          }
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3500,
+          3475
+        ],
+        "wallet": [
+          5,
+          2
+        ],
+        "locationsWon": [
+          5,
+          0
+        ],
+        "locations": [
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 0
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": 0
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          }
+        ]
+      },
+      {
+        "cycle": 3,
+        "vp": [
+          2,
+          3
+        ],
+        "servers": [
+          3175,
+          3200
+        ],
+        "wallet": [
+          5,
+          3
+        ],
+        "locationsWon": [
+          3,
+          1
+        ],
+        "locations": [
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 0
+          },
+          {
+            "id": "breach_relay",
+            "name": "Breach relay",
+            "winner": 1
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": null
+          }
+        ]
+      },
+      {
+        "cycle": 4,
+        "vp": [
+          2,
+          3
+        ],
+        "servers": [
+          3199,
+          2923
+        ],
+        "wallet": [
+          8,
+          1
+        ],
+        "locationsWon": [
+          4,
+          0
+        ],
+        "locations": [
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": null
+          }
+        ]
+      },
+      {
+        "cycle": 5,
+        "vp": [
+          2,
+          3
+        ],
+        "servers": [
+          3074,
+          2648
+        ],
+        "wallet": [
+          11,
+          1
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": null
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": null
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 0
+          }
+        ]
+      },
+      {
+        "cycle": 6,
+        "vp": [
+          2,
+          3
+        ],
+        "servers": [
+          2999,
+          2598
+        ],
+        "wallet": [
+          9,
+          2
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 1
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": 0
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": null
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 0
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          }
+        ]
+      },
+      {
+        "cycle": 7,
+        "vp": [
+          2,
+          3
+        ],
+        "servers": [
+          2824,
+          2023
+        ],
+        "wallet": [
+          13,
+          1
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          },
+          {
+            "id": "kilo-mill",
+            "name": "Kilo mill",
+            "winner": 1
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          }
+        ]
+      },
+      {
+        "cycle": 8,
+        "vp": [
+          11,
+          3
+        ],
+        "servers": [
+          2549,
+          1500
+        ],
+        "wallet": [
+          13,
+          1
+        ],
+        "locationsWon": [
+          2,
+          3
+        ],
+        "locations": [
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 1
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 1
+          },
+          {
+            "id": "breach_relay",
+            "name": "Breach relay",
+            "winner": 0
+          },
+          {
+            "id": "trash-compactor",
+            "name": "Trash compactor",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          }
+        ]
+      },
+      {
+        "cycle": 9,
+        "vp": [
+          15,
+          3
+        ],
+        "servers": [
+          2174,
+          975
+        ],
+        "wallet": [
+          10,
+          0
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 0
+          },
+          {
+            "id": "kilo-mill",
+            "name": "Kilo mill",
+            "winner": 1
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          }
+        ]
+      },
+      {
+        "cycle": 10,
+        "vp": [
+          15,
+          3
+        ],
+        "servers": [
+          1949,
+          1125
+        ],
+        "wallet": [
+          7,
+          2
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 0
+          },
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 1
+          },
+          {
+            "id": "kull-kode",
+            "name": "Kull kode",
+            "winner": null
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "the-inbetweener": 1,
+        "mega-cache": 2,
+        "superpositioning": 1,
+        "infernal-kernel": 2,
+        "dotkrawler": 1,
+        "byte-coin": 3,
+        "night-scythe": 1,
+        "root-rune": 1,
+        "shyte-coin": 1,
+        "zenith-wetware": 1,
+        "kilo-coin": 1,
+        "temporal-rift": 1,
+        "bios-archive": 1,
+        "rezz-blade": 3,
+        "delta-wave": 1,
+        "vault-encryption": 1,
+        "slash-dot": 1,
+        "iterative-incubus": 1
+      },
+      {
+        "night-scythe": 1,
+        "card-m7dztzir": 1,
+        "vault-encryption": 1,
+        "slash-dot": 1,
+        "basic-encryption": 1,
+        "rezz-razor": 1,
+        "razor-blade-jade": 1,
+        "rezz-blade": 1
+      }
+    ]
+  }
+}

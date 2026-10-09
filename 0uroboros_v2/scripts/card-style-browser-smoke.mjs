@@ -96,8 +96,9 @@ try{
  await page.waitForFunction(()=>document.querySelector('.market-art .cf-card'));
  marketCount=await page.locator('.market-art .cf-card').count();
  assert(marketCount>=12);
- assert.equal(await page.locator('.market-art [data-card-cost]').count(),marketCount);
- await page.locator('.market-art').first().click({button:'right'});
+ assert.equal(await page.locator('.market-art [data-card-cost]').count(),0);
+ assert.equal(await page.locator('.market-card .market-acquire').count(),marketCount);
+ await page.locator('.market-art').first().click();
  assert.equal(await page.getByRole('dialog',{name:/Inspect /}).locator('[data-card-cost]').count(),1);
  await page.getByRole('button',{name:'Close card inspect',exact:true}).click();
  await page.screenshot({path:`${evidence}/draft.png`});

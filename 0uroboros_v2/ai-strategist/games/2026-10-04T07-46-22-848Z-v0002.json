@@ -1,0 +1,113 @@
+{
+  "gameId": "game-mut5opzg",
+  "version": 2,
+  "startedAt": "2026-10-04T07:46:22.848Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 4-2 (human-me), Servers 3149/3325, Locations won 2-2, Draft wallets 7/7. Human bought nothing; I bought Thorn Shadow, Thorn Shadow."
+  ],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      4,
+      2
+    ],
+    "servers": [
+      3149,
+      3325
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "thorn-shadow",
+        "name": "Thorn Shadow",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "thorn-shadow",
+        "name": "Thorn Shadow",
+        "category": "Base",
+        "cost": 3
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          4,
+          2
+        ],
+        "servers": [
+          3149,
+          3325
+        ],
+        "wallet": [
+          7,
+          7
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "breach_relay",
+            "name": "Breach relay",
+            "winner": 1
+          },
+          {
+            "id": "trash-compactor",
+            "name": "Trash compactor",
+            "winner": 0
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": 1
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": null
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "vault-encryption": 2,
+        "slash-dot": 1,
+        "byte-coin": 2,
+        "rezz-blade": 1,
+        "kilo-coin": 1,
+        "dash-dot": 1,
+        "dotkrawler": 1,
+        "rezz-razor": 1
+      },
+      {
+        "vault-encryption": 1,
+        "rezz-blade": 2,
+        "thorn-shadow": 2,
+        "byte-coin": 2,
+        "slash-dot": 1,
+        "dash-dot": 1,
+        "dotkrawler": 1,
+        "kilo-coin": 1,
+        "rezz-razor": 1
+      }
+    ]
+  }
+}

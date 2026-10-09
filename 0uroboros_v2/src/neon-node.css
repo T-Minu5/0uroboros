@@ -1,0 +1,37 @@
+/* Neon: the Location plate fills the Node housing's window (neonNodeHousing), whose dark bezel is 3D. The plate keeps
+   its fill and rim colours; the window's outline is drawn by the pseudo-elements, so state glows follow it as a filter. */
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location) {
+ --plate-fill:linear-gradient(110deg,transparent 20%,#b985d60b 48%,transparent 65%),linear-gradient(160deg,#33263e,#181523 65%);
+ --plate-rim:#7d668e;
+ --plate-glow:transparent;
+ position:relative; isolation:isolate; width:155px; height:102px;
+ border:0; border-radius:0; background:none; box-shadow:none;
+ filter:drop-shadow(0 0 7px var(--plate-glow));
+}
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location)::before,
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location)::after {
+ content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+ clip-path:polygon(0 13.79%,8.66% 0,93.65% 0,100% 10.81%,100% 86.21%,91.34% 100%,4.64% 100%,0 92.11%);
+}
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location)::before { background:var(--plate-fill); }
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location)::after {
+ background:var(--plate-rim);
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 148 91' preserveAspectRatio='none'%3E%3Cpolygon points='0,12.55 12.81,0 138.6,0 148,9.84 148,78.45 135.19,91 6.87,91 0,83.82' fill='none' stroke='%23000' stroke-width='2' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+.board-canvas[data-board-style=neon] .world-anchor .sealed-location { --plate-fill:linear-gradient(115deg,#241d2f,#62445f 48%,#382b47); --plate-rim:#786379; }
+.board-canvas[data-board-style=neon] .world-anchor .location-plate.active { --plate-rim:#d5a6f5; --plate-glow:#bc64ff66; }
+.board-canvas[data-board-style=neon] .world-anchor .location-plate.drop-highlight { --plate-fill:linear-gradient(145deg,#49365e,#2c2440 60%,#211b32); --plate-rim:#d9c0ff; --plate-glow:#ba8fff99; }
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location).selection-focus { --plate-rim:#e3d5a0; --plate-glow:#d0b75c77; }
+.board-canvas[data-board-style=neon] .world-anchor .location-plate.node-choice,
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { --plate-rim:#ffd36b; animation-name:neon-node-choice-plate; }
+.board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location).transfer-plate.is-over { --plate-rim:#ffe7a8; --plate-glow:#ffd36bcc; box-shadow:none; filter:drop-shadow(0 0 12px #ffd36bcc) brightness(1.2); }
+@keyframes neon-node-choice-plate {
+ 0%,100% { filter:drop-shadow(0 0 3px #ffd36b55) brightness(1); }
+ 50% { filter:drop-shadow(0 0 10px #ffd36bcc) brightness(1.18); }
+}
+@media(prefers-reduced-motion:reduce){
+ .board-canvas[data-board-style=neon] .world-anchor .location-plate.node-choice,
+ .board-canvas[data-board-style=neon] .world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { animation:none; --plate-glow:#ffd36b99; }
+}
+/* Power sits in the hull peaks, set like the Figma Node's numbers. */
+.board-canvas[data-board-style=neon] .world-anchor .power-badge b { font:700 27px/1 Orbitron,sans-serif; }

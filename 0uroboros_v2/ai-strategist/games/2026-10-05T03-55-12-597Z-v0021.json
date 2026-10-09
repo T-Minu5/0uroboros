@@ -1,0 +1,2033 @@
+{
+  "gameId": "game-muupotc2",
+  "version": 21,
+  "startedAt": "2026-10-05T03:55:12.597Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 3-3 (human-me), Servers 3500/3400, Locations won 2-2, Draft wallets 6/2. Human bought nothing; I bought Jinx-001, Jinx-001, Jinx-001.",
+    "Observation: the human's Draft wallet (6) outpaces mine (2). Their economy is ahead.",
+    "Cycle 2: VP 2-2 (human-me), Servers 3500/3500, Locations won 2-0, Draft wallets 5/11. Human bought nothing; I bought Subroutine Succubus, Signal Surveyor, Jinx-001.",
+    "Cycle 3: VP 2-2 (human-me), Servers 3150/3500, Locations won 3-2, Draft wallets 6/10. Human bought Code Sniper; I bought The Tesseract Magi, Thorn Shadow.",
+    "Cycle 4: VP 3-2 (human-me), Servers 3350/3500, Locations won 3-2, Draft wallets 3/12. Human bought nothing; I bought Chrome Mitchell, Cowl Obscyra, Jinx-001."
+  ],
+  "report": {
+    "strategyVersion": 21,
+    "strategyExperiment": null,
+    "cycle": 5,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      3,
+      2
+    ],
+    "servers": [
+      3350,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "subroutine_succubus",
+        "name": "Subroutine Succubus",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "the-tesseract-magi",
+        "name": "The Tesseract Magi",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "thorn-shadow",
+        "name": "Thorn Shadow",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "code-sniper",
+        "name": "Code Sniper",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "chrome-mitchell",
+        "name": "Chrome Mitchell",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "cowl-obscyra",
+        "name": "Cowl Obscyra",
+        "category": "Base",
+        "cost": 5
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3500,
+          3400
+        ],
+        "wallet": [
+          6,
+          2
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Kull kode",
+            "winner": null
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 1
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "clean-cut",
+          "name": "Clean cut",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          10,
+          7
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3500,
+          3500
+        ],
+        "wallet": [
+          5,
+          11
+        ],
+        "locationsWon": [
+          2,
+          0
+        ],
+        "locations": [
+          {
+            "id": "location-sz68enux",
+            "name": "FX Bumper",
+            "winner": null
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": null
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Kull kode",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "recursive-curse",
+          "name": "Recursive curse",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          9,
+          5
+        ]
+      },
+      {
+        "cycle": 3,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3150,
+          3500
+        ],
+        "wallet": [
+          6,
+          10
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          },
+          {
+            "id": "breach_relay",
+            "name": "Breach relay",
+            "winner": 1
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 1
+          },
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 0
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "integrity_patch",
+          "name": "Integrity patch",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          8,
+          6
+        ]
+      },
+      {
+        "cycle": 4,
+        "vp": [
+          3,
+          2
+        ],
+        "servers": [
+          3350,
+          3500
+        ],
+        "wallet": [
+          3,
+          12
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 1
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 0
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "kilo-king",
+          "name": "Kilo king",
+          "eligible": [
+            0
+          ],
+          "claimed": []
+        },
+        "deckSize": [
+          9,
+          6
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "night-scythe": 1,
+        "slash-dot": 1,
+        "rezz-blade": 1,
+        "basic-encryption": 1,
+        "dotkrawler": 1,
+        "code-sniper": 1,
+        "shyte-coin": 1,
+        "byte-coin": 1,
+        "vault-encryption": 1
+      },
+      {
+        "cowl-obscyra": 1,
+        "jinx-001": 2,
+        "basic-encryption": 1,
+        "eval-signal-surveyor": 1,
+        "byte-coin": 1,
+        "subroutine_succubus": 1,
+        "thorn-shadow": 1,
+        "chrome-mitchell": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 460,
+      "drainDealt": [
+        300,
+        600
+      ],
+      "restoreDone": [
+        450,
+        300
+      ],
+      "drainBySource": {
+        "card": [
+          300,
+          400
+        ],
+        "location": [
+          0,
+          200
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          100,
+          300
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          350,
+          0
+        ]
+      },
+      "wastedRestores": [
+        3,
+        1
+      ],
+      "restoreEvents": [
+        5,
+        7
+      ],
+      "drainEvents": [
+        3,
+        4
+      ],
+      "drawn": [
+        14,
+        14
+      ],
+      "actionsGained": [
+        18,
+        19
+      ],
+      "cryptoGained": [
+        20,
+        35
+      ],
+      "vpGained": [
+        0,
+        1
+      ],
+      "destructions": [],
+      "cards": {
+        "vault-encryption": {
+          "definitionId": "vault-encryption",
+          "name": "Vault Encryption",
+          "cost": 3,
+          "type": "VP",
+          "plays": [
+            4,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            100,
+            50
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            3,
+            1
+          ],
+          "drain": [
+            300,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            3,
+            1
+          ],
+          "actions": [
+            6,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            4,
+            3
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            3
+          ],
+          "actions": [
+            12,
+            6
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            3,
+            3
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            8,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            8,
+            8
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            0,
+            3
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            150
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            2,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            6,
+            3
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "jinx-001": {
+          "definitionId": "jinx-001",
+          "name": "Jinx-001",
+          "cost": 0,
+          "type": "Character",
+          "cardClass": "Hacker",
+          "plays": [
+            0,
+            7
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            5
+          ],
+          "actions": [
+            0,
+            7
+          ],
+          "crypto": [
+            0,
+            21
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "eval-signal-surveyor": {
+          "definitionId": "eval-signal-surveyor",
+          "name": "Signal Surveyor",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "subroutine_succubus": {
+          "definitionId": "subroutine_succubus",
+          "name": "Subroutine Succubus",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            300
+          ],
+          "restore": [
+            0,
+            100
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "thorn-shadow": {
+          "definitionId": "thorn-shadow",
+          "name": "Thorn Shadow",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            3
+          ],
+          "crypto": [
+            0,
+            2
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "code-sniper": {
+          "definitionId": "code-sniper",
+          "name": "Code Sniper",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "the-tesseract-magi": {
+          "definitionId": "the-tesseract-magi",
+          "name": "The Tesseract Magi",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "data_exchange": {
+          "name": "Data exchange",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            4,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "wind-fall": {
+          "name": "Wind fall",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "breach_relay": {
+          "name": "Breach relay",
+          "drain": [
+            0,
+            200
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "loser-s-luck": {
+          "name": "Loser's luck",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            1
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {
+        "clean-cut": {
+          "name": "Clean cut",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            1
+          ]
+        },
+        "integrity_patch": {
+          "name": "Integrity patch",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            350,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            100,
+            0
+          ],
+          "events": 91
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            100
+          ],
+          "events": 119
+        },
+        {
+          "cycle": 3,
+          "drain": [
+            100,
+            350
+          ],
+          "restore": [
+            350,
+            100
+          ],
+          "events": 121
+        },
+        {
+          "cycle": 4,
+          "drain": [
+            100,
+            150
+          ],
+          "restore": [
+            0,
+            100
+          ],
+          "events": 128
+        },
+        {
+          "cycle": 5,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 1
+        }
+      ],
+      "failedOutcomes": [
+        3,
+        2
+      ],
+      "randomResults": 0,
+      "choices": [
+        16,
+        22
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 0,
+        "location": "Data exchange",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Kull kode",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Quantum commons",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Thin the heard"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 4,
+        "location": "Quantum commons",
+        "priority": 0.5,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 2 cards to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "clean-cut",
+        "name": "Clean cut"
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "economy",
+        "bought": "Jinx-001",
+        "cost": 0,
+        "plan": [
+          "Jinx-001",
+          "Jinx-001",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 4.46
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -0.48
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "economy",
+        "bought": "Jinx-001",
+        "cost": 0,
+        "plan": [
+          "Jinx-001",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 2.2
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -0.71
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "economy",
+        "bought": "Jinx-001",
+        "cost": 0,
+        "plan": [
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 1.01
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -0.88
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Wind fall",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Kull kode",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Ritual mine"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 0,
+        "location": "FX Bumper",
+        "priority": 3,
+        "nodeScore": 30,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 0,
+        "location": "FX Bumper",
+        "priority": 3,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 3,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 0,
+        "location": "FX Bumper",
+        "priority": 10.5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 0.5,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 11,
+        "phase": "economy",
+        "bought": "Subroutine Succubus",
+        "cost": 6,
+        "plan": [
+          "Subroutine Succubus",
+          "Signal Surveyor",
+          "Jinx-001",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 6.16
+          },
+          {
+            "name": "Subroutine Succubus",
+            "cost": 6,
+            "score": 5.57
+          },
+          {
+            "name": "Zenith Wetware",
+            "cost": 11,
+            "score": 5.47
+          },
+          {
+            "name": "Mega-Cache",
+            "cost": 9,
+            "score": 5.43
+          },
+          {
+            "name": "Code Sniper",
+            "cost": 6,
+            "score": 3.27
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "economy",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 5.8
+          },
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 1.77
+          },
+          {
+            "name": "Salvage Relay",
+            "cost": 3,
+            "score": 0.98
+          },
+          {
+            "name": "The Qubit Kid",
+            "cost": 5,
+            "score": 0.75
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 0.41
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "economy",
+        "bought": "Jinx-001",
+        "cost": 0,
+        "plan": [
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 1.52
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.4
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 2,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Get out",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 2,
+        "location": "Wind fall",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 4,
+        "location": "Quantum commons",
+        "priority": 3,
+        "nodeScore": 30,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power to or from nearby locations.",
+        "picked": [
+          "Pull 2 power from Data exchange"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Data exchange",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "card": "Subroutine Succubus",
+        "definitionId": "subroutine_succubus",
+        "node": 4,
+        "location": "Quantum commons",
+        "priority": 1.5,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Pull 1 power from Quantum commons"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 3,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 3,
+        "location": "Data exchange",
+        "priority": 3,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 4,
+        "location": "Quantum commons",
+        "priority": 0.5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 10,
+        "phase": "economy",
+        "bought": "The Tesseract Magi",
+        "cost": 6,
+        "plan": [
+          "The Tesseract Magi",
+          "Thorn Shadow"
+        ],
+        "alternatives": [
+          {
+            "name": "The Tesseract Magi",
+            "cost": 6,
+            "score": 10.59
+          },
+          {
+            "name": "Thorn Shadow",
+            "cost": 3,
+            "score": 5.79
+          },
+          {
+            "name": "Mega-Cache",
+            "cost": 9,
+            "score": 3.97
+          },
+          {
+            "name": "Kilo Cycle",
+            "cost": 7,
+            "score": 3.91
+          },
+          {
+            "name": "Code Sniper",
+            "cost": 6,
+            "score": 2.39
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "economy",
+        "bought": "Thorn Shadow",
+        "cost": 3,
+        "plan": [
+          "Thorn Shadow"
+        ],
+        "alternatives": [
+          {
+            "name": "Thorn Shadow",
+            "cost": 3,
+            "score": 5.23
+          },
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": -0.32
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -0.54
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -2.22
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 3,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Ritual mine",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Thorn Shadow",
+        "definitionId": "thorn-shadow",
+        "node": 2,
+        "location": "Trash collector",
+        "priority": 7,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 3,
+        "location": "Loser's luck",
+        "priority": 3,
+        "nodeScore": 30,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 4,
+        "location": "Wing clip",
+        "priority": 3,
+        "nodeScore": 30,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Tesseract Magi",
+        "definitionId": "the-tesseract-magi",
+        "node": 0,
+        "location": "Ritual mine",
+        "priority": 1.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 1,
+        "location": "Get out",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Subroutine Succubus",
+        "definitionId": "subroutine_succubus",
+        "node": 4,
+        "location": "Wing clip",
+        "priority": 1.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power to or from nearby locations.",
+        "picked": [
+          "Push 2 power to Trash collector"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 12,
+        "phase": "economy",
+        "bought": "Chrome Mitchell",
+        "cost": 7,
+        "plan": [
+          "Chrome Mitchell",
+          "Cowl Obscyra",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Zenith Wetware",
+            "cost": 11,
+            "score": 4.28
+          },
+          {
+            "name": "Chrome Mitchell",
+            "cost": 7,
+            "score": 3.72
+          },
+          {
+            "name": "Cowl Obscyra",
+            "cost": 5,
+            "score": 3.68
+          },
+          {
+            "name": "Mega-Cache",
+            "cost": 9,
+            "score": 3.25
+          },
+          {
+            "name": "Code Sniper",
+            "cost": 6,
+            "score": 2.08
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "economy",
+        "bought": "Cowl Obscyra",
+        "cost": 5,
+        "plan": [
+          "Cowl Obscyra",
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Cowl Obscyra",
+            "cost": 5,
+            "score": 3.58
+          },
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 0.85
+          },
+          {
+            "name": "The Qubit Kid",
+            "cost": 5,
+            "score": -0.17
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -0.53
+          },
+          {
+            "name": "Sleek Z",
+            "cost": 3,
+            "score": -0.72
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 0,
+        "phase": "economy",
+        "bought": "Jinx-001",
+        "cost": 0,
+        "plan": [
+          "Jinx-001"
+        ],
+        "alternatives": [
+          {
+            "name": "Jinx-001",
+            "cost": 0,
+            "score": 0.82
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 4,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      }
+    ]
+  }
+}

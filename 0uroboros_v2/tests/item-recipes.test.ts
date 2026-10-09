@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { compileContent, createDefaultContent, materializeItemRecipes, validateContent } from '../src/authoring/contentModel';
+import { compileContent, createDefaultContent, upgradeDocument, validateContent, type ContentDocument } from '../src/authoring/contentModel';
+import { migrateEffects } from '../src/effects/migrate';
 import { HISTORIC_SOURCE_METADATA } from '../src/historicCatalog';
 import { starterCards, type Card } from '../src/game';
 import { createSession, seededRandom, type RuntimeSession } from '../src/runtime';
@@ -13,49 +14,66 @@ function drain(game: RuntimeSession) {
   return events;
 }
 
-describe('item-owned recipe materialization', () => {
-  it('resolves old references into ordered, isolated inline arrays without changing the source document', () => {
-    const document=createDefaultContent();
-    const card=document.cards.find(item=>item.definitionId==='eval-relocation-relay')!;
+describe('version 1 recipe references', () => {
+  /** A version 1 document: hooks may reference a shared effects library. */
+  function legacyDocument() {
+    const document=createDefaultContent() as unknown as Record<string, any>;
+    document.version=1;
+    document.effects=[
+      {id:'card-draw',name:'Draw',description:'',scope:'card',effects:[{kind:'draw',amount:1}]},
+      {id:'card-gain-crypto',name:'Crypto',description:'',scope:'card',effects:[{kind:'crypto',amount:1}]},
+      {id:'location-crypto',name:'Crypto',description:'',scope:'location',effects:[{kind:'crypto',amount:1}]},
+      {id:'circuit-composite',name:'Composite',description:'Two steps.',scope:'circuit',effects:[{kind:'vp',amount:2},{kind:'crypto',amount:3}]},
+    ];
+    const card=document.cards.find((item:{definitionId?:string})=>item.definitionId==='eval-relocation-relay');
     card.onReveal=[{kind:'crypto',amount:1}];
     card.effectRefs={onReveal:['card-draw','card-gain-crypto']};
+    document.locations[0].effects=[];
     document.locations[0].effectIds=['location-crypto'];
+    document.locations[1].effects=[];
     document.locations[1].effectIds=['location-crypto'];
-    document.effects.push({id:'circuit-composite',name:'Composite',description:'Two steps.',scope:'circuit',effects:[{kind:'vp',amount:2},{kind:'crypto',amount:3}]});
+    delete document.circuitRewards[0].effects;
     document.circuitRewards[0].effectId='circuit-composite';
+    return document;
+  }
+  const you={type:'player',who:'self'} as const;
+
+  it('inlines references in order as isolated, migrated steps without changing the source document', () => {
+    const document=legacyDocument();
     const original=structuredClone(document);
-    const materialized=materializeItemRecipes(document);
+    const upgraded=upgradeDocument(document) as ContentDocument;
     expect(document).toEqual(original);
-    const ownCard=materialized.cards.find(item=>item.definitionId==='eval-relocation-relay')!;
-    expect(ownCard.effectRefs).toBeUndefined();
-    expect(ownCard.onReveal).toEqual([{kind:'crypto',amount:1},{kind:'draw',amount:1},{kind:'crypto',amount:1}]);
-    expect(materialized.locations[0].effectIds).toBeUndefined();
-    expect(materialized.locations[0].effects).toEqual([...document.locations[0].effects,{kind:'crypto',amount:1}]);
-    expect(materialized.circuitRewards[0].effectId).toBeUndefined();
-    expect(materialized.circuitRewards[0].effects).toEqual([{kind:'vp',amount:2},{kind:'crypto',amount:3}]);
-    expect(materialized.circuitRewards[0].effect).toEqual({kind:'vp',amount:2});
-    expect(materializeItemRecipes(materialized)).toEqual(materialized);
-    expect(compileContent(document)).toEqual(compileContent(materialized));
-    ownCard.onReveal![1].amount=99;
-    expect(document.effects.find(effect=>effect.id==='card-draw')!.effects[0].amount).toBe(1);
-    (materialized.locations[0].effects.at(-1) as {amount:number}).amount=99;
-    expect(materialized.locations[1].effects.at(-1)?.amount).toBe(1);
+    expect(upgraded.version).toBe(2);
+    expect('effects' in upgraded).toBe(false);
+    const card=upgraded.cards.find(item=>item.definitionId==='eval-relocation-relay')!;
+    expect('effectRefs' in card).toBe(false);
+    expect(card.onReveal).toEqual([{action:'gainCrypto',amount:1,target:you},{action:'draw',amount:1,target:you},{action:'gainCrypto',amount:1,target:you}]);
+    expect('effectIds' in upgraded.locations[0]).toBe(false);
+    expect(upgraded.locations[0].effects).toEqual([{action:'gainCrypto',amount:1,target:{type:'player',who:'winner'}}]);
+    expect(upgraded.circuitRewards[0].effects).toEqual([{action:'gainVP',amount:2,target:you},{action:'gainCrypto',amount:3,target:you}]);
+    expect(validateContent(upgraded)).toEqual([]);
+    expect(upgradeDocument(upgraded)).toBe(upgraded);
+    (upgraded.locations[0].effects[0] as {amount:number}).amount=99;
+    expect(upgraded.locations[1].effects[0].amount).toBe(1);
   });
 
-  it('rejects unknown or wrong-scope legacy references even when a direct Circuit array is authoritative', () => {
-    const document=createDefaultContent();
-    document.circuitRewards[0].effects=[{kind:'vp',amount:4}];
+  it('rejects unknown or wrong-scope references', () => {
+    const document=legacyDocument();
     document.circuitRewards[0].effectId='missing';
-    expect(()=>materializeItemRecipes(document)).toThrow(/Unknown circuit recipe reference/);
+    expect(()=>upgradeDocument(document)).toThrow(/Unknown circuit recipe reference/);
     document.circuitRewards[0].effectId='card-draw';
-    expect(()=>materializeItemRecipes(document)).toThrow(/must have circuit scope/);
+    expect(()=>upgradeDocument(document)).toThrow(/must have circuit scope/);
+  });
+
+  it('asks for an upgrade instead of validating a version 1 document directly', () => {
+    expect(validateContent(legacyDocument() as never).join(' ')).toMatch(/upgradeDocument/);
   });
 });
 
 describe('multi-step Circuit reward recipes', () => {
   function rewardSession() {
     const document=createDefaultContent();
-    document.circuitRewards[0].effects=[{kind:'crypto',amount:2},{kind:'vp',amount:3},{kind:'restorePrimary',amount:50}];
+    document.circuitRewards[0].effects=migrateEffects([{kind:'crypto',amount:2},{kind:'vp',amount:3},{kind:'restorePrimary',amount:50}],'circuit');
     document.circuitRewards.slice(1).forEach(reward=>{reward.enabled=false;});
     const content=compileContent(document);
     const game=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,evaluationContent:true,random:seededRandom(19),content});
@@ -106,7 +124,7 @@ describe('multi-step Circuit reward recipes', () => {
 });
 
 describe('generated cards and card class metadata', () => {
-  it('seeds Horror from historic power metadata and rejects invalid Hacker and generated starters', () => {
+  it('seeds Horror from historic power metadata, rejects invalid Hacker cards and Generated currencies, and allows Generated starters', () => {
     const document=createDefaultContent();
     const horror=document.cards.find(card=>HISTORIC_SOURCE_METADATA[card.definitionId??card.id]?.types.includes('power'))!;
     expect(horror.cardClass).toBe('Horror');
@@ -117,9 +135,9 @@ describe('generated cards and card class metadata', () => {
     base.cardClass='Utility';
     const starter=document.cards.find(card=>card.definitionId==='slash-dot')!;
     starter.generated=true;
-    expect(validateContent(document)).toEqual(expect.arrayContaining([
-      expect.stringContaining('starting deck and must remain enabled'),
-    ]));
+    expect(validateContent(document)).toEqual([]);
+    document.cards.find(card=>card.definitionId==='kilo-coin')!.generated=true;
+    expect(validateContent(document)).toEqual(['cards: kilo-coin is a Draft currency and must remain enabled as a non-Generated Crypto card']);
   });
 
   it('lets Generated cards take any type and class while keeping them out of Draft', () => {
@@ -138,7 +156,7 @@ describe('generated cards and card class metadata', () => {
 
   it('retains enabled generated definitions for gain and Morph while excluding every market pool', () => {
     const document=createDefaultContent();
-    const generated:typeof document.cards[number]={...starterCards[0],id:'generated-sentinel',definitionId:'generated-sentinel',name:'Sentinel',art:'/forms/sentinel.png',effect:'Generated sentinel.',onReveal:[],pool:'Base',enabled:true,cardClass:'Utility',generated:true};
+    const generated:typeof document.cards[number]={...document.cards[0],id:'generated-sentinel',definitionId:'generated-sentinel',name:'Sentinel',art:'/forms/sentinel.png',effect:'Generated sentinel.',onReveal:[],pool:'Base',enabled:true,cardClass:'Utility',generated:true};
     document.cards.push(generated);
     const content=compileContent(document);
     expect(content.cards.find(card=>card.definitionId==='generated-sentinel')).toMatchObject({generated:true,cardClass:'Utility'});

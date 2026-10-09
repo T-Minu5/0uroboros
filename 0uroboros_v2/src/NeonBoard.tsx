@@ -17,6 +17,7 @@ const DRAIN = new THREE.Color('#fa0048').multiplyScalar(neonIntensity('#fa0048',
 const RESTORE = CHOICE.clone().multiplyScalar(neonIntensity(CHOICE, .75));
 /** Lane glass keeps a fifth of the etched frost noise, so the beds read clean under cards. */
 const LANE_GRAIN = .2;
+export const NEON_LANE_BASE_Y = .12;
 
 // Widths are half-widths in world units; at the play camera one unit is about 64 px across, 52 px deep.
 const fragment = `
@@ -135,12 +136,21 @@ void main(){
  gl_FragColor=vec4(color*mask*(1.-uClosed*.88)+uFillColor*winFill*(1.-alpha),alpha+winFill*(1.-alpha));
 }`;
 
+/** The lane's glass bed; `position` is the lane centre at the bed's base. */
+export function NeonLaneBed({ side, position, clippingPlanes }: { side: number; position: [number, number, number]; clippingPlanes?: THREE.Plane[] }) {
+  const polygon = useMemo(() => neonLanePolygon(side), [side]);
+  const geometry = useMemo(() => new THREE.ExtrudeGeometry(neonLaneShape(side), { depth: NEON_LANE_DEPTH, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: NEON_BEVEL, bevelThickness: NEON_BEVEL }), [side]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh position={position} rotation={[-Math.PI / 2, 0, 0]} geometry={geometry} receiveShadow>
+    <NeonGlassMaterial variant="lane" side={side} outline={polygon} space="model" grain={LANE_GRAIN} clippingPlanes={clippingPlanes} />
+  </mesh>;
+}
+
 export function NeonLane({ x, side, lit, open, closed, pattern }: { x: number; side: number; lit: 0 | 1 | 2 | 3; open: boolean; closed: boolean; pattern: LanePattern }) {
   const colors = usePlayerColors(), lighting = useBoardLighting();
   const reduced = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
   const dimensions = neonLaneDimensions(side);
   const polygon = useMemo(() => neonLanePolygon(side), [side]);
-  const geometry = useMemo(() => new THREE.ExtrudeGeometry(neonLaneShape(side), { depth: NEON_LANE_DEPTH, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: NEON_BEVEL, bevelThickness: NEON_BEVEL }), [side]);
   const base = useMemo(() => new THREE.Color(colors[side].accent), [colors, side]);
   const etching = useTexture(PATTERN_URL);
   useLayoutEffect(() => {
@@ -167,7 +177,6 @@ export function NeonLane({ x, side, lit, open, closed, pattern }: { x: number; s
     uFillColor: { value: new THREE.Color() },
   }), [side, x, dimensions.halfWidth, dimensions.halfDepth, dimensions.z, polygon, etching]);
   const glow = useRef<THREE.ShaderMaterial>(null);
-  useEffect(() => () => geometry.dispose(), [geometry]);
   // The pattern darkens with the closing plate's travel, in step with the sinking cards; a lane mounted closed starts dark.
   const closeStart = useRef(closed ? -Infinity : 0), wasClosed = useRef(closed);
   useLayoutEffect(() => {
@@ -205,9 +214,7 @@ export function NeonLane({ x, side, lit, open, closed, pattern }: { x: number; s
     u.uSignal.value.copy(pulse?.kind === 'drain' ? DRAIN : RESTORE).multiplyScalar(amount);
   });
   return <group name={`neon-lane-${side}-${x}`}>
-    <mesh position={[x, .12, dimensions.z]} rotation={[-Math.PI / 2, 0, 0]} geometry={geometry} receiveShadow>
-      <NeonGlassMaterial variant="lane" side={side} outline={polygon} space="model" grain={LANE_GRAIN} />
-    </mesh>
+    <NeonLaneBed side={side} position={[x, NEON_LANE_BASE_Y, dimensions.z]} />
     <mesh position={[x, .208, dimensions.z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
       <planeGeometry args={[dimensions.halfWidth * 2 + .08, dimensions.halfDepth * 2 + .08]} />
       <shaderMaterial ref={glow} uniforms={uniforms} vertexShader={vertex} fragmentShader={fragment} transparent depthWrite={false} blending={THREE.CustomBlending} blendEquation={THREE.AddEquation} blendSrc={THREE.OneFactor} blendDst={THREE.OneMinusSrcAlphaFactor} blendSrcAlpha={THREE.ZeroFactor} blendDstAlpha={THREE.OneFactor} toneMapped={false} />

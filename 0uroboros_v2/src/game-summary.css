@@ -9,12 +9,31 @@
  box-shadow:0 -18px 60px #000a,inset 0 1px 0 #ffffff14;
  transform:translateX(-50%);
  animation:summary-rise 620ms cubic-bezier(.2,.9,.25,1) both;
+ /* Collapsing slides on `translate`, which stacks with the rise animation's `transform` instead of fighting it. */
+ transition:translate 420ms cubic-bezier(.4,0,.2,1),visibility 0s linear 0s;
 }
-.game-summary::before{
- content:'';display:block;flex:0 0 auto;
- width:44px;height:4px;margin:-8px auto 0;border-radius:2px;background:#ffffff2e;
-}
+.game-summary.collapsed{translate:0 calc(100% + 24px);visibility:hidden;transition:translate 420ms cubic-bezier(.4,0,.2,1),visibility 0s linear 420ms}
 @keyframes summary-rise{from{transform:translate(-50%,100%)}to{transform:translate(-50%,0)}}
+/* The grab bar doubles as the collapse control. */
+.summary-collapse{
+ flex:0 0 auto;align-self:center;display:grid;place-items:center;width:64px;height:16px;margin:-12px auto -6px;padding:0;
+ border:0;border-radius:8px;background:none;cursor:pointer;
+}
+.summary-collapse i{width:44px;height:4px;border-radius:2px;background:#ffffff2e;transition:background .15s,width .15s}
+.summary-collapse:hover i,.summary-collapse:focus-visible i{width:52px;background:#ffffff70}
+.summary-collapse:focus-visible{outline:1px solid #b990db;outline-offset:2px}
+.summary-expand{
+ position:fixed;left:50%;bottom:0;z-index:60;display:flex;align-items:center;gap:10px;
+ padding:9px 18px 10px;border:1px solid #806694;border-bottom:0;border-radius:12px 12px 0 0;
+ background:linear-gradient(180deg,#0d0e1ef2,#07070fe8);box-shadow:0 -10px 30px #0008;color:#eaf0f6;cursor:pointer;
+ transform:translateX(-50%);translate:0 110%;visibility:hidden;
+ transition:translate 360ms cubic-bezier(.2,.9,.25,1),visibility 0s linear 360ms;
+}
+.summary-expand.shown{translate:0 0;visibility:visible;transition:translate 360ms cubic-bezier(.2,.9,.25,1) 260ms,visibility 0s linear 0s}
+.summary-expand i{width:0;height:0;border:5px solid transparent;border-bottom:6px solid #b990db;margin-top:-6px}
+.summary-expand b{font:600 12px Orbitron;letter-spacing:1px}
+.summary-expand span{font-size:11px;color:#b6b9cd;font-variant-numeric:tabular-nums}
+.summary-expand:hover{border-color:#b990db}
 
 .summary-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
 .summary-head small{display:flex;align-items:center;gap:6px;font:8px Orbitron;letter-spacing:1.5px;color:#b990db}
@@ -81,4 +100,5 @@
 }
 @media (prefers-reduced-motion:reduce){
  .game-summary,.summary-rows>li,.summary-card{animation:none}
+ .game-summary,.game-summary.collapsed,.summary-expand,.summary-expand.shown{transition:none}
 }

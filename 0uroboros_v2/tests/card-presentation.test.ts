@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
@@ -56,12 +57,34 @@ describe('shared card presentation', () => {
   it('uses explicit remaining Duration including zero and distinguishes changed Power', () => {
     const infinite = renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 99, basePower: 1 } }));
     expect(infinite).toContain('data-card-duration="99"');
-    expect(infinite).toContain('>∞</b>');
+    expect(infinite).toContain('icon-infinite.svg');
+    expect(infinite).not.toContain('</b></span>');
+    const turns = renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 3, durationPeriod: 'runtime' } }));
+    expect(turns).toContain('icon-turns.svg');
+    expect(turns).toContain('<b>3</b>');
+    expect(renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 3, durationPeriod: 'cycle' } }))).toContain('icon-duration.svg');
     expect(infinite).toContain('data-card-power="2"');
     expect(infinite).toContain('boosted');
     const zero = renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 99, power: 0, basePower: 2 }, remainingDuration: 0, powerChanging: true }));
     expect(zero).toContain('data-card-duration="0"');
     expect(zero).toContain('reduced power-changing');
     expect(renderToStaticMarkup(createElement(CardFace, { card: sample, remainingDuration: 0 }))).not.toContain('data-card-duration');
+  });
+
+  it('shows Effect Bank cards with only their effects-left badge', () => {
+    const banked = renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 3, durationPeriod: 'runtime' }, compact: true, remainingDuration: 2, bankEffects: 0 }));
+    expect(banked).toContain('data-effects-left="0"');
+    expect(banked).toContain('icon-turns.svg');
+    expect(banked).not.toContain('data-card-duration');
+    expect(banked).not.toContain('data-card-power');
+    const endless = renderToStaticMarkup(createElement(CardFace, { card: { ...sample, duration: 99 }, compact: true, bankEffects: null }));
+    expect(endless).toContain('data-effects-left="infinite"');
+    expect(endless).toContain('icon-infinite.svg');
+  });
+
+  it('colours raised Power Cyan and lowered Power Pink', () => {
+    const css = readFileSync('src/card-face.css', 'utf8');
+    expect(css).toMatch(/\.cf-power\.card-power-value\.boosted\{[^}]*color:var\(--cyan/);
+    expect(css).toMatch(/\.cf-power\.card-power-value\.reduced\{[^}]*color:var\(--pink/);
   });
 });

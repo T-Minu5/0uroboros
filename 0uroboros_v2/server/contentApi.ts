@@ -6,6 +6,8 @@ import type { ContentDocument } from '../src/authoring/contentModel';
 export type ContentModelModule = {
   createDefaultContent(): ContentDocument;
   validateContent(value: unknown): string[];
+  /** Returns an older document in the current format, or the same value when it is already current. */
+  upgradeDocument?(value: unknown): unknown;
 };
 export type StoredContent = { revision: number; document: ContentDocument | null };
 export type ContentApiOptions = { filePath?: string; loadModel: () => Promise<ContentModelModule>; maxBytes?: number; onSaved?: (document: ContentDocument) => unknown };
@@ -88,14 +90,22 @@ export function createContentApi(options: ContentApiOptions) {
     if ((request.url ?? '').split('?')[0] !== '/api/content') return next();
     if (!isLocalRequest(request)) { reply(response, 403, { error: 'Content API is available only from this local app.' }); return; }
     if (request.method === 'GET') {
-      try {
-        const stored = await readStored(filePath);
+      const operation = writes.then(async () => {
+        let stored = await readStored(filePath);
         const model = await options.loadModel();
-        const document = stored.document ?? model.createDefaultContent();
+        const upgraded = stored.document && model.upgradeDocument ? model.upgradeDocument(stored.document) as ContentDocument : stored.document;
+        const document = upgraded ?? model.createDefaultContent();
         const errors = model.validateContent(document);
         if (errors.length) throw new Error(`Saved content is invalid: ${errors.join('; ')}`);
+        // An older save is rewritten once in the current format; the previous file stays as the .bak copy.
+        if (upgraded && upgraded !== stored.document) {
+          stored = { revision: stored.revision + 1, document: upgraded };
+          await atomicSave(filePath, stored);
+        }
         reply(response, 200, { revision: stored.revision, document });
-      } catch (error) { reply(response, 500, { error: error instanceof Error ? error.message : 'Unable to read content.' }); }
+      }).catch(error => reply(response, 500, { error: error instanceof Error ? error.message : 'Unable to read content.' }));
+      writes = operation;
+      await operation;
       return;
     }
     if (request.method !== 'PUT') { response.setHeader('Allow', 'GET, PUT'); reply(response, 405, { error: 'Method not allowed.' }); return; }

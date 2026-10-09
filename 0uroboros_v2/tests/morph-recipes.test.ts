@@ -42,19 +42,19 @@ describe('Morph recipes', () => {
     game.state.players[0].hand.push(source);
     game.deploy(source.id, 0);
     const placement = game.state.nodes[0].cards[0][0];
-    placement.powerModifier = 3;
+    placement.card.powerDelta = 3;
     game.endTurn();
     let first: RuntimeEvent | undefined;
     while (game.pendingCount && !first) { const event = game.step()!.event; if (event.kind === 'morph') first = event; }
     expect(first).toMatchObject({ owner: 0, cardId: 'evolver', targetCardId: 'evolver', targetOwner: 0, node: 0, sourceName: 'evolver', before: 5, after: 7, definitionId: 'form-a' });
-    expect(placement).toMatchObject({ card: { id: 'evolver', definitionId: 'form-a', name: 'form-a', art: '/forms/form-a.png' }, powerModifier: 3, node: 0, revealed: true });
+    expect(placement).toMatchObject({ card: { id: 'evolver', definitionId: 'form-a', name: 'form-a', art: '/forms/form-a.png', powerDelta: 3 }, node: 0, revealed: true });
     expect(game.state.nodes[0].powers[0]).toBe(7);
     const secondTurn = finish(game);
     expect(secondTurn.filter(event => event.kind === 'crypto' || event.kind === 'morph').map(event => [event.kind, event.amount, event.definitionId])).toEqual([
       ['crypto', 1, undefined], ['morph', undefined, 'form-b'],
     ]);
     expect(placement.card).toMatchObject({ id: 'evolver', definitionId: 'form-b', type: 'VP', vp: 6 });
-    expect(placement.powerModifier).toBe(3);
+    expect(placement.card.powerDelta).toBe(3);
     expect(game.state.nodes[0].powers[0]).toBe(4);
     expect(game.view().players[0].totalVP).toBe(6);
     expect(game.state.players[0].wallet).toBe(1);
@@ -134,7 +134,7 @@ describe('Morph recipes', () => {
     expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('timed-form');
     game.endTurn();
     expect(finish(game).filter(event=>event.kind==='crypto')).toHaveLength(0);
-    expect(game.state.players[0].discard.find(item=>item.id==='source')?.definitionId).toBe('timed-form');
+    expect(game.state.nodes[0].cards[0].find(item=>item.card.id==='source')?.card.definitionId).toBe('timed-form');
   });
 
   it('retains one-shot source Morph while each entered form uses its own relative schedule', () => {

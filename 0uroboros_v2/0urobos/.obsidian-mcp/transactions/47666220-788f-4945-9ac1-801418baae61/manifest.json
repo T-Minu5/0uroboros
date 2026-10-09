@@ -1,0 +1,18 @@
+{
+  "id": "47666220-788f-4945-9ac1-801418baae61",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:10.695Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Server effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "fed1f14391eaf393d1b07d0166ab822c64c6905e3f24221a4c53288414625167",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "fed1f14391eaf393d1b07d0166ab822c64c6905e3f24221a4c53288414625167"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:10.737Z"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "4ac71aa9-4c61-42df-825a-cab0371b19aa",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:39.693Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Zones/Destroyed.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "f40f600f63c4a9e0c26a9fae9b5f9c6ad23d2f9dadf562f7574ccd869c6f91f3",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "f40f600f63c4a9e0c26a9fae9b5f9c6ad23d2f9dadf562f7574ccd869c6f91f3"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:39.734Z"
+}

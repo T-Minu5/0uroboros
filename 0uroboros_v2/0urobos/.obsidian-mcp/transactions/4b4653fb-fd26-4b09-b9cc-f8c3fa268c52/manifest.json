@@ -1,0 +1,18 @@
+{
+  "id": "4b4653fb-fd26-4b09-b9cc-f8c3fa268c52",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:09.192Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Resource effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "5ba5ebac501988578a5fb1b88e327b8c218ecd2b4a8bea879921181b315ae47c",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "5ba5ebac501988578a5fb1b88e327b8c218ecd2b4a8bea879921181b315ae47c"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:09.233Z"
+}

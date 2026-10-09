@@ -82,38 +82,57 @@
  flex:1 1 0;min-height:0;
  overflow:auto;align-content:start;
 }
-/* Two Character rows plus the smaller VP/Crypto row fit the board height (≈3.9 card widths tall plus ~460px of Draft chrome). */
-.draft-market-board{--draft-card-w:clamp(110px,calc((100dvh - 460px) * .255),170px);--draft-resource-w:calc(var(--draft-card-w) * .82)}
+/* One Character row plus the smaller VP/Currency row fit the board height (≈2.6 card widths tall plus ~500px of Draft chrome and group labels).
+   The Character row holds 7 cards (3 offers + 4 game cards) and 124px of gaps, so the width caps at (1280 - 124) / 7. */
+.draft-market-board{--draft-card-w:clamp(110px,min(calc((100dvh - 500px) * .38),calc((100vw - 190px) / 7)),164px);--draft-resource-w:calc(var(--draft-card-w) * .82)}
 .market-hint{margin:0;font-size:11px;color:#9ea8bb;letter-spacing:.2px}
 .market-band,.market-band.resources{display:grid;gap:12px;justify-content:stretch;margin:0}
-/* Badges overhang the card edge (power top-right, cost right), so rows and gaps leave room for them. */
+/* The power badge overhangs the card's top-right edge, so rows and gaps leave room for it. */
 .market-row{display:flex;flex-wrap:wrap;align-items:flex-start;padding-top:8px}
 .character-row{gap:14px 34px}
 .market-group{display:flex;flex-wrap:wrap;gap:14px 18px}
 .market-group>.market-card{width:var(--draft-card-w)}
-.resource-row{gap:14px 18px}
-.resource-row>.market-card{width:var(--draft-resource-w)}
+.market-group-label{flex-basis:100%;margin:0 0 -6px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#c6cfdf}
+.market-group-label small{margin-left:6px;font-size:10px;font-weight:400;letter-spacing:.2px;text-transform:none;color:#8f9ab0}
+.resource-row{gap:14px 34px}
+.resource-row .market-card{width:var(--draft-resource-w)}
 
 .strategic-draft .market-card{
  display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:0;padding:0;
  background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;
 }
-.strategic-draft .market-art.acquire-card,
-.strategic-draft .market-art.acquire-card:hover{
+.strategic-draft .market-art,
+.strategic-draft .market-art:hover{
  display:block;width:100%;height:auto;aspect-ratio:170/236;padding:0;margin:0;
  border:0;border-radius:8px;background:none;overflow:visible;
  transition:transform .16s ease,filter .2s ease;
 }
 .strategic-draft .market-art>.cf-card{width:100%;height:100%}
-.strategic-draft .market-art.can-afford:hover{transform:translateY(-4px)}
+.strategic-draft .market-art:hover{transform:translateY(-4px)}
 .strategic-draft .market-art:focus-visible{outline:2px solid #1fffb1;outline-offset:4px}
-.strategic-draft .market-art[aria-disabled="true"]{cursor:default;filter:saturate(.7) brightness(.72)}
+.strategic-draft .market-card.unavailable .market-art{filter:saturate(.7) brightness(.72)}
 .strategic-draft .market-card.sold-out .market-art{filter:grayscale(1) brightness(.45)}
 .strategic-draft .market-card.just-acquired{border:0;box-shadow:none}
 .strategic-draft .market-card.just-acquired .market-art{animation:market-acquired .6s ease-out}
 @keyframes market-acquired{from{transform:scale(1.05);filter:brightness(1.45)}}
-.market-stock{font:600 10px/1 Orbitron;letter-spacing:.4px;color:#9ea8bb;text-align:center}
-.market-card.just-acquired .market-stock{color:#1fffb1}
+/* Same badge treatment the card cost used to carry, stretched to the card's width. */
+.strategic-draft .market-card>.market-acquire,
+.strategic-draft .market-card>.market-acquire:hover{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px 4px;
+ width:100%;min-height:28px;padding:5px 6px;margin:0;
+ border:1px solid #1fffb1;border-radius:8px;color:#1fffb1;background:#003246;
+ box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;
+ font:500 12px/1 Inter,system-ui,sans-serif;text-shadow:none;
+ transition:background .16s ease,box-shadow .16s ease,opacity .2s ease;
+}
+.strategic-draft .market-card>.market-acquire.can-afford:hover{background:#004a5c;box-shadow:0 0 12px #1fffb140}
+.strategic-draft .market-acquire:focus-visible{outline:2px solid #1fffb1;outline-offset:3px}
+.strategic-draft .market-card>.market-acquire[aria-disabled="true"]{cursor:default;opacity:.45}
+.strategic-draft .market-acquire>.market-acquire-label{display:inline-flex;align-items:center;gap:4px;color:#1fffb1;letter-spacing:.02em;white-space:nowrap}
+.strategic-draft .market-acquire-label .icon{display:block;width:10px;height:12px}
+.strategic-draft .market-acquire-label b{font:inherit}
+.strategic-draft .market-acquire>.market-acquire-remain{margin-left:auto;font:400 10px/1 Inter,system-ui,sans-serif;color:#8fd9c1;white-space:nowrap}
+.strategic-draft .market-card.just-acquired>.market-acquire{background:#00594a}
 
 .draft-footer{
  max-width:1280px;width:100%;margin:0 auto;
@@ -156,22 +175,29 @@
 .choice-group-actions button{min-width:78px;padding:6px 10px;font-size:11px;background:#252438}
 .choice-options button.selected,.choice-group-actions button.selected,.choice-options button.selected:hover:not(:disabled),.choice-group-actions button.selected:hover:not(:disabled){border-color:#ffd36b;background:#5e4f1f;color:#fff;font-weight:600;box-shadow:0 0 12px #ffd36b55}
 .choice-options button.selected::before,.choice-group-actions button.selected::before{content:'✓ '}
+.choice-options button:disabled{opacity:.45;cursor:not-allowed}.choice-unpayable{display:block;margin-top:2px;color:#ff8fb8;font-size:10px;letter-spacing:.04em;text-transform:uppercase}
 .choice-dialog footer{display:flex;align-items:center;gap:12px}
+.choice-dialog footer>span{flex:1}.choice-actions{display:flex;align-items:center;gap:14px;margin-left:auto}
+.choice-dialog .choice-decline{padding:8px 4px;border:0;background:none;color:#c9d2e3;font:500 12px Inter,sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}.choice-dialog .choice-decline:hover{color:#fff}
 .choice-confirm{padding:8px 22px;font:600 12px Orbitron;letter-spacing:.6px;border-color:#ffd36b;background:#3a3320;color:#fff3cf}
 .choice-confirm:hover:not(:disabled){background:#54482a;border-color:#ffe199}
 /* Node choices happen on the board: no scrim over the table and only the dialog takes pointer input. */
 .choice-backdrop.node-choice{pointer-events:none;background:linear-gradient(to top,#050614cc 0,#05061400 190px)}
 .choice-backdrop.node-choice .choice-dialog{pointer-events:auto;border-color:#ffd36b88}
+/* Circuit announcements: the choice dialog's look, passive and under the Draft overlay so a Draft opening covers it. */
+.choice-backdrop.event-message{z-index:46;pointer-events:none;background:linear-gradient(to top,#050614cc 0,#05061400 190px)}
+.event-dialog footer{margin-top:8px}
+.event-dialog.circuit-event{border-color:#c2a95f}
+.event-dialog.circuit-event>small{color:#ffcc12}
 .choice-options.node-options{grid-template-columns:repeat(auto-fit,minmax(90px,max-content))}
 .choice-options.node-options button{min-height:32px;padding:6px 14px}
 @keyframes choice-rise{from{transform:translateY(calc(100% + 60px))}to{transform:none}}
 @keyframes choice-scrim{from{opacity:0}}
 @media(prefers-reduced-motion:reduce){.choice-backdrop,.choice-dialog{animation:none}}
-.trash-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}.trash-list button{padding:12px;text-align:left}.trash-list small{display:block;margin-top:6px;color:#a8b0c4;line-height:1.5}
 .effect-path.move,.effect-path.probability,.effect-path.bank,.effect-path.trash{color:#c4a0f3}
 @media(max-width:1100px){
- .draft-market-board{--draft-card-w:clamp(110px,calc((100dvh - 460px) * .255),136px)}
- .character-row{column-gap:22px}
+ .draft-market-board{--draft-card-w:clamp(110px,min(calc((100dvh - 500px) * .38),calc((100vw - 170px) / 7)),136px)}
+ .character-row,.resource-row{column-gap:22px}
  .draft-topbar{flex-direction:column;align-items:stretch}
  .draft-wallet-hero{align-items:flex-start;padding-left:0}
  .cycle-summary{width:100%}
@@ -179,7 +205,7 @@
 }
 @media(max-width:760px){
  .draft-market-board{--draft-card-w:calc(50vw - 40px);--draft-resource-w:calc(33vw - 30px)}
- .character-row{column-gap:18px}
+ .character-row,.resource-row{column-gap:18px}
  .choice-options{grid-template-columns:1fr}
  .draft-footer{flex-wrap:wrap}
  .draft-wallet-hero .wallet-hero-value b{font-size:40px}

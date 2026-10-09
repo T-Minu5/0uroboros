@@ -1,0 +1,18 @@
+{
+  "id": "d121b7fa-4bb2-4366-ae05-a6520f7a931b",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:02.728Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Cards/VP card.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "ae24b3cba6852c1d2c3dd7520a4d865436e9f99d9482cbd03d8727054a4a0e8f",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "ae24b3cba6852c1d2c3dd7520a4d865436e9f99d9482cbd03d8727054a4a0e8f"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:02.768Z"
+}

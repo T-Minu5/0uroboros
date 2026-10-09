@@ -1,0 +1,46 @@
+{
+  "gameId": "game-muud1678",
+  "version": 2,
+  "startedAt": "2026-10-04T21:56:02.442Z",
+  "finished": true,
+  "notes": [],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 1,
+    "phase": "gameover",
+    "winner": null,
+    "endedReason": "Session ended early for evaluation. Tie, 3 to 3 VP.",
+    "finalVP": [
+      3,
+      3
+    ],
+    "servers": [
+      3500,
+      3500
+    ],
+    "purchases": [],
+    "cycles": [],
+    "decks": [
+      {
+        "byte-coin": 1,
+        "basic-encryption": 1,
+        "dotkrawler": 1,
+        "shyte-coin": 3,
+        "rezz-blade": 1,
+        "night-scythe": 1,
+        "slash-dot": 1,
+        "vault-encryption": 1
+      },
+      {
+        "byte-coin": 1,
+        "basic-encryption": 1,
+        "dotkrawler": 1,
+        "shyte-coin": 3,
+        "rezz-blade": 1,
+        "night-scythe": 1,
+        "slash-dot": 1,
+        "vault-encryption": 1
+      }
+    ]
+  }
+}

@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { compileContent, createDefaultContent, type ContentDocument } from '../src/authoring/contentModel';
 import { starterCards, type Card } from '../src/game';
 import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { migrateEffects } from '../src/effects/migrate';
+
+const you = { type: 'player', who: 'self' } as const;
 
 const identity = (card: Card) => card.definitionId ?? card.id;
 const saved = (document: ContentDocument) => compileContent(JSON.parse(JSON.stringify(document)) as ContentDocument);
@@ -30,42 +33,41 @@ const finish = (session: RuntimeSession) => {
 };
 
 describe('authored content in RuntimeSession', () => {
-  it('maps all ten canonical starter slots to authored definitions while preserving unique instance IDs', () => {
+  it('deals the active starting deck from authored definitions with unique instance IDs', () => {
     const document = createDefaultContent();
     const slash = document.cards.find(card => identity(card) === 'slash-dot')!;
     slash.name = 'Saved Slash'; slash.power = 6; slash.cost = 9;
-    slash.onReveal = [{ kind: 'crypto', amount: 4 }];
+    slash.onReveal = [{ action: 'gainCrypto', amount: 4, target: you }];
     const byte = document.cards.find(card => identity(card) === 'byte-coin')!;
     byte.name = 'Saved Byte'; byte.cryptoValue = 9;
     const vault = document.cards.find(card => identity(card) === 'vault-encryption')!;
     vault.name = 'Saved Vault'; vault.vp = 7;
     const compiled = saved(document);
     const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(19), strategicMarket: true, evaluationContent: true, content: compiled });
-    const slots: Record<string, string> = {
-      slash: 'slash-dot', 'dash-dot': 'dash-dot', dotkrawler: 'dotkrawler', razor: 'rezz-razor', blade: 'rezz-blade',
-      'byte-1': 'byte-coin', 'byte-2': 'byte-coin', kilo: 'kilo-coin',
-      'vault-1': 'vault-encryption', 'vault-2': 'vault-encryption',
-    };
+    const expected: Record<string, number> = { 'byte-coin': 1, 'shyte-coin': 3, dotkrawler: 1, 'slash-dot': 1, 'rezz-blade': 1, 'basic-encryption': 1, 'vault-encryption': 1, 'night-scythe': 1 };
     for (const owner of [0, 1] as const) {
       const cards = [...session.state.players[owner].hand, ...session.state.players[owner].draw];
       expect(cards).toHaveLength(10);
       expect(new Set(cards.map(card => card.id)).size).toBe(10);
-      for (const [slot, definitionId] of Object.entries(slots)) {
-        const instance = cards.find(card => card.id === `${owner}:${slot}`);
+      for (const [definitionId, copies] of Object.entries(expected)) {
+        const instances = cards.filter(card => card.definitionId === definitionId);
         const definition = compiled.cards.find(card => identity(card) === definitionId);
-        expect(instance).toMatchObject({ definitionId, name: definition?.name, cost: definition?.cost });
-        expect(instance?.onReveal).toEqual(definition?.onReveal);
+        expect(instances.map(card => card.id).sort()).toEqual(Array.from({ length: copies }, (_, copy) => `${owner}:${definitionId}-${copy + 1}`));
+        for (const instance of instances) {
+          expect(instance).toMatchObject({ name: definition?.name, cost: definition?.cost });
+          expect(instance.onReveal).toEqual(definition?.onReveal);
+        }
       }
-      expect(cards.find(card => card.id === `${owner}:slash`)).toMatchObject({ name: 'Saved Slash', power: 6, cost: 9 });
-      expect(cards.find(card => card.id === `${owner}:byte-1`)).toMatchObject({ name: 'Saved Byte', cryptoValue: 9 });
-      expect(cards.find(card => card.id === `${owner}:vault-1`)).toMatchObject({ name: 'Saved Vault', vp: 7 });
+      expect(cards.find(card => card.id === `${owner}:slash-dot-1`)).toMatchObject({ name: 'Saved Slash', power: 6, cost: 9 });
+      expect(cards.find(card => card.id === `${owner}:byte-coin-1`)).toMatchObject({ name: 'Saved Byte', cryptoValue: 9 });
+      expect(cards.find(card => card.id === `${owner}:vault-encryption-1`)).toMatchObject({ name: 'Saved Vault', vp: 7 });
     }
-    expect(session.view().players[0].totalVP).toBe(14);
+    expect(session.view().players[0].totalVP).toBe(8);
 
     const local = [...session.state.players[0].hand, ...session.state.players[0].draw];
-    const slashInstance = local.find(card => card.id === '0:slash')!;
-    const byteInstance = local.find(card => card.id === '0:byte-1')!;
-    const vaultInstance = local.find(card => card.id === '0:vault-1')!;
+    const slashInstance = local.find(card => card.id === '0:slash-dot-1')!;
+    const byteInstance = local.find(card => card.id === '0:byte-coin-1')!;
+    const vaultInstance = local.find(card => card.id === '0:vault-encryption-1')!;
     empty(session);
     session.state.players[0].hand = [slashInstance, byteInstance, vaultInstance];
     session.state.players[0].servers.primary = 1800;
@@ -85,45 +87,52 @@ describe('authored content in RuntimeSession', () => {
     expect(last).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'crypto', cardId: byteInstance.id, amount: 9 })]));
   });
 
-  it('builds the stable market and rotating offers from enabled authored pools and costs', () => {
+  it('builds game cards and each Draft offer from enabled authored pools and costs', () => {
     const document = createDefaultContent();
     document.cards.find(card => identity(card) === 'slash-dot')!.cost = 11;
     document.cards.find(card => identity(card) === 'eval-relocation-relay')!.cost = 1;
     const base = new Set(['slash-dot', 'dash-dot', 'dotkrawler', 'eval-cycle-cache', 'eval-relocation-relay', 'eval-signal-amplifier']);
-    const chaos = new Set(['rezz-razor', 'rezz-blade', 'eval-hostile-reroute', 'eval-power-siphon']);
+    const chaos = new Set(['rezz-razor', 'rezz-blade', 'eval-hostile-reroute', 'eval-power-siphon', 'veil-of-cthulhu']);
     document.cards.forEach(card => {
       if (card.pool === 'Base') card.enabled = base.has(identity(card));
       if (card.pool === 'Chaos') card.enabled = chaos.has(identity(card));
     });
+    document.startingDecks![0].cards = document.startingDecks![0].cards.filter(entry => entry.cardId !== 'night-scythe');
     const session = make(document);
-    const stables = session.state.market.filter(pile => pile.category === 'Base' && !pile.rotating);
-    expect(stables).toHaveLength(4);
-    const slash = session.state.market.find(pile => pile.id === 'Base:slash-dot');
-    if (slash) expect(slash.card.cost).toBe(11);
-    empty(session);
-    session.state.turn = 3;
-    session.endTurn(); finish(session);
-    const rotating = session.state.market.filter(pile => pile.category === 'Base' && pile.rotating);
-    expect(rotating).toHaveLength(2);
-    const stableIds = new Set(stables.map(pile => identity(pile.card)));
-    expect(rotating.every(pile => !stableIds.has(identity(pile.card)))).toBe(true);
-    expect([...stables, ...rotating].every(pile => base.has(identity(pile.card)))).toBe(true);
-    expect(new Set(session.state.market.filter(pile => pile.category === 'Chaos').map(pile => identity(pile.card)))).toEqual(chaos);
-    const relocation = session.state.market.find(pile => pile.id === 'Base:eval-relocation-relay');
-    if (relocation) expect(relocation.card.cost).toBe(1);
+    const characters = (pile: { category: string }) => pile.category === 'Base' || pile.category === 'Chaos';
+    const game = session.state.market.filter(pile => characters(pile) && !pile.rotating);
+    expect(game).toHaveLength(4);
+    expect(game.filter(pile => base.has(identity(pile.card)))).toHaveLength(2);
+    expect(game.filter(pile => chaos.has(identity(pile.card)))).toHaveLength(2);
+    expect(game.some(pile => identity(pile.card) === 'veil-of-cthulhu')).toBe(true);
+    const offers: string[][] = [];
+    for (let round = 0; round < 3; round++) {
+      empty(session);
+      session.state.turn = 3;
+      session.endTurn(); finish(session);
+      const offer = session.state.market.filter(pile => pile.rotating);
+      expect(offer).toHaveLength(3);
+      expect(offer.every(pile => !game.some(fixed => identity(fixed.card) === identity(pile.card)))).toBe(true);
+      expect(offer.every(pile => base.has(identity(pile.card)) || chaos.has(identity(pile.card)))).toBe(true);
+      offers.push(offer.map(pile => identity(pile.card)));
+      for (const pile of [...game, ...offer]) {
+        if (identity(pile.card) === 'slash-dot') expect(pile.card.cost).toBe(11);
+        if (identity(pile.card) === 'eval-relocation-relay') expect(pile.card.cost).toBe(1);
+      }
+      session.endDraft(0); session.endDraft(1); session.nextCycle();
+    }
+    expect(offers[1].some(id => offers[0].includes(id))).toBe(false);
+    expect(offers[2].some(id => offers[1].includes(id))).toBe(false);
   });
 
-  it('resolves authored Location and Circuit recipes during Collapse and Draft', () => {
+  it('resolves authored Location and Circuit effects during Collapse and Draft', () => {
     const document = createDefaultContent();
     document.locations[0].name = 'Saved Exchange';
-    document.locations[0].effects = [];
-    document.locations[0].effectIds = ['location-crypto'];
+    document.locations[0].effects = [{ action: 'gainCrypto', amount: 7, target: { type: 'player', who: 'winner' } }];
     document.locations.slice(1).forEach(location => { location.effects = []; });
-    document.effects.find(effect => effect.id === 'location-crypto')!.effects = [{ kind: 'crypto', amount: 7 }];
     document.circuitRewards[0].name = 'Saved Crown';
-    document.circuitRewards[0].effectId = 'circuit-vp';
+    document.circuitRewards[0].effects = [{ action: 'gainVP', amount: 9, target: you }];
     document.circuitRewards.slice(1).forEach(reward => { reward.enabled = false; });
-    document.effects.find(effect => effect.id === 'circuit-vp')!.effects = [{ kind: 'vp', amount: 9 }];
     // Keep a five-Location board so the authored fixture is guaranteed to appear.
     document.locations.forEach((location, index) => { if (index >= 5) location.enabled = false; });
     const session = make(document);
@@ -138,24 +147,24 @@ describe('authored content in RuntimeSession', () => {
     ]));
     expect(session.state.players[0].wallet).toBe(7);
     expect(session.state.players[1].wallet).toBe(7);
-    expect(session.state.circuitReward.definition).toMatchObject({ name: 'Saved Crown', effect: { kind: 'vp', amount: 9 } });
+    expect(session.state.circuitReward.definition).toMatchObject({ name: 'Saved Crown', effect: { action: 'gainVP', amount: 9 } });
     expect(session.claimCircuitReward(0)).toMatchObject({ kind: 'vp', sourceName: 'Saved Crown', amount: 9 });
     expect(session.state.players[0].rewardVP).toBe(9);
   });
 
-  it('runs resolved card effectRefs from an injected authored card through move and Power choices', () => {
+  it('runs an injected authored card through move and Power choices', () => {
     const document = createDefaultContent();
     const source = document.cards.find(card => identity(card) === 'eval-relocation-relay')!;
     source.name = 'Saved Relay'; source.power = 3; source.cost = 6;
-    source.onReveal = [];
-    source.effectRefs = { onReveal: ['card-move-opponent', 'card-power-surge'] };
+    const printed = migrateEffects([{ kind: 'moveCard', opponent: true }, { kind: 'modifyPower', amount: 2 }], 'card');
+    source.onReveal = printed;
     const session = make(document);
     empty(session);
     session.state.nodeOrder = [0, 1, 2, 3, 4];
     session.state.priority = 0;
     session.state.nodes[0].cards[1].push({ card: { ...starterCards[0], id: 'opponent-target' }, owner: 1, node: 0, order: 1, revealed: true });
     const added = session.addEvaluationCard('eval-relocation-relay');
-    expect(session.state.players[0].hand[0]).toMatchObject({ name: 'Saved Relay', cost: 6, power: 3, onReveal: [{ kind: 'moveCard', opponent: true }, { kind: 'modifyPower', amount: 2 }] });
+    expect(session.state.players[0].hand[0]).toMatchObject({ name: 'Saved Relay', cost: 6, power: 3, onReveal: printed });
     session.deploy(added.cardId!, 0); session.endTurn(); advance(session);
     expect(session.state.choice?.options.map(option => option.id)).toEqual(['card-opponent-target']);
     session.choose('card-opponent-target');
@@ -178,7 +187,7 @@ describe('authored content in RuntimeSession', () => {
     const originalCardName = source.name;
     const originalLocationName = compiled.locations[0].name;
     const originalReward = structuredClone(compiled.circuitRewards[0]);
-    const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(19), strategicMarket: true, evaluationContent: true, content: compiled });
+    const session = createSession({ carryover: true, priorityPreference: 'higher', random: seededRandom(20), strategicMarket: true, evaluationContent: true, content: compiled });
     empty(session);
     source.name = 'Caller Mutation';
     source.cost = 999;
@@ -192,8 +201,13 @@ describe('authored content in RuntimeSession', () => {
     session.endTurn(); finish(session);
     expect(session.state.circuitReward.definition).toEqual(originalReward);
     expect(session.state.nodes.some(node => node.location?.name === 'Caller Mutation')).toBe(false);
-    session.endDraft(0); session.endDraft(1); session.nextCycle();
-    expect(session.state.nodes.some(node => node.location?.name === originalLocationName)).toBe(true);
-    expect(session.state.nodes.some(node => node.location?.name === 'Caller Mutation')).toBe(false);
+    let dealt = false;
+    for (let cycle = 0; cycle < 12 && !dealt; cycle++) {
+      session.endDraft(0); session.endDraft(1); session.nextCycle();
+      expect(session.state.nodes.some(node => node.location?.name === 'Caller Mutation')).toBe(false);
+      dealt = session.state.nodes.some(node => node.location?.name === originalLocationName);
+      if (!dealt) { empty(session); session.state.turn = 3; session.endTurn(); finish(session); }
+    }
+    expect(dealt).toBe(true);
   });
 });

@@ -2,6 +2,7 @@ import {expect,it} from 'vitest';
 import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '../src/runtime';
 import {EVALUATION_ALL_CARDS} from '../src/evaluationMarket';
 import {starterCards,type Card,type EvaluationEffect} from '../src/game';
+import {transferText} from '../src/transferText';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
 const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>({...starterCards[0],id,onReveal:effects,...extra});
 function drain(session:RuntimeSession){const events=[];while(session.pendingCount){events.push(session.step()!.event);if(events.length>200)throw new Error('stalled');}return events;}
@@ -71,6 +72,55 @@ it('Runtime schedules cross Cycle refill, give Actions in the scheduled turn, th
  s.endDraft(0);s.endDraft(1);s.nextCycle();expect(s.state.phase).toBe('reveal');drain(s);
  expect(s.state.players[0].hand).toHaveLength(6);expect(s.state.phase).toBe('runtime');
  s.endTurn();drain(s);expect(s.state.players[0].bank).toHaveLength(0);expect(s.state.players[0].discard.some(c=>c.id==='timed')).toBe(true);
+});
+
+it('banked cards count the effect steps they still have to resolve, down to zero',()=>{
+ const s=make();
+ s.state.players[0].hand=[
+  card('scheduled',[],{duration:4,durationPeriod:'runtime',schedule:[{at:2,effects:[{kind:'actions',amount:2}]},{at:4,effects:[{kind:'draw',amount:1}]}]}),
+  card('recurring',[],{duration:5,durationPeriod:'runtime',recurring:[{kind:'crypto',amount:1}]}),
+  card('collapse',[],{duration:2,onCollapse:[{kind:'crypto',amount:1}]}),
+  card('endless',[],{duration:99,durationPeriod:'runtime',recurring:[{kind:'crypto',amount:1}]}),
+ ];
+ s.state.players[0].actions=4;
+ for(const id of ['scheduled','recurring','collapse','endless'])s.deploy(id,0);
+ s.endTurn();drain(s);s.endTurn();drain(s);s.endTurn();drain(s);
+ expect(s.state.phase).toBe('draft');
+ const left=()=>Object.fromEntries(s.view().players[0].bank.map(entry=>[entry.card.id,entry.effectsLeft]));
+ expect(left()).toEqual({scheduled:1,recurring:2,collapse:1,endless:null});
+ s.state.players[0].draw=Array.from({length:6},(_,i)=>card(`refill-${i}`));
+ s.endDraft(0);s.endDraft(1);s.nextCycle();drain(s);
+ expect(left()).toMatchObject({scheduled:0,recurring:1,collapse:1,endless:null});
+});
+
+it('a turn duration that ends on the board keeps the card and its Power there until Collapse, then discards it',()=>{
+ const s=make();s.state.players[0].hand=[card('short',[],{power:5,duration:2,durationPeriod:'runtime',recurring:[{kind:'crypto',amount:1}]})];
+ s.deploy('short',0);s.endTurn();drain(s);
+ s.endTurn();const events=drain(s);
+ expect(s.state.turn).toBe(3);
+ expect(s.state.nodes[0].cards[0].map(p=>p.card.id)).toEqual(['short']);
+ expect(s.state.nodes[0].powers[0]).toBe(5);
+ expect(events.find(e=>e.cardId==='short'&&/duration ends\. It stays on Node 1 until Collapse\./.test(e.text))).toBeDefined();
+ const wallet=s.state.players[0].wallet;
+ s.endTurn();drain(s);
+ expect(s.state.players[0].wallet).toBe(wallet);
+ expect(s.state.players[0].bank.some(entry=>entry.card.id==='short')).toBe(false);
+ expect(s.state.players[0].discard.some(c=>c.id==='short')).toBe(true);
+});
+
+it('a Cycle duration runs the same recipe on the Cycle scale, then leaves the bank when its Cycles run out',()=>{
+ const s=make();s.state.players[0].hand=[card('cyclic',[],{duration:2,durationPeriod:'cycle',recurring:[{kind:'crypto',amount:1}],schedule:[{at:1,timing:'end',effects:[{kind:'crypto',amount:3}]},{at:2,effects:[{kind:'crypto',amount:5}]}]})];
+ const crypto=(events:ReturnType<typeof drain>)=>events.filter(e=>e.kind==='crypto').map(e=>e.amount);
+ s.deploy('cyclic',0);s.endTurn();expect(crypto(drain(s))).toEqual([1]);
+ s.endTurn();expect(crypto(drain(s))).toEqual([]);
+ s.endTurn();expect(crypto(drain(s))).toEqual([3]);
+ expect(s.state.players[0].bank[0]).toMatchObject({card:{id:'cyclic'},expiresCycle:s.state.cycle+1});
+ expect(s.view().players[0].bank[0].effectsLeft).toBe(2);
+ s.state.players[0].draw=Array.from({length:6},(_,i)=>card(`refill-${i}`));
+ s.endDraft(0);s.endDraft(1);s.nextCycle();expect(crypto(drain(s))).toEqual([1,5]);
+ s.endTurn();expect(crypto(drain(s))).toEqual([]);
+ s.endTurn();drain(s);s.endTurn();drain(s);
+ expect(s.state.players[0].bank.some(entry=>entry.card.id==='cyclic')).toBe(false);
 });
 
 it('self-destruction gives the opponent no destruction VP',()=>{
@@ -176,7 +226,7 @@ it('shift still prompts for a direction when the author left it to the player',(
 
 it('a player-choice transfer offers push and pull on both sides with the diamond layout',()=>{
  const {s}=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice'});
- expect(s.state.choice?.prompt).toBe('Push or pull 2 power to or from nearby locations.');
+ expect(s.state.choice?.prompt).toBe('Push or pull 2 power.');
  expect(s.state.choice?.options.map(o=>o.id)).toEqual(['push-left','push-right','pull-left','pull-right']);
  expect(s.state.choice?.transfer).toMatchObject({amount:2,center:2,nodes:[{node:1,power:0},{node:2,power:6},{node:3,power:0}]});
 });
@@ -197,10 +247,24 @@ it('pushing is not capped by the Power on the source Location',()=>{
 
 it('push-only and pull-only player choices offer just that verb',()=>{
  const push=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice',flow:'push'}).s;
- expect(push.state.choice?.prompt).toBe('Push 2 power to a nearby location.');
+ expect(push.state.choice?.prompt).toBe('Push 2 power left or right.');
  expect(push.state.choice?.options.map(o=>o.id)).toEqual(['push-left','push-right']);
  const pull=shiftFrom(2,{kind:'transferPower',amount:2,direction:'choice',flow:'pull'}).s;
  expect(pull.state.choice?.options.map(o=>o.id)).toEqual(['pull-left','pull-right']);
+ expect(pull.state.choice?.prompt).toBe('Pull 2 power from the left or right.');
+});
+
+it('words one-location transfers by side',()=>{
+ expect(transferText(2,'choice','either')).toBe('Push or pull 2 power');
+ expect(transferText(2,'right','push')).toBe('Push 2 power right');
+ expect(transferText(2,'left','push')).toBe('Push 2 power left');
+ expect(transferText(2,'right','pull')).toBe('Pull 2 power from the right');
+ expect(transferText(2,'left','pull')).toBe('Pull 2 power from the left');
+ expect(transferText(2,'left','either')).toBe('Push or pull 2 power on the left');
+ expect(transferText(2,'choice','push')).toBe('Push 2 power left or right');
+ expect(transferText(2,'choice','pull')).toBe('Pull 2 power from the left or right');
+ expect(transferText(4,'split','push')).toBe('Push 2 power left and right');
+ expect(transferText(3,'split','pull')).toBe('Pull 3 power, split from the left and right');
 });
 
 it('an automatic one-sided pull resolves without prompting',()=>{
@@ -263,6 +327,27 @@ it('stealing Crypto moves cards from the opponent wallet into your hand',()=>{
  play(s,card('thief',[{kind:'stealCrypto',amount:2}]));
  expect(s.state.players[1].hand.filter(c=>c.type==='Crypto')).toHaveLength(1);
  expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(2);
+});
+
+const coins=()=>[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('coin-c',[],{type:'Crypto',cryptoValue:3})];
+
+it("attacker's-choice steal lets you pick which opponent Crypto cards to take",()=>{
+ const s=make();s.state.players[1].hand=coins();
+ play(s,card('thief',[{kind:'stealCrypto',amount:2,cardPick:'choice'}]));
+ expect(s.state.choice).toMatchObject({owner:0,select:{min:2,max:2},prompt:"Slash-Dot: choose 2 Crypto cards to steal from the opponent's wallet."});
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['coin-a','coin-b','coin-c']);
+ s.choose(['coin-a','coin-c']);
+ expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['coin-a','coin-c']);
+ expect(s.state.players[1].hand.map(c=>c.id)).toEqual(['coin-b']);
+});
+
+it("victim's-choice steal hands the pick to the opponent",()=>{
+ const s=make();s.state.players[1].hand=coins();
+ const events=play(s,card('thief',[{kind:'stealCrypto',amount:1,cardPick:'choice',chooser:'opponent'}]));
+ expect(s.state.choice).toBeFalsy();
+ expect(events.some(e=>e.text.startsWith('Opponent chooses:'))).toBe(true);
+ expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(1);
+ expect(s.state.players[1].hand.filter(c=>c.type==='Crypto')).toHaveLength(2);
 });
 
 it('stealing Crypto from an opponent holding none reports no target',()=>{

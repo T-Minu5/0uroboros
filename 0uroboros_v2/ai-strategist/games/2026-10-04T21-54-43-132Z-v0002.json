@@ -1,0 +1,46 @@
+{
+  "gameId": "game-muuczimg",
+  "version": 2,
+  "startedAt": "2026-10-04T21:54:43.132Z",
+  "finished": true,
+  "notes": [],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 1,
+    "phase": "gameover",
+    "winner": null,
+    "endedReason": "Session ended early for evaluation. Tie, 3 to 3 VP.",
+    "finalVP": [
+      3,
+      3
+    ],
+    "servers": [
+      3500,
+      3500
+    ],
+    "purchases": [],
+    "cycles": [],
+    "decks": [
+      {
+        "night-scythe": 1,
+        "shyte-coin": 3,
+        "byte-coin": 1,
+        "vault-encryption": 1,
+        "basic-encryption": 1,
+        "rezz-blade": 1,
+        "dotkrawler": 1,
+        "slash-dot": 1
+      },
+      {
+        "night-scythe": 1,
+        "shyte-coin": 3,
+        "byte-coin": 1,
+        "vault-encryption": 1,
+        "basic-encryption": 1,
+        "rezz-blade": 1,
+        "dotkrawler": 1,
+        "slash-dot": 1
+      }
+    ]
+  }
+}

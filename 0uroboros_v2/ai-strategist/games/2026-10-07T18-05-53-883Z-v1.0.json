@@ -1,0 +1,6270 @@
+{
+  "gameId": "game-muyf2e50",
+  "version": 0,
+  "startedAt": "2026-10-07T18:05:53.883Z",
+  "finished": true,
+  "notes": [
+    "Cycle 1: VP 2-2 (human-me), Servers 3500/3500, Locations won 1-1, Draft wallets 6/6. Human bought Kilo-Coin; I bought Ghost Key.",
+    "Cycle 2: VP 2-2 (human-me), Servers 3500/3400, Locations won 2-1, Draft wallets 10/6. Human bought Mega-Cache; I bought Kilo-Coin.",
+    "Observation: the human's Draft wallet (10) outpaces mine (6). Their economy is ahead.",
+    "Cycle 3: VP 2-2 (human-me), Servers 3500/3450, Locations won 2-1, Draft wallets 10/7. Human bought Mega-Cache; I bought Dotkrawler, Byte-Coin.",
+    "Cycle 4: VP 2-2 (human-me), Servers 3400/3300, Locations won 1-3, Draft wallets 13/6. Human bought Veil of Cthulhu; I bought Kilo-Coin.",
+    "Observation: the human's Draft wallet (13) outpaces mine (6). Their economy is ahead.",
+    "Cycle 5: VP 2-2 (human-me), Servers 3300/3350, Locations won 2-1, Draft wallets 9/12. Human bought Iterative Incubus; I bought Iterative Incubus, Slash-Dot.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 5 - an early-aggression line. Watch my Servers.",
+    "Cycle 6: VP 2-2 (human-me), Servers 3400/2700, Locations won 2-2, Draft wallets 9/4. Human bought Power Siphon, Dotkrawler; I bought BumpEffecter.",
+    "Observation: the human already owns 3 Chaos cards by Cycle 6 - an early-aggression line. Watch my Servers.",
+    "Observation: the human's Draft wallet (9) outpaces mine (4). Their economy is ahead.",
+    "Cycle 7: VP 1-2 (human-me), Servers 3400/1950, Locations won 5-0, Draft wallets 10/10. Human bought Dotkrawler, Ghost Key; I bought Cowl Obscyra, Power Siphon.",
+    "I lost most Locations this Cycle (Buggie Smalls, Healing hands, Wing clip, Hit 'em, Wind fall); my board Power is too low.",
+    "Cycle 8: VP 1-2 (human-me), Servers 3150/1900, Locations won 0-2, Draft wallets 10/3. Human bought Tin Coin, Trash Collector; I bought Tin Coin.",
+    "Observation: the human's Draft wallet (10) outpaces mine (3). Their economy is ahead.",
+    "Cycle 9: VP 6-2 (human-me), Servers 3300/1500, Locations won 0-4, Draft wallets 6/11. Human bought Bushido.io; I bought The Tesseract Magi, Bushido.io.",
+    "Cycle 10: VP 6-2 (human-me), Servers 3050/1450, Locations won 3-1, Draft wallets 14/10. Human bought Veil of Cthulhu; I bought ∆-Wave.",
+    "Observation: the human's Draft wallet (14) outpaces mine (10). Their economy is ahead.",
+    "Warning: my Servers are at 1450. Defense (Restore) matters now.",
+    "Cycle 11: VP 6-1 (human-me), Servers 2200/1300, Locations won 0-5, Draft wallets 6/5. Human bought Tin Coin, Summon the Acolytes; I bought Summon the Acolytes.",
+    "Warning: my Servers are at 1300. Defense (Restore) matters now.",
+    "Cycle 12: VP 6-1 (human-me), Servers 2625/450, Locations won 3-0, Draft wallets 14/9. Human bought Veil of Cthulhu; I bought H3x1-D3x1, Vault Encryption.",
+    "Observation: the human's Draft wallet (14) outpaces mine (9). Their economy is ahead.",
+    "Warning: my Servers are at 450. Defense (Restore) matters now.",
+    "Cycle 12: VP 6-1 (human-me), Servers 2625/450, Locations won 3-0, Draft wallets 14/9. Human bought nothing; I bought nothing.",
+    "Observation: the human's Draft wallet (14) outpaces mine (9). Their economy is ahead.",
+    "Warning: my Servers are at 450. Defense (Restore) matters now."
+  ],
+  "report": {
+    "strategyVersion": 0,
+    "strategyExperiment": null,
+    "cycle": 13,
+    "phase": "gameover",
+    "winner": 0,
+    "endedReason": "Both Servers destroyed. You win, 14 to 3 VP.",
+    "finalVP": [
+      14,
+      3
+    ],
+    "servers": [
+      2550,
+      0
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "ghost-key",
+        "name": "Ghost Key",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      },
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "dotkrawler",
+        "name": "Dotkrawler",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "byte-coin",
+        "name": "Byte-Coin",
+        "category": "Crypto",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      },
+      {
+        "cycle": 4,
+        "owner": 0,
+        "definitionId": "veil-of-cthulhu",
+        "name": "Veil of Cthulhu",
+        "category": "Chaos",
+        "cost": 12
+      },
+      {
+        "cycle": 5,
+        "owner": 1,
+        "definitionId": "iterative-incubus",
+        "name": "Iterative Incubus",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 5,
+        "owner": 1,
+        "definitionId": "slash-dot",
+        "name": "Slash-Dot",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 5,
+        "owner": 0,
+        "definitionId": "iterative-incubus",
+        "name": "Iterative Incubus",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 6,
+        "owner": 1,
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "eval-power-siphon",
+        "name": "Power Siphon",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "dotkrawler",
+        "name": "Dotkrawler",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 7,
+        "owner": 1,
+        "definitionId": "cowl-obscyra",
+        "name": "Cowl Obscyra",
+        "category": "Base",
+        "cost": 5
+      },
+      {
+        "cycle": 7,
+        "owner": 1,
+        "definitionId": "eval-power-siphon",
+        "name": "Power Siphon",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "dotkrawler",
+        "name": "Dotkrawler",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "ghost-key",
+        "name": "Ghost Key",
+        "category": "Base",
+        "cost": 4
+      },
+      {
+        "cycle": 8,
+        "owner": 1,
+        "definitionId": "card-728y2mjz",
+        "name": "Tin Coin",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "card-728y2mjz",
+        "name": "Tin Coin",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "trash-collector",
+        "name": "Trash Collector",
+        "category": "Base",
+        "cost": 5
+      },
+      {
+        "cycle": 9,
+        "owner": 1,
+        "definitionId": "the-tesseract-magi",
+        "name": "The Tesseract Magi",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 9,
+        "owner": 1,
+        "definitionId": "bushido-io",
+        "name": "Bushido.io",
+        "category": "Chaos",
+        "cost": 5
+      },
+      {
+        "cycle": 9,
+        "owner": 0,
+        "definitionId": "bushido-io",
+        "name": "Bushido.io",
+        "category": "Chaos",
+        "cost": 5
+      },
+      {
+        "cycle": 10,
+        "owner": 1,
+        "definitionId": "delta-wave",
+        "name": "∆-Wave",
+        "category": "Chaos",
+        "cost": 10
+      },
+      {
+        "cycle": 10,
+        "owner": 0,
+        "definitionId": "veil-of-cthulhu",
+        "name": "Veil of Cthulhu",
+        "category": "Chaos",
+        "cost": 12
+      },
+      {
+        "cycle": 11,
+        "owner": 1,
+        "definitionId": "summon-the-acolytes",
+        "name": "Summon the Acolytes",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 11,
+        "owner": 0,
+        "definitionId": "card-728y2mjz",
+        "name": "Tin Coin",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 11,
+        "owner": 0,
+        "definitionId": "summon-the-acolytes",
+        "name": "Summon the Acolytes",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 12,
+        "owner": 1,
+        "definitionId": "h3x1-d3x1",
+        "name": "H3x1-D3x1",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 12,
+        "owner": 1,
+        "definitionId": "vault-encryption",
+        "name": "Vault Encryption",
+        "category": "VP",
+        "cost": 3
+      },
+      {
+        "cycle": 12,
+        "owner": 0,
+        "definitionId": "veil-of-cthulhu",
+        "name": "Veil of Cthulhu",
+        "category": "Chaos",
+        "cost": 12
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3500,
+          3500
+        ],
+        "wallet": [
+          6,
+          6
+        ],
+        "locationsWon": [
+          1,
+          1
+        ],
+        "locations": [
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": null
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": null
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": null
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "between-cycles",
+          "name": "Between Cycles",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1,
+            0
+          ]
+        },
+        "deckSize": [
+          10,
+          10
+        ],
+        "market": [
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3500,
+          3400
+        ],
+        "wallet": [
+          10,
+          6
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 0
+          },
+          {
+            "id": "breach_relay",
+            "name": "Sacrificial LLM",
+            "winner": null
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "recursive-curse",
+          "name": "Recursive Curse",
+          "eligible": [
+            0
+          ],
+          "claimed": []
+        },
+        "deckSize": [
+          13,
+          11
+        ],
+        "market": [
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 3,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3500,
+          3450
+        ],
+        "wallet": [
+          10,
+          7
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": null
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          },
+          {
+            "id": "data_exchange",
+            "name": "Login the calvary",
+            "winner": 0
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-yz5dnv4k",
+          "name": "Repairman",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          13,
+          12
+        ],
+        "market": [
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              14,
+              14
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              7,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 4,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3400,
+          3300
+        ],
+        "wallet": [
+          13,
+          6
+        ],
+        "locationsWon": [
+          1,
+          3
+        ],
+        "locations": [
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          },
+          {
+            "id": "breach_relay",
+            "name": "Sacrificial LLM",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 1
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": null
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "between-cycles",
+          "name": "Between Cycles",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          13,
+          11
+        ],
+        "market": [
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              14,
+              14
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              6,
+              6
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 5,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3300,
+          3350
+        ],
+        "wallet": [
+          9,
+          12
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": null
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": null
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "telemetry",
+          "name": "Telemetry",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          13,
+          13
+        ],
+        "market": [
+          {
+            "id": "slash-dot",
+            "name": "Slash-Dot",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "h3x1-d3x1",
+            "name": "H3x1-D3x1",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "iterative-incubus",
+            "name": "Iterative Incubus",
+            "category": "Chaos",
+            "cost": 7,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 6,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3400,
+          2700
+        ],
+        "wallet": [
+          9,
+          4
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 0
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 0
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": 1
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": null
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-d3vksy9u",
+          "name": "Hydra Bite",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1,
+            0
+          ]
+        },
+        "deckSize": [
+          14,
+          16
+        ],
+        "market": [
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "byte-heist",
+            "name": "Byte Heist",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "system-seppuku",
+            "name": "System Seppuku",
+            "category": "Chaos",
+            "cost": 23,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 7,
+        "vp": [
+          1,
+          2
+        ],
+        "servers": [
+          3400,
+          1950
+        ],
+        "wallet": [
+          10,
+          10
+        ],
+        "locationsWon": [
+          5,
+          0
+        ],
+        "locations": [
+          {
+            "id": "kilo-mill",
+            "name": "Buggie Smalls",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 0
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-xr6csfdv",
+          "name": "The Giver",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          17,
+          17
+        ],
+        "market": [
+          {
+            "id": "cowl-obscyra",
+            "name": "Cowl Obscyra",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "banishing-ritual",
+            "name": "Banishing Ritual",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-relocation-relay",
+            "name": "Relocation Relay",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 8,
+        "vp": [
+          1,
+          2
+        ],
+        "servers": [
+          3150,
+          1900
+        ],
+        "wallet": [
+          10,
+          3
+        ],
+        "locationsWon": [
+          0,
+          2
+        ],
+        "locations": [
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": null
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": null
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": null
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "telemetry",
+          "name": "Telemetry",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          18,
+          17
+        ],
+        "market": [
+          {
+            "id": "opulent-void",
+            "name": "Opulent Void",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-728y2mjz",
+            "name": "Tin Coin",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash Collector",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 9,
+        "vp": [
+          6,
+          2
+        ],
+        "servers": [
+          3300,
+          1500
+        ],
+        "wallet": [
+          6,
+          11
+        ],
+        "locationsWon": [
+          0,
+          4
+        ],
+        "locations": [
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": null
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-fa5nxeut",
+          "name": "Lil Prick",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          19,
+          18
+        ],
+        "market": [
+          {
+            "id": "the-tesseract-magi",
+            "name": "The Tesseract Magi",
+            "category": "Base",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "nyx-luna",
+            "name": "Nyx Luna",
+            "category": "Chaos",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "bushido-io",
+            "name": "Bushido.io",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 10,
+        "vp": [
+          6,
+          2
+        ],
+        "servers": [
+          3050,
+          1450
+        ],
+        "wallet": [
+          14,
+          10
+        ],
+        "locationsWon": [
+          3,
+          1
+        ],
+        "locations": [
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": null
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 0
+          },
+          {
+            "id": "data_exchange",
+            "name": "Login the calvary",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-jfdvg12d",
+          "name": "The Healer",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          18,
+          19
+        ],
+        "market": [
+          {
+            "id": "delta-wave",
+            "name": "∆-Wave",
+            "category": "Chaos",
+            "cost": 10,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash Collector",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 11,
+        "vp": [
+          6,
+          1
+        ],
+        "servers": [
+          2200,
+          1300
+        ],
+        "wallet": [
+          6,
+          5
+        ],
+        "locationsWon": [
+          0,
+          5
+        ],
+        "locations": [
+          {
+            "id": "data-breach",
+            "name": "Data breach",
+            "winner": 1
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          },
+          {
+            "id": "breach_relay",
+            "name": "Sacrificial LLM",
+            "winner": 1
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-rdih7pg5",
+          "name": "Loose Change",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          17,
+          17
+        ],
+        "market": [
+          {
+            "id": "shiva-of-cern",
+            "name": "The Shiva of CERN",
+            "category": "Base",
+            "cost": 10,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-728y2mjz",
+            "name": "Tin Coin",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "summon-the-acolytes",
+            "name": "Summon the Acolytes",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 12,
+        "vp": [
+          6,
+          1
+        ],
+        "servers": [
+          2625,
+          450
+        ],
+        "wallet": [
+          14,
+          9
+        ],
+        "locationsWon": [
+          3,
+          0
+        ],
+        "locations": [
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": null
+          },
+          {
+            "id": "data-breach",
+            "name": "Data breach",
+            "winner": 0
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-xz0nqngp",
+          "name": "Enhance",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          20,
+          18
+        ],
+        "market": [
+          {
+            "id": "hack-attack",
+            "name": "Hack Attack",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "jinx-001",
+            "name": "Jinx-001",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "h3x1-d3x1",
+            "name": "H3x1-D3x1",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "dotkrawler",
+            "name": "Dotkrawler",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "ghost-key",
+            "name": "Ghost Key",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-power-siphon",
+            "name": "Power Siphon",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "vault-encryption",
+            "name": "Vault Encryption",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "apollo-ascii",
+            "name": "Apollo Ascii",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "dotkrawler": 2,
+        "card-728y2mjz": 1,
+        "kilo-coin": 2,
+        "summon-the-acolytes": 1,
+        "basic-encryption": 2,
+        "byte-coin": 2,
+        "eval-power-siphon": 1,
+        "ghost-key": 1,
+        "iterative-incubus": 1,
+        "veil-of-cthulhu": 3,
+        "the-inbetweener": 1,
+        "trash-collector": 1,
+        "mega-cache": 2,
+        "rezz-blade": 1
+      },
+      {
+        "slash-dot": 1,
+        "night-scythe": 1,
+        "the-inbetweener": 2,
+        "iterative-incubus": 1,
+        "cowl-obscyra": 1,
+        "the-tesseract-magi": 1,
+        "byte-coin": 2,
+        "summon-the-acolytes": 1,
+        "card-ot1vjma3": 1,
+        "ghost-key": 1,
+        "kilo-coin": 1,
+        "h3x1-d3x1": 1,
+        "vault-encryption": 1,
+        "basic-encryption": 1,
+        "eval-power-siphon": 1,
+        "bushido-io": 1,
+        "rezz-blade": 1,
+        "delta-wave": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 1441,
+      "drainDealt": [
+        4475,
+        2700
+      ],
+      "restoreDone": [
+        1750,
+        975
+      ],
+      "drainBySource": {
+        "card": [
+          4225,
+          2400
+        ],
+        "location": [
+          250,
+          300
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          1750,
+          975
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        6,
+        3
+      ],
+      "restoreEvents": [
+        28,
+        19
+      ],
+      "drainEvents": [
+        27,
+        27
+      ],
+      "drawn": [
+        46,
+        61
+      ],
+      "actionsGained": [
+        46,
+        54
+      ],
+      "cryptoGained": [
+        117,
+        89
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [
+        {
+          "cycle": 9,
+          "turn": 2,
+          "victim": 1,
+          "server": "primary",
+          "by": 0,
+          "source": "card",
+          "sourceId": "veil-of-cthulhu"
+        },
+        {
+          "cycle": 13,
+          "turn": 1,
+          "victim": 1,
+          "server": "backup",
+          "by": 0,
+          "source": "card",
+          "sourceId": "veil-of-cthulhu"
+        }
+      ],
+      "cards": {
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            6,
+            8
+          ],
+          "drain": [
+            625,
+            800
+          ],
+          "restore": [
+            150,
+            0
+          ],
+          "draw": [
+            5,
+            8
+          ],
+          "actions": [
+            12,
+            16
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            11,
+            7
+          ],
+          "drain": [
+            25,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            10,
+            7
+          ],
+          "actions": [
+            22,
+            14
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            4,
+            8
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            12,
+            24
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            13,
+            14
+          ],
+          "drain": [
+            25,
+            25
+          ],
+          "restore": [
+            575,
+            625
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            6,
+            6
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            30,
+            26
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            8,
+            8
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "the-inbetweener": {
+          "definitionId": "the-inbetweener",
+          "name": "The Inbetweener",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            4,
+            11
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            5,
+            10
+          ],
+          "actions": [
+            4,
+            16
+          ],
+          "crypto": [
+            4,
+            13
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "ghost-key": {
+          "definitionId": "ghost-key",
+          "name": "Ghost Key",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            1,
+            6
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            1,
+            6
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "kilo-coin": {
+          "definitionId": "kilo-coin",
+          "name": "Kilo-Coin",
+          "cost": 6,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            18,
+            30
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "mega-cache": {
+          "definitionId": "mega-cache",
+          "name": "Mega-Cache",
+          "cost": 9,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            50,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "veil-of-cthulhu": {
+          "definitionId": "veil-of-cthulhu",
+          "name": "Veil of Cthulhu",
+          "cost": 12,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            5,
+            0
+          ],
+          "drain": [
+            2700,
+            0
+          ],
+          "restore": [
+            575,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "card-ot1vjma3": {
+          "definitionId": "card-ot1vjma3",
+          "name": "BumpEffecter",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Hacker",
+          "plays": [
+            0,
+            3
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "iterative-incubus": {
+          "definitionId": "iterative-incubus",
+          "name": "Iterative Incubus",
+          "cost": 7,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            2,
+            1
+          ],
+          "drain": [
+            750,
+            600
+          ],
+          "restore": [
+            450,
+            350
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            5,
+            4
+          ],
+          "crypto": [
+            5,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "glitch": {
+          "definitionId": "glitch",
+          "name": "Glitch",
+          "cost": 0,
+          "type": "VP",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "eval-power-siphon": {
+          "definitionId": "eval-power-siphon",
+          "name": "Power Siphon",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Hacker",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "cowl-obscyra": {
+          "definitionId": "cowl-obscyra",
+          "name": "Cowl Obscyra",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            2
+          ],
+          "actions": [
+            0,
+            4
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "card-728y2mjz": {
+          "definitionId": "card-728y2mjz",
+          "name": "Tin Coin",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Runtime",
+          "plays": [
+            1,
+            1
+          ],
+          "drain": [
+            0,
+            50
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            1,
+            2
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "the-tesseract-magi": {
+          "definitionId": "the-tesseract-magi",
+          "name": "The Tesseract Magi",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            6
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "trash-collector": {
+          "definitionId": "trash-collector",
+          "name": "Trash Collector",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            2,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "bushido-io": {
+          "definitionId": "bushido-io",
+          "name": "Bushido.io",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            1,
+            1
+          ],
+          "drain": [
+            100,
+            250
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "delta-wave": {
+          "definitionId": "delta-wave",
+          "name": "∆-Wave",
+          "cost": 10,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            600
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "wind-fall": {
+          "name": "Wind fall",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "loser-s-luck": {
+          "name": "Loser's luck",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            1,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "sludge-core": {
+          "name": "Sludge core",
+          "drain": [
+            150,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "backup-failure": {
+          "name": "Backup failure",
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            3,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data_exchange": {
+          "name": "Login the calvary",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            0
+          ],
+          "actions": [
+            2,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "signal_tower": {
+          "name": "Signal tower",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            2,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data-breach": {
+          "name": "Data breach",
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {},
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            100,
+            100
+          ],
+          "events": 110
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            100,
+            0
+          ],
+          "events": 131
+        },
+        {
+          "cycle": 3,
+          "drain": [
+            50,
+            25
+          ],
+          "restore": [
+            25,
+            100
+          ],
+          "events": 99
+        },
+        {
+          "cycle": 4,
+          "drain": [
+            200,
+            200
+          ],
+          "restore": [
+            100,
+            50
+          ],
+          "events": 119
+        },
+        {
+          "cycle": 5,
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            50
+          ],
+          "events": 84
+        },
+        {
+          "cycle": 6,
+          "drain": [
+            725,
+            150
+          ],
+          "restore": [
+            250,
+            75
+          ],
+          "events": 123
+        },
+        {
+          "cycle": 7,
+          "drain": [
+            800,
+            25
+          ],
+          "restore": [
+            25,
+            50
+          ],
+          "events": 118
+        },
+        {
+          "cycle": 8,
+          "drain": [
+            250,
+            250
+          ],
+          "restore": [
+            0,
+            200
+          ],
+          "events": 113
+        },
+        {
+          "cycle": 9,
+          "drain": [
+            600,
+            250
+          ],
+          "restore": [
+            400,
+            200
+          ],
+          "events": 132
+        },
+        {
+          "cycle": 10,
+          "drain": [
+            100,
+            300
+          ],
+          "restore": [
+            50,
+            50
+          ],
+          "events": 142
+        },
+        {
+          "cycle": 11,
+          "drain": [
+            250,
+            1050
+          ],
+          "restore": [
+            200,
+            100
+          ],
+          "events": 142
+        },
+        {
+          "cycle": 12,
+          "drain": [
+            850,
+            75
+          ],
+          "restore": [
+            500,
+            0
+          ],
+          "events": 116
+        },
+        {
+          "cycle": 13,
+          "drain": [
+            450,
+            75
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 12
+        }
+      ],
+      "failedOutcomes": [
+        14,
+        3
+      ],
+      "randomResults": 16,
+      "choices": [
+        35,
+        51
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Wind fall",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Hot oil spa",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Wind fall"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Penny for the poor",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Ticking-tacking",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "FX bumper",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Penny for the poor",
+        "priority": 0.5,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "between-cycles",
+        "name": "Between Cycles"
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Ghost Key",
+        "cost": 4,
+        "plan": [
+          "Ghost Key"
+        ],
+        "alternatives": [
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": 3.66
+          },
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 3.21
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.23
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.48
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.98
+          }
+        ],
+        "offered": [
+          {
+            "id": "dotkrawler",
+            "score": 2.23
+          },
+          {
+            "id": "ghost-key",
+            "score": 3.66
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 0.48
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.17
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.98
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.48
+          },
+          {
+            "id": "kilo-coin",
+            "score": 3.21
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 1,
+        "location": "Wind fall",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 3,
+        "location": "Sacrificial LLM",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Trash collector"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Loser's luck",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 4,
+        "location": "Thin the heard",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 1,
+        "location": "Wind fall",
+        "priority": 1,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 0,
+        "location": "Loser's luck",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Trash collector"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Wind fall"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Ghost Key: select 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 2,
+        "location": "Trash collector",
+        "priority": 0.5,
+        "nodeScore": 14,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 2 cards to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Kilo-Coin",
+        "cost": 6,
+        "plan": [
+          "Kilo-Coin"
+        ],
+        "alternatives": [
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 3.1
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.05
+          },
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": 1.6
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.35
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.83
+          }
+        ],
+        "offered": [
+          {
+            "id": "dotkrawler",
+            "score": 2.05
+          },
+          {
+            "id": "ghost-key",
+            "score": 1.6
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 0.3
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.33
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.83
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.35
+          },
+          {
+            "id": "kilo-coin",
+            "score": 3.1
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 2,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Ticking-tacking",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Sludge core",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Hit 'em"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 4,
+        "location": "Hit 'em",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Ticking-tacking",
+        "priority": 0.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 7,
+        "phase": "economy",
+        "bought": "Dotkrawler",
+        "cost": 4,
+        "plan": [
+          "Dotkrawler",
+          "Byte-Coin"
+        ],
+        "alternatives": [
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 2.65
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.15
+          },
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": 1.7
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.09
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.92
+          }
+        ],
+        "offered": [
+          {
+            "id": "dotkrawler",
+            "score": 2.15
+          },
+          {
+            "id": "ghost-key",
+            "score": 1.7
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 0.4
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.24
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.92
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.09
+          },
+          {
+            "id": "kilo-coin",
+            "score": 2.65
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Byte-Coin",
+        "cost": 3,
+        "plan": [
+          "Byte-Coin"
+        ],
+        "alternatives": [
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.11
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.32
+          }
+        ],
+        "offered": [
+          {
+            "id": "vault-encryption",
+            "score": -0.32
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.11
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 3,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Code cull",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Moving mod"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Backup failure",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 1,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 0,
+        "nodeScore": 54,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Moving mod"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Sacrificial LLM"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Ghost Key: select 1 card to trash.",
+        "picked": [
+          "Byte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Sacrificial LLM",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 4,
+        "owner": 1,
+        "rewardId": "between-cycles",
+        "name": "Between Cycles"
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Kilo-Coin",
+        "cost": 6,
+        "plan": [
+          "Kilo-Coin"
+        ],
+        "alternatives": [
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 2.53
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.19
+          },
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": 1.74
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.02
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 1.01
+          }
+        ],
+        "offered": [
+          {
+            "id": "dotkrawler",
+            "score": 2.19
+          },
+          {
+            "id": "ghost-key",
+            "score": 1.74
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 0.44
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.17
+          },
+          {
+            "id": "quantum-archive",
+            "score": 1.01
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.02
+          },
+          {
+            "id": "kilo-coin",
+            "score": 2.53
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 4,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 1,
+        "location": "Quantum commons",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 2,
+        "location": "Sludge core",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Penny for the poor"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 5,
+        "owner": 1,
+        "wallet": 12,
+        "phase": "endgame",
+        "bought": "Iterative Incubus",
+        "cost": 7,
+        "plan": [
+          "Iterative Incubus",
+          "Slash-Dot"
+        ],
+        "alternatives": [
+          {
+            "name": "Iterative Incubus",
+            "cost": 7,
+            "score": 30.72
+          },
+          {
+            "name": "Veil of Cthulhu",
+            "cost": 12,
+            "score": 24.11
+          },
+          {
+            "name": "H3x1-D3x1",
+            "cost": 6,
+            "score": 10.66
+          },
+          {
+            "name": "Slash-Dot",
+            "cost": 4,
+            "score": 6.21
+          },
+          {
+            "name": "Zenith Worx",
+            "cost": 11,
+            "score": 5.51
+          }
+        ],
+        "offered": [
+          {
+            "id": "slash-dot",
+            "score": 6.21
+          },
+          {
+            "id": "h3x1-d3x1",
+            "score": 10.66
+          },
+          {
+            "id": "iterative-incubus",
+            "score": 30.72
+          },
+          {
+            "id": "dotkrawler",
+            "score": 2.61
+          },
+          {
+            "id": "ghost-key",
+            "score": 0.91
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 3.11
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "score": 24.11
+          },
+          {
+            "id": "vault-encryption",
+            "score": 0.24
+          },
+          {
+            "id": "zenith-worx",
+            "score": 5.51
+          },
+          {
+            "id": "quantum-archive",
+            "score": 1.41
+          },
+          {
+            "id": "apollo-ascii",
+            "score": 3.41
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 5,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Slash-Dot",
+        "cost": 4,
+        "plan": [
+          "Slash-Dot"
+        ],
+        "alternatives": [
+          {
+            "name": "Slash-Dot",
+            "cost": 4,
+            "score": 5.22
+          },
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": 2.12
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 1.62
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.42
+          },
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": -0.08
+          }
+        ],
+        "offered": [
+          {
+            "id": "slash-dot",
+            "score": 5.22
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1.62
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.08
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 2.12
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.75
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.42
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 5,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Penny for the poor",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Hot oil spa",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Penny for the poor"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Healing hands",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 4,
+        "location": "Hit 'em",
+        "priority": 1,
+        "nodeScore": 14,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 4,
+        "location": "Hit 'em",
+        "priority": 1,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 1,
+        "location": "Penny for the poor",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 2,
+        "location": "Hot oil spa",
+        "priority": 0,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Healing hands"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Healing hands"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Ticking-tacking"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 6,
+        "owner": 1,
+        "rewardId": "reward-d3vksy9u",
+        "name": "Hydra Bite"
+      },
+      {
+        "kind": "draft",
+        "cycle": 6,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "BumpEffecter",
+        "cost": 3,
+        "plan": [
+          "BumpEffecter"
+        ],
+        "alternatives": [
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 2.62
+          },
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": 2.02
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 1.52
+          },
+          {
+            "name": "Ghost Key",
+            "cost": 4,
+            "score": -0.18
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.7
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-ot1vjma3",
+            "score": 2.62
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1.52
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.18
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 2.02
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.7
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 6,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Buggie Smalls",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 2,
+        "location": "Wing clip",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 3,
+        "location": "Hit 'em",
+        "priority": 1.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 0,
+        "location": "Buggie Smalls",
+        "priority": 1,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Healing hands"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 7,
+        "owner": 1,
+        "wallet": 10,
+        "phase": "endgame",
+        "bought": "Cowl Obscyra",
+        "cost": 5,
+        "plan": [
+          "Cowl Obscyra",
+          "Power Siphon"
+        ],
+        "alternatives": [
+          {
+            "name": "Cowl Obscyra",
+            "cost": 5,
+            "score": 4.12
+          },
+          {
+            "name": "Apollo Ascii",
+            "cost": 8,
+            "score": 2.32
+          },
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": 2.02
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 1.52
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.8
+          }
+        ],
+        "offered": [
+          {
+            "id": "cowl-obscyra",
+            "score": 4.12
+          },
+          {
+            "id": "banishing-ritual",
+            "score": 0.32
+          },
+          {
+            "id": "eval-relocation-relay",
+            "score": -0.18
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1.52
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.18
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 2.02
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.52
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.8
+          },
+          {
+            "id": "apollo-ascii",
+            "score": 2.32
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 7,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Power Siphon",
+        "cost": 4,
+        "plan": [
+          "Power Siphon"
+        ],
+        "alternatives": [
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": 1.98
+          },
+          {
+            "name": "Cowl Obscyra",
+            "cost": 5,
+            "score": 1.82
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 1.48
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.76
+          },
+          {
+            "name": "Banishing Ritual",
+            "cost": 4,
+            "score": 0.28
+          }
+        ],
+        "offered": [
+          {
+            "id": "cowl-obscyra",
+            "score": 1.82
+          },
+          {
+            "id": "banishing-ritual",
+            "score": 0.28
+          },
+          {
+            "id": "eval-relocation-relay",
+            "score": -0.22
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1.48
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.22
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 1.98
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.56
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.76
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 7,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Thin the heard",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Iterative Incubus",
+        "definitionId": "iterative-incubus",
+        "node": 1,
+        "location": "Penny for the poor",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 2,
+        "location": "Backup failure",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 4,
+        "location": "Moving mod",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Thin the heard",
+        "priority": 0.5,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Penny for the poor"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Ticking-tacking"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Ghost Key: select 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Byte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Ticking-tacking",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 8,
+        "owner": 1,
+        "rewardId": "telemetry",
+        "name": "Telemetry"
+      },
+      {
+        "kind": "draft",
+        "cycle": 8,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "endgame",
+        "bought": "Tin Coin",
+        "cost": 3,
+        "plan": [
+          "Tin Coin"
+        ],
+        "alternatives": [
+          {
+            "name": "Tin Coin",
+            "cost": 3,
+            "score": 2.73
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.75
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-728y2mjz",
+            "score": 2.73
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.75
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 8,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Moving mod",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 3,
+        "location": "Backup failure",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Power Siphon",
+        "definitionId": "eval-power-siphon",
+        "node": 4,
+        "location": "Wind fall",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Ticking-tacking"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "Cowl Obscyra",
+        "definitionId": "cowl-obscyra",
+        "node": 1,
+        "location": "Occult archive",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 0,
+        "location": "Moving mod",
+        "priority": 1.5,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Ticking-tacking",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 1,
+        "location": "Occult archive",
+        "priority": 9,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Occult archive",
+        "priority": 7.5,
+        "nodeScore": 54,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Moving mod"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 9,
+        "owner": 1,
+        "rewardId": "reward-fa5nxeut",
+        "name": "Lil Prick"
+      },
+      {
+        "kind": "draft",
+        "cycle": 9,
+        "owner": 1,
+        "wallet": 11,
+        "phase": "endgame",
+        "bought": "The Tesseract Magi",
+        "cost": 6,
+        "plan": [
+          "The Tesseract Magi",
+          "Bushido.io"
+        ],
+        "alternatives": [
+          {
+            "name": "Bushido.io",
+            "cost": 5,
+            "score": 11.37
+          },
+          {
+            "name": "The Tesseract Magi",
+            "cost": 6,
+            "score": 10.4
+          },
+          {
+            "name": "Zenith Worx",
+            "cost": 11,
+            "score": 5.37
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 3.62
+          },
+          {
+            "name": "Apollo Ascii",
+            "cost": 8,
+            "score": 2
+          }
+        ],
+        "offered": [
+          {
+            "id": "the-tesseract-magi",
+            "score": 10.4
+          },
+          {
+            "id": "nyx-luna",
+            "score": 3.62
+          },
+          {
+            "id": "bushido-io",
+            "score": 11.37
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1.2
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.5
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": 0.13
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.75
+          },
+          {
+            "id": "zenith-worx",
+            "score": 5.37
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.63
+          },
+          {
+            "id": "apollo-ascii",
+            "score": 2
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 9,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Bushido.io",
+        "cost": 5,
+        "plan": [
+          "Bushido.io"
+        ],
+        "alternatives": [
+          {
+            "name": "Bushido.io",
+            "cost": 5,
+            "score": 11.18
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 3.43
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 1
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.44
+          },
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": -0.07
+          }
+        ],
+        "offered": [
+          {
+            "id": "nyx-luna",
+            "score": 3.43
+          },
+          {
+            "id": "bushido-io",
+            "score": 11.18
+          },
+          {
+            "id": "dotkrawler",
+            "score": 1
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.7
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": -0.07
+          },
+          {
+            "id": "vault-encryption",
+            "score": -0.94
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.44
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 9,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 1,
+        "location": "Wing clip",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "Tin Coin",
+        "definitionId": "card-728y2mjz",
+        "node": 3,
+        "location": "Signal tower",
+        "priority": 2.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Tesseract Magi",
+        "definitionId": "the-tesseract-magi",
+        "node": 4,
+        "location": "Login the calvary",
+        "priority": 1.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 1,
+        "location": "Wing clip",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Boost Juice"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 2,
+        "location": "Boost Juice",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Signal tower",
+        "priority": 11,
+        "nodeScore": 11,
+        "options": 5
+      },
+      {
+        "kind": "draft",
+        "cycle": 10,
+        "owner": 1,
+        "wallet": 10,
+        "phase": "endgame",
+        "bought": "∆-Wave",
+        "cost": 10,
+        "plan": [
+          "∆-Wave"
+        ],
+        "alternatives": [
+          {
+            "name": "∆-Wave",
+            "cost": 10,
+            "score": 11.21
+          },
+          {
+            "name": "Apollo Ascii",
+            "cost": 8,
+            "score": 1.61
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 0.81
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 0.26
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 0.11
+          }
+        ],
+        "offered": [
+          {
+            "id": "delta-wave",
+            "score": 11.21
+          },
+          {
+            "id": "trash-collector",
+            "score": -1.39
+          },
+          {
+            "id": "kim-dracula",
+            "score": 0.11
+          },
+          {
+            "id": "dotkrawler",
+            "score": 0.81
+          },
+          {
+            "id": "ghost-key",
+            "score": -0.89
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": -0.26
+          },
+          {
+            "id": "vault-encryption",
+            "score": -1.12
+          },
+          {
+            "id": "quantum-archive",
+            "score": 0.26
+          },
+          {
+            "id": "apollo-ascii",
+            "score": 1.61
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 10,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Data breach",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "card": "Cowl Obscyra",
+        "definitionId": "cowl-obscyra",
+        "node": 3,
+        "location": "Code cull",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "card": "Bushido.io",
+        "definitionId": "bushido-io",
+        "node": 4,
+        "location": "Occult archive",
+        "priority": 3,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Sacrificial LLM",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "∆-Wave",
+        "definitionId": "delta-wave",
+        "node": 0,
+        "location": "Data breach",
+        "priority": 8.5,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "Power Siphon",
+        "definitionId": "eval-power-siphon",
+        "node": 2,
+        "location": "Sacrificial LLM",
+        "priority": 2,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 3,
+        "location": "Code cull",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 4,
+        "location": "Occult archive",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Ritual mine"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Occult archive"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Ghost Key: select 1 card to trash.",
+        "picked": [
+          "Kilo-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Code cull"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Code cull",
+        "priority": 10,
+        "nodeScore": 54,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Ritual mine",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 11,
+        "owner": 1,
+        "rewardId": "reward-rdih7pg5",
+        "name": "Loose Change"
+      },
+      {
+        "kind": "draft",
+        "cycle": 11,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Summon the Acolytes",
+        "cost": 3,
+        "plan": [
+          "Summon the Acolytes"
+        ],
+        "alternatives": [
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 3.51
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.31
+          },
+          {
+            "name": "Tin Coin",
+            "cost": 3,
+            "score": 1.66
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": -0.28
+          },
+          {
+            "name": "Power Siphon",
+            "cost": 4,
+            "score": -0.85
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-728y2mjz",
+            "score": 1.66
+          },
+          {
+            "id": "summon-the-acolytes",
+            "score": 3.51
+          },
+          {
+            "id": "dotkrawler",
+            "score": 2.31
+          },
+          {
+            "id": "ghost-key",
+            "score": -1.49
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": -0.85
+          },
+          {
+            "id": "vault-encryption",
+            "score": -1.68
+          },
+          {
+            "id": "quantum-archive",
+            "score": -0.28
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 11,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 0,
+        "location": "Ritual mine",
+        "priority": 1.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "card": "The Inbetweener",
+        "definitionId": "the-inbetweener",
+        "node": 1,
+        "location": "Trash collector",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Ritual mine"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "source": "The Inbetweener",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Ritual mine"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 2,
+        "owner": 1,
+        "card": "Ghost Key",
+        "definitionId": "ghost-key",
+        "node": 3,
+        "location": "Get out",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Data breach"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 2,
+        "owner": 1,
+        "source": "Ghost Key",
+        "prompt": "Ghost Key: select 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 3,
+        "owner": 1,
+        "source": "Trash collector",
+        "prompt": "Recover one card from shared Trash to your Discard.",
+        "picked": [
+          "Byte-Coin"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 12,
+        "owner": 1,
+        "wallet": 9,
+        "phase": "endgame",
+        "bought": "H3x1-D3x1",
+        "cost": 6,
+        "plan": [
+          "H3x1-D3x1",
+          "Vault Encryption"
+        ],
+        "alternatives": [
+          {
+            "name": "H3x1-D3x1",
+            "cost": 6,
+            "score": 8.21
+          },
+          {
+            "name": "Apollo Ascii",
+            "cost": 8,
+            "score": 7.56
+          },
+          {
+            "name": "Quantum Archive",
+            "cost": 5,
+            "score": 4.91
+          },
+          {
+            "name": "Jinx-001",
+            "cost": 4,
+            "score": 4.03
+          },
+          {
+            "name": "Dotkrawler",
+            "cost": 4,
+            "score": 2.26
+          }
+        ],
+        "offered": [
+          {
+            "id": "hack-attack",
+            "score": -2.84
+          },
+          {
+            "id": "jinx-001",
+            "score": 4.03
+          },
+          {
+            "id": "h3x1-d3x1",
+            "score": 8.21
+          },
+          {
+            "id": "dotkrawler",
+            "score": 2.26
+          },
+          {
+            "id": "ghost-key",
+            "score": -1.75
+          },
+          {
+            "id": "eval-power-siphon",
+            "score": -0.9
+          },
+          {
+            "id": "vault-encryption",
+            "score": 1.76
+          },
+          {
+            "id": "quantum-archive",
+            "score": 4.91
+          },
+          {
+            "id": "apollo-ascii",
+            "score": 7.56
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 12,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "endgame",
+        "bought": "Vault Encryption",
+        "cost": 3,
+        "plan": [
+          "Vault Encryption"
+        ],
+        "alternatives": [
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": 1.69
+          }
+        ],
+        "offered": [
+          {
+            "id": "vault-encryption",
+            "score": 1.69
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 12,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "BumperBall",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "card": "∆-Wave",
+        "definitionId": "delta-wave",
+        "node": 2,
+        "location": "Quantum commons",
+        "priority": 8.5,
+        "nodeScore": 60,
+        "options": 3
+      }
+    ]
+  }
+}

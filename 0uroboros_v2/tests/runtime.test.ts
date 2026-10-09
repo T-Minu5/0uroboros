@@ -15,9 +15,18 @@ function drain(session: RuntimeSession) {
 function cycle(session: RuntimeSession) {
   for (let turn = 1; turn <= 3; turn++) { session.endTurn(); drain(session); }
 }
-function ownedCount(session: RuntimeSession, owner: 0 | 1) {
+/** Night Scythe trashes from hand, so a player's cards include their instances in the shared Trash. */
+function ownedCards(session: RuntimeSession, owner: 0 | 1) {
   const player = session.state.players[owner];
-  return player.draw.length + player.hand.length + player.discard.length + player.destroyed.length + session.state.nodes.reduce((sum, node) => sum + node.cards[owner].length, 0);
+  return [...player.draw, ...player.hand, ...player.discard, ...player.destroyed, ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card)), ...session.state.trash.filter(card => card.id.startsWith(`${owner}:`))];
+}
+function ownedCount(session: RuntimeSession, owner: 0 | 1) {
+  return ownedCards(session, owner).length;
+}
+/** Printed VP still held: every owned card except those in Trash or Destroyed. */
+function liveCardVP(session: RuntimeSession, owner: 0 | 1) {
+  const player = session.state.players[owner];
+  return [...player.draw, ...player.hand, ...player.discard, ...player.bank.map(entry => entry.card), ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))].reduce((sum, card) => sum + (card.vp ?? 0), 0);
 }
 
 describe("Local Runtime session", () => {
@@ -28,7 +37,7 @@ describe("Local Runtime session", () => {
     const view = session.view();
     expect(view.players[1].hand.every(card => card.hidden && !("name" in card))).toBe(true);
     expect(view.players[0].draw.every(card => !("name" in card))).toBe(true);
-    expect(view.players[0].totalVP).toBe(4);
+    expect(view.players[0].totalVP).toBe(3);
     expect(view.unresolved.length).toBeGreaterThan(0);
   });
 
@@ -93,7 +102,7 @@ describe("Local Runtime session", () => {
     expect(circuit).toBeLessThan(draft);
     expect(events.filter(event => event.kind === "circuit")).toHaveLength(1);
     expect(session.state.phase).toBe("draft");
-    expect(session.state.players[0].wallet).toBe(session.state.players[0].discard.filter(card => card.type === "Crypto").reduce((sum, card) => sum + (card.name === "Kilo-Coin" ? 3 : 2), 0));
+    expect(session.state.players[0].wallet).toBe(session.state.players[0].discard.filter(card => card.type === "Crypto").reduce((sum, card) => sum + (card.cryptoValue ?? 0), 0));
     expect(session.state.players[0].hand).toHaveLength(0);
     expect(ownedCount(session, 0)).toBe(10);
   });
@@ -121,6 +130,7 @@ describe("Local Runtime session", () => {
 
   it("deals the remaining deck first and fills each new-Cycle hand from shuffled Discard", () => {
     const session = make(); cycle(session);
+    const held = session.state.players.map(player => player.draw.length + player.discard.length);
     const remaining = session.state.players.map((player, owner) => {
       const cards = [...player.draw, ...player.discard];
       const count = owner === 0 ? 2 : 4;
@@ -133,7 +143,7 @@ describe("Local Runtime session", () => {
       expect(player.hand).toHaveLength(5);
       expect(player.hand.slice(0, remaining[owner].length)).toEqual(remaining[owner]);
       expect(player.discard).toEqual([]);
-      expect(player.draw).toHaveLength(5);
+      expect(player.draw).toHaveLength(held[owner] - 5);
       expect(ownedCount(session, owner as 0 | 1)).toBe(10);
     });
   });
@@ -161,7 +171,8 @@ describe("Local Runtime session", () => {
     }
     expect(session.state.cycle).toBe(16);
     expect(session.state.phase).toBe("gameover");
-    expect(session.state.players[0].totalVP).toBe(4);
+    const player = session.state.players[0];
+    expect(player.totalVP).toBe(liveCardVP(session, 0) + player.rewardVP + player.destructionVP);
     expect(session.state.endedReason).toMatch(/VP/);
   });
 
@@ -182,10 +193,21 @@ describe("Session edge conditions", () => {
     session.endTurn();
     const events = drain(session);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
-    expect(session.state.players[0].destructionVP).toBe(12);
+    expect(session.state.players[0].destructionVP).toBe(20);
     expect(session.state.phase).toBe("gameover");
     expect(events.filter(event => event.kind === "gameover")).toHaveLength(1);
     expect(events.some(event => event.kind === "draft")).toBe(false);
+  });
+
+  it("scores the configured Server VP", () => {
+    const session = createSession({ carryover: false, priorityPreference: "higher", random: seededRandom(7), practiceMarket: [starterCards[0], starterCards[1]], serverVP: { primary: 3, backup: 15 } });
+    session.state.players[0].hand = [{ ...starterCards[3], id: "fatal-razor" }];
+    session.state.players[1].servers = { primary: 0, backup: 50 };
+    session.state.players[1].hand = [];
+    session.deploy("fatal-razor", 0);
+    session.endTurn();
+    drain(session);
+    expect(session.state.players[0].destructionVP).toBe(15);
   });
 
   it("gives tied selected Node eligibility to both while keeping rewards unresolved", () => {
@@ -261,7 +283,7 @@ describe("State and visibility invariants", () => {
       const assertState = () => {
         for (const owner of [0, 1] as const) {
           const player = session.state.players[owner];
-          const cards = [...player.draw, ...player.hand, ...player.discard, ...player.destroyed, ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))];
+          const cards = ownedCards(session, owner);
           expect(cards).toHaveLength(10);
           expect(new Set(cards.map(card => card.id)).size).toBe(10);
           expect(player.actions).toBeGreaterThanOrEqual(0);
@@ -320,7 +342,7 @@ describe("Approved VP scoring", () => {
     player.destructionVP = 8;
     session.deploy("hand-vault", 0);
     expect(session.view().players[0].totalVP).toBe(14);
-    expect(session.view().players[1].totalVP).toBe(4);
+    expect(session.view().players[1].totalVP).toBe(3);
   });
 
   it("counts a Vault purchased in the final Draft before choosing the winner", () => {
@@ -329,12 +351,12 @@ describe("Approved VP scoring", () => {
     session.state.cycle = 16;
     session.state.players[0].wallet = 3;
     session.buy(session.state.market[0].id);
-    expect(session.state.players[0].totalVP).toBe(6);
+    expect(session.state.players[0].totalVP).toBe(5);
     expect(session.state.phase).toBe("draft");
     session.endDraft(); session.nextCycle();
     expect(session.state.phase).toBe("gameover");
     expect(session.state.winner).toBe(0);
-    expect(session.state.endedReason).toMatch(/You win, 6 to 4 VP/);
+    expect(session.state.endedReason).toMatch(/You win, 5 to 3 VP/);
   });
 
   it("reports a tie when both final totals match", () => {
@@ -342,7 +364,7 @@ describe("Approved VP scoring", () => {
     session.state.cycle = 16;
     session.endDraft(); session.nextCycle();
     expect(session.state.winner).toBeNull();
-    expect(session.state.endedReason).toMatch(/Tie, 4 to 4 VP/);
+    expect(session.state.endedReason).toMatch(/Tie, 3 to 3 VP/);
   });
 
   it("chooses winner by total VP after lethal Drain, not by surviving Servers alone", () => {
@@ -353,13 +375,13 @@ describe("Approved VP scoring", () => {
     session.state.players[1].hand = [];
     session.state.players[1].draw = [];
     session.state.players[1].discard = [];
-    session.state.players[1].destructionVP = 20;
+    session.state.players[1].destructionVP = 30;
     session.state.players[1].servers = { primary: 0, backup: 20 };
     session.deploy("lethal", 0); session.endTurn(); drain(session);
-    expect(session.state.players[0].totalVP).toBe(12);
-    expect(session.state.players[1].totalVP).toBe(20);
+    expect(session.state.players[0].totalVP).toBe(20);
+    expect(session.state.players[1].totalVP).toBe(30);
     expect(session.state.winner).toBe(1);
-    expect(session.state.endedReason).toMatch(/Opponent wins, 12 to 20 VP/);
+    expect(session.state.endedReason).toMatch(/Opponent wins, 20 to 30 VP/);
   });
 });
 
@@ -390,6 +412,7 @@ describe("Planning and Location-count rulings", () => {
     const session = createSession({carryover:true,priorityPreference:"higher",random:()=>{draws++;return random();}});
     const player = session.state.players[0];
     player.hand = [{...starterCards[0],id:"a"},{...starterCards[8],id:"b"},{...starterCards[1],id:"c"}];
+    session.view();
     const before = structuredClone(session.state), count = draws;
     session.deploy("a",4); session.deploy("b",3); session.deploy("c",0);
     const orders = session.state.nodes.flatMap(node=>node.cards[0]).map(card=>card.order).sort();
@@ -461,6 +484,6 @@ it("targeted Server effects cannot revive or repeatedly award a destroyed server
   session.state.players[0].hand=[{...starterCards[0],id:'targeted',onReveal:[{kind:'drain',target:'backup',amount:100},{kind:'drain',target:'backup',amount:100},{kind:'restore',target:'primary',amount:100}]}];
   session.deploy('targeted',0);session.endTurn();const events=drain(session);
   expect(events.filter(event=>event.kind==='drain').map(event=>event.amount)).toEqual([50,0]);
-  expect(session.state.players[0].destructionVP).toBe(12);
+  expect(session.state.players[0].destructionVP).toBe(20);
   expect(session.state.players[0].servers.primary).toBe(0);
 });

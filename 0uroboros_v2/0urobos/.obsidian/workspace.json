@@ -1,0 +1,229 @@
+{
+  "main": {
+    "id": "dfd40058043ca101",
+    "type": "split",
+    "children": [
+      {
+        "id": "560a7739b7084b48",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9f7cf2e4e9b7a8a0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Indexes/Cards index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Cards index"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4715c35882455ddf",
+    "type": "split",
+    "children": [
+      {
+        "id": "84a3c7997db56063",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6c99870e4e5b509b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "7120290e9a1eba8d",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d3f68c38fecf62f2",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "0ae2eb30179c18ad",
+    "type": "split",
+    "children": [
+      {
+        "id": "13dcb23371c6847f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b23b4b60b92460ce",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Indexes/Cards index.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "8c9e8460b0fe25fe",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Welcome.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "ea606054ce72585f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "60947d0e7a722ed8",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "6017558b3343c8ab",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Welcome.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "9f7cf2e4e9b7a8a0",
+  "lastOpenFiles": [
+    "Ontology/Effects/Card effects.md",
+    "Untitled.canvas",
+    "Ontology/Zones/Hand.md",
+    "Ontology/Zones/Zone.md",
+    "Indexes/Cards index.md",
+    "Indexes/Locations index.md",
+    "Reference/Card Text Style Guide.md",
+    "Welcome.md",
+    "Card Text Style Guide.md",
+    "0uroboros Ontology.md",
+    "Indexes/Starting decks and mods index.md",
+    "Indexes/Circuit Rewards index.md",
+    "Indexes",
+    "Reference/Glossary.md",
+    "Reference",
+    "Ontology/Effects/Flow effects.md",
+    "Ontology/Effects/Mod effects.md",
+    "Ontology/Effects/Node Power effects.md",
+    "Ontology/Effects/Deck effects.md",
+    "Ontology/Effects/Server effects.md",
+    "Ontology/Effects/Resource effects.md",
+    "Ontology/Effects/Pick.md",
+    "Ontology/Effects/Who.md",
+    "Ontology/Effects/Target.md",
+    "Ontology/Effects/Scope.md",
+    "Ontology/Effects/Trigger.md",
+    "Ontology/Effects/Effect step.md",
+    "Ontology/Effects",
+    "Ontology/Resources/Circuit Reward.md",
+    "Ontology/Resources",
+    "Ontology/Zones",
+    "Ontology/Cards",
+    "Ontology/Board",
+    "Ontology/Structure",
+    "Ontology"
+  ]
+}

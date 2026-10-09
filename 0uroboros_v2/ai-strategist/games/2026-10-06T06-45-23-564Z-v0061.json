@@ -1,0 +1,655 @@
+{
+  "gameId": "game-muwbcigb",
+  "version": 61,
+  "startedAt": "2026-10-06T06:45:23.564Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 2-2 (human-me), Servers 3400/3500, Locations won 0-5, Draft wallets 7/5. Human bought nothing; I bought Recursive Seance."
+  ],
+  "report": {
+    "strategyVersion": 61,
+    "strategyExperiment": null,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      2,
+      2
+    ],
+    "servers": [
+      3400,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "recursive-seance",
+        "name": "Recursive Seance",
+        "category": "Base",
+        "cost": 5
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3400,
+          3500
+        ],
+        "wallet": [
+          7,
+          5
+        ],
+        "locationsWon": [
+          0,
+          5
+        ],
+        "locations": [
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 1
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 1
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 1
+          },
+          {
+            "id": "data_exchange",
+            "name": "Login the Calvary",
+            "winner": 1
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot Oil Spa",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "telemetry",
+          "name": "Telemetry",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          11,
+          9
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "night-scythe": 1,
+        "rezz-blade": 1,
+        "slash-dot": 1,
+        "byte-coin": 2,
+        "shyte-coin": 3,
+        "dotkrawler": 1,
+        "basic-encryption": 2
+      },
+      {
+        "night-scythe": 1,
+        "recursive-seance": 1,
+        "slash-dot": 1,
+        "dotkrawler": 1,
+        "byte-coin": 2,
+        "rezz-blade": 1,
+        "basic-encryption": 2,
+        "shyte-coin": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 89,
+      "drainDealt": [
+        0,
+        100
+      ],
+      "restoreDone": [
+        0,
+        0
+      ],
+      "drainBySource": {
+        "card": [
+          0,
+          100
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          0,
+          0
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        0,
+        3
+      ],
+      "restoreEvents": [
+        0,
+        3
+      ],
+      "drainEvents": [
+        0,
+        1
+      ],
+      "drawn": [
+        5,
+        5
+      ],
+      "actionsGained": [
+        2,
+        4
+      ],
+      "cryptoGained": [
+        7,
+        5
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [],
+      "cards": {
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            3
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            3,
+            1
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            4,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "data_exchange": {
+          "name": "Login the Calvary",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            0
+          ],
+          "actions": [
+            2,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {},
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 88
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 1
+        }
+      ],
+      "failedOutcomes": [
+        1,
+        2
+      ],
+      "randomResults": 0,
+      "choices": [
+        0,
+        3
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Healing hands",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Login the Calvary",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Healing hands"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Penny for the poor",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Hot Oil Spa",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Penny for the poor",
+        "priority": 0.5,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 1,
+        "location": "Wing clip",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "telemetry",
+        "name": "Telemetry"
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "economy",
+        "bought": "Recursive Seance",
+        "cost": 5,
+        "plan": [
+          "Recursive Seance"
+        ],
+        "alternatives": [
+          {
+            "name": "Recursive Seance",
+            "cost": 5,
+            "score": 8.47
+          },
+          {
+            "name": "Opulent Void",
+            "cost": 4,
+            "score": 4.67
+          },
+          {
+            "name": "Slash-Dot",
+            "cost": 4,
+            "score": 3.37
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 0.9
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.03
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      }
+    ]
+  }
+}

@@ -16,6 +16,9 @@ const BOARD_Y = 0.22;
 const SIZE = 2.7;
 /** Horizon radius as a fraction of the board's on-screen half-height. */
 const HORIZON = 0.36;
+/** Half-width of the core HUD's square, in shadow radii: room for a HUD larger than the horizon, turned and parted,
+ *  and for its glow through the disk beyond the shadow's edge. */
+export const CORE_HUD_SPAN = 2;
 
 /** Ripple bursts mirror the server tubes: solo 50%, pair 30%, triple 20%, never more
  *  than three back-to-back. The gap between bursts is tightened here because the whole
@@ -25,6 +28,9 @@ const RIPPLE_OFF = -1;
 /** Slot age sentinel for a ripple that is neither swelling nor travelling. */
 const RIPPLE_IDLE = -99;
 const RIPPLE_SPEED = 0.55;
+/** Distortion multiplier for the first waves the forming hole sends out, stepping down to 1 after them. */
+export const RIPPLE_OPENING_BOOST = [4, 3, 2] as const;
+export const rippleBoost = (wave: number) => RIPPLE_OPENING_BOOST[wave] ?? 1;
 const burstSize = () => { const r = Math.random(); return r < 0.5 ? 1 : r < 0.8 ? 2 : 3; };
 const burstGap = (more: boolean) => (more ? 0.16 + Math.random() * 0.12 : 0.8 + Math.random() * 1.2);
 /** The horizon swells for PULSE_CHARGE_S, releases a ripple from its edge at the peak, then settles over
@@ -146,6 +152,11 @@ const SINGULARITY_SHADER = {
     /** Rasterised Html HUD, warped alongside the scene so cards bend rather than just slide. */
     tHud: { value: null as THREE.Texture | null },
     uHudAmount: { value: 0 },
+    /** HUD drawn inside the shadow (premultiplied, linear), a square spanning the shadow's diameter. */
+    tCoreHud: { value: null as THREE.Texture | null },
+    uCoreHudAmount: { value: 0 },
+    /** Strength of the colourless blurred glow the core HUD shows through disk that passes in front of it. */
+    uCoreHudGlow: { value: 1.0 },
     /** Board centre in screen UV. */
     uCenter: { value: new THREE.Vector2(0.5, 0.5) },
     /** Board half-height in screen UV-Y units; the whole effect is scaled against this. */
@@ -173,6 +184,8 @@ const SINGULARITY_SHADER = {
     uDoppler: { value: 0.15 },
     /** Expanding ripple radii in screen units (half-screen-height = 0.5); negative is idle. */
     uRipples: { value: new THREE.Vector4(RIPPLE_OFF, RIPPLE_OFF, RIPPLE_OFF, RIPPLE_OFF) },
+    /** Per-ripple multiplier on the image displacement (not the crest light). */
+    uRippleBoost: { value: new THREE.Vector4(1, 1, 1, 1) },
     uRippleAmp: { value: 0.02 },
     uRippleFreq: { value: 62 },
     uRippleWidth: { value: 0.05 },
@@ -240,6 +253,9 @@ const SINGULARITY_SHADER = {
     uniform sampler2D tDiffuse;
     uniform sampler2D tHud;
     uniform float uHudAmount;
+    uniform sampler2D tCoreHud;
+    uniform float uCoreHudAmount;
+    uniform float uCoreHudGlow;
     uniform vec2 uCenter;
     uniform float uRadius;
     uniform float uAspect;
@@ -256,6 +272,7 @@ const SINGULARITY_SHADER = {
     uniform float uStreakGain;
     uniform float uDoppler;
     uniform vec4 uRipples;
+    uniform vec4 uRippleBoost;
     uniform float uRippleAmp;
     uniform float uRippleFreq;
     uniform float uRippleWidth;
@@ -303,6 +320,33 @@ const SINGULARITY_SHADER = {
       return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
                  mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x), u.y);
     }
+
+    /** Core HUD at screen offset s (screen-height units), premultiplied; rs is the shadow's screen radius. */
+    vec4 coreHud(vec2 s, float rs){
+      if(uCoreHudAmount <= 0.0) return vec4(0.0);
+      vec2 q = s / (2.0 * max(rs, 1e-4)) + 0.5;
+      if(q.x < 0.0 || q.y < 0.0 || q.x > 1.0 || q.y > 1.0) return vec4(0.0);
+      return texture2DLodEXT(tCoreHud, q, 0.0) * uCoreHudAmount;
+    }
+
+    /** Blurred coverage of the core HUD at s, from its mip chain, faded out before the square's edge. Explicit
+     *  LODs, because it is sampled inside branches where derivatives are undefined. */
+    float coreHudGlow(vec2 s, float rs){
+      if(uCoreHudAmount <= 0.0 || uCoreHudGlow <= 0.0) return 0.0;
+      vec2 q = s / (2.0 * max(rs, 1e-4)) + 0.5;
+      vec2 edge = smoothstep(0.0, 0.1, q) * smoothstep(1.0, 0.9, q);
+      if(edge.x * edge.y <= 0.0) return 0.0;
+      // A tight blur that keeps the rings' shapes, under a wider one for the bloom round them.
+      const float o = ${(0.012 / CORE_HUD_SPAN).toFixed(4)};
+      float a = texture2DLodEXT(tCoreHud, q, 2.5).a * 0.55
+              + (texture2DLodEXT(tCoreHud, q + vec2(o, 0.0), 4.0).a + texture2DLodEXT(tCoreHud, q - vec2(o, 0.0), 4.0).a
+               + texture2DLodEXT(tCoreHud, q + vec2(0.0, o), 4.0).a + texture2DLodEXT(tCoreHud, q - vec2(0.0, o), 4.0).a) * 0.1125;
+      // Thin rings blur down to faint coverage; lifted so they still read through the disk.
+      return (1.0 - exp(-a * 4.0)) * edge.x * edge.y * uCoreHudAmount * uCoreHudGlow;
+    }
+
+    /** Share of the marched ray swallowed by the core: where the shadow shows, unblocked by disk in front. */
+    float gSwallow;
 
 #ifdef SINGULARITY_RAYMARCH
     vec3 catmullRom(float t, vec3 p0, vec3 p1, vec3 p2, vec3 p3){
@@ -408,6 +452,7 @@ const SINGULARITY_SHADER = {
         // edge into spikes. Emission is weighted by the disk's own opacity, since em is lit even off-plane.
         float swallow = length(pos) < core ? 1.0 : 1.0 - smoothstep(core, core * 1.2, length(pos));
         float aT = max(a, swallow);
+        gSwallow += (1.0 - cover) * (aT - a * (1.0 - swallow));
         em *= a * (1.0 - swallow) / max(aT, 1e-4);
         a = aT;
         // Faded towards the core, so rays falling in keep the shadow dark at its middle.
@@ -560,11 +605,14 @@ const SINGULARITY_SHADER = {
       for(int i = 0; i < 4; i++){
         float radius = uRipples[i];
         if(radius < 0.0) continue;
+        // A boosted wave is stretched by its boost as well as raised by it: at the base wavelength the
+        // displacement is already near the slope where the image folds over itself and tears.
+        float k = uRippleBoost[i];
         float d = sr - radius;
-        float e = d / uRippleWidth;
+        float e = d / (uRippleWidth * k);
         // Energy spreads as the ring grows, so it thins out by the time it reaches the corners.
-        float w = sin(d * uRippleFreq) * exp(-e * e) / (1.0 + radius * 2.2);
-        offset += w;
+        float w = sin(d * uRippleFreq / k) * exp(-e * e) / (1.0 + radius * 2.2);
+        offset += w * k;
         crest += max(w, 0.0);
       }
       return offset * uRippleAmp;
@@ -637,6 +685,7 @@ const SINGULARITY_SHADER = {
         gDiskRipWidth = uRippleWidth * toDisk;
         gDiskRipFreq = uRippleFreq / toDisk;
         float glow;
+        gSwallow = 0.0;
         vec4 disk = raymarchDisk(n, rhs, uHorizon / ${HORIZON.toFixed(3)}, glow);
         disk.rgb = tintShade(disk.rgb, pow(uTint / max(max(uTint.r, uTint.g), max(uTint.b, 1e-4)), vec3(1.0 / 2.2)));
         // The reference composites over its environment in display space; the lensed board stands in for it.
@@ -644,6 +693,12 @@ const SINGULARITY_SHADER = {
         col = pow(max(mix(disk.rgb * uMarchGain, env, 1.0 - disk.a), 0.0), vec3(2.2));
         // Held back where the march went opaque, so the shadow stays black under a saturated tint.
         col += uTint * glow * ${RM.step.toFixed(4)} * uGlow * (1.0 - 0.85 * disk.a);
+        // The core HUD shows only where the ray fell into the core, so disk passing in front covers it.
+        float coreR = rhs * rOuter * ${CORE_HUD_SPAN.toFixed(3)};
+        vec4 core = coreHud(s, coreR) * clamp(gSwallow, 0.0, 1.0);
+        col = col * (1.0 - core.a) + core.rgb;
+        // Where disk blocks the ray instead, the HUD glows through it as a colourless blur.
+        col += coreHudGlow(s, coreR) * clamp(disk.a - gSwallow, 0.0, 1.0);
       }
 #else
       float rhg = max(rh, 1e-3);
@@ -723,12 +778,19 @@ const SINGULARITY_SHADER = {
       // The band's glow spills over the shadow, so it is umber beside the band and black only at the top.
       float haze = exp(-abs(n.y / rhg + 0.08) / 0.7);
       col = mix(col, vec3(0.006, 0.003, 0.001) + uDeep * 0.03 * haze, hole);
+      // The core HUD sits in the shadow, under the band that crosses in front of it.
+      float coreR = rhs * rOuter * ${CORE_HUD_SPAN.toFixed(3)};
+      vec4 core = coreHud(s, coreR) * hole;
+      col = col * (1.0 - core.a) + core.rgb;
       // The direct image goes on in a single composite so band and arcs cannot seam where they meet. Its far
       // half is swallowed by the horizon only inside ~0.87 rh: the arc's tufted inner edge overhangs the rim,
       // which is what makes the top of the shadow ragged. The near half (the band) is always in front.
       float hole2 = 1.0 - smoothstep(rh * 0.84, rh * 0.9, r);
-      col = mix(col, dP.rgb, dP.a * mix(1.0 - hole2, 1.0, front) * p);
+      float dPa = dP.a * mix(1.0 - hole2, 1.0, front) * p;
+      col = mix(col, dP.rgb, dPa);
       col += ringCol * p * (1.0 - dP.a);
+      // Where the disk covers the HUD, it glows through as a colourless blur.
+      col += coreHudGlow(s, coreR) * dPa;
 #endif
 
       gl_FragColor = vec4(col, src.a);
@@ -747,6 +809,8 @@ export type SingularityField = {
   /** True once the HUD has been rasterised into the shader, which supersedes the CSS fallback. */
   snapshot: boolean;
 };
+/** Screen radius, in canvas pixels, of the square the core HUD is drawn into. */
+export const coreHudRadius = (field: SingularityField) => field.radius * HORIZON * field.progress * CORE_HUD_SPAN;
 export const SingularityContext = createContext<RefObject<SingularityField> | null>(null);
 export function useSingularityField(){ return useContext(SingularityContext); }
 
@@ -774,7 +838,7 @@ export function Singularity({ active, onPass, field, portal, tint }:{
 }){
   const { camera, size } = useThree();
   const progress = useRef({ value: 0 });
-  const ripples = useRef({ age: Array(RIPPLE_SLOTS).fill(RIPPLE_IDLE) as number[], radius: Array(RIPPLE_SLOTS).fill(RIPPLE_OFF) as number[], clock: 0, next: 0, left: 0 });
+  const ripples = useRef({ age: Array(RIPPLE_SLOTS).fill(RIPPLE_IDLE) as number[], radius: Array(RIPPLE_SLOTS).fill(RIPPLE_OFF) as number[], boost: Array(RIPPLE_SLOTS).fill(1) as number[], clock: 0, next: 0, left: 0, fired: 0 });
   const reduced = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
   const tintTarget = useMemo(() => glowTint(tint), [tint]);
 
@@ -849,7 +913,7 @@ export function Singularity({ active, onPass, field, portal, tint }:{
     const rp = ripples.current;
     if(u.uProgress.value <= 0){
       pass.enabled = false;
-      rp.age.fill(RIPPLE_IDLE); rp.radius.fill(RIPPLE_OFF); rp.clock = 0; rp.next = 0; rp.left = 0;
+      rp.age.fill(RIPPLE_IDLE); rp.radius.fill(RIPPLE_OFF); rp.boost.fill(1); rp.clock = 0; rp.next = 0; rp.left = 0; rp.fired = 0;
       u.uHorizon.value = HORIZON;
       // Snapped while closed, so the hole always opens already in the winner's colour.
       u.uTint.value.copy(tintTarget);
@@ -872,7 +936,7 @@ export function Singularity({ active, onPass, field, portal, tint }:{
       if(rp.left === 0) rp.left = burstSize();
       rp.left--;
       const free = rp.age.findIndex(value => value === RIPPLE_IDLE);
-      if(free >= 0) rp.age[free] = -PULSE_CHARGE_S;
+      if(free >= 0){ rp.age[free] = -PULSE_CHARGE_S; rp.boost[free] = rippleBoost(rp.fired++); }
       rp.next = rp.clock + burstGap(rp.left > 0);
     }
     let pulse = 0;
@@ -891,13 +955,13 @@ export function Singularity({ active, onPass, field, portal, tint }:{
       if(rp.radius[i] > 1.6){ rp.age[i] = RIPPLE_IDLE; rp.radius[i] = RIPPLE_OFF; }
     }
     u.uRipples.value.set(rp.radius[0], rp.radius[1], rp.radius[2], rp.radius[3]);
+    u.uRippleBoost.value.set(rp.boost[0], rp.boost[1], rp.boost[2], rp.boost[3]);
 
     // Project the board's near and far rail to screen space; the hole is scaled against that.
     _near.set(0, BOARD_Y, BOARD_Z.near).project(camera);
     _far.set(0, BOARD_Y, BOARD_Z.far).project(camera);
     const cxNdc = (_near.x + _far.x) / 2, cyNdc = (_near.y + _far.y) / 2;
-    u.uCenter.value.set(cxNdc * 0.5 + 0.5, cyNdc * 0.5 + 0.5);
-    u.uRadius.value = Math.abs(_near.y - _far.y) * 0.25 * SIZE;
+    u.uCenter.value.set(cxNdc * 0.5 + 0.5, cyNdc * 0.5 + 0.5);    u.uRadius.value = Math.abs(_near.y - _far.y) * 0.25 * SIZE;
 
     if(field?.current){
       field.current.cx = (cxNdc * 0.5 + 0.5) * size.width;

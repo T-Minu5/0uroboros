@@ -1,0 +1,21 @@
+{
+  "id": "1cb013ca-5f81-4821-8dc2-0bbadec023fb",
+  "state": "committed",
+  "createdAt": "2026-10-07T05:22:45.403Z",
+  "snapshots": [
+    {
+      "path": "Reference/Card Text Style Guide.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "68621027c15eea872089e3ed01799efbb175165e753eebc8adf4efc3b079cbe2",
+      "recoverable": true,
+      "existed": true,
+      "mode": 33152,
+      "etag": "07a3da9be7f5a2278c3d8c7c5c9742e6df0839615e93e679bc01f1367ce1cdce",
+      "snapshot": "0.bin",
+      "committedEtag": "68621027c15eea872089e3ed01799efbb175165e753eebc8adf4efc3b079cbe2"
+    }
+  ],
+  "completedAt": "2026-10-07T05:22:45.450Z"
+}

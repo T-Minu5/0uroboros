@@ -1,0 +1,18 @@
+{
+  "id": "9258e637-96d2-4956-b5a7-2db56b29778e",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:51.100Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Resources/Location Reward.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "285328692836cd90c9cbc2cf027d44111e3ca3363b66afc35d5adafbe7f39826",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "285328692836cd90c9cbc2cf027d44111e3ca3363b66afc35d5adafbe7f39826"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:51.142Z"
+}

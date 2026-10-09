@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
 import { compileChains, starterCards, type Card, type EvaluationEffect } from '../src/game';
 import { compileContent, createDefaultContent, validateContent } from '../src/authoring/contentModel';
-import { deriveEffectText } from '../src/authoring/recipeModel';
+import { describeSteps } from '../src/effects/catalog';
+import { migrateEffects } from '../src/effects/migrate';
+import type { EffectStep } from '../src/effects/types';
 
 const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, power: 2, onReveal: effects, ...extra });
@@ -41,19 +43,21 @@ describe('chained effects', () => {
     expect(compileChains([{ kind: 'crypto', amount: 1, chain: true }])).toEqual([{ kind: 'crypto', amount: 1 }]);
   });
 
-  it('accepts chain on authored card effects and compiles it for play', () => {
+  it('authors a step with follow-ups, matching how a legacy chain migrates', () => {
     const content = createDefaultContent();
     const target = content.cards.find(item => item.type === 'Character')!;
-    target.onReveal = [{ kind: 'handDiscard', amount: 3, optional: true, chain: true }, { kind: 'crypto', amount: 4 }];
+    const steps: EffectStep[] = [{ action: 'discardCards', amount: 3, optional: true, target: { type: 'card', who: 'self', where: 'hand' }, pick: { mode: 'choose' }, then: [{ action: 'gainCrypto', amount: 4, target: { type: 'player', who: 'self' } }] }];
+    target.onReveal = steps;
     expect(validateContent(content)).toEqual([]);
+    expect(migrateEffects([{ kind: 'handDiscard', amount: 3, optional: true, chain: true }, { kind: 'crypto', amount: 4 }], 'card')).toEqual(steps);
     const compiled = compileContent(content).cards.find(item => item.id === target.id)!;
-    expect(compiled.onReveal).toEqual([{ kind: 'handDiscard', amount: 3, optional: true, then: [{ kind: 'crypto', amount: 4 }] }]);
+    expect(compiled.onReveal).toEqual(steps);
   });
 
   it('prints a chained step as "…, then …"', () => {
-    expect(deriveEffectText([{ kind: 'destroyCard', opponent: true, cardRelation: 'next', chain: true }, { kind: 'crypto', amount: 2 }], 'card', []))
+    expect(describeSteps(migrateEffects([{ kind: 'destroyCard', opponent: true, cardRelation: 'next', chain: true }, { kind: 'crypto', amount: 2 }], 'card'), 'card'))
       .toMatch(/, then \+2 Crypto\.$/);
-    expect(deriveEffectText([{ kind: 'draw', amount: 1 }, { kind: 'crypto', amount: 2 }], 'card', [])).toBe('+1 Card. +2 Crypto.');
+    expect(describeSteps(migrateEffects([{ kind: 'draw', amount: 1 }, { kind: 'crypto', amount: 2 }], 'card'), 'card')).toBe('+1 Card. +2 Crypto.');
   });
 
   it('lets the player skip an optional discard, forfeiting the chained reward', () => {

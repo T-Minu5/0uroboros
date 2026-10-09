@@ -8,12 +8,16 @@ export function transferFlow(effect: { kind?: string; direction?: TransferDirect
 
 export const formatAmount = (amount: number) => String(Number.isInteger(amount) ? amount : Number(amount.toFixed(2)));
 
-/** The Transfer sentence shared by printed card text, the activation notice and the choice question. */
+/** The Transfer sentence shared by printed card text, the activation notice and the choice question.
+ * "Push or pull 2 power", "Push 2 power right", "Pull 2 power from the left". A split moves half the amount each way. */
 export function transferText(amount: number, direction: TransferDirection = 'choice', flow: TransferFlow = transferFlow({ direction })): string {
   const n = formatAmount(amount);
   const verb = flow === 'push' ? 'Push' : flow === 'pull' ? 'Pull' : 'Push or pull';
-  const link = flow === 'push' ? 'to' : flow === 'pull' ? 'from' : 'to or from';
-  if (direction === 'left' || direction === 'right') return `${verb} ${n} power ${link} the location on the ${direction}`;
-  if (direction === 'split') return `${verb} ${n} power, split ${link} both nearby locations`;
-  return flow === 'either' ? `${verb} ${n} power ${link} nearby locations` : `${verb} ${n} power ${link} a nearby location`;
+  const sides = (left: string, right: string, join: string) => flow === 'pull' ? `from the ${left}${join}${right}` : `${left}${join}${right}`;
+  if (direction === 'left' || direction === 'right') {
+    if (flow === 'either') return `${verb} ${n} power on the ${direction}`;
+    return `${verb} ${n} power ${flow === 'pull' ? `from the ${direction}` : direction}`;
+  }
+  if (direction === 'split') return amount % 2 === 0 ? `${verb} ${formatAmount(amount / 2)} power ${sides('left', 'right', ' and ')}` : `${verb} ${n} power, split ${sides('left', 'right', ' and ')}`;
+  return flow === 'either' ? `${verb} ${n} power` : `${verb} ${n} power ${sides('left', 'right', ' or ')}`;
 }

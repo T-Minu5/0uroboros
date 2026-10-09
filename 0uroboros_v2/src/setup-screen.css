@@ -1,0 +1,117 @@
+/* Setup screen: the intro card, then the AI agents panel beside it. Both scroll inside the backdrop when the window is short. */
+.setup-backdrop{gap:40px;align-items:flex-start;overflow:auto}
+.setup-backdrop>.setup-card{margin:auto 0}
+.setup-card h1{margin:14px 0 16px}
+.setup-note{margin:20px 0 14px}
+
+/* Configure: a summary button that opens the turn timer, Server VP and starting deck. */
+.game-configure{margin:0 0 16px}
+.game-configure-toggle{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:10px;width:100%;padding:10px 12px;border-color:#ffffff24;border-radius:7px;background:#ffffff08;text-align:left}
+.game-configure-toggle b{font:600 12px Inter,sans-serif;color:#e8ecf4}
+.game-configure-toggle small{font-size:10px;color:#8b93a7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-configure-toggle span{font-size:10px;color:#8b93a7}
+.game-configure-toggle[aria-expanded='true']{border-color:#1fffb166;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.game-configure-panel{display:flex;flex-direction:column;gap:14px;padding:14px 12px 2px;border:1px solid #1fffb166;border-top:0;border-radius:0 0 7px 7px;background:#ffffff05}
+.game-configure-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:0;border:0;min-width:0;font-size:12px;color:#c4bfd2}
+.game-configure-row>span{display:flex;flex-direction:column;gap:2px}
+.game-configure-row small{font-size:10px;color:#7f899e}
+.game-configure-row select,.game-configure-row input{padding:6px 8px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit}
+.game-configure-row select{width:130px}
+.game-configure-vp>div{display:flex;align-items:center;gap:8px}
+.game-configure-vp label{display:flex;align-items:center;gap:6px;font-size:11px;color:#aab3c5}
+.game-configure-vp input{width:58px}
+.game-configure-vp button{padding:5px 9px;font-size:11px}
+.game-configure .deck-picker{margin-bottom:12px}
+
+.deck-picker{margin:0 0 16px;padding:0;border:0;min-width:0}
+.deck-picker legend{display:flex;align-items:baseline;justify-content:space-between;width:100%;padding:0;margin-bottom:8px;font-size:12px;color:#c4bfd2}
+.deck-picker legend small{font-size:10px;color:#7f899e}
+.deck-picker-options{display:flex;flex-wrap:wrap;gap:6px;max-height:112px;overflow-y:auto}
+.deck-picker-options button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:120px;padding:8px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff08;text-align:left}
+.deck-picker-options button b{font:600 12px Inter,sans-serif;color:#e8ecf4}
+.deck-picker-options button small{font-size:10px;color:#8b93a7}
+.deck-picker-options button:hover:not(:disabled){border-color:#ffffff55;background:#ffffff12}
+.deck-picker-options button[aria-checked='true'],.deck-picker-options button[aria-checked='true']:hover{border-color:var(--green,#1fffb1);background:#1fffb114;box-shadow:0 0 0 1px var(--green,#1fffb1) inset}
+.deck-picker-options button[aria-checked='true'] small{color:#9ff5d6}
+.deck-picker-options button:disabled{opacity:.45}
+.deck-picker-cards{display:flex;flex-wrap:wrap;gap:4px 10px;margin:8px 0 0;font-size:10px;line-height:1.4;color:#9eabc0}
+.deck-picker-cards i{margin-right:3px;font-style:normal;color:#7f899e}
+.deck-picker-note{margin:0;font-size:11px;color:#7f899e}
+
+/* A small window: it rolls up into its header bar, which is also the drag handle. Pinned to the top so rolling up keeps the bar in place. */
+.setup-agents{position:relative;z-index:1;display:flex;flex-direction:column;flex:none;width:min(680px,100%);max-height:100%;align-self:flex-start;border:1px solid #ffffff1f;border-radius:10px;background:#0b0b17eb;box-shadow:0 22px 50px #0009;overflow:hidden}
+.setup-agents.dragging{box-shadow:0 30px 70px #000c,0 0 0 1px #1fffb155}
+.setup-agents>header{display:flex;align-items:center;gap:9px;flex:none;padding:8px 8px 8px 10px;border-bottom:1px solid #ffffff14;background:#ffffff06;cursor:grab;touch-action:none;user-select:none}
+.setup-agents.dragging>header{cursor:grabbing}
+.setup-agents.collapsed{width:340px}
+.setup-agents.collapsed>header{border-bottom-color:transparent}
+.setup-agents-grip{width:8px;height:16px;flex:none;background:radial-gradient(circle,#ffffff55 1px,transparent 1.4px) 0 0/4px 4px}
+.setup-agents-faces{display:flex;flex:none}
+.setup-agents-faces .agent-avatar+.agent-avatar{margin-left:-6px}
+.setup-agents-title{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.setup-agents-title small{font:600 9px Inter,sans-serif;letter-spacing:2px;color:var(--green,#1fffb1)}
+.setup-agents-title span{font-size:10px;color:#7f899e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.setup-agents .setup-agents-roll{display:grid;place-items:center;flex:none;width:26px;height:26px;padding:0;border-color:#ffffff24;border-radius:6px;background:#ffffff0a;color:#cfd8e3}
+.setup-agents .setup-agents-roll svg{transition:rotate .18s}
+.setup-agents.collapsed .setup-agents-roll svg{rotate:180deg}
+.setup-agents-tabs{display:flex;gap:3px;flex:none;padding:7px 12px 0;border-bottom:1px solid #ffffff14}
+.setup-agents-tabs button{padding:6px 14px;border:1px solid transparent;border-bottom:0;border-radius:7px 7px 0 0;background:none;color:#7e8499;font:600 10px Inter,sans-serif;letter-spacing:.8px;cursor:pointer}
+.setup-agents-tabs button:hover{color:#d7dce8}
+.setup-agents-tabs button[aria-selected='true']{border-color:#ffffff1f;background:#ffffff0a;color:#9fe8ff}
+.setup-agents-body{display:block;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 14px}
+.setup-agents-body.games .test-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
+.setup-agents-body.games .test-games>:not(.test-games-card){grid-column:1/-1}
+.mentoring-recipients{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
+.report-control{display:flex;flex-direction:column;gap:4px}
+.agents-panel .report-control>button{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center}
+.agents-panel .report-control>button.busy{opacity:1;border-color:#9fe8ff88;color:#dff7ff;background:linear-gradient(90deg,#9fe8ff0a,#9fe8ff22,#9fe8ff0a) 0 0/200% 100%;animation:report-sweep 1.6s linear infinite;font-variant-numeric:tabular-nums}
+.report-spinner{width:10px;height:10px;flex:none;border:1.5px solid #9fe8ff44;border-top-color:#9fe8ff;border-radius:50%;animation:report-spin .8s linear infinite}
+@keyframes report-spin{to{rotate:360deg}}
+@keyframes report-sweep{to{background-position:-200% 0}}
+.report-stamp{margin:0;font:500 9px/1.4 Inter,sans-serif;color:#7e8499}
+.report-stamp b{font-weight:600;color:#cfd8e3}
+.agents-panel .report-stamp .report-read{display:inline;width:auto;padding:0;border:0;background:none;color:#9fe8ff;font:600 9px Inter,sans-serif;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.report-spinner,.agents-panel .report-control>button.busy{animation:none}}
+.setup-agents-body h3{display:flex;align-items:baseline;gap:8px;margin:0 0 2px;font:600 10px Inter,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:#eaf0f6}
+.setup-agents-body h3 small{font:500 9px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#7e8499}
+.setup-agents-settings{display:flex;flex-direction:column;gap:8px;min-width:0}
+
+/* Agent games and mentoring tabs: one card per study, league or recipient. */
+.test-games{min-width:0}
+.test-games-meta{margin:-4px 0 0;font:500 9px/1.4 Inter,sans-serif;color:#7e8499}
+.test-games-meta b{font-weight:600;color:#aab3c5}
+.test-games-card{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid #ffffff1a;border-radius:8px;background:#ffffff05}
+.test-games-card>header{display:flex;align-items:center;gap:8px}
+.test-games-card>header>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.test-games-card>header strong{font:600 10px Inter,sans-serif;letter-spacing:1px;color:#eaf0f6}
+.test-games-card>header small{font:600 9px Inter,sans-serif;color:#7e8499;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-games-card .agents-cadence>small{width:84px}
+.test-games-experiment,.test-games-result{margin:0;font:500 9px/1.45 Inter,sans-serif;color:#9ea6ba;overflow-wrap:anywhere}
+.test-games-experiment b{font-weight:600;color:#ffe9a8}
+.test-games-result{padding:5px 8px;border-left:2px solid #9fe8ff55;background:#9fe8ff0a}
+.test-games .agents-fold-body p+p{margin-top:6px}
+.mentoring>.test-games-card+.mentoring-recipients,.mentoring>.test-games-card+.agents-note{margin-top:2px}
+.mentoring-recipient p{display:flex;align-items:center;gap:5px;margin:0 0 3px;font:500 10px/1.4 Inter,sans-serif;color:#d8deeb}
+.mentoring-recipient ol{margin:0;padding-left:18px;display:grid;gap:4px;font:500 9px/1.45 Inter,sans-serif;color:#9ea6ba}
+.mentoring-recipient li span{display:block;color:#d8deeb;overflow-wrap:anywhere}
+.mentoring-recipient li small{display:block;color:#ffe9a8;overflow-wrap:anywhere}
+.coaching-phases{margin:6px 0;padding-left:18px;display:grid;gap:3px;font:500 10px/1.45 Inter,sans-serif;color:#9ea6ba}
+.coaching-phases b{color:#d8deeb;font-weight:600;margin-right:4px}
+.test-games-card>header>.league-faces{flex-direction:row;flex:none;gap:0}
+.league-faces .agent-avatar+.agent-avatar{margin-left:-7px}
+.league-table{width:100%;border-collapse:collapse;font:500 9px/1.3 Inter,sans-serif;color:#aab3c5}
+.league-table th{padding:0 4px 3px;font:600 8px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7e8499;text-align:right}
+.league-table th:first-child,.league-table td:first-child{text-align:left;padding-left:0}
+.league-table td{padding:3px 4px;border-top:1px solid #ffffff0f;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.league-table td:first-child{display:flex;align-items:center;gap:6px}
+.league-table td:first-child>span{display:flex;flex-direction:column;line-height:1.15}
+.league-table td b{font:600 9px Inter,sans-serif;letter-spacing:.5px;color:#eaf0f6}
+.league-table td small{font:500 8px Inter,sans-serif;color:#7e8499}
+.league-table td:last-child{color:#ffe9a8}
+.league-table tr.off{opacity:.45}
+.league-h2h{display:flex;flex-wrap:wrap;gap:3px 10px;margin:0;font:500 9px Inter,sans-serif;color:#7e8499}
+.league-h2h b{font-weight:600;color:#cfd8e3;font-variant-numeric:tabular-nums}
+.agents-panel .agents-actions button.primary{border-color:#1fffb1aa;color:#d9fff1;background:#1fffb114}
+.agents-panel .agents-actions button.primary:hover:not(:disabled){border-color:#1fffb1;background:#1fffb124}
+@media(prefers-reduced-motion:reduce){.setup-agents .setup-agents-roll svg{transition:none}}
+@media(max-width:1100px){.setup-backdrop{flex-wrap:wrap}.setup-backdrop>.setup-card{margin:0}}

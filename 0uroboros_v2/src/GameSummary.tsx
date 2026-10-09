@@ -11,6 +11,8 @@ type Props = {
  colors: ResolvedColorTheme;
  inspect: (card: Card) => void;
  restart: () => void;
+ /** Called once both totals have finished counting up. */
+ onTallied?: () => void;
 };
 
 /** Delay before the totals start counting, so the rows land first. */
@@ -75,13 +77,23 @@ function PlayerTally({ owner, score, color, leading, showEffects, showDestructio
 }
 
 /** End-of-session sheet: rises over the singularity without dimming it. */
-export function GameSummary({ view, colors, inspect, restart }: Props){
+export function GameSummary({ view, colors, inspect, restart, onTallied }: Props){
  const scores = view.finalScore;
+ const showEffects = !!scores?.some(score => score.effectVP !== 0);
+ const showDestruction = !!scores?.some(score => score.destructionVP !== 0);
+ const rowCount = 2 + Number(showEffects) + Number(showDestruction);
+ useEffect(() => {
+  if(!scores || !onTallied) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const timer = window.setTimeout(onTallied, reduced ? 0 : (rowCount + 2) * ROW_STAGGER_MS + TALLY_MS);
+  return () => window.clearTimeout(timer);
+ }, [!!scores, rowCount, onTallied]);
+ const [collapsed, setCollapsed] = useState(false);
  if(!scores) return null;
  const headline = view.winner === 0 ? 'You win' : view.winner === 1 ? 'Opponent wins' : 'Tie';
- const showEffects = scores.some(score => score.effectVP !== 0);
- const showDestruction = scores.some(score => score.destructionVP !== 0);
- return <section className='game-summary' role='region' aria-label='Session summary'>
+ return <>
+ <section id='session-summary' className={`game-summary ${collapsed ? 'collapsed' : ''}`} role='region' aria-label='Session summary' inert={collapsed}>
+  <button type='button' className='summary-collapse' aria-label='Collapse session summary' aria-controls='session-summary' aria-expanded={!collapsed} onClick={() => setCollapsed(true)}><i aria-hidden='true'/></button>
   <header className='summary-head'>
    <div>
     <small><Icon name='volume'/>CIRCUIT COMPLETE · CYCLE {String(view.cycle).padStart(2, '0')}</small>
@@ -93,5 +105,9 @@ export function GameSummary({ view, colors, inspect, restart }: Props){
   <div className='summary-players'>
    {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}
   </div>
- </section>;
+ </section>
+ <button type='button' className={`summary-expand ${collapsed ? 'shown' : ''}`} aria-label='Expand session summary' aria-controls='session-summary' aria-expanded={!collapsed} inert={!collapsed} onClick={() => setCollapsed(false)}>
+  <i aria-hidden='true'/><b>{headline}</b><span>{scores[0].total} – {scores[1].total} VP</span>
+ </button>
+ </>;
 }

@@ -1,0 +1,129 @@
+---
+kind: guide
+category: reference
+aliases: [Style guide, Text style]
+related: ["[[Glossary]]", "[[Effect step]]", "[[Location]]"]
+tags: [ontology/reference]
+---
+# Card Text Style Guide
+
+Concise yet clear text for cards, Locations and circuit rewards. Related: [[Glossary]].
+
+## Colours (Location text)
+
+| Term | Colour | Hex |
+| --- | --- | --- |
+| Triggers (On Reveal, Ongoing, On Collapse, …) | White | `#ffffff` |
+| +N Card(s) | Blue | `#4185ff` |
+| +N Action(s), Inspect, Recover | Cyan | `#27e2ff` |
+| Drain -N | Red | `#fa0048` |
+| Restore (card power) +N | Orange | `#ff8a1f` |
+| Gain / lose Crypto | Green | `#1fffb1` |
+| Destroy, Trash | Pink | `#ff0ba1` |
+| Gain Power, Reset Power, Push / Pull Power | Yellow | `#ffff00` |
+| Reduce Power | Purple | `#b24cff` |
+| +N VP, Repair (Server) +N | Gold | `#ffcc12` |
+| Discard, Mill | Lavender | `#c9b6ff` |
+| Bump, Move a card, Attach / Remove mod | White (plain) | — |
+
+## Vocabulary
+
+| Word | Means |
+| --- | --- |
+| Restore | Heal a weakened card toward its printed power, never above it |
+| Reset | Set a card back to its printed power |
+| Repair | Heal a Server |
+| Drain | Damage a Server |
+| Inspect | Look at the top cards of a deck |
+| Steal | Take Crypto from the enemy wallet |
+| Node Power | Push, pull or let the player choose, between nearby locations |
+
+## Effect editor menu
+
+The Effect select is grouped like the content sheet. Each item has its own Target list.
+
+| Group | Effects | Targets |
+| --- | --- | --- |
+| Resources | Draw cards, Gain actions, Gain victory points, Gain a card, Gain crypto, Pay | Player |
+| Servers | Drain, Repair | Available, Both, Backup |
+| Servers | Destroy your backup | Fixed: your Backup server |
+| Cards | Add power, Remove power, Restore power, Reset power, Trash a card, Destroy a card | Any revealed card, Revealed card here, This card, Next revealed card, Previously revealed card, Card in hand, Top card, Bottom card, Deck (random), Effect Bank |
+| Cards | Move a card | Revealed cards on the board |
+| Cards | Morph | None (this card) |
+| Deck | Mill, Inspect | Top of deck |
+| Deck | Discard | Hand |
+| Deck | Trash | Hand, Discard pile, Deck (random) |
+| Deck | Steal | Wallet |
+| Deck | Bump | Effect Bank, Wallet, Effect Bank or Wallet |
+| Deck | Recover | Trash pile |
+| Node Power | Push, Pull, Player's choice | Left, Right, Between, Choice |
+| Mods | Attach a mod, Remove mods | Card place and filters |
+| Flow | Choice, Random | Options |
+
+- Add and Remove power take a plain amount; the sign comes from the menu item.
+- Deck (random) always picks at random, so the Pick select is hidden; a count still applies.
+- Deck → Trash is a bulk trash of up to N cards. Cards → Trash a card trashes one specific card.
+- Whose: "Yours", "Enemy", "Any side", "Both" (each player separately). On Locations, "Winning" / "Losing" for cards and "Winning player" / "Losing player" for players.
+- There is no Primary server target: use Available (primary first, backup once it falls) or Both.
+
+## Targets
+
+- **Random** single target: unmarked — "a card", "a revealed card of yours", "a revealed enemy card here".
+- **Owner:** yours = "a card of yours"; theirs = "an enemy card". Off-board zones drop "enemy": "a card in enemy hand".
+- **Deck and Effect Bank:** "a card in your deck", "Restore 2 cards in your deck +1", "Destroy a card in enemy Effect Bank"; bulk Trash reads "Trash 2 cards from your deck at random".
+- **All:** "all your revealed cards", "all enemy cards here" ("revealed" is omitted when the place is "here").
+- **Relations:** "this card", "your next revealed card", "the next revealed enemy card", "the previously revealed enemy card".
+- **Chosen** targets lead with who chooses:
+  - "Choose a revealed card of yours to …" (you choose)
+  - "Opponent chooses …"
+  - On Locations: "The winning player chooses …"
+
+## Verb forms
+
+- Draw: "+1 Card", "+2 Cards"
+- Actions: "+1 Action", "+2 Actions"
+- Crypto: "+2 Crypto" / "-1 Crypto"
+- VP: "+1 VP", "+1 VP to the player who played here", "-1 VP from enemy"
+- Drain: "-200 Enemy server", "-200 Both enemy servers", "Drain -2 from the enemy Server"
+- Repair: "Repair +100" (your available Server), "Repair backup server +100", "Repair both servers +100"; on Locations "Repair their server +25"
+- Destroy: "Destroy your backup server"
+- Restore: "Restore a revealed card of yours +1", "Restore this card +1"; after a choice, "Choose a revealed card of yours to Restore +1"
+- Gain a card: "Gain a Glitch" (to your hand), "Gain a Byte-Coin on top of your deck", "Gain 2 Glitches in your Discard", "Gain a Glitch in the winning player's hand"
+- Power: "give +1 Power" / "give -1 Power" / "steal 1 Power from …"
+- Reset: "Reset the Power of all cards here", "Reset the Power of your next revealed card", "Reset the Power of a revealed enemy card here"
+- Mods: "gain Shielded", "lose Shielded"; collection form "Attach X to a Character in your deck"
+
+## Power transfer
+
+| Setup | Text |
+| --- | --- |
+| Push or pull, either side | Push or pull N power |
+| Push, one side | Push N power right / Push N power left |
+| Pull, one side | Pull N power from the right / Pull N power from the left |
+| Push or pull, one side | Push or pull N power on the left |
+| Push only, either side | Push N power left or right |
+| Pull only, either side | Pull N power from the left or right |
+| Split (Target: Between) | Push N power left and right (N is each side's share; an odd total reads "Push 3 power, split left and right") |
+
+In the editor these are the Node Power items Push, Pull and Player's choice, with Target Left, Right, Between or Choice. Push names the side bare ("right"); pull says "from the right".
+
+## Durations
+
+- A card counts its duration, every-turn steps and schedule in one time scale: Runtime turns or Cycles. Switching the scale keeps the same recipe and only changes the words.
+- Recurring effects end with the span: "…, for the next 2 turns", "…, for the next turn", "…, every turn" (duration 99); on the Cycle scale "…, for the next 2 Cycles", "…, every Cycle".
+- Scheduled effects lead with timing: "Next Runtime turn: …", "In 2 Runtime turns: …", "End of the next Runtime turn: …"; on the Cycle scale "In 2 Cycles: …", "End of the next Cycle: …". Scheduled text ends with "Lasts 2 turns." / "Lasts 2 Cycles."
+- Duration cards stay on the board until their Location collapses, even after their effects stop.
+- Card icons: turns icon, Cycles icon, infinity for 99.
+
+## Choice modals
+
+- The primary button (right) is the action verb, with a count when one is possible: "Trash 3 cards", "Discard a card", "Select a card", "Select cards".
+- When declining is allowed, a text button to its left says how: "Don't trash cards", "Don't discard", "Select none".
+
+## Where it lives in code
+
+- `src/effects/catalog.ts` — card and reward wording, Effect editor menu (`EDITOR_ENTRIES`) and Target lists
+- `src/authoring/StepEditor.tsx` — the step editor form
+- `src/locationTriggers.ts` — Location colours and patterns
+- `src/transferText.ts` — Power transfer sentence
+- `src/EffectChoice.tsx` — modal button and decline labels

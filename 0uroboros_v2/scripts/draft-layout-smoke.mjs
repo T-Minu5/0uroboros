@@ -9,8 +9,9 @@ page.on('console',message=>{if(message.type()==='error')report.errors.push(messa
 try{
  await page.addInitScript(()=>{let state=31;Math.random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};});
  await page.goto('http://127.0.0.1:5173');
+ await page.getByRole('button',{name:'Enter evaluation build'}).click({timeout:60000});
+ await page.waitForFunction(()=>document.querySelector('.end-turn')&&!document.querySelector('.end-turn').disabled,null,{timeout:120000});
  await useSetting(page,'Normal pace',{exact:true});
- await page.getByRole('button',{name:'Enter evaluation build'}).click();
  for(let turn=1;turn<=3;turn++){
   await page.waitForFunction(turn=>document.querySelector('.phase-label')?.textContent.includes(`RUNTIME ${turn} OF 3`)&&!document.querySelector('.end-turn')?.disabled,turn,{timeout:120000});
   await page.locator('.end-turn').click();
@@ -41,6 +42,7 @@ try{
     fullCards:cards.every(card=>{const b=box(card);return Math.abs(b.height/b.width-236/170)<.02;}),
     costBadges:document.querySelectorAll('.market-art [data-card-cost]').length,
     acquireBars:document.querySelectorAll('.acquire-label').length,
+    acquireButtons:document.querySelectorAll('.market-card .market-acquire').length,
     resourceScale:Math.round(resourceBoxes[0].width/characterW*100)/100,
     resourcesOneRow:resourceBoxes.every(b=>Math.abs(b.top-resourceBoxes[0].top)<1),
     boardOverflow:(el=>el.scrollHeight-el.clientHeight)(document.querySelector('.draft-market-board')),
@@ -52,7 +54,7 @@ try{
     overflow:document.querySelector('.strategic-draft').scrollWidth>innerWidth,
    };
   });
-  if(!layout.fullCards||layout.costBadges!==16||layout.acquireBars||!layout.resourcesOneRow||layout.resourceScale>=1||layout.walletColor!=='rgb(31, 255, 177)'||!layout.buttonVisible||layout.cardCount!==16||layout.rows.row1!==6||layout.rows.row2!==4||layout.rows.resources!==6||layout.overflow)throw new Error(JSON.stringify(layout));
+  if(!layout.fullCards||layout.costBadges!==0||layout.acquireButtons!==12||layout.acquireBars||!layout.resourcesOneRow||layout.resourceScale>=1||layout.walletColor!=='rgb(31, 255, 177)'||!layout.buttonVisible||layout.cardCount!==12||layout.rows.row1!==6||layout.rows.row2!==0||layout.rows.resources!==6||layout.overflow)throw new Error(JSON.stringify(layout));
   report.layouts.push({width,...layout});
   await page.screenshot({path:`docs/evidence/strategic-draft-scrolled-${width}.png`});
  }

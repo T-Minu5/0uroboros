@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import {
-  boardSideChoices, changeRecipeBoardSide, changeRecipeTarget, createRecipe, deriveEffectText, deriveLocationText, normalizeRecipe,
-  operationChoices, recipeOperation, recipeSummary, targetChoices,
-} from '../src/authoring/recipeModel';
-import { compileContent, createDefaultContent, materializeItemRecipes, validateContent } from '../src/authoring/contentModel';
+import { actionsFor, createStep, describeLocation, describeStep, describeSteps, targetsFor, whoChoices } from '../src/effects/catalog';
+import { migrateEffects } from '../src/effects/migrate';
+import type { EffectStep, Scope } from '../src/effects/types';
+import { compileContent, createDefaultContent, normalizeDocument, validateContent } from '../src/authoring/contentModel';
 import { isGeneratedCard, newCardCategory, poolForClass } from '../src/authoring/cardBrowser';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
 import { isNoTargetEvent, eventTime } from '../src/presentation';
@@ -13,6 +12,9 @@ const catalog: Card[] = [
   { id: 'alpha', definitionId: 'alpha-definition', name: 'Alpha Relay', type: 'Character', power: 2, cost: 2, art: '/alpha.png', effect: '' },
   { id: 'beta', definitionId: 'beta-definition', name: 'Beta Archive', type: 'Character', power: 3, cost: 3, art: '/beta.png', effect: '' },
 ];
+
+const steps = (effects: Parameters<typeof migrateEffects>[0], scope: Scope = 'card') => migrateEffects(effects, scope);
+const ids = (scope: Scope) => actionsFor(scope).map(spec => spec.id);
 
 const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, power: 2, onReveal: effects, ...extra });
@@ -34,45 +36,43 @@ function finish(game: RuntimeSession) {
 }
 
 describe('authoring effects overhaul', () => {
-  it('exposes the shared evaluation catalog to location and circuit scopes', () => {
-    const location = operationChoices('location', catalog).map(choice => choice.value);
-    const circuit = operationChoices('circuit', catalog).map(choice => choice.value);
-    for (const op of ['draw', 'crypto', 'vp', 'drain', 'restore', 'handTrash', 'attachModifier', 'recover']) {
-      expect(location).toContain(op);
-      expect(circuit).toContain(op);
+  it('exposes the shared catalog to Location and Circuit scopes', () => {
+    for (const action of ['draw', 'gainCrypto', 'gainVP', 'damageServer', 'repairServer', 'trashCards', 'attachModifier', 'recover'] as const) {
+      expect(ids('location')).toContain(action);
+      expect(ids('circuit')).toContain(action);
     }
-    expect(location).not.toContain('trashSelf');
-    expect(circuit).not.toContain('morph');
+    expect(targetsFor('trashCard', 'location')[0]).toMatchObject({ relations: undefined });
+    expect(ids('circuit')).not.toContain('morph');
   });
 
-  it('normalizes legacy aliases and derives printed text', () => {
-    expect(normalizeRecipe({ kind: 'damageLoser', amount: 200 })).toEqual({ kind: 'drain', amount: 200, opponent: true });
-    expect(normalizeRecipe({ kind: 'restorePrimary', amount: 400 })).toEqual({ kind: 'restore', amount: 400, target: 'primary' });
-    expect(deriveEffectText([{ kind: 'crypto', amount: 2 }, { kind: 'draw', amount: 1 }], 'location', catalog))
-      .toBe('Give 2 Crypto to the winning player\'s wallet. Draw 1 card into the winning player\'s hand.');
-    expect(deriveLocationText({ effects: [{ kind: 'crypto', amount: 2 }], ongoing: [{ kind: 'draw', amount: 1 }], onPlay: [{ kind: 'vp', amount: 1 }], schedule: [{ at: 2, effects: [{ kind: 'actions', amount: 1 }] }] }, catalog))
-      .toBe('On collapse: Give 2 Crypto to the winning player\'s wallet. Ongoing: Draw 1 card into the winning player\'s hand. On reveal: Give 1 Victory Point to the player who played here. After turn 2: Give 1 Action to the winning player.');
-    const modifier = createRecipe('attachModifier', 'circuit', catalog);
-    expect(modifier).toMatchObject({ kind: 'attachModifier', modifier: 'doublePrintedEffects' });
-    expect(changeRecipeTarget(modifier, 'specific-character', 'circuit', catalog).cardId).toBe('alpha-definition');
-    expect(recipeSummary({ kind: 'attachModifier', modifier: 'powerAuraAtLocation', amount: 2 }, 'circuit', catalog))
-      .toContain('+2 Power aura');
+  it('migrates legacy aliases and derives printed text from the catalog', () => {
+    expect(steps([{ kind: 'damageLoser', amount: 200 }], 'location')).toEqual([{ action: 'damageServer', amount: 200, target: { type: 'server', who: 'loser', server: 'auto' } }]);
+    expect(steps([{ kind: 'restorePrimary', amount: 400 }], 'circuit')).toEqual([{ action: 'repairServer', amount: 400, target: { type: 'server', who: 'self', server: 'primary' } }]);
+    expect(describeSteps(steps([{ kind: 'crypto', amount: 2 }, { kind: 'draw', amount: 1 }], 'location'), 'location', catalog))
+      .toBe('+2 Crypto to the winning player. +1 Card to the winning player.');
+    expect(describeLocation({ effects: steps([{ kind: 'crypto', amount: 2 }], 'location'), ongoing: steps([{ kind: 'draw', amount: 1 }], 'location'), onPlay: steps([{ kind: 'vp', amount: 1 }], 'locationPlay'), startTurn2: steps([{ kind: 'actions', amount: 1 }], 'location'), startTurn3: steps([{ kind: 'vp', amount: 1 }], 'location') }, catalog))
+      .toBe('On collapse: +2 Crypto to the winning player. Ongoing: +1 Card to the winning player. On reveal: +1 VP to the player who played here. Start of turn 2: +1 Action to the winning player. Start of turn 3: +1 VP to the winning player.');
+    const modifier = createStep('attachModifier', 'circuit', catalog);
+    expect(modifier).toMatchObject({ action: 'attachModifier', modifier: 'doublePrintedEffects', target: { type: 'card', where: 'collection' } });
+    expect(describeStep({ ...modifier, cardId: 'alpha-definition' }, 'circuit', catalog)).toBe('Attach “printed effects happen twice” to Alpha Relay');
+    expect(describeStep({ ...modifier, modifier: 'powerAuraAtLocation', amount: 2 }, 'circuit', catalog)).toContain('+2 Power aura');
   });
 
   it('prints the target of card effects in the derived card text', () => {
-    expect(deriveEffectText([{ kind: 'modifyPower', amount: 3, cardRelation: 'next' }], 'card', catalog)).toBe('+3 Power to your next revealed card.');
-    expect(deriveEffectText([{ kind: 'modifyPower', amount: 2 }], 'card', catalog)).toBe('+2 Power to one of your revealed cards.');
-    expect(deriveEffectText([{ kind: 'modifyPower', amount: -1, cardRelation: 'previous' }], 'card', catalog)).toBe('-1 Power from your previously revealed card.');
-    expect(deriveEffectText([{ kind: 'modifyPower', amount: -2, opponent: true }], 'card', catalog)).toBe('Steal 2 Power from an enemy revealed card.');
-    expect(deriveEffectText([{ kind: 'draw', amount: 1 }, { kind: 'crypto', amount: 2, opponent: true }, { kind: 'vp', amount: -1, opponent: true }], 'card', catalog))
-      .toBe('+1 Card. +2 Crypto to enemy. -1 Victory Point from enemy.');
+    const text = (effects: Parameters<typeof migrateEffects>[0]) => describeSteps(steps(effects), 'card', catalog);
+    expect(text([{ kind: 'modifyPower', amount: 3, cardRelation: 'next' }])).toBe('+3 Power to your next revealed card.');
+    expect(text([{ kind: 'modifyPower', amount: 2 }])).toBe('Choose a revealed card of yours to give +2 Power.');
+    expect(text([{ kind: 'modifyPower', amount: -1, cardRelation: 'previous' }])).toBe('-1 Power from your previously revealed card.');
+    expect(text([{ kind: 'modifyPower', amount: -2, opponent: true }])).toBe('Choose a revealed enemy card to steal 2 Power from.');
+    expect(text([{ kind: 'draw', amount: 1 }, { kind: 'crypto', amount: 2, opponent: true }, { kind: 'vp', amount: -1, opponent: true }]))
+      .toBe('+1 Card. +2 Crypto to enemy. -1 VP from enemy.');
   });
 
   it('accepts negative printed Power and negative VP amounts', () => {
     const content = createDefaultContent();
     const target = content.cards.find(item => item.type === 'Character')!;
     target.power = -2;
-    target.onReveal = [{ kind: 'vp', amount: -1, opponent: true }];
+    target.onReveal = [{ action: 'gainVP', amount: -1, target: { type: 'player', who: 'opponent' } }];
     expect(validateContent(content)).toEqual([]);
   });
 
@@ -84,7 +84,7 @@ describe('authoring effects overhaul', () => {
       id: 'gen-token', definitionId: 'gen-token', name: 'Gen Token', type: 'Character', power: 1, cost: 0,
       art: '/assets/card_art/image_placeHolder.png', effect: '', pool: 'Base', enabled: true, cardClass: 'Action', generated: true,
     });
-    const materialized = materializeItemRecipes(document);
+    const materialized = normalizeDocument(document);
     const migrated = materialized.cards.find(item => item.definitionId === 'gen-token')!;
     expect(migrated.cardClass).toBe('Action');
     expect(migrated.generated).toBe(true);
@@ -95,16 +95,15 @@ describe('authoring effects overhaul', () => {
     expect(compiled.cards.some(item => item.definitionId === 'gen-token')).toBe(true);
   });
 
-  it('routes location and circuit rewards through evaluation effects including legacy aliases', () => {
+  it('routes Location rewards through effect steps, including migrated legacy aliases', () => {
     const document = createDefaultContent();
     document.locations.forEach((location, index) => { location.enabled = index < 2; });
-    document.locations[0].effects = [{ kind: 'crypto', amount: 2 }];
-    document.locations[1].effects = [{ kind: 'damageLoser', amount: 200 }];
+    document.locations[0].effects = steps([{ kind: 'crypto', amount: 2 }], 'location');
+    document.locations[1].effects = steps([{ kind: 'damageLoser', amount: 200 }], 'location');
     // Keep enough locations enabled for validation.
-    document.locations.forEach((location, index) => { location.enabled = true; if (index > 1) location.effects = [{ kind: 'draw', amount: 0 }]; });
+    document.locations.forEach((location, index) => { location.enabled = true; if (index > 1) location.effects = steps([{ kind: 'draw', amount: 0 }], 'location'); });
     const content = compileContent(document);
-    expect(content.locations.find(location => location.effects.some(effect => effect.kind === 'drain' && effect.opponent))?.effects[0])
-      .toEqual({ kind: 'drain', amount: 200, opponent: true });
+    expect(content.locations[1].effects).toEqual([{ action: 'damageServer', amount: 200, target: { type: 'server', who: 'loser', server: 'auto' } }]);
     const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(7), content });
     game.state.nodeOrder = [0, 1, 2, 3, 4];
     game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
@@ -174,8 +173,8 @@ describe('authoring effects overhaul', () => {
     finish(game);
     const older = game.state.nodes[0].cards[0].find(placement => placement.card.id === 'older');
     const newer = game.state.nodes[1].cards[0].find(placement => placement.card.id === 'newer');
-    expect(older?.powerModifier).toBe(3);
-    expect(newer?.powerModifier ?? 0).toBe(0);
+    expect(older?.card.powerDelta).toBe(3);
+    expect(newer?.card.powerDelta ?? 0).toBe(0);
   });
 
   it('relocates a movable card once per Runtime turn', () => {
@@ -224,8 +223,8 @@ describe('authoring effects overhaul', () => {
     drainGame.deploy('second', 1);
     drainGame.endTurn();
     finish(drainGame);
-    expect(drainGame.state.nodes[1].cards[0].find(placement => placement.card.id === 'second')?.powerModifier).toBe(-2);
-    expect(drainGame.state.nodes[0].cards[0].find(placement => placement.card.id === 'first')?.powerModifier ?? 0).toBe(0);
+    expect(drainGame.state.nodes[1].cards[0].find(placement => placement.card.id === 'second')?.card.powerDelta).toBe(-2);
+    expect(drainGame.state.nodes[0].cards[0].find(placement => placement.card.id === 'first')?.card.powerDelta ?? 0).toBe(0);
   });
 
   it('destroys the next enemy revealed card and removes Runtime cards from the game', () => {
@@ -277,45 +276,35 @@ describe('authoring effects overhaul', () => {
   });
 
   it('authors Destroy card with a printed target', () => {
-    expect(operationChoices('card', catalog).map(choice => choice.value)).toContain('destroyCard');
-    expect(operationChoices('location', catalog).map(choice => choice.value)).toContain('destroyCard');
-    expect(operationChoices('circuit', catalog).map(choice => choice.value)).not.toContain('destroyCard');
-    const destroy = changeRecipeTarget(createRecipe('destroyCard', 'card', catalog), 'opponent-next-card', 'card', catalog);
-    expect(destroy).toMatchObject({ kind: 'destroyCard', opponent: true, cardRelation: 'next' });
-    expect(deriveEffectText([destroy], 'card', catalog)).toBe('Destroy the next enemy revealed card.');
+    expect(ids('card')).toContain('destroyCard');
+    expect(ids('location')).toContain('destroyCard');
+    expect(ids('circuit')).toContain('destroyCard');
+    const destroy: EffectStep = { action: 'destroyCard', target: { type: 'card', who: 'opponent', where: 'board', relation: 'next' } };
+    expect(steps([{ kind: 'destroyCard', opponent: true, cardRelation: 'next' }])).toEqual([destroy]);
+    expect(describeSteps([destroy], 'card', catalog)).toBe('Destroy the next revealed enemy card.');
     const content = createDefaultContent();
-    content.cards.push({ ...content.cards[0], id: 'hack-test', definitionId: 'hack-test', onReveal: [destroy as EvaluationEffect], cardClass: 'Runtime', powerSource: 'trash' });
+    content.cards.push({ ...content.cards[0], id: 'hack-test', definitionId: 'hack-test', onReveal: [destroy], cardClass: 'Runtime', powerSource: 'trash' });
     expect(validateContent(content)).toEqual([]);
   });
 
   it('authors Location Trash and Destroy with weakest, strongest, or first-revealed targets', () => {
-    const destroy = createRecipe('destroyCard', 'location', catalog);
-    expect(destroy).toEqual({ kind: 'destroyAtLocation', rank: 'weakest', amount: 1, boardSide: 'either' });
-    expect(targetChoices(destroy, 'location').map(choice => choice.label)).toEqual(['Weakest card here', 'Strongest card here', 'First card revealed here']);
-    const strongest = changeRecipeBoardSide(changeRecipeTarget(destroy, 'strongest', 'location', catalog), 'loser', 'location');
-    expect(recipeSummary(strongest, 'location', catalog)).toBe("Destroy the strongest revealed card on the losing player's side.");
-    expect(boardSideChoices(strongest, 'locationPlay').map(choice => choice.value)).toEqual(['either', 'played', 'other', 'both']);
-
-    const legacy = { kind: 'trashLowestAtLocation', amount: 1, boardSide: 'both' as const };
-    expect(recipeOperation(legacy, 'location')).toBe('trashAtLocation');
-    expect(recipeSummary(legacy, 'location', catalog)).toBe('Trash the weakest revealed card on each side.');
-    const first = changeRecipeTarget(legacy, 'first', 'location', catalog);
-    expect(first).toEqual({ kind: 'trashAtLocation', rank: 'first', amount: 1, boardSide: 'both' });
-    expect(recipeSummary({ ...first, amount: 2, boardSide: 'either' }, 'location', catalog)).toBe('Trash the first 2 revealed cards here.');
-
+    const strongest: EffectStep = { action: 'destroyCard', target: { type: 'card', who: 'loser', where: 'thisNode' }, pick: { mode: 'strongest' } };
+    expect(describeStep(strongest, 'location', catalog)).toBe('Destroy the strongest revealed card on the losing side here');
+    expect(whoChoices(targetsFor('destroyCard', 'locationPlay')[0], 'locationPlay')).toEqual(['played', 'winner', 'other', 'loser', 'any', 'both']);
+    const [legacy] = steps([{ kind: 'trashLowestAtLocation', amount: 1, boardSide: 'both' }], 'location');
+    expect(legacy).toMatchObject({ action: 'trashCard', target: { type: 'card', who: 'both', where: 'thisNode' }, pick: { mode: 'weakest' } });
+    expect(describeStep(legacy, 'location', catalog)).toBe('Trash the weakest revealed card on each side here');
+    const first: EffectStep = { action: 'trashCard', target: { type: 'card', who: 'any', where: 'thisNode' }, pick: { mode: 'first', count: 2 } };
+    expect(describeStep(first, 'location', catalog)).toBe('Trash the first 2 revealed cards here');
     const content = createDefaultContent();
-    content.locations[0].effects = [strongest as never, first as never];
+    content.locations[0].effects = [strongest, legacy, first];
     expect(validateContent(content)).toEqual([]);
   });
 
-  it('exposes previous/next targets for attach, gain, and drain in authoring', () => {
-    const attach = createRecipe('attachModifier', 'card', catalog);
-    const board = changeRecipeTarget(attach, 'your-next-card', 'card', catalog);
-    expect(board).toMatchObject({ boardHost: true, cardRelation: 'next', opponent: false });
-    expect(recipeSummary(board, 'card', catalog)).toMatch(/next revealed/);
-    const power = changeRecipeTarget(createRecipe('gainPower', 'card', catalog), 'opponent-previous-card', 'card', catalog);
-    expect(power).toMatchObject({ kind: 'modifyPower', cardRelation: 'previous', opponent: true });
-    expect(recipeSummary(power, 'card', catalog)).toMatch(/previously revealed/);
+  it('offers previous and next targets for attach and Power changes', () => {
+    expect(targetsFor('attachModifier', 'card')[0]).toMatchObject({ relations: ['previous', 'next'] });
+    expect(describeStep({ action: 'attachModifier', modifier: 'movableEachTurn', target: { type: 'card', who: 'self', where: 'board', relation: 'next' } }, 'card', catalog)).toMatch(/next revealed/);
+    expect(describeStep({ action: 'changePower', amount: 2, target: { type: 'card', who: 'opponent', where: 'board', relation: 'previous' } }, 'card', catalog)).toMatch(/previously revealed enemy card/);
   });
 });
 

@@ -118,3 +118,32 @@
 @media(prefers-reduced-motion:reduce){
  .world-anchor .lane-drop-target.node-choice-target,.world-anchor .location-plate.node-choice { animation:none; box-shadow:0 0 18px #ffd36b77; }
 }
+
+/* Pending Power transfer: the same gold breath marks where a drag can start, then where the lifted Power can land. */
+.world-anchor .lane-drop-target.transfer-target {
+ display:block;
+ padding:0;
+ pointer-events:auto;
+ touch-action:none;
+ border:1px solid transparent;
+ border-radius:16px;
+ background:none;
+}
+.world-anchor .lane-drop-target.transfer-target.is-source { cursor:grab; }
+.world-anchor .lane-drop-target.transfer-target:is(.is-source,.is-target) {
+ border-color:#ffd36b55;
+ background:radial-gradient(ellipse at center,#ffd36b1c,#ffd36b00 72%);
+ animation:node-choice-column 2.4s ease-in-out infinite;
+}
+.world-anchor .lane-drop-target.transfer-target.is-over { border-color:#ffe7a8; background:radial-gradient(ellipse at center,#ffd36b38,#ffd36b00 75%); box-shadow:inset 0 0 26px #ffd36b40,0 0 26px #ffd36b88; }
+.world-anchor .lane-drop-target.transfer-target.is-origin { border:1px dashed #ff7a9588; }
+.world-anchor :is(.location-plate,.sealed-location).transfer-plate { touch-action:none; }
+.world-anchor :is(.location-plate,.sealed-location).transfer-plate.is-source { cursor:grab; }
+.world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { border-color:#ffd36b; animation:node-choice-plate 2.4s ease-in-out infinite; }
+.world-anchor :is(.location-plate,.sealed-location).transfer-plate.is-over { border-color:#ffe7a8; box-shadow:inset 0 0 16px #ffd36b55,0 0 26px #ffd36bcc; filter:brightness(1.2); }
+.board-canvas:has(.transfer-target) .field-card { pointer-events:none; }
+.board-canvas .world-anchor .power-badge.local.transfer-loss b { color:#ff7a95; text-shadow:0 0 8px #ff7a9588,0 1px 2px #000; }
+.board-canvas .world-anchor .power-badge.local.transfer-gain b { color:#1fffb1; text-shadow:0 0 8px #1fffb188,0 1px 2px #000; }
+@media(prefers-reduced-motion:reduce){
+ .world-anchor .lane-drop-target.transfer-target:is(.is-source,.is-target),.world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { animation:none; box-shadow:0 0 18px #ffd36b77; }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "aa991a1c-0c95-4d82-a3f1-5619a43683a1",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:47.955Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Resources/Victory Points.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "ffb6c45cbab0a43c8efd79f7795d3becad1a11729d22b8e84e7238bf6c61050b",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "ffb6c45cbab0a43c8efd79f7795d3becad1a11729d22b8e84e7238bf6c61050b"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:47.996Z"
+}

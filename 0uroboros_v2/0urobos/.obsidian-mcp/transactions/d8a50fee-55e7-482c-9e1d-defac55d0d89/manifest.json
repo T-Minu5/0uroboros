@@ -1,0 +1,18 @@
+{
+  "id": "d8a50fee-55e7-482c-9e1d-defac55d0d89",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:16.729Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Node Power effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "01e464abea44490484b26dedb24bd197592c0fc7fcc752499359b8ab2a417ec4",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "01e464abea44490484b26dedb24bd197592c0fc7fcc752499359b8ab2a417ec4"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:16.770Z"
+}

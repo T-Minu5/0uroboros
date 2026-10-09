@@ -93,7 +93,7 @@ describe("Evaluation Location content", () => {
     const hit = result.find(step => step.event.kind === "drain" && step.event.source === "location")!;
     expect(hit.event).toMatchObject({ node: 2, owner: 0, targetOwner: 1, target: "primary", amount: 100, before: 100, after: 0 });
     expect(session.state.players[1].servers.backup).toBe(1500);
-    expect(session.state.players[0].destructionVP).toBe(8);
+    expect(session.state.players[0].destructionVP).toBe(12);
   });
 
   it("finishes lethal Node awards then stops later Nodes, Effect Bank, Circuit selection and Draft", () => {
@@ -101,8 +101,8 @@ describe("Evaluation Location content", () => {
     session.state.players[1].servers = { primary: 0, backup: 150 };
     session.endTurn(); const result = drain(session);
     expect(session.state.phase).toBe("gameover");
-    expect(session.state.players[0].destructionVP).toBe(12);
-    expect(session.state.players[0].totalVP).toBe(12);
+    expect(session.state.players[0].destructionVP).toBe(20);
+    expect(session.state.players[0].totalVP).toBe(20);
     expect(session.state.winner).toBe(0);
     expect(result.some(step => step.event.node !== undefined && step.event.node > 1)).toBe(false);
     expect(result.some(step => step.event.text.startsWith("Effect Bank"))).toBe(false);
@@ -137,10 +137,10 @@ describe("Evaluation Circuit claims", () => {
 
   it("adds earned VP immediately and keeps it through Cycle transitions", () => {
     const session = draftFixture("serpent_crown");
-    expect(session.claimCircuitReward()).toMatchObject({ kind: "vp", target: "vp", before: 4, after: 8 });
+    expect(session.claimCircuitReward()).toMatchObject({ kind: "vp", target: "vp", before: 3, after: 7 });
     expect(session.state.players[0].rewardVP).toBe(4);
     session.endDraft(); session.nextCycle();
-    expect(session.view().players[0].totalVP).toBe(8);
+    expect(session.view().players[0].totalVP).toBe(7);
     expect(session.state.circuitReward.definition).toBeNull();
     expect(session.state.circuitReward.claimed).toEqual([]);
   });
@@ -200,7 +200,8 @@ describe("Evaluation information and repeat-play boundaries", () => {
         const player = session.state.players[owner];
         const cards = [...player.hand, ...player.draw, ...player.discard, ...player.destroyed, ...player.bank.map(entry => entry.card), ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))];
         expect(new Set(cards.map(card => card.id)).size).toBe(cards.length);
-        expect(player.totalVP).toBe(4 + player.rewardVP + player.destructionVP);
+        const printedVP = cards.filter(card => !player.destroyed.includes(card)).reduce((sum, card) => sum + (card.vp ?? 0), 0);
+        expect(player.totalVP).toBe(printedVP + player.rewardVP + player.destructionVP);
       }
       const conserved = [0, 1].flatMap(owner => {
         const player = session.state.players[owner];

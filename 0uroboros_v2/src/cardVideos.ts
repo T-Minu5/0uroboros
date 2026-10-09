@@ -7,10 +7,14 @@ import { cardNameKey } from './cardArtwork';
  */
 const files = import.meta.glob(['/assets/videos/**/*.mp4', '!/assets/videos/Board/**'], {query: '?url', import: 'default', eager: true}) as Record<string, string>;
 const ON_FX = /_onfx$/i;
+/** Cards whose `_onFX` clip is switched off; the file stays in place and their inspect clip still plays. */
+const EFFECT_CLIPS_OFF = new Set(['rezz-blade'].map(cardNameKey));
 const inspectClips = new Map<string, string>(), effectClips = new Map<string, string>();
 for (const [path, url] of Object.entries(files)) {
  const stem = path.slice(path.lastIndexOf('/') + 1).replace(/\.mp4$/i, '');
- (ON_FX.test(stem) ? effectClips : inspectClips).set(cardNameKey(stem.replace(ON_FX, '')), url);
+ const key = cardNameKey(stem.replace(ON_FX, ''));
+ if (!ON_FX.test(stem)) inspectClips.set(key, url);
+ else if (!EFFECT_CLIPS_OFF.has(key)) effectClips.set(key, url);
 }
 
 /**

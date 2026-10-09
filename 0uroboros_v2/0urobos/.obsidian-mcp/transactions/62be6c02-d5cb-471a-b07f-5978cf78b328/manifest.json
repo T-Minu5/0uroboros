@@ -1,0 +1,21 @@
+{
+  "id": "62be6c02-d5cb-471a-b07f-5978cf78b328",
+  "state": "committed",
+  "createdAt": "2026-10-07T05:22:28.940Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Target.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "f61b7715f79ff2685db8dbc34f489b6ac58bd8da02f0958ed56fed73d19ee857",
+      "recoverable": true,
+      "existed": true,
+      "mode": 33152,
+      "etag": "c9ce0d1e10ecbb8c2f25cfa6a9b9e10d4253b9407781121c79884444c35498f5",
+      "snapshot": "0.bin",
+      "committedEtag": "f61b7715f79ff2685db8dbc34f489b6ac58bd8da02f0958ed56fed73d19ee857"
+    }
+  ],
+  "completedAt": "2026-10-07T05:22:28.982Z"
+}

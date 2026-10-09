@@ -1,0 +1,18 @@
+{
+  "id": "c3ad950a-be9e-490c-9656-24b87d54a9a8",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:10.048Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Cards/Card Power.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "8a74a3f8db05a2bb99b1f7a71334cd527b28a3ac7d1974aa5d116df9521e3544",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "8a74a3f8db05a2bb99b1f7a71334cd527b28a3ac7d1974aa5d116df9521e3544"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:10.088Z"
+}

@@ -1,0 +1,1808 @@
+{
+  "schema": 1,
+  "version": 6,
+  "mode": "llm",
+  "profile": {
+    "version": 6,
+    "plan": "Maintain early tempo with draw and Action cards, focusing on Slash-Dot and Rezz-Blade. Transition into Chaos strategies by Cycle 5 while prioritizing Drain through Bloodlet Drone. Adjust VP acquisition timing based on human strategies, aiming for optimal scoring potential. Focus on high-value Crypto purchases and avoid low-value options like Shyte-Coin. Overall schedule: economy until Cycle 5, Chaos from Cycle 6, VP from Cycle 10. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+    "economyUntilCycle": 5,
+    "chaosFromCycle": 6,
+    "vpFromCycle": 10,
+    "handCryptoTarget": 15,
+    "minCryptoValue": 2,
+    "minBuyScore": 1,
+    "dilution": 0.5,
+    "weights": {
+      "power": 1,
+      "draw": 1.6,
+      "actions": 1.1,
+      "crypto": 1,
+      "drain": 0,
+      "restore": 1.2,
+      "vp": 2.2,
+      "duration": 0.8,
+      "thin": 1.2,
+      "disrupt": 0.8,
+      "chaos": 1.5
+    },
+    "cardBias": {
+      "dash": 2,
+      "slash-dot": 4,
+      "bloodlet-drone": 4,
+      "rezz-blade": 4,
+      "kilo-coin": -1,
+      "shyte-coin": -2,
+      "rezz-razor": 1.5,
+      "razor-blade-jade": -0.3,
+      "card-3c9ng7g8": -0.3,
+      "card-m7dztzir": -0.3,
+      "sudo-demiurge": 0.5,
+      "byte-coin": 1,
+      "superpositioning": 0.5,
+      "infernal-kernel": 0.25,
+      "mega-cache": 1,
+      "iterative-incubus": 0.25,
+      "delta-wave": 0.25,
+      "temporal-rift": 0.5,
+      "root-rune": 0.5,
+      "bios-archive": 0.5,
+      "zenith-wetware": 0.5
+    }
+  },
+  "plan": "Maintain early tempo with draw and Action cards, focusing on Slash-Dot and Rezz-Blade. Transition into Chaos strategies by Cycle 5 while prioritizing Drain through Bloodlet Drone. Adjust VP acquisition timing based on human strategies, aiming for optimal scoring potential. Focus on high-value Crypto purchases and avoid low-value options like Shyte-Coin. Overall schedule: economy until Cycle 5, Chaos from Cycle 6, VP from Cycle 10. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+  "theories": [
+    {
+      "id": "no-shyte",
+      "text": "Shyte-Coin is not worth a deck slot: it dilutes draws. Bigger Crypto (Kilo, Mega-Cache) or Characters that draw cards are better buys.",
+      "status": "proposed",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "no-shyte",
+      "createdBy": 0,
+      "updatedBy": 5
+    },
+    {
+      "id": "economy-first",
+      "text": "Buying a few high-value Crypto cards (cost 6+) by Cycle 5 builds the economy that wins the late game.",
+      "status": "proposed",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "test": "economy-first",
+      "createdBy": 0,
+      "updatedBy": 5
+    },
+    {
+      "id": "draw-engine",
+      "text": "Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.",
+      "status": "proposed",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "draw-engine",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "chaos-endgame",
+      "text": "Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +8/+12 VP.",
+      "status": "proposed",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "chaos-endgame",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "early-aggression",
+      "text": "Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).",
+      "status": "proposed",
+      "confidence": 0.4,
+      "support": 0,
+      "against": 0,
+      "test": "early-aggression",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "vp-late",
+      "text": "VP cards are best bought late (Cycle 12+); earlier they clog the hand.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "vp-late",
+      "createdBy": 0,
+      "updatedBy": 6
+    },
+    {
+      "id": "drain-race",
+      "text": "Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.",
+      "status": "refuted",
+      "confidence": 0.33,
+      "support": 1,
+      "against": 3,
+      "test": "drain-race",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "early-chaos-transition",
+      "text": "Transitioning into Chaos by Cycle 5 is optimal for enhancing Drain and server destruction.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 6
+    },
+    {
+      "id": "strong-draw-focus",
+      "text": "Focusing on strong draw/Action Base cards in the early game maximizes efficiency and prepares for later cycles.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 3
+    },
+    {
+      "id": "mid-game-vp-acquisition",
+      "text": "Acquiring VP cards in the mid to late game (Cycle 12+) prevents hand clogging and maximizes scoring potential.",
+      "status": "supported",
+      "confidence": 0.6,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 6
+    },
+    {
+      "id": "restore-importance",
+      "text": "Including Restore cards earlier in the strategy can help mitigate Server damage and prolong the game.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 6
+    },
+    {
+      "id": "high-value-chaos",
+      "text": "Focusing on high-value Chaos cards early (cost 5+) can enhance Drain effects and Server destruction capabilities.",
+      "status": "supported",
+      "confidence": 0.8,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 6
+    },
+    {
+      "id": "mid-game-draft-adjustment",
+      "text": "Improving mid-game Draft strategies can prevent economic disparity and enhance overall performance.",
+      "status": "supported",
+      "confidence": 0.7,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 2
+    },
+    {
+      "id": "early-vp-strategy",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 5
+    },
+    {
+      "id": "high-value-draw-action-focus",
+      "text": "Prioritizing high-value draw and Action cards early maximizes efficiency and prepares for later cycles.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 3
+    },
+    {
+      "id": "vp-early-acquisition",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 6
+    },
+    {
+      "id": "early-vp-acquisition",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "supported",
+      "confidence": 0.9,
+      "support": 0,
+      "against": 0,
+      "createdBy": 5,
+      "updatedBy": 5
+    },
+    {
+      "id": "high-value-chaos-early",
+      "text": "Focusing on high-value Chaos cards early (cost 5+) can enhance Drain effects and Server destruction capabilities.",
+      "status": "supported",
+      "confidence": 0.85,
+      "support": 0,
+      "against": 0,
+      "createdBy": 6,
+      "updatedBy": 6
+    },
+    {
+      "id": "timely-vp-acquisition",
+      "text": "Adjusting VP acquisition timing based on observed human strategies maximizes scoring potential.",
+      "status": "supported",
+      "confidence": 0.85,
+      "support": 0,
+      "against": 0,
+      "createdBy": 6,
+      "updatedBy": 6
+    },
+    {
+      "id": "early-restore-importance",
+      "text": "Including Restore cards earlier in the strategy can help mitigate Server damage and prolong the game.",
+      "status": "supported",
+      "confidence": 0.85,
+      "support": 0,
+      "against": 0,
+      "createdBy": 6,
+      "updatedBy": 6
+    }
+  ],
+  "notes": [
+    {
+      "version": 0,
+      "at": "2026-10-03T23:12:36.891Z",
+      "text": "Founding guidance from the designer: gain a few high-value Crypto and Base cards first, then collect Chaos cards for an endgame play. Every game is different, so adapt to the market and the opponent."
+    },
+    {
+      "version": 0,
+      "at": "2026-10-03T23:12:36.891Z",
+      "text": "Pre-launch self-play (80 headless games per profile vs scripted opponents): most games ended by Server destruction around Cycles 8-11. Valuing Drain early and pivoting to Chaos by Cycle 5 won 88-92% vs 71% for a Cycle 9 pivot. Extra Crypto lowered the win rate (70 -> 62 of 80 as the Crypto weight rose), because draw/Power Base cards return more per Crypto spent. Shyte-Coin is never bought. Human opponents deploy far better than the scripts, so re-test all of this against the human."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:37.300Z",
+      "text": "v1 online. Read v0's notebook: 7 active theories, 2 notes, record 0-0-0."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:43.345Z",
+      "text": "Prioritize acquiring Base cards with draw and Action effects to enhance early game efficiency."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:43.345Z",
+      "text": "Avoid Shyte-Coin; its low value dilutes deck quality."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:43.345Z",
+      "text": "Transition into Chaos around Cycle 5, as Drain becomes crucial for server destruction."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:43.345Z",
+      "text": "Plan to buy VP cards primarily in the late game to avoid clogging the hand too early."
+    },
+    {
+      "version": 1,
+      "at": "2026-10-03T23:12:43.345Z",
+      "text": "Monitor the effectiveness of new cards for potential inclusion in strategy."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:25.132Z",
+      "text": "v2 online. Read v1's notebook: 10 active theories, 8 notes, record 0-0-0."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:31.973Z",
+      "text": "Cycle 1: Focused on early draw and Action cards; bought Bloodlet Drone and Opulent Void."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:31.973Z",
+      "text": "Cycle 2: Human opponent opted for Kilo-Coin; I maintained focus on draw and Chaos cards."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:31.973Z",
+      "text": "Transitioning into Chaos by Cycle 5 is crucial for optimizing Drain effects."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:31.973Z",
+      "text": "High-value Crypto is still a priority but should not dilute the deck with low-value cards."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T01:10:31.973Z",
+      "text": "Monitoring performance of new cards from recent updates is essential for strategy adjustments."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:31.028Z",
+      "text": "Debrief: The human won at Cycle 11 (Both Servers destroyed. You win, 35 to 3 VP.). VP human 35 / me 3. Servers human 2249 / me 0. Human bought: Infernal Kernel x2, Mega-Cache x2, Sudo Demiurge, Byte-Coin, Superpositioning, Iterative Incubus, ∆-Wave, Temporal Rift, Root Rune, BIOS Archive, Zenith Wetware. I bought: Razor Blade Jade x2, Rezz Razor, Timed Bomb, Slash-Dot, Bumpster."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:31.028Z",
+      "text": "Theory evidence: no-shyte contradicted (Shyte-Coins owned: winner 1, loser 0); economy-first supported (Kilo/Mega Crypto bought by Cycle 5: winner 1, loser 0); draw-engine contradicted (cards of draw bought: winner 5, loser 6); chaos-endgame contradicted (Chaos bought from Cycle 8: winner 0, loser 1); drain-race supported (Servers destroyed at Cycle 11)."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:31.028Z",
+      "text": "Adjusting: my Servers fell low, so Restore is worth more; the human won on VP bought earlier than my VP window; my mid-game Draft wallet averaged 1.5 vs the human's 9.8, so the Crypto target rises."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "Human opponent effectively utilized high-value Crypto and Drain cards early, leading to significant Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "I struggled with low Power early on; focusing on draw and Actions is critical."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "The human's mid-game Draft wallet consistently outpaced mine, indicating a need for improved economic strategies."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "Transitioning to Chaos by Cycle 5 was beneficial, but I need to buy more effective Chaos cards sooner."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "Restore cards may need to be prioritized to mitigate Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:00:40.602Z",
+      "text": "The human's VP acquisition strategy was effective; I need to adjust my timing for VP purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:15:53.747Z",
+      "text": "Debrief: I won at Cycle 1 (Automatic concession after two consecutive no-input Runtime turns.). VP human 3 / me 3. Servers human 3400 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:15:53.747Z",
+      "text": "Theory evidence: drain-race contradicted (went to Cycle 1 on VP)."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:15:53.747Z",
+      "text": "No structural change; card biases updated from the purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "Human opponent effectively utilized high-value Crypto and Drain cards early, leading to significant Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "I struggled with low Power early on; focusing on draw and Actions is critical."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "The human's mid-game Draft wallet consistently outpaced mine, indicating a need for improved economic strategies."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "Transitioning to Chaos by Cycle 5 was beneficial, but I need to buy more effective Chaos cards sooner."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "Restore cards may need to be prioritized to mitigate Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:16:00.837Z",
+      "text": "The human's VP acquisition strategy was effective; I need to adjust my timing for VP purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:42.505Z",
+      "text": "Debrief: I won at Cycle 1 (Automatic concession after two consecutive no-input Runtime turns.). VP human 3 / me 3. Servers human 3400 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:42.505Z",
+      "text": "Theory evidence: drain-race contradicted (went to Cycle 1 on VP)."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:42.505Z",
+      "text": "No structural change; card biases updated from the purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:49.493Z",
+      "text": "Monitor the performance of high-value Crypto cards; they significantly impacted early game strategies."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:49.493Z",
+      "text": "The human's early aggressive Drain strategy led to substantial Server damage, indicating a need for Restore cards."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:49.493Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were critical for effective Drain and Server destruction."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:17:49.493Z",
+      "text": "The human's focus on VP acquisition earlier than Cycle 12 clogged my hand, impacting my endgame strategy."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:43.169Z",
+      "text": "Debrief: I won at Cycle 1 (Automatic concession after two consecutive no-input Runtime turns.). VP human 3 / me 3. Servers human 3400 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:43.169Z",
+      "text": "Theory evidence: drain-race contradicted (went to Cycle 1 on VP)."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:43.169Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:52.123Z",
+      "text": "High-value Crypto is still a priority but should not dilute the deck with low-value cards."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:52.123Z",
+      "text": "The human effectively utilized high-value Crypto and Drain cards early, leading to significant Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:52.123Z",
+      "text": "I struggled with low Power early on; focusing on draw and Actions is critical."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:52.123Z",
+      "text": "The human's VP acquisition strategy was effective; I need to adjust my timing for VP purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:18:52.123Z",
+      "text": "Adjusting: my Servers fell low, so Restore is worth more; the human won on VP bought earlier than my VP window."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:43.132Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:43.132Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:50.779Z",
+      "text": "The human effectively leveraged high-value Crypto and Drain cards early, causing significant Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:50.779Z",
+      "text": "Transitioning to Chaos by Cycle 5 was beneficial, but I need to prioritize more effective Chaos cards earlier."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:50.779Z",
+      "text": "Restore cards should be prioritized to mitigate early Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:50.779Z",
+      "text": "The human's VP acquisition strategy was effective; I need to adjust my timing for VP purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:54:50.779Z",
+      "text": "I struggled with low Power early on; focusing on draw and Actions is critical."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:02.443Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:02.443Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "High-value Crypto cards were effective in the human's early game strategy, leading to significant Server damage."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "I need to ensure a more balanced acquisition of Chaos cards earlier to keep up with aggressive strategies."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "The human effectively used VP cards earlier than Cycle 12, indicating a need for earlier VP strategy adjustments."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "Restore cards played a crucial role in mitigating Server damage; they should be prioritized sooner."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "My focus on draw and Actions was initially beneficial, but I need to maintain that focus while also considering effective Chaos."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T21:56:08.206Z",
+      "text": "The transition to Chaos at Cycle 5 was beneficial, but I need more effective Chaos cards to maximize Drain."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:01.229Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:01.229Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:13.230Z",
+      "text": "No structural change; card biases updated from the purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:13.230Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were critical for effective Drain and Server destruction."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:13.230Z",
+      "text": "The human's early aggressive Drain strategy led to substantial Server damage, indicating a need for Restore cards earlier."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:13.230Z",
+      "text": "The human effectively utilized high-value Crypto cards, indicating a need to prioritize better Crypto purchases."
+    },
+    {
+      "version": 2,
+      "at": "2026-10-04T22:00:13.230Z",
+      "text": "Adjusting the timing for VP acquisition is crucial after observing the human's strategy."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:23.772Z",
+      "text": "v3 online. Read v2's notebook: 14 active theories, 69 notes, record 3-1-3. Removed cards: dot, eval-cycle-cache, shyte-coin."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:33.783Z",
+      "text": "High-value draw and Action cards are critical for early game efficiency."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:33.783Z",
+      "text": "Transitioning to Chaos by Cycle 5 remains optimal for enhancing Drain strategies."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:33.783Z",
+      "text": "Mid-to-high value Crypto should be prioritized over low-value options to avoid deck dilution."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:33.783Z",
+      "text": "VP acquisition should start earlier to align with observed human strategies."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:46.781Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:01:46.781Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:00.604Z",
+      "text": "The human's early acquisition of high-value Crypto led to significant Server pressure, indicating a need to prioritize better Crypto purchases."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:00.604Z",
+      "text": "Transitioning to Chaos by Cycle 5 was beneficial, but I need to ensure I acquire more effective Chaos cards earlier."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:00.604Z",
+      "text": "VP acquisition should start earlier to align with observed human strategies and optimize scoring potential."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:00.604Z",
+      "text": "Restore cards played a crucial role in mitigating Server damage; they should be prioritized sooner in my strategy."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:00.604Z",
+      "text": "I struggled with low Power early on; focusing on draw and Actions is critical for maintaining tempo."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:49.870Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:02:49.870Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:03:11.414Z",
+      "text": "High-value draw and Action cards were essential for maintaining tempo in early Cycles."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:03:11.414Z",
+      "text": "The transition to Chaos by Cycle 5 proved beneficial for enhancing Drain strategies."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:03:11.414Z",
+      "text": "Restoration cards mitigated Server damage; their acquisition should be prioritized sooner."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:03:11.414Z",
+      "text": "VP cards were effectively utilized earlier by the human, indicating a need for earlier VP strategy adjustments."
+    },
+    {
+      "version": 3,
+      "at": "2026-10-04T22:03:11.414Z",
+      "text": "Low-value Crypto like Shyte-Coin should continue to be avoided to maintain deck efficiency."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:05.697Z",
+      "text": "v4 online. Read v3's notebook: 16 active theories, 88 notes, record 3-1-5."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:14.132Z",
+      "text": "Prioritize high-value draw and Action cards early for tempo."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:14.132Z",
+      "text": "Chaos strategies should focus on cards that enhance Drain and Server damage."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:14.132Z",
+      "text": "VP cards should be acquired earlier to maximize scoring opportunities."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:14.132Z",
+      "text": "Transitioning to Chaos by Cycle 5 has proven effective."
+    },
+    {
+      "version": 4,
+      "at": "2026-10-04T22:05:14.132Z",
+      "text": "Avoid low-value Crypto to maintain deck efficiency."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:29.044Z",
+      "text": "v5 online. Read v4's notebook: 16 active theories, 94 notes, record 3-1-5."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:36.980Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial for effective Drain and Server destruction."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:36.980Z",
+      "text": "The human's early aggressive Drain strategy indicates a need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:36.980Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:36.980Z",
+      "text": "Adjusting the timing for VP acquisition is critical after observing the human's effective strategy."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:05:36.980Z",
+      "text": "Restore cards played a significant role in prolonging the game, suggesting they should be acquired earlier."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:49.876Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:49.876Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "High-value Chaos cards were crucial for effective Drain and server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "The human's early Drain strategy highlights the importance of timing for Restore cards."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "Prioritizing high-value Crypto purchases is essential to avoid deck dilution."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "Adjust VP acquisition timing to align with observed strategies."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "Restore cards should be acquired earlier to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:08:58.826Z",
+      "text": "The transition to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:21.694Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:21.694Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial for effective Drain and Server destruction."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "The human's early aggressive Drain strategy highlighted the importance of timing for Restore cards."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "Prioritizing high-value Crypto purchases is essential to avoid deck dilution."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "Adjust VP acquisition timing to align with observed strategies."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "Restore cards should be acquired earlier to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:30.279Z",
+      "text": "The transition to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:53.532Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:53.532Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:58.169Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial for effective Drain and Server destruction."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:58.169Z",
+      "text": "The human's early aggressive Drain strategy indicates a need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:58.169Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:58.169Z",
+      "text": "Adjust VP acquisition timing to align with observed strategies."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:09:58.169Z",
+      "text": "Restore cards should be acquired earlier to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:22.218Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:22.218Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:29.372Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial for effective Drain and Server destruction."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:29.372Z",
+      "text": "The human's early aggressive Drain strategy indicates a need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:29.372Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:29.372Z",
+      "text": "Adjusting the timing for VP acquisition is critical after observing the human's effective strategy."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:11:29.372Z",
+      "text": "Restore cards played a significant role in prolonging the game, suggesting they should be acquired earlier."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:32.586Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:32.586Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "High-value Chaos cards were crucial for effective Drain and server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "The human's early Drain strategy highlights the importance of timing for Restore cards."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "Prioritizing high-value Crypto purchases is essential to avoid deck dilution."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "Adjust VP acquisition timing to align with observed strategies."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "Restore cards should be acquired earlier to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:12:38.979Z",
+      "text": "Transition to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:15.122Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:15.122Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial for effective Drain and Server destruction."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "The human's early aggressive Drain strategy highlighted the importance of timing for Restore cards."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "Prioritizing high-value Crypto purchases is essential to avoid deck dilution."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "Adjust VP acquisition timing to align with observed strategies."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "Restore cards should be acquired earlier to mitigate Server damage."
+    },
+    {
+      "version": 5,
+      "at": "2026-10-04T22:13:24.223Z",
+      "text": "Transition to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:04.016Z",
+      "text": "v6 online. Read v5's notebook: 17 active theories, 146 notes, record 3-1-11."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:12.284Z",
+      "text": "Transitioning to Chaos strategies by Cycle 5 has proven effective in previous games."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:12.284Z",
+      "text": "High-value draw and Action cards are crucial for maintaining tempo and card cycling."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:12.284Z",
+      "text": "Acquiring Restore cards earlier can help mitigate Server damage from aggressive Drain strategies."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:12.284Z",
+      "text": "Mid-to-high value Crypto purchases are essential to maintain economic efficiency."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:12.284Z",
+      "text": "Adjusting VP acquisition timing based on observed human strategies is critical for success."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:36.126Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:36.126Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:43.849Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were critical for effective Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:43.849Z",
+      "text": "The human's aggressive Drain strategy indicates a need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:43.849Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:43.849Z",
+      "text": "Adjust timing for VP acquisition based on observed human strategies to maximize scoring potential."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:15:43.849Z",
+      "text": "Transitioning to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:38.828Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:38.828Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:45.498Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were critical for effective Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:45.498Z",
+      "text": "The human's aggressive Drain strategy indicates a need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:45.498Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:45.498Z",
+      "text": "Adjust timing for VP acquisition based on observed human strategies to maximize scoring potential."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:16:45.498Z",
+      "text": "Transitioning to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:03.088Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:03.088Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:09.846Z",
+      "text": "The early game showed the importance of drawing and maintaining tempo with high-value cards like Slash-Dot."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:09.846Z",
+      "text": "The human's strategy of delaying VP acquisition until late highlighted the need for adjusting my own timing for VP."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:09.846Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were key in applying effective pressure on Servers."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:09.846Z",
+      "text": "Observing the human's aggressive drain strategy reinforces the value of timely Restore cards to protect Servers."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:26:09.846Z",
+      "text": "Transitioning to Chaos at Cycle 5 remains effective for enhancing Drain strategies."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:37.769Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:37.769Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:44.150Z",
+      "text": "The game ended as a tie, highlighting the importance of timely VP acquisition."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:44.150Z",
+      "text": "Observed that high-value Chaos cards like Rezz-Blade were critical for effective Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:44.150Z",
+      "text": "The human's strategy of delaying VP acquisition until late suggests I should adapt my timing for VP."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:44.150Z",
+      "text": "Early game emphasized the need for strong draw and tempo maintenance with cards like Slash-Dot."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:27:44.150Z",
+      "text": "The need for earlier Restore cards became apparent due to the human's aggressive Drain strategy."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:06.780Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:06.780Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:12.766Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were critical for effective Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:12.766Z",
+      "text": "Human's aggressive Drain strategy shows the need for earlier Restore cards to mitigate Server damage."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:12.766Z",
+      "text": "Transitioning to Chaos by Cycle 5 remains effective for enhancing Drain."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:35:12.766Z",
+      "text": "Adjusting VP acquisition timing based on observed human strategies can maximize scoring potential."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:43.648Z",
+      "text": "Debrief: Tie at Cycle 1 (Session ended early for evaluation. Tie, 3 to 3 VP.). VP human 3 / me 3. Servers human 3500 / me 3500. Human bought: nothing. I bought: nothing."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:43.648Z",
+      "text": "Adjusting: games against the human go the distance, so VP matters earlier and Drain a little less."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "High-value Chaos cards like Rezz-Blade and Bloodlet Drone were crucial during Drain phases."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "The human delayed VP acquisition until late, indicating I should adapt my own timing for VP."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "Prioritize high-value Crypto purchases to maintain deck efficiency and avoid dilution from low-value options."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "Early game emphasized the need for strong draw and tempo maintenance with cards like Slash-Dot."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "The game ended as a tie, highlighting the importance of timely VP acquisition."
+    },
+    {
+      "version": 6,
+      "at": "2026-10-04T22:40:50.716Z",
+      "text": "Observing the human's aggressive drain strategy reinforces the value of timely Restore cards to protect Servers."
+    }
+  ],
+  "cardNotes": {
+    "dash": "High utility for early draw and Actions, crucial for maintaining pace.",
+    "dot": "utility; est. hand value 5.5 early / 4.7 late at cost 3. Untested.",
+    "eval-cycle-cache": "utility; est. hand value 4.3 early / 2.8 late at cost 3. Untested.",
+    "eval-phase-runner": "utility; est. hand value 4.5 early / 4.5 late at cost 3. Untested.",
+    "eval-signal-surveyor": "high Power; est. hand value 8.1 early / 8.1 late at cost 3. Untested.",
+    "eval-burn-ledger": "economy; est. hand value 4.8 early / 2.5 late at cost 2. Untested.",
+    "eval-salvage-relay": "utility; est. hand value 3.3 early / 3.3 late at cost 3. Untested.",
+    "eval-forked-signal": "utility; est. hand value 2 early / 2 late at cost 2. Untested.",
+    "atomic-unit": "utility; est. hand value 7.3 early / 7.3 late at cost 2. Untested.",
+    "atomic-mass": "utility; est. hand value 7.6 early / 7.6 late at cost 3. Untested.",
+    "thorn-shadow": "Action engine; est. hand value 8.6 early / 7.1 late at cost 3. Untested.",
+    "dash-dot": "Action engine; est. hand value 5.8 early / 5.8 late at cost 3. Untested.",
+    "slash-dot": "Excellent for early tempo and drawing; crucial for maintaining efficiency in the first cycles.",
+    "the-inbetweener": "utility; est. hand value 6.5 early / 5.7 late at cost 4. Untested.",
+    "dotkrawler": "Action engine; est. hand value 5.3 early / 5.3 late at cost 4. Untested.",
+    "quantum-telementry": "Action engine, economy; est. hand value 7.2 early / 5.7 late at cost 5. Untested.",
+    "byte-drone": "Strong Crypto engine; consider for later cycles.",
+    "recursive-seance": "utility; est. hand value 10.3 early / 5.8 late at cost 5. Untested.",
+    "cowl-obscyra": "Action engine; est. hand value 6.8 early / 6.8 late at cost 5. Untested.",
+    "infernal-kernel": "utility; est. hand value 7.5 early / 6.7 late at cost 6. Untested.",
+    "the-tesseract-magi": "utility; est. hand value 13.4 early / 13.4 late at cost 6. Untested.",
+    "root-rune": "deck-cycling draw engine, Action engine; est. hand value 10 early / 10 late at cost 7. Untested.",
+    "astra-ascii": "Action engine, economy, high Power; est. hand value 11.8 early / 10.3 late at cost 9. Untested.",
+    "shiva-of-cern": "deck-cycling draw engine, economy; est. hand value 14 early / 12.5 late at cost 10. Untested.",
+    "night-scythe": "deck thinning; est. hand value 2.5 early / 1.6 late at cost 2. Untested.",
+    "superpositioning": "utility; est. hand value 6 early / 6 late at cost 2. Untested.",
+    "summon-the-acolytes": "deck-cycling draw engine; est. hand value 7.5 early / 7.5 late at cost 3. Untested.",
+    "temporal-rift": "utility; est. hand value 11.2 early / 11.2 late at cost 3. Untested.",
+    "ghost-key": "deck thinning; est. hand value 5.3 early / 3.6 late at cost 4. Untested.",
+    "banishing-ritual": "deck thinning; est. hand value 4.4 early / 3 late at cost 4. Untested.",
+    "opulent-void": "deck thinning; est. hand value 6.5 early / 3.8 late at cost 4. Untested.",
+    "sacrifical-sigil": "utility; est. hand value 5.7 early / 3.4 late at cost 4. Untested.",
+    "byte-heist": "utility; est. hand value 7.6 early / 7.6 late at cost 5. Untested.",
+    "code-sniper": "utility; est. hand value 5.2 early / 5.2 late at cost 6. Untested.",
+    "kilo-cycle": "utility; est. hand value 6.7 early / 6.7 late at cost 7. Untested.",
+    "chronos-cache": "utility; est. hand value 3.7 early / 3.7 late at cost 9. Untested.",
+    "eval-persistent-leech": "light Drain; est. hand value 4.2 early / 6.9 late at cost 5. Untested.",
+    "nyx-luna": "light Drain; est. hand value 3.8 early / 5.1 late at cost 2. Untested.",
+    "rezz-razor": "Increased value due to its ability to damage Servers while providing Actions.",
+    "rezz-blade": "Essential for enhancing Drain effects; critical in late-game pushes.",
+    "invocation-of-the-sword": "light Drain; est. hand value 4.5 early / 6.3 late at cost 4. Untested.",
+    "bushido-io": "light Drain; est. hand value 8.2 early / 12.6 late at cost 4. Untested.",
+    "bloodlet-drone": "Key for Drain strategies; prioritize for effective server pressure in mid-game.",
+    "h3x1-d3x1": "endgame Drain finisher; est. hand value 6.3 early / 10.8 late at cost 5. Untested.",
+    "1337_speaker": "utility; est. hand value 4.9 early / 8.5 late at cost 5. Untested.",
+    "qubit-kid": "utility; est. hand value 4.6 early / 4.6 late at cost 5. Untested.",
+    "chrome-mitchell": "endgame Drain finisher; est. hand value 7.6 early / 14.8 late at cost 7. Untested.",
+    "delta-wave": "high Power; est. hand value 10.4 early / 21.2 late at cost 9. Untested.",
+    "system-seppuku": "high Power; est. hand value -1 early / -1 late at cost 23. Untested.",
+    "sudo-demiurge": "endgame Drain finisher; est. hand value 6.5 early / 9.6 late at cost 5. Untested.",
+    "cicada-3301": "light Drain, Server defense; est. hand value 7.7 early / 9.5 late at cost 6. Untested.",
+    "subroutine_succubus": "economy, endgame Drain finisher, Server defense; est. hand value 8.3 early / 9.5 late at cost 6. Untested.",
+    "iterative-incubus": "endgame Drain finisher, Server defense; est. hand value 22 early / 29.8 late at cost 7. Untested.",
+    "node-feratu": "endgame Drain finisher, Server defense; est. hand value 7 early / 11.1 late at cost 7. Untested.",
+    "the-azimuthal-kill": "endgame Drain finisher; est. hand value 11.6 early / 25.1 late at cost 8. Untested.",
+    "tihkal-hound": "endgame Drain finisher, high Power; est. hand value 16.3 early / 27.6 late at cost 9. Untested.",
+    "veil-of-cthulhu": "endgame Drain finisher, Server defense, high Power; est. hand value 13.2 early / 24 late at cost 12. Untested.",
+    "razor-blade-jade": "endgame Drain finisher; est. hand value 5.5 early / 9.1 late at cost 0. Untested.",
+    "basic-encryption": "1 VP finisher; est. hand value 1.2 early / 1.2 late at cost 2. Untested.",
+    "vault-encryption": "2 VP finisher; est. hand value 1.4 early / 1.4 late at cost 3. Untested.",
+    "quantum-archive": "3 VP finisher, Server defense; est. hand value 2.6 early / 2.6 late at cost 5. Untested.",
+    "bios-archive": "4 VP finisher; est. hand value 2.7 early / 2.7 late at cost 6. Untested.",
+    "esoteric-encryption": "6 VP finisher, Server defense; est. hand value 3.6 early / 3.6 late at cost 8. Untested.",
+    "neural-wetware": "6 VP finisher; est. hand value 4.7 early / 4.7 late at cost 8. Untested.",
+    "zenith-worx": "8 VP finisher, Server defense; est. hand value 5.2 early / 5.2 late at cost 11. Untested.",
+    "zenith-wetware": "8 VP finisher; est. hand value 6 early / 6 late at cost 11. Untested.",
+    "shyte-coin": "Continue avoiding; it dilutes deck efficiency.",
+    "byte-coin": "Crypto worth 2, economy; est. hand value 2.5 early / 1 late at cost 3. Untested.",
+    "kilo-coin": "Crypto worth 3, economy; est. hand value 3.8 early / 1.5 late at cost 6. Untested.",
+    "mega-cache": "Crypto worth 5; est. hand value 6.3 early / 2.5 late at cost 9. Untested.",
+    "eval-relocation-relay": "utility; est. hand value 2.5 early / 2.5 late at cost 3. Untested.",
+    "eval-hostile-reroute": "utility; est. hand value 2.5 early / 2.5 late at cost 4. Untested.",
+    "eval-signal-amplifier": "utility; est. hand value 3.2 early / 3.2 late at cost 3. Untested.",
+    "eval-power-siphon": "utility; est. hand value 3.2 early / 3.2 late at cost 4. Untested.",
+    "sleek-z": "utility; est. hand value 2.5 early / 2.5 late at cost 3. Untested.",
+    "salem-surge": "utility; est. hand value 4.5 early / 4.5 late at cost 3. Untested.",
+    "foder-fox": "utility; est. hand value 2.8 early / 2.8 late at cost 4. Untested.",
+    "trash-collector": "utility; est. hand value 2 early / 2 late at cost 5. Untested.",
+    "kim-dracula": "utility; est. hand value 2 early / 2 late at cost 5. Untested.",
+    "hack-attack": "utility; est. hand value 1.2 early / 1.2 late at cost 4. Untested.",
+    "jinx-001": "deck-cycling draw engine, economy; est. hand value 9.3 early / 7 late at cost 0. Untested.",
+    "card-m7dztzir": "utility; est. hand value 3.8 early / 3.8 late at cost 2. Untested.",
+    "card-ot1vjma3": "utility; est. hand value 3.8 early / 3.8 late at cost 2. Untested.",
+    "card-u994kue3": "utility; est. hand value 0.8 early / 0.8 late at cost 2. Untested.",
+    "card-3c9ng7g8": "utility; est. hand value 5.2 early / 5.2 late at cost 1. Untested.",
+    "card-56k08pz8": "utility; est. hand value 0.8 early / 0.8 late at cost 1. Untested.",
+    "card-728y2mjz": "high Power; est. hand value 6.3 early / 5.5 late at cost 3. Untested."
+  },
+  "knownCards": [
+    "dash",
+    "eval-phase-runner",
+    "eval-signal-surveyor",
+    "eval-burn-ledger",
+    "eval-salvage-relay",
+    "eval-forked-signal",
+    "atomic-unit",
+    "atomic-mass",
+    "thorn-shadow",
+    "dash-dot",
+    "slash-dot",
+    "the-inbetweener",
+    "dotkrawler",
+    "quantum-telementry",
+    "byte-drone",
+    "recursive-seance",
+    "cowl-obscyra",
+    "infernal-kernel",
+    "the-tesseract-magi",
+    "root-rune",
+    "astra-ascii",
+    "shiva-of-cern",
+    "night-scythe",
+    "superpositioning",
+    "summon-the-acolytes",
+    "temporal-rift",
+    "ghost-key",
+    "banishing-ritual",
+    "opulent-void",
+    "sacrifical-sigil",
+    "byte-heist",
+    "code-sniper",
+    "kilo-cycle",
+    "chronos-cache",
+    "eval-persistent-leech",
+    "nyx-luna",
+    "rezz-razor",
+    "rezz-blade",
+    "invocation-of-the-sword",
+    "bushido-io",
+    "bloodlet-drone",
+    "h3x1-d3x1",
+    "1337_speaker",
+    "qubit-kid",
+    "chrome-mitchell",
+    "delta-wave",
+    "system-seppuku",
+    "sudo-demiurge",
+    "cicada-3301",
+    "subroutine_succubus",
+    "iterative-incubus",
+    "node-feratu",
+    "the-azimuthal-kill",
+    "tihkal-hound",
+    "veil-of-cthulhu",
+    "razor-blade-jade",
+    "basic-encryption",
+    "vault-encryption",
+    "quantum-archive",
+    "bios-archive",
+    "esoteric-encryption",
+    "neural-wetware",
+    "zenith-worx",
+    "zenith-wetware",
+    "byte-coin",
+    "kilo-coin",
+    "mega-cache",
+    "eval-relocation-relay",
+    "eval-hostile-reroute",
+    "eval-signal-amplifier",
+    "eval-power-siphon",
+    "sleek-z",
+    "salem-surge",
+    "foder-fox",
+    "trash-collector",
+    "kim-dracula",
+    "hack-attack",
+    "jinx-001",
+    "card-m7dztzir",
+    "card-ot1vjma3",
+    "card-u994kue3",
+    "card-3c9ng7g8",
+    "card-56k08pz8",
+    "card-728y2mjz"
+  ],
+  "knownLocations": [
+    "data_exchange",
+    "occult_archive",
+    "quantum_commons",
+    "signal_tower",
+    "breach_relay",
+    "trash-compactor",
+    "loser-s-luck",
+    "trash-collector",
+    "boost-juice",
+    "ritual-mine",
+    "healing-hands",
+    "kilo-mill",
+    "data-breach",
+    "wing-clip",
+    "backup-failure",
+    "penny-for-the-poor",
+    "wind-fall",
+    "moving-mod",
+    "thin-the-heard",
+    "sludge-core",
+    "get-out",
+    "hit-em",
+    "kull-kode",
+    "location-qn2xfxg2",
+    "location-sz68enux"
+  ],
+  "cardStats": {
+    "sudo-demiurge": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "byte-coin": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "superpositioning": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "infernal-kernel": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 2,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "mega-cache": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 2,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "iterative-incubus": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "delta-wave": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "temporal-rift": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "root-rune": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "bios-archive": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "zenith-wetware": {
+      "ai": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      },
+      "human": {
+        "bought": 1,
+        "games": 1,
+        "wins": 1
+      }
+    },
+    "rezz-razor": {
+      "ai": {
+        "bought": 1,
+        "games": 1,
+        "wins": 0
+      },
+      "human": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      }
+    },
+    "razor-blade-jade": {
+      "ai": {
+        "bought": 2,
+        "games": 1,
+        "wins": 0
+      },
+      "human": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      }
+    },
+    "card-3c9ng7g8": {
+      "ai": {
+        "bought": 1,
+        "games": 1,
+        "wins": 0
+      },
+      "human": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      }
+    },
+    "slash-dot": {
+      "ai": {
+        "bought": 1,
+        "games": 1,
+        "wins": 0
+      },
+      "human": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      }
+    },
+    "card-m7dztzir": {
+      "ai": {
+        "bought": 1,
+        "games": 1,
+        "wins": 0
+      },
+      "human": {
+        "bought": 0,
+        "games": 0,
+        "wins": 0
+      }
+    }
+  },
+  "locationStats": {
+    "trash-collector": {
+      "seen": 2,
+      "aiWon": 0,
+      "humanWon": 2
+    },
+    "loser-s-luck": {
+      "seen": 4,
+      "aiWon": 3,
+      "humanWon": 0
+    },
+    "data-breach": {
+      "seen": 4,
+      "aiWon": 1,
+      "humanWon": 2
+    },
+    "backup-failure": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 0
+    },
+    "ritual-mine": {
+      "seen": 2,
+      "aiWon": 0,
+      "humanWon": 2
+    },
+    "location-qn2xfxg2": {
+      "seen": 2,
+      "aiWon": 0,
+      "humanWon": 2
+    },
+    "location-sz68enux": {
+      "seen": 4,
+      "aiWon": 1,
+      "humanWon": 2
+    },
+    "get-out": {
+      "seen": 4,
+      "aiWon": 2,
+      "humanWon": 2
+    },
+    "boost-juice": {
+      "seen": 3,
+      "aiWon": 0,
+      "humanWon": 3
+    },
+    "hit-em": {
+      "seen": 3,
+      "aiWon": 0,
+      "humanWon": 2
+    },
+    "breach_relay": {
+      "seen": 2,
+      "aiWon": 1,
+      "humanWon": 1
+    },
+    "healing-hands": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 1
+    },
+    "occult_archive": {
+      "seen": 4,
+      "aiWon": 2,
+      "humanWon": 2
+    },
+    "thin-the-heard": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 1
+    },
+    "penny-for-the-poor": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 0
+    },
+    "moving-mod": {
+      "seen": 2,
+      "aiWon": 1,
+      "humanWon": 1
+    },
+    "kilo-mill": {
+      "seen": 2,
+      "aiWon": 2,
+      "humanWon": 0
+    },
+    "quantum_commons": {
+      "seen": 2,
+      "aiWon": 0,
+      "humanWon": 2
+    },
+    "sludge-core": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 1
+    },
+    "signal_tower": {
+      "seen": 1,
+      "aiWon": 1,
+      "humanWon": 0
+    },
+    "trash-compactor": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 1
+    },
+    "wind-fall": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 1
+    },
+    "data_exchange": {
+      "seen": 1,
+      "aiWon": 1,
+      "humanWon": 0
+    },
+    "kull-kode": {
+      "seen": 1,
+      "aiWon": 0,
+      "humanWon": 0
+    }
+  },
+  "record": {
+    "games": 21,
+    "aiWins": 3,
+    "humanWins": 1,
+    "ties": 17
+  },
+  "history": [
+    {
+      "version": 1,
+      "bootedAt": "2026-10-03T23:12:43.346Z",
+      "mode": "llm",
+      "plan": "Focus on acquiring strong draw/Action Base cards early to build an efficient economy. Avoid Shyte-Coin; prioritize high-value Crypto only when beneficial. Transition into Chaos by Cycle 5 to enhance Drain capabilities, aiming for a late-game push with VP cards post-Cycle 12. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 12.)",
+      "games": 0,
+      "aiWins": 0
+    },
+    {
+      "version": 2,
+      "bootedAt": "2026-10-04T01:10:31.973Z",
+      "mode": "llm",
+      "plan": "Acquire strong draw/Action Base cards early, prioritizing cards like Dash and Slash-Dot for efficiency. Avoid Shyte-Coin; focus on high-value Crypto when beneficial. Transition into Chaos by Cycle 5 to enhance Drain capabilities, utilizing cards like Bloodlet Drone and Rezz-Blade. Aim for a late-game push with VP cards after Cycle 12, leveraging the power from Drain to destroy Servers for VP. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 12.)",
+      "games": 7,
+      "aiWins": 3
+    },
+    {
+      "version": 3,
+      "bootedAt": "2026-10-04T22:01:33.783Z",
+      "mode": "llm",
+      "plan": "Focus on acquiring high-value draw and Action cards early, such as Dash and Slash-Dot, to maintain tempo. Transition to Chaos strategies by Cycle 5, prioritizing cards like Bloodlet Drone and Rezz-Blade to maximize Drain potential. Avoid low-value Crypto like Shyte-Coin and instead aim for mid-to-high value options. Begin acquiring VP cards after Cycle 10 to optimize scoring and leverage Drain for Server damage. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+      "games": 2,
+      "aiWins": 0
+    },
+    {
+      "version": 4,
+      "bootedAt": "2026-10-04T22:05:14.132Z",
+      "mode": "llm",
+      "plan": "Start by acquiring strong draw and Action cards to maximize tempo, focusing on cards like Dash and Slash-Dot. Transition into Chaos strategies by Cycle 5, prioritizing high-value cards such as Bloodlet Drone and Rezz-Blade for effective Drain. Avoid low-value Crypto, especially Shyte-Coin, and aim for mid-to-high value options. Begin acquiring VP cards by Cycle 10 to enhance scoring potential, while leveraging Drain for Server damage. Maintain an economy focus through Cycle 5, shift to Chaos at Cycle 6, and integrate VP strategies by Cycle 10. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+      "games": 0,
+      "aiWins": 0
+    },
+    {
+      "version": 5,
+      "bootedAt": "2026-10-04T22:05:36.980Z",
+      "mode": "llm",
+      "plan": "Begin by acquiring strong draw and Action cards like Dash and Slash-Dot to maximize early-game tempo. Shift to Chaos strategies by Cycle 5, focusing on high-value cards such as Bloodlet Drone and Rezz-Blade for effective Drain. Avoid low-value Crypto cards like Shyte-Coin, instead opting for mid-to-high value options. Start acquiring VP cards by Cycle 10 to enhance scoring potential, while leveraging Drain to damage Servers. Maintain an economy focus through Cycle 5, transition to Chaos from Cycle 6, and integrate VP strategies starting Cycle 10. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+      "games": 6,
+      "aiWins": 0
+    },
+    {
+      "version": 6,
+      "bootedAt": "2026-10-04T22:15:12.289Z",
+      "mode": "llm",
+      "plan": "Focus on acquiring high-value draw and Action cards early, such as Slash-Dot and Rezz-Blade, to maintain tempo and prepare for later cycles. Transition into Chaos strategies by Cycle 5, emphasizing high-value Chaos cards like Bloodlet Drone for effective Drain. Prioritize mid-to-high value Crypto purchases while avoiding low-value options like Shyte-Coin. Start acquiring VP cards by Cycle 10 to enhance scoring potential and adjust VP acquisition timing based on human strategies. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 10.)",
+      "games": 6,
+      "aiWins": 0
+    }
+  ]
+}

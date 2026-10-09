@@ -55,7 +55,7 @@ async function resources() {
 }
 async function collectLog(cycle, turn) {
   await page.getByRole('button', { name: /^Log \d+/ }).click();
-  const events = await page.locator('.side-panel li').evaluateAll(els => els.map(el => ({
+  const events = await page.locator('.log-events li').evaluateAll(els => els.map(el => ({
     id: el.dataset.eventId, kind: el.dataset.eventKind,
     owner: el.dataset.owner, cardId: el.dataset.cardId,
     text: el.textContent,
@@ -169,15 +169,20 @@ async function shop(cycle) {
         report.coverage.endResume = true;
       } else throw new Error('Opponent completed during early-end test; Draft cannot resume');
     } else report.coverage.endResumeSkipped = 'Opponent was already ready on first Draft entry';
-    const counts = await page.locator('.market-card').evaluateAll(els => Object.fromEntries(['Base', 'VP', 'Crypto', 'Chaos'].map(category => [category, els.filter(el => el.dataset.category === category).length])));
-    if (JSON.stringify(counts) !== JSON.stringify({ Base: 6, VP: 3, Crypto: 3, Chaos: 4 })) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
+    const counts = await page.locator('.market-card').evaluateAll(els => ({
+      characters: els.filter(el => el.dataset.category === 'Base' || el.dataset.category === 'Chaos').length,
+      draftOffers: els.filter(el => el.dataset.pileId?.startsWith('Draft:')).length,
+      VP: els.filter(el => el.dataset.category === 'VP').length,
+      Crypto: els.filter(el => el.dataset.category === 'Crypto').length,
+    }));
+    if (JSON.stringify(counts) !== JSON.stringify({ characters: 6, draftOffers: 3, VP: 3, Crypto: 3 })) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
     report.coverage.marketCounts = counts;
     report.coverage.marketLayout = await page.evaluate(() => ({
       row1: document.querySelectorAll('.character-row')[0]?.querySelectorAll('.market-card').length ?? 0,
       row2: document.querySelectorAll('.character-row')[1]?.querySelectorAll('.market-card').length ?? 0,
       resources: document.querySelectorAll('.resource-row .market-card').length,
     }));
-    if (JSON.stringify(report.coverage.marketLayout) !== JSON.stringify({ row1: 6, row2: 4, resources: 6 })) {
+    if (JSON.stringify(report.coverage.marketLayout) !== JSON.stringify({ row1: 6, row2: 0, resources: 6 })) {
       throw new Error(`Market layout mismatch: ${JSON.stringify(report.coverage.marketLayout)}`);
     }
   }

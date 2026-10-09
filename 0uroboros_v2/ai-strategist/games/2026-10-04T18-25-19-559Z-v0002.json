@@ -1,0 +1,139 @@
+{
+  "gameId": "game-muu5g3to",
+  "version": 2,
+  "startedAt": "2026-10-04T18:25:19.559Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 3-3 (human-me), Servers 3400/3500, Locations won 2-2, Draft wallets 4/2. Human bought Kilo-Coin; I bought Burn Ledger, Razor Blade Jade, Burn Ledger, Razor Blade Jade."
+  ],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      3,
+      3
+    ],
+    "servers": [
+      3500,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "eval-burn-ledger",
+        "name": "Burn Ledger",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "razor-blade-jade",
+        "name": "Razor Blade Jade",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "eval-burn-ledger",
+        "name": "Burn Ledger",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "razor-blade-jade",
+        "name": "Razor Blade Jade",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3400,
+          3500
+        ],
+        "wallet": [
+          4,
+          2
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          },
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": null
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 1
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "slash-dot": 1,
+        "rezz-blade": 1,
+        "dotkrawler": 1,
+        "byte-coin": 1,
+        "shyte-coin": 2,
+        "basic-encryption": 1,
+        "vault-encryption": 1,
+        "night-scythe": 1,
+        "kilo-coin": 1
+      },
+      {
+        "slash-dot": 1,
+        "basic-encryption": 1,
+        "vault-encryption": 1,
+        "eval-burn-ledger": 2,
+        "shyte-coin": 2,
+        "razor-blade-jade": 2,
+        "night-scythe": 1,
+        "dotkrawler": 1,
+        "rezz-blade": 1,
+        "byte-coin": 1
+      }
+    ]
+  }
+}

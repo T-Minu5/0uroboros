@@ -1,0 +1,114 @@
+{
+  "gameId": "game-mut1rtnv",
+  "version": 1,
+  "startedAt": "2026-10-03T23:55:54.866Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 4-4 (human-me), Servers 3500/3500, Locations won 2-1, Draft wallets 7/7. Human bought nothing; I bought Bloodlet Drone, Burn Ledger."
+  ],
+  "report": {
+    "strategyVersion": 1,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      4,
+      4
+    ],
+    "servers": [
+      3500,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "eval-burn-ledger",
+        "name": "Burn Ledger",
+        "category": "Base",
+        "cost": 2
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          4,
+          4
+        ],
+        "servers": [
+          3500,
+          3500
+        ],
+        "wallet": [
+          7,
+          7
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": null
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": null
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "byte-coin": 2,
+        "dash-dot": 1,
+        "rezz-razor": 1,
+        "kilo-coin": 1,
+        "dotkrawler": 1,
+        "vault-encryption": 2,
+        "slash-dot": 1,
+        "rezz-blade": 1
+      },
+      {
+        "rezz-razor": 1,
+        "vault-encryption": 2,
+        "bloodlet-drone": 1,
+        "rezz-blade": 1,
+        "eval-burn-ledger": 1,
+        "slash-dot": 1,
+        "kilo-coin": 1,
+        "byte-coin": 2,
+        "dash-dot": 1,
+        "dotkrawler": 1
+      }
+    ]
+  }
+}

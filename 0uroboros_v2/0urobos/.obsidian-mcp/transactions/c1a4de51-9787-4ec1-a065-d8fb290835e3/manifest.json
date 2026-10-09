@@ -1,0 +1,18 @@
+{
+  "id": "c1a4de51-9787-4ec1-a065-d8fb290835e3",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:14.485Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Deck effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "b0e933c78e80965c3b52a516c8207d3f7cb8638f518054ed688a95e62009afd4",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "b0e933c78e80965c3b52a516c8207d3f7cb8638f518054ed688a95e62009afd4"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:14.525Z"
+}

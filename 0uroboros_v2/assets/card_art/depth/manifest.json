@@ -1072,6 +1072,33 @@
       "height": 300,
       "focus": 0.4993
     },
+    "/assets/card_art/solar_monks/Apollo-Ascii.png": {
+      "sha": "409e4d225ed55d2399e9b009f4c55c8880222a4cb786a7ab360ae3fe27a41e29",
+      "v": 2,
+      "color": "/assets/card_art/depth/409e4d225ed55d2399e9-v2.color.webp",
+      "depth": "/assets/card_art/depth/409e4d225ed55d2399e9-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4111
+    },
+    "/assets/card_art/uploads/501-ar.png": {
+      "sha": "26e043aeb8845713c2e56875a9888b9dd3d51afb172cf05aa0afe7705b3ebd9d",
+      "v": 2,
+      "color": "/assets/card_art/depth/26e043aeb8845713c2e5-v2.color.webp",
+      "depth": "/assets/card_art/depth/26e043aeb8845713c2e5-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5137
+    },
+    "/assets/card_art/uploads/dama-de-fuego.png": {
+      "sha": "11717fb5452b11ca3deebfe425000641b7f61dbb6b4e3bfe5068442fc0a6cddd",
+      "v": 2,
+      "color": "/assets/card_art/depth/11717fb5452b11ca3dee-v2.color.webp",
+      "depth": "/assets/card_art/depth/11717fb5452b11ca3dee-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.447
+    },
     "/assets/card_art/volume/10vp-b.png": {
       "sha": "4402fe11289c1fec569f6a409d3184d6214c0844af37e17f816875e167865d27",
       "v": 2,

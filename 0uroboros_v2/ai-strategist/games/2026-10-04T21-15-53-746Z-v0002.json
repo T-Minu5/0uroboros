@@ -1,0 +1,46 @@
+{
+  "gameId": "game-muuble7d",
+  "version": 2,
+  "startedAt": "2026-10-04T21:15:53.746Z",
+  "finished": true,
+  "notes": [],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 1,
+    "phase": "gameover",
+    "winner": 1,
+    "endedReason": "Automatic concession after two consecutive no-input Runtime turns.",
+    "finalVP": [
+      3,
+      3
+    ],
+    "servers": [
+      3400,
+      3500
+    ],
+    "purchases": [],
+    "cycles": [],
+    "decks": [
+      {
+        "basic-encryption": 1,
+        "shyte-coin": 3,
+        "byte-coin": 1,
+        "night-scythe": 1,
+        "rezz-blade": 1,
+        "vault-encryption": 1,
+        "slash-dot": 1,
+        "dotkrawler": 1
+      },
+      {
+        "shyte-coin": 3,
+        "byte-coin": 1,
+        "night-scythe": 1,
+        "slash-dot": 1,
+        "basic-encryption": 1,
+        "vault-encryption": 1,
+        "rezz-blade": 1,
+        "dotkrawler": 1
+      }
+    ]
+  }
+}

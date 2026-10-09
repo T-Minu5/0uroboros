@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { DEFAULT_GLASS_SCRATCH, GLASS_SCRATCH_TEXTURES, glassScratch, setGlassScratch, type GlassScratchSettings } from './neonGlassScratch';
 import { CAR_PAINT_COLORS, CAR_PAINT_SLIDERS, DEFAULT_CAR_PAINT, carPaint, carPaintDefaults, sameCarPaint, saveCarPaintDefaults, setCarPaint, type CarPaintSettings } from './neonCarPaint';
+import { CORE_HUDS, setCoreHud, useHudTuning } from './hudTuning';
+import { AgentsPanel } from './AgentsPanel';
 import { neonGain } from './neonTubeShading';
 import { REAL_LIGHTING_SLIDERS, realLightingDefaults, type RealLightingAction, type RealLightingSettings } from './realLighting';
+import './board-tuning.css';
 
 /** Live multipliers for board bloom and scene light intensity, read every frame by BoardFinish, and neon tube glow. */
 const DEFAULT_TUNING = { bloom: 1.39, light: 1, neon: 2.5 };
@@ -35,22 +38,6 @@ export function applyLightTuning(scene: THREE.Object3D) {
   });
 }
 
-function Slider({ label, name }: { label: string; name: keyof typeof boardTuning }) {
-  const [value, setValue] = useState(boardTuning[name]);
-  const change = (next: number) => {
-    setTuning(name, next);
-    setValue(next);
-  };
-  return <label style={{ display: 'grid', gridTemplateColumns: '44px 120px 34px', alignItems: 'center', gap: 6 }}>
-    <span>{label}</span>
-    <input type='range' min={0} max={3} step={.05} value={value} onChange={e => change(Number(e.target.value))} onDoubleClick={() => change(DEFAULT_TUNING[name])} />
-    <b style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>{value.toFixed(2)}</b>
-  </label>;
-}
-
-/** The sliders are hidden; saved values still apply. The panel shows the viewport size instead. */
-const SHOW_SLIDERS = false;
-
 function useViewportSize() {
   const [size, setSize] = useState(() => ({ width: window.innerWidth, height: window.innerHeight }));
   useEffect(() => {
@@ -61,6 +48,36 @@ function useViewportSize() {
   return size;
 }
 
+/** One labelled range with its value; double-click resets it. */
+function TuneSlider({ label, min, max, step, value, digits = 2, disabled, onChange, onReset }: {
+  label: string; min: number; max: number; step: number; value: number; digits?: number; disabled?: boolean;
+  onChange: (value: number) => void; onReset: () => void;
+}) {
+  return <label className='tuning-slider'>
+    <span>{label}</span>
+    <input type='range' min={min} max={max} step={step} value={value} disabled={disabled} onChange={e => onChange(Number(e.target.value))} onDoubleClick={onReset} />
+    <output>{value.toFixed(digits)}</output>
+  </label>;
+}
+
+/** A row of mutually exclusive choices. */
+function Segmented<T extends string>({ label, options, value, onChange }: { label: string; options: readonly { id: T; label: string }[]; value: T; onChange: (id: T) => void }) {
+  return <div className='tuning-segmented' role='radiogroup' aria-label={label}>
+    {options.map(o => <button key={o.id} type='button' role='radio' aria-checked={value === o.id} onClick={() => onChange(o.id)}>{o.label}</button>)}
+  </div>;
+}
+
+/** A drawer section that folds open in place. */
+function Disclosure({ id, title, note, children }: { id: string; title: string; note?: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return <section className={`tuning-disclosure ${open ? 'open' : ''}`}>
+    <button type='button' className='tuning-disclosure-head' aria-expanded={open} aria-controls={id} onClick={() => setOpen(o => !o)}>
+      <span>{title}</span>{note && <small>{note}</small>}<i aria-hidden='true'>›</i>
+    </button>
+    {open && <div id={id} className='tuning-disclosure-body'>{children}</div>}
+  </section>;
+}
+
 const SCRATCH_SLIDERS: { name: Exclude<keyof GlassScratchSettings, 'texture'>; label: string; min: number; max: number; step: number; digits: number }[] = [
   { name: 'strength', label: 'Strength', min: 0, max: 3, step: .05, digits: 2 },
   { name: 'cutoff', label: 'Black cut', min: 0, max: .9, step: .01, digits: 2 },
@@ -68,44 +85,31 @@ const SCRATCH_SLIDERS: { name: Exclude<keyof GlassScratchSettings, 'texture'>; l
   { name: 'rotation', label: 'Rotate', min: 0, max: 180, step: 1, digits: 0 },
 ];
 
-const panelStyle = { padding: '8px 10px', font: '600 10px Inter, sans-serif', color: '#cfd8e3', background: '#0b0b17e6', border: '1px solid #ffffff24', borderRadius: 6 } as const;
-const chipStyle = (on: boolean) => ({ font: '600 10px Inter, sans-serif', padding: '3px 8px', borderRadius: 4, cursor: 'pointer', color: on ? '#0b0b17' : '#cfd8e3', background: on ? '#9fe8ff' : '#ffffff10', border: '1px solid #ffffff30' });
-
 /** Picks and tunes the scratched-glass photo laid over the Neon glass; changes apply live and persist. */
-function GlassScratchMenu() {
-  const [open, setOpen] = useState(false);
+function GlassScratchControls() {
   const [settings, setSettings] = useState<GlassScratchSettings>({ ...glassScratch });
   const update = (next: Partial<GlassScratchSettings>) => {
     setGlassScratch(next);
     setSettings({ ...glassScratch });
   };
-  return <div style={{ ...panelStyle, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-    <button type='button' aria-expanded={open} aria-controls='glass-scratch-menu' onClick={() => setOpen(o => !o)} style={{ ...chipStyle(open), padding: '4px 9px' }}>
-      Glass texture {open ? '‹' : '›'}
-    </button>
-    {open && <div id='glass-scratch-menu' role='group' aria-label='Glass texture' style={{ display: 'grid', gap: 6 }}>
-      <div role='radiogroup' aria-label='Glass texture image' style={{ display: 'flex', gap: 4 }}>
-        {GLASS_SCRATCH_TEXTURES.map(t => <button key={t.id} type='button' role='radio' aria-checked={settings.texture === t.id} onClick={() => update({ texture: t.id })} style={chipStyle(settings.texture === t.id)}>{t.label}</button>)}
-        <button type='button' title='Restore default adjustments' onClick={() => update({ ...DEFAULT_GLASS_SCRATCH, texture: settings.texture })} style={{ ...chipStyle(false), marginLeft: 'auto' }}>Reset</button>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, auto)', columnGap: 14, rowGap: 4, opacity: settings.texture === 'none' ? .45 : 1 }}>
-        {SCRATCH_SLIDERS.map(s => <label key={s.name} style={{ display: 'grid', gridTemplateColumns: '54px 100px 30px', alignItems: 'center', gap: 6 }}>
-          <span>{s.label}</span>
-          <input type='range' min={s.min} max={s.max} step={s.step} value={settings[s.name]} disabled={settings.texture === 'none'}
-            onChange={e => update({ [s.name]: Number(e.target.value) })} onDoubleClick={() => update({ [s.name]: DEFAULT_GLASS_SCRATCH[s.name] })} />
-          <b style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>{settings[s.name].toFixed(s.digits)}</b>
-        </label>)}
-      </div>
-    </div>}
-  </div>;
+  const off = settings.texture === 'none';
+  return <>
+    <div className='tuning-row'>
+      <Segmented label='Glass texture image' options={GLASS_SCRATCH_TEXTURES} value={settings.texture} onChange={texture => update({ texture })} />
+      <button type='button' className='tuning-chip' title='Restore default adjustments' onClick={() => update({ ...DEFAULT_GLASS_SCRATCH, texture: settings.texture })}>Reset</button>
+    </div>
+    <div className={`tuning-sliders ${off ? 'inactive' : ''}`}>
+      {SCRATCH_SLIDERS.map(s => <TuneSlider key={s.name} label={s.label} min={s.min} max={s.max} step={s.step} digits={s.digits} value={settings[s.name]} disabled={off}
+        onChange={value => update({ [s.name]: value })} onReset={() => update({ [s.name]: DEFAULT_GLASS_SCRATCH[s.name] })} />)}
+    </div>
+  </>;
 }
 
 /** `active` is false while the Neon frame uses another finish; `enable` switches it to car paint. */
 export type CarPaintPanelProps = { active: boolean; enable: () => void };
 
 /** Colour and finish of the Neon frame's car paint; changes apply live and persist. Save keeps them as the look Reset returns to. */
-function CarPaintMenu({ active, enable }: CarPaintPanelProps) {
-  const [open, setOpen] = useState(false);
+function CarPaintControls({ active, enable }: CarPaintPanelProps) {
   const [settings, setSettings] = useState<CarPaintSettings>({ ...carPaint });
   const [, setSavedVersion] = useState(0);
   const update = (next: Partial<CarPaintSettings>) => {
@@ -117,34 +121,24 @@ function CarPaintMenu({ active, enable }: CarPaintPanelProps) {
     setSavedVersion(v => v + 1);
   };
   const isSaved = sameCarPaint(settings, carPaintDefaults);
-  return <div style={{ ...panelStyle, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-    <button type='button' aria-expanded={open} aria-controls='car-paint-menu' onClick={() => setOpen(o => !o)} style={{ ...chipStyle(open), padding: '4px 9px' }}>
-      Car paint {open ? '‹' : '›'}
-    </button>
-    {open && <div id='car-paint-menu' role='group' aria-label='Car paint' title='Double-click a slider to reset it to the saved look' style={{ display: 'grid', gap: 6 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {CAR_PAINT_COLORS.map(c => <label key={c.key} title={settings[c.key]} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span>{c.label}</span>
-          <input type='color' aria-label={`${c.label} colour`} value={settings[c.key]} onChange={e => update({ [c.key]: e.target.value })}
-            style={{ width: 34, height: 20, padding: 0, border: '1px solid #ffffff30', borderRadius: 3, background: 'none', cursor: 'pointer' }} />
-        </label>)}
-        {!active && <button type='button' title='Switch the Neon frame to the car paint finish' onClick={enable} style={chipStyle(false)}>Use car paint</button>}
-        <span style={{ display: 'flex', gap: 4, marginLeft: 'auto' }}>
-          <button type='button' disabled={isSaved} title='Keep these colours and settings as the car paint look' onClick={save} style={chipStyle(false)}>{isSaved ? 'Saved' : 'Save'}</button>
-          <button type='button' title='Back to the saved look' onClick={() => update({ ...carPaintDefaults })} style={chipStyle(false)}>Reset</button>
-          <button type='button' disabled={sameCarPaint(settings, DEFAULT_CAR_PAINT)} title='Back to the factory paint; the saved look is kept' onClick={() => update({ ...DEFAULT_CAR_PAINT })} style={chipStyle(false)}>Factory</button>
-        </span>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, auto)', columnGap: 14, rowGap: 4, opacity: active ? 1 : .45 }}>
-        {CAR_PAINT_SLIDERS.map(s => <label key={s.key} style={{ display: 'grid', gridTemplateColumns: '74px 100px 30px', alignItems: 'center', gap: 6 }}>
-          <span>{s.label}</span>
-          <input type='range' min={s.min} max={s.max} step={s.step} value={settings[s.key]}
-            onChange={e => update({ [s.key]: Number(e.target.value) })} onDoubleClick={() => update({ [s.key]: carPaintDefaults[s.key] })} />
-          <b style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>{settings[s.key].toFixed(2)}</b>
-        </label>)}
-      </div>
-    </div>}
-  </div>;
+  return <>
+    {!active && <button type='button' className='tuning-chip wide' title='Switch the Neon frame to the car paint finish' onClick={enable}>Use car paint on the frame</button>}
+    <div className='tuning-row'>
+      {CAR_PAINT_COLORS.map(c => <label key={c.key} className='tuning-color' title={settings[c.key]}>
+        <input type='color' aria-label={`${c.label} colour`} value={settings[c.key]} onChange={e => update({ [c.key]: e.target.value })} />
+        <span>{c.label}</span>
+      </label>)}
+    </div>
+    <div className={`tuning-sliders ${active ? '' : 'inactive'}`} title='Double-click a slider to reset it to the saved look'>
+      {CAR_PAINT_SLIDERS.map(s => <TuneSlider key={s.key} label={s.label} min={s.min} max={s.max} step={s.step} value={settings[s.key]}
+        onChange={value => update({ [s.key]: value })} onReset={() => update({ [s.key]: carPaintDefaults[s.key] })} />)}
+    </div>
+    <div className='tuning-actions'>
+      <button type='button' className='tuning-chip' disabled={isSaved} title='Keep these colours and settings as the car paint look' onClick={save}>{isSaved ? 'Saved' : 'Save'}</button>
+      <button type='button' className='tuning-chip' title='Back to the saved look' onClick={() => update({ ...carPaintDefaults })}>Reset</button>
+      <button type='button' className='tuning-chip' disabled={sameCarPaint(settings, DEFAULT_CAR_PAINT)} title='Back to the factory paint; the saved look is kept' onClick={() => update({ ...DEFAULT_CAR_PAINT })}>Factory</button>
+    </div>
+  </>;
 }
 
 /** Each slider reaches twice its default. */
@@ -171,52 +165,79 @@ export function BoardLightSliders() {
   </div>;
 }
 
-/** What the Lighting panel edits: the selected Real lighting floor's live sliders and its saved look. */
+/** What the Lighting section edits: the selected Real lighting floor's live sliders and its saved look. */
 /** `neon` false hides the sliders that only act through the Neon light rig. */
 export type LightingPanelProps = { floor: string; value: RealLightingSettings; saved?: RealLightingSettings; change: (action: RealLightingAction) => void; neon: boolean };
 
 const sameLook = (a: RealLightingSettings, b?: RealLightingSettings) => !!b && (Object.keys(a) as (keyof RealLightingSettings)[]).every(k => a[k] === b[k]);
 
 /** Real lighting sliders for the selected floor, with Save, Reset (to the saved look) and Factory reset. */
-function RealLightingMenu({ floor, value, saved, change, neon }: LightingPanelProps) {
-  const [open, setOpen] = useState(false);
+function RealLightingControls({ floor, value, saved, change, neon }: LightingPanelProps) {
   const factory = realLightingDefaults(floor), isSaved = sameLook(value, saved);
-  return <div style={{ ...panelStyle, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-    <button type='button' aria-expanded={open} aria-controls='real-lighting-menu' onClick={() => setOpen(o => !o)} style={{ ...chipStyle(open), padding: '4px 9px' }}>
-      Lighting {open ? '‹' : '›'}
-    </button>
-    {open && <div id='real-lighting-menu' className='real-lighting-controls' role='group' aria-label='Real lighting' title='Double-click a slider to reset it to the saved look'>
-      <div className='real-lighting-head'>
-        <small>{floor}</small>
-        <span>
-          <button type='button' disabled={isSaved} title='Keep these sliders as this floor’s look' onClick={() => change({ type: 'save' })} style={chipStyle(false)}>{isSaved ? 'Saved' : 'Save'}</button>
-          <button type='button' title={saved ? 'Back to the saved look' : 'Back to the factory look'} onClick={() => change({ type: 'reset' })} style={chipStyle(false)}>Reset</button>
-          <button type='button' disabled={sameLook(value, factory)} title='Back to this floor’s factory look; the saved look is kept' onClick={() => change({ type: 'factory' })} style={chipStyle(false)}>Factory</button>
-        </span>
-      </div>
-      {REAL_LIGHTING_SLIDERS.map(({ group, sliders }) => ({ group, sliders: sliders.filter(s => neon || !s.rig) })).filter(g => g.sliders.length).map(({ group, sliders }) => <fieldset key={group}><legend>{group}</legend>{sliders.map(slider => <label key={slider.key}>
-        <span>{slider.label}</span>
-        <input type='range' min={slider.min} max={slider.max} step={slider.step} value={value[slider.key]}
-          onChange={event => { const next = Number(event.target.value); change({ type: 'set', update: current => ({ ...current, [slider.key]: next }) }); }}
-          onDoubleClick={() => change({ type: 'set', update: current => ({ ...current, [slider.key]: (saved ?? factory)[slider.key] }) })} />
-        <output>{value[slider.key].toFixed(slider.step >= 1 ? 0 : slider.step >= .1 ? 1 : 2)}</output>
-      </label>)}</fieldset>)}
-    </div>}
+  const groups = REAL_LIGHTING_SLIDERS.map(({ group, sliders }) => ({ group, sliders: sliders.filter(s => neon || !s.rig) })).filter(g => g.sliders.length);
+  return <div role='group' aria-label='Real lighting' title='Double-click a slider to reset it to the saved look'>
+    {groups.map(({ group, sliders }) => <fieldset key={group} className='tuning-sliders'>
+      <legend>{group}</legend>
+      {sliders.map(slider => <TuneSlider key={slider.key} label={slider.label} min={slider.min} max={slider.max} step={slider.step} value={value[slider.key]}
+        digits={slider.step >= 1 ? 0 : slider.step >= .1 ? 1 : 2}
+        onChange={next => change({ type: 'set', update: current => ({ ...current, [slider.key]: next }) })}
+        onReset={() => change({ type: 'set', update: current => ({ ...current, [slider.key]: (saved ?? factory)[slider.key] }) })} />)}
+    </fieldset>)}
+    <div className='tuning-actions'>
+      <button type='button' className='tuning-chip' disabled={isSaved} title='Keep these sliders as this floor’s look' onClick={() => change({ type: 'save' })}>{isSaved ? 'Saved' : 'Save'}</button>
+      <button type='button' className='tuning-chip' title={saved ? 'Back to the saved look' : 'Back to the factory look'} onClick={() => change({ type: 'reset' })}>Reset</button>
+      <button type='button' className='tuning-chip' disabled={sameLook(value, factory)} title='Back to this floor’s factory look; the saved look is kept' onClick={() => change({ type: 'factory' })}>Factory</button>
+    </div>
   </div>;
 }
 
-/** Bottom-left dev panel. `lighting` shows the Real lighting floor menu; `paint` shows the Car paint menu. */
-export function BoardTuningPanel({ lighting, paint }: { lighting?: LightingPanelProps; paint?: CarPaintPanelProps }) {
+/** Ends the running session at once, scored as it stands, to reach the endgame without playing it out. */
+export type EndGameProps = { run: () => void; disabled: boolean };
+
+/**
+ * Bottom-left dev drawer: the black hole HUD switch, End game, the board's glass, car paint and lighting looks, and the
+ * AI agents.
+ * `lighting` shows the Real lighting floor section; `paint` the Car paint section; `endGame` the End game button.
+ */
+export function BoardTuningPanel({ lighting, paint, endGame }: { lighting?: LightingPanelProps; paint?: CarPaintPanelProps; endGame?: EndGameProps }) {
+  const [open, setOpen] = useState(false);
   const { width, height } = useViewportSize();
-  return <div style={{ position: 'fixed', left: 12, bottom: 12, zIndex: 60, display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-    <div title={SHOW_SLIDERS ? 'Double-click a slider to reset it' : 'Viewport size'} style={{ ...panelStyle, display: 'flex', flexDirection: 'column', gap: 4 }}>
-      {SHOW_SLIDERS ? <>
-        <Slider label='Bloom' name='bloom' />
-        <Slider label='Lights' name='light' />
-      </> : <b style={{ font: '400 16px Inter, sans-serif', fontVariantNumeric: 'tabular-nums' }}>{width} × {height}</b>}
-    </div>
-    <GlassScratchMenu />
-    {paint && <CarPaintMenu {...paint} />}
-    {lighting && <RealLightingMenu {...lighting} />}
-  </div>;
+  const { coreHud } = useHudTuning();
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [open]);
+  return <>
+    <button type='button' className='tuning-toggle' aria-expanded={open} aria-controls='tuning-drawer' onClick={() => setOpen(o => !o)}>
+      <svg viewBox='0 0 16 16' aria-hidden='true'><path d='M2 4h7.4M12.6 4H14M2 8h2.4M7.6 8H14M2 12h8.4M13.6 12H14' /><circle cx='11' cy='4' r='1.6' /><circle cx='6' cy='8' r='1.6' /><circle cx='12' cy='12' r='1.6' /></svg>
+      Tuning
+    </button>
+    <aside id='tuning-drawer' className={`tuning-drawer ${open ? 'open' : ''}`} aria-label='Tuning' inert={!open}>
+      <header>
+        <h2>Tuning</h2>
+        <small title='Viewport size'>{width} × {height}</small>
+      </header>
+      <section className='tuning-section'>
+        <h3>Black hole HUD</h3>
+        <Segmented label='Black hole HUD' options={CORE_HUDS} value={coreHud} onChange={setCoreHud} />
+      </section>
+      {endGame && <section className='tuning-section'>
+        <h3>Session</h3>
+        <button type='button' className='tuning-end' disabled={endGame.disabled} title={endGame.disabled ? 'Wait for the current resolution to finish' : undefined} onClick={() => { endGame.run(); setOpen(false); }}>End game</button>
+        <p>Scores the session as it stands and plays the endgame.</p>
+      </section>}
+      <section className='tuning-section flush'>
+        <h3>Board</h3>
+        <Disclosure id='tuning-glass' title='Glass texture'><GlassScratchControls /></Disclosure>
+        {paint && <Disclosure id='tuning-paint' title='Car paint' note={paint.active ? undefined : 'Not in use'}><CarPaintControls {...paint} /></Disclosure>}
+        {lighting && <Disclosure id='tuning-lighting' title='Lighting' note={lighting.floor}><RealLightingControls {...lighting} /></Disclosure>}
+      </section>
+      <section className='tuning-section flush'>
+        <h3>Agents</h3>
+        <Disclosure id='tuning-agents' title='Strat-G and Eco-Strat'><AgentsPanel /></Disclosure>
+      </section>
+    </aside>
+  </>;
 }

@@ -53,6 +53,7 @@ export function outlineUniforms(outline: Outline, hole: Outline = NO_HOLE) {
 }
 
 const glassVertex = /* glsl */`
+#include <clipping_planes_pars_vertex>
 varying vec3 vWorld;
 varying vec3 vNormal;
 varying vec2 vModelXZ;
@@ -64,11 +65,13 @@ void main() {
   vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
   vNormal = normalize(mat3(modelMatrix) * normal);
+  vec4 mvPosition = viewMatrix * world;
+#include <clipping_planes_vertex>
 #ifdef REAL_LIGHTING
-  vViewPos = (viewMatrix * world).xyz;
+  vViewPos = mvPosition.xyz;
   vViewNormal = mat3(viewMatrix) * vNormal;
 #endif
-  gl_Position = projectionMatrix * viewMatrix * world;
+  gl_Position = projectionMatrix * mvPosition;
 }`;
 
 /**
@@ -134,6 +137,7 @@ varying vec3 vViewPos, vViewNormal;
 uniform float uGlassGlow, uGlassBody, uFloorArt, uFloorTone;
 ${rigLightGlsl}
 #endif
+#include <clipping_planes_pars_fragment>
 varying vec3 vWorld;
 varying vec3 vNormal;
 varying vec2 vModelXZ;
@@ -220,6 +224,7 @@ vec3 glassLiquid(vec3 c, vec3 normal, float faceSign, float variantFrame, float 
 #endif
 
 void main() {
+#include <clipping_planes_fragment>
   // The hollow chassis is drawn double-sided, so its walls seen from inside, through the frame, shade by their inner face.
   float faceSign = gl_FrontFacing ? 1.0 : -1.0;
   vec3 normal = normalize(vNormal) * faceSign;
@@ -442,6 +447,8 @@ type NeonGlassProps = {
    * glass look over the frame and walls (see neonLiquidLook).
    */
   liquid?: boolean;
+  /** World-space clip planes; the list is read live, so planes may be moved per frame. */
+  clippingPlanes?: THREE.Plane[];
 };
 
 function outlineVectors(points: Outline) {
@@ -486,7 +493,7 @@ function variantUniform(v: NeonGlassProps['variant']) {
   return 0;
 }
 
-export function NeonGlassMaterial({ variant = 'deck', side, outline = GLASS_OUTLINE, hole = NO_HOLE, space = 'world', wall = NO_WALL, grain = 1, opacity = 1, twoSided = false, liquid = false }: NeonGlassProps) {
+export function NeonGlassMaterial({ variant = 'deck', side, outline = GLASS_OUTLINE, hole = NO_HOLE, space = 'world', wall = NO_WALL, grain = 1, opacity = 1, twoSided = false, liquid = false, clippingPlanes }: NeonGlassProps) {
   const { scene, camera, gl } = useThree();
   const colors = usePlayerColors();
   const rig = useNeonRig();
@@ -542,7 +549,8 @@ export function NeonGlassMaterial({ variant = 'deck', side, outline = GLASS_OUTL
     lights: lit, defines: { ...(lit ? REAL_LIGHTING_DEFINES : {}), ...(liquid ? LIQUID_DEFINES : {}) },
     depthWrite: true, depthTest: true, toneMapped: false,
     transparent, side: twoSided ? THREE.DoubleSide : THREE.FrontSide,
-  }), [uniforms, lit, transparent, twoSided, liquid]);
+    clipping: !!clippingPlanes, clippingPlanes: clippingPlanes ?? null,
+  }), [uniforms, lit, transparent, twoSided, liquid, clippingPlanes]);
   useEffect(() => () => glass.dispose(), [glass]);
   useEffect(() => () => fallback.dispose(), [fallback]);
   useEffect(() => {

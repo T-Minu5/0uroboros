@@ -1,0 +1,144 @@
+{
+  "gameId": "game-muud8fha",
+  "version": 3,
+  "startedAt": "2026-10-04T22:01:46.780Z",
+  "finished": true,
+  "notes": [],
+  "report": {
+    "strategyVersion": 3,
+    "cycle": 1,
+    "phase": "gameover",
+    "winner": null,
+    "endedReason": "Session ended early for evaluation. Tie, 3 to 3 VP.",
+    "finalVP": [
+      3,
+      3
+    ],
+    "servers": [
+      3500,
+      3500
+    ],
+    "purchases": [],
+    "cycles": [],
+    "decks": [
+      {
+        "vault-encryption": 1,
+        "basic-encryption": 1,
+        "byte-coin": 1,
+        "night-scythe": 1,
+        "shyte-coin": 3,
+        "dotkrawler": 1,
+        "rezz-blade": 1,
+        "slash-dot": 1
+      },
+      {
+        "vault-encryption": 1,
+        "basic-encryption": 1,
+        "byte-coin": 1,
+        "night-scythe": 1,
+        "shyte-coin": 3,
+        "dotkrawler": 1,
+        "rezz-blade": 1,
+        "slash-dot": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 1,
+      "drainDealt": [
+        0,
+        0
+      ],
+      "restoreDone": [
+        0,
+        0
+      ],
+      "drainBySource": {
+        "card": [
+          0,
+          0
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          0,
+          0
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        0,
+        0
+      ],
+      "restoreEvents": [
+        0,
+        0
+      ],
+      "drainEvents": [
+        0,
+        0
+      ],
+      "drawn": [
+        0,
+        0
+      ],
+      "actionsGained": [
+        0,
+        0
+      ],
+      "cryptoGained": [
+        0,
+        0
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [],
+      "cards": {},
+      "locations": {},
+      "circuit": {},
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 1
+        }
+      ],
+      "failedOutcomes": [
+        0,
+        0
+      ],
+      "randomResults": 0,
+      "choices": [
+        0,
+        0
+      ]
+    },
+    "decisions": []
+  }
+}

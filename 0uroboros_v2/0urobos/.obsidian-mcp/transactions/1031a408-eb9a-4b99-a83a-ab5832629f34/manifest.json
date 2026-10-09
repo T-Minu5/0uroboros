@@ -1,0 +1,18 @@
+{
+  "id": "1031a408-eb9a-4b99-a83a-ab5832629f34",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:17.758Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Cards/Starting deck.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "7613ad6244bd0575e764189770ecdb595ec527c377dc33415b2caa884d8cb441",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "7613ad6244bd0575e764189770ecdb595ec527c377dc33415b2caa884d8cb441"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:17.798Z"
+}

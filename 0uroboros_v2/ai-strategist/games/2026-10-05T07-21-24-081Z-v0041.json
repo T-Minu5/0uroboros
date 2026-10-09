@@ -1,0 +1,3033 @@
+{
+  "gameId": "game-muux5ogm",
+  "version": 41,
+  "startedAt": "2026-10-05T07:21:24.081Z",
+  "finished": true,
+  "notes": [
+    "Cycle 1: VP 3-3 (human-me), Servers 3500/3375, Locations won 2-2, Draft wallets 3/1. Human bought Byte-Coin; I bought nothing.",
+    "Cycle 2: VP 3-3 (human-me), Servers 3350/3275, Locations won 2-1, Draft wallets 8/5. Human bought Node Feratu; I bought Recursive Seance.",
+    "Cycle 3: VP 3-3 (human-me), Servers 3500/2975, Locations won 4-1, Draft wallets 8/3. Human bought Mega-Cache; I bought Temporal Rift.",
+    "Observation: the human's Draft wallet (8) outpaces mine (3). Their economy is ahead.",
+    "I lost most Locations this Cycle (Data exchange, Ritual mine, Kilo mill, Boost Juice); my board Power is too low.",
+    "Cycle 4: VP 3-3 (human-me), Servers 3500/2750, Locations won 3-2, Draft wallets 5/4. Human bought Recursive Seance; I bought Bloodlet Drone.",
+    "Cycle 5: VP 3-3 (human-me), Servers 3050/2475, Locations won 0-4, Draft wallets 9/3. Human bought Node Feratu; I bought Temporal Rift.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 5 - an early-aggression line. Watch my Servers.",
+    "Observation: the human's Draft wallet (9) outpaces mine (3). Their economy is ahead.",
+    "Cycle 6: VP 3-3 (human-me), Servers 2700/2225, Locations won 3-2, Draft wallets 17/2. Human bought Veil of Cthulhu, Bloodlet Drone; I bought nothing.",
+    "Observation: the human already owns 4 Chaos cards by Cycle 6 - an early-aggression line. Watch my Servers.",
+    "Observation: the human's Draft wallet (17) outpaces mine (2). Their economy is ahead.",
+    "Cycle 7: VP 11-3 (human-me), Servers 3300/1325, Locations won 0-4, Draft wallets 6/4. Human bought Bloodlet Drone; I bought Bloodlet Drone.",
+    "Warning: my Servers are at 1325. Defense (Restore) matters now.",
+    "Cycle 8: VP 11-4 (human-me), Servers 2650/1125, Locations won 1-3, Draft wallets 12/4. Human bought Node Feratu, Sudo Demiurge; I bought Bloodlet Drone.",
+    "Observation: the human's Draft wallet (12) outpaces mine (4). Their economy is ahead.",
+    "Warning: my Servers are at 1125. Defense (Restore) matters now.",
+    "Cycle 8: VP 11-4 (human-me), Servers 2650/1125, Locations won 1-3, Draft wallets 12/4. Human bought nothing; I bought nothing.",
+    "Observation: the human's Draft wallet (12) outpaces mine (4). Their economy is ahead.",
+    "Warning: my Servers are at 1125. Defense (Restore) matters now."
+  ],
+  "report": {
+    "strategyVersion": 41,
+    "strategyExperiment": null,
+    "cycle": 9,
+    "phase": "gameover",
+    "winner": 0,
+    "endedReason": "Both Servers destroyed. You win, 23 to 4 VP.",
+    "finalVP": [
+      23,
+      4
+    ],
+    "servers": [
+      2225,
+      0
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "byte-coin",
+        "name": "Byte-Coin",
+        "category": "Crypto",
+        "cost": 3
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "recursive-seance",
+        "name": "Recursive Seance",
+        "category": "Base",
+        "cost": 5
+      },
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "node-feratu",
+        "name": "Node Feratu",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "temporal-rift",
+        "name": "Temporal Rift",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 4,
+        "owner": 0,
+        "definitionId": "recursive-seance",
+        "name": "Recursive Seance",
+        "category": "Base",
+        "cost": 5
+      },
+      {
+        "cycle": 5,
+        "owner": 1,
+        "definitionId": "temporal-rift",
+        "name": "Temporal Rift",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 5,
+        "owner": 0,
+        "definitionId": "node-feratu",
+        "name": "Node Feratu",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "veil-of-cthulhu",
+        "name": "Veil of Cthulhu",
+        "category": "Chaos",
+        "cost": 12
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 7,
+        "owner": 1,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 8,
+        "owner": 1,
+        "definitionId": "bloodlet-drone",
+        "name": "Bloodlet Drone",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "node-feratu",
+        "name": "Node Feratu",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "sudo-demiurge",
+        "name": "Sudo Demiurge",
+        "category": "Chaos",
+        "cost": 5
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3500,
+          3375
+        ],
+        "wallet": [
+          3,
+          1
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 1
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Kull kode",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "the-rezz",
+          "name": "The Rezz",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1,
+            0
+          ]
+        },
+        "deckSize": [
+          11,
+          8
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3350,
+          3275
+        ],
+        "wallet": [
+          8,
+          5
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 0
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": null
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 1
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "recursive-curse",
+          "name": "Recursive curse",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          12,
+          10
+        ]
+      },
+      {
+        "cycle": 3,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3500,
+          2975
+        ],
+        "wallet": [
+          8,
+          3
+        ],
+        "locationsWon": [
+          4,
+          1
+        ],
+        "locations": [
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 1
+          },
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 0
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          },
+          {
+            "id": "kilo-mill",
+            "name": "Kilo mill",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "lil-help",
+          "name": "Lil help",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          14,
+          11
+        ]
+      },
+      {
+        "cycle": 4,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3500,
+          2750
+        ],
+        "wallet": [
+          5,
+          4
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 0
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "recursive-curse",
+          "name": "Recursive curse",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          14,
+          10
+        ]
+      },
+      {
+        "cycle": 5,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          3050,
+          2475
+        ],
+        "wallet": [
+          9,
+          3
+        ],
+        "locationsWon": [
+          0,
+          4
+        ],
+        "locations": [
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 1
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          },
+          {
+            "id": "breach_relay",
+            "name": "Breach relay",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "telemetry",
+          "name": "Telemetry",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          15,
+          9
+        ]
+      },
+      {
+        "cycle": 6,
+        "vp": [
+          3,
+          3
+        ],
+        "servers": [
+          2700,
+          2225
+        ],
+        "wallet": [
+          17,
+          2
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 0
+          },
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 0
+          },
+          {
+            "id": "data_exchange",
+            "name": "Data exchange",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "integrity_patch",
+          "name": "Integrity patch",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          16,
+          11
+        ]
+      },
+      {
+        "cycle": 7,
+        "vp": [
+          11,
+          3
+        ],
+        "servers": [
+          3300,
+          1325
+        ],
+        "wallet": [
+          6,
+          4
+        ],
+        "locationsWon": [
+          0,
+          4
+        ],
+        "locations": [
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": null
+          },
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 1
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "clean-cut",
+          "name": "Clean cut",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          19,
+          11
+        ]
+      },
+      {
+        "cycle": 8,
+        "vp": [
+          11,
+          4
+        ],
+        "servers": [
+          2650,
+          1125
+        ],
+        "wallet": [
+          12,
+          4
+        ],
+        "locationsWon": [
+          1,
+          3
+        ],
+        "locations": [
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 1
+          },
+          {
+            "id": "kilo-mill",
+            "name": "Kilo mill",
+            "winner": null
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "telemetry",
+          "name": "Telemetry",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          21,
+          13
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "kilo-coin": 2,
+        "mega-cache": 1,
+        "rezz-blade": 2,
+        "shyte-coin": 2,
+        "node-feratu": 3,
+        "bloodlet-drone": 2,
+        "byte-coin": 1,
+        "recursive-seance": 1,
+        "basic-encryption": 1,
+        "night-scythe": 1,
+        "dotkrawler": 1,
+        "sudo-demiurge": 1,
+        "vault-encryption": 1,
+        "veil-of-cthulhu": 1,
+        "slash-dot": 1
+      },
+      {
+        "kilo-coin": 1,
+        "shyte-coin": 1,
+        "bloodlet-drone": 3,
+        "temporal-rift": 2,
+        "vault-encryption": 1,
+        "recursive-seance": 1,
+        "rezz-blade": 2,
+        "basic-encryption": 1,
+        "dotkrawler": 1,
+        "slash-dot": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 1055,
+      "drainDealt": [
+        4675,
+        4000
+      ],
+      "restoreDone": [
+        2725,
+        1175
+      ],
+      "drainBySource": {
+        "card": [
+          4375,
+          3550
+        ],
+        "location": [
+          300,
+          450
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          2325,
+          1175
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          400,
+          0
+        ]
+      },
+      "wastedRestores": [
+        3,
+        3
+      ],
+      "restoreEvents": [
+        21,
+        19
+      ],
+      "drainEvents": [
+        32,
+        41
+      ],
+      "drawn": [
+        45,
+        40
+      ],
+      "actionsGained": [
+        52,
+        48
+      ],
+      "cryptoGained": [
+        70,
+        26
+      ],
+      "vpGained": [
+        0,
+        1
+      ],
+      "destructions": [
+        {
+          "cycle": 7,
+          "turn": 1,
+          "victim": 1,
+          "server": "primary",
+          "by": 0,
+          "source": "card",
+          "sourceId": "node-feratu"
+        },
+        {
+          "cycle": 9,
+          "turn": 3,
+          "victim": 1,
+          "server": "backup",
+          "by": 0,
+          "source": "card",
+          "sourceId": "sudo-demiurge"
+        }
+      ],
+      "cards": {
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            7,
+            9
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            7,
+            6
+          ],
+          "actions": [
+            14,
+            18
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            6,
+            9
+          ],
+          "drain": [
+            25,
+            0
+          ],
+          "restore": [
+            200,
+            400
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            4,
+            1
+          ],
+          "drain": [
+            25,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "vault-encryption": {
+          "definitionId": "vault-encryption",
+          "name": "Vault Encryption",
+          "cost": 3,
+          "type": "VP",
+          "plays": [
+            6,
+            9
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            425,
+            775
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            12,
+            9
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            11,
+            15
+          ],
+          "drain": [
+            1525,
+            1525
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            16,
+            13
+          ],
+          "actions": [
+            30,
+            30
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            5,
+            7
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            15,
+            12
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            20,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "node-feratu": {
+          "definitionId": "node-feratu",
+          "name": "Node Feratu",
+          "cost": 7,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            6,
+            0
+          ],
+          "drain": [
+            1350,
+            0
+          ],
+          "restore": [
+            1100,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            6,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "kilo-coin": {
+          "definitionId": "kilo-coin",
+          "name": "Kilo-Coin",
+          "cost": 6,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            2,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            9,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "recursive-seance": {
+          "definitionId": "recursive-seance",
+          "name": "Recursive Seance",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            1,
+            3
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            6,
+            13
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "bloodlet-drone": {
+          "definitionId": "bloodlet-drone",
+          "name": "Bloodlet Drone",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            1,
+            4
+          ],
+          "drain": [
+            100,
+            2000
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "temporal-rift": {
+          "definitionId": "temporal-rift",
+          "name": "Temporal Rift",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            6
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            5
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "mega-cache": {
+          "definitionId": "mega-cache",
+          "name": "Mega-Cache",
+          "cost": 9,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            15,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "veil-of-cthulhu": {
+          "definitionId": "veil-of-cthulhu",
+          "name": "Veil of Cthulhu",
+          "cost": 12,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            2,
+            0
+          ],
+          "drain": [
+            1200,
+            0
+          ],
+          "restore": [
+            600,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "sudo-demiurge": {
+          "definitionId": "sudo-demiurge",
+          "name": "Sudo Demiurge",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            150,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "backup-failure": {
+          "name": "Backup failure",
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data_exchange": {
+          "name": "Data exchange",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            6,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "sludge-core": {
+          "name": "Sludge core",
+          "drain": [
+            100,
+            50
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "breach_relay": {
+          "name": "Breach relay",
+          "drain": [
+            0,
+            200
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "signal_tower": {
+          "name": "Signal tower",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            3,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data-breach": {
+          "name": "Data Breach",
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "loser-s-luck": {
+          "name": "Loser's luck",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            2,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {
+        "lil-help": {
+          "name": "Lil help",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            2,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "integrity_patch": {
+          "name": "Integrity patch",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            400,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "clean-cut": {
+          "name": "Clean cut",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            1
+          ]
+        }
+      },
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            125,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 87
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            250,
+            250
+          ],
+          "restore": [
+            100,
+            150
+          ],
+          "events": 119
+        },
+        {
+          "cycle": 3,
+          "drain": [
+            425,
+            100
+          ],
+          "restore": [
+            250,
+            125
+          ],
+          "events": 113
+        },
+        {
+          "cycle": 4,
+          "drain": [
+            375,
+            200
+          ],
+          "restore": [
+            200,
+            150
+          ],
+          "events": 123
+        },
+        {
+          "cycle": 5,
+          "drain": [
+            425,
+            600
+          ],
+          "restore": [
+            150,
+            150
+          ],
+          "events": 115
+        },
+        {
+          "cycle": 6,
+          "drain": [
+            400,
+            500
+          ],
+          "restore": [
+            550,
+            150
+          ],
+          "events": 133
+        },
+        {
+          "cycle": 7,
+          "drain": [
+            1050,
+            600
+          ],
+          "restore": [
+            800,
+            150
+          ],
+          "events": 123
+        },
+        {
+          "cycle": 8,
+          "drain": [
+            350,
+            750
+          ],
+          "restore": [
+            100,
+            150
+          ],
+          "events": 139
+        },
+        {
+          "cycle": 9,
+          "drain": [
+            1275,
+            1000
+          ],
+          "restore": [
+            575,
+            150
+          ],
+          "events": 103
+        }
+      ],
+      "failedOutcomes": [
+        2,
+        6
+      ],
+      "randomResults": 0,
+      "choices": [
+        22,
+        16
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Penny for the poor",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Backup failure",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 4,
+        "location": "Kull kode",
+        "priority": 0.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Pull 1 power from Kull kode"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 1,
+        "location": "Healing hands",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "the-rezz",
+        "name": "The Rezz"
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Data exchange",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Penny for the poor",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 3,
+        "location": "Quantum commons",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Data exchange",
+        "priority": 10.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 4,
+        "location": "Hit 'em",
+        "priority": 9.5,
+        "nodeScore": 30,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Hit 'em",
+        "priority": 9,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Quantum commons"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "economy",
+        "bought": "Recursive Seance",
+        "cost": 5,
+        "plan": [
+          "Recursive Seance"
+        ],
+        "alternatives": [
+          {
+            "name": "Recursive Seance",
+            "cost": 5,
+            "score": 8.37
+          },
+          {
+            "name": "Bloodlet Drone",
+            "cost": 4,
+            "score": 7.32
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 0.88
+          },
+          {
+            "name": "Night Scythe",
+            "cost": 2,
+            "score": 0.57
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.07
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 2,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Wing clip",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Data exchange",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Kilo mill",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Boost Juice"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 2,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 2,
+        "location": "Ritual mine",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Temporal Rift",
+        "cost": 3,
+        "plan": [
+          "Temporal Rift"
+        ],
+        "alternatives": [
+          {
+            "name": "Temporal Rift",
+            "cost": 3,
+            "score": 8.93
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 0.51
+          },
+          {
+            "name": "Sleek Z",
+            "cost": 3,
+            "score": 0.23
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -0.35
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.06
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 3,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Thin the heard",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Ritual mine",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Get out",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 1,
+        "location": "Sludge core",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Ritual mine",
+        "priority": 9,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Recursive Seance",
+        "definitionId": "recursive-seance",
+        "node": 0,
+        "location": "Thin the heard",
+        "priority": 1,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Trash collector"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 3,
+        "location": "Trash collector",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 2 cards to trash.",
+        "picked": [
+          "Shyte-Coin",
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "economy",
+        "bought": "Bloodlet Drone",
+        "cost": 4,
+        "plan": [
+          "Bloodlet Drone"
+        ],
+        "alternatives": [
+          {
+            "name": "Bloodlet Drone",
+            "cost": 4,
+            "score": 6.21
+          },
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 4.46
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": -0.02
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -0.06
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -1.07
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 4,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Quantum commons",
+        "priority": 12,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 3,
+        "location": "Breach relay",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 4,
+        "location": "Occult archive",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Breach relay",
+        "priority": 9.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Bloodlet Drone",
+        "definitionId": "bloodlet-drone",
+        "node": 0,
+        "location": "Quantum commons",
+        "priority": 3,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Pull 1 power from Occult archive"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 3,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 2,
+        "location": "Moving mod",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 3,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 2,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 5,
+        "turn": 3,
+        "owner": 1,
+        "source": "Thin the heard",
+        "prompt": "Thin the heard: select up to 2 cards to trash.",
+        "picked": [
+          "Shyte-Coin",
+          "Byte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 5,
+        "owner": 1,
+        "rewardId": "telemetry",
+        "name": "Telemetry"
+      },
+      {
+        "kind": "draft",
+        "cycle": 5,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "endgame",
+        "bought": "Temporal Rift",
+        "cost": 3,
+        "plan": [
+          "Temporal Rift"
+        ],
+        "alternatives": [
+          {
+            "name": "Temporal Rift",
+            "cost": 3,
+            "score": 2.98
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -2.45
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -3.13
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -3.22
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 5,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 12,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Trash collector",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 4,
+        "location": "Data exchange",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Signal tower",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Data exchange",
+        "priority": 9.5,
+        "nodeScore": 11,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Data exchange",
+        "priority": 7.5,
+        "nodeScore": 54,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 2,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Pull 1 power from Signal tower"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "card": "Recursive Seance",
+        "definitionId": "recursive-seance",
+        "node": 2,
+        "location": "Data Breach",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "source": "Trash collector",
+        "prompt": "Recover one card from shared Trash to your Discard.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 6,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Ritual mine",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Occult archive",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Backup failure"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 3,
+        "location": "Backup failure",
+        "priority": 12,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Ritual mine",
+        "priority": 10.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 7.5,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 2,
+        "nodeScore": 54,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 4,
+        "location": "Penny for the poor",
+        "priority": 2,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 7,
+        "owner": 1,
+        "rewardId": "clean-cut",
+        "name": "Clean cut"
+      },
+      {
+        "kind": "draft",
+        "cycle": 7,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Bloodlet Drone",
+        "cost": 4,
+        "plan": [
+          "Bloodlet Drone"
+        ],
+        "alternatives": [
+          {
+            "name": "Bloodlet Drone",
+            "cost": 4,
+            "score": 12.94
+          },
+          {
+            "name": "The Inbetweener",
+            "cost": 4,
+            "score": 1.37
+          },
+          {
+            "name": "Tin Coin",
+            "cost": 3,
+            "score": 1.17
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -2.03
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -2.93
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 7,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Loser's luck",
+        "priority": 12.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Kilo mill",
+        "priority": 12,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 4,
+        "location": "Sludge core",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 3,
+        "location": "Wing clip",
+        "priority": 11,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 2,
+        "location": "Kilo mill",
+        "priority": 9.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Sludge core",
+        "priority": 7.5,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Bloodlet Drone",
+        "definitionId": "bloodlet-drone",
+        "node": 4,
+        "location": "Sludge core",
+        "priority": 3,
+        "nodeScore": 54,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Bloodlet Drone",
+        "definitionId": "bloodlet-drone",
+        "node": 0,
+        "location": "Loser's luck",
+        "priority": 3,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Push 1 power to Data Breach"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 1,
+        "location": "Data Breach",
+        "priority": 2,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "card": "Recursive Seance",
+        "definitionId": "recursive-seance",
+        "node": 3,
+        "location": "Wing clip",
+        "priority": 1,
+        "nodeScore": 11,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 8,
+        "owner": 1,
+        "rewardId": "telemetry",
+        "name": "Telemetry"
+      },
+      {
+        "kind": "draft",
+        "cycle": 8,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Bloodlet Drone",
+        "cost": 4,
+        "plan": [
+          "Bloodlet Drone"
+        ],
+        "alternatives": [
+          {
+            "name": "Bloodlet Drone",
+            "cost": 4,
+            "score": 8.32
+          },
+          {
+            "name": "Vault Encryption",
+            "cost": 3,
+            "score": -2.29
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -3.21
+          },
+          {
+            "name": "Hack Attack",
+            "cost": 4,
+            "score": -3.43
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -3.43
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 8,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 12.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Thin the heard",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power to or from nearby locations.",
+        "picked": [
+          "Pull 1 power from Wing clip"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Wing clip",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "Bloodlet Drone",
+        "definitionId": "bloodlet-drone",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 3,
+        "nodeScore": 27,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 2,
+        "nodeScore": 54,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 12,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Vault Encryption",
+        "definitionId": "vault-encryption",
+        "node": 0,
+        "location": "Kull kode",
+        "priority": 11,
+        "nodeScore": 14,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Recursive Seance",
+        "definitionId": "recursive-seance",
+        "node": 0,
+        "location": "Kull kode",
+        "priority": 0.5,
+        "nodeScore": 27,
+        "options": 5
+      }
+    ]
+  }
+}

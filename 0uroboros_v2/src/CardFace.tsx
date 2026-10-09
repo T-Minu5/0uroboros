@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { builtinMod } from './builtinMods';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from './cardArtwork';
 import { cardPresentation, type CardWithPresentation } from './cardPresentation';
 import { servedArtPath } from './depthArt/depthManifest';
@@ -9,7 +10,7 @@ import './card-face.css';
  * `playing: false` keeps the clip loaded but hidden on its first frame, so a later start has no load delay.
  */
 export type CardArtVideo = { src: string; loop?: boolean; sound?: boolean; playing?: boolean; rate?: number; onEnd?: () => void };
-export type CardFaceProps = { card: CardWithPresentation; context?: 'runtime' | 'draft' | 'preview'; compact?: boolean; remainingDuration?: number; powerChanging?: boolean; className?: string; movableCue?: boolean; video?: CardArtVideo };
+export type CardFaceProps = { card: CardWithPresentation; context?: 'runtime' | 'draft' | 'preview'; compact?: boolean; remainingDuration?: number; /** In the Effect Bank: effect steps left to resolve (null = unending); replaces Power. */ bankEffects?: number | null; powerChanging?: boolean; className?: string; movableCue?: boolean; video?: CardArtVideo };
 
 function ArtVideo({src,loop=false,sound=false,playing=true,rate=1,onEnd}:CardArtVideo){
   const ref=useRef<HTMLVideoElement>(null);
@@ -108,33 +109,36 @@ export function effectKeywords(effect:string|undefined):string[]{
   });
 }
 
-export function CardFace({card,context='runtime',compact=false,remainingDuration,powerChanging=false,className='',movableCue=false,video}:CardFaceProps){
+const DURATION_ICONS={infinite:'/assets/Icons/icon-infinite.svg',runtime:'/assets/Icons/icon-turns.svg',cycle:'/assets/Icons/icon-duration.svg'};
+
+export function CardFace({card,context='runtime',compact=false,remainingDuration,bankEffects,powerChanging=false,className='',movableCue=false,video}:CardFaceProps){
   const {style,icon}=cardPresentation(card),{windowRef,measureRef,fit}=useTitleFit(card.name,compact);
   const art=cardArtworkPath(card);
   const duration=card.duration===undefined?undefined:remainingDuration??card.duration,printed=card.basePower;
+  const durationKind=card.duration===99?'infinite':card.durationPeriod==='runtime'?'runtime':'cycle';
   const powerState=card.power===undefined||printed===undefined||card.power===printed?'':card.power>printed?'boosted':'reduced';
   const titleStyle={'--cf-title-scale':fit.scale} as CSSProperties;
   const keywords=compact?[]:effectKeywords(card.effect);
   const {panelRef,tier}=useKeywordFit(keywords.join('|'));
   const modifiers=card.modifiers??[];
-  const badges=modifiers.flatMap(modifier=>{
-    if(modifier.kind==='doublePrintedEffects')return [{key:modifier.id,label:'[x2]'}];
-    if(modifier.kind==='powerAuraAtLocation')return [{key:modifier.id,label:`[+${modifier.amount??1}]`}];
-    if(modifier.kind==='movableEachTurn')return [{key:modifier.id,label:'[↔]'}];
-    return [];
+  const badges=modifiers.map(modifier=>{
+    if(modifier.kind==='authored')return {key:modifier.id,label:modifier.badge??'[MOD]',title:modifier.name??'Card mod'};
+    const details=builtinMod(modifier.kind,modifier.kind==='powerAuraAtLocation'?modifier.amount??1:undefined);
+    return {key:modifier.id,label:details.badge,title:details.name};
   });
   return <div className={`cf-card${compact?' cf-card--compact':''}${movableCue?' cf-card--movable':''}${className?` ${className}`:''}`} data-card-style={style} data-card-context={context} data-movable={movableCue||undefined} title={card.name}>
     <div className="cf-body">
       <div className="cf-image-wrap" data-depth-art-src={art} data-depth-intensity={compact?.7:1}>
         <img className="cf-art" src={servedArtPath(art)} alt="" onError={event=>{const current=event.currentTarget.getAttribute('src');event.currentTarget.src=current!==art&&current!==CARD_ART_PLACEHOLDER?art:CARD_ART_PLACEHOLDER}}/>
         {video&&<ArtVideo key={video.src} {...video}/>}
-        {badges.length>0&&<div className="cf-modifier-badges" aria-label="Card modifiers">{badges.map(badge=><span className="cf-modifier-badge" key={badge.key}>{badge.label}</span>)}</div>}
+        {badges.length>0&&<div className="cf-modifier-badges" aria-label="Card modifiers">{badges.map(badge=><span className="cf-modifier-badge" key={badge.key} title={badge.title}>{badge.label}</span>)}</div>}
       </div>
       {!compact&&<div className="cf-title-strip"><img className="cf-class-icon" src={icon} alt=""/><span className="cf-title-window" ref={windowRef}><span className="cf-title card-name" data-title-fit={fit.truncated?'truncated':'exact'} title={card.name} style={titleStyle}>{card.name}</span></span><span className="cf-title-measure" ref={measureRef} aria-hidden="true">{card.name}</span></div>}
         {keywords.length>0&&<div className="cf-keywords" ref={panelRef} data-fit={tier}>{keywords.map((keyword,index)=><span className="cf-keyword" key={index}>{keyword}</span>)}</div>}
     </div>
-    {duration!==undefined&&<span className="cf-duration" data-card-duration={duration} aria-label={`Duration ${duration===99?'infinite':duration}`}><img src="/assets/Icons/icon-duration.svg" alt=""/><b>{duration===99?'∞':duration}</b></span>}
-    {card.power!==undefined&&<b className={`cf-power card-power-value${powerState?` ${powerState}`:''}${powerChanging?' power-changing':''}`} data-card-power={card.power} aria-label={`Power ${card.power}${printed!==undefined?`, printed Power ${printed}`:''}`}>{card.power}</b>}
-    {context==='draft'&&<span className="cf-cost" data-card-cost={card.cost} aria-label={`Draft cost ${card.cost}`}><b>{card.cost}</b><img src="/assets/Icons/icon-crypto.svg" alt=""/></span>}
+    {duration!==undefined&&bankEffects===undefined&&<span className="cf-duration" data-card-duration={duration} data-duration-period={duration===99?'infinite':card.durationPeriod??'cycle'} aria-label={duration===99?'Permanent':`Duration ${duration} ${card.durationPeriod==='runtime'?'Runtime turns':'Cycles'}`}><img src={DURATION_ICONS[duration===99?'infinite':card.durationPeriod==='runtime'?'runtime':'cycle']} alt=""/>{duration!==99&&<b>{duration}</b>}</span>}
+    {bankEffects!==undefined&&<span className="cf-bank-effects" data-effects-left={bankEffects??'infinite'} data-duration-period={durationKind} aria-label={bankEffects===null?'Effects never run out':`${bankEffects} ${bankEffects===1?'effect':'effects'} left to resolve`}><img src={DURATION_ICONS[durationKind]} alt=""/>{bankEffects!==null&&<b>{bankEffects}</b>}</span>}
+    {bankEffects===undefined&&card.power!==undefined&&<b className={`cf-power card-power-value${powerState?` ${powerState}`:''}${powerChanging?' power-changing':''}`} data-card-power={card.power} aria-label={`Power ${card.power}${printed!==undefined?`, printed Power ${printed}`:''}`}>{card.power}</b>}
+    {context==='draft'&&<span className="cf-cost" data-card-cost={card.cost} aria-label={`Draft cost ${card.cost}`}><b>{card.cost}</b><span className="cf-cost-icon" aria-hidden="true" style={{maskImage:'url(/assets/Icons/icon-crypto.svg)',WebkitMaskImage:'url(/assets/Icons/icon-crypto.svg)'}}/></span>}
   </div>;
 }

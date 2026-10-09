@@ -1,0 +1,18 @@
+{
+  "id": "3579eb2a-5af2-40c2-bc77-bf082277ecfd",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:05.982Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Who.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "75a7e2fc9d70e095d3c895da2fd9f1a8a7cbe371610a4ddfb4e67a9f7e36c7b1",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "75a7e2fc9d70e095d3c895da2fd9f1a8a7cbe371610a4ddfb4e67a9f7e36c7b1"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:06.025Z"
+}

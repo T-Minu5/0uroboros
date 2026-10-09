@@ -1,0 +1,7660 @@
+{
+  "gameId": "game-muxu21l5",
+  "version": 0,
+  "startedAt": "2026-10-07T08:18:03.230Z",
+  "finished": true,
+  "notes": [
+    "Cycle 1: VP 0-1 (human-me), Servers 3450/3500, Locations won 2-1, Draft wallets 3/3. Human bought Byte-Coin; I bought Signal Surveyor.",
+    "Cycle 2: VP 0-0 (human-me), Servers 3400/3500, Locations won 0-4, Draft wallets 5/6. Human bought Signal Surveyor; I bought Bushido.io.",
+    "Cycle 3: VP 0-0 (human-me), Servers 3375/3350, Locations won 5-0, Draft wallets 8/5. Human bought Iterative Incubus; I bought Signal Surveyor.",
+    "I lost most Locations this Cycle (Quantum commons, Healing hands, FX bumper, Occult archive, Hit 'em); my board Power is too low.",
+    "Cycle 4: VP 1-0 (human-me), Servers 3300/3100, Locations won 0-4, Draft wallets 4/6. Human bought Timed Bomb, BumpEffecter; I bought Signal Surveyor, Timed Bomb, Timed Bomb.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 4 - an early-aggression line. Watch my Servers.",
+    "Cycle 5: VP 0-0 (human-me), Servers 3175/3025, Locations won 1-1, Draft wallets 8/6. Human bought Root Rune; I bought Jinx-001, BumpEffecter.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 5 - an early-aggression line. Watch my Servers.",
+    "Cycle 6: VP 0-0 (human-me), Servers 3275/3050, Locations won 3-2, Draft wallets 7/8. Human bought Kilo-Coin; I bought BumpEffecter, Signal Surveyor.",
+    "Observation: the human already owns 2 Chaos cards by Cycle 6 - an early-aggression line. Watch my Servers.",
+    "Cycle 7: VP 0-0 (human-me), Servers 3175/2975, Locations won 2-2, Draft wallets 10/4. Human bought 501.Dial, Signal Surveyor; I bought Forked Signal.",
+    "Observation: the human's Draft wallet (10) outpaces mine (4). Their economy is ahead.",
+    "Cycle 8: VP 2-0 (human-me), Servers 3075/2925, Locations won 3-2, Draft wallets 9/6. Human bought H3x1-D3x1, Atomic Unit; I bought H3x1-D3x1.",
+    "Cycle 9: VP 2-0 (human-me), Servers 3075/2475, Locations won 4-1, Draft wallets 9/5. Human bought Mega-Cache; I bought Temporal Rift.",
+    "Observation: the human's Draft wallet (9) outpaces mine (5). Their economy is ahead.",
+    "I lost most Locations this Cycle (Get out, Hot oil spa, Data breach, Penny for the poor); my board Power is too low.",
+    "Cycle 10: VP 2-1 (human-me), Servers 3075/2125, Locations won 3-1, Draft wallets 13/10. Human bought H3x1-D3x1, H3x1-D3x1; I bought Cicada 3301, Signal Surveyor.",
+    "Cycle 11: VP 2-1 (human-me), Servers 2825/1475, Locations won 3-1, Draft wallets 13/6. Human bought The Shiva of CERN, Atomic Unit; I bought Atomic Unit, Atomic Unit.",
+    "Observation: the human's Draft wallet (13) outpaces mine (6). Their economy is ahead.",
+    "Warning: my Servers are at 1475. Defense (Restore) matters now.",
+    "Cycle 12: VP 6-1 (human-me), Servers 2500/1425, Locations won 3-1, Draft wallets 10/7. Human bought ∆-Wave; I bought Signal Surveyor, Nyx Luna, Nyx Luna.",
+    "Warning: my Servers are at 1425. Defense (Restore) matters now.",
+    "Cycle 13: VP 6-1 (human-me), Servers 2600/275, Locations won 5-0, Draft wallets 17/3. Human bought Zenith Worx, 501.Dial; I bought BumpEffecter.",
+    "Observation: the human's Draft wallet (17) outpaces mine (3). Their economy is ahead.",
+    "Warning: my Servers are at 275. Defense (Restore) matters now.",
+    "I lost most Locations this Cycle (Signal tower, Hot oil spa, FX bumper, Boost Juice, BumperBall); my board Power is too low.",
+    "Cycle 13: VP 6-1 (human-me), Servers 2600/275, Locations won 5-0, Draft wallets 17/3. Human bought nothing; I bought nothing.",
+    "Observation: the human's Draft wallet (17) outpaces mine (3). Their economy is ahead.",
+    "Warning: my Servers are at 275. Defense (Restore) matters now.",
+    "I lost most Locations this Cycle (Signal tower, Hot oil spa, FX bumper, Boost Juice, BumperBall); my board Power is too low."
+  ],
+  "report": {
+    "strategyVersion": 0,
+    "strategyExperiment": null,
+    "cycle": 14,
+    "phase": "gameover",
+    "winner": 0,
+    "endedReason": "Both Servers destroyed. You win, 24 to 1 VP.",
+    "finalVP": [
+      24,
+      1
+    ],
+    "servers": [
+      2375,
+      0
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "byte-coin",
+        "name": "Byte-Coin",
+        "category": "Crypto",
+        "cost": 3
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "bushido-io",
+        "name": "Bushido.io",
+        "category": "Chaos",
+        "cost": 5
+      },
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 3,
+        "owner": 0,
+        "definitionId": "iterative-incubus",
+        "name": "Iterative Incubus",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "card-3c9ng7g8",
+        "name": "Timed Bomb",
+        "category": "Base",
+        "cost": 1
+      },
+      {
+        "cycle": 4,
+        "owner": 1,
+        "definitionId": "card-3c9ng7g8",
+        "name": "Timed Bomb",
+        "category": "Base",
+        "cost": 1
+      },
+      {
+        "cycle": 4,
+        "owner": 0,
+        "definitionId": "card-3c9ng7g8",
+        "name": "Timed Bomb",
+        "category": "Base",
+        "cost": 1
+      },
+      {
+        "cycle": 4,
+        "owner": 0,
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 5,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 4
+      },
+      {
+        "cycle": 5,
+        "owner": 1,
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 5,
+        "owner": 0,
+        "definitionId": "root-rune",
+        "name": "Root Rune",
+        "category": "Base",
+        "cost": 7
+      },
+      {
+        "cycle": 6,
+        "owner": 1,
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 6,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 6,
+        "owner": 0,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      },
+      {
+        "cycle": 7,
+        "owner": 1,
+        "definitionId": "eval-forked-signal",
+        "name": "Forked Signal",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "card-099bvoal",
+        "name": "501.Dial",
+        "category": "VP",
+        "cost": 6
+      },
+      {
+        "cycle": 7,
+        "owner": 0,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 8,
+        "owner": 1,
+        "definitionId": "h3x1-d3x1",
+        "name": "H3x1-D3x1",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "h3x1-d3x1",
+        "name": "H3x1-D3x1",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 8,
+        "owner": 0,
+        "definitionId": "atomic-unit",
+        "name": "Atomic Unit",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 9,
+        "owner": 1,
+        "definitionId": "temporal-rift",
+        "name": "Temporal Rift",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 9,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 10,
+        "owner": 1,
+        "definitionId": "cicada-3301",
+        "name": "Cicada 3301",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 10,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 10,
+        "owner": 0,
+        "definitionId": "h3x1-d3x1",
+        "name": "H3x1-D3x1",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 10,
+        "owner": 0,
+        "definitionId": "h3x1-d3x1",
+        "name": "H3x1-D3x1",
+        "category": "Chaos",
+        "cost": 6
+      },
+      {
+        "cycle": 11,
+        "owner": 1,
+        "definitionId": "atomic-unit",
+        "name": "Atomic Unit",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 11,
+        "owner": 1,
+        "definitionId": "atomic-unit",
+        "name": "Atomic Unit",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 11,
+        "owner": 0,
+        "definitionId": "shiva-of-cern",
+        "name": "The Shiva of CERN",
+        "category": "Base",
+        "cost": 10
+      },
+      {
+        "cycle": 11,
+        "owner": 0,
+        "definitionId": "atomic-unit",
+        "name": "Atomic Unit",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 12,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 12,
+        "owner": 1,
+        "definitionId": "nyx-luna",
+        "name": "Nyx Luna",
+        "category": "Chaos",
+        "cost": 2
+      },
+      {
+        "cycle": 12,
+        "owner": 0,
+        "definitionId": "delta-wave",
+        "name": "∆-Wave",
+        "category": "Chaos",
+        "cost": 10
+      },
+      {
+        "cycle": 12,
+        "owner": 1,
+        "definitionId": "nyx-luna",
+        "name": "Nyx Luna",
+        "category": "Chaos",
+        "cost": 2
+      },
+      {
+        "cycle": 13,
+        "owner": 1,
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
+        "category": "Chaos",
+        "cost": 3
+      },
+      {
+        "cycle": 13,
+        "owner": 0,
+        "definitionId": "zenith-worx",
+        "name": "Zenith Worx",
+        "category": "VP",
+        "cost": 11
+      },
+      {
+        "cycle": 13,
+        "owner": 0,
+        "definitionId": "card-099bvoal",
+        "name": "501.Dial",
+        "category": "VP",
+        "cost": 6
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          0,
+          1
+        ],
+        "servers": [
+          3450,
+          3500
+        ],
+        "wallet": [
+          3,
+          3
+        ],
+        "locationsWon": [
+          2,
+          1
+        ],
+        "locations": [
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": 0
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": null
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          },
+          {
+            "id": "kilo-mill",
+            "name": "Buggie Smalls",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-rdih7pg5",
+          "name": "Loose Change",
+          "eligible": [
+            0
+          ],
+          "claimed": []
+        },
+        "deckSize": [
+          10,
+          11
+        ],
+        "market": [
+          {
+            "id": "nyx-luna",
+            "name": "Nyx Luna",
+            "category": "Chaos",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-3c9ng7g8",
+            "name": "Timed Bomb",
+            "category": "Base",
+            "cost": 1,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "the-tesseract-magi",
+            "name": "The Tesseract Magi",
+            "category": "Base",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          0,
+          0
+        ],
+        "servers": [
+          3400,
+          3500
+        ],
+        "wallet": [
+          5,
+          6
+        ],
+        "locationsWon": [
+          0,
+          4
+        ],
+        "locations": [
+          {
+            "id": "breach_relay",
+            "name": "Sacrificial LLM",
+            "winner": 1
+          },
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 1
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 1
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": null
+          },
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "integrity_patch",
+          "name": "Integrity Patch",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          10,
+          11
+        ],
+        "market": [
+          {
+            "id": "invocation-of-the-sword",
+            "name": "Invocation of the Sword",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "bushido-io",
+            "name": "Bushido.io",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "system-seppuku",
+            "name": "System Seppuku",
+            "category": "Chaos",
+            "cost": 23,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 3,
+        "vp": [
+          0,
+          0
+        ],
+        "servers": [
+          3375,
+          3350
+        ],
+        "wallet": [
+          8,
+          5
+        ],
+        "locationsWon": [
+          5,
+          0
+        ],
+        "locations": [
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": 0
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 0
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-fa5nxeut",
+          "name": "Lil Prick",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          11,
+          12
+        ],
+        "market": [
+          {
+            "id": "iterative-incubus",
+            "name": "Iterative Incubus",
+            "category": "Chaos",
+            "cost": 7,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "cicada-3301",
+            "name": "Cicada 3301",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "astra-ascii",
+            "name": "Astra Ascii",
+            "category": "Base",
+            "cost": 9,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 4,
+        "vp": [
+          1,
+          0
+        ],
+        "servers": [
+          3300,
+          3100
+        ],
+        "wallet": [
+          4,
+          6
+        ],
+        "locationsWon": [
+          0,
+          4
+        ],
+        "locations": [
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": null
+          },
+          {
+            "id": "breach_relay",
+            "name": "Sacrificial LLM",
+            "winner": 1
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 1
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-rdih7pg5",
+          "name": "Loose Change",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          10,
+          12
+        ],
+        "market": [
+          {
+            "id": "card-3c9ng7g8",
+            "name": "Timed Bomb",
+            "category": "Base",
+            "cost": 1,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "nyx-luna",
+            "name": "Nyx Luna",
+            "category": "Chaos",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-k78ew0ce",
+            "name": "A Total Loss",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 5,
+        "vp": [
+          0,
+          0
+        ],
+        "servers": [
+          3175,
+          3025
+        ],
+        "wallet": [
+          8,
+          6
+        ],
+        "locationsWon": [
+          1,
+          1
+        ],
+        "locations": [
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": 1
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": null
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": null
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "little-cuts",
+          "name": "Lil Bit-o",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1,
+            0
+          ]
+        },
+        "deckSize": [
+          10,
+          13
+        ],
+        "market": [
+          {
+            "id": "jinx-001",
+            "name": "Jinx-001",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "chronos-cache",
+            "name": "Chronos Cache",
+            "category": "Base",
+            "cost": 9,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "root-rune",
+            "name": "Root Rune",
+            "category": "Base",
+            "cost": 7,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 6,
+        "vp": [
+          0,
+          0
+        ],
+        "servers": [
+          3275,
+          3050
+        ],
+        "wallet": [
+          7,
+          8
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "data_exchange",
+            "name": "Login the calvary",
+            "winner": 0
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 0
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 1
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-jfdvg12d",
+          "name": "The Healer",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          10,
+          13
+        ],
+        "market": [
+          {
+            "id": "sleek-z",
+            "name": "Sleek Z",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash Collector",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "tihkal-hound",
+            "name": "Tihkal Hound",
+            "category": "Chaos",
+            "cost": 9,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              6,
+              6
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 7,
+        "vp": [
+          0,
+          0
+        ],
+        "servers": [
+          3175,
+          2975
+        ],
+        "wallet": [
+          10,
+          4
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 1
+          },
+          {
+            "id": "wing-clip",
+            "name": "Wing clip",
+            "winner": 0
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 0
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-d3vksy9u",
+          "name": "Hydra Bite",
+          "eligible": [
+            0,
+            1
+          ],
+          "claimed": [
+            1,
+            0
+          ]
+        },
+        "deckSize": [
+          11,
+          14
+        ],
+        "market": [
+          {
+            "id": "eval-burn-ledger",
+            "name": "Burn Ledger",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-forked-signal",
+            "name": "Forked Signal",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "night-scythe",
+            "name": "Night Scythe",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              3,
+              3
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 8,
+        "vp": [
+          2,
+          0
+        ],
+        "servers": [
+          3075,
+          2925
+        ],
+        "wallet": [
+          9,
+          6
+        ],
+        "locationsWon": [
+          3,
+          2
+        ],
+        "locations": [
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 1
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 0
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": 1
+          },
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-xz0nqngp",
+          "name": "Enhance",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          12,
+          15
+        ],
+        "market": [
+          {
+            "id": "hack-attack",
+            "name": "Hack Attack",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "atomic-unit",
+            "name": "Atomic Unit",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "h3x1-d3x1",
+            "name": "H3x1-D3x1",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 9,
+        "vp": [
+          2,
+          0
+        ],
+        "servers": [
+          3075,
+          2475
+        ],
+        "wallet": [
+          9,
+          5
+        ],
+        "locationsWon": [
+          4,
+          1
+        ],
+        "locations": [
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": 0
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": 0
+          },
+          {
+            "id": "data-breach",
+            "name": "Data breach",
+            "winner": 0
+          },
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 0
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "between-cycles",
+          "name": "Between Cycles",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          14,
+          17
+        ],
+        "market": [
+          {
+            "id": "temporal-rift",
+            "name": "Temporal Rift",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "invocation-of-the-sword",
+            "name": "Invocation of the Sword",
+            "category": "Chaos",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 10,
+        "vp": [
+          2,
+          1
+        ],
+        "servers": [
+          3075,
+          2125
+        ],
+        "wallet": [
+          13,
+          10
+        ],
+        "locationsWon": [
+          3,
+          1
+        ],
+        "locations": [
+          {
+            "id": "occult_archive",
+            "name": "Occult archive",
+            "winner": null
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 0
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": 1
+          },
+          {
+            "id": "location-t91bjxd9",
+            "name": "Ticking-tacking",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-jfdvg12d",
+          "name": "The Healer",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          16,
+          15
+        ],
+        "market": [
+          {
+            "id": "h3x1-d3x1",
+            "name": "H3x1-D3x1",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "cicada-3301",
+            "name": "Cicada 3301",
+            "category": "Chaos",
+            "cost": 6,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "foder-fox",
+            "name": "Foder Fox",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              7,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 11,
+        "vp": [
+          2,
+          1
+        ],
+        "servers": [
+          2825,
+          1475
+        ],
+        "wallet": [
+          13,
+          6
+        ],
+        "locationsWon": [
+          3,
+          1
+        ],
+        "locations": [
+          {
+            "id": "data_exchange",
+            "name": "Login the calvary",
+            "winner": 0
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": null
+          },
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 1
+          },
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 0
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "between-cycles",
+          "name": "Between Cycles",
+          "eligible": [
+            0
+          ],
+          "claimed": []
+        },
+        "deckSize": [
+          18,
+          16
+        ],
+        "market": [
+          {
+            "id": "atomic-unit",
+            "name": "Atomic Unit",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "night-scythe",
+            "name": "Night Scythe",
+            "category": "Base",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "shiva-of-cern",
+            "name": "The Shiva of CERN",
+            "category": "Base",
+            "cost": 10,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              1,
+              1
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              7,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 12,
+        "vp": [
+          6,
+          1
+        ],
+        "servers": [
+          2500,
+          1425
+        ],
+        "wallet": [
+          10,
+          7
+        ],
+        "locationsWon": [
+          3,
+          1
+        ],
+        "locations": [
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": 1
+          },
+          {
+            "id": "kull-kode",
+            "name": "Code cull",
+            "winner": null
+          },
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-jfdvg12d",
+          "name": "The Healer",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          20,
+          17
+        ],
+        "market": [
+          {
+            "id": "sacrifical-sigil",
+            "name": "Sacrifical Sigil",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "delta-wave",
+            "name": "∆-Wave",
+            "category": "Chaos",
+            "cost": 10,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "nyx-luna",
+            "name": "Nyx Luna",
+            "category": "Chaos",
+            "cost": 2,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              1,
+              1
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              7,
+              7
+            ]
+          }
+        ]
+      },
+      {
+        "cycle": 13,
+        "vp": [
+          6,
+          1
+        ],
+        "servers": [
+          2600,
+          275
+        ],
+        "wallet": [
+          17,
+          3
+        ],
+        "locationsWon": [
+          5,
+          0
+        ],
+        "locations": [
+          {
+            "id": "signal_tower",
+            "name": "Signal tower",
+            "winner": 0
+          },
+          {
+            "id": "location-huzvzstj",
+            "name": "Hot oil spa",
+            "winner": 0
+          },
+          {
+            "id": "location-sz68enux",
+            "name": "FX bumper",
+            "winner": 0
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 0
+          },
+          {
+            "id": "location-qn2xfxg2",
+            "name": "BumperBall",
+            "winner": 0
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-9owkb03b",
+          "name": "Restoration Kit",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          21,
+          18
+        ],
+        "market": [
+          {
+            "id": "banishing-ritual",
+            "name": "Banishing Ritual",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "cowl-obscyra",
+            "name": "Cowl Obscyra",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "byte-drone",
+            "name": "Byte Drone",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "name": "Signal Surveyor",
+            "category": "Base",
+            "cost": 3,
+            "stock": [
+              0,
+              0
+            ]
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "name": "Signal Amplifier",
+            "category": "Base",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kim-dracula",
+            "name": "Kim Dracula",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-ot1vjma3",
+            "name": "BumpEffecter",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              5,
+              5
+            ]
+          },
+          {
+            "id": "esoteric-encryption",
+            "name": "Esoteric Encryption",
+            "category": "VP",
+            "cost": 8,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "basic-encryption",
+            "name": "Basic Encryption",
+            "category": "VP",
+            "cost": 2,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-099bvoal",
+            "name": "501.Dial",
+            "category": "VP",
+            "cost": 6,
+            "stock": [
+              7,
+              7
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              15,
+              15
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              7,
+              7
+            ]
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "zenith-worx": 1,
+        "shiva-of-cern": 1,
+        "h3x1-d3x1": 3,
+        "card-099bvoal": 2,
+        "byte-coin": 3,
+        "eval-signal-surveyor": 2,
+        "delta-wave": 1,
+        "card-ot1vjma3": 1,
+        "slash-dot": 1,
+        "kilo-coin": 1,
+        "the-inbetweener": 1,
+        "mega-cache": 1,
+        "dotkrawler": 1,
+        "root-rune": 1,
+        "rezz-blade": 1,
+        "atomic-unit": 2
+      },
+      {
+        "eval-signal-surveyor": 3,
+        "jinx-001": 1,
+        "dotkrawler": 1,
+        "byte-coin": 2,
+        "card-ot1vjma3": 2,
+        "shyte-coin": 2,
+        "nyx-luna": 2,
+        "night-scythe": 1,
+        "temporal-rift": 1,
+        "atomic-unit": 1,
+        "basic-encryption": 1,
+        "slash-dot": 1,
+        "h3x1-d3x1": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 1724,
+      "drainDealt": [
+        4450,
+        2275
+      ],
+      "restoreDone": [
+        1150,
+        950
+      ],
+      "drainBySource": {
+        "card": [
+          4150,
+          2225
+        ],
+        "location": [
+          300,
+          50
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          1050,
+          850
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          100,
+          100
+        ]
+      },
+      "wastedRestores": [
+        0,
+        3
+      ],
+      "restoreEvents": [
+        15,
+        17
+      ],
+      "drainEvents": [
+        42,
+        21
+      ],
+      "drawn": [
+        94,
+        84
+      ],
+      "actionsGained": [
+        80,
+        44
+      ],
+      "cryptoGained": [
+        117,
+        76
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [
+        {
+          "cycle": 12,
+          "turn": 2,
+          "victim": 1,
+          "server": "primary",
+          "by": 0,
+          "source": "card",
+          "sourceId": "h3x1-d3x1"
+        },
+        {
+          "cycle": 14,
+          "turn": 2,
+          "victim": 1,
+          "server": "backup",
+          "by": 0,
+          "source": "card",
+          "sourceId": "h3x1-d3x1"
+        }
+      ],
+      "cards": {
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            11,
+            9
+          ],
+          "drain": [
+            1100,
+            900
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            11,
+            9
+          ],
+          "actions": [
+            22,
+            18
+          ],
+          "crypto": [
+            0,
+            6
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            5,
+            12
+          ],
+          "drain": [
+            25,
+            0
+          ],
+          "restore": [
+            250,
+            500
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            2,
+            7
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            11,
+            8
+          ],
+          "drain": [
+            250,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            9,
+            7
+          ],
+          "actions": [
+            22,
+            16
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "glitch": {
+          "definitionId": "glitch",
+          "name": "Glitch",
+          "cost": 0,
+          "type": "VP",
+          "plays": [
+            2,
+            6
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            60,
+            36
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            2,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            9,
+            18
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            9,
+            9
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            25,
+            27
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "eval-signal-surveyor": {
+          "definitionId": "eval-signal-surveyor",
+          "name": "Signal Surveyor",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            13,
+            19
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            50,
+            50
+          ],
+          "draw": [
+            10,
+            19
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "bushido-io": {
+          "definitionId": "bushido-io",
+          "name": "Bushido.io",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            2
+          ],
+          "drain": [
+            0,
+            350
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "iterative-incubus": {
+          "definitionId": "iterative-incubus",
+          "name": "Iterative Incubus",
+          "cost": 7,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            150,
+            0
+          ],
+          "restore": [
+            150,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            1,
+            0
+          ],
+          "crypto": [
+            1,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "card-ot1vjma3": {
+          "definitionId": "card-ot1vjma3",
+          "name": "BumpEffecter",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Hacker",
+          "plays": [
+            9,
+            4
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "card-3c9ng7g8": {
+          "definitionId": "card-3c9ng7g8",
+          "name": "Timed Bomb",
+          "cost": 1,
+          "type": "Character",
+          "cardClass": "Runtime",
+          "plays": [
+            1,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "jinx-001": {
+          "definitionId": "jinx-001",
+          "name": "Jinx-001",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Hacker",
+          "plays": [
+            0,
+            5
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            10
+          ],
+          "actions": [
+            0,
+            5
+          ],
+          "crypto": [
+            0,
+            15
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "root-rune": {
+          "definitionId": "root-rune",
+          "name": "Root Rune",
+          "cost": 7,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            7,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            17,
+            0
+          ],
+          "actions": [
+            14,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "kilo-coin": {
+          "definitionId": "kilo-coin",
+          "name": "Kilo-Coin",
+          "cost": 6,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            21,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "card-099bvoal": {
+          "definitionId": "card-099bvoal",
+          "name": "501.Dial",
+          "cost": 6,
+          "type": "VP",
+          "cardClass": "Solar-monk",
+          "plays": [
+            3,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            600,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "h3x1-d3x1": {
+          "definitionId": "h3x1-d3x1",
+          "name": "H3x1-D3x1",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            10,
+            3
+          ],
+          "drain": [
+            2325,
+            750
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "atomic-unit": {
+          "definitionId": "atomic-unit",
+          "name": "Atomic Unit",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            3,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            14,
+            4
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "the-inbetweener": {
+          "definitionId": "the-inbetweener",
+          "name": "The Inbetweener",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            3,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            5,
+            0
+          ],
+          "actions": [
+            2,
+            0
+          ],
+          "crypto": [
+            3,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "eval-forked-signal": {
+          "definitionId": "eval-forked-signal",
+          "name": "Forked Signal",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "mega-cache": {
+          "definitionId": "mega-cache",
+          "name": "Mega-Cache",
+          "cost": 9,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            20,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "cicada-3301": {
+          "definitionId": "cicada-3301",
+          "name": "Cicada 3301",
+          "cost": 6,
+          "type": "Character",
+          "cardClass": "Horror",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            300
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shiva-of-cern": {
+          "definitionId": "shiva-of-cern",
+          "name": "The Shiva of CERN",
+          "cost": 10,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            0
+          ],
+          "actions": [
+            1,
+            0
+          ],
+          "crypto": [
+            2,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "temporal-rift": {
+          "definitionId": "temporal-rift",
+          "name": "Temporal Rift",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            4
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "delta-wave": {
+          "definitionId": "delta-wave",
+          "name": "∆-Wave",
+          "cost": 10,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            300,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "nyx-luna": {
+          "definitionId": "nyx-luna",
+          "name": "Nyx Luna",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            75
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            1
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "signal_tower": {
+          "name": "Signal tower",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            2,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "sludge-core": {
+          "name": "Sludge core",
+          "drain": [
+            100,
+            50
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "wind-fall": {
+          "name": "Wind fall",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data_exchange": {
+          "name": "Login the calvary",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            5,
+            0
+          ],
+          "actions": [
+            4,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "data-breach": {
+          "name": "Data breach",
+          "drain": [
+            100,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "backup-failure": {
+          "name": "Backup failure",
+          "drain": [
+            100,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            2
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {
+        "little-cuts": {
+          "name": "Lil Bit-o",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            100,
+            100
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            1,
+            1
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            100,
+            100
+          ],
+          "restore": [
+            50,
+            100
+          ],
+          "events": 96
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            50,
+            0
+          ],
+          "events": 110
+        },
+        {
+          "cycle": 3,
+          "drain": [
+            150,
+            100
+          ],
+          "restore": [
+            75,
+            0
+          ],
+          "events": 93
+        },
+        {
+          "cycle": 4,
+          "drain": [
+            300,
+            275
+          ],
+          "restore": [
+            200,
+            50
+          ],
+          "events": 131
+        },
+        {
+          "cycle": 5,
+          "drain": [
+            125,
+            175
+          ],
+          "restore": [
+            150,
+            150
+          ],
+          "events": 125
+        },
+        {
+          "cycle": 6,
+          "drain": [
+            150,
+            0
+          ],
+          "restore": [
+            0,
+            75
+          ],
+          "events": 134
+        },
+        {
+          "cycle": 7,
+          "drain": [
+            125,
+            100
+          ],
+          "restore": [
+            0,
+            50
+          ],
+          "events": 142
+        },
+        {
+          "cycle": 8,
+          "drain": [
+            100,
+            200
+          ],
+          "restore": [
+            100,
+            50
+          ],
+          "events": 138
+        },
+        {
+          "cycle": 9,
+          "drain": [
+            500,
+            100
+          ],
+          "restore": [
+            100,
+            50
+          ],
+          "events": 116
+        },
+        {
+          "cycle": 10,
+          "drain": [
+            350,
+            100
+          ],
+          "restore": [
+            100,
+            0
+          ],
+          "events": 152
+        },
+        {
+          "cycle": 11,
+          "drain": [
+            950,
+            350
+          ],
+          "restore": [
+            100,
+            300
+          ],
+          "events": 146
+        },
+        {
+          "cycle": 12,
+          "drain": [
+            125,
+            350
+          ],
+          "restore": [
+            25,
+            75
+          ],
+          "events": 125
+        },
+        {
+          "cycle": 13,
+          "drain": [
+            1150,
+            0
+          ],
+          "restore": [
+            100,
+            0
+          ],
+          "events": 154
+        },
+        {
+          "cycle": 14,
+          "drain": [
+            325,
+            325
+          ],
+          "restore": [
+            100,
+            50
+          ],
+          "events": 62
+        }
+      ],
+      "failedOutcomes": [
+        41,
+        7
+      ],
+      "randomResults": 3,
+      "choices": [
+        39,
+        50
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "FX bumper",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Quantum commons",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 2,
+        "location": "Hot oil spa",
+        "priority": 0.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Buggie Smalls"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 4,
+        "location": "Buggie Smalls",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 6.49
+          },
+          {
+            "name": "Timed Bomb",
+            "cost": 1,
+            "score": 3.59
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.95
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.44
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 1.41
+          }
+        ],
+        "offered": [
+          {
+            "id": "nyx-luna",
+            "score": 1.41
+          },
+          {
+            "id": "card-3c9ng7g8",
+            "score": 3.59
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 6.49
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.44
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.46
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.95
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 0,
+        "location": "Sacrificial LLM",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 1,
+        "location": "Signal tower",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Sacrificial LLM"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Wing clip",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 4,
+        "location": "BumperBall",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 4,
+        "location": "BumperBall",
+        "priority": 9.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Ticking-tacking",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 3,
+        "location": "Wing clip",
+        "priority": 9,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 0,
+        "location": "Sacrificial LLM",
+        "priority": 0.5,
+        "nodeScore": 2,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to BumperBall"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "source": "BumperBall",
+        "prompt": "BumperBall: choose a card to bump from your Crypto wallet to Discard.",
+        "picked": [
+          "Shyte-Coin · Crypto wallet"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 2,
+        "owner": 1,
+        "rewardId": "integrity_patch",
+        "name": "Integrity Patch"
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Bushido.io",
+        "cost": 5,
+        "plan": [
+          "Bushido.io"
+        ],
+        "alternatives": [
+          {
+            "name": "Bushido.io",
+            "cost": 5,
+            "score": 6.3
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 3.47
+          },
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 3.42
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 2.08
+          },
+          {
+            "name": "Invocation of the Sword",
+            "cost": 4,
+            "score": 1.83
+          }
+        ],
+        "offered": [
+          {
+            "id": "invocation-of-the-sword",
+            "score": 1.83
+          },
+          {
+            "id": "bushido-io",
+            "score": 6.3
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 3.47
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": 0.28
+          },
+          {
+            "id": "kim-dracula",
+            "score": -0.67
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.12
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.78
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 2.08
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.64
+          },
+          {
+            "id": "kilo-coin",
+            "score": 3.42
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 2,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 0,
+        "location": "Quantum commons",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 3,
+        "turn": 1,
+        "owner": 1,
+        "card": "Bushido.io",
+        "definitionId": "bushido-io",
+        "node": 2,
+        "location": "FX bumper",
+        "priority": 1,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "draft",
+        "cycle": 3,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "economy",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 3.26
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.51
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.91
+          },
+          {
+            "name": "Signal Amplifier",
+            "cost": 5,
+            "score": 0.06
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": -0.89
+          }
+        ],
+        "offered": [
+          {
+            "id": "eval-signal-surveyor",
+            "score": 3.26
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": 0.06
+          },
+          {
+            "id": "kim-dracula",
+            "score": -0.89
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.91
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.97
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.51
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 3,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 9.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 3,
+        "location": "Get out",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Sacrificial LLM",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 0,
+        "location": "Sludge core",
+        "priority": 9,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 3,
+        "location": "Get out",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 4,
+        "location": "Code cull",
+        "priority": 5,
+        "nodeScore": 5,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Hit 'em"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Sacrificial LLM"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 2,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Get out"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 1,
+        "location": "Hit 'em",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 1,
+        "location": "Hit 'em",
+        "priority": 0.5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 4,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 4,
+        "owner": 1,
+        "rewardId": "reward-rdih7pg5",
+        "name": "Loose Change"
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor",
+          "Timed Bomb",
+          "Timed Bomb"
+        ],
+        "alternatives": [
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 3.33
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 3.26
+          },
+          {
+            "name": "Timed Bomb",
+            "cost": 1,
+            "score": 3.06
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 2.04
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.5
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-3c9ng7g8",
+            "score": 3.06
+          },
+          {
+            "id": "nyx-luna",
+            "score": 0.88
+          },
+          {
+            "id": "card-k78ew0ce",
+            "score": -10.69
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 3.26
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": 0.06
+          },
+          {
+            "id": "kim-dracula",
+            "score": -0.89
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.91
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.95
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 2.04
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.5
+          },
+          {
+            "id": "kilo-coin",
+            "score": 3.33
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Timed Bomb",
+        "cost": 1,
+        "plan": [
+          "Timed Bomb",
+          "Timed Bomb"
+        ],
+        "alternatives": [
+          {
+            "name": "Timed Bomb",
+            "cost": 1,
+            "score": 2.91
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.76
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.43
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.76
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 0.74
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-3c9ng7g8",
+            "score": 2.91
+          },
+          {
+            "id": "nyx-luna",
+            "score": 0.74
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.76
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.76
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.09
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.43
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 4,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "economy",
+        "bought": "Timed Bomb",
+        "cost": 1,
+        "plan": [
+          "Timed Bomb"
+        ],
+        "alternatives": [
+          {
+            "name": "Timed Bomb",
+            "cost": 1,
+            "score": 1.16
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 0.71
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.12
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-3c9ng7g8",
+            "score": 1.16
+          },
+          {
+            "id": "nyx-luna",
+            "score": 0.71
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.12
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 4,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 0,
+        "location": "Wind fall",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "FX bumper",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 3,
+        "location": "Wing clip",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 5,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Backup failure"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Sludge core",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Wind fall",
+        "priority": 10.5,
+        "nodeScore": 11,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 3,
+        "owner": 1,
+        "card": "Timed Bomb",
+        "definitionId": "card-3c9ng7g8",
+        "node": 4,
+        "location": "Backup failure",
+        "priority": 2,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 5,
+        "turn": 3,
+        "owner": 1,
+        "card": "Timed Bomb",
+        "definitionId": "card-3c9ng7g8",
+        "node": 1,
+        "location": "FX bumper",
+        "priority": 2,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 5,
+        "owner": 1,
+        "rewardId": "little-cuts",
+        "name": "Lil Bit-o"
+      },
+      {
+        "kind": "draft",
+        "cycle": 5,
+        "owner": 1,
+        "wallet": 7,
+        "phase": "endgame",
+        "bought": "Jinx-001",
+        "cost": 4,
+        "plan": [
+          "Jinx-001",
+          "BumpEffecter"
+        ],
+        "alternatives": [
+          {
+            "name": "Root Rune",
+            "cost": 7,
+            "score": 7.75
+          },
+          {
+            "name": "Jinx-001",
+            "cost": 4,
+            "score": 6.3
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 3.05
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 1.92
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.8
+          }
+        ],
+        "offered": [
+          {
+            "id": "jinx-001",
+            "score": 6.3
+          },
+          {
+            "id": "root-rune",
+            "score": 7.75
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.8
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.05
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.25
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 3.05
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.06
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 1.92
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.76
+          },
+          {
+            "id": "kilo-coin",
+            "score": -0.02
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 5,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "endgame",
+        "bought": "BumpEffecter",
+        "cost": 3,
+        "plan": [
+          "BumpEffecter"
+        ],
+        "alternatives": [
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 2.96
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.71
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -0.83
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.15
+          }
+        ],
+        "offered": [
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.71
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 2.96
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.15
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.83
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 5,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 0,
+        "location": "Login the calvary",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Thin the heard"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Wind fall",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 4,
+        "location": "Penny for the poor",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 4,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 0,
+        "location": "Login the calvary",
+        "priority": 1.5,
+        "nodeScore": 2,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 2,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Healing hands"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 3,
+        "location": "Healing hands",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 2,
+        "location": "Wind fall",
+        "priority": 0.5,
+        "nodeScore": 11,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Wind fall"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 6,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 6,
+        "owner": 1,
+        "wallet": 8,
+        "phase": "endgame",
+        "bought": "BumpEffecter",
+        "cost": 3,
+        "plan": [
+          "BumpEffecter",
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 2.8
+          },
+          {
+            "name": "Esoteric Encryption",
+            "cost": 8,
+            "score": 2.76
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 1.71
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.55
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 1
+          }
+        ],
+        "offered": [
+          {
+            "id": "sleek-z",
+            "score": 0
+          },
+          {
+            "id": "trash-collector",
+            "score": -0.5
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.55
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.3
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 2.8
+          },
+          {
+            "id": "esoteric-encryption",
+            "score": 2.76
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.29
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 1.71
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.95
+          },
+          {
+            "id": "kilo-coin",
+            "score": -0.18
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 6,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.6
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.08
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 1.05
+          },
+          {
+            "name": "Sleek Z",
+            "cost": 3,
+            "score": 0.05
+          },
+          {
+            "name": "Signal Amplifier",
+            "cost": 5,
+            "score": -0.25
+          }
+        ],
+        "offered": [
+          {
+            "id": "sleek-z",
+            "score": 0.05
+          },
+          {
+            "id": "trash-collector",
+            "score": -0.45
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.6
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.25
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.05
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.08
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.25
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.89
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 6,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Occult archive",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 3,
+        "location": "Loser's luck",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Ticking-tacking",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Loser's luck"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 0,
+        "location": "Boost Juice",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 3,
+        "location": "Loser's luck",
+        "priority": 1.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 2,
+        "location": "Occult archive",
+        "priority": 0.5,
+        "nodeScore": 11,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Byte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 1,
+        "location": "Wing clip",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 0,
+        "location": "Boost Juice",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 4,
+        "location": "Ticking-tacking",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Wing clip"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 7,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Loser's luck"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 7,
+        "owner": 1,
+        "rewardId": "reward-d3vksy9u",
+        "name": "Hydra Bite"
+      },
+      {
+        "kind": "draft",
+        "cycle": 7,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Forked Signal",
+        "cost": 3,
+        "plan": [
+          "Forked Signal"
+        ],
+        "alternatives": [
+          {
+            "name": "Forked Signal",
+            "cost": 3,
+            "score": 0.83
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.77
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 0.47
+          },
+          {
+            "name": "Burn Ledger",
+            "cost": 2,
+            "score": 0.18
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -1.1
+          }
+        ],
+        "offered": [
+          {
+            "id": "eval-burn-ledger",
+            "score": 0.18
+          },
+          {
+            "id": "eval-forked-signal",
+            "score": 0.83
+          },
+          {
+            "id": "night-scythe",
+            "score": -1.7
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 0.47
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.77
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.56
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.1
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 7,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Trash collector",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Penny for the poor",
+        "priority": 10,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 3,
+        "location": "Code cull",
+        "priority": 5.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 2,
+        "location": "Penny for the poor",
+        "priority": 4.5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "card": "Bushido.io",
+        "definitionId": "bushido-io",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 3.5,
+        "nodeScore": 11,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 2,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Penny for the poor"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 4,
+        "location": "Occult archive",
+        "priority": 5.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 0,
+        "location": "Trash collector",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Code cull"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Thin the heard"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 8,
+        "turn": 3,
+        "owner": 1,
+        "source": "Trash collector",
+        "prompt": "Recover one card from shared Trash to your Discard.",
+        "picked": [
+          "Byte-Coin"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 8,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "endgame",
+        "bought": "H3x1-D3x1",
+        "cost": 6,
+        "plan": [
+          "H3x1-D3x1"
+        ],
+        "alternatives": [
+          {
+            "name": "H3x1-D3x1",
+            "cost": 6,
+            "score": 10.25
+          },
+          {
+            "name": "Atomic Unit",
+            "cost": 2,
+            "score": 5.3
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 2.26
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 2.05
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.53
+          }
+        ],
+        "offered": [
+          {
+            "id": "hack-attack",
+            "score": -0.8
+          },
+          {
+            "id": "atomic-unit",
+            "score": 5.3
+          },
+          {
+            "id": "h3x1-d3x1",
+            "score": 10.25
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 2.05
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": 0.2
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.5
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.53
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.79
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 2.26
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.47
+          },
+          {
+            "id": "kilo-coin",
+            "score": 0.29
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 8,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Glitch",
+        "definitionId": "glitch",
+        "node": 0,
+        "location": "Get out",
+        "priority": 9.5,
+        "nodeScore": 5,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 1,
+        "location": "Hot oil spa",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 3,
+        "location": "Penny for the poor",
+        "priority": 1.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 9,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Get out"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 2,
+        "location": "Data breach",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 9,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Get out",
+        "priority": 10,
+        "nodeScore": 11,
+        "options": 5
+      },
+      {
+        "kind": "draft",
+        "cycle": 9,
+        "owner": 1,
+        "wallet": 5,
+        "phase": "endgame",
+        "bought": "Temporal Rift",
+        "cost": 3,
+        "plan": [
+          "Temporal Rift"
+        ],
+        "alternatives": [
+          {
+            "name": "Temporal Rift",
+            "cost": 3,
+            "score": 9.09
+          },
+          {
+            "name": "Invocation of the Sword",
+            "cost": 4,
+            "score": 5.69
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.94
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.43
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 1.39
+          }
+        ],
+        "offered": [
+          {
+            "id": "temporal-rift",
+            "score": 9.09
+          },
+          {
+            "id": "invocation-of-the-sword",
+            "score": 5.69
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.94
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": 0.09
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.39
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.43
+          },
+          {
+            "id": "basic-encryption",
+            "score": -0.84
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.58
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 9,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 1,
+        "location": "Thin the heard",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 2,
+        "location": "Code cull",
+        "priority": 5.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Occult archive"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 10,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Thin the heard"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 4.5,
+        "nodeScore": 14,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "card": "Forked Signal",
+        "definitionId": "eval-forked-signal",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 1,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 4,
+        "location": "Sludge core",
+        "priority": 0.5,
+        "nodeScore": 14,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "source": "Forked Signal",
+        "prompt": "Forked Signal: choose an effect.",
+        "picked": [
+          "+1 Card"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "choice",
+        "cycle": 10,
+        "turn": 2,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Glitch"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 11.5,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 10,
+        "turn": 3,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 0,
+        "location": "Occult archive",
+        "priority": 8,
+        "nodeScore": 54,
+        "options": 5
+      },
+      {
+        "kind": "draft",
+        "cycle": 10,
+        "owner": 1,
+        "wallet": 10,
+        "phase": "endgame",
+        "bought": "Cicada 3301",
+        "cost": 6,
+        "plan": [
+          "Cicada 3301",
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "Cicada 3301",
+            "cost": 6,
+            "score": 10.51
+          },
+          {
+            "name": "H3x1-D3x1",
+            "cost": 6,
+            "score": 5.79
+          },
+          {
+            "name": "Esoteric Encryption",
+            "cost": 8,
+            "score": 3.2
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 3.03
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 2.26
+          }
+        ],
+        "offered": [
+          {
+            "id": "h3x1-d3x1",
+            "score": 5.79
+          },
+          {
+            "id": "cicada-3301",
+            "score": 10.51
+          },
+          {
+            "id": "foder-fox",
+            "score": 0.43
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 3.03
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.17
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.13
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.16
+          },
+          {
+            "id": "esoteric-encryption",
+            "score": 3.2
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.07
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 2.26
+          },
+          {
+            "id": "byte-coin",
+            "score": -0.89
+          },
+          {
+            "id": "kilo-coin",
+            "score": -0.15
+          },
+          {
+            "id": "mega-cache",
+            "score": 1.34
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 10,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 2.82
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.95
+          },
+          {
+            "name": "Foder Fox",
+            "cost": 4,
+            "score": 0.22
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -1.08
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.27
+          }
+        ],
+        "offered": [
+          {
+            "id": "foder-fox",
+            "score": 0.22
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 2.82
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.95
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.27
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.08
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 10,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "card": "H3x1-D3x1",
+        "definitionId": "h3x1-d3x1",
+        "node": 0,
+        "location": "Login the calvary",
+        "priority": 7,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 1,
+        "location": "Wind fall",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Login the calvary"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 4,
+        "location": "Ritual mine",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Pull 1 power from Backup failure"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 2,
+        "location": "BumperBall",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 1,
+        "location": "Wind fall",
+        "priority": 4.5,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "card": "Cicada 3301",
+        "definitionId": "cicada-3301",
+        "node": 3,
+        "location": "Backup failure",
+        "priority": 4,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Backup failure"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 11,
+        "turn": 3,
+        "owner": 1,
+        "source": "BumperBall",
+        "prompt": "BumperBall: choose a card to bump from your Crypto wallet to Discard.",
+        "picked": [
+          "Byte-Coin · Crypto wallet"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 11,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "endgame",
+        "bought": "Atomic Unit",
+        "cost": 2,
+        "plan": [
+          "Atomic Unit",
+          "Atomic Unit"
+        ],
+        "alternatives": [
+          {
+            "name": "Atomic Unit",
+            "cost": 2,
+            "score": 4.79
+          },
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 2.41
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.54
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.02
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 0.99
+          }
+        ],
+        "offered": [
+          {
+            "id": "atomic-unit",
+            "score": 4.79
+          },
+          {
+            "id": "night-scythe",
+            "score": -1.45
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.54
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.31
+          },
+          {
+            "id": "kim-dracula",
+            "score": 0.99
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.02
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.13
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 2.41
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.01
+          },
+          {
+            "id": "kilo-coin",
+            "score": -0.26
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 11,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Atomic Unit",
+        "cost": 2,
+        "plan": [
+          "Atomic Unit"
+        ],
+        "alternatives": [
+          {
+            "name": "Atomic Unit",
+            "cost": 2,
+            "score": 2.29
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.47
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.95
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -1.06
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": -1.2
+          }
+        ],
+        "offered": [
+          {
+            "id": "atomic-unit",
+            "score": 2.29
+          },
+          {
+            "id": "night-scythe",
+            "score": -1.51
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.47
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.95
+          },
+          {
+            "id": "basic-encryption",
+            "score": -1.2
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.06
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 11,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "FX bumper",
+        "priority": 10,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 2,
+        "location": "Quantum commons",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Code cull",
+        "priority": 11.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 2,
+        "owner": 1,
+        "card": "H3x1-D3x1",
+        "definitionId": "h3x1-d3x1",
+        "node": 0,
+        "location": "FX bumper",
+        "priority": 7,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 3,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 4,
+        "location": "Healing hands",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 12,
+        "turn": 3,
+        "owner": 1,
+        "card": "BumpEffecter",
+        "definitionId": "card-ot1vjma3",
+        "node": 2,
+        "location": "Quantum commons",
+        "priority": 1.5,
+        "nodeScore": 14,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 12,
+        "turn": 3,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Boost Juice"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "draft",
+        "cycle": 12,
+        "owner": 1,
+        "wallet": 7,
+        "phase": "endgame",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor",
+          "Nyx Luna",
+          "Nyx Luna"
+        ],
+        "alternatives": [
+          {
+            "name": "501.Dial",
+            "cost": 6,
+            "score": 5.79
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 4.16
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 1.59
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 1.07
+          },
+          {
+            "name": "Kim Dracula",
+            "cost": 5,
+            "score": 1.04
+          }
+        ],
+        "offered": [
+          {
+            "id": "sacrifical-sigil",
+            "score": 0.9
+          },
+          {
+            "id": "nyx-luna",
+            "score": 4.16
+          },
+          {
+            "id": "eval-signal-surveyor",
+            "score": 1.59
+          },
+          {
+            "id": "eval-signal-amplifier",
+            "score": -0.26
+          },
+          {
+            "id": "kim-dracula",
+            "score": 1.04
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 1.07
+          },
+          {
+            "id": "basic-encryption",
+            "score": 0.57
+          },
+          {
+            "id": "card-099bvoal",
+            "score": 5.79
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.32
+          },
+          {
+            "id": "kilo-coin",
+            "score": -0.75
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 12,
+        "owner": 1,
+        "wallet": 4,
+        "phase": "endgame",
+        "bought": "Nyx Luna",
+        "cost": 2,
+        "plan": [
+          "Nyx Luna",
+          "Nyx Luna"
+        ],
+        "alternatives": [
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 4.07
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.98
+          },
+          {
+            "name": "Sacrifical Sigil",
+            "cost": 4,
+            "score": 0.81
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": 0.49
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -1.4
+          }
+        ],
+        "offered": [
+          {
+            "id": "sacrifical-sigil",
+            "score": 0.81
+          },
+          {
+            "id": "nyx-luna",
+            "score": 4.07
+          },
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.98
+          },
+          {
+            "id": "basic-encryption",
+            "score": 0.49
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.4
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 12,
+        "owner": 1,
+        "wallet": 2,
+        "phase": "endgame",
+        "bought": "Nyx Luna",
+        "cost": 2,
+        "plan": [
+          "Nyx Luna"
+        ],
+        "alternatives": [
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": 1.86
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": 0.49
+          }
+        ],
+        "offered": [
+          {
+            "id": "nyx-luna",
+            "score": 1.86
+          },
+          {
+            "id": "basic-encryption",
+            "score": 0.49
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 12,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 0,
+        "location": "Signal tower",
+        "priority": 8.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 3,
+        "location": "Boost Juice",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power from a nearby location.",
+        "picked": [
+          "Push 1 power to Hot oil spa"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 13,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to BumperBall"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 2,
+        "owner": 1,
+        "card": "Jinx-001",
+        "definitionId": "jinx-001",
+        "node": 2,
+        "location": "FX bumper",
+        "priority": 4.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 2,
+        "owner": 1,
+        "card": "Atomic Unit",
+        "definitionId": "atomic-unit",
+        "node": 4,
+        "location": "BumperBall",
+        "priority": 3.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 2,
+        "owner": 1,
+        "card": "Temporal Rift",
+        "definitionId": "temporal-rift",
+        "node": 0,
+        "location": "Signal tower",
+        "priority": 2,
+        "nodeScore": 11,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 3,
+        "owner": 1,
+        "card": "Atomic Unit",
+        "definitionId": "atomic-unit",
+        "node": 1,
+        "location": "Hot oil spa",
+        "priority": 3.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 13,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 3,
+        "location": "Boost Juice",
+        "priority": 0.5,
+        "nodeScore": 27,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 13,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [
+          "Shyte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 13,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "endgame",
+        "bought": "BumpEffecter",
+        "cost": 3,
+        "plan": [
+          "BumpEffecter"
+        ],
+        "alternatives": [
+          {
+            "name": "BumpEffecter",
+            "cost": 3,
+            "score": 0.88
+          },
+          {
+            "name": "Basic Encryption",
+            "cost": 2,
+            "score": 0.52
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -1.86
+          }
+        ],
+        "offered": [
+          {
+            "id": "card-ot1vjma3",
+            "score": 0.88
+          },
+          {
+            "id": "basic-encryption",
+            "score": 0.52
+          },
+          {
+            "id": "byte-coin",
+            "score": -1.86
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 13,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "endgame"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Hot oil spa",
+        "priority": 10,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 1,
+        "location": "Buggie Smalls",
+        "priority": 8,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 2,
+        "location": "Sacrificial LLM",
+        "priority": 5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 0,
+        "location": "Hot oil spa",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Pull 2 power from Buggie Smalls"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "choice",
+        "cycle": 14,
+        "turn": 1,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Buggie Smalls"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 2,
+        "owner": 1,
+        "card": "H3x1-D3x1",
+        "definitionId": "h3x1-d3x1",
+        "node": 4,
+        "location": "Wing clip",
+        "priority": 7,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 14,
+        "turn": 2,
+        "owner": 1,
+        "card": "Nyx Luna",
+        "definitionId": "nyx-luna",
+        "node": 1,
+        "location": "Buggie Smalls",
+        "priority": 5.5,
+        "nodeScore": 2,
+        "options": 4
+      }
+    ]
+  }
+}

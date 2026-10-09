@@ -1,0 +1,1203 @@
+{
+  "gameId": "game-muwd51id",
+  "version": 62,
+  "startedAt": "2026-10-06T07:36:51.363Z",
+  "finished": true,
+  "ignored": "ended at Cycle 3 by: Session ended early for evaluation. You win, 2 to 1 VP.",
+  "notes": [
+    "Cycle 1: VP 2-2 (human-me), Servers 3425/3325, Locations won 2-0, Draft wallets 6/6. Human bought Kilo-Coin, Superpositioning; I bought Signal Surveyor, Summon the Acolytes.",
+    "Cycle 2: VP 2-1 (human-me), Servers 3350/3275, Locations won 1-3, Draft wallets 9/6. Human bought Mega-Cache; I bought Summon the Acolytes, Superpositioning.",
+    "Cycle 2: VP 2-1 (human-me), Servers 3350/3275, Locations won 1-3, Draft wallets 9/6. Human bought nothing; I bought nothing."
+  ],
+  "report": {
+    "strategyVersion": 62,
+    "strategyExperiment": null,
+    "cycle": 3,
+    "phase": "gameover",
+    "winner": 0,
+    "endedReason": "Session ended early for evaluation. You win, 2 to 1 VP.",
+    "finalVP": [
+      2,
+      1
+    ],
+    "servers": [
+      3350,
+      3275
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "eval-signal-surveyor",
+        "name": "Signal Surveyor",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "summon-the-acolytes",
+        "name": "Summon the Acolytes",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "kilo-coin",
+        "name": "Kilo-Coin",
+        "category": "Crypto",
+        "cost": 6
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "superpositioning",
+        "name": "Superpositioning",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "summon-the-acolytes",
+        "name": "Summon the Acolytes",
+        "category": "Base",
+        "cost": 3
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "superpositioning",
+        "name": "Superpositioning",
+        "category": "Base",
+        "cost": 2
+      },
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3425,
+          3325
+        ],
+        "wallet": [
+          6,
+          6
+        ],
+        "locationsWon": [
+          2,
+          0
+        ],
+        "locations": [
+          {
+            "id": "quantum_commons",
+            "name": "Quantum commons",
+            "winner": 0
+          },
+          {
+            "id": "trash-compactor",
+            "name": "Trash compactor",
+            "winner": null
+          },
+          {
+            "id": "get-out",
+            "name": "Get out",
+            "winner": null
+          },
+          {
+            "id": "hit-em",
+            "name": "Hit 'em",
+            "winner": 0
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": null
+          }
+        ],
+        "circuit": {
+          "rewardId": "little-cuts",
+          "name": "Little cuts",
+          "eligible": [
+            0
+          ],
+          "claimed": [
+            0
+          ]
+        },
+        "deckSize": [
+          10,
+          9
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          2,
+          1
+        ],
+        "servers": [
+          3350,
+          3275
+        ],
+        "wallet": [
+          9,
+          6
+        ],
+        "locationsWon": [
+          1,
+          3
+        ],
+        "locations": [
+          {
+            "id": "trash-compactor",
+            "name": "Trash compactor",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": null
+          },
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "the-shiva-of-cern",
+          "name": "The Shiva of Cern",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          12,
+          10
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "kilo-coin": 1,
+        "nyx-luna": 1,
+        "superpositioning": 1,
+        "byte-coin": 3,
+        "dash-dot": 1,
+        "slash-dot": 1,
+        "basic-encryption": 2,
+        "mega-cache": 1,
+        "rezz-razor": 1,
+        "atomic-mass": 1
+      },
+      {
+        "summon-the-acolytes": 2,
+        "byte-coin": 3,
+        "basic-encryption": 1,
+        "shiva-of-cern": 1,
+        "slash-dot": 1,
+        "superpositioning": 1,
+        "eval-signal-surveyor": 1,
+        "nyx-luna": 1,
+        "dash-dot": 1,
+        "atomic-mass": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 252,
+      "drainDealt": [
+        350,
+        250
+      ],
+      "restoreDone": [
+        100,
+        125
+      ],
+      "drainBySource": {
+        "card": [
+          350,
+          250
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          100,
+          125
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        1,
+        1
+      ],
+      "restoreEvents": [
+        3,
+        4
+      ],
+      "drainEvents": [
+        7,
+        4
+      ],
+      "drawn": [
+        15,
+        16
+      ],
+      "actionsGained": [
+        9,
+        7
+      ],
+      "cryptoGained": [
+        17,
+        12
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [],
+      "cards": {
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            0,
+            25
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            6,
+            6
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 2,
+          "type": "VP",
+          "plays": [
+            2,
+            4
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            100,
+            125
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "atomic-mass": {
+          "definitionId": "atomic-mass",
+          "name": "Atomic Mass",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            25,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            4,
+            3
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dash-dot": {
+          "definitionId": "dash-dot",
+          "name": "Dash-Dot",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            1
+          ],
+          "actions": [
+            4,
+            4
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "rezz-razor": {
+          "definitionId": "rezz-razor",
+          "name": "Rezz Razor",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            2,
+            1
+          ],
+          "drain": [
+            175,
+            75
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            1,
+            0
+          ],
+          "actions": [
+            2,
+            1
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "nyx-luna": {
+          "definitionId": "nyx-luna",
+          "name": "Nyx Luna",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            150,
+            150
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            2,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            12,
+            12
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "summon-the-acolytes": {
+          "definitionId": "summon-the-acolytes",
+          "name": "Summon the Acolytes",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            4
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "eval-signal-surveyor": {
+          "definitionId": "eval-signal-surveyor",
+          "name": "Signal Surveyor",
+          "cost": 3,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "superpositioning": {
+          "definitionId": "superpositioning",
+          "name": "Superpositioning",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            1,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            3,
+            0
+          ],
+          "actions": [
+            1,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "kilo-coin": {
+          "definitionId": "kilo-coin",
+          "name": "Kilo-Coin",
+          "cost": 6,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            3,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shiva-of-cern": {
+          "definitionId": "shiva-of-cern",
+          "name": "The Shiva of CERN",
+          "cost": 10,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {},
+      "circuit": {
+        "little-cuts": {
+          "name": "Little cuts",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            2,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            200,
+            175
+          ],
+          "restore": [
+            100,
+            25
+          ],
+          "events": 124
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            150,
+            75
+          ],
+          "restore": [
+            0,
+            100
+          ],
+          "events": 122
+        },
+        {
+          "cycle": 3,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 6
+        }
+      ],
+      "failedOutcomes": [
+        2,
+        1
+      ],
+      "randomResults": 0,
+      "choices": [
+        3,
+        3
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Quantum commons",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 3,
+        "location": "Hit 'em",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Atomic Mass",
+        "definitionId": "atomic-mass",
+        "node": 4,
+        "location": "Wind fall",
+        "priority": 3,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Get out",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dash-Dot",
+        "definitionId": "dash-dot",
+        "node": 4,
+        "location": "Wind fall",
+        "priority": 9,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Rezz Razor",
+        "definitionId": "rezz-razor",
+        "node": 1,
+        "location": "Trash compactor",
+        "priority": 7,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Nyx Luna",
+        "definitionId": "nyx-luna",
+        "node": 2,
+        "location": "Get out",
+        "priority": 4,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Signal Surveyor",
+        "cost": 3,
+        "plan": [
+          "Signal Surveyor",
+          "Summon the Acolytes"
+        ],
+        "alternatives": [
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 6.16
+          },
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 5.56
+          },
+          {
+            "name": "Rezz Razor",
+            "cost": 3,
+            "score": 4.68
+          },
+          {
+            "name": "Superpositioning",
+            "cost": 2,
+            "score": 4.06
+          },
+          {
+            "name": "Persistent Leech",
+            "cost": 5,
+            "score": 2.81
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Summon the Acolytes",
+        "cost": 3,
+        "plan": [
+          "Summon the Acolytes"
+        ],
+        "alternatives": [
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 5.35
+          },
+          {
+            "name": "Rezz Razor",
+            "cost": 3,
+            "score": 4.47
+          },
+          {
+            "name": "Superpositioning",
+            "cost": 2,
+            "score": 3.85
+          },
+          {
+            "name": "Signal Surveyor",
+            "cost": 3,
+            "score": 3.25
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 2,
+            "score": 0.9
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 0,
+        "phase": "economy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Trash compactor",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Summon the Acolytes",
+        "definitionId": "summon-the-acolytes",
+        "node": 1,
+        "location": "Data Breach",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "card": "Dash-Dot",
+        "definitionId": "dash-dot",
+        "node": 2,
+        "location": "Wind fall",
+        "priority": 9,
+        "nodeScore": 60,
+        "options": 3
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 1,
+        "owner": 1,
+        "source": "Summon the Acolytes",
+        "prompt": "Summon the Acolytes: select 3 cards to discard.",
+        "picked": [
+          "Basic Encryption",
+          "Byte-Coin",
+          "Byte-Coin"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Ritual mine",
+        "priority": 7.5,
+        "nodeScore": 60,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Signal Surveyor",
+        "definitionId": "eval-signal-surveyor",
+        "node": 1,
+        "location": "Data Breach",
+        "priority": 5,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "card": "Nyx Luna",
+        "definitionId": "nyx-luna",
+        "node": 2,
+        "location": "Wind fall",
+        "priority": 4,
+        "nodeScore": 57,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 2,
+        "turn": 2,
+        "owner": 1,
+        "source": "Signal Surveyor",
+        "prompt": "Push or pull 2 power from a nearby location.",
+        "picked": [
+          "Push 2 power to Trash compactor"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 3,
+        "location": "Sludge core",
+        "priority": 10.5,
+        "nodeScore": 60,
+        "options": 5
+      },
+      {
+        "kind": "deploy",
+        "cycle": 2,
+        "turn": 3,
+        "owner": 1,
+        "card": "Atomic Mass",
+        "definitionId": "atomic-mass",
+        "node": 4,
+        "location": "Ritual mine",
+        "priority": 3,
+        "nodeScore": 57,
+        "options": 5
+      },
+      {
+        "kind": "circuit",
+        "cycle": 2,
+        "owner": 1,
+        "rewardId": "the-shiva-of-cern",
+        "name": "The Shiva of Cern"
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "Summon the Acolytes",
+        "cost": 3,
+        "plan": [
+          "Summon the Acolytes",
+          "Superpositioning"
+        ],
+        "alternatives": [
+          {
+            "name": "Superpositioning",
+            "cost": 2,
+            "score": 3.08
+          },
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 2.08
+          },
+          {
+            "name": "Banishing Ritual",
+            "cost": 4,
+            "score": 1.43
+          },
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 0.92
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 2,
+            "score": 0.13
+          }
+        ]
+      },
+      {
+        "kind": "draft",
+        "cycle": 2,
+        "owner": 1,
+        "wallet": 3,
+        "phase": "economy",
+        "bought": "Superpositioning",
+        "cost": 2,
+        "plan": [
+          "Superpositioning"
+        ],
+        "alternatives": [
+          {
+            "name": "Superpositioning",
+            "cost": 2,
+            "score": 3.01
+          },
+          {
+            "name": "Summon the Acolytes",
+            "cost": 3,
+            "score": 0.76
+          },
+          {
+            "name": "BumpEffecter",
+            "cost": 2,
+            "score": 0.06
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": -0.35
+          },
+          {
+            "name": "Nyx Luna",
+            "cost": 2,
+            "score": -0.98
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 2,
+        "owner": 1,
+        "walletLeft": 1,
+        "phase": "economy"
+      }
+    ]
+  }
+}

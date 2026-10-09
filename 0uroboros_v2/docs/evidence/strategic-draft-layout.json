@@ -4,19 +4,20 @@
     {
       "width": 1600,
       "fullCards": true,
-      "costBadges": 16,
+      "costBadges": 0,
       "acquireBars": 0,
+      "acquireButtons": 12,
       "resourceScale": 0.82,
       "resourcesOneRow": true,
-      "boardOverflow": 0,
+      "boardOverflow": 268,
       "walletColor": "rgb(31, 255, 177)",
       "footerBottom": 964,
       "buttonVisible": true,
-      "cardCount": 16,
+      "cardCount": 12,
       "rows": {
-        "characters": 2,
+        "characters": 1,
         "row1": 6,
-        "row2": 4,
+        "row2": 0,
         "resources": 6
       },
       "overflow": false
@@ -24,19 +25,20 @@
     {
       "width": 1366,
       "fullCards": true,
-      "costBadges": 16,
+      "costBadges": 0,
       "acquireBars": 0,
+      "acquireButtons": 12,
       "resourceScale": 0.82,
       "resourcesOneRow": true,
       "boardOverflow": 0,
       "walletColor": "rgb(31, 255, 177)",
       "footerBottom": 864,
       "buttonVisible": true,
-      "cardCount": 16,
+      "cardCount": 12,
       "rows": {
-        "characters": 2,
+        "characters": 1,
         "row1": 6,
-        "row2": 4,
+        "row2": 0,
         "resources": 6
       },
       "overflow": false

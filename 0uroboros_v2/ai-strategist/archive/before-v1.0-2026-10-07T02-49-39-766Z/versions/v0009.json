@@ -1,0 +1,202 @@
+{
+  "version": 9,
+  "bootedAt": "2026-10-05T02:15:52.835Z",
+  "mode": "llm",
+  "plan": "Focus on early tempo with draw and Action cards, especially leveraging Slash-Dot and Rezz-Razor for effective Drain strategies. Transition to Chaos strategies by Cycle 4, prioritizing high-value Chaos cards like Bloodlet Drone and Infernal Kernel to maximize server pressure. Maintain an aggressive VP acquisition strategy while drafting high-value Crypto cards, avoiding lower-value options. Overall schedule: economy until Cycle 4, Chaos from Cycle 4, VP from Cycle 10. (Schedule: economy through Cycle 4, Chaos from Cycle 5, VP from Cycle 12.)",
+  "profile": {
+    "version": 9,
+    "plan": "Focus on early tempo with draw and Action cards, especially leveraging Slash-Dot and Rezz-Razor for effective Drain strategies. Transition to Chaos strategies by Cycle 4, prioritizing high-value Chaos cards like Bloodlet Drone and Infernal Kernel to maximize server pressure. Maintain an aggressive VP acquisition strategy while drafting high-value Crypto cards, avoiding lower-value options. Overall schedule: economy until Cycle 4, Chaos from Cycle 4, VP from Cycle 10. (Schedule: economy through Cycle 4, Chaos from Cycle 5, VP from Cycle 12.)",
+    "economyUntilCycle": 4,
+    "chaosFromCycle": 5,
+    "vpFromCycle": 12,
+    "handCryptoTarget": 9,
+    "minCryptoValue": 2,
+    "minBuyScore": 0.75,
+    "dilution": 0.5,
+    "weights": {
+      "power": 1,
+      "draw": 1.6,
+      "actions": 1.1,
+      "crypto": 1,
+      "drain": 2,
+      "restore": 1,
+      "vp": 2.2,
+      "duration": 0.8,
+      "thin": 1.2,
+      "disrupt": 0.8,
+      "chaos": 1.5
+    },
+    "cardBias": {}
+  },
+  "adopted": {},
+  "experiment": null,
+  "theories": [
+    {
+      "id": "no-shyte",
+      "text": "Shyte-Coin is not worth a deck slot: it dilutes draws. Bigger Crypto (Kilo, Mega-Cache) or Characters that draw cards are better buys.",
+      "status": "proposed",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "no-shyte",
+      "createdBy": 0,
+      "updatedBy": 6
+    },
+    {
+      "id": "economy-first",
+      "text": "Buying a few high-value Crypto cards (cost 6+) by Cycle 5 builds the economy that wins the late game.",
+      "status": "proposed",
+      "confidence": 0.6,
+      "support": 2,
+      "against": 1,
+      "test": "economy-first",
+      "createdBy": 0,
+      "updatedBy": 7
+    },
+    {
+      "id": "draw-engine",
+      "text": "Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.",
+      "status": "retired",
+      "confidence": 0.4,
+      "support": 1,
+      "against": 2,
+      "test": "draw-engine",
+      "createdBy": 0,
+      "updatedBy": 7
+    },
+    {
+      "id": "chaos-endgame",
+      "text": "Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +8/+12 VP.",
+      "status": "proposed",
+      "confidence": 0.4,
+      "support": 1,
+      "against": 2,
+      "test": "chaos-endgame",
+      "createdBy": 0,
+      "updatedBy": 7
+    },
+    {
+      "id": "early-aggression",
+      "text": "Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).",
+      "status": "proposed",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "test": "early-aggression",
+      "createdBy": 0,
+      "updatedBy": 7
+    },
+    {
+      "id": "vp-late",
+      "text": "VP cards are best bought late (Cycle 12+); earlier they clog the hand.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "vp-late",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "drain-race",
+      "text": "Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 1,
+      "against": 1,
+      "test": "drain-race",
+      "createdBy": 0,
+      "updatedBy": 7
+    },
+    {
+      "id": "early-chaos-transition",
+      "text": "Transitioning into Chaos by Cycle 5 is optimal for enhancing Drain and server destruction.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 7
+    },
+    {
+      "id": "strong-draw-focus",
+      "text": "Focusing on strong draw/Action Base cards in the early game maximizes efficiency and prepares for later cycles.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 9
+    },
+    {
+      "id": "mid-game-vp-acquisition",
+      "text": "Acquiring VP cards in the mid to late game (Cycle 12+) prevents hand clogging and maximizes scoring potential.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 9
+    },
+    {
+      "id": "restore-importance",
+      "text": "Including Restore cards earlier in the strategy can help mitigate Server damage and prolong the game.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 9
+    },
+    {
+      "id": "high-value-chaos",
+      "text": "Focusing on high-value Chaos cards early (cost 5+) can enhance Drain effects and Server destruction capabilities.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 9
+    },
+    {
+      "id": "mid-game-draft-adjustment",
+      "text": "Improving mid-game Draft strategies can prevent economic disparity and enhance overall performance.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 9
+    },
+    {
+      "id": "early-vp-strategy",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 9
+    },
+    {
+      "id": "high-value-draw-action-focus",
+      "text": "Prioritizing high-value draw and Action cards early maximizes efficiency and prepares for later cycles.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 9
+    },
+    {
+      "id": "timely-vp-acquisition",
+      "text": "Adjusting VP acquisition timing based on observed human strategies maximizes scoring potential.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 6,
+      "updatedBy": 9
+    }
+  ]
+}

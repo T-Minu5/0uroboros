@@ -1,0 +1,21 @@
+{
+  "id": "e9d0c9a1-c9b5-4a64-bf4d-38869f425d7a",
+  "state": "committed",
+  "createdAt": "2026-10-07T05:22:32.813Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Card effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "ac843c30b2a459480baa755d7ba44e9537a32ee9817ce22a617263e05d5de962",
+      "recoverable": true,
+      "existed": true,
+      "mode": 33152,
+      "etag": "4c21523f34dfa7bb37733e1da2fcc5a8278fcf27506f7cd70ae3c3065957c077",
+      "snapshot": "0.bin",
+      "committedEtag": "ac843c30b2a459480baa755d7ba44e9537a32ee9817ce22a617263e05d5de962"
+    }
+  ],
+  "completedAt": "2026-10-07T05:22:32.855Z"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "31ee0c80-9d99-4813-8868-9cf5a11be032",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:54:27.928Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Structure/Reveal priority.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "e2599a82d99e5ab683aca9ee2c35707dfe69073d4590de4db716e3705de3bc33",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "e2599a82d99e5ab683aca9ee2c35707dfe69073d4590de4db716e3705de3bc33"
+    }
+  ],
+  "completedAt": "2026-10-07T04:54:27.971Z"
+}

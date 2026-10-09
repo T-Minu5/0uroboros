@@ -1,10 +1,11 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { createReadStream, cpSync, existsSync, mkdirSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
-import { createContentApi } from './server/contentApi';
-import { createArtworkApi } from './server/artworkApi';
-import { createDepthApi } from './server/depthApi';
+
+// Server code is loaded through Vite, never imported here: importing it would make Vite restart in-process on every server edit,
+// and each in-process restart leaks the previous server's memory. `npm run dev` restarts the whole process instead (see package.json).
+const load = <T>(server: ViteDevServer, path: string) => server.ssrLoadModule(path) as Promise<T>;
 
 // Reference animations, concept art and Blender sources are never production assets.
 export default defineConfig({
@@ -42,22 +43,40 @@ export default defineConfig({
    });
   },
   closeBundle() {
-   for (const folder of ['card_art', 'Icons', 'materials', 'board']) cpSync(resolve('assets', folder), resolve('dist/assets', folder), { recursive: true });
+   for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve('dist/assets', folder), { recursive: true });
    mkdirSync(resolve('dist/assets/models'), { recursive: true });
    cpSync(resolve('assets/models/ouroboros-board-v4.glb'), resolve('dist/assets/models/ouroboros-board-v4.glb'));
   },
  }, {
   name: 'local-authoring-content-api',
-  configureServer(server) {
+  async configureServer(server) {
+   const { createContentApi } = await load<typeof import('./server/contentApi')>(server, '/server/contentApi.ts');
+   const { createArtworkApi } = await load<typeof import('./server/artworkApi')>(server, '/server/artworkApi.ts');
+   const { createDepthApi } = await load<typeof import('./server/depthApi')>(server, '/server/depthApi.ts');
+   const { createGameLogApi } = await load<typeof import('./server/gameLogApi')>(server, '/server/gameLogApi.ts');
    const depth = createDepthApi();
    server.middlewares.use(createContentApi({
     loadModel: () => server.ssrLoadModule('/src/authoring/contentModel.ts'),
     onSaved: document => depth.enqueue(document),
    }));
    server.middlewares.use(createArtworkApi());
+   server.middlewares.use(createGameLogApi());
    server.middlewares.use(depth.middleware);
+  },
+ }, {
+  name: 'ai-agents',
+  async configureServer(server) {
+   // Vitest and scripts reuse this config; they must not boot agent versions or call the model.
+   if (process.env.VITEST || process.env.OUROBOROS_AGENTS === 'off') return;
+   const { createAgentSystem } = await load<typeof import('./server/agents')>(server, '/server/agents/index.ts');
+   // Every dev-server start boots the next Strat-G version (if enabled in Settings > Agents); Eco-Strat resumes its journal.
+   const env = loadEnv(server.config.mode, process.cwd(), '');
+   const agents = createAgentSystem({ cwd: process.cwd(), env, loadModule: path => server.ssrLoadModule(path) });
+   agents.start();
+   for (const middleware of agents.middlewares) server.middlewares.use(middleware);
   },
  }],
  // The client follows depth updates through /api/depth/status; a file-watch reload would discard unsaved authoring edits.
- server: {host:'127.0.0.1', port:5173, strictPort:true, watch:{ignored:['**/assets/card_art/depth/**']}},
+ // Strat-G and Eco-Strat write their notebooks during play; reloading on those writes would end the game.
+ server: {host:'127.0.0.1', port:5173, strictPort:true, watch:{ignored:['**/assets/card_art/depth/**', '**/ai-strategist/**', '**/ai-agents/**', '**/logs/**']}},
 });

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { createDefaultContent, compileContent, validateContent } from '../src/authoring/contentModel';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
+import { createDefaultContent, compileContent, normalizeDocument, upgradeDocument, validateContent, type ContentDocument } from '../src/authoring/contentModel';
+import { createSession, latestRevealSlot, seededRandom, type RuntimeEvent, type RuntimeSession } from '../src/runtime';
 import { starterCards, type Card, type EvaluationEffect } from '../src/game';
 import { EVALUATION_LOCATIONS } from '../src/content';
+import { migrateEffects } from '../src/effects/migrate';
+import type { AnyEffect, EffectStep, Scope } from '../src/effects/types';
+import { describeStep, targetsFor, whoChoices } from '../src/effects/catalog';
+
+const steps = (effects: AnyEffect[], scope: Scope = 'location') => migrateEffects(effects, scope);
 
 const card = (id: string, extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, power: 2, onReveal: [], ...extra });
@@ -29,13 +34,13 @@ describe('location hooks and in-location targeting', () => {
     document.locations.forEach(location => {
       location.enabled = location.id === 'trash_compactor';
       if (location.id === 'trash_compactor') {
-        location.effects = [{ kind: 'trashLowestAtLocation', amount: 1 }];
+        location.effects = steps([{ kind: 'trashLowestAtLocation', amount: 1 }]);
       }
     });
     // Keep validation happy with five enabled Locations.
     document.locations.filter(location => location.id !== 'trash_compactor').slice(0, 4).forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
     });
     const content = compileContent(document);
     const game = createSession({
@@ -70,8 +75,8 @@ describe('location hooks and in-location targeting', () => {
     const document = createDefaultContent();
     document.locations.forEach((location, index) => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
-      location.ongoing = index === 0 ? [{ kind: 'draw', amount: 1 }] : [];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
+      location.ongoing = index === 0 ? steps([{ kind: 'draw', amount: 1 }]) : [];
     });
     const content = compileContent(document);
     const game = createSession({
@@ -89,13 +94,12 @@ describe('location hooks and in-location targeting', () => {
     expect(game.state.players[0].hand.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('applies after-turn Power boosts only to Locations that were already open', () => {
+  it('applies start-of-turn Power boosts only to Locations that were already open', () => {
     const boost: EvaluationEffect = { kind: 'boostPowerAtLocation', amount: 1 };
     const document = createDefaultContent();
     document.locations.forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
-      location.schedule = [{ at: 2, effects: [boost] }];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
     });
     const content = compileContent(document);
     const game = createSession({
@@ -106,27 +110,97 @@ describe('location hooks and in-location targeting', () => {
     game.state.nodeOrder = [0, 1, 2, 3, 4];
     game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
     game.state.nodes.forEach((node, index) => {
-      node.location = { ...structuredClone(content.locations[0]), id: `loc-${index}`, schedule: [{ at: 2, effects: [boost] }], effects: [{ kind: 'crypto', amount: 0 }] };
+      node.location = { ...structuredClone(content.locations[0]), id: `loc-${index}`, startTurn3: [boost], effects: [{ kind: 'crypto', amount: 0 }] };
       node.cards[0].push({ card: card(`n${index}`, { power: 2 }), owner: 0, node: index, order: index, revealed: true });
     });
     game.state.turn = 2;
     game.state.phase = 'runtime';
     game.endTurn();
     finish(game);
-    // After turn 2, nodes open under legalNodes(2) = first 4 in order → 0,1,2,3 get +1; node 4 does not.
-    expect(game.state.nodes[0].cards[0][0].powerModifier).toBe(1);
-    expect(game.state.nodes[3].cards[0][0].powerModifier).toBe(1);
-    expect(game.state.nodes[4].cards[0][0].powerModifier ?? 0).toBe(0);
+    // Turn 3 starts with nodes open under legalNodes(2) = first 4 in order → 0,1,2,3 get +1; node 4 does not.
+    expect(game.state.nodes[0].cards[0][0].card.powerDelta).toBe(1);
+    expect(game.state.nodes[3].cards[0][0].card.powerDelta).toBe(1);
+    expect(game.state.nodes[4].cards[0][0].card.powerDelta ?? 0).toBe(0);
+  });
+
+  it('fires start-of-turn-2 effects when turn 2 begins, not on other turns', () => {
+    const document = createDefaultContent();
+    document.locations.forEach(location => { location.enabled = true; location.effects = steps([{ kind: 'crypto', amount: 0 }]); });
+    const content = compileContent(document);
+    const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(5), content });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
+    game.state.nodes.forEach((node, index) => { node.location = { ...structuredClone(content.locations[0]), id: `loc-${index}`, effects: [{ kind: 'crypto', amount: 0 }] }; });
+    game.state.nodes[0].location!.startTurn2 = [{ kind: 'crypto', amount: 2 }];
+    game.state.nodes[0].cards[0].push({ card: card('lead', { power: 4 }), owner: 0, node: 0, order: 1, revealed: true });
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.endTurn();
+    finish(game);
+    expect(game.state.turn).toBe(2);
+    expect(game.state.players[0].wallet).toBe(2);
+    game.state.players[1].actions = 0;
+    game.endTurn();
+    finish(game);
+    expect(game.state.players[0].wallet).toBe(2);
+  });
+
+  it('turns saved after-turn schedules into the matching start-of-turn effects', () => {
+    const document = createDefaultContent() as ContentDocument & { locations: Record<string, unknown>[] };
+    document.locations[0].schedule = [{ at: 2, effects: steps([{ kind: 'draw', amount: 1 }]) }, { at: 3, effects: steps([{ kind: 'crypto', amount: 2 }]) }];
+    document.locations[0].rule = document.locations[0].reward = 'After turn 2: old copy.';
+    const upgraded = upgradeDocument(document) as ContentDocument;
+    const location = upgraded.locations[0];
+    expect(location).not.toHaveProperty('schedule');
+    expect(location.startTurn2?.[0]).toMatchObject({ action: 'draw' });
+    expect(location.startTurn3?.[0]).toMatchObject({ action: 'gainCrypto' });
+    expect(location.rule).toContain('Start of turn 2:');
+    expect(location.rule).toContain('Start of turn 3:');
+    expect(validateContent(upgraded)).toEqual([]);
+  });
+
+  it('keeps hand-shortened Location text and only fills blank text', () => {
+    const document = createDefaultContent();
+    document.locations[0].rule = document.locations[0].reward = 'Short.';
+    document.locations[1].rule = document.locations[1].reward = '';
+    const normalized = normalizeDocument(document);
+    expect(normalized.locations[0].rule).toBe('Short.');
+    expect(normalized.locations[1].rule).toMatch(/^On collapse:/);
+  });
+
+  it('needs enough Locations without start-of-turn effects for the late reveals', () => {
+    const document = createDefaultContent();
+    document.locations.forEach(location => { location.enabled = true; location.startTurn3 = steps([{ kind: 'crypto', amount: 1 }]); });
+    expect(validateContent(document).some(error => error.includes('fifth reveal'))).toBe(true);
+    document.locations[0].startTurn3 = undefined;
+    document.locations.slice(1).forEach(location => { location.startTurn3 = undefined; location.startTurn2 = steps([{ kind: 'crypto', amount: 1 }]); });
+    expect(validateContent(document).some(error => error.includes('fourth and fifth reveals'))).toBe(true);
+  });
+
+  it('deals start-of-turn Locations only to reveal slots that are open in time', () => {
+    for (let seed = 1; seed <= 40; seed++) {
+      const document = createDefaultContent();
+      document.locations.forEach(location => { location.enabled = true; location.effects = steps([{ kind: 'crypto', amount: 0 }]); });
+      document.locations[0].startTurn2 = steps([{ kind: 'crypto', amount: 1 }]);
+      document.locations[1].startTurn2 = steps([{ kind: 'crypto', amount: 1 }]);
+      document.locations[2].startTurn3 = steps([{ kind: 'crypto', amount: 1 }]);
+      document.locations[3].startTurn3 = steps([{ kind: 'crypto', amount: 1 }]);
+      const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(seed), content: compileContent(document) });
+      game.state.nodeOrder.forEach((node, slot) => {
+        const location = game.state.nodes[node].location!;
+        expect(slot, `seed ${seed}: ${location.id}`).toBeLessThanOrEqual(latestRevealSlot(location));
+      });
+    }
   });
 
   it('on-play rewards the player who played the card, not the Location winner', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
-      location.onPlay = [];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
+      location.onPlay = steps([], 'locationPlay');
     });
-    document.locations[0].onPlay = [{ kind: 'crypto', amount: 3 }];
+    document.locations[0].onPlay = steps([{ kind: 'crypto', amount: 3 }], 'locationPlay');
     const content = compileContent(document);
     const game = createSession({
       carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
@@ -157,7 +231,7 @@ describe('location hooks and in-location targeting', () => {
     { effect: { kind: 'destroyAtLocation', rank: 'weakest', amount: 1, boardSide: 'loser' } as EvaluationEffect, hit: 'small', zone: 'destroyed' },
   ])('$effect.kind hits the $effect.rank card here', ({ effect, hit, zone }) => {
     const document = createDefaultContent();
-    document.locations.forEach(location => { location.enabled = true; location.effects = [{ kind: 'crypto', amount: 0 }]; });
+    document.locations.forEach(location => { location.enabled = true; location.effects = steps([{ kind: 'crypto', amount: 0 }]); });
     const content = compileContent(document);
     const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(3), content });
     game.state.nodeOrder = [0, 1, 2, 3, 4];
@@ -181,9 +255,9 @@ describe('location hooks and in-location targeting', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
     });
-    document.locations[0].effects = [{ kind: 'trashLowestAtLocation', amount: 1, boardSide: 'winner' }];
+    document.locations[0].effects = steps([{ kind: 'trashLowestAtLocation', amount: 1, boardSide: 'winner' }]);
     const content = compileContent(document);
     const game = createSession({
       carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
@@ -213,9 +287,9 @@ describe('location hooks and in-location targeting', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
     });
-    document.locations[0].effects = [{ kind: 'moveCard', boardSide: 'either', cardPick: 'random' }];
+    document.locations[0].effects = steps([{ kind: 'moveCard', boardSide: 'either', cardPick: 'random' }]);
     const content = compileContent(document);
     expect(validateContent(document)).toEqual([]);
     const game = createSession({
@@ -243,7 +317,7 @@ describe('location hooks and in-location targeting', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => {
       location.enabled = true;
-      location.effects = [{ kind: 'crypto', amount: 0 }];
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
     });
     const content = compileContent(document);
     const game = createSession({
@@ -271,12 +345,51 @@ describe('location hooks and in-location targeting', () => {
       const step = game.step();
       if (!step) break;
       if (step.event.kind === 'power' && step.event.source === 'location' && /loser|1 revealed/i.test(step.event.text)) {
-        expect(game.state.nodes[0].cards[1][0]?.powerModifier).toBe(2);
-        expect(game.state.nodes[0].cards[0][0]?.powerModifier ?? 0).toBe(0);
+        expect(game.state.nodes[0].cards[1][0]?.card.powerDelta).toBe(2);
+        expect(game.state.nodes[0].cards[0][0]?.card.powerDelta ?? 0).toBe(0);
         boosted = true;
         break;
       }
     }
     expect(boosted).toBe(true);
+  });
+});
+
+describe('Location awards for the player with the least VP', () => {
+  const award: EffectStep = { action: 'gainCrypto', amount: 3, target: { type: 'player', who: 'leastVP' } };
+
+  function playHere(vp: [number, number]) {
+    const content = compileContent(createDefaultContent());
+    const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(9), content });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach((player, owner) => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; player.rewardVP = vp[owner]; });
+    game.state.nodes[0].location = { ...structuredClone(content.locations[0]), onPlay: [award], effects: [] };
+    game.state.players[0].hand = [card('played', { power: 1 })];
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.deploy('played', 0);
+    game.endTurn();
+    finish(game);
+    return game.state.players.map(player => player.wallet);
+  }
+
+  it('awards whoever trails on VP, even when the other player triggered it', () => {
+    expect(playHere([2, 5])).toEqual([3, 0]);
+    expect(playHere([6, 1])).toEqual([0, 3]);
+  });
+
+  it('awards both players on a VP tie', () => {
+    expect(playHere([4, 4])).toEqual([3, 3]);
+  });
+
+  it('is offered for player, Server and zone targets in Location effects only, and prints plainly', () => {
+    expect(whoChoices(targetsFor('gainVP', 'location')[0], 'location')).toContain('leastVP');
+    expect(whoChoices(targetsFor('repairServer', 'location')[0], 'location')).toContain('leastVP');
+    expect(whoChoices(targetsFor('gainVP', 'card')[0], 'card')).not.toContain('leastVP');
+    expect(whoChoices(targetsFor('destroyCard', 'location')[0], 'location')).not.toContain('leastVP');
+    expect(describeStep({ action: 'gainVP', amount: 2, target: { type: 'player', who: 'leastVP' } }, 'location')).toBe('+2 VP to the player with the least VP');
+    const document = createDefaultContent();
+    document.locations[0].effects = [award];
+    expect(validateContent(document)).toEqual([]);
   });
 });

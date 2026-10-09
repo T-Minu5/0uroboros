@@ -1,0 +1,204 @@
+{
+  "gameId": "game-muu4fwlu",
+  "version": 2,
+  "startedAt": "2026-10-04T18:17:08.343Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 4-4 (human-me), Servers 3500/3425, Locations won 2-2, Draft wallets 7/8. Human bought Mega-Cache; I bought Iterative Incubus, Timed Bomb.",
+    "Cycle 2: VP 4-4 (human-me), Servers 3025/3500, Locations won 0-3, Draft wallets 12/6. Human bought The Tesseract Magi; I bought The Tesseract Magi, Jinx-001, Jinx-001.",
+    "Observation: the human's Draft wallet (12) outpaces mine (6). Their economy is ahead."
+  ],
+  "report": {
+    "strategyVersion": 2,
+    "cycle": 3,
+    "phase": "reveal",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      4,
+      4
+    ],
+    "servers": [
+      3025,
+      3500
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "iterative-incubus",
+        "name": "Iterative Incubus",
+        "category": "Chaos",
+        "cost": 7
+      },
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "card-3c9ng7g8",
+        "name": "Timed Bomb",
+        "category": "Base",
+        "cost": 1
+      },
+      {
+        "cycle": 1,
+        "owner": 0,
+        "definitionId": "mega-cache",
+        "name": "Mega-Cache",
+        "category": "Crypto",
+        "cost": 9
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "the-tesseract-magi",
+        "name": "The Tesseract Magi",
+        "category": "Base",
+        "cost": 6
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 2,
+        "owner": 1,
+        "definitionId": "jinx-001",
+        "name": "Jinx-001",
+        "category": "Chaos",
+        "cost": 0
+      },
+      {
+        "cycle": 2,
+        "owner": 0,
+        "definitionId": "the-tesseract-magi",
+        "name": "The Tesseract Magi",
+        "category": "Base",
+        "cost": 6
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          4,
+          4
+        ],
+        "servers": [
+          3500,
+          3425
+        ],
+        "wallet": [
+          7,
+          8
+        ],
+        "locationsWon": [
+          2,
+          2
+        ],
+        "locations": [
+          {
+            "id": "penny-for-the-poor",
+            "name": "Penny for the poor",
+            "winner": 0
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "ritual-mine",
+            "name": "Ritual mine",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": null
+          }
+        ]
+      },
+      {
+        "cycle": 2,
+        "vp": [
+          4,
+          4
+        ],
+        "servers": [
+          3025,
+          3500
+        ],
+        "wallet": [
+          12,
+          6
+        ],
+        "locationsWon": [
+          0,
+          3
+        ],
+        "locations": [
+          {
+            "id": "wind-fall",
+            "name": "Wind fall",
+            "winner": null
+          },
+          {
+            "id": "trash-collector",
+            "name": "Trash collector",
+            "winner": 1
+          },
+          {
+            "id": "thin-the-heard",
+            "name": "Thin the heard",
+            "winner": 1
+          },
+          {
+            "id": "data-breach",
+            "name": "Data Breach",
+            "winner": 1
+          },
+          {
+            "id": "healing-hands",
+            "name": "Healing hands",
+            "winner": null
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "byte-coin": 2,
+        "rezz-razor": 1,
+        "vault-encryption": 2,
+        "mega-cache": 1,
+        "the-tesseract-magi": 1,
+        "dotkrawler": 1,
+        "dash-dot": 1,
+        "kilo-coin": 1,
+        "slash-dot": 1
+      },
+      {
+        "dotkrawler": 1,
+        "vault-encryption": 2,
+        "byte-coin": 2,
+        "jinx-001": 2,
+        "kilo-coin": 1,
+        "slash-dot": 1,
+        "the-tesseract-magi": 1,
+        "dash-dot": 1,
+        "rezz-blade": 1,
+        "rezz-razor": 1,
+        "iterative-incubus": 1
+      }
+    ]
+  }
+}

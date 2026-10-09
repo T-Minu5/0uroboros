@@ -1,5 +1,6 @@
 import source from '../assets/card_art/cards.json';
-import { type Card, type EvaluationEffect as Effect } from './game';
+import { type Card, type LegacyEffect as Effect } from './game';
+import { migrateCard } from './effects/migrate';
 
 type Recipe = Pick<Card,'onReveal'|'duration'|'durationPeriod'|'schedule'|'recurring'>;
 const e=(kind:Effect['kind'],amount?:number,extra:Partial<Effect>={}):Effect=>({kind,...(amount===undefined?{}:{amount}),...extra});
@@ -92,7 +93,7 @@ export const HISTORIC_CARDS:readonly Card[]=source.cards.filter(card=>!exclusion
  const type=card.types.includes('crypto')?'Crypto':card.types.includes('encryptedVolume')?'VP':'Character';
  const vp=type==='VP'?Number(card.effects.find(text=>/\d+vp/i.test(text))?.match(/\d+/)?.[0]):undefined;
  const cryptoValue=type==='Crypto'?Number(card.effects.join(' ').match(/\+(\d+) crypto/i)?.[1]):undefined;
- return {id:card.id,definitionId:card.id,name:card.name,type,cost:card.cost,art:card.artwork,effect:card.description,...(type==='Crypto'?{cryptoValue}:{power:retainedPower[card.id]??(type==='VP'?vp:Math.max(1,Math.min(5,Math.ceil(card.cost/2))))}),...(vp!==undefined?{vp}:{}),...recipe};
+ return migrateCard({id:card.id,definitionId:card.id,name:card.name,type,cost:card.cost,art:card.artwork,effect:card.description,...(type==='Crypto'?{cryptoValue}:{power:retainedPower[card.id]??(type==='VP'?vp:Math.max(1,Math.min(5,Math.ceil(card.cost/2))))}),...(vp!==undefined?{vp}:{}),...recipe} as Card);
 });
 export function historicCategory(card:Card):'Base'|'VP'|'Crypto'|'Chaos'{
  if(card.type!=='Character')return card.type;

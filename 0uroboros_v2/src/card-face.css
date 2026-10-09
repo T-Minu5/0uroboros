@@ -4,7 +4,7 @@
    sizes cards are drawn at — 145px in hand, 54px on a Node, full width in the inspector. */
 .cf-card{--cf-edge-start:#5b0f94;--cf-edge-end:#320055;--cf-line:#bc64ff;--cf-name-veil:#00000040;--cf-u:calc(100cqw / 170);position:relative;display:block;width:100%;height:100%;min-width:0;aspect-ratio:170/236;box-sizing:border-box;overflow:visible;isolation:isolate;container-type:inline-size}
 .cf-card *,.cf-card *::before,.cf-card *::after{box-sizing:border-box}
-.cf-card[data-card-style="hacker"]{--cf-edge-start:#d72891;--cf-edge-end:#6f0a4a;--cf-line:#ff0ba1}.cf-card[data-card-style="action"]{--cf-edge-start:#202f78;--cf-edge-end:#0c1230;--cf-line:#4173f2}.cf-card[data-card-style="runtime"]{--cf-edge-start:#0a81d6;--cf-edge-end:#004c83;--cf-line:#31a9ff;--cf-power-bg:linear-gradient(0deg,#1b85d2,#005b9c 77.076%)}.cf-card[data-card-style="attack"]{--cf-edge-start:#7e1839;--cf-edge-end:#370715;--cf-line:#fa0048}.cf-card[data-card-style="utility"]{--cf-edge-start:#286c8c;--cf-edge-end:#0d2635;--cf-line:#27e2ff}.cf-card[data-card-style="horror"]{--cf-edge-start:#5b0f94;--cf-edge-end:#320055;--cf-line:#bc64ff}.cf-card[data-card-style="crypto"]{--cf-edge-start:#057642;--cf-edge-end:#0c2b1f;--cf-line:#1fffb1}.cf-card[data-card-style="vp"]{--cf-edge-start:#94581c;--cf-edge-end:#44290f;--cf-line:#ffcc12;--cf-name-veil:#00000080}
+.cf-card[data-card-style="hacker"]{--cf-edge-start:#d72891;--cf-edge-end:#6f0a4a;--cf-line:#ff0ba1}.cf-card[data-card-style="action"]{--cf-edge-start:#202f78;--cf-edge-end:#0c1230;--cf-line:#4173f2}.cf-card[data-card-style="runtime"]{--cf-edge-start:#0a81d6;--cf-edge-end:#004c83;--cf-line:#31a9ff;--cf-power-bg:linear-gradient(0deg,#1b85d2,#005b9c 77.076%)}.cf-card[data-card-style="attack"]{--cf-edge-start:#7e1839;--cf-edge-end:#370715;--cf-line:#fa0048}.cf-card[data-card-style="utility"]{--cf-edge-start:#286c8c;--cf-edge-end:#0d2635;--cf-line:#27e2ff}.cf-card[data-card-style="horror"]{--cf-edge-start:#5b0f94;--cf-edge-end:#320055;--cf-line:#bc64ff}.cf-card[data-card-style="crypto"]{--cf-edge-start:#057642;--cf-edge-end:#0c2b1f;--cf-line:#1fffb1}.cf-card[data-card-style="vp"]{--cf-edge-start:#94581c;--cf-edge-end:#44290f;--cf-line:#ffcc12;--cf-name-veil:#00000080}.cf-card[data-card-style="solar"]{--cf-edge-start:#a8a800;--cf-edge-end:#3d3d00;--cf-line:#ffff00;--cf-name-veil:#00000080}
 
 /* Edge band, accent stroke and the column the three rows stack in. The band is painted by a
    second background layer on the border box rather than a border colour, so it can carry the
@@ -44,18 +44,27 @@
 .cf-duration{position:absolute;z-index:3;top:calc(14 * var(--cf-u));left:calc(14 * var(--cf-u));display:inline-flex;align-items:center;justify-content:center;gap:calc(2 * var(--cf-u));padding:calc(4 * var(--cf-u));border:0;border-radius:calc(8 * var(--cf-u));color:#fff;background:#0009;box-shadow:0 1px 3px #0000001a,0 1px 2px -1px #0000001a;font:500 calc(14 * var(--cf-u))/1 Inter,system-ui,sans-serif;letter-spacing:.07em;text-shadow:none}
 .cf-duration img{display:block;width:calc(10 * var(--cf-u));height:calc(10 * var(--cf-u));object-fit:contain}
 .cf-duration b{font:inherit}
+.cf-duration[data-duration-period="runtime"] img{width:calc(14.5 * var(--cf-u))}
+.cf-duration[data-duration-period="infinite"] img{width:calc(12 * var(--cf-u));height:calc(12 * var(--cf-u))}
 
 /* 4px of breathing room was added around the numeral, which grows the circle 24 -> 32 and is
    re-centred on where it used to sit so it still breaks the corner the same way. */
 .cf-power.card-power-value{position:absolute;z-index:8;top:calc(-6 * var(--cf-u));right:calc(-8 * var(--cf-u));display:grid;place-items:center;width:calc(32 * var(--cf-u));height:calc(32 * var(--cf-u));margin:0;padding:calc(8 * var(--cf-u));border:calc(2 * var(--cf-u)) solid var(--cf-line);border-radius:99px;color:#fff;background:var(--cf-power-bg,linear-gradient(180deg,var(--cf-edge-start),var(--cf-edge-end)));box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;font:500 calc(14 * var(--cf-u))/1 Inter,system-ui,sans-serif;letter-spacing:.07em;text-shadow:0 1px 2px #000c}
-.cf-power.card-power-value.boosted{border-color:var(--green,#1fffb1);color:#1fffb1;background:linear-gradient(180deg,#0f5c3f,#0c2b22)}
-.cf-power.card-power-value.reduced{border-color:#fa0048;color:#fa0048;background:linear-gradient(180deg,#5c0f22,#2a0810)}
+.cf-power.card-power-value.boosted{border-color:var(--cyan,#27e2ff);color:var(--cyan,#27e2ff);background:linear-gradient(180deg,#0b4a5c,#08222b);box-shadow:0 0 9px #27e2ff77}
+.cf-power.card-power-value.reduced{border-color:var(--pink,#ff0ba1);color:var(--pink,#ff0ba1);background:linear-gradient(180deg,#5c0b40,#2b0820);box-shadow:0 0 9px #ff0ba177}
 .cf-power.card-power-value.power-changing{animation:cf-power-pulse 650ms ease-in-out infinite alternate}
 @keyframes cf-power-pulse{to{transform:scale(1.12)}}
+.cf-bank-effects{position:absolute;z-index:8;top:calc(-6 * var(--cf-u));right:calc(-8 * var(--cf-u));display:inline-flex;align-items:center;justify-content:center;gap:calc(3 * var(--cf-u));min-width:calc(32 * var(--cf-u));height:calc(32 * var(--cf-u));padding:0 calc(7 * var(--cf-u));border:calc(2 * var(--cf-u)) solid var(--cf-line);border-radius:99px;color:#fff;background:var(--cf-power-bg,linear-gradient(180deg,var(--cf-edge-start),var(--cf-edge-end)));box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;font:500 calc(14 * var(--cf-u))/1 Inter,system-ui,sans-serif;letter-spacing:.07em;text-shadow:0 1px 2px #000c}
+.cf-bank-effects img{display:block;width:calc(10 * var(--cf-u));height:calc(10 * var(--cf-u));object-fit:contain}
+.cf-bank-effects[data-duration-period="runtime"] img{width:calc(14.5 * var(--cf-u))}
+.cf-bank-effects[data-duration-period="infinite"] img{width:calc(12 * var(--cf-u));height:calc(12 * var(--cf-u))}
+.cf-bank-effects b{font:inherit}
+.cf-bank-effects[data-effects-left="0"]{color:#ffffffa6;background:#151826;border-color:#ffffff40}
+.cf-bank-effects[data-effects-left="0"] img{opacity:.65}
 
 .cf-cost{position:absolute;z-index:7;top:calc(84 * var(--cf-u));right:calc(-10 * var(--cf-u));left:auto;display:inline-flex;align-items:center;justify-content:center;gap:calc(2 * var(--cf-u));width:calc(44 * var(--cf-u));height:calc(40 * var(--cf-u));padding:calc(8 * var(--cf-u));border:calc(1 * var(--cf-u)) solid #1fffb1;border-radius:calc(8 * var(--cf-u));color:#1fffb1;background:#003246;box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;font:500 calc(20 * var(--cf-u))/1 Inter,system-ui,sans-serif;letter-spacing:.07em;text-shadow:none}
 .cf-cost b{font:inherit}
-.cf-cost img{display:block;width:calc(14 * var(--cf-u));height:calc(16 * var(--cf-u));object-fit:contain;filter:none}
+.cf-cost-icon{display:block;width:calc(14 * var(--cf-u));height:calc(16 * var(--cf-u));background-color:currentColor;mask-size:contain;mask-position:center;mask-repeat:no-repeat;-webkit-mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat}
 
 /* Node and wallet cards are too small for the rules panel, so they keep the art full-bleed and
    hold their badges at readable pixel sizes rather than scaling them into nothing. */
@@ -65,8 +74,14 @@
 .cf-card--compact .cf-title-strip,.cf-card--compact .cf-keywords{display:none}
 .cf-card--compact .cf-duration{top:4px;left:4px;gap:2px;padding:2px;border-radius:4px;font-size:9px;letter-spacing:.3px}
 .cf-card--compact .cf-duration img{width:8px;height:8px}
+.cf-card--compact .cf-duration[data-duration-period="runtime"] img{width:11.5px}
+.cf-card--compact .cf-duration[data-duration-period="infinite"] img{width:10px;height:10px}
 .cf-card--compact .cf-power.card-power-value{top:1px;right:-4px;width:25px;height:25px;padding:2px;border-width:1px;font-size:11px;letter-spacing:.4px}
+.cf-card--compact .cf-bank-effects{top:1px;right:-4px;gap:2px;min-width:25px;height:21px;padding:0 4px;border-width:1px;font-size:11px;letter-spacing:.4px}
+.cf-card--compact .cf-bank-effects img{width:8px;height:8px}
+.cf-card--compact .cf-bank-effects[data-duration-period="runtime"] img{width:11.5px}
+.cf-card--compact .cf-bank-effects[data-duration-period="infinite"] img{width:10px;height:10px}
 .cf-card--compact .cf-cost{top:28px;right:2px;bottom:auto;left:auto;gap:2px;width:auto;min-width:27px;height:19px;padding:2px 3px;border-width:1px;border-radius:4px;font-size:10px;letter-spacing:.3px}
-.cf-card--compact .cf-cost img{width:9px;height:10px}
-@container (max-width:54px){.cf-card--compact .cf-duration{top:auto;bottom:3px;left:3px;font-size:7px}.cf-card--compact .cf-duration img{width:7px;height:7px}.cf-card--compact .cf-power.card-power-value{top:1px;right:-2px;width:18px;height:18px;font-size:8px}}
+.cf-card--compact .cf-cost-icon{width:9px;height:10px}
+@container (max-width:54px){.cf-card--compact .cf-duration{top:auto;bottom:3px;left:3px;font-size:7px}.cf-card--compact .cf-duration img{width:7px;height:7px}.cf-card--compact .cf-power.card-power-value{top:1px;right:-2px;width:18px;height:18px;font-size:8px}.cf-card--compact .cf-bank-effects{right:-2px;min-width:18px;height:16px;padding:0 3px;font-size:8px}.cf-card--compact .cf-bank-effects img{width:7px;height:7px}}
 @media (prefers-reduced-motion:reduce){.cf-card .cf-power.card-power-value.power-changing{animation:none}}

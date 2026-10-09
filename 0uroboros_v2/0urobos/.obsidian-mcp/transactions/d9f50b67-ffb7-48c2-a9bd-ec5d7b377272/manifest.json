@@ -1,0 +1,18 @@
+{
+  "id": "d9f50b67-ffb7-48c2-a9bd-ec5d7b377272",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:38.334Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Zones/Trash.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "e0a0b4fa07a756f930507391ee88429dda0e9fe36e367e764df972c3ffd42106",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "e0a0b4fa07a756f930507391ee88429dda0e9fe36e367e764df972c3ffd42106"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:38.374Z"
+}

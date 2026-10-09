@@ -1,0 +1,147 @@
+{
+  "version": 2,
+  "bootedAt": "2026-10-04T01:10:31.977Z",
+  "mode": "llm",
+  "plan": "Acquire strong draw/Action Base cards early, prioritizing cards like Dash and Slash-Dot for efficiency. Avoid Shyte-Coin; focus on high-value Crypto when beneficial. Transition into Chaos by Cycle 5 to enhance Drain capabilities, utilizing cards like Bloodlet Drone and Rezz-Blade. Aim for a late-game push with VP cards after Cycle 12, leveraging the power from Drain to destroy Servers for VP. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 12.)",
+  "profile": {
+    "version": 2,
+    "plan": "Acquire strong draw/Action Base cards early, prioritizing cards like Dash and Slash-Dot for efficiency. Avoid Shyte-Coin; focus on high-value Crypto when beneficial. Transition into Chaos by Cycle 5 to enhance Drain capabilities, utilizing cards like Bloodlet Drone and Rezz-Blade. Aim for a late-game push with VP cards after Cycle 12, leveraging the power from Drain to destroy Servers for VP. (Schedule: economy through Cycle 5, Chaos from Cycle 6, VP from Cycle 12.)",
+    "economyUntilCycle": 5,
+    "chaosFromCycle": 6,
+    "vpFromCycle": 12,
+    "handCryptoTarget": 9,
+    "minCryptoValue": 2,
+    "minBuyScore": 1,
+    "dilution": 0.5,
+    "weights": {
+      "power": 1,
+      "draw": 1.6,
+      "actions": 1.1,
+      "crypto": 1,
+      "drain": 2,
+      "restore": 1,
+      "vp": 2.2,
+      "duration": 0.8,
+      "thin": 1.2,
+      "disrupt": 0.8,
+      "chaos": 1.5
+    },
+    "cardBias": {
+      "dash": 1,
+      "slash-dot": 1,
+      "bloodlet-drone": 1,
+      "rezz-blade": 1,
+      "kilo-coin": -1,
+      "shyte-coin": -1
+    }
+  },
+  "theories": [
+    {
+      "id": "no-shyte",
+      "text": "Shyte-Coin is not worth a deck slot: it dilutes draws. Bigger Crypto (Kilo, Mega-Cache) or Characters that draw cards are better buys.",
+      "status": "proposed",
+      "confidence": 0.6,
+      "support": 0,
+      "against": 0,
+      "test": "no-shyte",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "economy-first",
+      "text": "Buying a few high-value Crypto cards (cost 6+) by Cycle 5 builds the economy that wins the late game.",
+      "status": "proposed",
+      "confidence": 0.55,
+      "support": 0,
+      "against": 0,
+      "test": "economy-first",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "draw-engine",
+      "text": "Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.",
+      "status": "proposed",
+      "confidence": 0.55,
+      "support": 0,
+      "against": 0,
+      "test": "draw-engine",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "chaos-endgame",
+      "text": "Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +8/+12 VP.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "chaos-endgame",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "early-aggression",
+      "text": "Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).",
+      "status": "proposed",
+      "confidence": 0.4,
+      "support": 0,
+      "against": 0,
+      "test": "early-aggression",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "vp-late",
+      "text": "VP cards are best bought late (Cycle 12+); earlier they clog the hand.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "vp-late",
+      "createdBy": 0,
+      "updatedBy": 2
+    },
+    {
+      "id": "drain-race",
+      "text": "Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.",
+      "status": "proposed",
+      "confidence": 0.6,
+      "support": 0,
+      "against": 0,
+      "test": "drain-race",
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "early-chaos-transition",
+      "text": "Transitioning into Chaos by Cycle 5 is optimal for enhancing Drain and server destruction.",
+      "status": "proposed",
+      "confidence": 0.7,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 1
+    },
+    {
+      "id": "strong-draw-focus",
+      "text": "Focusing on strong draw/Action Base cards in the early game maximizes efficiency and prepares for later cycles.",
+      "status": "proposed",
+      "confidence": 0.8,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 1
+    },
+    {
+      "id": "mid-game-vp-acquisition",
+      "text": "Acquiring VP cards in the mid to late game (Cycle 12+) prevents hand clogging and maximizes scoring potential.",
+      "status": "proposed",
+      "confidence": 0.6,
+      "support": 0,
+      "against": 0,
+      "createdBy": 1,
+      "updatedBy": 1
+    }
+  ]
+}

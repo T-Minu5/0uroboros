@@ -1,0 +1,18 @@
+{
+  "id": "70b748c8-0cba-4946-b1c5-295fe4d9726f",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:56:19.805Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Effects/Flow effects.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "829f5c37ad2c1eb6cdf5677e482971159a329fadb9640decc438bbfbc7e8e31d",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "829f5c37ad2c1eb6cdf5677e482971159a329fadb9640decc438bbfbc7e8e31d"
+    }
+  ],
+  "completedAt": "2026-10-07T04:56:19.847Z"
+}

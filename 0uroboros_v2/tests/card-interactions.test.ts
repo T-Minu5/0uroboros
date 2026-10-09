@@ -31,8 +31,7 @@ const finish = (session: RuntimeSession) => {
 describe('revealed card movement', () => {
   it('moves a chosen own card without changing its identity, order, revelation, duration or modifier; queued reveals still run', () => {
     const session = make();
-    const target = placed(card('target', [], { duration: 2 }), 0, 0, 40);
-    target.powerModifier = 2;
+    const target = placed(card('target', [], { duration: 2, powerDelta: 2 }), 0, 0, 40);
     session.state.nodes[0].cards[0].push(target);
     session.state.players[0].hand = [card('source', [{ kind: 'moveCard' }]), card('later')];
     session.deploy('source', 0); session.deploy('later', 0); session.endTurn(); advance(session);
@@ -42,7 +41,7 @@ describe('revealed card movement', () => {
     const move = session.choose('node-2');
     expect(move).toMatchObject({ kind: 'move', cardId: 'source', targetCardId: 'target', targetOwner: 0, sourceNode: 0, targetNode: 2 });
     expect(session.state.nodes[2].cards[0][0]).toBe(target);
-    expect(target).toMatchObject({ owner: 0, node: 2, order: 40, revealed: true, powerModifier: 2, card: { id: 'target', duration: 2 } });
+    expect(target).toMatchObject({ owner: 0, node: 2, order: 40, revealed: true, card: { id: 'target', duration: 2, powerDelta: 2 } });
     expect(session.state.nodes[2].powers[0]).toBe(5);
     expect(finish(session).some(event => event.kind === 'reveal' && event.cardId === 'later')).toBe(true);
   });
@@ -79,7 +78,7 @@ describe('revealed card movement', () => {
     absent.deploy('source', 0); absent.endTurn();
     const noTarget = advance(absent).find(event => event.kind === 'power');
     expect(noTarget).toMatchObject({ cardId: 'source', targetOwner: 1, amount: 0 });
-    expect(absent.state.nodes[0].cards[1][0].powerModifier).toBeUndefined();
+    expect(absent.state.nodes[0].cards[1][0].card.powerDelta).toBeUndefined();
   });
 
   it('allows an optional move to be skipped without moving any card', () => {
@@ -111,9 +110,9 @@ describe('deployment Power changes', () => {
   it('keeps negative printed Power on the board while buffs still raise it', () => {
     const target = placed(card('cursed', [], { power: -2 }), 1, 0, 1);
     expect(effectiveCardPower(target)).toBe(-2);
-    target.powerModifier = -3;
+    target.card.powerDelta = -3;
     expect(effectiveCardPower(target)).toBe(-2);
-    target.powerModifier = 3;
+    target.card.powerDelta = 3;
     expect(effectiveCardPower(target)).toBe(1);
   });
 
@@ -142,7 +141,7 @@ describe('deployment Power changes', () => {
     expect(definition.power).toBe(2);
   });
 
-  it('adjusts own card Power, supports optional skip, and resets modifiers when a card leaves the board', () => {
+  it('adjusts own card Power, supports optional skip, and keeps the change after the card leaves the board', () => {
     const session = make();
     const target = placed(card('victim', [], { power: 1 }), 0, 0, 1);
     session.state.nodes[0].cards[0].push(target);
@@ -157,12 +156,14 @@ describe('deployment Power changes', () => {
     session.endTurn(); finish(session);
     session.endTurn(); finish(session);
     expect(session.state.nodes.every(node => node.cards[0].length === 0)).toBe(true);
-    expect(session.state.players[0].discard.find(item => item.id === 'victim')).toMatchObject({ power: 1 });
+    expect(session.state.players[0].discard.find(item => item.id === 'victim')).toMatchObject({ power: 1, powerDelta: 2 });
     expect(session.state.players[0].discard.find(item => item.id === 'victim')?.basePower).toBeUndefined();
+    expect(session.view().players[0].discard.find(item => item.id === 'victim')).toMatchObject({ power: 3, basePower: 1 });
     session.endDraft(0); session.nextCycle();
     session.state.players[0].hand = [target.card];
+    expect(session.view().players[0].hand[0]).toMatchObject({ id: 'victim', power: 3, basePower: 1 });
     session.deploy('victim', 0);
-    expect(session.state.nodes[0].cards[0][0].powerModifier).toBeUndefined();
+    expect(session.state.nodes[0].cards[0][0].card.powerDelta).toBe(2);
   });
 
   it('moves stolen Power onto the thief and only as much as the victim actually lost', () => {

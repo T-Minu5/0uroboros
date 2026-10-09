@@ -1,0 +1,18 @@
+{
+  "id": "727be123-a008-4aa7-91f3-6d1635cda38a",
+  "state": "committed",
+  "createdAt": "2026-10-07T04:55:01.224Z",
+  "snapshots": [
+    {
+      "path": "Ontology/Cards/Character.md",
+      "operation": "write",
+      "entryType": "file",
+      "phase": "applied",
+      "plannedEtag": "ba77fc2810cf12f56de5b4f0268d99eb2963e5cc243b489380efce90c602cefa",
+      "recoverable": true,
+      "existed": false,
+      "committedEtag": "ba77fc2810cf12f56de5b4f0268d99eb2963e5cc243b489380efce90c602cefa"
+    }
+  ],
+  "completedAt": "2026-10-07T04:55:01.277Z"
+}

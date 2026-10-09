@@ -5,10 +5,11 @@ import * as THREE from 'three';
 import type { Card } from './game';
 import { CardFace, type CardFaceProps } from './CardFace';
 import './board-ritual.css';
+import './neon-node.css';
 import { CARD_ART_PLACEHOLDER, CARD_BACK, cardArtworkPath } from './cardArtwork';
 import { servedArtPath } from './depthArt/depthManifest';
 import { PLACEMENT_CLIP_DELAY_MS, PLACEMENT_CLIP_RATE, cardEffectVideo, effectVideoOnPlacement } from './cardVideos';
-import { LOCATION_TRIGGERS, splitLocationTriggers } from './locationTriggers';
+import { LocationText } from './LocationText';
 import { boardMaterial, boardDepth, isBoardDepth, boardWashUniforms, boardSideHealth, DAMAGED_LIGHT, inlayMaterial, neonIntensity, PERIMETER_DIM, sideLightScale, WINNER_FILL } from './boardMaterials';
 import { PlayerColorsProvider, usePlayerColors, type ResolvedColorTheme } from './playerTheme';
 import { BoardStage, BoardFinish, BoardSideEdges, useBoardScanPass } from './BoardAtmosphere';
@@ -22,16 +23,20 @@ import { DEFAULT_LANE_PATTERN, type LanePattern } from './lanePatterns';
 import { DEFAULT_SERVER_STYLE, type ServerStyle } from './serverStyles';
 import type { PerPlayer } from './playerSettings';
 import { BoardStyleProvider, useBoardStyle, type BoardStyle } from './boardStyles';
-import { NeonLane } from './NeonBoard';
+import { NEON_LANE_BASE_Y, NeonLane, NeonLaneBed } from './NeonBoard';
 import { NeonTable } from './NeonTable';
+import { BlackHoleHud } from './BlackHoleHud';
 import type { NeonSurface } from './neonSurfaces';
 import { DEFAULT_REAL_LIGHTING, NeonRigContext, type RealLightingSettings } from './realLighting';
 import type { LightingMode } from './boardBackgrounds';
 import { NeonLightRig } from './NeonLightRig';
-import { isNeonNodeBridge, keepNeonHardware } from './neonModelFilter';
+import { keepNeonHardware } from './neonModelFilter';
+import { NODE_POWER_ANCHOR, nodeHousingGeometries, nodePointGeometry, nodeWindow, type NodeHousingPart } from './neonNodeHousing';
 import { NEAR_SLOPE, offsetOutline, slabGeometry, type TablePath } from './neonTableGeometry';
 import { neonLaneDimensions, neonLaneShape } from './neonGeometry';
 import { BoardDiagnostics } from './BoardDiagnostics';
+import type { TransferView } from './transferDrag';
+import { formatAmount } from './transferText';
 import { neonTrimShading, useNeonTrimClock } from './neonTubeShading';
 import { Singularity, SingularityContext, useSingularityPass, useSingularityField, singularityTransform, type SingularityField } from './Singularity';
 import { AUTHORED_NODE_X, AUTHORED_SERVER, SERVER_SHIFT, FAR_SHIFT, LANE_MARK_DX, LANE_MARK_HALF, LANE_MARK_Z, LANE_RIM, LANE_RIM_HX, LANE_RIM_RADIUS, LANE_SCALE, NEON_FAR_RAISE, NEON_FIELD_SHIFT, NEON_STATS_DROP, NODE_GROW, NODE_X, boardZ, warpFarZ, warpX } from './boardLayout';
@@ -45,6 +50,8 @@ export type BoardProps = {
  cycle?:number;
  /** Collapses the board into the end-of-session singularity. */
  gameover?:boolean;
+ /** Once the final scores have tallied, the HUD inside the singularity turns to follow the cursor. */
+ hudFollow?:boolean;
  /** Session winner, whose colour tints the singularity's glow; null for a tie. */
  winner?:0|1|null;
  boardScan?:boolean;
@@ -73,6 +80,8 @@ export type BoardProps = {
  onFieldDrag?:(event:ReactPointerEvent<HTMLButtonElement>,card:Card)=>void;
  /** Nodes a pending choice lets the player pick; they pulse until one is chosen. */
  choiceNodes?:number[]; chooseNode?:(node:number)=>void;
+ /** A pending Power transfer, dragged between these Nodes' columns and plates. */
+ transfer?:TransferView|null;
 };
 /** CSS px of the canvas that run up behind the header (its height), so the board shows through the header's cut-out. */
 const HEADER_OVERLAP=66;
@@ -84,7 +93,9 @@ export const BOARD_DROP=16/56.5;
 /** Board zoom for the part of the canvas below the header. */
 const fitZoom=(size:{width:number;height:number})=>Math.min(size.width/22.7,(size.height-HEADER_OVERLAP)/14);
 /** Frames the board in the canvas below the header, exactly where it would sit if the canvas stopped there. */
-function CameraFit(){const {camera,size}=useThree();useEffect(()=>{if(camera instanceof THREE.OrthographicCamera){const height=size.height-HEADER_OVERLAP;camera.zoom=fitZoom(size);camera.position.set(0,18,13.8);const shift=new THREE.Vector3(0,-13.1,18).normalize().multiplyScalar(Math.min(60,height*.07)/camera.zoom);camera.position.add(shift);camera.lookAt(shift.x,shift.y,shift.z+.7);camera.position.add(new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion).multiplyScalar(HEADER_OVERLAP/2/camera.zoom));camera.position.z-=BOARD_DROP;camera.updateProjectionMatrix();}},[camera,size]);return null;}
+function CameraFit(){const {camera,size}=useThree();const {width,height:fullHeight}=size;useEffect(()=>{if(camera instanceof THREE.OrthographicCamera){const height=fullHeight-HEADER_OVERLAP;camera.zoom=fitZoom({width,height:fullHeight});camera.position.set(0,18,13.8);const shift=new THREE.Vector3(0,-13.1,18).normalize().multiplyScalar(Math.min(60,height*.07)/camera.zoom);camera.position.add(shift);camera.lookAt(shift.x,shift.y,shift.z+.7);camera.position.add(new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion).multiplyScalar(HEADER_OVERLAP/2/camera.zoom));camera.position.z-=BOARD_DROP;camera.updateProjectionMatrix();
+  // lookAt left the view matrix at the pose before the final shifts; anything projecting before the next render would read it.
+  camera.updateMatrixWorld();}},[camera,width,fullHeight]);return null;}
 /**
  * Authored `*_duration_*` bay rims (mirrored at ±z0..±z1), lifted out of their side accent batch so each
  * one can carry its owner's Effect Bank inlay.
@@ -126,6 +137,8 @@ function nearHousingGeometry(){
  const outline:TablePath=[[-x+cut,z0],[x-cut,z0],[x,z0+dz],[x,z1-dz],[x-cut,z1],[-x+cut,z1],[-x,z1-dz],[-x,z0+dz]];
  return slabGeometry(offsetOutline(outline,-bevel),y1-y0-bevel*2,bevel,30).translate(0,y0+bevel,0);
 }
+/** Neon Node housings: the near-black bezel and vents, in the housing's graphite. */
+const NODE_BEZEL='#0b0d12';
 function Table(){
  const boardStyle=useBoardStyle();
  useNeonTrimClock();
@@ -134,9 +147,9 @@ function Table(){
  const colors=usePlayerColors();
  const bankMaterials=useMemo(()=>[0,1].map(owner=>inlayMaterial(BANK_BAYS.x0,BANK_BAYS.x1,colors[owner].inlay)),[colors]);
  useEffect(()=>()=>bankMaterials.forEach(material=>material.dispose()),[bankMaterials]);
- const {tuned,bankInlays,housing}=useMemo(()=>{
+ const {tuned,bankInlays,housing,nodeHousing}=useMemo(()=>{
   const inlay=[0,1].map(()=>({positions:[] as number[],normals:[] as number[]}));
-  let housingMaterial:THREE.Material|undefined;
+  let housingMaterial:THREE.MeshStandardMaterial|undefined, gunmetalMaterial:THREE.Material|undefined, screenMaterial:THREE.Material|undefined;
   const clone=scene.clone(true);
   clone.traverse(object=>{
    if(!(object instanceof THREE.Mesh))return;
@@ -189,7 +202,7 @@ function Table(){
     const bedFar=points[0].z<0;
     const nearBar=gunmetal&&points.every(v=>v.y<.23&&Math.abs(boardDepth(v.z)-AUTHORED_NEAR_BAR_Z)<.04&&AUTHORED_NODE_X.some(x=>Math.abs(Math.abs(v.x-x)-AUTHORED_LANE_MARK_DX)<.12));
     const farPeripheral=fixedPeripheral&&points[0].z<0;
-    const fieldShift=boardStyle!=='neon'?0:isNeonNodeBridge(points)?NEON_FIELD_SHIFT:points.every(inNearHousing)?NEON_STATS_DROP:points.every(inFarHousing)?-NEON_FAR_RAISE:0;
+    const fieldShift=boardStyle!=='neon'?0:points.every(inNearHousing)?NEON_STATS_DROP:points.every(inFarHousing)?-NEON_FAR_RAISE:0;
     points.forEach(v=>{v.x=warpX(v.x,v.z);if(!fixedPeripheral)v.z=boardZ(v.x,v.z);if(nearBank)v.z+=NEAR_BANK_DROP;if(farPeripheral){v.add(FAR_BANK_RAISE);v.z-=FAR_BANK_LIFT;}if(bedX!==undefined){v.x+=Math.sign(bedX)*SERVER_SHIFT.x;v.z+=bedFar?SERVER_SHIFT.far:SERVER_SHIFT.near;}v.z+=fieldShift;});
     if(trim)sides.push(points[0].z+points[1].z+points[2].z<0?1:0);
     points.forEach((v,k)=>{if(nearBar)v.z+=LANE_MARK_Z[0][0]-AUTHORED_NEAR_BAR_Z;v.applyMatrix4(inverse);kept.push(v.x,v.y,v.z);if(normal)normals.push(normal.getX(i+k),normal.getY(i+k),normal.getZ(i+k));if(uv)uvs.push(uv.getX(i+k),uv.getY(i+k));});
@@ -202,7 +215,11 @@ function Table(){
    object.castShadow=true; object.receiveShadow=true;
    const adjust=(original:THREE.Material)=>boardMaterial(original,surface,boardStyle);
    object.material=Array.isArray(object.material)?object.material.map(adjust):adjust(object.material);
-   if(boardStyle==='neon'&&graphite)housingMaterial??=(Array.isArray(object.material)?object.material:[object.material]).find(m=>m.name.includes('graphite titanium'));
+   if(boardStyle==='neon')for(const m of Array.isArray(object.material)?object.material:[object.material]){
+    if(m.name.includes('graphite titanium')&&m instanceof THREE.MeshStandardMaterial)housingMaterial??=m;
+    else if(m.name.includes('milled gunmetal'))gunmetalMaterial??=m;
+    else if(m.name.includes('Location smoked violet'))screenMaterial??=m;
+   }
    if(trim&&object.material instanceof THREE.MeshStandardMaterial){
     const near=sides.filter(side=>side===0).length*3;
     clean.addGroup(0,near,0);clean.addGroup(near,sides.length*3-near,1);
@@ -221,9 +238,15 @@ function Table(){
    return geometry;
   });
   const housing=housingMaterial?{geometry:nearHousingGeometry(),material:housingMaterial}:null;
-  return {tuned:clone,bankInlays,housing};
+  let nodeHousing:{part:NodeHousingPart;geometry:THREE.BufferGeometry;material:THREE.Material}[]=[];
+  if(housingMaterial&&gunmetalMaterial&&screenMaterial){
+   const bezel=housingMaterial.clone();bezel.color.set(NODE_BEZEL);bezel.onBeforeCompile=housingMaterial.onBeforeCompile;
+   const materials:Record<NodeHousingPart,THREE.Material>={body:housingMaterial,playerHull:gunmetalMaterial,bezel,window:screenMaterial};
+   nodeHousing=Object.entries(nodeHousingGeometries()).map(([part,geometry])=>({part:part as NodeHousingPart,geometry,material:materials[part as NodeHousingPart]}));
+  }
+  return {tuned:clone,bankInlays,housing,nodeHousing};
  },[scene,surface,boardStyle]);
- useEffect(()=>()=>{bankInlays.forEach(geometry=>geometry.dispose());housing?.geometry.dispose();tuned.traverse(object=>{if(object instanceof THREE.Mesh){object.geometry.dispose();(Array.isArray(object.material)?object.material:[object.material]).forEach(material=>material.dispose());}});},[tuned,bankInlays,housing]);
+ useEffect(()=>()=>{bankInlays.forEach(geometry=>geometry.dispose());housing?.geometry.dispose();nodeHousing.forEach(({part,geometry,material})=>{geometry.dispose();if(part==='bezel')material.dispose();});tuned.traverse(object=>{if(object instanceof THREE.Mesh){object.geometry.dispose();(Array.isArray(object.material)?object.material:[object.material]).forEach(material=>material.dispose());}});},[tuned,bankInlays,housing]);
  // Classic keeps the authored orange and violet trim; a chosen colour retints that owner's half of both batches.
  // Retinting in place keeps a theme change off the scene-clone path, which is far too costly to repeat.
  useEffect(()=>{
@@ -247,7 +270,7 @@ function Table(){
    }
   });
  },[tuned,colors]);
- return <><primitive object={tuned}/>{housing&&<mesh geometry={housing.geometry} material={housing.material} castShadow receiveShadow/>}{bankInlays.map((geometry,owner)=><mesh key={owner} geometry={geometry} material={bankMaterials[owner]}/>)}</>;
+ return <><primitive object={tuned}/>{housing&&<mesh geometry={housing.geometry} material={housing.material} castShadow receiveShadow/>}<group position-z={NEON_FIELD_SHIFT}>{nodeHousing.map(({part,geometry,material})=><mesh key={part} geometry={geometry} material={material} castShadow={part!=='window'} receiveShadow/>)}</group>{bankInlays.map((geometry,owner)=><mesh key={owner} geometry={geometry} material={bankMaterials[owner]}/>)}</>;
 }
 
 /**
@@ -280,6 +303,7 @@ function NodeShutters({x,open,closed}:{x:number;open:boolean;closed:boolean}){
  const boardStyle=useBoardStyle();
  const doors=useRef<THREE.Group>(null);const progress=useRef(open?1:0);
  const reduced=useMemo(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,[]);
+ const door=boardStyle==='neon'?NEON_DOOR:CLASSIC_DOOR;
  useFrame((_,delta)=>{
   const target=open?1:0;
   progress.current=reduced?target:THREE.MathUtils.damp(progress.current,target,5,Math.min(delta,.05));
@@ -287,16 +311,20 @@ function NodeShutters({x,open,closed}:{x:number;open:boolean;closed:boolean}){
   doors.current.visible=progress.current<.995;
   doors.current.children.forEach((child,i)=>{
    const sign=i===0?-1:1;
-   child.position.x=sign*(.57+progress.current*1.1)*LANE_SCALE;
+   child.position.x=sign*(door.x+progress.current*1.1*LANE_SCALE);
    child.position.y=.5+Math.sin(progress.current*Math.PI)*.28;
    child.scale.x=1-progress.current*.95;
   });
  });
  return <group position={[x,0,0]}>
   {boardStyle==='classic'&&!open&&!closed&&[0,1].map(side=><mesh key={side} geometry={LANE_FACE_GEOMETRY[side]} position={[0,LANE_SEAL_Y,(LANE_FIT[side].z0+LANE_FIT[side].z1)/2]} rotation={[-Math.PI/2,0,0]} receiveShadow><meshStandardMaterial color='#0a0e16' metalness={.72} roughness={.38} emissive='#1a0a22' emissiveIntensity={0.18}/></mesh>)}
-  <group ref={doors} position={[0,0,PLATE_Z]}>{[-1,1].map(sign=><group key={sign} position={[sign*.57*LANE_SCALE,.5,0]}><RoundedBox args={[1.13*LANE_SCALE,.16,1.26+NODE_GROW]} radius={.075} smoothness={3} castShadow receiveShadow><meshStandardMaterial color='#303c50' metalness={.85} roughness={.32}/></RoundedBox><mesh position={[sign*.44*LANE_SCALE,.085,0]}><boxGeometry args={[.018,.02,.82+NODE_GROW]}/><meshStandardMaterial color='#7c8aa3' metalness={.8} roughness={.25}/></mesh></group>)}</group>
+  <group ref={doors} position={[0,0,door.z]}>{[-1,1].map(sign=><group key={sign} position={[sign*door.x,.5,0]}><RoundedBox args={[door.width,.16,door.depth]} radius={.075} smoothness={3} castShadow receiveShadow><meshStandardMaterial color='#303c50' metalness={.85} roughness={.32}/></RoundedBox><mesh position={[sign*.44*LANE_SCALE,.085,0]}><boxGeometry args={[.018,.02,door.depth-.44]}/><meshStandardMaterial color='#7c8aa3' metalness={.8} roughness={.25}/></mesh></group>)}</group>
  </group>;
 }
+/** Shutter doors, closed: each door's width, centre x and depth, and the pair's centre z. */
+const CLASSIC_DOOR={width:1.13*LANE_SCALE,x:.57*LANE_SCALE,depth:1.26+NODE_GROW,z:-NODE_GROW/2};
+/** Neon: the doors close over the housing's window, read at their top face (y .58). */
+const NEON_DOOR=(()=>{const {halfX,depth,z}=nodeWindow(.58);return {width:halfX,x:halfX/2,depth,z};})();
 /**
  * Compiles, while the setup card is up, the programs for pieces that first draw mid-session: hidden lane seal plates
  * and markers, and the Node seals. A first compile mid-Collapse stalls the frame. A plain render target is bound so
@@ -352,6 +380,8 @@ function Anchor({position,children,mapDepth=true}:{position:[number,number,numbe
 const NEON_HIDE_LANES=(import.meta as ImportMeta&{env?:{DEV?:boolean}}).env?.DEV===true&&new URLSearchParams(window.location.search).get('neonNoLanes')==='1';
 /** Centre of the Node housing, which grows only away from the player; the plate's near edge stays put. */
 const PLATE_Z=-NODE_GROW/2;
+/** Neon: the Location plate sits on the housing's window. */
+const NEON_PLATE_Z=nodeWindow(.76).z;
 function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
  const neon=p.boardStyle==='neon';
  const x=NODE_X[index],closed=p.closedNodes.includes(index),open=p.openNodes.includes(index)&&!closed;
@@ -364,6 +394,10 @@ function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
  const winnerSide:0|1|'tie'=tied?'tie':node.powers[0]>node.powers[1]?0:1;
  const unresolved=!node.title||node.title==='Location pending';
  const choosable=open&&!!p.chooseNode&&!!p.choiceNodes?.includes(index);
+ const transfer=p.transfer&&!closed&&p.transfer.nodes.includes(index)?p.transfer:null;
+ const transferState=!transfer?'':transfer.over===index?'is-over':transfer.from===index?'is-origin':transfer.from!==null?(transfer.targets.includes(index)?'is-target':''):transfer.sources.includes(index)?'is-source':'';
+ const transferDelta=transfer?.delta[index]??0;
+ const transferHandle=transfer?{'data-transfer-node':index,onPointerDown:(event:ReactPointerEvent<HTMLElement>)=>transfer.begin(event,index)}:{};
  const wasOpen=useRef(open);const [opening,setOpening]=useState(false);
  useEffect(()=>{
   let timeout:ReturnType<typeof setTimeout>|undefined;
@@ -373,7 +407,8 @@ function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
  },[open]);
  const laneLit=(side:number)=>{
   if(closed)return 0;
-  if(choosable)return 3;
+  if(choosable||transferState==='is-source'||transferState==='is-target')return 3;
+  if(transferState==='is-over')return 2;
   if(side===0&&accepted)return 2;
   const winning=node.powers[side]>node.powers[side===0?1:0];
   return !p.dragged&&(winning||(scanning&&tied))?1:0;
@@ -381,10 +416,12 @@ function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
  const lit:[LaneLit,LaneLit]=[laneLit(0) as LaneLit,laneLit(1) as LaneLit];
  return <group>
   <NodeShutters x={x} open={open} closed={closed}/>
-  <PowerSocket x={x} side={0} winning={node.powers[0]>node.powers[1]}/><PowerSocket x={x} side={1} winning={node.powers[1]>node.powers[0]}/>
+  {[0,1].map(side=>{const winning=node.powers[side]>node.powers[1-side];return neon?<NeonNodePoint key={side} x={x} side={side} winning={winning}/>:<PowerSocket key={side} x={x} side={side} winning={winning}/>;})}
   <NodeLight x={x} lit={lit}/>
   <Anchor position={[x,.24,COLUMN_DROP_Z]} mapDepth={false}>
-   {choosable
+   {transfer
+    ?<button type='button' tabIndex={-1} className={`lane-drop-target transfer-target ${transferState}`} data-lane-drop={index} style={{height:COLUMN_DROP_PX}} aria-label={`Node ${index+1}: drag power${transfer.sources.includes(index)?' from here':' here'}`} {...transferHandle}/>
+    :choosable
     ?<button type='button' className='lane-drop-target node-choice-target' data-lane-drop={index} data-node-choice={index} style={{height:COLUMN_DROP_PX}} aria-label={`Select Node ${index+1}${unresolved?'':`: ${node.title}`}`} onClick={()=>p.chooseNode?.(index)}/>
     :<div className={`lane-drop-target ${open?'':'sealed'} ${hovered?(accepted?'lane-hovered':'lane-rejected'):''}`} data-lane-drop={index} style={{height:COLUMN_DROP_PX}} aria-hidden='true'/>}
   </Anchor>
@@ -404,28 +441,27 @@ function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
       </button>)}
      </div>
     </Anchor>
-    <Anchor position={[x,side===1?.735:.49,side===1?-.98:.98]}>
-     <div className={`power-badge ${side===0?'local':'opponent'} ${winning?'winning':tied?'tied':'trailing'} ${sourceActive&&!awarding?'score-active':''}`} aria-label={`${side===0?'Your':'Opponent'} Node ${index+1} Power ${node.powers[side]}, ${tied?'tied':winning?'leading':'trailing'}${p.priority===side?', priority':''}`}>
-      <b key={node.powers[side]}>{node.powers[side]}</b>
+    <Anchor position={neon?[x,NODE_POWER_ANCHOR[side].y,NODE_POWER_ANCHOR[side].z]:[x,side===1?.735:.49,side===1?-.98:.98]} mapDepth={!neon}>
+     <div className={`power-badge ${side===0?'local':'opponent'} ${winning?'winning':tied?'tied':'trailing'} ${sourceActive&&!awarding?'score-active':''} ${side===0&&transferDelta?(transferDelta>0?'transfer-gain':'transfer-loss'):''}`} aria-label={`${side===0?'Your':'Opponent'} Node ${index+1} Power ${node.powers[side]}, ${tied?'tied':winning?'leading':'trailing'}${p.priority===side?', priority':''}`}>
+      <b key={node.powers[side]}>{formatAmount(node.powers[side]+(side===0?transferDelta:0))}</b>
      </div>
     </Anchor>
    </group>;
   })}
-  <Anchor position={[x,.76,PLATE_Z]} mapDepth={false}>
-   {open?<button type='button' data-location-node={index} className={`location-plate ${active&&!awarding?'active':''} ${selecting?'selection-focus':''} ${accepted?'drop-highlight':''} ${opening?'location-opening':''} ${unresolved?'unassigned':''} ${choosable?'node-choice':''}`} onClick={()=>choosable?p.chooseNode?.(index):p.onLocationInspect?.(index)} aria-label={`${choosable?'Select':'Inspect'} Node ${index+1}${unresolved?'':`: ${node.title}`}`} disabled={!choosable&&!p.onLocationInspect}>
+  <Anchor position={[x,.76,neon?NEON_PLATE_Z:PLATE_Z]} mapDepth={false}>
+   {open?<button type='button' data-location-node={index} className={`location-plate ${active&&!awarding?'active':''} ${selecting?'selection-focus':''} ${accepted?'drop-highlight':''} ${opening?'location-opening':''} ${unresolved?'unassigned':''} ${choosable?'node-choice':''} ${transferState?`transfer-plate ${transferState}`:''}`} {...transferHandle} onClick={()=>transfer?undefined:choosable?p.chooseNode?.(index):p.onLocationInspect?.(index)} aria-label={`${choosable?'Select':'Inspect'} Node ${index+1}${unresolved?'':`: ${node.title}`}`} disabled={!choosable&&!transfer&&!p.onLocationInspect}>
     <small>N{index+1}</small>
     <PlateTitle text={unresolved?'Open circuit':node.title}/>
-    {!unresolved&&node.reward?<span className='location-reward'><TriggerText text={node.reward}/></span>:<span className='location-rule'>{unresolved?'Location source required':<TriggerText text={node.text}/>}</span>}
-   </button>:closed?<span className='node-closed-marker' data-location-node={index} data-node-sealed={index} data-node-closed={index} aria-label={`Node ${index+1} resolved`}/>:<div className={`sealed-location ${selecting?'selection-focus':''}`} data-location-node={index} data-node-sealed={index} aria-label={`Node ${index+1} sealed. Location unrevealed.`}><b>N{index+1}</b></div>}
+    {!unresolved&&node.reward?<span className='location-reward'><LocationText text={node.reward}/></span>:<span className='location-rule'>{unresolved?'Location source required':<LocationText text={node.text}/>}</span>}
+   </button>:closed?<span className='node-closed-marker' data-location-node={index} data-node-sealed={index} data-node-closed={index} aria-label={`Node ${index+1} resolved`}/>:<div className={`sealed-location ${selecting?'selection-focus':''} ${transferState?`transfer-plate ${transferState}`:''}`} data-location-node={index} data-node-sealed={index} aria-label={`Node ${index+1} sealed. Location unrevealed.`} {...transferHandle}><b>N{index+1}</b></div>}
   </Anchor>
-  {closed&&<NodeSealOrigami x={x} z={PLATE_Z} nodeIndex={index} cycle={p.cycle??1} winner={winnerSide}/>}
+  {closed&&<NodeSealOrigami x={x} z={neon?NEON_PLATE_Z:PLATE_Z} nodeIndex={index} cycle={p.cycle??1} winner={winnerSide}/>}
   <LaneRewardGlow x={x} index={index} awarding={awarding} closed={closed} reward={node.reward} winnerSide={winnerSide}/>
 
  </group>;
 }
 const SOCKET_HALF_W=.46, SOCKET_BEVEL=.025;
 function PowerSocket({x,side,winning}:{x:number;side:number;winning:boolean}){
- const neon=useBoardStyle()==='neon';
  const geometry=useMemo(()=>{const shape=new THREE.Shape();shape.moveTo(-SOCKET_HALF_W,0);shape.lineTo(0,side===0?.39:.3);shape.lineTo(SOCKET_HALF_W,0);shape.lineTo(0,side===0?-.39:-.3);shape.closePath();return new THREE.ExtrudeGeometry(shape,{depth:.075,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:SOCKET_BEVEL,bevelThickness:.025});},[side]);
  const chevron=useMemo(()=>{
   // Primary: tip toward screen bottom. Secondary: tip toward screen top (opponent).
@@ -451,21 +487,34 @@ function PowerSocket({x,side,winning}:{x:number;side:number;winning:boolean}){
  return <group position={[x,side===0?.38:.62,side===0?.98:warpFarZ(-.98)]} rotation={[-Math.PI/2,0,0]}>
   <mesh position={[0,side===0?.36:-.30,-.035]} castShadow><boxGeometry args={[.26,.40,.085]}/><meshStandardMaterial color='#314253' metalness={.88} roughness={.24}/></mesh>
   {/* The local NodeLight hangs just above this socket, so a glossy top mirrors it as a second hot spot inside the chevron's V. */}
-  <mesh geometry={geometry} castShadow><meshPhysicalMaterial color='#263a4b' metalness={neon?.38:.85} roughness={neon?.65:side===0?.7:.24} clearcoat={neon?0:side===0?0:.5}/></mesh>
-  <mesh geometry={geometry} position={[0,0,.081]} scale={[.82,.82,.1]}>{neon?<meshBasicMaterial color='#07101a'/>:<meshStandardMaterial color='#050813' roughness={.23} metalness={.65} emissive={shadow} emissiveIntensity={0.35}/>}</mesh>
+  <mesh geometry={geometry} castShadow><meshPhysicalMaterial color='#263a4b' metalness={.85} roughness={side===0?.7:.24} clearcoat={side===0?0:.5}/></mesh>
+  <mesh geometry={geometry} position={[0,0,.081]} scale={[.82,.82,.1]}><meshStandardMaterial color='#050813' roughness={.23} metalness={.65} emissive={shadow} emissiveIntensity={0.35}/></mesh>
   <mesh geometry={chevron} position={[0,0,.092]} castShadow>
-   <meshStandardMaterial color={winning?accent:'#4a5564'} metalness={neon?.15:.55} roughness={neon?.6:.28} emissive={winning?accent:'#000000'} emissiveIntensity={winning?neonIntensity(accent,neon?.8:1.4):0}/>
+   <meshStandardMaterial color={winning?accent:'#4a5564'} metalness={.55} roughness={.28} emissive={winning?accent:'#000000'} emissiveIntensity={winning?neonIntensity(accent,1.4):0}/>
   </mesh>
  </group>;
+}
+/** Neon: the diamond point capping each Node hull's peak, white until its side leads. */
+const NODE_POINT_IDLE='#cfd5de';
+function NeonNodePoint({x,side,winning}:{x:number;side:number;winning:boolean}){
+ const geometry=useMemo(()=>nodePointGeometry(side),[side]);
+ useEffect(()=>()=>geometry.dispose(),[geometry]);
+ const {accent}=usePlayerColors()[side];
+ return <mesh geometry={geometry} position-x={x}>
+  <meshStandardMaterial color={winning?accent:NODE_POINT_IDLE} metalness={.15} roughness={.6} emissive={winning?accent:'#000000'} emissiveIntensity={winning?neonIntensity(accent,.8):0}/>
+ </mesh>;
 }
 const _sealEdge=new THREE.Vector3();
 /** Between the engraving panel (y .226) and the reward sweep (y .232). */
 const SINK_Y=.228;
+/** Neon: the replacement lane rides this far above the old one so it covers it; plate and bed keep their spacing. */
+const NEON_SEAL_LIFT=.008;
 /**
  * Lane seal on Node close: a fitted metal plate slides out from the Node over the lane while the
  * placed cards shrink as a group. The cards are DOM, so the plate's projected leading edge clips them.
  * A dark layer on the pattern's footprint darkens under the cards until the plate covers it, so they sink into the lane;
- * on Neon the cards darken with it.
+ * on Neon the cards darken with it. On Neon the plate rides on its own glass bed, so a whole closed lane slides in
+ * over the old one and settles in its place.
  */
 function LaneTurnover({x,index,side,turning}:{x:number;index:number;side:number;turning:boolean}){
  const boardStyle=useBoardStyle();
@@ -479,14 +528,16 @@ function LaneTurnover({x,index,side,turning}:{x:number;index:number;side:number;
  const neonDimensions=neonLaneDimensions(side);
  useEffect(()=>()=>sinkMaterial.dispose(),[sinkMaterial]);
  const reduced=useMemo(()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,[]);
- const {z0,z1}=LANE_FIT[side], length=z1-z0, centre=(z0+z1)/2, dir=side===0?1:-1, powerZ=side===0?z0:z1;
+ const {z0,z1}=LANE_FIT[side], length=z1-z0, dir=side===0?1:-1, powerZ=side===0?z0:z1;
+ // Neon's replacement lane settles exactly on the lane it replaces.
+ const restZ=neonCover?neonDimensions.z:(z0+z1)/2, lift=neonCover?NEON_SEAL_LIFT:0;
  // Clip planes and the projected plate edge are in world space; on Neon the node regions sit NEON_FIELD_SHIFT further out.
  const shift=boardStyle==='neon'?NEON_FIELD_SHIFT:0;
+ const powerClips=useMemo(()=>[new THREE.Plane(new THREE.Vector3(0,0,dir),-dir*(powerZ+shift))],[dir,powerZ,shift]);
  const material=useMemo(()=>{
-  const clip=new THREE.Plane(new THREE.Vector3(0,0,dir),-dir*(powerZ+shift));
   const metal=laneMetalTexture();
-  return new THREE.MeshPhysicalMaterial({color:boardStyle==='neon'?'#081923':'#0a0f19',metalness:boardStyle==='neon'?.18:.92,roughness:.34,roughnessMap:metal,bumpMap:metal,bumpScale:boardStyle==='neon'?.025:.35,clearcoat:.55,clearcoatRoughness:.22,envMapIntensity:boardStyle==='neon'?.35:1.25,clippingPlanes:[clip]});
- },[dir,powerZ,shift,boardStyle]);
+  return new THREE.MeshPhysicalMaterial({color:boardStyle==='neon'?'#081923':'#0a0f19',metalness:boardStyle==='neon'?.18:.92,roughness:.34,roughnessMap:metal,bumpMap:metal,bumpScale:boardStyle==='neon'?.025:.35,clearcoat:.55,clearcoatRoughness:.22,envMapIntensity:boardStyle==='neon'?.35:1.25,clippingPlanes:powerClips});
+ },[powerClips,boardStyle]);
  useEffect(()=>{gl.localClippingEnabled=true;},[gl]);
  useEffect(()=>()=>material.dispose(),[material]);
  const seal=useRef({turning,start:turning?-Infinity:0,done:false,mounted:false});
@@ -504,7 +555,7 @@ function LaneTurnover({x,index,side,turning}:{x:number;index:number;side:number;
   const t=reduced?Infinity:performance.now()/1000-s.start;
   const {slide,scale}=laneSealProgress(t);
   g.visible=slide>.001;
-  g.position.z=centre-dir*(1-slide)*length;
+  g.position.z=restZ-dir*(1-slide)*length;
   const overlay=laneSinkOverlay(side,t,boardStyle==='neon');
   m.visible=!overlay.covered&&overlay.opacity>0;
   sinkClip.constant=-dir*(overlay.clipZ+shift);
@@ -526,8 +577,9 @@ function LaneTurnover({x,index,side,turning}:{x:number;index:number;side:number;
   <mesh ref={sink} position={[x,SINK_Y,neonCover?neonDimensions.z:PATTERN_LANES[side].z]} rotation={[-Math.PI/2,0,0]} material={sinkMaterial} visible={false} renderOrder={2.5}>
    {neonCover?<primitive object={neonCover} attach='geometry'/>:<planeGeometry args={[PATTERN_W,PATTERN_LANES[side].d]}/>}
   </mesh>
-  <group ref={group} position={[x,LANE_SEAL_Y,centre]} visible={false}>
-   <mesh geometry={neonCover??LANE_COVER_GEOMETRY[side]} material={material} rotation={[-Math.PI/2,0,0]} receiveShadow/>
+  <group ref={group} position={[x,0,restZ]} visible={false}>
+   {neonCover&&<NeonLaneBed side={side} position={[0,NEON_LANE_BASE_Y+lift,0]} clippingPlanes={powerClips}/>}
+   <mesh geometry={neonCover??LANE_COVER_GEOMETRY[side]} material={material} position={[0,LANE_SEAL_Y+lift,0]} rotation={[-Math.PI/2,0,0]} receiveShadow/>
   </group>
  </>;
 }
@@ -860,6 +912,7 @@ function BoardEffects({
   boardScanTone,
   boardScanDuration,
   gameover,
+  hudFollow,
   glowTint,
   scanning,
   onScanning,
@@ -872,6 +925,7 @@ function BoardEffects({
   boardScanTone?:BoardScanTone;
   boardScanDuration?:number;
   gameover?:boolean;
+  hudFollow?:boolean;
   glowTint?:string;
   scanning:boolean;
   onScanning:(scanning:boolean)=>void;
@@ -885,6 +939,7 @@ function BoardEffects({
  return <>
   <NeonHorizonScan active={!!boardScan} tone={boardScanTone} duration={(boardScanDuration??BOARD_SCAN_MS.normal)/1000} onPass={onPass} onScanning={onScanning} onPower={onPower} overlayRef={overlayRef}/>
   <Singularity active={!!gameover} onPass={onSingularityPass} field={field} portal={portal} tint={glowTint}/>
+  <BlackHoleHud pass={singularityPass} follow={!!hudFollow}/>
   <BoardFinish scanPass={scanPass} scanning={scanning} singularityPass={singularityPass}/>
  </>;
 }
@@ -923,7 +978,7 @@ export function BoardScene(props:BoardProps){
      <BoardReady onReady={props.onReady}/><ShaderWarmup/>
      {(import.meta as ImportMeta&{env?:{DEV?:boolean}}).env?.DEV&&new URLSearchParams(window.location.search).get('boardStats')==='1'&&<BoardDiagnostics style={props.boardStyle??'classic'} phase={props.phase}/>}
     </Suspense>
-    <BoardEffects boardScan={props.boardScan} boardScanTone={props.boardScanTone} boardScanDuration={props.boardScanDuration} gameover={props.gameover} glowTint={props.winner==null?undefined:props.playerColors[props.winner].accent} scanning={scanning} onScanning={setScanning} onPower={setBoardPower} overlayRef={overlayRef} field={singularity} portal={portal}/>
+    <BoardEffects boardScan={props.boardScan} boardScanTone={props.boardScanTone} boardScanDuration={props.boardScanDuration} gameover={props.gameover} hudFollow={props.hudFollow} glowTint={props.winner==null?undefined:props.playerColors[props.winner].accent} scanning={scanning} onScanning={setScanning} onPower={setBoardPower} overlayRef={overlayRef} field={singularity} portal={portal}/>
    </BoardLightingProvider></PlayerColorsProvider></SingularityContext.Provider></HudPortal.Provider></NeonRigContext.Provider></BoardStyleProvider>
   </Canvas>
   <canvas ref={overlayRef} className='board-scan-overlay' aria-hidden='true'/>
@@ -968,5 +1023,3 @@ function PlateTitle({text}:{text:string}){
  return <b ref={ref}>{text}</b>;
 }
 
-/** Location copy is plain white; only its trigger prefixes carry their colour. */
-function TriggerText({text}:{text:string}){return <>{splitLocationTriggers(text).map((part,index)=>part.trigger?<span key={index} className='location-trigger' data-trigger={part.trigger} style={{color:LOCATION_TRIGGERS[part.trigger].color}}>{part.text}</span>:part.text)}</>;}
