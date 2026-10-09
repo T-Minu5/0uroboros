@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches: [main, client_server_arch]
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 0uroboros_v2
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: 0uroboros_v2/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: node scripts/check-boundaries.mjs
+      - run: npm run assets:check
+      - run: npx vitest run --reporter=dot
+        env:
+          OUROBOROS_AGENTS: off
+      - run: npm run server:build
+      - run: npm run build:client
+      - uses: actions/upload-artifact@v4
+        with:
+          name: client
+          path: 0uroboros_v2/dist/client
+          retention-days: 7

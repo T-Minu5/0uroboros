@@ -1,0 +1,37 @@
+# Deploys the game server to Fly.io on every push to main (after CI). Needs the FLY_API_TOKEN secret
+# (`fly tokens create deploy -x 999999h`) and the app created once by hand (see deploy/README.md).
+name: Deploy server
+on:
+  push:
+    branches: [main]
+    paths:
+      - '0uroboros_v2/packages/**'
+      - '0uroboros_v2/content/**'
+      - '0uroboros_v2/deploy/**'
+      - '0uroboros_v2/vite.server.config.ts'
+      - '0uroboros_v2/package.json'
+      - '0uroboros_v2/package-lock.json'
+  workflow_dispatch:
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 0uroboros_v2
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: 0uroboros_v2/package-lock.json
+      - run: npm ci
+      - run: npx vitest run tests/game-server.test.ts --reporter=dot
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --config deploy/fly.toml --dockerfile deploy/Dockerfile
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

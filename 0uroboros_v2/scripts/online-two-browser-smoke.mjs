@@ -19,8 +19,14 @@ const report = { cycles: [], wire: { framesChecked: 0, hiddenInfoViolations: [] 
 
 console.log('building server bundle');
 execSync('npx vite build -c vite.server.config.ts --logLevel error', { stdio: 'inherit' });
-const server = spawn('node', ['dist/server/main.mjs'], { env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1' }, stdio: ['ignore', 'pipe', 'inherit'] });
-server.stdout.on('data', chunk => { if (process.env.ONLINE_VERBOSE) process.stdout.write(chunk); });
+// Sign-in is on with the console mailer: magic links appear in the server log, where the gate reads them.
+const webOrigin = `http://127.0.0.1:${vitePort}`;
+const server = spawn('node', ['dist/server/main.mjs'], { env: { ...process.env, PORT: String(serverPort), HOST: '127.0.0.1', OUROBOROS_AUTH: 'on', OUROBOROS_PUBLIC_URL: `http://127.0.0.1:${serverPort}`, OUROBOROS_WEB_ORIGIN: webOrigin }, stdio: ['ignore', 'pipe', 'inherit'] });
+const magicLinks = [];
+server.stdout.on('data', chunk => {
+  if (process.env.ONLINE_VERBOSE) process.stdout.write(chunk);
+  for (const line of String(chunk).split('\n')) { try { const entry = JSON.parse(line); if (entry.event === 'magic-link') magicLinks.push(entry.link); } catch { /* not JSON */ } }
+});
 const vite = spawn('node', ['node_modules/vite/bin/vite.js', '--port', String(vitePort), '--strictPort', '--logLevel', 'error'], { env: { ...process.env, VITE_GAME_SERVER_URL: `ws://127.0.0.1:${serverPort}` }, stdio: ['ignore', 'pipe', 'inherit'] });
 const cleanup = () => { server.kill(); vite.kill(); };
 process.on('exit', cleanup);
@@ -59,8 +65,19 @@ for (const name of ['Ada', 'Bo']) {
 const [ada, bo] = seats;
 const shot = (seat, label) => seat.page.screenshot({ path: `${prefix}-${seat.name.toLowerCase()}-${label}.png` });
 
-// Lobby: Ada creates, Bo joins by code.
-await ada.page.getByPlaceholder('Name at the table').fill('Ada');
+// Sign-in: Ada asks for a magic link, follows it, and comes back signed in; the seat then carries her account name.
+await ada.page.getByLabel('E-mail for sign-in link').fill('ada.lovelace@example.com');
+await ada.page.getByRole('button', { name: 'E-mail me a sign-in link' }).click();
+await ada.page.getByRole('status').filter({ hasText: 'Check your e-mail' }).waitFor();
+for (let i = 0; i < 50 && !magicLinks.length; i++) await new Promise(r => setTimeout(r, 100));
+if (!magicLinks.length) throw new Error('The server logged no magic link');
+await ada.page.goto(magicLinks[0]);
+await ada.page.waitForURL(url => url.origin === webOrigin && !url.hash.includes('session='));
+await ada.page.locator('[data-signed-in]').waitFor();
+report.coverage.signIn = (await ada.page.locator('.online-account b').innerText());
+if (report.coverage.signIn !== 'Ada Lovelace') throw new Error(`Signed in as "${report.coverage.signIn}", expected the account name`);
+
+// Lobby: Ada creates (her name field was filled from the account), Bo joins by code.
 await ada.page.getByRole('button', { name: 'Create table' }).click();
 const code = await ada.page.locator('[data-room-code]').first().getAttribute('data-room-code');
 if (!/^[A-Z0-9]{6}$/.test(code ?? '')) throw new Error(`Bad invite code: ${code}`);
@@ -158,7 +175,7 @@ for (let cycle = 1; cycle <= cycles; cycle++) {
       // Bo's Log names Ada's placement without the card.
       await bo.page.waitForTimeout(600);
       const texts = await logTexts(bo);
-      const seen = texts.find(text => /Ada deployed a face-down card/.test(text));
+      const seen = texts.find(text => /Ada Lovelace deployed a face-down card/.test(text));
       if (!seen) throw new Error(`Bo's Log does not show Ada's face-down placement: ${texts.slice(-5).join(' | ')}`);
       report.log.faceDownSeen = seen;
       await shot(bo, 'opponent-facedown');

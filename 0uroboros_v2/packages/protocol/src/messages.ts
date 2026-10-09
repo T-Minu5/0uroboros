@@ -55,7 +55,8 @@ export const RoomSettingsSchema = z.object({
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 
 export const ClientMessageSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("hello"), protocol: z.number().int() }),
+  /** `session` is an account session token from the sign-in flow (see server auth); guests send none. */
+  z.object({ type: z.literal("hello"), protocol: z.number().int(), session: z.string().max(200).optional() }),
   z.object({ type: z.literal("createRoom"), mode: RoomModeSchema, name: displayName, settings: RoomSettingsSchema.partial().optional() }),
   z.object({ type: z.literal("joinRoom"), code: roomCode, name: displayName }),
   z.object({ type: z.literal("resumeSeat"), code: roomCode, seatToken }),
@@ -68,6 +69,8 @@ export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 // --- What the server sends -------------------------------------------------------------------------------------------
 
 export type SeatSummary = { name: string; connected: boolean; ai: boolean } | null;
+/** The signed-in player, as the client may know it. */
+export type AccountSummary = { id: string; name: string; email: string | null };
 export type RoomStatus = "waiting" | "playing" | "finished";
 
 /** Server-owned deadlines, as server timestamps (ms). The client shows countdowns against `serverTime`. */
@@ -91,7 +94,7 @@ export type GameResult = {
 };
 
 export type ServerMessage =
-  | { type: "welcome"; protocol: number; serverTime: number }
+  | { type: "welcome"; protocol: number; serverTime: number; account: AccountSummary | null }
   | { type: "roomJoined"; code: string; seat: PlayerId; seatToken: string; mode: RoomMode; settings: RoomSettings }
   | { type: "lobby"; code: string; status: RoomStatus; seats: [SeatSummary, SeatSummary]; mode: RoomMode; settings: RoomSettings }
   | { type: "left" }

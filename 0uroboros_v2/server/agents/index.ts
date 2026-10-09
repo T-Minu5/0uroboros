@@ -9,6 +9,7 @@ import { isLocalRequest } from '../contentApi';
 import { runCohort, type SelfPlayHarness } from './cohortRunner';
 import { createEcoStrat } from './ecoStrat';
 import { createEvidenceBus } from './evidence';
+import { createOnlineEvidence } from './onlineEvidence';
 import { createLeague, type LeagueMember } from './league';
 import { coach, coachingTips, combineTips, createCoachingStore, withoutCoaching, type CoachingStore } from './coaching';
 import { baselineTips, createMentoringStore, handOff, TIPS_PER_MENTOR, type MentoringStore } from './mentoring';
@@ -104,6 +105,10 @@ export function createAgentSystem(options: AgentSystemOptions) {
     settings: () => { const s = settings.read(); return { active: ecoStratActive(s), observeHumanGames: s.ecoStrat.observeHumanGames, continuous: s.ecoStrat.continuous, reportEvery: s.ecoStrat.reportEvery, baselineGames: s.ecoStrat.baselineGames }; },
   });
   bus.subscribe(evidence => eco.observe(evidence));
+  // Hosted games reach Eco-Strat too, when the studio knows where the server is and holds its admin token.
+  const online = env.OUROBOROS_EVIDENCE_URL && env.OUROBOROS_ADMIN_TOKEN
+    ? createOnlineEvidence({ url: env.OUROBOROS_EVIDENCE_URL, adminToken: env.OUROBOROS_ADMIN_TOKEN, cursorFile: resolve(cwd, 'ai-agents/online-evidence.json'), publish: evidence => bus.publish(evidence), log: message => log(`online evidence ${message}`) })
+    : null;
 
   type CohortState = { running: boolean; kind: 'baseline' | 'evaluation' | null; phase: 'studying' | 'researching' | 'playing' | null; seedBase: number | null; cohortId: string | null; valid: number; invalid: number; target: number; error: string | null; stop: boolean };
   let cohort: CohortState = { running: false, kind: null, phase: null, seedBase: null, cohortId: null, valid: 0, invalid: 0, target: 0, error: null, stop: false };
@@ -193,6 +198,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
     if (dv8Active(current)) void dv8.start();
     if (vpDogActive(current)) void vpDog.start();
     if (ecoStratActive(current)) void eco.load().catch(error => log(`Eco-Strat failed to load its journal (gameplay unaffected): ${error instanceof Error ? error.message : String(error)}`));
+    if (ecoStratActive(current)) online?.start();
   }
 
   function status() {

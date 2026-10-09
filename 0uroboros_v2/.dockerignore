@@ -1,0 +1,10 @@
+# Only what the server bundle needs reaches the Docker build context (see deploy/Dockerfile).
+*
+!package.json
+!package-lock.json
+!tsconfig.json
+!vite.server.config.ts
+!packages/**
+!content/**
+packages/**/node_modules
+**/.DS_Store

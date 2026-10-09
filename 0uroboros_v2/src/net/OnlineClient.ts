@@ -7,8 +7,9 @@
  */
 import type { Card } from '@0uroboros/engine/game';
 import type { CycleRecord, RuntimeEvent, SessionView } from '@0uroboros/engine/runtime';
-import { PROTOCOL_VERSION, type ClientMessage, type Command, type GameResult, type RoomMode, type RoomSettings, type SeatSummary, type ServerMessage, type Timers } from '@0uroboros/protocol/messages';
+import { PROTOCOL_VERSION, type AccountSummary, type ClientMessage, type Command, type GameResult, type RoomMode, type RoomSettings, type SeatSummary, type ServerMessage, type Timers } from '@0uroboros/protocol/messages';
 import type { ClientChange, ConnectionState, GameClient, Presented } from './GameClient';
+import { platform } from '../platform';
 
 export type LobbyState = {
   status: 'idle' | 'connecting' | 'waiting' | 'playing' | 'finished';
@@ -20,6 +21,8 @@ export type LobbyState = {
   settings: RoomSettings | null;
   result: GameResult | null;
   error: string | null;
+  /** The account the server recognised from the session sent in `hello`; null for guests. */
+  account: AccountSummary | null;
 };
 
 type QueueItem = Presented;
@@ -30,19 +33,14 @@ export type SavedSeat = { url: string; code: string; seatToken: string; seat: 0 
 export const savedSeat = (): SavedSeat | null => { try { return JSON.parse(sessionStorage.getItem(SEAT_KEY) ?? 'null'); } catch { return null; } };
 const saveSeat = (seat: SavedSeat | null) => { if (seat) sessionStorage.setItem(SEAT_KEY, JSON.stringify(seat)); else sessionStorage.removeItem(SEAT_KEY); };
 
-/** Where the game server lives: the build's `VITE_GAME_SERVER_URL`, else the page host on the server's default port. */
-export function defaultServerUrl(): string {
-  const configured = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_GAME_SERVER_URL;
-  if (configured) return configured;
-  const secure = location.protocol === 'https:';
-  return `${secure ? 'wss' : 'ws'}://${location.hostname}:8787`;
-}
+/** Where the game server lives, as the platform knows it (`VITE_GAME_SERVER_URL` on the web). */
+export const defaultServerUrl = () => platform().serverUrl;
 
 export class OnlineClient implements GameClient {
   readonly mode = 'online' as const;
   readonly url: string;
   seatNames: [string, string] | null = null;
-  lobby: LobbyState = { status: 'idle', connection: 'offline', code: null, seat: null, seats: [null, null], mode: null, settings: null, result: null, error: null };
+  lobby: LobbyState = { status: 'idle', connection: 'offline', code: null, seat: null, seats: [null, null], mode: null, settings: null, result: null, error: null, account: null };
   private socket: WebSocket | null = null;
   private current: SessionView | null = null;
   private queue: QueueItem[] = [];
@@ -76,13 +74,13 @@ export class OnlineClient implements GameClient {
       const socket = new WebSocket(this.url);
       this.socket = socket;
       let settled = false;
-      socket.addEventListener('open', () => { this.send({ type: 'hello', protocol: PROTOCOL_VERSION }); });
+      socket.addEventListener('open', () => { this.send({ type: 'hello', protocol: PROTOCOL_VERSION, session: platform().auth.session()?.token }); });
       socket.addEventListener('message', raw => {
         const message = JSON.parse(String(raw.data)) as ServerMessage;
         if (message.type === 'welcome' && !settled) {
           settled = true; this.reconnectAttempt = 0;
           this.clockOffset = message.serverTime - Date.now();
-          this.setLobby({ connection: 'online', status: this.lobby.status === 'connecting' ? 'idle' : this.lobby.status });
+          this.setLobby({ connection: 'online', status: this.lobby.status === 'connecting' ? 'idle' : this.lobby.status, account: message.account });
           this.emit({ kind: 'connection', state: 'online' });
           resolve();
         }

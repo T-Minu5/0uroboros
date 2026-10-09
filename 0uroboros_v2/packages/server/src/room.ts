@@ -36,6 +36,8 @@ export type RoomConfig = {
 
 type Seat = {
   name: string;
+  /** Signed-in account in this seat; null for guests and the AI. */
+  accountId: string | null;
   token: string;
   ai: boolean;
   connection: Connection | null;
@@ -95,8 +97,8 @@ export class Room {
 
   private get now() { return this.config.scheduler.now(); }
   private log(entry: Record<string, unknown>) { this.config.log?.({ room: this.code, at: this.now, ...entry }); }
-  private makeSeat(name: string, ai: boolean): Seat {
-    return { name, token: ai ? "" : newSeatToken(), ai, connection: null, disconnects: 0, idleTurns: 0, inputThisTurn: false, cancelGrace: null };
+  private makeSeat(name: string, ai: boolean, accountId: string | null = null): Seat {
+    return { name, accountId, token: ai ? "" : newSeatToken(), ai, connection: null, disconnects: 0, idleTurns: 0, inputThisTurn: false, cancelGrace: null };
   }
   private humanSeats(): PlayerId[] { return ([0, 1] as PlayerId[]).filter(seat => this.seats[seat] && !this.seats[seat]!.ai); }
   private aiSeats(): PlayerId[] { return ([0, 1] as PlayerId[]).filter(seat => this.seats[seat]?.ai); }
@@ -105,14 +107,14 @@ export class Room {
   // --- Lobby ---------------------------------------------------------------------------------------------------------
 
   /** Seats a new player; returns the seat and its token, or null when the table is full or already playing. */
-  join(name: string, connection: Connection): { seat: PlayerId; token: string } | null {
+  join(name: string, connection: Connection, accountId: string | null = null): { seat: PlayerId; token: string } | null {
     if (this.status !== "waiting") return null;
     const seat = ([0, 1] as PlayerId[]).find(index => this.seats[index] === null);
     if (seat === undefined) return null;
-    const state = this.makeSeat(name, false);
+    const state = this.makeSeat(name, false, accountId);
     state.connection = connection;
     this.seats[seat] = state;
-    this.log({ event: "join", seat, name });
+    this.log({ event: "join", seat, name, accountId });
     connection.send({ type: "roomJoined", code: this.code, seat, seatToken: state.token, mode: this.mode, settings: this.settings });
     this.broadcastLobby();
     if (this.seats.every(Boolean)) this.start();
@@ -420,7 +422,10 @@ export class Room {
     const aiSeats = this.aiSeats();
     this.log({ event: "finish", ...result });
     try {
-      this.config.store.saveResult({ code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result });
+      this.config.store.saveResult({
+        code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result,
+        accountIds: [this.seats[0]!.accountId, this.seats[1]!.accountId], report: session.matchReport(),
+      });
       this.config.store.saveReplay(this.replay());
     } catch (error) { this.log({ event: "store-error", message: error instanceof Error ? error.message : String(error) }); }
     for (const seat of this.humanSeats()) this.seats[seat]!.connection?.send({ type: "gameOver", result, view: session.view(seat), cycles: session.cycleHistory() });

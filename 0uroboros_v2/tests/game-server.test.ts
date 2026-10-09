@@ -292,6 +292,7 @@ describe("game server over WebSocket", () => {
       // Listen before open: the welcome can arrive in the same read as the handshake.
       const client = new WireClient(socket);
       await new Promise<void>((resolve, reject) => { socket.once("open", () => resolve()); socket.once("error", reject); });
+      client.send({ type: "hello", protocol: PROTOCOL_VERSION });
       await client.until(m => m.type === "welcome");
       return client;
     }

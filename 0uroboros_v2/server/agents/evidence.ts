@@ -5,8 +5,11 @@ import type { MatchReport } from '@0uroboros/engine/runtime';
  * deep-frozen copies. `publish` returns nothing, so no evaluator output can travel back to the
  * publisher through this channel.
  */
-/** `human-vs-strat-g` is kept for games recorded before the human could pick any agent as the opponent. */
-export type EvidenceSource = 'human-vs-agent' | 'human-vs-strat-g' | 'self-play' | 'league';
+/**
+ * `human-vs-strat-g` is kept for games recorded before the human could pick any agent as the opponent.
+ * `online-pvp` is two humans at a hosted table, pulled from the game server (see onlineEvidence.ts).
+ */
+export type EvidenceSource = 'human-vs-agent' | 'human-vs-strat-g' | 'self-play' | 'league' | 'online-pvp';
 export const isHumanSource = (source: EvidenceSource) => source === 'human-vs-agent' || source === 'human-vs-strat-g';
 export type StratGEvidence = {
   version: number; mode: string; plan: string; notes: string[];

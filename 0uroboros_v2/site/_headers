@@ -1,0 +1,14 @@
+# Cloudflare Pages / Netlify header rules for the web client (copied into the build output by scripts/build-site.mjs).
+# Vite's JS/CSS are content-hashed; art under /assets keeps stable names, so it may be cached for a day, not forever.
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/index.html
+  Cache-Control: no-cache
+/version.json
+  Cache-Control: no-cache
+/download/*
+  Cache-Control: public, max-age=3600
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

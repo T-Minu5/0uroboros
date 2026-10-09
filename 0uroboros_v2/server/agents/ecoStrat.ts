@@ -702,7 +702,7 @@ Point of view: your own considered view of how a deck-building economy should wo
     const bullets = (value: unknown, count: number, prefix = '') => strings(value, count, 260).map(line => `- ${prefix}${line}`);
     const cell = (text: string) => text.replace(/\|/g, '/');
     const humanLabel = `human vs ${input.humanOpponents?.length ? input.humanOpponents.join(', ') : 'Strat-G'}`;
-    const sourceLabel = [...new Set(input.sources.map(source => source === 'self-play' ? 'AI vs AI self-play' : isHumanSource(source as GameEvidence['source']) ? humanLabel : source))].join(', ');
+    const sourceLabel = [...new Set(input.sources.map(source => source === 'self-play' ? 'AI vs AI self-play' : source === 'online-pvp' ? 'human vs human online' : isHumanSource(source as GameEvidence['source']) ? humanLabel : source))].join(', ');
     const seeds = input.cohort?.seeds.length ? `seeds ${Math.min(...input.cohort.seeds)}–${Math.max(...input.cohort.seeds)}` : '';
     const noModel = '_No model was available for this report, so this tab has measured facts only._';
     const glance: [string, string][] = [

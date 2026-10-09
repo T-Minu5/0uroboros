@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import type { LobbyState, SavedSeat } from './OnlineClient';
 import type { RoomMode } from '@0uroboros/protocol/messages';
+import { platform, type Session } from '../platform';
 
 const NAME_KEY = 'ouroboros.playerName';
 
@@ -15,13 +16,35 @@ type Props = {
   disabled?: boolean;
 };
 
-/** The setup card's online section: create a table for a friend, join one by code, or play the server's AI. */
+/** The setup card's online section: sign in (optional), create a table for a friend, join one by code, or play the server's AI. */
 export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onResume, onLeave, disabled }: Props) {
-  const [name, setName] = useState(() => localStorage.getItem(NAME_KEY) ?? '');
+  const host = platform();
+  const [session, setSession] = useState<Session | null>(() => host.auth.session());
+  const [name, setName] = useState(() => host.auth.session()?.account.name ?? host.storage.get(NAME_KEY) ?? '');
   const [code, setCode] = useState('');
+  const [email, setEmail] = useState('');
+  const [authNote, setAuthNote] = useState<string | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
+
+  useEffect(() => host.auth.onChange(next => { setSession(next); if (next) setName(next.account.name); }), [host]);
+
   const ready = name.trim().length > 0 && !disabled && lobby.connection !== 'reconnecting';
-  const keepName = (value: string) => { setName(value); localStorage.setItem(NAME_KEY, value); };
+  const keepName = (value: string) => { setName(value); host.storage.set(NAME_KEY, value); };
+  /** A signed-in player's name lives on the account; the server seats them under it, so push edits there. */
+  const commitName = async () => {
+    const value = name.trim();
+    if (!session || !value || value === session.account.name) return;
+    try { await host.auth.rename(value); } catch (error) { setAuthNote(error instanceof Error ? error.message : 'Could not rename.'); }
+  };
   const join = (event: FormEvent) => { event.preventDefault(); if (ready && code.trim()) onJoin(code, name.trim()); };
+  const requestLink = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!email.trim() || authBusy) return;
+    setAuthBusy(true); setAuthNote(null);
+    try { setAuthNote(await host.auth.requestMagicLink(email.trim())); } catch (error) { setAuthNote(error instanceof Error ? error.message : 'Could not send the link.'); }
+    finally { setAuthBusy(false); }
+  };
+  const signOut = async () => { await host.auth.signOut(); setAuthNote(null); };
 
   if (lobby.status === 'waiting' && lobby.code) {
     return <section className='online-lobby' aria-label='Online table' data-online-status='waiting'>
@@ -33,7 +56,7 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
   }
   return <section className='online-lobby' aria-label='Play online' data-online-status={lobby.status}>
     <small>PLAY ONLINE</small>
-    <label className='online-field'><span>Your name</span><input value={name} maxLength={24} placeholder='Name at the table' onChange={event => keepName(event.target.value)} disabled={disabled}/></label>
+    <label className='online-field'><span>Your name</span><input value={name} maxLength={24} placeholder='Name at the table' onChange={event => keepName(event.target.value)} onBlur={() => void commitName()} disabled={disabled}/></label>
     <div className='online-actions'>
       <button type='button' disabled={!ready} onClick={() => onCreate('pvp', name.trim())}>Create table</button>
       <button type='button' disabled={!ready} onClick={() => onCreate('ai', name.trim())}>Play the server AI</button>
@@ -43,6 +66,14 @@ export function OnlineLobby({ lobby, saved, turnSeconds, onCreate, onJoin, onRes
       </form>
     </div>
     {saved && lobby.status === 'idle' && <button type='button' className='online-resume' onClick={() => onResume(saved)}>Rejoin table {saved.code}</button>}
+    {host.auth.methods.includes('email') && (session
+      ? <p className='online-account' data-signed-in={session.account.id}>Signed in as <b>{session.account.name}</b>{session.account.email ? ` (${session.account.email})` : ''}. <button type='button' className='online-link' onClick={() => void signOut()}>Sign out</button></p>
+      : <form className='online-signin' onSubmit={requestLink}>
+          <input type='email' value={email} placeholder='you@example.com' aria-label='E-mail for sign-in link' autoComplete='email' onChange={event => setEmail(event.target.value)} disabled={authBusy}/>
+          <button type='submit' disabled={!email.trim() || authBusy}>{authBusy ? 'Sending…' : 'E-mail me a sign-in link'}</button>
+          <span>Optional. Signing in keeps your name and lets friends recognise you.</span>
+        </form>)}
+    {authNote && <p className='online-status' role='status'>{authNote}</p>}
     {lobby.status === 'connecting' && <p className='online-status'>Connecting to the game server…</p>}
     {lobby.connection === 'reconnecting' && <p className='online-status'>Reconnecting…</p>}
     {lobby.error && <p role='alert' className='online-error'>{lobby.error}</p>}

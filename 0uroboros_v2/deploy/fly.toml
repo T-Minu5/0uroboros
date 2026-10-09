@@ -1,0 +1,43 @@
+# Fly.io app definition for the 0uroboros game server. Deploy from the repository root:
+#   fly launch --copy-config --config deploy/fly.toml --dockerfile deploy/Dockerfile --no-deploy
+#   fly volumes create ouroboros_data --size 1
+#   fly secrets set OUROBOROS_ADMIN_TOKEN=... RESEND_API_KEY=... MAIL_FROM="0uroboros <play@your-domain>"
+#   fly deploy --config deploy/fly.toml --dockerfile deploy/Dockerfile
+# One machine only: rooms live in process memory, so the server must not scale horizontally until Phase 6 adds a shared lobby.
+app = "ouroboros-server"
+primary_region = "lhr"
+
+# No [build] section on purpose: pass `--dockerfile deploy/Dockerfile` from the repository root so the whole repo
+# (minus .dockerignore) is the build context.
+
+[env]
+  PORT = "8787"
+  HOST = "0.0.0.0"
+  OUROBOROS_DB = "/data/ouroboros.sqlite"
+  OUROBOROS_MAX_ROOMS = "500"
+  # Set these to your real hosts before the first deploy.
+  OUROBOROS_PUBLIC_URL = "https://ouroboros-server.fly.dev"
+  OUROBOROS_WEB_ORIGIN = "https://play.0uroboros.example"
+
+[mounts]
+  source = "ouroboros_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+  max_machines_running = 1
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

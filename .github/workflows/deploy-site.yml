@@ -1,0 +1,36 @@
+# Builds the web client + download page and publishes it to Cloudflare Pages. Needs CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID secrets and the GAME_SERVER_URL variable (wss://...). See deploy/README.md.
+name: Deploy site
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 0uroboros_v2
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: 0uroboros_v2/package-lock.json
+      - run: npm ci
+      - run: npm run build:site
+        env:
+          VITE_GAME_SERVER_URL: ${{ vars.GAME_SERVER_URL }}
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: 0uroboros_v2
+          command: pages deploy dist/site --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT || 'ouroboros' }}
