@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import type * as THREE from 'three';
 import { NeonGlassMaterial } from './neonMaterials';
 import { useNeonCarPaint } from './neonCarPaint';
-import { useNeonLiquid } from './neonLiquid';
 import { NeonApron } from './NeonApron';
 import { NeonServerBases } from './NeonServerBases';
 import { NeonSideRails } from './NeonSideRails';
@@ -80,21 +79,6 @@ function PaintChassis({ geometry }: { geometry: THREE.BufferGeometry }) {
   return <mesh name="chassis" geometry={geometry} material={paint} position={[0, CHASSIS_Y, 0]} receiveShadow castShadow />;
 }
 
-const LIQUID_FRAME = { outline: FRAME_OUTER, hole: FRAME_HOLE };
-const LIQUID_WALL = { outline: TABLE_OUTLINE, wall: CHASSIS_SPAN };
-
-/** Frame and chassis in the demo's clear liquid glass, each lit like Apple glass across its own bars or faces. */
-function LiquidShell({ chassis, frame }: { chassis: THREE.BufferGeometry; frame: THREE.BufferGeometry }) {
-  const frameGlass = useNeonLiquid(LIQUID_FRAME);
-  const wallGlass = useNeonLiquid(LIQUID_WALL);
-  return (
-    <>
-      <mesh name="chassis" geometry={chassis} material={wallGlass} position={[0, CHASSIS_Y, 0]} receiveShadow castShadow />
-      <mesh name="liquid-glass-frame" geometry={frame} material={frameGlass} position={[0, FRAME_Y, 0]} receiveShadow />
-    </>
-  );
-}
-
 /** Complete procedural Neon table shell (presentation only). */
 export function NeonTable({ surface = DEFAULT_NEON_SURFACE }: { surface?: NeonSurface }) {
   const refracted = surface === 'liquidGlass';
@@ -116,7 +100,6 @@ export function NeonTable({ surface = DEFAULT_NEON_SURFACE }: { surface?: NeonSu
   return (
     <group name="neon-table">
       {surface === 'paint' && <><PaintChassis geometry={geometries.chassis} /><PaintFrame geometry={geometries.frame} /></>}
-      {surface === 'liquid' && <LiquidShell chassis={geometries.chassis} frame={geometries.frame} />}
       {(surface === 'glass' || refracted) && <>
         <GlassChassis shell={geometries.shell} cap={geometries.cap} liquid={refracted} />
         <GlassFrame geometry={geometries.frame} liquid={refracted} />

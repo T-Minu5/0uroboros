@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { OPPONENTS, opponentName, type OpponentId } from './ai/strategistClient';
+import { AGENT_FLAG_KEYS, opponentName, resolveOpponent, type OpponentId } from './ai/strategistClient';
+import type { AuthoredOpponent } from '@0uroboros/engine/ai/opponents';
+import { STUDIO_TOOLS } from './studioTools';
 import type { DeckOption } from './contentPack/loadGameContent';
 import { defaultServerVP, type Servers } from '@0uroboros/engine/game';
 import { SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
@@ -8,16 +10,16 @@ import { StartingDeckPicker } from './StartingDeckPicker';
 type Props = {
   setup: GameSetup; onChange: (setup: GameSetup) => void;
   decks: DeckOption[] | null; deckId: string | undefined; onDeck: (id: string) => void;
-  opponent: OpponentId; onOpponent: (id: OpponentId) => void; disabled?: boolean;
+  opponents: readonly AuthoredOpponent[]; opponent: OpponentId; onOpponent: (id: OpponentId) => void; disabled?: boolean;
 };
 
-type AgentFlags = Partial<Record<(typeof OPPONENTS)[number]['key'] | 'ecoStrat', boolean>>;
+type AgentFlags = Partial<Record<string, boolean>>;
 
-/** Which agents are switched on, from the local dev server; null when it is not running (every choice stays open). */
+/** Which agents are switched on, from the local dev server (studio build only); null otherwise, so every choice stays open. */
 function useAgentFlags(active: boolean) {
   const [flags, setFlags] = useState<AgentFlags | null>(null);
   useEffect(() => {
-    if (!active) return;
+    if (!active || !STUDIO_TOOLS) return;
     let live = true;
     fetch('/api/agents/status', { cache: 'no-store' })
       .then(response => response.ok ? response.json() as Promise<{ effective?: AgentFlags }> : null)
@@ -29,16 +31,17 @@ function useAgentFlags(active: boolean) {
 }
 
 /** Setup-screen Configure button: one summary line that opens the game options. */
-export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent, onOpponent, disabled }: Props) {
+export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponents, opponent, onOpponent, disabled }: Props) {
   const [open, setOpen] = useState(false);
   const flags = useAgentFlags(open);
-  const choice = OPPONENTS.find(entry => entry.id === opponent);
+  const choice = resolveOpponent(opponents, opponent);
+  const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
   const { serverVP, turnSeconds } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
-    `vs ${opponentName(opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
+    `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
@@ -46,9 +49,9 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
     </button>
     {open && <div id='game-configure-panel' className='game-configure-panel'>
       <label className='game-configure-row'>
-        <span>Opponent <small>{choice ? `${choice.style}.${flags?.[choice.key] === false ? ' Switched off: plays the default profile.' : ''}${flags?.ecoStrat ? ' Eco-Strat watches.' : ''}` : ''}</small></span>
-        <select aria-label='Opponent' value={opponent} disabled={disabled} onChange={event => onOpponent(event.target.value as OpponentId)}>
-          {OPPONENTS.map(entry => <option key={entry.id} value={entry.id} disabled={flags?.[entry.key] === false && entry.id !== opponent}>{entry.name} · {entry.style}{flags?.[entry.key] === false ? ' (off)' : ''}</option>)}
+        <span>Opponent <small>{choice ? `${choice.style}.${off(choice.id) ? ' Switched off: plays its published profile.' : ''}${flags?.ecoStrat ? ' Eco-Strat watches.' : ''}` : ''}</small></span>
+        <select aria-label='Opponent' value={choice?.id ?? ''} disabled={disabled || !opponents.length} onChange={event => onOpponent(event.target.value)}>
+          {opponents.map(entry => <option key={entry.id} value={entry.id} disabled={off(entry.id) && entry.id !== choice?.id}>{entry.name} · {entry.style}{off(entry.id) ? ' (off)' : ''}</option>)}
         </select>
       </label>
       <label className='game-configure-row'>

@@ -14,8 +14,13 @@ describe('neon table surface setting', () => {
     expect(loadNeonSurface()).toBe('glass');
   });
 
-  it('offers glass, car paint, liquid and liquid glass', () => {
-    expect(NEON_SURFACES.map(option => option.id)).toEqual(['glass', 'paint', 'liquid', 'liquidGlass']);
+  it('offers Frosted, Pearl and Glossy', () => {
+    expect(NEON_SURFACES).toEqual([{ id: 'glass', label: 'Frosted' }, { id: 'paint', label: 'Pearl' }, { id: 'liquidGlass', label: 'Glossy' }]);
+  });
+
+  it('loads the retired liquid finish as the default', () => {
+    store.set('ouroboros.neonSurface', 'liquid');
+    expect(loadNeonSurface()).toBe(DEFAULT_NEON_SURFACE);
   });
 
   it('round-trips a saved choice', () => {

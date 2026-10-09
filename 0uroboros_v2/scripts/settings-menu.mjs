@@ -1,4 +1,4 @@
-/** Pace, Card catalog, Content Studio, Evaluation build and Background live behind the header Settings menu. */
+/** Pace, Card catalog, Evaluation build, Background and Lighting live behind the header Settings menu. */
 export async function openSettings(page){
  if(await page.locator('.settings-popover').count())return;
  await page.getByRole('button',{name:'Settings',exact:true}).click();
@@ -9,10 +9,10 @@ export async function closeSettings(page){
  if(await page.locator('.settings-popover').count())await page.locator('.settings-scrim').click();
 }
 
-/** Picks 'Real lighting' or 'Studio' on the General tab; each has its own floor background list. Leaves the menu closed. */
+/** Picks 'Real lighting' or 'Studio' on the Board tab; each has its own floor background list. Leaves the menu closed. */
 export async function chooseLighting(page,name){
  await openSettings(page);
- await page.getByRole('tab',{name:'General',exact:true}).click();
+ await page.getByRole('tab',{name:'Board',exact:true}).click();
  await page.getByRole('radiogroup',{name:'Lighting',exact:true}).getByRole('radio',{name,exact:true}).click();
  await closeSettings(page);
 }

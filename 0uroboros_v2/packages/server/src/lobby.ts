@@ -2,6 +2,7 @@
 import { randomInt } from "node:crypto";
 import type { CompiledContent } from "@0uroboros/engine/authoring/contentModel";
 import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
+import { pickOpponent } from "@0uroboros/engine/ai/opponents";
 import { RoomSettingsSchema, type RoomMode, type RoomSettings } from "@0uroboros/protocol/messages";
 import { Room } from "./room";
 import type { Scheduler } from "./scheduler";
@@ -16,6 +17,7 @@ export type LobbyConfig = {
   contentRevision: number | null;
   scheduler: Scheduler;
   store: Store;
+  /** Overrides the pack's opponents for every table (tests, experiments); unset, `ai` tables play the pack profile the host picked. */
   strategy?: StrategyProfile;
   log?: (entry: Record<string, unknown>) => void;
   /** Most rooms alive at once; `createRoom` fails beyond it. */
@@ -39,13 +41,16 @@ export class Lobby {
 
   createRoom(mode: RoomMode, settings: Partial<RoomSettings> = {}): Room {
     if (this.rooms.size >= (this.config.maxRooms ?? 500)) throw new Error("The server is full; try again shortly.");
-    const resolved = RoomSettingsSchema.parse(settings);
+    const { opponent: requested, ...resolved } = RoomSettingsSchema.parse(settings);
     const seed = resolved.seed ?? randomInt(1, 2 ** 31 - 1);
+    const opponent = mode === "ai" ? pickOpponent(this.config.content.opponents, requested) : null;
+    const strategy = this.config.strategy ?? opponent?.profile;
     const room = new Room({
-      code: this.newCode(), mode, settings: { ...resolved, seed }, seed,
+      code: this.newCode(), mode, settings: { ...resolved, seed, ...(opponent ? { opponent: opponent.id } : {}) }, seed,
       content: this.config.content, contentRevision: this.config.contentRevision,
       scheduler: this.config.scheduler, store: this.config.store, log: this.config.log,
-      ...(this.config.strategy ? { strategy: this.config.strategy } : {}),
+      ...(strategy ? { strategy } : {}),
+      ...(opponent ? { opponent: opponent.id } : {}),
       onClose: closed => { if (this.rooms.get(closed.code) === closed) this.rooms.delete(closed.code); },
       ...(this.config.onFinish ? { onFinish: this.config.onFinish } : {}),
     });

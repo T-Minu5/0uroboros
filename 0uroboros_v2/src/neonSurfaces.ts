@@ -1,19 +1,19 @@
 /**
- * Neon table frame finish: the original milky edge-lit glass, flaked white car paint, clear refractive liquid glass, or
- * the original glass refracting what's behind it as the liquid glass does.
+ * Neon table frame finish: the original milky edge-lit glass (Frosted), flaked white car paint (Pearl), or the original
+ * glass refracting what's behind it (Glossy). Ids keep their original names so saved choices survive the labels.
  */
-export type NeonSurface = 'glass' | 'paint' | 'liquid' | 'liquidGlass';
+export type NeonSurface = 'glass' | 'paint' | 'liquidGlass';
 
 export const NEON_SURFACES: { id: NeonSurface; label: string }[] = [
-  { id: 'glass', label: 'Glass' },
-  { id: 'paint', label: 'Car paint' },
-  { id: 'liquid', label: 'Liquid' },
-  { id: 'liquidGlass', label: 'LiquidGlass' },
+  { id: 'glass', label: 'Frosted' },
+  { id: 'paint', label: 'Pearl' },
+  { id: 'liquidGlass', label: 'Glossy' },
 ];
 export const DEFAULT_NEON_SURFACE: NeonSurface = 'glass';
 
 const STORAGE_KEY = 'ouroboros.neonSurface';
 
+/** A retired finish (such as the old clear liquid) loads as the default. */
 export function loadNeonSurface(): NeonSurface {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);

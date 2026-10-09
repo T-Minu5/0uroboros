@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+import { packHash } from '@0uroboros/content/hash';
+import { DEFAULT_OPPONENTS } from '@0uroboros/engine/ai/opponents';
+import type { StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import { upgradeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import type { AgentDocument } from './AgentReader';
 
 export type AgentSettings = {
@@ -73,6 +77,37 @@ export type AgentsPatch = {
   league?: Partial<AgentSettings['league']>; ecoStrat?: Partial<AgentSettings['ecoStrat']>;
 };
 export type AgentsApi = ReturnType<typeof useAgents>;
+
+async function readJson<T>(response: Response): Promise<T> {
+  const value = await response.json() as T & { error?: string; errors?: string[] };
+  if (!response.ok) throw new Error(value.errors?.[0] ?? value.error ?? `Request failed (${response.status}).`);
+  return value;
+}
+
+export type PublishedOpponent = { label: string; revision: number; hash: string };
+/**
+ * Writes the agent's current best profile into the content pack as its opponent entry, through the studio's
+ * revision-checked `/api/content` save (a concurrent studio save makes this fail rather than overwrite it). Biases on
+ * cards the pack has disabled are dropped. Commit and deploy the pack to ship it.
+ */
+export async function publishOpponent(agent: string): Promise<PublishedOpponent> {
+  const best = await readJson<{ label: string; profile: StrategyProfile }>(await fetch(`/api/agents/publishable?agent=${encodeURIComponent(agent)}`, { cache: 'no-store' }));
+  const stored = await readJson<{ revision: number; document: unknown }>(await fetch('/api/content', { cache: 'no-store' }));
+  const document = upgradeDocument(stored.document) as ContentDocument;
+  const enabled = new Set(document.cards.filter(card => card.enabled).map(card => card.definitionId ?? card.id));
+  const profile = { ...best.profile, cardBias: Object.fromEntries(Object.entries(best.profile.cardBias).filter(([id]) => enabled.has(id))) };
+  const opponents = document.opponents ?? [];
+  const current = opponents.find(entry => entry.id === agent) ?? DEFAULT_OPPONENTS.find(entry => entry.id === agent);
+  if (!current) throw new Error(`${agent} is not an opponent.`);
+  const entry = { id: agent, name: current.name, style: current.style, profile };
+  const next: ContentDocument = { ...document, opponents: opponents.some(item => item.id === agent) ? opponents.map(item => item.id === agent ? entry : item) : [...opponents, entry] };
+  const errors = validateContent(next);
+  if (errors.length) throw new Error(errors[0]);
+  const saved = await readJson<{ revision: number }>(await fetch('/api/content', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ revision: stored.revision, document: next }),
+  }));
+  return { label: best.label, revision: saved.revision, hash: packHash(next) };
+}
 
 /** Polls the local agents API while `active`; keys never reach the client, only "model configured" does. */
 export function useAgents(active = true) {

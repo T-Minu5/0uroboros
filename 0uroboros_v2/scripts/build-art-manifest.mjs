@@ -18,7 +18,7 @@ import { join, relative, resolve } from 'node:path';
 const root = process.cwd();
 const check = process.argv.includes('--check');
 const MANIFEST = resolve(root, 'packages/content/art-manifest.json');
-const STUDIO_ONLY = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/AgentReader.tsx', 'src/SetupAgentsWindow.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts', 'src/studio.tsx']);
+const STUDIO_ONLY = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts', 'src/studio.tsx', 'src/agents.tsx']);
 
 const readJson = p => JSON.parse(readFileSync(p, 'utf8'));
 const nameKey = name => name.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');

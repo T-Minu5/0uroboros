@@ -51,6 +51,8 @@ export const RoomSettingsSchema = z.object({
   priorityPreference: z.enum(["higher", "lower"]).default("higher"),
   /** Seed for the table's shuffles; unset, the server draws one. Recorded in the replay. */
   seed: z.number().int().optional(),
+  /** Which of the pack's opponents an `ai` table plays, by id; unset or unknown plays the pack's first. */
+  opponent: z.string().trim().min(1).max(80).optional(),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

@@ -1,5 +1,5 @@
 {
-  "revision": 274,
+  "revision": 275,
   "document": {
     "version": 2,
     "cards": [
@@ -4970,6 +4970,129 @@
             }
           }
         ]
+      }
+    ],
+    "opponents": [
+      {
+        "id": "strat-g",
+        "name": "Strat-G",
+        "style": "Balanced",
+        "profile": {
+          "version": 0,
+          "plan": "Three phases: economy and deck engine through Cycle 4 (high-value Crypto, draw, Actions, thinning); a balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP.",
+          "economyUntilCycle": 4,
+          "chaosFromCycle": 9,
+          "vpFromCycle": 9,
+          "midgameMix": 0.5,
+          "handCryptoTarget": 9,
+          "minCryptoValue": 2,
+          "minBuyScore": 0.75,
+          "dilution": 0.5,
+          "weights": {
+            "power": 1,
+            "draw": 1.6,
+            "actions": 1.1,
+            "crypto": 1,
+            "drain": 2.4,
+            "restore": 1,
+            "vp": 2.6,
+            "duration": 0.8,
+            "thin": 1.2,
+            "disrupt": 0.8,
+            "chaos": 1.5
+          },
+          "cardBias": {}
+        }
+      },
+      {
+        "id": "t-5",
+        "name": "T-5",
+        "style": "Pure aggression",
+        "profile": {
+          "version": 0,
+          "plan": "Pure aggression: one or two Cycles of cheap Power and Action cards, then Chaos and Drain from Cycle 3, keeping enough Drain on pace over Cycles 3-12 to destroy both Servers, whatever their integrity, by Cycles 10-13. VP cards only to close out a won race.",
+          "economyUntilCycle": 2,
+          "chaosFromCycle": 3,
+          "vpFromCycle": 11,
+          "handCryptoTarget": 7,
+          "minCryptoValue": 2,
+          "minBuyScore": 0.5,
+          "dilution": 0.3,
+          "weights": {
+            "power": 1.4,
+            "draw": 1.2,
+            "actions": 1.2,
+            "crypto": 0.8,
+            "drain": 3.4,
+            "restore": 0.5,
+            "vp": 1.4,
+            "duration": 0.6,
+            "thin": 0.8,
+            "disrupt": 1.4,
+            "chaos": 2.8
+          },
+          "cardBias": {}
+        }
+      },
+      {
+        "id": "dv-8",
+        "name": "DV-8",
+        "style": "Engine",
+        "profile": {
+          "version": 0,
+          "plan": "Engine: trash weak cards and buy draw, Action and big Crypto through Cycle 7, defend the Servers with Restore, add Chaos only late, then buy heavy VP from Cycle 13.",
+          "economyUntilCycle": 7,
+          "chaosFromCycle": 10,
+          "vpFromCycle": 13,
+          "handCryptoTarget": 12,
+          "minCryptoValue": 2,
+          "minBuyScore": 1.2,
+          "dilution": 0.9,
+          "weights": {
+            "power": 0.9,
+            "draw": 2.2,
+            "actions": 1.6,
+            "crypto": 1.3,
+            "drain": 1,
+            "restore": 1.8,
+            "vp": 2.8,
+            "duration": 1,
+            "thin": 2.4,
+            "disrupt": 0.6,
+            "chaos": 0.8
+          },
+          "cardBias": {}
+        }
+      },
+      {
+        "id": "vp-dog",
+        "name": "VP-Dog",
+        "style": "Pure economy",
+        "profile": {
+          "version": 0,
+          "plan": "Pure economy: big Crypto (Kilo-Coin, Mega-Cache), draw and Action cards through Cycle 5, then the most VP the Wallet affords every Draft from Cycle 6, aiming for 25+ VP bought by Cycles 11-14. Restore when the Servers take real damage; Chaos and Drain almost never.",
+          "economyUntilCycle": 5,
+          "chaosFromCycle": 13,
+          "vpFromCycle": 6,
+          "handCryptoTarget": 13,
+          "minCryptoValue": 2,
+          "minBuyScore": 0.6,
+          "dilution": 0.4,
+          "weights": {
+            "power": 0.8,
+            "draw": 1.8,
+            "actions": 1.3,
+            "crypto": 1.8,
+            "drain": 0.5,
+            "restore": 1.6,
+            "vp": 3.8,
+            "duration": 0.8,
+            "thin": 1.4,
+            "disrupt": 0.4,
+            "chaos": 0.3
+          },
+          "cardBias": {}
+        }
       }
     ]
   }

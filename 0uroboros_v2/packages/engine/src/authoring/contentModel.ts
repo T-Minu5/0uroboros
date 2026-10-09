@@ -7,6 +7,8 @@ import { describeLocation, validateSteps, type ValidationCards } from '../effect
 import { liftLocationSchedule, migrateCard, migrateEffects, migrateLocation, migrateRewardEffects } from '../effects/migrate';
 import { MOD_HOOKS, isBuiltinModifier, type AnyEffect, type EffectStep, type ModDefinition, type Scope } from '../effects/types';
 import { BUILTIN_MOD_FIELDS, BUILTIN_MOD_LIMITS, type BuiltinModOverrides } from '../builtinMods';
+import { defaultOpponents, isCanonicalProfile, type AuthoredOpponent } from '../ai/opponents';
+export type { AuthoredOpponent } from '../ai/opponents';
 
 export type CardPool = 'Base' | 'Chaos' | 'VP' | 'Crypto';
 export type { CardClass } from '../game';
@@ -37,6 +39,8 @@ export type ContentDocument = {
   /** Absent in older saves; those load with the default deck. */
   startingDecks?: StartingDeck[];
   activeStartingDeckId?: string;
+  /** The AI opponents players can face; absent in older saves, which load with the league's founding baselines. */
+  opponents?: AuthoredOpponent[];
 };
 export type CompiledContent = {
   cards: (Card & Pick<AuthoredCard,'cardClass'|'generated'>)[];
@@ -50,6 +54,8 @@ export type CompiledContent = {
   mods?: ModDefinition[];
   /** The active starting deck, one entry per copy, dealt identically to both players. */
   startingDeck: Card[];
+  /** The opponents this pack offers, in menu order; the first is the default. */
+  opponents: AuthoredOpponent[];
 };
 
 export const DEFAULT_DECK_ID = 'deck-standard';
@@ -62,6 +68,11 @@ export function withStartingDecks(doc: ContentDocument): ContentDocument {
   return { ...doc, startingDecks: [defaultStartingDeck()], activeStartingDeckId: DEFAULT_DECK_ID };
 }
 export const deckSize = (deck: Pick<StartingDeck, 'cards'>) => deck.cards.reduce((sum, entry) => sum + entry.count, 0);
+/** Gives older saves the league's founding opponents so every pack offers someone to play. */
+export function withOpponents(doc: ContentDocument): ContentDocument {
+  if (doc.opponents?.length) return doc;
+  return { ...doc, opponents: defaultOpponents() };
+}
 
 function seededCardClass(card:Pick<Card,'type'|'id'|'definitionId'>,pool:CardPool):CardClass|undefined {
   if(card.type!=="Character")return undefined;
@@ -102,6 +113,7 @@ export function createDefaultContent(): ContentDocument {
     mods: [],
     startingDecks: [defaultStartingDeck()],
     activeStartingDeckId: DEFAULT_DECK_ID,
+    opponents: defaultOpponents(),
   };
 }
 
@@ -177,6 +189,23 @@ function validateStartingDecks(value: Record<string, unknown>, enabledIds: Reado
   if (!decks.some(deck => record(deck) && deck.id === value.activeStartingDeckId)) errors.push('activeStartingDeckId: choose which starting deck new games load');
 }
 
+function validateOpponents(value: unknown, cardIds: ReadonlySet<unknown>, errors: string[]) {
+  if (value === undefined) return;
+  if (!Array.isArray(value) || value.length === 0 || value.length > 20) { errors.push('opponents: expected 1–20 opponents'); return; }
+  checkUnique(value, 'opponents', errors);
+  value.forEach((item, index) => {
+    const p = `opponents[${index}]`;
+    if (!record(item)) { errors.push(`${p}: expected an opponent object`); return; }
+    extraFields(item, ['id', 'name', 'style', 'profile'], p, errors);
+    requiredId(item.id, `${p}.id`, errors);
+    requiredText(item.name, `${p}.name`, errors, 40);
+    requiredText(item.style, `${p}.style`, errors, 120);
+    if (!record(item.profile)) { errors.push(`${p}.profile: expected a strategy profile`); return; }
+    if (!isCanonicalProfile(item.profile)) errors.push(`${p}.profile: values outside the strategy bounds or malformed; publish a sanitized profile`);
+    for (const cardId of Object.keys(record(item.profile.cardBias) ? item.profile.cardBias : {})) if (!cardIds.has(cardId)) errors.push(`${p}.profile.cardBias.${cardId}: unknown or disabled card`);
+  });
+}
+
 function validateBuiltinMods(value: unknown, errors: string[]) {
   if (value === undefined) return;
   if (!record(value)) { errors.push('builtinMods: expected an object'); return; }
@@ -192,7 +221,7 @@ function validateBuiltinMods(value: unknown, errors: string[]) {
 export function validateContent(value: unknown): string[] {
   const errors: string[] = [];
   if (!record(value)) return ['document: expected an object'];
-  extraFields(value, ['version', 'cards', 'locations', 'circuitRewards', 'mods', 'builtinMods', 'startingDecks', 'activeStartingDeckId'], 'document', errors);
+  extraFields(value, ['version', 'cards', 'locations', 'circuitRewards', 'mods', 'builtinMods', 'startingDecks', 'activeStartingDeckId', 'opponents'], 'document', errors);
   validateBuiltinMods(value.builtinMods, errors);
   if (value.version !== CONTENT_VERSION) errors.push(`version: expected ${CONTENT_VERSION}${value.version === 1 ? ' (load the document through upgradeDocument first)' : ''}`);
   for (const field of ['cards', 'locations', 'circuitRewards'] as const) {
@@ -310,6 +339,7 @@ export function validateContent(value: unknown): string[] {
     if (!record(card) || card.enabled !== true || card.generated === true || card.type !== 'Crypto') errors.push(`cards: ${cardId} is a Draft currency and must remain enabled as a non-Generated Crypto card`);
   }
   validateStartingDecks(value, cardIds, errors);
+  validateOpponents(value.opponents, cardIds, errors);
   const enabledLocations = locations.filter(record).filter(location => location.enabled === true);
   const hasSteps = (location: Record<string, unknown>, hook: string) => Array.isArray(location[hook]) && (location[hook] as unknown[]).length > 0;
   if (enabledLocations.length < 5) errors.push('locations: at least 5 enabled locations required');
@@ -321,10 +351,11 @@ export function validateContent(value: unknown): string[] {
 
 type LegacyLibrary = Map<string, { scope: string; effects: AnyEffect[] }>;
 /** Brings an older document up to the current shape: version 1 effect kinds and shared library, then
-Location after-turn schedules. Anything else is returned unchanged. */
+Location after-turn schedules, then the founding opponents for saves that predate them. Anything else is returned unchanged. */
 export function upgradeDocument(value: unknown): unknown {
   if (!record(value)) return value;
-  return liftLocationSchedules(value.version === 1 ? upgradeVersion1(value) : value);
+  const upgraded = liftLocationSchedules(value.version === 1 ? upgradeVersion1(value) : value);
+  return upgraded.opponents === undefined ? { ...upgraded, opponents: defaultOpponents() } : upgraded;
 }
 
 const AFTER_TURN_COPY = /\bAfter turn [23]:/i;
@@ -386,7 +417,7 @@ function upgradeVersion1(value: Record<string, unknown>): Record<string, unknown
 /** The editable form of a document: upgraded, with a starting deck, and blank Location copy written from its effects.
 Hand-shortened Location copy is kept. */
 export function normalizeDocument(value: ContentDocument | unknown): ContentDocument {
-  const copy = withStartingDecks(structuredClone(upgradeDocument(value)) as ContentDocument);
+  const copy = withOpponents(withStartingDecks(structuredClone(upgradeDocument(value)) as ContentDocument));
   copy.mods ??= [];
   for (const location of copy.locations) {
     if (location.rule?.trim()) continue;
@@ -413,5 +444,6 @@ export function compileContent(doc: ContentDocument): CompiledContent {
   const mods = normalized.mods!.filter(mod => mod.enabled).map(({ enabled: _enabled, ...mod }) => mod);
   const activeDeck = normalized.startingDecks!.find(deck => deck.id === normalized.activeStartingDeckId)!;
   const startingDeck = expandDeck(activeDeck.cards, cards);
-  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, locations, circuitRewards, mods, startingDeck };
+  const opponents = normalized.opponents!.map(opponent => structuredClone(opponent));
+  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, locations, circuitRewards, mods, startingDeck, opponents };
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AGENT_NAMES, AgentAvatar, type AgentId } from './agentAvatars';
 import { AgentReader } from './AgentReader';
-import { cohortPhaseLabel, useAgents, type AgentsApi, type AgentsStatus, type LearnerStatus } from './agentsApi';
+import { cohortPhaseLabel, publishOpponent, useAgents, type AgentsApi, type AgentsStatus, type LearnerStatus } from './agentsApi';
 import { versionLabel } from '@0uroboros/engine/ai/strategy';
 
 const REPORT_CADENCE = [5, 10, 20] as const;
@@ -57,6 +57,23 @@ export function ReportControl({ status, act, onRead }: { status: AgentsStatus; a
   </div>;
 }
 
+/** Writes the agent's current best into the content pack; players get it once the pack is committed and deployed. */
+function PublishControl({ agent }: { agent: AgentId }) {
+  const name = AGENT_NAMES[agent];
+  const [state, setState] = useState({ busy: false, message: '', failed: false });
+  const publish = async () => {
+    setState({ busy: true, message: '', failed: false });
+    try {
+      const done = await publishOpponent(agent);
+      setState({ busy: false, failed: false, message: `${name} ${done.label} is in the content pack (revision ${done.revision}, pack ${done.hash}). Commit and deploy the server to ship it.` });
+    } catch (reason) { setState({ busy: false, failed: true, message: reason instanceof Error ? reason.message : 'Publishing failed.' }); }
+  };
+  return <div className='agents-publish'>
+    <button type='button' disabled={state.busy} aria-busy={state.busy} onClick={() => void publish()}>{state.busy ? 'Publishing…' : `Publish ${name} to the pack`}</button>
+    {state.message && <p className={state.failed ? 'agents-error' : 'agents-note'} aria-live='polite'>{state.message}</p>}
+  </div>;
+}
+
 /**
  * Switches and status for Eco-Strat, Strat-G and the league adversaries T-5, DV-8 and VP-Dog, one agent per tab, with a reader for
  * each agent's notebook, journal and reports. `settingsOnly` (the setup screen, where test games have their own column) keeps just the switches; Tuning ›
@@ -102,6 +119,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
       {toggle('Strat-G', settings.stratG.enabled, () => update({ stratG: { enabled: !settings.stratG.enabled } }), !master)}
       {toggle('Decision log', settings.stratG.recordDecisions, () => update({ stratG: { recordDecisions: !settings.stratG.recordDecisions } }), !master)}
       {reader('strat-g')}
+      <PublishControl agent='strat-g'/>
       <Fold title='About Strat-G'><p>Balanced: plays you from the designer's baseline, and plays T-5, DV-8 and VP-Dog in the league. It changes its play only through measured experiments, and never sees the adversaries' strategies.</p></Fold>
       {details&&<Fold title='Status'><dl>
         <dt>Record</dt><dd>{stratG.record.aiWins}–{stratG.record.humanWins}–{stratG.record.ties} over {stratG.record.games}</dd>
@@ -121,6 +139,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
         {toggle(name, settings[key].enabled, () => update({ [key]: { enabled: !settings[key].enabled } }), !master)}
         <p className='agents-note'>{leagueLine(status, tab)}</p>
         {reader(tab)}
+        <PublishControl key={tab} agent={tab}/>
         <Fold title={`About ${name}`}><p>{about} Plays in the AI league and against you when you pick it as your opponent, and learns only from its own results: it never sees the other agents' strategies.</p></Fold>
         {details&&<Fold title='Status'><dl>
           <dt>Experiment</dt><dd>{agent.experiment ? `${agent.experiment.id} (${agent.experiment.stage}): ${agent.experiment.change}` : 'none running'}</dd>

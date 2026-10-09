@@ -84,6 +84,20 @@ While Eco-Strat is active the dev server pulls finished PvP games every five min
 `source: 'online-pvp'`, and keeps its cursor in `ai-agents/online-evidence.json`. AI tables and games without a match
 report are skipped; e-mails never leave the server.
 
+### Publishing an opponent
+
+The agents (Strat-G, T-5, DV-8, VP-Dog) learn locally; players only ever face the profiles published in the content
+pack's `opponents` list. To ship a re-tuned agent:
+
+1. `npm run dev`, open `/agents` › Agents, pick the agent and press **Publish … to the pack**. This writes its current
+   best profile into `content/authored-content.json` (a revision-checked save, like the Content Studio's).
+2. `npm run assets:manifest`, commit, and push. The server deploy picks up the new pack: online tables (including AI
+   tables the server hosts) play it, and clients fetch it by the hash in `welcome`, so no client download is needed.
+3. Local games against the AI use the pack bundled in the client, so they get the new opponent with the next client
+   release.
+
+Changes to the AI's code (`packages/engine/src/ai/strategy.ts`, `runtime.ts`) still need a client and server release.
+
 ## 6. Hardening (Phase 6)
 
 Optional secrets and vars, all read by `packages/server/src/main.ts`:

@@ -29,6 +29,8 @@ export type RoomConfig = {
   store: Store;
   /** The AI seat's plan of play; unset, the engine's current default. */
   strategy?: StrategyProfile;
+  /** The pack opponent an `ai` table plays, recorded with the result for the league's evidence. */
+  opponent?: string;
   log?: (entry: Record<string, unknown>) => void;
   /** Called once the room has nothing left to do, so the registry can drop it. */
   onClose?: (room: Room) => void;
@@ -451,6 +453,7 @@ export class Room {
     const record: ResultRecord = {
       code: this.code, mode: this.mode, seatNames: names, aiSeats, startedAt: this.startedAt, endedAt: this.now, cycles: session.state.cycle, result,
       accountIds: [this.seats[0]!.accountId, this.seats[1]!.accountId], report: session.matchReport(),
+      ...(this.config.opponent ? { opponent: this.config.opponent } : {}),
     };
     try {
       this.config.store.saveResult(record);

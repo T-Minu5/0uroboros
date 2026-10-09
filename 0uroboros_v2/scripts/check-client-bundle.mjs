@@ -7,7 +7,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const out = process.argv[2] ?? 'dist/client';
-const FORBIDDEN = /AuthoringApp|AgentsPanel|TestGamesPanel|SetupAgentsWindow|AgentReader|devGameLog|contentApi|depthPipeline|agents\//i;
+const FORBIDDEN = /AuthoringApp|AgentsPanel|TestGamesPanel|AgentsPage|AgentReader|devGameLog|contentApi|depthPipeline|agents\//i;
 let total = 0; const offenders = []; const byKind = {};
 (function walk(dir) {
   for (const name of readdirSync(dir)) {

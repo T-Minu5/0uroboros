@@ -5,19 +5,22 @@
 import type { PlayerId } from "@0uroboros/engine/game";
 import type { CompiledContent } from "@0uroboros/engine/authoring/contentModel";
 import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
+import { pickOpponent } from "@0uroboros/engine/ai/opponents";
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from "@0uroboros/engine/runtime";
 import type { Command } from "@0uroboros/protocol/messages";
 import type { ReplayRecord, SystemCommand } from "./store";
 
 export type ReplayResult = { session: RuntimeSession; events: RuntimeEvent[] };
 
+/** `strategy` overrides the profile; otherwise an `ai` table replays with the pack opponent its settings recorded. */
 export function replayGame(replay: ReplayRecord, content: CompiledContent, strategy?: StrategyProfile): ReplayResult {
   const clock = { now: replay.startedAt };
+  const profile = strategy ?? (replay.mode === "ai" ? pickOpponent(content.opponents, replay.settings.opponent)?.profile : undefined);
   const session = createSession({
     content, strategicMarket: true, evaluationContent: true,
     carryover: replay.settings.carryover, priorityPreference: replay.settings.priorityPreference,
     random: seededRandom(replay.seed), aiSeats: replay.aiSeats, seatNames: replay.seatNames, recordDecisions: false,
-    ...(strategy ? { strategy } : {}),
+    ...(profile ? { strategy: profile } : {}),
     now: () => clock.now,
   });
   const events: RuntimeEvent[] = [];

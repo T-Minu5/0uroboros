@@ -876,6 +876,7 @@ export function AuthoringApp() {
       <div className="au-header-actions">
         <span className={`au-save-status au-status-${statusKind}`} role="status"><i />{statusLabel}</span>
         {saveBlocked && <button type="button" className="au-issue-chip" onClick={() => jumpTo(issues[0])} title="Show the first problem">{issues.length === 1 ? '1 problem' : `${issues.length} problems`}</button>}
+        <a className="au-page-link" href="/agents" title="AI agents: league games, switches, publishing and mentoring" onClick={event => { if ((dirty || advancedPending) && !window.confirm('Leave Content Studio with unsaved changes?')) event.preventDefault(); }}>Agents</a>
       </div>
     </header>
     <div className="au-workbench-tools">

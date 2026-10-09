@@ -1,0 +1,133 @@
+/* Agents page (/agents, studio build only): the league's games, the agents' switches and mentoring. The game page never loads this. */
+.agents-page{min-height:100vh;display:flex;flex-direction:column;background:#0b0f17;color:#d7dce8}
+.agents-page>header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #ffffff14;background:#ffffff06}
+.agents-page>header nav{margin-left:auto;display:flex;gap:10px;font-size:11px}
+.agents-page>header nav a{color:#9fe8ff;text-decoration:none}
+.agents-page>header nav a:hover{text-decoration:underline}
+.agents-page>.setup-agents{width:min(1100px,100%);margin:18px auto;max-height:none}
+
+/* The panel block, shared by the page shell and its tabs. */
+.setup-agents{position:relative;z-index:1;display:flex;flex-direction:column;flex:none;width:min(680px,100%);max-height:100%;align-self:flex-start;border:1px solid #ffffff1f;border-radius:10px;background:#0b0b17eb;box-shadow:0 22px 50px #0009;overflow:hidden}
+.setup-agents.dragging{box-shadow:0 30px 70px #000c,0 0 0 1px #1fffb155}
+.setup-agents>header{display:flex;align-items:center;gap:9px;flex:none;padding:8px 8px 8px 10px;border-bottom:1px solid #ffffff14;background:#ffffff06;cursor:grab;touch-action:none;user-select:none}
+.setup-agents.dragging>header{cursor:grabbing}
+.setup-agents.collapsed{width:340px}
+.setup-agents.collapsed>header{border-bottom-color:transparent}
+.setup-agents-grip{width:8px;height:16px;flex:none;background:radial-gradient(circle,#ffffff55 1px,transparent 1.4px) 0 0/4px 4px}
+.setup-agents-faces{display:flex;flex:none}
+.setup-agents-faces .agent-avatar+.agent-avatar{margin-left:-6px}
+.setup-agents-title{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.setup-agents-title small{font:600 9px Inter,sans-serif;letter-spacing:2px;color:var(--green,#1fffb1)}
+.setup-agents-title span{font-size:10px;color:#7f899e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.setup-agents .setup-agents-roll{display:grid;place-items:center;flex:none;width:26px;height:26px;padding:0;border-color:#ffffff24;border-radius:6px;background:#ffffff0a;color:#cfd8e3}
+.setup-agents .setup-agents-roll svg{transition:rotate .18s}
+.setup-agents.collapsed .setup-agents-roll svg{rotate:180deg}
+.setup-agents-tabs{display:flex;gap:3px;flex:none;padding:7px 12px 0;border-bottom:1px solid #ffffff14}
+.setup-agents-tabs button{padding:6px 14px;border:1px solid transparent;border-bottom:0;border-radius:7px 7px 0 0;background:none;color:#7e8499;font:600 10px Inter,sans-serif;letter-spacing:.8px;cursor:pointer}
+.setup-agents-tabs button:hover{color:#d7dce8}
+.setup-agents-tabs button[aria-selected='true']{border-color:#ffffff1f;background:#ffffff0a;color:#9fe8ff}
+.setup-agents-body{display:block;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 14px}
+.setup-agents-body.games .test-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
+.setup-agents-body.games .test-games>:not(.test-games-card){grid-column:1/-1}
+.mentoring-recipients{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
+.report-control{display:flex;flex-direction:column;gap:4px}
+.agents-panel .report-control>button{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center}
+.agents-panel .report-control>button.busy{opacity:1;border-color:#9fe8ff88;color:#dff7ff;background:linear-gradient(90deg,#9fe8ff0a,#9fe8ff22,#9fe8ff0a) 0 0/200% 100%;animation:report-sweep 1.6s linear infinite;font-variant-numeric:tabular-nums}
+.report-spinner{width:10px;height:10px;flex:none;border:1.5px solid #9fe8ff44;border-top-color:#9fe8ff;border-radius:50%;animation:report-spin .8s linear infinite}
+@keyframes report-spin{to{rotate:360deg}}
+@keyframes report-sweep{to{background-position:-200% 0}}
+.report-stamp{margin:0;font:500 9px/1.4 Inter,sans-serif;color:#7e8499}
+.report-stamp b{font-weight:600;color:#cfd8e3}
+.agents-panel .report-stamp .report-read{display:inline;width:auto;padding:0;border:0;background:none;color:#9fe8ff;font:600 9px Inter,sans-serif;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.report-spinner,.agents-panel .report-control>button.busy{animation:none}}
+.setup-agents-body h3{display:flex;align-items:baseline;gap:8px;margin:0 0 2px;font:600 10px Inter,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:#eaf0f6}
+.setup-agents-body h3 small{font:500 9px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#7e8499}
+.setup-agents-settings{display:flex;flex-direction:column;gap:8px;min-width:0}
+
+/* Agent games and mentoring tabs: one card per study, league or recipient. */
+.test-games{min-width:0}
+.test-games-meta{margin:-4px 0 0;font:500 9px/1.4 Inter,sans-serif;color:#7e8499}
+.test-games-meta b{font-weight:600;color:#aab3c5}
+.test-games-card{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid #ffffff1a;border-radius:8px;background:#ffffff05}
+.test-games-card>header{display:flex;align-items:center;gap:8px}
+.test-games-card>header>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.test-games-card>header strong{font:600 10px Inter,sans-serif;letter-spacing:1px;color:#eaf0f6}
+.test-games-card>header small{font:600 9px Inter,sans-serif;color:#7e8499;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-games-card .agents-cadence>small{width:84px}
+.test-games-experiment,.test-games-result{margin:0;font:500 9px/1.45 Inter,sans-serif;color:#9ea6ba;overflow-wrap:anywhere}
+.test-games-experiment b{font-weight:600;color:#ffe9a8}
+.test-games-result{padding:5px 8px;border-left:2px solid #9fe8ff55;background:#9fe8ff0a}
+.test-games .agents-fold-body p+p{margin-top:6px}
+.mentoring>.test-games-card+.mentoring-recipients,.mentoring>.test-games-card+.agents-note{margin-top:2px}
+.mentoring-recipient p{display:flex;align-items:center;gap:5px;margin:0 0 3px;font:500 10px/1.4 Inter,sans-serif;color:#d8deeb}
+.mentoring-recipient ol{margin:0;padding-left:18px;display:grid;gap:4px;font:500 9px/1.45 Inter,sans-serif;color:#9ea6ba}
+.mentoring-recipient li span{display:block;color:#d8deeb;overflow-wrap:anywhere}
+.mentoring-recipient li small{display:block;color:#ffe9a8;overflow-wrap:anywhere}
+.coaching-phases{margin:6px 0;padding-left:18px;display:grid;gap:3px;font:500 10px/1.45 Inter,sans-serif;color:#9ea6ba}
+.coaching-phases b{color:#d8deeb;font-weight:600;margin-right:4px}
+.test-games-card>header>.league-faces{flex-direction:row;flex:none;gap:0}
+.league-faces .agent-avatar+.agent-avatar{margin-left:-7px}
+.league-table{width:100%;border-collapse:collapse;font:500 9px/1.3 Inter,sans-serif;color:#aab3c5}
+.league-table th{padding:0 4px 3px;font:600 8px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7e8499;text-align:right}
+.league-table th:first-child,.league-table td:first-child{text-align:left;padding-left:0}
+.league-table td{padding:3px 4px;border-top:1px solid #ffffff0f;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.league-table td:first-child{display:flex;align-items:center;gap:6px}
+.league-table td:first-child>span{display:flex;flex-direction:column;line-height:1.15}
+.league-table td b{font:600 9px Inter,sans-serif;letter-spacing:.5px;color:#eaf0f6}
+.league-table td small{font:500 8px Inter,sans-serif;color:#7e8499}
+.league-table td:last-child{color:#ffe9a8}
+.league-table tr.off{opacity:.45}
+.league-h2h{display:flex;flex-wrap:wrap;gap:3px 10px;margin:0;font:500 9px Inter,sans-serif;color:#7e8499}
+.league-h2h b{font-weight:600;color:#cfd8e3;font-variant-numeric:tabular-nums}
+.agents-panel .agents-actions button.primary{border-color:#1fffb1aa;color:#d9fff1;background:#1fffb114}
+.agents-panel .agents-actions button.primary:hover:not(:disabled){border-color:#1fffb1;background:#1fffb124}
+@media(prefers-reduced-motion:reduce){.setup-agents .setup-agents-roll svg{transition:none}}
+
+/* Agent switches and reports (the Agents tab). */
+.agents-panel{display:flex;flex-direction:column;gap:8px}
+.agents-panel button{width:100%;padding:6px 10px;border:1px solid #ffffff24;border-radius:6px;background:#ffffff0a;color:#cfd8e3;font:600 10px Inter,sans-serif;text-align:left}
+.agents-panel button:hover:not(:disabled){border-color:#ffffff40;background:#ffffff12}
+.agents-panel button[aria-pressed='true']{border-color:#9fe8ff66;color:#eaf6ff;background:#9fe8ff14}
+.agents-panel button:disabled{opacity:.45;cursor:default}
+.agents-panel .agent-card{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid #9fe8ff66;border-radius:0 0 7px 7px;background:#9fe8ff08}
+.agents-tabs{display:flex;gap:3px;margin-bottom:-4px}
+.agents-panel .agents-tabs button{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:5px 3px;border-radius:7px 7px 0 0;border-bottom-color:transparent;background:#ffffff05;text-align:center}
+.agents-tabs button>span{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;max-width:100%}
+.agents-tabs strong{font:600 9px Inter,sans-serif;letter-spacing:.6px;color:#aab3c5;white-space:nowrap}
+.agents-tabs small{max-width:100%;font:600 8px Inter,sans-serif;color:#7e8499;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agents-tabs .agent-avatar{flex:none;filter:saturate(.55) brightness(.85);transition:filter .15s,rotate .2s}
+.agents-tabs button[aria-selected='true'] .agent-avatar{filter:none}
+.agents-tabs button:hover .agent-avatar{rotate:-8deg}
+.agents-reading{display:flex;gap:4px}
+.agents-panel .agents-reading button{flex:1;text-align:center;border-color:#ffd36b55;color:#ffe9a8;background:#ffd36b0d}
+.agents-panel .agents-reading button:hover:not(:disabled){border-color:#ffd36b;background:#ffd36b1c}
+.agents-publish{display:grid;gap:4px}
+.agents-panel .agents-publish button{text-align:center;border-color:#6bd3ff55;color:#bfeaff;background:#6bd3ff0d}
+.agents-panel .agents-publish button:hover:not(:disabled){border-color:#6bd3ff;background:#6bd3ff1c}
+.agents-fold{border-top:1px solid #ffffff12;padding-top:4px}
+.agents-fold>summary{display:flex;align-items:center;gap:6px;padding:3px 0;font:600 9px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#7e8499;cursor:pointer;list-style:none}
+.agents-fold>summary::-webkit-details-marker{display:none}
+.agents-fold>summary::before{content:'›';font-size:13px;line-height:1;transition:rotate .15s}
+.agents-fold[open]>summary::before{rotate:90deg}
+.agents-fold>summary:hover{color:#cfd8e3}
+.agents-fold-body{padding:4px 0 2px}
+.agents-fold-body p{margin:0;font:500 10px/1.45 Inter,sans-serif;color:#9ea6ba}
+@media(prefers-reduced-motion:reduce){.agents-tabs .agent-avatar,.agents-fold>summary::before{transition:none}}
+.agents-panel .agents-tabs button[aria-selected='true']{border-color:#9fe8ff66;background:#9fe8ff12}
+.agents-tabs button[aria-selected='true'] strong{color:#eaf0f6}
+.agents-tabs button[aria-selected='true'] small{color:#9fe8ff}
+.agent-card>small,.agents-panel .agents-note{font:500 9px/1.4 Inter,sans-serif;color:#7e8499}
+.agent-card dl{display:grid;grid-template-columns:72px 1fr;gap:3px 8px;margin:2px 0 0;font:500 9px/1.35 Inter,sans-serif}
+.agent-card dt{color:#7e8499}
+.agent-card dd{margin:0;min-width:0;overflow-wrap:anywhere;color:#aab3c5}
+.agents-panel code{font:500 8.5px ui-monospace,Menlo,monospace;color:#c3cbd9}
+.agents-cadence{display:flex;align-items:center;gap:4px}
+.agents-cadence>small{flex:none;font:600 9px Inter,sans-serif;color:#7e8499}
+.agents-panel .agents-cadence button{flex:1;padding:5px 4px;font-size:9px;text-align:center}
+.agents-panel .agents-cadence button[aria-checked='true']{border-color:#9fe8ff;background:#9fe8ff;color:#0b0b17}
+.agents-progress{position:relative;overflow:hidden;padding:6px 8px;border:1px solid #ffffff14;border-radius:6px;font:600 9px Inter,sans-serif;color:#aab3c5}
+.agents-progress>span{position:relative;z-index:1}
+.agents-progress>i{position:absolute;inset:0 auto 0 0;background:#9fe8ff1f;transition:width .4s}
+.agents-actions{display:flex;gap:4px}
+.agents-panel .agents-actions button{flex:1;text-align:center}
+.agents-panel .agents-error{margin:0;font:500 9px/1.4 Inter,sans-serif;color:#ff9a9a}

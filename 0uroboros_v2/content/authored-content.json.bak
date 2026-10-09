@@ -1,5 +1,5 @@
 {
-  "revision": 273,
+  "revision": 274,
   "document": {
     "version": 2,
     "cards": [
@@ -1998,7 +1998,7 @@
         "type": "Character",
         "cost": 18,
         "art": "/assets/card_art/chaos cards/attack/system-seppuku.png",
-        "effect": "Destroy your backup server.",
+        "effect": "Destroy your backup server, robbing your enemy of its VP points.",
         "power": 5,
         "onReveal": [
           {

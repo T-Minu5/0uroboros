@@ -443,8 +443,8 @@ type NeonGlassProps = {
   /** Shade both faces; back faces take their inner normal. */
   twoSided?: boolean;
   /**
-   * Refract the floor seen through the pane as the Liquid surface's glass does (see neonLiquid), and lay its Apple
-   * glass look over the frame and walls (see neonLiquidLook).
+   * Refract the floor seen through the pane (the Glossy surface), and lay the Apple glass look over the frame and walls
+   * (see neonLiquidLook).
    */
   liquid?: boolean;
   /** World-space clip planes; the list is read live, so planes may be moved per frame. */

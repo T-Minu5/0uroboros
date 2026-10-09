@@ -2,6 +2,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { relative, resolve } from 'node:path';
 import { DEFAULT_STRATEGY, sanitizeProfile, versionLabel, type StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import { opponentBaseline } from '@0uroboros/engine/ai/opponents';
 import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import type { MatchReport } from '@0uroboros/engine/runtime';
 import { createStrategist, type StratGGameRecord } from '../aiStrategist';
@@ -74,6 +75,22 @@ export function createAgentSystem(options: AgentSystemOptions) {
   const t5 = createStrategist({ root: t5Root, contentFile, identity: T_5, league: true, mentorTips: async () => baselineTips(await mentoringStore.read(), 't-5'), apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => t5Active(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('t-5'), log: message => log(`T-5 ${message}`) });
   const dv8 = createStrategist({ root: dv8Root, contentFile, identity: DV_8, league: true, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => dv8Active(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('dv-8'), log: message => log(`DV-8 ${message}`) });
   const vpDog = createStrategist({ root: vpDogRoot, contentFile, identity: VP_DOG, league: true, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => vpDogActive(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('vp-dog'), log: message => log(`VP-Dog ${message}`) });
+
+  const learners: Record<string, { agent: typeof strategist; root: string }> = {
+    'strat-g': { agent: strategist, root: stratGRoot }, 't-5': { agent: t5, root: t5Root }, 'dv-8': { agent: dv8, root: dv8Root }, 'vp-dog': { agent: vpDog, root: vpDogRoot },
+  };
+  /** The agent's current best profile (never a running experiment's arm), sanitized for the content pack. */
+  async function publishable(id: string) {
+    const learner = learners[id];
+    if (!learner) return null;
+    let memory: { version?: unknown; plan?: unknown; profile?: unknown } = learner.agent.memory();
+    if (learner.agent.status().state !== 'online') {
+      try { memory = JSON.parse(await readFile(resolve(learner.root, 'memory.json'), 'utf8')); } catch { /* never played: its seed */ }
+    }
+    const version = typeof memory.version === 'number' ? memory.version : 0;
+    const source = memory.profile && typeof memory.profile === 'object' ? memory.profile : {};
+    return { agent: id, label: versionLabel(version), profile: sanitizeProfile({ ...source, version, plan: memory.plan }, opponentBaseline(id)) };
+  }
 
   const member = (id: string, name: string, agent: typeof strategist, active: () => boolean): LeagueMember => ({
     id, name, active, start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms, concludeTrial: agent.concludeLeagueTrial,
@@ -262,6 +279,11 @@ export function createAgentSystem(options: AgentSystemOptions) {
         if (!entry) { reply(response, 404, { error: 'That agent document does not exist yet.' }); return; }
         const { file, ...meta } = entry;
         reply(response, 200, { ...meta, markdown: await readFile(file, 'utf8') }); return;
+      }
+      if (path === '/api/agents/publishable' && request.method === 'GET') {
+        const best = await publishable(new URLSearchParams((request.url ?? '').split('?')[1] ?? '').get('agent') ?? '');
+        if (!best) { reply(response, 404, { error: 'Only Strat-G, T-5, DV-8 and VP-Dog can be published as opponents.' }); return; }
+        reply(response, 200, best); return;
       }
       if (path === '/api/agents/settings' && request.method === 'PUT') {
         settings.write(await body(request));

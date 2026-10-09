@@ -8,6 +8,8 @@
 .au-workbench .au-brand b { color: var(--au-muted); font-size: 12px; font-weight: 600; }
 .au-workbench .au-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--au-line-strong); border-radius: 8px; color: var(--au-accent); background: var(--au-surface-2); font-size: 18px; text-decoration: none; }
 .au-workbench .au-mark:hover { border-color: var(--au-accent); }
+.au-workbench .au-page-link { padding: 6px 10px; border: 1px solid var(--au-line-strong, #ffffff24); border-radius: 7px; color: var(--au-muted); font-size: 12px; text-decoration: none; }
+.au-workbench .au-page-link:hover { border-color: var(--au-accent); color: var(--au-text, #eaf0f6); }
 .au-workbench .au-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; justify-self: end; min-width: 0; }
 .au-history { display: flex; gap: 4px; }
 .au-save-status { display: inline-flex; align-items: center; gap: 7px; margin-right: 4px; color: var(--au-muted); font-size: 12px; white-space: nowrap; }

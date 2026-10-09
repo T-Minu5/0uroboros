@@ -1,4 +1,6 @@
-import { DEFAULT_STRATEGY, sanitizeProfile, type StrategyProfile, type StrategyWeights } from '@0uroboros/engine/ai/strategy';
+import { sanitizeProfile, type StrategyProfile, type StrategyWeights } from '@0uroboros/engine/ai/strategy';
+import { STRAT_G_PHASES, opponentBaseline } from '@0uroboros/engine/ai/opponents';
+export { STRAT_G_PHASES };
 
 /**
  * The league's players. Each has its own baseline, playbook and style envelope: every
@@ -50,19 +52,11 @@ export function describeEnvelope(envelope: StyleEnvelope): string {
   return parts.join(', ');
 }
 
-/** Strat-G's three phases, set by the designer: economy and engine, a balanced midgame, then attack and VP. */
-export const STRAT_G_PHASES = { economyUntilCycle: 4, midgameMix: 0.5, endgameFromCycle: 9 } as const;
-
 export const STRAT_G: StrategistIdentity = {
   id: 'strat-g', name: 'Strat-G', archetype: 'Balanced',
   style: 'Balanced in three phases: economy and engine (Cycles 1-4), a balanced midgame (5-8), then all-out Server attacks and VP buying (9-16).',
   persona: `You play the designer's balanced line in three phases, and you plan every game around them. Phase 1 (Cycles 1-${STRAT_G_PHASES.economyUntilCycle}): economy and deck engine (high-value Crypto, draw, Actions, thinning). Phase 2 (Cycles ${STRAT_G_PHASES.economyUntilCycle + 1}-${STRAT_G_PHASES.endgameFromCycle - 1}): a balance of attacks, deck engine, Server Restore and VP collection. Phase 3 (Cycles ${STRAT_G_PHASES.endgameFromCycle}-16): attack the enemy Servers like crazy and spend mostly on VP. The phase Cycles are fixed by the designer, so experiment on weights, the buy bar, dilution and card biases, not on timing. Adapt to the opponent without abandoning that shape.`,
-  baseline: {
-    ...DEFAULT_STRATEGY, cardBias: {},
-    plan: 'Three phases: economy and deck engine through Cycle 4 (high-value Crypto, draw, Actions, thinning); a balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP.',
-    economyUntilCycle: STRAT_G_PHASES.economyUntilCycle, chaosFromCycle: STRAT_G_PHASES.endgameFromCycle, vpFromCycle: STRAT_G_PHASES.endgameFromCycle, midgameMix: STRAT_G_PHASES.midgameMix,
-    weights: { ...DEFAULT_STRATEGY.weights, drain: 2.4, vp: 2.6 },
-  },
+  baseline: opponentBaseline('strat-g'),
   envelope: {
     economyUntilCycle: [STRAT_G_PHASES.economyUntilCycle, STRAT_G_PHASES.economyUntilCycle],
     chaosFromCycle: [STRAT_G_PHASES.endgameFromCycle, STRAT_G_PHASES.endgameFromCycle],
@@ -75,12 +69,7 @@ export const T_5: StrategistIdentity = {
   id: 't-5', name: 'T-5', archetype: 'Pure aggression',
   style: 'Pure aggression: almost no economy, Chaos and Drain from Cycle 3, both enemy Servers destroyed by Cycles 10-13.',
   persona: 'You are T-5, a countdown and the pure aggression deck. Your goal is Server destruction: destroy both enemy Servers and end the game by Cycles 10-13, before the opponent\'s engine or VP buying pays off. The damage that takes is the full integrity of both Servers as the rules state it, plus whatever the opponent Restores; the designer may rebalance that integrity, so the number can change but the goal does not. Minimal economy, Chaos and Drain from the first Cycles, Power and disruption to take Nodes, little defense and little VP. Destroying both Servers ends the game, but the most VP still wins, so your destruction VP plus a few VP cards bought to close out a won race must be enough at that moment. When you lose, it is because the kill came too late or the Drain ran dry, not because you rushed.',
-  baseline: {
-    ...DEFAULT_STRATEGY, cardBias: {},
-    plan: 'Pure aggression: one or two Cycles of cheap Power and Action cards, then Chaos and Drain from Cycle 3, keeping enough Drain on pace over Cycles 3-12 to destroy both Servers, whatever their integrity, by Cycles 10-13. VP cards only to close out a won race.',
-    economyUntilCycle: 2, chaosFromCycle: 3, vpFromCycle: 11, handCryptoTarget: 7, minBuyScore: 0.5, dilution: 0.3,
-    weights: { power: 1.4, draw: 1.2, actions: 1.2, crypto: 0.8, drain: 3.4, restore: 0.5, vp: 1.4, duration: 0.6, thin: 0.8, disrupt: 1.4, chaos: 2.8 },
-  },
+  baseline: opponentBaseline('t-5'),
   playbook: [
     'Draft: cheap Power, Action and Drain cards first; a big Crypto card only when nothing aggressive is affordable. Never Shyte-Coin.',
     'Deploy: commit Power early to win Nodes and their rewards; Drain cards go out as soon as they are drawn.',
@@ -95,12 +84,7 @@ export const DV_8: StrategistIdentity = {
   id: 'dv-8', name: 'DV-8', archetype: 'Engine',
   style: 'Engine and control: a long thin, draw-heavy economy, solid Restore, then late heavy VP.',
   persona: 'You are DV-8, the deviant: you refuse the race. You build a long, thin, draw-heavy engine, keep your Servers healthy with Restore, and win late on heavy VP after the opponent burns out. When you lose, it is because the engine came online too late or the deck was not thin enough, not because you should have rushed.',
-  baseline: {
-    ...DEFAULT_STRATEGY, cardBias: {},
-    plan: 'Engine: trash weak cards and buy draw, Action and big Crypto through Cycle 7, defend the Servers with Restore, add Chaos only late, then buy heavy VP from Cycle 13.',
-    economyUntilCycle: 7, chaosFromCycle: 10, vpFromCycle: 13, handCryptoTarget: 12, minBuyScore: 1.2, dilution: 0.9,
-    weights: { power: 0.9, draw: 2.2, actions: 1.6, crypto: 1.3, drain: 1, restore: 1.8, vp: 2.8, duration: 1, thin: 2.4, disrupt: 0.6, chaos: 0.8 },
-  },
+  baseline: opponentBaseline('dv-8'),
   playbook: [
     'Draft: thinning, draw and Action cards and big Crypto (Kilo, Mega-Cache) through the long economy; skip anything that dilutes the deck. Never Shyte-Coin.',
     'Deploy: draw and Action cards first so the engine chains; Restore whenever the Servers take real damage.',
@@ -115,12 +99,7 @@ export const VP_DOG: StrategistIdentity = {
   id: 'vp-dog', name: 'VP-Dog', archetype: 'Pure economy',
   style: 'Pure economy: big Crypto and draw first, VP every Draft from the midgame, 25+ VP bought by Cycles 11-14.',
   persona: 'You are VP-Dog, the pure economy deck: you hound the VP piles. Your aim is to buy about 25 or more VP from the market by Cycles 11-14 and win on points. Build an economy of high-value Crypto, draw and Actions early, start buying VP cards in the midgame and keep buying them every Draft, keep your Servers alive with Restore long enough for the points to count, and almost never spend on Chaos or Drain. The most VP wins, whether the game reaches the Cycle 16 Draft or ends early because a player loses both Servers, so be ahead on VP whenever the opponent could finish your Servers. When you lose, it is because the VP came too slowly or your Servers fell before the points added up, not because you should have attacked.',
-  baseline: {
-    ...DEFAULT_STRATEGY, cardBias: {},
-    plan: 'Pure economy: big Crypto (Kilo-Coin, Mega-Cache), draw and Action cards through Cycle 5, then the most VP the Wallet affords every Draft from Cycle 6, aiming for 25+ VP bought by Cycles 11-14. Restore when the Servers take real damage; Chaos and Drain almost never.',
-    economyUntilCycle: 5, chaosFromCycle: 13, vpFromCycle: 6, handCryptoTarget: 13, minBuyScore: 0.6, dilution: 0.4,
-    weights: { power: 0.8, draw: 1.8, actions: 1.3, crypto: 1.8, drain: 0.5, restore: 1.6, vp: 3.8, duration: 0.8, thin: 1.4, disrupt: 0.4, chaos: 0.3 },
-  },
+  baseline: opponentBaseline('vp-dog'),
   playbook: [
     'Draft: through the economy buy the biggest Crypto (Kilo-Coin, Mega-Cache) plus draw and Action cards; from Cycle 6 spend most of every Wallet on VP piles, most VP per Crypto first. Never Shyte-Coin; skip Chaos.',
     'Deploy: draw and Action cards first, VP cards whenever they are drawn (they cost no Actions); Restore as soon as the Servers take real damage.',

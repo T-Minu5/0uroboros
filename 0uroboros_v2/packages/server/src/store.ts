@@ -25,6 +25,8 @@ export type ResultRecord = {
   accountIds?: [string | null, string | null];
   /** The engine's match report, the evidence Eco-Strat reads. Null when the game never reached a report. */
   report?: MatchReport | null;
+  /** The pack opponent an `ai` table played, by id; absent for pvp. */
+  opponent?: string;
 };
 
 export type Account = { id: string; email: string | null; name: string; createdAt: number };
@@ -162,14 +164,14 @@ export class SqliteStore implements Store {
       CREATE TABLE IF NOT EXISTS packs (hash TEXT PRIMARY KEY, revision INTEGER, document TEXT NOT NULL, published_at INTEGER NOT NULL);
     `);
     // Columns added after the first release; SQLite has no ADD COLUMN IF NOT EXISTS.
-    for (const column of ["account_ids TEXT", "report TEXT"]) {
+    for (const column of ["account_ids TEXT", "report TEXT", "opponent TEXT"]) {
       try { db.exec(`ALTER TABLE results ADD COLUMN ${column}`); } catch { /* already present */ }
     }
   }
   saveResult(record: ResultRecord) {
-    this.db.prepare(`INSERT OR REPLACE INTO results (code, mode, seat_names, ai_seats, started_at, ended_at, cycles, winner, outcome, ended_reason, final_vp, account_ids, report) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    this.db.prepare(`INSERT OR REPLACE INTO results (code, mode, seat_names, ai_seats, started_at, ended_at, cycles, winner, outcome, ended_reason, final_vp, account_ids, report, opponent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(record.code, record.mode, JSON.stringify(record.seatNames), JSON.stringify(record.aiSeats), record.startedAt, record.endedAt, record.cycles, record.result.winner, record.result.outcome, record.result.endedReason, JSON.stringify(record.result.finalVP),
-        JSON.stringify(record.accountIds ?? [null, null]), record.report ? JSON.stringify(record.report) : null);
+        JSON.stringify(record.accountIds ?? [null, null]), record.report ? JSON.stringify(record.report) : null, record.opponent ?? null);
   }
   saveReplay(replay: ReplayRecord) {
     this.db.prepare(`INSERT OR REPLACE INTO replays (code, started_at, body) VALUES (?, ?, ?)`).run(replay.code, replay.startedAt, JSON.stringify(replay));
@@ -244,6 +246,7 @@ function rowToResult(row: Record<string, unknown>): ResultRecord {
     result: { winner: row.winner as PlayerId | null, outcome: row.outcome as GameResult["outcome"], endedReason: row.ended_reason as string | null, finalVP: JSON.parse(row.final_vp as string) },
     accountIds: row.account_ids ? JSON.parse(row.account_ids as string) : [null, null],
     report: row.report ? JSON.parse(row.report as string) as MatchReport : null,
+    ...(row.opponent ? { opponent: row.opponent as string } : {}),
   };
 }
 function rowToAccount(row: unknown): Account | null {

@@ -267,6 +267,26 @@ describe("game server rooms", () => {
     expect(a.ofType("gameOver")[0].result).toMatchObject({ outcome: "concession", winner: 0 });
   });
 
+  it("seats the pack opponent the host picked at an ai table, and records it with the result", () => {
+    const scheduler = new ManualScheduler(), store = new MemoryStore();
+    const lobby = new Lobby({ content, contentRevision: PACK_REVISION, scheduler, store });
+    const picked = lobby.createRoom("ai", { seed: 5, opponent: "vp-dog" });
+    expect(picked.settings.opponent).toBe("vp-dog");
+    const fallback = lobby.createRoom("ai", { seed: 5, opponent: "nobody" });
+    expect(fallback.settings.opponent).toBe(content.opponents[0].id);
+    const unset = lobby.createRoom("ai", { seed: 5 });
+    expect(unset.settings.opponent).toBe(content.opponents[0].id);
+    expect(lobby.createRoom("pvp", { seed: 5, opponent: "vp-dog" }).settings.opponent).toBeUndefined();
+    const a = new FakeConnection();
+    picked.join("Ada", a);
+    expect(picked.session!.matchReport().strategyVersion).toBe(content.opponents.find(o => o.id === "vp-dog")!.profile.version);
+    command(picked, 0, { type: "concede" });
+    expect(store.results.at(-1)).toMatchObject({ code: picked.code, mode: "ai", opponent: "vp-dog" });
+    const replay = store.replays.get(picked.code)!;
+    expect(replay.settings.opponent).toBe("vp-dog");
+    expect(replayGame(replay, content).events.map(e => e.text)).toEqual(picked.events.map(e => e.text));
+  });
+
   it("plays against the AI seat, which drafts on the server's clock", () => {
     const { room, a, scheduler } = table({ mode: "ai", seed: 3 });
     expect(room.status).toBe("playing");

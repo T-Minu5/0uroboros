@@ -30,15 +30,17 @@ export default defineConfig({
  build: {
   outDir: OUT_DIR,
   emptyOutDir: true,
-  rollupOptions: { input: CLIENT ? { index: resolve('index.html') } : { index: resolve('index.html'), studio: resolve('studio.html') } },
+  rollupOptions: { input: CLIENT ? { index: resolve('index.html') } : { index: resolve('index.html'), studio: resolve('studio.html'), agents: resolve('agents.html') } },
  },
  plugins: [react(), {
   name: 'studio-page-route',
   configureServer(server) {
-   // The Content Studio keeps its /author URL in dev; it is a separate page so the client build can leave it out.
+   // The Content Studio keeps its /author URL and the Agents page its /agents URL in dev; they are separate pages so
+   // the client build can leave them out.
    server.middlewares.use((request, _response, next) => {
     const path = (request.url ?? '').split('?')[0];
     if (path === '/author' || path.startsWith('/author/')) request.url = '/studio.html';
+    else if (path === '/agents' || path.startsWith('/agents/')) request.url = '/agents.html';
     next();
    });
   },
