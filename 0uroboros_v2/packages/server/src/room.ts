@@ -71,6 +71,10 @@ export class Room {
   session: RuntimeSession | null = null;
   readonly commands: CommandRecord[] = [];
   readonly events: RuntimeEvent[] = [];
+  /** Planning events (deploy, relocate) a seat has not committed yet; the other seat receives them when the reveal begins. */
+  private planningEvents: [RuntimeEvent[], RuntimeEvent[]] = [[], []];
+  /** Planning that was undone, and the undo itself: the other seat never learns of it. */
+  private readonly hiddenFrom = new Map<RuntimeEvent, PlayerId>();
   result: GameResult | null = null;
   startedAt = 0;
   private readonly config: RoomConfig;
@@ -224,9 +228,29 @@ export class Room {
     if (command.type === "concede") this.result = this.resultFrom("concession");
     if (event) this.events.push(event);
     if (requestId) reply({ type: "ack", requestId, ok: true, event: event ? this.forSeat(event, seat) : null, view: session.view(seat), timers: this.timers() });
-    if (event) this.broadcast(null, seat, other => this.eventMessage(event!, other));
+    if (event) {
+      // Uncommitted planning stays with its seat (see RuntimeSession.view); the other seat hears of it at the reveal.
+      const planning = session.state.phase === "runtime" && (command.type === "deploy" || command.type === "relocate" || command.type === "undoPlanning");
+      if (!planning) this.broadcast(null, seat, other => this.eventMessage(event!, other));
+      else if (command.type === "undoPlanning") {
+        for (const undone of [...this.planningEvents[seat], event]) this.hiddenFrom.set(undone, (1 - seat) as PlayerId);
+        this.planningEvents[seat] = [];
+      } else this.planningEvents[seat].push(event);
+    }
     this.afterChange();
     return true;
+  }
+
+  /** Once planning is over (the reveal, or the game ending) the other seat receives the withheld placements, face down. */
+  private releasePlanning() {
+    for (const seat of [0, 1] as PlayerId[]) {
+      const events = this.planningEvents[seat];
+      if (!events.length) continue;
+      this.planningEvents[seat] = [];
+      const other = (1 - seat) as PlayerId, connection = this.seats[other]?.connection;
+      if (!connection || this.seats[other]!.ai) continue;
+      for (const event of events) connection.send(this.eventMessage(event, other));
+    }
   }
 
   private run(session: RuntimeSession, seat: PlayerId, command: Command): RuntimeEvent | null {
@@ -269,6 +293,7 @@ export class Room {
   private afterChange() {
     const session = this.session;
     if (!session || this.status !== "playing") return;
+    if (session.state.phase !== "runtime") this.releasePlanning();
     for (let guard = 0; !session.state.choice && session.pendingCount; guard++) {
       if (guard > 10_000) throw new Error(`Room ${this.code}: resolution failed to terminate.`);
       const { event } = session.step()!;
@@ -477,7 +502,9 @@ export class Room {
   private sendSnapshot(seat: PlayerId) {
     const session = this.session, connection = this.seats[seat]?.connection;
     if (!session || !connection) return;
-    connection.send({ type: "snapshot", view: session.view(seat), log: this.events.map(event => this.forSeat(event, seat)), cycles: session.cycleHistory(), timers: this.timers() });
+    const withheld = this.planningEvents[(1 - seat) as PlayerId];
+    const log = this.events.filter(event => this.hiddenFrom.get(event) !== seat && !withheld.includes(event)).map(event => this.forSeat(event, seat));
+    connection.send({ type: "snapshot", view: session.view(seat), log, cycles: session.cycleHistory(), timers: this.timers() });
     if (this.status === "finished" && this.result) connection.send({ type: "gameOver", result: this.result, view: session.view(seat), cycles: session.cycleHistory() });
   }
 

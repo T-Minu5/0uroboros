@@ -449,9 +449,14 @@ export class RuntimeSession {
     if (!this.state.circuitEligible.includes(me)) view.circuitReward.definition = null;
     view.players.forEach((player,owner)=>player.bank.forEach((entry,index)=>{const timer=this.runtimeTimers.get(entry.card.id);if(timer&&Number.isFinite(this.timerUntil(timer)))entry.remainingTurns=Math.max(0,this.timerUntil(timer)-timer.age);entry.effectsLeft=this.bankEffectsLeft(this.state.players[owner].bank[index]);}));
     const hidden = (_card: Card, index: number) => ({ id: `hidden-${index}`, hidden: true as const });
+    // The other seat's uncommitted planning is its secret: until every seat has ended the turn, this view shows that
+    // side as it stood when its planning began (hand size, Actions, where its cards sit), so neither where nor when
+    // it places or moves cards is visible. Once the reveal starts the snapshot is gone and the placements show face down.
+    const theirPlanning = this.state.phase === "runtime" ? this.planningSnapshot[them] : null;
     view.players[0].draw = this.state.players[0].draw.map(hidden);
     view.players[1].draw = this.state.players[1].draw.map(hidden);
-    (view.players[them] as { hand: VisibleCard[] }).hand = this.state.players[them].hand.map(hidden);
+    (view.players[them] as { hand: VisibleCard[] }).hand = (theirPlanning?.hand ?? this.state.players[them].hand).map(hidden);
+    if (theirPlanning) view.players[them].actions = theirPlanning.actions;
     (view.players[me] as { hand: VisibleCard[] }).hand = this.state.players[me].hand.map(card => this.shownCard(card));
     view.players.forEach((player, owner) => {
       const state = this.state.players[owner];
@@ -468,7 +473,13 @@ export class RuntimeSession {
       // Closed Nodes reveal neither Location identity nor its rules/rewards to the client.
       if (!legalNodes(this.state.turn, this.state.nodeOrder).includes(i)) node.location = null;
       node.cards[me] = this.state.nodes[i].cards[me].map(placement => placement.revealed ? visiblePower(placement) : { ...structuredClone(placement), card: this.shownCard(placement.card) });
-      node.cards[them] = this.state.nodes[i].cards[them].map(visiblePower);
+      if (theirPlanning) {
+        // A relocated card keeps the Node it had when planning began; its Power counts there too.
+        const theirs = theirPlanning.nodes[i].map(placement => ({ ...placement, node: i }));
+        node.cards[them] = theirs.map(visiblePower);
+        node.powers[them] = theirs.reduce((sum, placement) => sum + (placement.revealed ? this.cardPower(placement) : 0), this.state.nodes[i].powerModifiers[them]);
+        node.winner = nodeWinner(node.powers);
+      } else node.cards[them] = this.state.nodes[i].cards[them].map(visiblePower);
     });
     return seat === 0 ? view : mirrorView(view);
   }

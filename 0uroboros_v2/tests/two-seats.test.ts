@@ -112,7 +112,10 @@ describe("what each seat may see", () => {
     expect(ids(mine.players[0].hand)).toEqual(ids(session.state.players[0].hand));
     expect(mine.players[1].hand.every(card => card.hidden)).toBe(true);
     expect(mine.nodes.flatMap(node => node.cards[0]).map(placement => placement.card.id)).toEqual([placed0]);
-    expect(mine.nodes.flatMap(node => node.cards[1]).every(placement => "hidden" in placement.card)).toBe(true);
+    // The other seat's uncommitted planning is invisible: no placement, and its hand and Actions as the turn began.
+    expect(mine.nodes.flatMap(node => node.cards[1])).toEqual([]);
+    expect(mine.players[1].hand.length).toBe(hand1.length);
+    expect(mine.players[1].actions).toBe(session.view(1).players[0].actions + 1);
     expect(mentionsNone(mine, [...hand1, placed1])).toBe(true);
     expect(mine.planningCardIds).toEqual([placed0]);
 
@@ -121,10 +124,22 @@ describe("what each seat may see", () => {
     expect(ids(theirs.players[0].hand)).toEqual(ids(session.state.players[1].hand));
     expect(theirs.players[1].hand.every(card => card.hidden)).toBe(true);
     expect(theirs.nodes.flatMap(node => node.cards[0]).map(placement => placement.card.id)).toEqual([placed1]);
-    expect(theirs.nodes.flatMap(node => node.cards[1]).every(placement => "hidden" in placement.card)).toBe(true);
+    expect(theirs.nodes.flatMap(node => node.cards[1])).toEqual([]);
+    expect(theirs.players[1].hand.length).toBe(hand0.length);
     expect(mentionsNone(theirs, [...hand0, placed0])).toBe(true);
     expect(theirs.planningCardIds).toEqual([placed1]);
     expect(theirs.canUndoPlanning).toBe(true);
+
+    // One commit changes nothing for the other seat; the second starts the reveal and the placements appear.
+    session.endTurn(1);
+    expect(session.view(0).nodes.flatMap(node => node.cards[1])).toEqual([]);
+    expect(session.view(0).turnReady).toEqual([false, true]);
+    expect(session.endTurn(0)).toBeNull();
+    const afterCommit = session.view(0);
+    expect(afterCommit.nodes.flatMap(node => node.cards[1]).length).toBe(1);
+    expect(afterCommit.players[1].hand.length).toBe(hand1.length - 1);
+    drain(session);
+    expect(session.view(0).nodes.flatMap(node => node.cards[1]).map(placement => placement.card.id)).toEqual([placed1]);
 
     // The mirror keeps the table consistent: the same Node order, swapped seats.
     expect(theirs.openNodes).toEqual(mine.openNodes);

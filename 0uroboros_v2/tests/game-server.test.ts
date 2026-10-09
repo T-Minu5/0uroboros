@@ -86,6 +86,47 @@ function playCycle(room: Room, conns: [FakeConnection, FakeConnection], schedule
 }
 
 describe("game server rooms", () => {
+  it("keeps a seat's planning from the other seat until both commit, and forgets planning that was undone", () => {
+    const { room, a, b, tokens } = table();
+    const boHand = b.view!.players[1].hand.length, boActions = b.view!.players[1].actions;
+    expect(placeOne(room, 0, a)).toBe(true);
+    // Bo: no event, no card, Ada's hand and Actions unchanged.
+    expect(b.events().some(e => e.kind === "deploy")).toBe(false);
+    expect(b.view!.nodes.flatMap(node => node.cards[1])).toEqual([]);
+    expect(b.view!.players[1].hand.length).toBe(boHand);
+    expect(b.view!.players[1].actions).toBe(boActions);
+
+    // Ada takes it back: Bo never hears of the placement or the undo.
+    command(room, 0, { type: "undoPlanning" });
+    expect(lastAck(a).ok).toBe(true);
+    expect(b.events().some(e => e.kind === "deploy" || /undone/.test(e.text))).toBe(false);
+
+    expect(placeOne(room, 0, a)).toBe(true);
+    expect(placeOne(room, 1, b)).toBe(true);
+    command(room, 1, { type: "endTurn" });
+    expect(lastAck(b).ok).toBe(true);
+    // Bo's commit is public; Bo's placement still is not.
+    expect(a.events().some(e => e.kind === "turn" && e.owner === 1 && /commits the turn/.test(e.text))).toBe(true);
+    expect(a.events().some(e => e.kind === "deploy" && e.owner === 1)).toBe(false);
+    expect(a.view!.nodes.flatMap(node => node.cards[1])).toEqual([]);
+
+    command(room, 0, { type: "endTurn" });
+    expect(lastAck(a).ok).toBe(true);
+    // The reveal began: each seat now holds exactly the other's committed placement, never the undone one.
+    expect(a.events().filter(e => e.kind === "deploy" && e.owner === 1)).toHaveLength(1);
+    expect(b.events().filter(e => e.kind === "deploy" && e.owner === 1)).toHaveLength(1);
+    expect(b.events().filter(e => e.kind === "deploy" && e.owner === 1)[0].cardId).toBeUndefined();
+    expect(room.events.filter(e => e.kind === "deploy")).toHaveLength(3);
+
+    // A rejoin snapshot for Bo also omits Ada's undone planning and its undo.
+    room.disconnect(1);
+    const b2 = new FakeConnection();
+    expect(room.resume(tokens[1], b2)).toBe(1);
+    const snapshot = b2.ofType("snapshot")[0];
+    expect(snapshot.log.filter(e => e.kind === "deploy" && e.owner === 1)).toHaveLength(1);
+    expect(snapshot.log.some(e => /undone/.test(e.text))).toBe(false);
+  });
+
   it("seats two players, plays three Cycles over the wire and replays the recorded game to the same result", () => {
     const { room, a, b, scheduler, store } = table();
     expect(room.status).toBe("playing");
@@ -102,18 +143,25 @@ describe("game server rooms", () => {
     expect(room.session!.state.cycle).toBe(4);
     expect(room.status).toBe("playing");
 
-    // Both seats received every Log event, each from its own side of the table, and no event twice.
+    // Both seats received every Log event, each from its own side of the table, and no event twice. Planning events
+    // reach the other seat later (at the reveal), so the sets agree even though the order differs.
     const total = room.events.length;
     expect(new Set(room.events.map(e => e.id)).size).toBe(total);
     expect(new Set(a.events().map(e => e.id)).size).toBe(total);
     expect(a.events().length).toBe(total);
     expect(b.events().length).toBe(total);
     const deployA = a.events().find(e => e.kind === "deploy" && e.owner === 0)!;
-    const sameEventForB = b.events()[a.events().indexOf(deployA)];
+    const sameEventForB = b.events().find(e => e.id === deployA.id)!;
     expect(sameEventForB.owner).toBe(1);
     expect(sameEventForB.text).toMatch(/deployed a face-down card/);
     expect(sameEventForB.cardId).toBeUndefined();
     expect(deployA.cardId).toBeDefined();
+    // B heard of A's placement only once the turn's reveal began: after A's commit (owner 1 from B's side), before the first reveal.
+    const bOrder = b.events().map(e => e.id);
+    const aCommitForB = b.events().find(e => e.kind === "turn" && e.owner === 1 && /commits the turn/.test(e.text))!;
+    const firstReveal = b.events().find(e => e.kind === "reveal")!;
+    expect(bOrder.indexOf(sameEventForB.id)).toBeGreaterThan(bOrder.indexOf(aCommitForB.id));
+    expect(bOrder.indexOf(sameEventForB.id)).toBeLessThan(bOrder.indexOf(firstReveal.id));
 
     // Views agree on the public score from either side.
     const va = a.view!, vb = b.view!;
@@ -337,9 +385,11 @@ describe("game server over WebSocket", () => {
     ada.send({ type: "command", requestId: "d1", command: { type: "deploy", cardId: card.id, node: ada.view!.openNodes[0] } });
     const ack = await ada.until<Extract<ServerMessage, { type: "ack" }>>(m => m.type === "ack" && m.requestId === "d1");
     expect(ack.ok).toBe(true);
-    const seen = await bo.until<Extract<ServerMessage, { type: "event" }>>(m => m.type === "event" && m.event.kind === "deploy");
-    expect(seen.event.owner).toBe(1);
-    expect(seen.event.text).toMatch(/Ada deployed a face-down card/);
+    // Bo learns nothing of Ada's placement while the turn is open: no event, no card on the board, hand size unchanged.
+    await new Promise(resolve => setTimeout(resolve, 150));
+    expect(bo.inbox.some(m => m.type === "event" && m.event.kind === "deploy")).toBe(false);
+    expect(bo.view!.nodes.flatMap(node => node.cards[1])).toEqual([]);
+    expect(bo.view!.players[1].hand.length).toBe(5);
 
     // Bo drops and comes back with the seat token.
     bo.close();
@@ -348,7 +398,9 @@ describe("game server over WebSocket", () => {
     bo2.send({ type: "resumeSeat", code: boJoined.code, seatToken: boJoined.seatToken });
     const snapshot = await bo2.until<Extract<ServerMessage, { type: "snapshot" }>>(m => m.type === "snapshot");
     expect(snapshot.view.seat).toBe(1);
-    expect(snapshot.log.some(e => e.kind === "deploy")).toBe(true);
+    // The rejoin snapshot withholds the open planning too.
+    expect(snapshot.log.some(e => e.kind === "deploy")).toBe(false);
+    expect(snapshot.view.nodes.flatMap(node => node.cards[1])).toEqual([]);
     await ada.until(m => m.type === "presence" && m.connected);
 
     bo2.send({ type: "resumeSeat", code: boJoined.code, seatToken: "x".repeat(20) });
@@ -401,6 +453,9 @@ describe("game server over WebSocket", () => {
       a.send({ type: "command", requestId: `d${i}`, command: { type: "deploy", cardId: card.id, node: a.view!.openNodes[0] } });
       const ack = await a.until<Extract<ServerMessage, { type: "ack" }>>(m => m.type === "ack");
       expect(ack.ok).toBe(true);
+      // B sees the placement once both have committed and the reveal begins.
+      a.send({ type: "command", requestId: `e${i}`, command: { type: "endTurn" } });
+      b.send({ type: "command", requestId: `f${i}`, command: { type: "endTurn" } });
       await b.until(m => m.type === "event" && m.event.kind === "deploy");
     }));
     for (const { a, b } of pairs) { a.close(); b.close(); }

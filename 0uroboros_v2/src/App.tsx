@@ -165,7 +165,8 @@ export function App(){
  function later(callback:()=>void,time:number){const id=window.setTimeout(()=>{timers.current=timers.current.filter(timer=>timer!==id);callback();},time);timers.current.push(id);}
  function record(event:RuntimeEvent){if(devGameLog){const id=logGame.current,session=client.current instanceof LocalClient?client.current.session:null;void devGameLog.then(m=>m.logGameEvent(id,session,event));}setHistory(h=>[...h,event].slice(-6000));}
  /** Online, the other seat's planning placements and commits show in the Log and on the board without a presentation beat. */
- const quiet=(event:RuntimeEvent)=>client.current?.mode==='online'&&event.owner===1&&event.phase==='runtime'&&(event.kind==='deploy'||event.kind==='turn');
+ /** The other seat's own bookkeeping (its placements, commits, Draft purchases and Draft end) updates the table and Log without a presentation beat, so the Draft panel never blinks for an opponent's purchase. */
+ const quiet=(event:RuntimeEvent)=>client.current?.mode==='online'&&event.owner===1&&(event.phase==='runtime'&&(event.kind==='deploy'||event.kind==='turn')||event.phase==='draft'&&(event.kind==='purchase'||event.kind==='draft'));
  /** Starts presenting events the client holds, unless a presentation or a drag is already under way. */
  function kick(){if(client.current?.pendingCount&&!resolvingRef.current&&!isDragging.current){resolvingRef.current=true;setBusy(true);pump();}}
  function pump(){

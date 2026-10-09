@@ -56,6 +56,8 @@ for (const name of ['Ada', 'Bo']) {
       const them = view.players[1];
       if (them.hand.some(card => !card.hidden) || them.draw.some(card => !card.hidden) || view.players[0].draw.some(card => !card.hidden)) report.wire.hiddenInfoViolations.push({ seat: name, type: message.type, eventId: message.event?.id });
       for (const node of view.nodes) for (const placement of node.cards[1]) if (!placement.revealed && !('hidden' in placement.card)) report.wire.hiddenInfoViolations.push({ seat: name, type: message.type, faceDown: placement.card.id });
+      // While a Runtime turn is open the other seat's uncommitted placements must be absent: nothing face down at an open Node.
+      if (view.phase === 'runtime') for (const [index, node] of view.nodes.entries()) if (view.openNodes.includes(index) && node.cards[1].some(placement => !placement.revealed)) report.wire.hiddenInfoViolations.push({ seat: name, type: message.type, eventId: message.event?.id, planningLeak: index });
     } catch { /* not JSON */ }
   }));
   await page.goto(`http://127.0.0.1:${vitePort}/`);
@@ -77,7 +79,9 @@ await ada.page.locator('[data-signed-in]').waitFor();
 report.coverage.signIn = (await ada.page.locator('.online-account b').innerText());
 if (report.coverage.signIn !== 'Ada Lovelace') throw new Error(`Signed in as "${report.coverage.signIn}", expected the account name`);
 
-// Lobby: Ada creates (her name field was filled from the account), Bo joins by code.
+// Lobby: Ada creates (her name field was filled from the account), Bo joins by code. The button enables once the
+// board has preloaded, which a loaded machine or CI runner can take a while over.
+await ada.page.getByRole('button', { name: 'Create table' }).and(ada.page.locator(':enabled')).waitFor({ timeout: 90_000 });
 await ada.page.getByRole('button', { name: 'Create table' }).click();
 const code = await ada.page.locator('[data-room-code]').first().getAttribute('data-room-code');
 if (!/^[A-Z0-9]{6}$/.test(code ?? '')) throw new Error(`Bad invite code: ${code}`);
@@ -172,13 +176,13 @@ for (let cycle = 1; cycle <= cycles; cycle++) {
     const placedA = await deployOne(ada);
     const placedB = await deployOne(bo);
     if (cycle === 1 && turn === 1 && placedA) {
-      // Bo's Log names Ada's placement without the card.
+      // While the turn is open Bo's Log and board show nothing of Ada's placement.
       await bo.page.waitForTimeout(600);
       const texts = await logTexts(bo);
-      const seen = texts.find(text => /Ada Lovelace deployed a face-down card/.test(text));
-      if (!seen) throw new Error(`Bo's Log does not show Ada's face-down placement: ${texts.slice(-5).join(' | ')}`);
-      report.log.faceDownSeen = seen;
-      await shot(bo, 'opponent-facedown');
+      const leaked = texts.find(text => /deployed a face-down card/.test(text));
+      if (leaked) throw new Error(`Bo's Log shows Ada's placement before the commit: ${leaked}`);
+      report.log.planningHidden = true;
+      await shot(bo, 'opponent-planning-hidden');
     }
     await endTurn(ada).click();
     await ada.page.locator('.turn-dock > .end-turn.turn-waiting').waitFor();
@@ -194,6 +198,14 @@ for (let cycle = 1; cycle <= cycles; cycle++) {
     await endTurn(bo).click();
     const next = turn < 3 ? text => text.includes(runtimeLabel(cycle, turn + 1)) : text => text.includes('DRAFT');
     await Promise.all([until(ada, next, `Ada after ${cycle}/${turn}`), until(bo, next, `Bo after ${cycle}/${turn}`)]);
+    if (cycle === 1 && turn === 1 && placedA) {
+      // Once both committed, Bo's Log names Ada's placement without the card.
+      const texts = await logTexts(bo);
+      const seen = texts.find(text => /Ada Lovelace deployed a face-down card/.test(text));
+      if (!seen) throw new Error(`Bo's Log does not show Ada's face-down placement after the commit: ${texts.slice(-8).join(' | ')}`);
+      report.log.faceDownSeen = seen;
+      await shot(bo, 'opponent-facedown');
+    }
     record.turns.push({ turn, placedA, placedB });
   }
   await Promise.all([ada, bo].map(seat => seat.page.locator('.draft-overlay').waitFor()));
