@@ -63,8 +63,11 @@ Workflows live at the repository root (`.github/workflows/`), running inside `0u
 ```bash
 npm run server:build
 OUROBOROS_AUTH=on OUROBOROS_WEB_ORIGIN=http://127.0.0.1:5173 OUROBOROS_DB=.data/dev.sqlite npm run server:start
-npm run dev          # the client on :5173 talks to ws://127.0.0.1:8787 by default
+# In a second terminal. The client on :5173 talks to ws://127.0.0.1:8787 by default.
+npm run dev
 ```
+
+(Keep comments on their own line: zsh passes an inline `# …` to the command, and Vite would use `#` as its root.)
 
 Magic links print to the server's stdout. `npm run test:online` runs the whole gate (server + two browsers + sign-in).
 

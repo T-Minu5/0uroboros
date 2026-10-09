@@ -132,6 +132,12 @@ type SqliteDatabase = {
 /** `node:sqlite` is loaded lazily so the module imports cleanly where it is unavailable (the browser, older Node). */
 export async function openSqliteStore(file: string): Promise<Store> {
   const { DatabaseSync } = await import("node:sqlite") as unknown as { DatabaseSync: new (file: string) => SqliteDatabase };
+  // SQLite creates the file but not its folder (`.data/` locally, the volume mount on Fly).
+  if (file !== ":memory:") {
+    const { mkdirSync } = await import("node:fs");
+    const { dirname } = await import("node:path");
+    mkdirSync(dirname(file), { recursive: true });
+  }
   return new SqliteStore(new DatabaseSync(file));
 }
 
