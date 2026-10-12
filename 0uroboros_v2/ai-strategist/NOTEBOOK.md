@@ -16,7 +16,7 @@ League snapshots (newest first): strat-g@v1.7, strat-g@v1.6, strat-g@v1.5, strat
 
 ### Plan of play
 
-I will focus on building a strong economy through Cycle 4 by prioritizing high-value Crypto cards like Kilo-Coin and Mega-Cache, aiming for a Crypto target of 12. In Cycles 5-8, I will integrate more Restore cards for Server stability while balancing my strategy with Drain and early VP acquisition. From Cycle 9 onwards, I will aggressively attack enemy Servers and prioritize VP card purchases. I will closely monitor the new Location 'Nothing ever happens here' for its impact on strategies and adjust my approach accordingly. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+I will maintain my focus on acquiring high-value Crypto early, aiming for 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft between attacks, deck engine, Server Restore, and VP collection. From Cycle 9 onwards, aggressive attacks on enemy Servers will be prioritized, with heavy investments in VP cards. I will assess the new Locations 'The Might Meek' and 'The Nudge' for potential adjustments in strategy, particularly concerning board Power and VP gains, as they could shift the balance of power in critical Cycles. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos fro (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best)
 
@@ -56,10 +56,18 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 
 ## Current experiment
 
-- none running.
+- **x060-power** (lab, proposed by v1.7, heuristic): Valuing Power higher wins more Locations and their rewards.
+- Change: power weight 1.01→1.31
+- Prediction: More Locations won and more wins than the current best.
+- Theory: none
+- League trial: pending
 
 ## Experiment log
 
+- **x059-thinner** rejected (v1.7): Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. league 28/48 for the experiment vs 29/48 for the current best against t-5@v1.4, strat-g@v1.6, dv-8@v1.1 (margin -1.2/game) → rejected. Kept the current best.
+- **x058-leaner** inconclusive (v1.7): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. league 27.5/48 for the experiment vs 26.5/48 for the current best against vp-dog@v1.1, t-5@v1.6 (margin +0.8/game) → inconclusive. Kept the current best.
+- **x057-drain** rejected (v1.7): Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. league 32/48 for the experiment vs 37.5/48 for the current best against strat-g@v1.5, t-5@v1.8, dv-8@v1.1 (margin -2.4/game) → rejected. Kept the current best.
+- **x056-monitor-nothing-happens-here** rejected (v1.7): Integrating strategies that account for the new Location 'Nothing ever happens here' will improve my performance against opponents. Change: power weight 1.01→1.2. league 27.5/48 for the experiment vs 28.5/48 for the current best against dv-8@v1.1, strat-g@v1.5 (margin -1.8/game) → rejected. Kept the current best.
 - **x055-draw** inconclusive (v1.7): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. league 34/48 for the experiment vs 33/48 for the current best against t-5@v1.5, dv-8@v89, t-5@v1.4 (margin -3.6/game) → inconclusive. Kept the current best.
 - **x054-restore** inconclusive (v1.7): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. league 34/48 for the experiment vs 33/48 for the current best against t-5@v1.4, vp-dog@v1.1, t-5@v1.5 (margin -0.5/game) → inconclusive. Kept the current best.
 - **x053-increasing-the-handcryptotar** inconclusive (v1.7): Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents. Change: Crypto target 11.67→12. league 13.5/48 for the experiment vs 13.5/48 for the current best against dv-8@v1.1, vp-dog@v1.1 (margin +0.3/game) → inconclusive. Kept the current best.
@@ -71,10 +79,6 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 - **x047-leaner** adopted (v1.5): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.5→2, dilution 0.9→1.1. league 24/48 for the experiment vs 17/48 for the current best against dv-8@v90, t-5@v1.3, vp-dog@v1.0 (margin +6.5/game) → promising. Adopted into the current best.
 - **x046-drain** rejected (v1.4): Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2→2.5. league 17/48 for the experiment vs 20/48 for the current best against dv-8@v1.1, strat-g@v1.2 (margin -4.2/game) → rejected. Kept the current best.
 - **x045-vp-earlier** adopted (v1.4): Valuing VP cards two Cycles earlier banks points before the race is decided. Change: VP from Cycle 12→10. league 9.5/48 for the experiment vs 5/48 for the current best against vp-dog@v1.0, dv-8@v1.1 (margin +7.7/game) → promising. Adopted into the current best.
-- **x044-the-nudge-impact** rejected (v1.3): Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies. Change: restore weight 1.3→1.6. league 21.5/48 for the experiment vs 23.5/48 for the current best against t-5@v90, vp-dog@v1.0, dv-8@v91 (margin -2.5/game) → rejected. Kept the current best.
-- **x043-draw** rejected (v1.3): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.6→3. league 25.5/48 for the experiment vs 26/48 for the current best against t-5@v90, strat-g@v1.2, dv-8@v90 (margin -0.9/game) → rejected. Kept the current best.
-- **x042-chaos-later** inconclusive (v1.3): Two more economy Cycles build an engine that out-drains an early Chaos pivot. Change: economy through Cycle 5→6, Chaos from Cycle 6→8. league 39/48 for the experiment vs 39/48 for the current best against strat-g@v1.2, t-5@v1.0, strat-g@v1.0 (margin +5.1/game) → inconclusive. Kept the current best.
-- **x041-restore** inconclusive (v1.3): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. league 20.5/48 for the experiment vs 21.5/48 for the current best against vp-dog@v1.0, t-5@v1.1, dv-8@v91 (margin +1.2/game) → inconclusive. Kept the current best.
 
 ## Theories
 
@@ -82,20 +86,13 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 - none yet
 
 ### Under test
-- **monitor-nothing-happens-here** (untested · v1.7): The Location 'Nothing ever happens here' may shift strategies significantly by providing a neutral space.
+- **evaluate-new-locations** (untested · v1.7): Assessing the impact of new Locations like 'The Might Meek' and 'The Nudge' will enhance my strategic decisions.
 
 ### Refuted
 - none yet
 
 ## Card and Location notes
 
-- **BIOS Archive**: 4 VP finisher; est. hand value 2.7 early / 2.7 late at cost 6. Untested.
-- **Esoteric Encryption**: 6 VP finisher, Server defense; est. hand value 3.6 early / 3.6 late at cost 8. Untested.
-- **Neural Wetware**: 6 VP finisher; est. hand value 4.7 early / 4.7 late at cost 8. Untested.
-- **Zenith Worx**: 8 VP finisher, Server defense; est. hand value 5.2 early / 5.2 late at cost 11. Untested.
-- **Zenith Wetware**: 8 VP finisher; est. hand value 6 early / 6 late at cost 11. Untested.
-- **shyte-coin**: Continue avoiding; it dilutes deck efficiency.
-- **Byte-Coin**: Crypto worth 2, economy; est. hand value 2.5 early / 1 late at cost 3. Untested.
 - **Kilo-Coin**: Crypto worth 3, economy; est. hand value 3.8 early / 1.5 late at cost 6. Untested.
 - **Mega-Cache**: Crypto worth 5; est. hand value 6.3 early / 2.5 late at cost 9. Untested.
 - **Relocation Relay**: utility; est. hand value 2.5 early / 2.5 late at cost 3. Untested.
@@ -118,17 +115,24 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 - **Apollo Ascii**: Monitor its potential to reset power dynamics significantly.
 - **Dama de Fuego**: 3 VP finisher; est. hand value 3.8 early / 3.8 late at cost 6. Untested.
 - **501.AR**: 1 VP finisher; est. hand value 3.6 early / 3.6 late at cost 4. Untested.
-- **Hot oil spa**: Monitor the impact of healing on revealed cards, as it may change strategies for both players.
+- **Hot Oil Spa**: Monitor the impact of healing on revealed cards, as it may change strategies for both players.
 - **A Total Loss**: utility; est. hand value -7.8 early / -7.8 late at cost 4. Untested.
 - **501.Dial**: 2 VP finisher; est. hand value 5.8 early / 5.8 late at cost 6. Untested.
 - **Ticking-tacking**: Evaluate how power reduction affects card deployment and overall strategy.
-- **Healing hands**: Monitor for its potential to significantly change defensive strategies.
-- **No man's land**: New Location: 'Nothing ever happens here' - Monitor its potential to shift strategies and impact the economy.
+- **Healing Hands**: Monitor for its potential to significantly change defensive strategies.
+- **No Man's Land**: New Location: 'Nothing ever happens here' - Monitor its potential to shift strategies and impact the economy.
 - **Rezz-Rizz**: Consider for its utility in enhancing the power of other cards deployed at the same Node, potentially increasing board pressure.
 - **Z-Mobile**: Evaluate its ability to gain power based on the number of cards moved, which could synergize well with mobility strategies.
 - **T-Moble**: Monitor its performance in gaining power through card movement, as it offers flexibility in placement.
 - **The Nudge**: Watch who wins this new Location and how it shifts the economy.
 - **Babba Yaga**: endgame Drain finisher; est. hand value 5.1 early / 13.2 late at cost 10. Untested.
+- **The Might Meek**: New Location: "Ongoing: +1 Power to the weakest revealed card on each side." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Cull the Meek**: New Location: "On collapse: Destroy the weakest revealed card on each side." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Loose Change**: New Location: "Ongoing: +1 Crypto to the losing player." Read: winning it hands the other player about 7.34 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.
+- **Renew**: New Location: "Start of turn 3: Reset the Power of all cards here." Read: contest it: holding it is worth about 1.62 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Pay to Play?**: New Location: "On collapse: Winner may pay 2 Crypto, and get +4 Power to a random card in their deck." Read: winning it hands the other player about 3.68 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.
+- **Peep my shit**: New Location: "Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each." Read: contest it: holding it is worth about 2.7 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Wreck my shit **: New Location: "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck." Read: winning it hands the other player about 1 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.
 
 ## Card results (complete games where a side bought it)
 
@@ -150,64 +154,64 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 
 ## Locations (from my side, complete games)
 
-- FX bumper: seen 30, I won 10, human won 16
+- FX Bumper: seen 30, I won 10, human won 16
 - Quantum commons: seen 29, I won 12, human won 15
 - Ritual mine: seen 28, I won 9, human won 15
-- Data breach: seen 27, I won 11, human won 15
+- Data Breach: seen 27, I won 11, human won 15
 - BumperBall: seen 27, I won 11, human won 14
-- Occult archive: seen 27, I won 13, human won 12
+- Occult Archive: seen 27, I won 13, human won 12
 - Sacrificial LLM: seen 25, I won 13, human won 3
 - Sludge core: seen 25, I won 8, human won 11
 - Ticking-tacking: seen 25, I won 13, human won 7
 - Buggie Smalls: seen 24, I won 11, human won 6
 - Wind fall: seen 24, I won 6, human won 14
 - Wing clip: seen 24, I won 10, human won 10
-- Get out: seen 23, I won 7, human won 13
-- Login the calvary: seen 23, I won 6, human won 15
-- Loser's luck: seen 22, I won 11, human won 9
+- Get Out: seen 23, I won 7, human won 13
+- Login the Calvary: seen 23, I won 6, human won 15
+- Loser's Luck: seen 22, I won 11, human won 9
 
 ## Recent notes
 
-- v1.7 · 2026-10-09 02:56 · Model experiment "Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: The human's Draft wallet consistently outpaces mine; adjustments are needed.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: Warning: my Servers are vulnerable; defense (Restore) matters now.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: I lost many Locations due to low board Power; I must improve this.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: Integrating more Restore cards is essential for stability against aggressive opponents.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: My economy is lagging; I need to secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 02:56 · v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0.
-- v1.7 · 2026-10-09 02:56 · Model experiment "Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-09 02:56 · The human's economy consistently outpaces mine; I must secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 02:56 · Warning: my Servers are vulnerable; defense (Restore) matters now.
-- v1.7 · 2026-10-09 02:56 · I lost many Locations due to low board Power; I must improve this.
-- v1.7 · 2026-10-09 02:56 · Integrating more Restore cards is essential for stability against aggressive opponents.
-- v1.7 · 2026-10-09 02:56 · Cycle 14 showed weaknesses in my economy; I need to secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 02:56 · v1.7 online (server start). Read the notebook: 0 active theories, 55 concluded experiments, record 3-10-0.
-- v1.7 · 2026-10-09 02:56 · Model experiment "Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-09 02:56 · Integrating more Restore cards is essential for stability against aggressive opponents.
-- v1.7 · 2026-10-09 02:56 · Rule change: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP; I need to adjust my strategies accordingly.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: Monitor the new Location 'Nothing ever happens here' for strategic implications.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: I lost most Locations this Cycle; my board Power is too low.
-- v1.7 · 2026-10-09 02:56 · Cycle 14: The human's economy was significantly ahead; I need to secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 02:56 · Cycle 13: Warning: my Servers are at 275. Defense (Restore) matters now.
-- v1.7 · 2026-10-09 02:56 · v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0.
-- v1.7 · 2026-10-09 02:56 · Rule change from the designer: destroying an enemy Primary Server now gives +12 VP and a Backup +20 VP (was 16 and 24), 32 VP for both. Server damage now moves the score less: finishing a Server is worth less than before, VP cards carry more of the score, Restore protects fewer VP, and the trailing-player count weighs damage less. Re-check theories and plans built on the old values.
-- v1.7 · 2026-10-09 01:23 · Model experiment "Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-09 01:23 · The human consistently outpaced my Draft wallet; adjustments are needed.
-- v1.7 · 2026-10-09 01:23 · My Servers are vulnerable; defense (Restore) matters now.
-- v1.7 · 2026-10-09 01:23 · Monitor the new Location 'Nothing ever happens here' for strategic implications.
-- v1.7 · 2026-10-09 01:23 · I lost many Locations due to low board Power; this must improve.
-- v1.7 · 2026-10-09 01:23 · Integrating more Restore cards is essential for stability against aggressive opponents.
-- v1.7 · 2026-10-09 01:23 · Cycle 14 showed weaknesses in my economy; I need to secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 01:23 · v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0.
-- v1.7 · 2026-10-09 01:11 · Model experiment "Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-09 01:11 · Cycle 14: Warning: my Servers are vulnerable; defense (Restore) matters now.
-- v1.7 · 2026-10-09 01:11 · Cycle 14: Monitor the new Location 'Nothing ever happens here' for strategic implications.
-- v1.7 · 2026-10-09 01:11 · Cycle 14: I lost many Locations due to low board Power; I must improve this.
-- v1.7 · 2026-10-09 01:11 · Cycle 14: Integrating more Restore cards is essential for stability against aggressive opponents.
-- v1.7 · 2026-10-09 01:11 · Cycle 14: Human's economy consistently outpaces mine; I must secure higher-value Crypto earlier.
-- v1.7 · 2026-10-09 01:11 · v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0.
-- v1.7 · 2026-10-08 23:40 · Model experiment "Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents." was skipped: the same change was tested recently.
-- v1.7 · 2026-10-08 23:40 · Cycle 14: My Servers are vulnerable; defense (Restore) matters now.
+- v1.7 · 2026-10-12 01:28 · Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts.
+- v1.7 · 2026-10-12 01:28 · Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial.
+- v1.7 · 2026-10-12 01:28 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:28 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:28 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:28 · v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:22 · Cycle 13: My economy remains weak; high-value Crypto acquisition is crucial.
+- v1.7 · 2026-10-12 01:22 · v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: The human's Draft wallet significantly exceeds mine; I need to improve my economy.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: Integration of Restore cards is essential for stabilizing my Servers.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: Early VP acquisition remains critical to compete with the human's economy.
+- v1.7 · 2026-10-12 01:22 · Cycle 14: My board Power is low; I lost many Locations impacting my strategy.
+- v1.7 · 2026-10-12 01:22 · v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:21 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:21 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:21 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:21 · Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial.
+- v1.7 · 2026-10-12 01:21 · v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early.
+- v1.7 · 2026-10-12 01:18 · v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:18 · Cycle 14: High-value Crypto acquisition remains crucial for my economy.
+- v1.7 · 2026-10-12 01:18 · v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: My board Power is low; consistently losing Locations impacts my strategy.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: Early VP acquisition is vital to match the human's economy.
+- v1.7 · 2026-10-12 01:14 · v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays.
+- v1.7 · 2026-10-12 01:14 · Cycle 14: Early VP acquisition is vital to match the human's economy.
 
 ## Version history
 

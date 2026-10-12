@@ -53,6 +53,10 @@ export const RoomSettingsSchema = z.object({
   seed: z.number().int().optional(),
   /** Which of the pack's opponents an `ai` table plays, by id; unset or unknown plays the pack's first. */
   opponent: z.string().trim().min(1).max(80).optional(),
+  /** Every Node is No Man's Land for the whole game. */
+  noLocations: z.boolean().default(false),
+  /** Circuit Rewards that go to the trailing player are never drawn. */
+  noTrailingRewards: z.boolean().default(false),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

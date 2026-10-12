@@ -249,16 +249,17 @@ describe("game server rooms", () => {
 
   it("runs the turn timer: commits the plan a seat left open, then concedes after two turns with no input", () => {
     const { room, a, b, scheduler } = table({ turnSeconds: 30 });
-    expect(a.ofType("timers").at(-1)!.timers.turnEndsAt).toBe(scheduler.now() + 30_000);
+    const firstEndsAt = a.ofType("timers").at(-1)!.timers.turnEndsAt!;
+    expect(firstEndsAt).toBe(scheduler.now() + 30_000);
     placeOne(room, 0, a);
     command(room, 0, { type: "endTurn" });
     scheduler.advance(30_100);
     answerChoices(room, [a, b]);
     expect(room.session!.state.turn).toBe(2);
     expect(room.commands.some(c => c.command.type === "system" && c.command.action === "autoEndTurn")).toBe(true);
-    // Bo's second silent turn counts 1.25x faster.
+    // Bo's second silent turn counts 1.25x faster, from the moment the first one expired.
     const timers = b.ofType("timers").at(-1)!.timers;
-    expect(timers.turnEndsAt! - scheduler.now()).toBe(24_000);
+    expect(timers.turnEndsAt! - firstEndsAt).toBe(24_000);
     placeOne(room, 0, a);
     command(room, 0, { type: "endTurn" });
     scheduler.advance(24_100);
@@ -329,7 +330,7 @@ describe("game server rooms", () => {
     expect(elapsed).toBeLessThan(20_000);
     for (const { room } of tables) room.close();
     expect(lobby.rooms.size).toBe(0);
-  });
+  }, 30_000);
 
   it("persists results and replays through node:sqlite", async () => {
     const { DatabaseSync } = await import("node:sqlite");

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { serverMaximums, type PlayerId } from '@0uroboros/engine/game';
 import type { CycleRecord, RuntimeEvent, SessionPhase } from '@0uroboros/engine/runtime';
+import { summarizeEvents, type SeatNames } from './logSummary';
 import './log-drawer.css';
 
 type SectionId = 'turn-1'|'turn-2'|'turn-3'|'collapse'|'draft'|'end';
@@ -15,13 +16,13 @@ const sectionOf = (phase: SessionPhase|undefined, turn: number|undefined): Secti
  phase === 'collapse' ? 'collapse' : phase === 'draft' ? 'draft' : phase === 'gameover' ? 'end' : `turn-${Math.min(3, Math.max(1, turn ?? 1))}` as SectionId;
 
 type Live = { cycle: number; turn: number; phase: SessionPhase };
-type Props = { events: RuntimeEvent[]; cycles: CycleRecord[]; live: Live|null; colors: [string, string]; close: () => void };
+type Props = { events: RuntimeEvent[]; cycles: CycleRecord[]; live: Live|null; colors: [string, string]; names: SeatNames; close: () => void };
 
 const pad = (n: number) => String(n).padStart(2, '0');
 const signed = (n: number) => n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '±0';
-const winnerLabel = (winner: PlayerId|null) => winner === 0 ? 'You' : winner === 1 ? 'Opponent' : 'Tie';
+const winnerLabel = (winner: PlayerId|null, names: SeatNames) => winner === null ? 'Tie' : names[winner];
 
-export function LogDrawer({ events, cycles, live, colors, close }: Props) {
+export function LogDrawer({ events, cycles, live, colors, names, close }: Props) {
  const grouped = useMemo(() => {
   const byCycle = new Map<number, Map<SectionId, RuntimeEvent[]>>();
   let cycle = 1;
@@ -125,16 +126,20 @@ export function LogDrawer({ events, cycles, live, colors, close }: Props) {
     {!shown.length && <p className='log-empty'>{events.length ? 'Nothing recorded for this Cycle yet.' : 'Your first deployment starts the record.'}</p>}
     {shown.map(id => {
      const list = sections.get(id) ?? [];
+     const players = id === 'end' ? [] : summarizeEvents(list, names);
+     const count = players.reduce((sum, group) => sum + group.lines.length, 0);
      return <section key={id} className={`log-section log-section--${id}`} data-section={id}
       ref={el => { if (el) sectionRefs.current.set(id, el); else sectionRefs.current.delete(id); }}>
-      <h3 className='log-section-head'>{SECTION_LABEL[id]}<span>{list.length} {list.length === 1 ? 'event' : 'events'}</span></h3>
-      {id === 'collapse' && <CollapseSummary record={record} previous={previous}/>}
-      {id === 'collapse' && record && list.length > 0 && <h4 className='log-subhead'>Resolution</h4>}
-      <ol className='log-events'>
-       {list.map(e => <li key={e.id} data-event-kind={e.kind} data-owner={e.owner} data-card-id={e.cardId} data-event-id={e.id}>
-        <small>{e.node !== undefined ? `NODE ${e.node + 1}` : e.kind.toUpperCase()}</small>{e.text}
-       </li>)}
-      </ol>
+      <h3 className='log-section-head'>{SECTION_LABEL[id]}{id !== 'end' && <span>{count} {count === 1 ? 'entry' : 'entries'}</span>}</h3>
+      {id === 'collapse' && <CollapseSummary record={record} previous={previous} names={names}/>}
+      {id === 'collapse' && record && count > 0 && <h4 className='log-subhead'>Resolution</h4>}
+      {id === 'end'
+       ? <ol className='log-events'>{list.map(e => <li key={e.id} data-event-kind={e.kind} data-event-id={e.id}>{e.text}</li>)}</ol>
+       : players.map(group => <div key={group.owner} className='log-player' data-owner={group.owner}>
+        <h4>{names[group.owner]}</h4>
+        <ul>{group.lines.map((line, index) => <li key={index}>{line}</li>)}</ul>
+       </div>)}
+      {id.startsWith('turn-') && !count && <p className='log-empty-turn'>No cards revealed yet.</p>}
      </section>;
     })}
    </div>
@@ -142,7 +147,7 @@ export function LogDrawer({ events, cycles, live, colors, close }: Props) {
  </aside>;
 }
 
-function CollapseSummary({ record, previous }: { record: CycleRecord|null; previous: CycleRecord|null }) {
+function CollapseSummary({ record, previous, names }: { record: CycleRecord|null; previous: CycleRecord|null; names: SeatNames }) {
  if (!record) return <p className='log-collapse-pending'>The summary appears once every Node has resolved.</p>;
  const startVP = previous?.vp ?? [0, 0];
  const fullIntegrity = serverMaximums.primary + serverMaximums.backup;
@@ -154,20 +159,20 @@ function CollapseSummary({ record, previous }: { record: CycleRecord|null; previ
   { label: 'Crypto for Draft', values: [String(record.wallet[0]), String(record.wallet[1])] },
  ];
  const circuit = record.circuit;
- const eligible = circuit ? circuit.eligible.length === 2 ? 'Both players' : circuit.eligible[0] === 0 ? 'You' : circuit.eligible[0] === 1 ? 'Opponent' : 'No one' : null;
+ const eligible = circuit ? circuit.eligible.length === 2 ? 'Both players' : circuit.eligible[0] === 0 || circuit.eligible[0] === 1 ? names[circuit.eligible[0]] : 'No one' : null;
  return <div className='log-collapse-summary' data-cycle={record.cycle}>
   <ul className='log-locations'>
    {record.locations.map((location, index) => <li key={`${location.id}-${index}`} data-winner={location.winner ?? 'tie'}>
-    <span>{location.name}</span><b>{winnerLabel(location.winner)}</b>
+    <span>{location.name}</span><b>{winnerLabel(location.winner, names)}</b>
    </li>)}
   </ul>
   <table className='log-score'>
-   <thead><tr><th/><th>You</th><th>Opponent</th></tr></thead>
+   <thead><tr><th/><th>{names[0]}</th><th>{names[1]}</th></tr></thead>
    <tbody>{rows.map(row => <tr key={row.label}>
     <th scope='row'>{row.label}</th>
     {row.values.map((value, owner) => <td key={owner}>{value}{row.deltas && <em>{row.deltas[owner]}</em>}</td>)}
    </tr>)}</tbody>
   </table>
-  {circuit && <p className='log-circuit'><small>Circuit Reward</small>{circuit.name} · {eligible} earned it{circuit.claimed.length ? ` · claimed by ${circuit.claimed.map(owner => owner === 0 ? 'you' : 'the opponent').join(' and ')}` : ''}</p>}
+  {circuit && <p className='log-circuit'><small>Circuit Reward</small>{circuit.name} · {eligible} earned it{circuit.claimed.length ? ` · claimed by ${circuit.claimed.map(owner => names[owner]).join(' and ')}` : ''}</p>}
  </div>;
 }

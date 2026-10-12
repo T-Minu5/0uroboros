@@ -2,11 +2,15 @@ import { createContext, useContext } from 'react';
 
 export type BoardStyle = 'classic' | 'neon';
 export const BOARD_STYLES = [{ id: 'neon', label: 'Neon' }, { id: 'classic', label: 'Classic' }] as const;
-export const BOARD_STYLE_KEY = 'ouroboros.boardStyle';
-export const DEFAULT_BOARD_STYLE: BoardStyle = 'classic';
+/** v2: the style was saved on every load, so everyone moves to the Neon default once. */
+export const BOARD_STYLE_KEY = 'ouroboros.boardStyle.v2';
+export const DEFAULT_BOARD_STYLE: BoardStyle = 'neon';
 
 export function loadBoardStyle(): BoardStyle {
-  try { return localStorage.getItem(BOARD_STYLE_KEY) === 'neon' ? 'neon' : DEFAULT_BOARD_STYLE; }
+  try {
+    const saved = localStorage.getItem(BOARD_STYLE_KEY);
+    return saved === 'neon' || saved === 'classic' ? saved : DEFAULT_BOARD_STYLE;
+  }
   catch { return DEFAULT_BOARD_STYLE; }
 }
 export function saveBoardStyle(style: BoardStyle) {

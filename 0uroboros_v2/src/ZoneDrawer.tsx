@@ -16,6 +16,13 @@ export function ZoneButtons({trash,destroyed,open,toggle}:{trash:number;destroye
  </div>;
 }
 
+/** Circuit log button on the board's right wing, styled like the Trash and Destroyed piles. */
+export function LogButton({open,toggle}:{open:boolean;toggle:()=>void}){
+ return <div className='zone-buttons'>
+  <button type='button' className='zone-button log-button' aria-pressed={open} aria-label='Circuit log' title='Circuit log' onClick={toggle}><Icon name='log'/><b>Log</b></button>
+ </div>;
+}
+
 function ZoneCard({card,selected,onClick,label}:{card:Card;selected?:boolean;onClick:()=>void;label:string}){
  return <button type='button' className={`zone-card ${selected?'selected':''}`} data-card-id={card.id} aria-pressed={selected===undefined?undefined:selected} aria-label={label} title={card.name} onClick={onClick}>
   <span className='zone-card-face'><CardFace card={card}/></span>

@@ -1,5 +1,5 @@
 {
-  "revision": 275,
+  "revision": 328,
   "document": {
     "version": 2,
     "cards": [
@@ -259,7 +259,7 @@
         "type": "Character",
         "cost": 3,
         "art": "/assets/card_art/base cards/action/thorn-shadow.png",
-        "effect": "+2 Actions. +1 Crypto.",
+        "effect": "+2 Actions,  +1 Crypto for the next 2 Cycles.",
         "power": 2,
         "onReveal": [
           {
@@ -281,33 +281,28 @@
         ],
         "duration": 2,
         "durationPeriod": "cycle",
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "gainActions",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              },
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
+        "schedule": [],
         "pool": "Base",
         "enabled": true,
-        "cardClass": "Action"
+        "cardClass": "Action",
+        "recurring": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          }
+        ]
       },
       {
         "id": "dash-dot",
@@ -576,58 +571,25 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/byte-drone.png",
-        "effect": "Duration card +2 crypto for next 3 turns.",
+        "effect": "+2 Crypto for the next 4 Cycles.",
         "power": 3,
         "duration": 4,
         "durationPeriod": "cycle",
         "onReveal": [],
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 3,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 4,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
+        "schedule": [],
         "pool": "Base",
         "enabled": true,
-        "cardClass": "Action"
+        "cardClass": "Action",
+        "recurring": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          }
+        ]
       },
       {
         "id": "recursive-seance",
@@ -636,7 +598,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/recursive-seance.png",
-        "effect": "+1 Crypto.",
+        "effect": "+1 Crypto for the next 6 turns.",
         "power": 3,
         "duration": 6,
         "durationPeriod": "runtime",
@@ -650,81 +612,20 @@
             }
           }
         ],
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 3,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 4,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 5,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 6,
-            "effects": [
-              {
-                "action": "gainCrypto",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
+        "schedule": [],
         "pool": "Base",
         "enabled": true,
-        "cardClass": "Action"
+        "cardClass": "Action",
+        "recurring": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          }
+        ]
       },
       {
         "id": "cowl-obscyra",
@@ -733,7 +634,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/cowl-obscyra.png",
-        "effect": "+2 Actions. +1 Card.",
+        "effect": "+2 Actions. +2 Cards.",
         "power": 3,
         "onReveal": [
           {
@@ -811,7 +712,7 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/base cards/action/the-tesseract-magi.png",
-        "effect": "+1 Card, for the next 7 turns.",
+        "effect": "+1 Card for the next 7 turns.",
         "power": 3,
         "duration": 7,
         "durationPeriod": "runtime",
@@ -2898,8 +2799,8 @@
         "definitionId": "eval-power-siphon",
         "name": "Power Siphon",
         "type": "Character",
-        "power": 2,
-        "cost": 4,
+        "power": 0,
+        "cost": 5,
         "art": "/assets/card_art/image_placeHolder.png",
         "effect": "Steal 2 power from enemy (select card).",
         "onReveal": [
@@ -2952,8 +2853,8 @@
         "type": "Character",
         "cardClass": "Hacker",
         "enabled": true,
-        "cost": 2,
-        "power": 5,
+        "cost": 5,
+        "power": 2,
         "art": "/assets/card_art/image_placeHolder.png",
         "effect": "Push 2 power left and right.",
         "onReveal": [
@@ -3572,7 +3473,7 @@
     "locations": [
       {
         "id": "data_exchange",
-        "name": "Login the calvary",
+        "name": "Login the Calvary",
         "rule": "Ongoing: +2 Cards, +1 Action to the losing player.",
         "reward": "Ongoing: +2 Cards, +1 Action to the losing player.",
         "effects": [],
@@ -3600,7 +3501,7 @@
       },
       {
         "id": "occult_archive",
-        "name": "Occult archive",
+        "name": "Occult Archive",
         "rule": "On collapse: Attach “printed effects happen twice” to a Character in the winning player's deck.",
         "reward": "On collapse: Attach “printed effects happen twice” to a random Character in the winning player's deck.",
         "effects": [
@@ -3718,7 +3619,7 @@
       },
       {
         "id": "loser-s-luck",
-        "name": "Loser's luck",
+        "name": "Loser's Luck",
         "rule": "Ongoing: The losing player gets +1 Action and +1 Card",
         "reward": "Ongoing: The losing player gets +1 Action and +1 Card",
         "effects": [],
@@ -3811,7 +3712,7 @@
       },
       {
         "id": "healing-hands",
-        "name": "Healing hands",
+        "name": "Healing Hands",
         "rule": "On reveal: Repair their server +25.",
         "reward": "On reveal: Repair their server +25.",
         "effects": [],
@@ -3850,7 +3751,7 @@
       },
       {
         "id": "data-breach",
-        "name": "Data breach",
+        "name": "Data Breach",
         "rule": "On collapse: Drain -100 from the losing player's server.",
         "reward": "On collapse: Deal 100 damage to the losing player's server.",
         "effects": [
@@ -3889,9 +3790,9 @@
       },
       {
         "id": "backup-failure",
-        "name": "Backup failure",
-        "rule": "On collapse: Drain -50 from the losing player's backup server. Ongoing: +1 Card to the losing player.",
-        "reward": "On collapse: Drain -50 from the losing player's backup server. Ongoing: +1 Card to the losing player.",
+        "name": "Backup Plan Fails",
+        "rule": "Ongoing: +1 Card to the losing player. On collapse: Drain -50 form their backup server. ",
+        "reward": "Ongoing: +1 Card to the losing player. On collapse: Drain -50 form their backup server. ",
         "effects": [
           {
             "action": "damageServer",
@@ -3975,7 +3876,7 @@
             "modifier": "movableEachTurn"
           }
         ],
-        "enabled": true
+        "enabled": false
       },
       {
         "id": "thin-the-heard",
@@ -4021,7 +3922,7 @@
       },
       {
         "id": "get-out",
-        "name": "Get out",
+        "name": "Get Out",
         "rule": "On collapse: Mill 1 card from the losing player's deck.",
         "reward": "On collapse: Mill 1 card from the losing player's deck.",
         "effects": [
@@ -4059,15 +3960,15 @@
       },
       {
         "id": "kull-kode",
-        "name": "Code cull",
-        "rule": "On collapse: Destroy the weakest revealed card on each side here.",
-        "reward": "On collapse: Destroy the weakest revealed card on each side here.",
+        "name": "Code Cull",
+        "rule": "On collapse: Destroy the weakest revealed card on the winning side here.",
+        "reward": "On collapse: Destroy the weakest revealed card on the winning side here.",
         "effects": [
           {
             "action": "destroyCard",
             "target": {
               "type": "card",
-              "who": "both",
+              "who": "winner",
               "where": "thisNode"
             },
             "pick": {
@@ -4101,7 +4002,7 @@
       },
       {
         "id": "location-sz68enux",
-        "name": "FX bumper",
+        "name": "FX Bumper",
         "rule": "On collapse: Bump a random card from the losing player's Effect Bank to discard.",
         "reward": "On collapse: Bump a random card from the losing player's Effect Bank to discard.",
         "effects": [
@@ -4122,7 +4023,7 @@
       },
       {
         "id": "location-huzvzstj",
-        "name": "Hot oil spa",
+        "name": "Hot Oil Spa",
         "rule": "Ongoing: Restore a revealed card on each side +1.",
         "reward": "Ongoing: Heal 1 Power on a random revealed card on each side.",
         "effects": [],
@@ -4166,7 +4067,7 @@
       },
       {
         "id": "location-f83zsdwl",
-        "name": "No man's land",
+        "name": "No Man's Land",
         "rule": "Nothing ever happens here",
         "reward": "Nothing ever happens here",
         "effects": [],
@@ -4188,6 +4089,155 @@
           }
         ],
         "enabled": true
+      },
+      {
+        "id": "location-hak8535x",
+        "name": "The Might Meek",
+        "rule": "Ongoing: +1 Power to the weakest revealed card on each side.",
+        "reward": "Ongoing: +1 Power to the weakest revealed card on each side.",
+        "effects": [],
+        "enabled": true,
+        "ongoing": [
+          {
+            "action": "changePower",
+            "target": {
+              "type": "card",
+              "who": "both",
+              "where": "board"
+            },
+            "amount": 1,
+            "pick": {
+              "mode": "weakest"
+            }
+          }
+        ]
+      },
+      {
+        "id": "location-udhywjrh",
+        "name": "Cull the Meek",
+        "rule": "On collapse: Destroy the weakest revealed card on each side.",
+        "reward": "On collapse: Destroy the weakest revealed card on each side.",
+        "effects": [
+          {
+            "action": "destroyCard",
+            "target": {
+              "type": "card",
+              "who": "both",
+              "where": "board"
+            },
+            "pick": {
+              "mode": "weakest"
+            }
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "location-xsglnved",
+        "name": "Loose Change",
+        "rule": "Ongoing: +1 Crypto to the losing player.",
+        "reward": "Ongoing: +1 Crypto to the losing player.",
+        "effects": [],
+        "enabled": true,
+        "ongoing": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "loser"
+            },
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "id": "location-yybkdh5m",
+        "name": "Renew",
+        "rule": "Start of turn 3: Reset the Power of all cards here.",
+        "reward": "Start of turn 3: Reset the Power of all cards here.",
+        "effects": [],
+        "enabled": true,
+        "startTurn3": [
+          {
+            "action": "restoreCard",
+            "target": {
+              "type": "card",
+              "who": "both",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "all"
+            }
+          }
+        ]
+      },
+      {
+        "id": "location-25kpy0uk",
+        "name": "Pay to Play?",
+        "rule": "Start of turn 3: Pay 1 Crypto, then +3 Cards to each player.",
+        "reward": "Start of turn 3: Pay 1 Crypto, then +3 Cards to each player.",
+        "effects": [],
+        "enabled": true,
+        "startTurn3": [
+          {
+            "action": "payCrypto",
+            "target": {
+              "type": "player",
+              "who": "winner"
+            },
+            "amount": 1,
+            "then": [
+              {
+                "action": "draw",
+                "target": {
+                  "type": "player",
+                  "who": "both"
+                },
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "location-adm0cvxt",
+        "name": "Peep my shit",
+        "rule": "Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.",
+        "reward": "Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.",
+        "effects": [],
+        "enabled": true,
+        "startTurn3": [
+          {
+            "action": "scry",
+            "target": {
+              "type": "zone",
+              "who": "winner",
+              "zone": "deck"
+            },
+            "amount": 3
+          }
+        ]
+      },
+      {
+        "id": "location-m78m3xz4",
+        "name": "Wreck my shit ",
+        "rule": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
+        "reward": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
+        "effects": [
+          {
+            "action": "removeModifier",
+            "target": {
+              "type": "card",
+              "who": "winner",
+              "where": "collection"
+            },
+            "pick": {
+              "mode": "random"
+            },
+            "modifier": "movableEachTurn"
+          }
+        ],
+        "enabled": true
       }
     ],
     "circuitRewards": [
@@ -4206,14 +4256,15 @@
               "who": "self"
             }
           }
-        ]
+        ],
+        "awardTrailing": true
       },
       {
         "id": "serpent-s-crown",
         "name": "Serpent's crown",
         "text": "+1 VP.",
         "cost": 0,
-        "enabled": true,
+        "enabled": false,
         "effects": [
           {
             "action": "gainVP",
@@ -4223,7 +4274,8 @@
               "who": "self"
             }
           }
-        ]
+        ],
+        "awardTrailing": true
       },
       {
         "id": "integrity_patch",
@@ -4359,19 +4411,20 @@
       {
         "id": "clean-cut",
         "name": "Clean Cut",
-        "text": "Give 1 Victory Point to the eligible player.",
+        "text": "+2 Crypto.",
         "cost": 0,
         "effects": [
           {
-            "action": "gainVP",
-            "amount": 1,
+            "action": "gainCrypto",
             "target": {
               "type": "player",
               "who": "self"
-            }
+            },
+            "amount": 2
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "between-cycles",
@@ -4489,12 +4542,14 @@
                 "label": "+2 Crypto",
                 "effects": [
                   {
-                    "action": "gainCrypto",
-                    "amount": 0,
+                    "action": "gainCard",
                     "target": {
-                      "type": "player",
-                      "who": "self"
-                    }
+                      "type": "zone",
+                      "who": "self",
+                      "zone": "deck"
+                    },
+                    "amount": 1,
+                    "cardId": "byte-coin"
                   }
                 ]
               },
@@ -4519,7 +4574,8 @@
             ]
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "reward-xr6csfdv",
@@ -4543,7 +4599,8 @@
             "modifier": "mod-r3emmf8z"
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "reward-fa5nxeut",
@@ -4591,7 +4648,8 @@
             "modifier": "mod-byffiyl0"
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "reward-iag9ld3w",
@@ -4756,11 +4814,11 @@
       },
       {
         "id": "deck-aozfccs1",
-        "name": "Short-Circuit-A",
+        "name": "Short-Circuit",
         "cards": [
           {
             "cardId": "byte-coin",
-            "count": 1
+            "count": 2
           },
           {
             "cardId": "kilo-coin",
@@ -4768,10 +4826,6 @@
           },
           {
             "cardId": "vault-encryption",
-            "count": 2
-          },
-          {
-            "cardId": "night-scythe",
             "count": 1
           },
           {
@@ -4779,59 +4833,43 @@
             "count": 1
           },
           {
-            "cardId": "dash-dot",
-            "count": 1
-          },
-          {
             "cardId": "slash-dot",
             "count": 1
           },
           {
-            "cardId": "shyte-coin",
+            "cardId": "dotkrawler",
             "count": 1
           },
           {
-            "cardId": "dotkrawler",
+            "cardId": "bushido-io",
+            "count": 1
+          },
+          {
+            "cardId": "eval-power-siphon",
+            "count": 1
+          },
+          {
+            "cardId": "card-93h8cciw",
             "count": 1
           }
         ]
       },
       {
         "id": "deck-rjwj1cpi",
-        "name": "Shorter-Circuit",
+        "name": "Extended Runtime",
         "cards": [
           {
             "cardId": "basic-encryption",
-            "count": 2
-          },
-          {
-            "cardId": "byte-coin",
             "count": 3
           },
           {
-            "cardId": "rezz-razor",
-            "count": 1
-          },
-          {
-            "cardId": "dash-dot",
-            "count": 1
-          },
-          {
-            "cardId": "slash-dot",
-            "count": 1
-          },
-          {
-            "cardId": "atomic-mass",
-            "count": 1
-          },
-          {
-            "cardId": "nyx-luna",
-            "count": 1
+            "cardId": "shyte-coin",
+            "count": 7
           }
         ]
       }
     ],
-    "activeStartingDeckId": "deck-standard",
+    "activeStartingDeckId": "deck-aozfccs1",
     "mods": [
       {
         "id": "mod-r3emmf8z",
@@ -4964,7 +5002,7 @@
               "where": "board",
               "relation": "self"
             },
-            "amount": 3,
+            "amount": 1,
             "pick": {
               "mode": "choose"
             }

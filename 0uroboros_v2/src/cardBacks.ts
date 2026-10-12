@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-import { servedArtPath } from './depthArt/depthManifest';
 import { loadPerPlayer, savePerPlayer, type PerPlayer } from './playerSettings';
 import type { PlayerColor } from './playerTheme';
 
@@ -17,7 +16,6 @@ const W = 500, H = 700;
 type Crop = readonly [x: number, y: number, width: number, height: number];
 /** `crop` picks one emblem out of a sheet; `fit` is the largest share of the card's width and height the art may fill. */
 type SvgBack = { id: string; label: string; file: string; crop: Crop; fit: readonly [number, number] };
-type ImageBack = { id: string; label: string; image: string };
 
 const EMBLEM_FIT = [.78, .56] as const;
 /** The emblem sheets hold six emblems in three columns and two rows; crops are each emblem's measured bounds, padded for stroke and glow. */
@@ -32,8 +30,7 @@ export const CARD_BACKS = [
   emblem('sun', 'Sun serpent', 'Ouro-small-01.svg', [220, 263, 235, 177]),
   emblem('twins', 'Twin rings', 'Ouro-small-01.svg', [465, 240, 151, 224]),
   emblem('delta', 'Delta ring', 'Ouro-small-06.svg', [36, 259, 171, 185]),
-  { id: 'silicone', label: 'Silicone', image: `${FOLDER}cardback_02_silicone.png` },
-] as const satisfies readonly (SvgBack | ImageBack)[];
+] as const satisfies readonly SvgBack[];
 
 export type CardBackId = (typeof CARD_BACKS)[number]['id'];
 export const DEFAULT_CARD_BACK: CardBackId = 'ouroboros';
@@ -75,16 +72,14 @@ function svgUrl(markup: string) {
 
 const findBack = (id: CardBackId) => CARD_BACKS.find(entry => entry.id === id) ?? CARD_BACKS[0];
 
-/** SVG markup for `id` glowing in `accent`; null for a fixed image back. */
-export function cardBackMarkup(id: CardBackId, accent: string): string | null {
-  const back = findBack(id);
-  return 'image' in back ? null : composeBack(back, accent);
+/** SVG markup for `id` glowing in `accent`. */
+export function cardBackMarkup(id: CardBackId, accent: string): string {
+  return composeBack(findBack(id), accent);
 }
 
 /** Image URL for `id` glowing in `color`; built once per back and colour, so repeated cards share one decoded image. */
 export function cardBackSrc(id: CardBackId, color: PlayerColor): string {
   const back = findBack(id);
-  if ('image' in back) return servedArtPath(back.image);
   const key = `${back.id}|${color.accent}`;
   let url = urls.get(key);
   if (!url) urls.set(key, url = svgUrl(composeBack(back, color.accent)));

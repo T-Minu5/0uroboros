@@ -19,7 +19,7 @@ await page.addInitScript(() => {
   let seed = 341;
   Math.random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
   if (!sessionStorage.getItem('neon-review-initialized')) {
-    localStorage.setItem('ouroboros.boardStyle', 'neon');
+    localStorage.setItem('ouroboros.boardStyle.v2', 'neon');
     sessionStorage.setItem('neon-review-initialized', '1');
   }
 });
@@ -178,8 +178,8 @@ try {
   await page.waitForFunction(() => document.querySelector('.phase-label')?.textContent?.includes('CYCLE 02'), null, { timeout: 90000 }); await ready();
   await shot('next-cycle');
   report.checks.push('Populated Cycle completed through Collapse and Draft into Cycle 2');
-  // Real lighting cycles its three lit floors; Studio cycles the video, every image and None.
-  for (const [mode, count] of [['Real lighting', 3], ['Studio', 10]]) {
+  // Real lighting cycles its three lit floors; Studio cycles the same three and None.
+  for (const [mode, count] of [['Real lighting', 3], ['Studio', 4]]) {
     await chooseLighting(page, mode); await visuals();
     for (let i = 0; i < count; i++) {
       const label = await page.locator('.bg-picker-label').innerText();
@@ -191,7 +191,7 @@ try {
   }
   await chooseLighting(page, 'Real lighting');
   report.checks.push('All Real lighting floors and Studio image, video and None backgrounds switch with Neon');
-  assert.equal(await page.evaluate(() => localStorage.getItem('ouroboros.boardStyle')), 'neon');
+  assert.equal(await page.evaluate(() => localStorage.getItem('ouroboros.boardStyle.v2')), 'neon');
   await page.reload(); await page.getByRole('button', { name: 'Enter evaluation build' }).waitFor();
   assert.equal(await page.locator('.board-canvas').getAttribute('data-board-style'), 'neon');
   report.checks.push('Neon selection persists across reload');

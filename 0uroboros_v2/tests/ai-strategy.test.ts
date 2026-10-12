@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_STRATEGY, draftScore, effectTotal, handValue, optionValue, planDraft, sanitizeProfile, type StrategyContext } from "@0uroboros/engine/ai/strategy";
+import { DEFAULT_STRATEGY, draftScore, effectTotal, handValue, optionValue, planDraft, sanitizeProfile, thinningPicks, type StrategyContext } from "@0uroboros/engine/ai/strategy";
 import { createSession, firstLegalSelection, seededRandom, type MatchReport, type RuntimeSession } from "@0uroboros/engine/runtime";
 import { canDeploy, legalNodes, type Card } from "@0uroboros/engine/game";
 import { createStrategist } from "../server/aiStrategist";
@@ -47,6 +47,23 @@ describe("opponent draft strategy", () => {
     const final = planDraft(["delta-wave", "shiva-of-cern", "mega-cache", "zenith-worx", "vault-encryption"].map(id => option(id)), 20, DEFAULT_STRATEGY, context(16));
     expect(final.length).toBeGreaterThan(0);
     expect(final.every(id => byId(id).type === "VP")).toBe(true);
+  });
+
+  it("trashes starting cards once better cards replace them, keeping VP, Crypto it needs and a working deck", () => {
+    const unique = (list: Card[], tag: string) => list.map((card, index) => ({ ...card, id: `${card.id}#${tag}${index}` }));
+    const deck = unique(starter, "s");
+    const profile = { ...DEFAULT_STRATEGY, dilution: 1 };
+    const characters = deck.filter(card => card.type !== "VP" && card.type !== "Crypto");
+    expect(thinningPicks([...characters, unique([byId("shyte-coin")], "j")[0]], profile, context(3, deck), 5).map(card => card.name)).toEqual(["Shyte-Coin"]);
+    const strong = unique(cards.filter(card => card.type !== "VP" && card.type !== "Crypto" && !starter.some(item => item.id === card.id))
+      .sort((a, b) => handValue(b, profile, context(3)) - handValue(a, profile, context(3))).slice(0, 10), "m");
+    const upgraded = [...deck, ...strong];
+    const picks = thinningPicks(deck, profile, context(3, upgraded), 10);
+    expect(picks.length).toBeGreaterThan(0);
+    expect(picks.every(card => card.type !== "VP")).toBe(true);
+    expect(picks.filter(card => card.type === "Crypto")).toEqual([]);
+    expect(thinningPicks(deck, profile, context(3, deck.slice(0, 8)), 10)).toEqual([]);
+    expect(thinningPicks(deck, { ...profile, handCryptoTarget: 2 }, context(3, upgraded), 10).some(card => card.type === "Crypto")).toBe(true);
   });
 
   it("clamps untrusted profiles", () => {

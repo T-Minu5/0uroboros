@@ -92,6 +92,7 @@
  padding:1px 6px;border-radius:8px;
  font:700 9px Orbitron;color:#181027;background:var(--tally-accent);
 }
+.summary-card-vp.negative{color:#fff;background:#d63a4f}
 @keyframes summary-card{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
 
 @media (max-width:760px){

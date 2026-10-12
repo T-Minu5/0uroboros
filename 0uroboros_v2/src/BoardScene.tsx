@@ -35,6 +35,8 @@ import { NODE_POWER_ANCHOR, nodeHousingGeometries, nodePointGeometry, nodeWindow
 import { NEAR_SLOPE, offsetOutline, slabGeometry, type TablePath } from './neonTableGeometry';
 import { neonLaneDimensions, neonLaneShape } from './neonGeometry';
 import { BoardDiagnostics } from './BoardDiagnostics';
+import { AutoQuality } from './AutoQuality';
+import { GraphicsQualityProvider, QUALITY, type QualityLevel } from './graphicsQuality';
 import type { TransferView } from './transferDrag';
 import { formatAmount } from '@0uroboros/engine/transferText';
 import { neonTrimShading, useNeonTrimClock } from './neonTubeShading';
@@ -62,6 +64,10 @@ export type BoardProps = {
  lightingMode?:LightingMode;
  /** Lighting and material tuning for the Real lighting floor. */
  realLighting?:RealLightingSettings;
+ /** Rendering cost level; lower levels give up resolution, antialiasing and the costliest lighting. */
+ quality?:QualityLevel;
+ /** Set when quality is on Auto: the board measures its frame times and reports the level it should run at. */
+ onAutoQuality?:(level:QualityLevel)=>void;
  /** Each player's etched line pattern on their half of the open lanes, from Settings › Players. */
  lanePatterns?:PerPlayer<LanePattern>;
  /** Each player's Server tube look, from Settings › Players. */
@@ -957,13 +963,17 @@ export function BoardScene(props:BoardProps){
  const [scanning,setScanning]=useState(false);
  const [boardPower,setBoardPower]=useState(1);
  const singularity=useRef<SingularityField>({cx:0,cy:0,radius:0,progress:0,snapshot:false});
+ const qualityLevel=props.quality??'high', quality=QUALITY[qualityLevel];
+ const real=props.lightingMode==='real'&&quality.realFloor;
  // Real lighting on Neon: the board is lit by its own neon, the studio rig only a faint fill.
- const rig=props.boardStyle==='neon'&&props.lightingMode==='real'?props.realLighting??DEFAULT_REAL_LIGHTING:null;
- return <div className={`board-canvas${scanning?' is-scanning':''}`} data-board-style={props.boardStyle??'classic'} style={{'--scan-power':String(boardPower),top:-HEADER_OVERLAP} as CSSProperties}><div className='board-hud-portal' ref={portal}/>
-  <Canvas orthographic shadows={{type:THREE.PCFShadowMap}} camera={{position:[0,18,13.8],zoom:55,near:.1,far:100}} dpr={[1,1.6]} gl={{antialias:true,alpha:true,toneMapping:THREE.ACESFilmicToneMapping,toneMappingExposure:BOARD_EXPOSURE}}>
-   <BoardStyleProvider value={props.boardStyle??'classic'}><NeonRigContext.Provider value={rig}><HudPortal.Provider value={portal}><SingularityContext.Provider value={singularity}><PlayerColorsProvider value={props.playerColors}><BoardLightingProvider servers={props.servers} effect={props.effect} awardNode={props.awardNode}>
+ const rig=props.boardStyle==='neon'&&real&&quality.neonRig?props.realLighting??DEFAULT_REAL_LIGHTING:null;
+ return <div className={`board-canvas${scanning?' is-scanning':''}`} data-board-style={props.boardStyle??'classic'} data-quality={qualityLevel} style={{'--scan-power':String(boardPower),top:-HEADER_OVERLAP} as CSSProperties}><div className='board-hud-portal' ref={portal}/>
+  {/* No canvas antialiasing: every frame is drawn into the composer's own multisampled target. */}
+  <Canvas orthographic shadows={{type:THREE.PCFShadowMap}} camera={{position:[0,18,13.8],zoom:55,near:.1,far:100}} dpr={quality.dpr} gl={{antialias:false,alpha:true,toneMapping:THREE.ACESFilmicToneMapping,toneMappingExposure:BOARD_EXPOSURE}}>
+   {props.onAutoQuality&&<AutoQuality level={qualityLevel} onChange={props.onAutoQuality}/>}
+   <GraphicsQualityProvider value={quality}><BoardStyleProvider value={props.boardStyle??'classic'}><NeonRigContext.Provider value={rig}><HudPortal.Provider value={portal}><SingularityContext.Provider value={singularity}><PlayerColorsProvider value={props.playerColors}><BoardLightingProvider servers={props.servers} effect={props.effect} awardNode={props.awardNode}>
     <CameraFit/><color attach="background" args={['#111722']}/><fog attach="fog" args={['#111722',32,68]}/><ambientLight intensity={.08*(rig?.ambient??1)} color='#a9b8d6'/><hemisphereLight args={['#b4c3de','#0c0818']} intensity={.35*(rig?.ambient??1)}/><SceneEnvironmentIntensity value={rig?.reflections??1}/>
-    <directionalLight position={[-3,12,8]} intensity={3.3*(rig?.moonlight??1)} color='#dce3f0' castShadow={!rig||rig.moonlight>.1} shadow-mapSize={[2048,2048]} shadow-camera-left={-12} shadow-camera-right={12} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0005} shadow-normalBias={.02} shadow-radius={3}/>
+    <directionalLight position={[-3,12,8]} intensity={3.3*(rig?.moonlight??1)} color='#dce3f0' castShadow={quality.shadows&&(!rig||rig.moonlight>.1)} shadow-mapSize={[2048,2048]} shadow-camera-left={-12} shadow-camera-right={12} shadow-camera-top={10} shadow-camera-bottom={-10} shadow-bias={-.0005} shadow-normalBias={.02} shadow-radius={3}/>
     <BoardLightRig studio={rig?0:1}/>
     <Suspense fallback={null}>
      <Environment frames={1} resolution={256}>
@@ -972,14 +982,14 @@ export function BoardScene(props:BoardProps){
       <Lightformer form='rect' intensity={1.2} color='#b24cff' position={[10,4,0]} rotation={[0,-Math.PI/2,0]} scale={[3,10,1]}/>
       <Lightformer form='rect' intensity={.9} color='#ff8a1f' position={[-10,3,-1]} rotation={[0,Math.PI/2,0]} scale={[2,9,1]}/>
      </Environment>
-     <BoardStage backgroundUrl={props.floorBackground} real={props.lightingMode==='real'} realLighting={props.realLighting}/>{props.boardStyle==='neon'?<NeonTable surface={props.neonSurface}/>:<BoardSideEdges/>}{rig&&<NeonLightRig/>}
+     <BoardStage backgroundUrl={props.floorBackground} real={real} realLighting={props.realLighting}/>{props.boardStyle==='neon'?<NeonTable surface={props.neonSurface}/>:<BoardSideEdges/>}{rig&&<NeonLightRig/>}
      <Table/><ServerLights power={boardPower} readoutBacking={props.boardStyle!=='neon'} neon={props.boardStyle==='neon'} styles={props.serverStyles??[DEFAULT_SERVER_STYLE,DEFAULT_SERVER_STYLE]} attacking={props.effect?.kind==='drain'?{owner:props.effect.targetOwner??0,target:props.effect.target??'',id:props.effect.id,before:props.effect.before,after:props.effect.after}:null} servers={props.servers} healing={props.effect?.kind==='restore'?{owner:props.effect.targetOwner??props.effect.player??0,target:props.effect.target??'',id:props.effect.id,before:props.effect.before,after:props.effect.after}:null}/><group position-z={props.boardStyle==='neon'?NEON_FIELD_SHIFT:0}>{props.nodes.map((node,i)=><NodeRegion key={i} index={i} node={node} p={props}/>)}</group>
      {props.hudAnchors?.map(anchor=>{const [x,y,z]=anchor.position,neonShift=props.boardStyle!=='neon'?0:anchor.id==='local-console'?NEON_STATS_DROP:anchor.id==='opponent-console'?-NEON_FAR_RAISE:0;return <Anchor key={anchor.id} position={neonShift?[x,y,boardZ(x,z)+neonShift]:anchor.position} mapDepth={!neonShift&&anchor.id.endsWith('-console')}>{anchor.content}</Anchor>;})}
      <BoardReady onReady={props.onReady}/><ShaderWarmup/>
      {(import.meta as ImportMeta&{env?:{DEV?:boolean}}).env?.DEV&&new URLSearchParams(window.location.search).get('boardStats')==='1'&&<BoardDiagnostics style={props.boardStyle??'classic'} phase={props.phase}/>}
     </Suspense>
     <BoardEffects boardScan={props.boardScan} boardScanTone={props.boardScanTone} boardScanDuration={props.boardScanDuration} gameover={props.gameover} hudFollow={props.hudFollow} glowTint={props.winner==null?undefined:props.playerColors[props.winner].accent} scanning={scanning} onScanning={setScanning} onPower={setBoardPower} overlayRef={overlayRef} field={singularity} portal={portal}/>
-   </BoardLightingProvider></PlayerColorsProvider></SingularityContext.Provider></HudPortal.Provider></NeonRigContext.Provider></BoardStyleProvider>
+   </BoardLightingProvider></PlayerColorsProvider></SingularityContext.Provider></HudPortal.Provider></NeonRigContext.Provider></BoardStyleProvider></GraphicsQualityProvider>
   </Canvas>
   <canvas ref={overlayRef} className='board-scan-overlay' aria-hidden='true'/>
  </div>;

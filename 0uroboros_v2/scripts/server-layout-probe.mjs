@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 const style = process.argv[2] ?? 'neon';
 const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
-await page.addInitScript(s => localStorage.setItem('ouroboros.boardStyle', s), style);
+await page.addInitScript(s => localStorage.setItem('ouroboros.boardStyle.v2', s), style);
 await page.goto('http://127.0.0.1:5173/?boardStats=1');
 await page.getByRole('button', { name: 'Enter evaluation build' }).click();
 await page.waitForFunction(() => !!document.querySelector('.end-turn') && !document.querySelector('.end-turn').disabled, null, { timeout: 60000 });

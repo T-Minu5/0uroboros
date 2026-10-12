@@ -19,6 +19,7 @@ import { BackdropScan, backdropScanMaterialProps } from './BackdropScan';
 import { BOARD_EXPOSURE, lightingNow, pulseDuration, pulseEnvelope, useBoardLighting } from './boardLighting';
 import { applyLightTuning, boardTuning } from './boardTuning';
 import { useBoardStyle } from './boardStyles';
+import { useGraphicsQuality } from './graphicsQuality';
 import { NEON_HALO_REACH, neonGain, neonTubeGlsl, neonTubeVertex, withTubeAxis } from './neonTubeShading';
 
 const BACKDROP_TINT = new THREE.Color().setScalar(1 / BOARD_EXPOSURE);
@@ -229,6 +230,8 @@ export const BoardGradeShader={
  *  disk carries its own halo. Pass order: render → [scan] → bloom → [singularity] → grade → output. */
 export function BoardFinish({scanPass,scanning,singularityPass}:{scanPass?:ShaderPass|null;scanning?:boolean;singularityPass?:ShaderPass|null}={}){
  const {gl,scene,camera,size}=useThree();
+ const dpr=useThree(state=>state.viewport.dpr);
+ const {samples,bloom:bloomOn}=useGraphicsQuality();
  const boardStyle=useBoardStyle();
  const rig=useNeonRig();
  const rigRef=useRef(rig);rigRef.current=rig;
@@ -247,20 +250,24 @@ export function BoardFinish({scanPass,scanning,singularityPass}:{scanPass?:Shade
   return {composer,render,bloom,grade,output};
  },[gl,scene,camera]);
  useEffect(()=>{
-  const pr=Math.min(gl.getPixelRatio(),1.5);
+  const pr=Math.min(dpr,1.5);
   pipeline.composer.setPixelRatio(pr);pipeline.composer.setSize(size.width,size.height);
   pipeline.grade.uniforms.uResolution.value.set(size.width*pr,size.height*pr);
- },[gl,pipeline,size]);
+ },[dpr,pipeline,size]);
+ useEffect(()=>{
+  const {renderTarget1,renderTarget2}=pipeline.composer;
+  for(const target of [renderTarget1,renderTarget2])if(target.samples!==samples){target.samples=samples;target.dispose();}
+ },[pipeline,samples]);
  useEffect(()=>{
   const {composer,render,bloom,grade,output}=pipeline;
   composer.passes.length=0;
   composer.addPass(render);
   if(scanPass)composer.addPass(scanPass);
-  composer.addPass(bloom);
+  if(bloomOn)composer.addPass(bloom);
   if(singularityPass)composer.addPass(singularityPass);
   composer.addPass(grade);
   composer.addPass(output);
- },[pipeline,scanPass,singularityPass]);
+ },[pipeline,scanPass,singularityPass,bloomOn]);
  useEffect(()=>{
   if(reduced)pipeline.grade.uniforms.uGrain.value=0;
   if(!(import.meta as ImportMeta&{env?:{DEV?:boolean}}).env?.DEV)return;

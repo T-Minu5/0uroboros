@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 // Prints Server label icons and Effect Bank panels in world X/Z (play camera, 1600x1000).
 const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const page = await browser.newPage({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 1 });
-await page.addInitScript(() => localStorage.setItem('ouroboros.boardStyle', 'neon'));
+await page.addInitScript(() => localStorage.setItem('ouroboros.boardStyle.v2', 'neon'));
 await page.goto('http://127.0.0.1:5173/?boardStats=1');
 await page.getByRole('button', { name: 'Enter evaluation build' }).click();
 await page.waitForFunction(() => !!document.querySelector('.end-turn') && !document.querySelector('.end-turn').disabled, null, { timeout: 60000 });

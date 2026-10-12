@@ -10,13 +10,13 @@ describe('server tube style setting', () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it('defaults both players to the shield', () => {
-    expect(DEFAULT_SERVER_STYLE).toBe('shield');
-    expect(loadServerStyles()).toEqual(['shield', 'shield']);
+  it('defaults both players to Digital (the classic column)', () => {
+    expect(DEFAULT_SERVER_STYLE).toBe('classic');
+    expect(loadServerStyles()).toEqual(['classic', 'classic']);
   });
 
-  it('offers shield, pulse and classic as separate choices', () => {
-    expect(SERVER_STYLES.map(option => option.id)).toEqual(['shield', 'pulse', 'classic']);
+  it('offers Digital first, then Shield and Pulse', () => {
+    expect(SERVER_STYLES).toEqual([{ id: 'classic', label: 'Digital' }, { id: 'shield', label: 'Shield' }, { id: 'pulse', label: 'Pulse' }]);
   });
 
   it('round-trips a separate choice for each player', () => {
@@ -26,16 +26,17 @@ describe('server tube style setting', () => {
     expect(loadServerStyles()).toEqual(['shield', 'classic']);
   });
 
-  it('carries a choice saved before styles were per player over to both players', () => {
+  it('moves everyone to the Digital default once, ignoring choices saved under the old keys', () => {
     store.set('ouroboros.serverStyle', 'pulse');
-    expect(loadServerStyles()).toEqual(['pulse', 'pulse']);
+    store.set('ouroboros.serverStyles', JSON.stringify(['shield', 'shield']));
+    expect(loadServerStyles()).toEqual(['classic', 'classic']);
   });
 
   it('falls back to the default for unknown or unreadable values', () => {
-    store.set('ouroboros.serverStyles', JSON.stringify(['liquid', 'pulse']));
-    expect(loadServerStyles()).toEqual(['shield', 'shield']);
+    store.set('ouroboros.serverStyles.v2', JSON.stringify(['liquid', 'pulse']));
+    expect(loadServerStyles()).toEqual(['classic', 'classic']);
     vi.stubGlobal('localStorage', { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } });
-    expect(loadServerStyles()).toEqual(['shield', 'shield']);
+    expect(loadServerStyles()).toEqual(['classic', 'classic']);
     expect(() => saveServerStyles(['classic', 'classic'])).not.toThrow();
   });
 });

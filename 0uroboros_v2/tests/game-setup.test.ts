@@ -7,11 +7,11 @@ describe('game setup', () => {
   });
 
   it('defaults to 12 VP for a Primary Server, 20 for a Backup and no turn timer', () => {
-    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 20 }, turnSeconds: null });
+    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 20 }, turnSeconds: null, noLocations: false, noTrailingRewards: false });
   });
 
   it('drops saved values the setup can no longer choose', () => {
-    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 } })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null });
-    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45 })).toEqual({ serverVP: { primary: 10, backup: 20 }, turnSeconds: 45 });
+    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 } })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null, noLocations: false, noTrailingRewards: false });
+    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45 })).toEqual({ serverVP: { primary: 10, backup: 20 }, turnSeconds: 45, noLocations: false, noTrailingRewards: false });
   });
 });

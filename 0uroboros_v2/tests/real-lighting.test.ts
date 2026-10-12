@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOARD_BACKGROUNDS, NO_BOARD_BACKGROUND, REAL_LIGHTING_FLOORS, backgroundsFor, loadBackgroundChoice, saveBackgroundChoice, stepBackground } from '../src/boardBackgrounds';
+import { BOARD_BACKGROUNDS, NO_BOARD_BACKGROUND, REAL_LIGHTING_FLOORS, boardBackgroundLabel, backgroundsFor, loadBackgroundChoice, saveBackgroundChoice, stepBackground } from '../src/boardBackgrounds';
 import { DEFAULT_REAL_LIGHTING, REAL_LIGHTING_SLIDERS, floorLighting, loadRealLightingStore, realLightingDefaults, saveRealLightingStore, updateFloorLighting } from '../src/realLighting';
 
 const floor = (n: string) => `/assets/board/backgrounds/back-${n}.webp`;
@@ -11,27 +11,36 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('lighting mode and floors', () => {
-  it('Real lighting offers back-01, 02 and 07; Studio keeps the full list ending in None', () => {
-    expect(REAL_LIGHTING_FLOORS).toEqual([floor('01'), floor('02'), floor('07')]);
+  it('offers Underworld, Table Top and Tunnel in both modes, Studio ending in None', () => {
+    expect(REAL_LIGHTING_FLOORS).toEqual([floor('02'), floor('07'), floor('01')]);
+    expect(BOARD_BACKGROUNDS).toEqual([floor('02'), floor('07'), floor('01'), NO_BOARD_BACKGROUND]);
+    expect(BOARD_BACKGROUNDS.map(boardBackgroundLabel)).toEqual(['Underworld', 'Table Top', 'Tunnel', 'None']);
     expect(backgroundsFor('real')).toBe(REAL_LIGHTING_FLOORS);
     expect(backgroundsFor('studio')).toBe(BOARD_BACKGROUNDS);
-    expect(BOARD_BACKGROUNDS.at(-1)).toBe(NO_BOARD_BACKGROUND);
   });
 
-  it('defaults to Real lighting and persists the mode and each mode’s background', () => {
+  it('defaults to Studio lighting on Underworld and persists the mode and each mode’s background', () => {
     const initial = loadBackgroundChoice();
-    expect(initial.mode).toBe('real');
-    const next = stepBackground({ ...stepBackground(initial, 1), mode: 'studio' }, -1);
+    expect(initial).toEqual({ mode: 'studio', background: { real: floor('02'), studio: floor('02') } });
+    const next = stepBackground({ ...stepBackground({ ...initial, mode: 'real' }, 1), mode: 'studio' }, -1);
     saveBackgroundChoice(next);
     expect(loadBackgroundChoice()).toEqual(next);
-    expect(next.background.real).toBe(floor('01'));
+    expect(next.background.real).toBe(floor('07'));
+    expect(next.background.studio).toBe(NO_BOARD_BACKGROUND);
   });
 
-  it('wraps through the active list and ignores saved backgrounds outside it', () => {
+  it('ignores choices saved under the old keys, which recorded the old defaults on every load', () => {
+    store.set('ouroboros.lightingMode', 'real');
+    store.set('ouroboros.lightingMode.v2', 'real');
+    store.set('ouroboros.boardBackground', JSON.stringify({ real: floor('07'), studio: floor('01') }));
+    expect(loadBackgroundChoice()).toEqual({ mode: 'studio', background: { real: floor('02'), studio: floor('02') } });
+  });
+
+  it('wraps through the active list and ignores saved backgrounds outside it, including the removed ones', () => {
     const defaults = loadBackgroundChoice();
-    expect(stepBackground({ ...defaults, background: { ...defaults.background, real: floor('07') } }, 1).background.real).toBe(floor('01'));
-    store.set('ouroboros.boardBackground', JSON.stringify({ real: floor('05'), studio: 'nope' }));
-    store.set('ouroboros.lightingMode', 'disco');
+    expect(stepBackground({ mode: 'real', background: { ...defaults.background, real: floor('01') } }, 1).background.real).toBe(floor('02'));
+    store.set('ouroboros.boardBackground.v2', JSON.stringify({ real: floor('08'), studio: '/assets/board/backgrounds/background-01.mp4' }));
+    store.set('ouroboros.lightingMode.v3', 'disco');
     expect(loadBackgroundChoice()).toEqual(defaults);
   });
 });
@@ -73,8 +82,8 @@ describe('real lighting settings', () => {
   it('follows looks and choices saved against the old PNG floors to their WebP builds', () => {
     store.set('ouroboros.realLighting.v2', JSON.stringify({ '/assets/board/backgrounds/back-01.png': { current: { neon: 2 } } }));
     expect(loadRealLightingStore()[floor('01')]?.current.neon).toBe(2);
-    store.set('ouroboros.boardBackground', JSON.stringify({ real: '/assets/board/backgrounds/back-02.png', studio: '/assets/board/backgrounds/back-08.png' }));
-    expect(loadBackgroundChoice().background).toEqual({ real: floor('02'), studio: floor('08') });
+    store.set('ouroboros.boardBackground.v2', JSON.stringify({ real: '/assets/board/backgrounds/back-07.png', studio: '/assets/board/backgrounds/back-01.png' }));
+    expect(loadBackgroundChoice().background).toEqual({ real: floor('07'), studio: floor('01') });
   });
 
   it('migrates the single pre-v2 look to back-07, clamping out-of-range values and dropping invalid ones', () => {

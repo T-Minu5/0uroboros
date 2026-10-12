@@ -37,11 +37,12 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
   const choice = resolveOpponent(opponents, opponent);
   const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds } = setup;
+  const { serverVP, turnSeconds, noLocations, noTrailingRewards } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
     `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
+    ...(noLocations ? ['No Locations'] : []), ...(noTrailingRewards ? ['No trailing rewards'] : []),
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
@@ -69,6 +70,14 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
           <button type='button' title={`Back to ${defaultServerVP.primary} / ${defaultServerVP.backup}`} disabled={disabled || (serverVP.primary === defaultServerVP.primary && serverVP.backup === defaultServerVP.backup)} onClick={() => onChange({ ...setup, serverVP: { ...defaultServerVP } })}>Reset</button>
         </div>
       </div>
+      <label className='game-configure-row game-configure-check'>
+        <span>No Locations <small>Every Node is No Man's Land for the whole game</small></span>
+        <input aria-label='No Locations' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />
+      </label>
+      <label className='game-configure-row game-configure-check'>
+        <span>No trailing rewards <small>Removes the Circuit Rewards that go to the player with the least VP</small></span>
+        <input aria-label='No trailing rewards' type='checkbox' disabled={disabled} checked={noTrailingRewards} onChange={event => onChange({ ...setup, noTrailingRewards: event.target.checked })} />
+      </label>
       <StartingDeckPicker decks={decks} value={deckId} onChange={onDeck} disabled={disabled} />
     </div>}
   </div>;

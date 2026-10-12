@@ -1,5 +1,5 @@
 import { EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, type MarketPile } from "./evaluationMarket";
-import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, type LocationRewardEffect, type CircuitRewardDefinition } from "./content";
+import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, NO_MANS_LAND, type LocationRewardEffect, type CircuitRewardDefinition } from "./content";
 import type { CompiledContent } from './authoring/contentModel';
 import {
   type Card, type CardModifier, type PlayerId, type RandomSource, type Deployment, type Servers,
@@ -13,7 +13,7 @@ import { migrateEffects } from "./effects/migrate";
 import { builtinMod } from "./builtinMods";
 import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type ModDefinition, type ModHook, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
 import { formatAmount, transferFlow, transferText } from "./transferText";
-import { DEFAULT_STRATEGY, deployPriority, draftScore, keepValue, locationStakes, optionValue, planDraft, strategyPhase, type StrategyContext, type StrategyProfile } from "./ai/strategy";
+import { DEFAULT_STRATEGY, deployPriority, draftScore, JUNK_KEEP_VALUE, keepValue, locationStakes, optionValue, planDraft, strategyPhase, thinningPicks, type StrategyContext, type StrategyProfile } from "./ai/strategy";
 import { TelemetryCollector, type GameTelemetry } from "./ai/telemetry";
 
 export type SessionPhase = "runtime" | "reveal" | "collapse" | "draft" | "gameover";
@@ -58,6 +58,10 @@ export type SessionConfig = {
    * client expects. Set, events name both seats in the third person so one text serves every reader.
    */
   seatNames?: [string, string];
+  /** Every Node is No Man's Land for the whole session. */
+  noLocations?: boolean;
+  /** Circuit Rewards that go to the trailing player are never drawn. */
+  noTrailingRewards?: boolean;
   /** The clock Draft deadlines and purchase cooldowns read; defaults to Date.now. Inject for tests and servers. */
   now?: () => number;
 };
@@ -158,7 +162,7 @@ export type VisiblePlacement = Omit<Deployment, "card"> & { card: VisibleCard };
 /** End-of-session VP tally by source; the parts always sum to `total`. */
 export type ScoreBreakdown = {
   total: number;
-  /** Every owned card in an active zone that scores VP, both players revealed. */
+  /** Every owned card in an active zone that changes the score (VP cards, then negative ones like Glitch), both players revealed. */
   vpCards: Card[];
   cardVP: number; locationVP: number; circuitVP: number; effectVP: number; destructionVP: number;
 };
@@ -284,8 +288,7 @@ export function mirrorView(view: SessionView): SessionView {
 }
 
 const cardVP = (card: Card) => card.vp ?? (card.name === "Vault Encryption" ? 2 : 0);
-/** Below this keep value the opponent treats a card as deck clutter (Shyte-Coin, Glitch). */
-const AI_JUNK_VALUE = 1.5;
+const AI_JUNK_VALUE = JUNK_KEEP_VALUE;
 /** Node-choice units per hand point of Location value; a flipped Node is worth 60, so a Location can outweigh it only when capped near that. */
 const LOCATION_POINT = 3;
 const LOCATION_SCORE_CAP = 45;
@@ -403,6 +406,11 @@ export class RuntimeSession {
 
   private setupEvaluationLocations() {
     if (!this.config.evaluationContent) return;
+    if (this.config.noLocations) {
+      const empty = this.config.content?.locations.find(location => location.id === NO_MANS_LAND.id) ?? NO_MANS_LAND;
+      this.state.nodes.forEach(node => { node.location = structuredClone(empty); });
+      return;
+    }
     const locations = (this.config.content?.locations??EVALUATION_LOCATIONS).map(location => structuredClone(location));
     for (let i = locations.length - 1; i > 0; i--) {
       const j = Math.floor(this.config.random() * (i + 1));
@@ -505,7 +513,7 @@ export class RuntimeSession {
 
   private scoreBreakdown(owner: PlayerId): ScoreBreakdown {
     const player = this.state.players[owner], sources = this.rewardSources[owner];
-    const vpCards = structuredClone(this.activeCards(owner).filter(card => cardVP(card) > 0));
+    const vpCards = structuredClone(this.activeCards(owner).filter(card => cardVP(card) !== 0).sort((a, b) => Number(cardVP(a) < 0) - Number(cardVP(b) < 0)));
     return {
       total: player.totalVP, vpCards,
       cardVP: vpCards.reduce((sum, card) => sum + cardVP(card), 0),
@@ -1587,9 +1595,10 @@ export class RuntimeSession {
         const value = (card: Card) => keepValue(card, this.strategyOf(chooser), context, trash);
         const ranked = [...eligible].sort((a, b) => value(a) - value(b));
         if (victim !== chooser) return ranked.reverse().slice(0, max).map(card => card.id);
-        // Thinning: trash every junk card the effect allows, but never discard more than required.
-        const junk = trash ? ranked.filter(card => value(card) < AI_JUNK_VALUE).length : 0;
-        return ranked.slice(0, Math.min(max, Math.max(min, junk))).map(card => card.id);
+        // Thinning: trash every card the profile counts as dead weight, but never discard more than required.
+        const thinned = trash ? thinningPicks(eligible, this.strategyOf(chooser), context, max) : [];
+        const required = ranked.filter(card => !thinned.includes(card)).slice(0, Math.max(0, min - thinned.length));
+        return [...thinned, ...required].map(card => card.id);
       },
     });
   }
@@ -1614,11 +1623,12 @@ export class RuntimeSession {
       groups: cards.map(card => ({ id: card.id, label: card.name, card: this.shownCard(card) })),
       options,
       aiPick: () => {
-        const context = this.strategyContext(viewer);
+        const context = this.strategyContext(viewer), profile = this.strategyOf(placement.owner);
+        const thinned = viewer === placement.owner ? thinningPicks(cards, profile, context, cards.length) : [];
         return cards.map(card => {
-          const value = keepValue(card, this.strategyOf(placement.owner), context, true);
+          const value = keepValue(card, profile, context, true);
           const action = viewer === placement.owner
-            ? value < AI_JUNK_VALUE ? "trash" : value < AI_JUNK_VALUE * 2 ? "discard" : "keep"
+            ? thinned.includes(card) ? "trash" : value < AI_JUNK_VALUE * 2 ? "discard" : "keep"
             : value >= AI_JUNK_VALUE * 3 ? "trash" : value >= AI_JUNK_VALUE * 2 ? "discard" : "keep";
           return `${action}:${card.id}`;
         });
@@ -2340,7 +2350,9 @@ export class RuntimeSession {
     this.queue.push(() => {
       this.state.selectedNode = null;
       const wins = this.locationWins();
-      const rewards=this.config.content?.circuitRewards??EVALUATION_CIRCUIT_REWARDS;
+      const pool=this.config.content?.circuitRewards??EVALUATION_CIRCUIT_REWARDS;
+      const leaders=this.config.noTrailingRewards ? pool.filter(reward => !reward.awardTrailing) : pool;
+      const rewards=leaders.length ? leaders : pool;
       const definition = this.config.evaluationContent ? structuredClone(rewards[Math.floor(this.config.random() * rewards.length)]) : null;
       this.refreshScores();
       const [me, them] = this.state.players;

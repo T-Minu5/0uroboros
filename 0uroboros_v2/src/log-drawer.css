@@ -39,6 +39,13 @@
 .log-events li{padding:12px 0;border-bottom:1px solid #ffffff13;font-size:12px;line-height:1.6;color:#c6cbd7}
 .log-events li:last-child{border-bottom:0}
 .log-events li small{display:block;margin-bottom:4px;font:8px Orbitron;color:#b391d0}
+.log-player{margin:12px 0 4px}
+.log-player h4{margin:0 0 6px;font:10px Orbitron;letter-spacing:1px}
+.log-player[data-owner='0'] h4{color:var(--log-p0)}
+.log-player[data-owner='1'] h4{color:var(--log-p1)}
+.log-player ul{margin:0;padding:0 0 0 16px}
+.log-player li{padding:3px 0;font-size:12px;line-height:1.55;color:#c6cbd7}
+.log-empty-turn{margin:10px 0 0;font-size:12px;color:#7f899e}
 
 .log-collapse-summary{display:flex;flex-direction:column;gap:14px;margin-top:14px;padding:14px 16px;border:1px solid #e7cb8033;border-radius:8px;background:#e7cb800a}
 .log-locations{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:0;padding:0;list-style:none}

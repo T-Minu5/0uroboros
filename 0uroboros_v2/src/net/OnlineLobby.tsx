@@ -5,6 +5,12 @@ import { platform, type Session } from '../platform';
 
 const NAME_KEY = 'ouroboros.playerName';
 
+/** The signed-in account name, else the name last typed into the lobby; empty when neither exists. */
+export function savedPlayerName(): string {
+  const host = platform();
+  return (host.auth.session()?.account.name ?? host.storage.get(NAME_KEY) ?? '').trim();
+}
+
 type Props = {
   lobby: LobbyState;
   saved: SavedSeat | null;

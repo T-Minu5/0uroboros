@@ -19,7 +19,7 @@ describe('neon table surface setting', () => {
   });
 
   it('loads the retired liquid finish as the default', () => {
-    store.set('ouroboros.neonSurface', 'liquid');
+    store.set('ouroboros.neonSurface.v2', 'liquid');
     expect(loadNeonSurface()).toBe(DEFAULT_NEON_SURFACE);
   });
 
@@ -31,7 +31,7 @@ describe('neon table surface setting', () => {
   });
 
   it('falls back to glass for unknown or unreadable values', () => {
-    store.set('ouroboros.neonSurface', 'plastic');
+    store.set('ouroboros.neonSurface.v2', 'plastic');
     expect(loadNeonSurface()).toBe('glass');
     vi.stubGlobal('localStorage', { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } });
     expect(loadNeonSurface()).toBe('glass');

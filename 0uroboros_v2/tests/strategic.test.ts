@@ -400,6 +400,18 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(() => session.endSessionNow()).toThrow();
   });
 
+  it("lists negative-VP cards like Glitch in the final VP cards row so the rows sum to the total", () => {
+    const session = make(); empty(session);
+    const unit = EVALUATION_VP_CARDS.find(card => card.name === "Basic Encryption")!;
+    const glitch: Card = { id: "glitch-1", definitionId: "glitch", name: "Glitch", type: "VP", vp: -1, cost: 0, art: "", effect: "" };
+    session.state.players[0].discard = [{ ...glitch }, { ...unit, id: "unit-1" }, { ...glitch, id: "glitch-2" }];
+    session.endSessionNow();
+    const score = session.view().finalScore![0];
+    expect(score.vpCards.map(card => card.id)).toEqual(["unit-1", "glitch-1", "glitch-2"]);
+    expect(score.cardVP).toBe((unit.vp ?? 0) - 2);
+    expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
+  });
+
   it("counts actual VP market purchases in the final Draft before scoring", () => {
     const session = make(); draft(session);
     session.state.cycle = 16;

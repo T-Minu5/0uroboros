@@ -65,7 +65,7 @@ function PlayerTally({ owner, score, color, leading, showEffects, showDestructio
     {open && <div className='summary-cards' role='list'>
      {score.vpCards.map((card, index) => <button key={card.id} role='listitem' className='summary-card' style={{ '--card-index': index } as CSSProperties} aria-label={`Inspect ${card.name}, ${cardVP(card)} VP`} onClick={() => inspect(card)}>
       <CardFace card={card}/>
-      <span className='summary-card-vp'>+{cardVP(card)}</span>
+      <span className={`summary-card-vp ${cardVP(card) < 0 ? 'negative' : ''}`}>{cardVP(card) < 0 ? `−${-cardVP(card)}` : `+${cardVP(card)}`}</span>
      </button>)}
     </div>}
    </li>

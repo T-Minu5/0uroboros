@@ -6,27 +6,29 @@ export const NO_BOARD_BACKGROUND = 'none';
  * sources in assets/source/board/backgrounds by `npm run assets:optimise`.
  */
 export const BOARD_BACKGROUNDS = [
-  '/assets/board/backgrounds/background-01.mp4',
-  '/assets/board/backgrounds/back-01.webp',
   '/assets/board/backgrounds/back-02.webp',
-  '/assets/board/backgrounds/back-03.webp',
-  '/assets/board/backgrounds/back-04.webp',
   '/assets/board/backgrounds/back-07.webp',
-  '/assets/board/backgrounds/back-08.webp',
+  '/assets/board/backgrounds/back-01.webp',
   NO_BOARD_BACKGROUND,
 ] as const;
 
 /** Real lighting: floor art rendered as lit, depth-mapped steel. */
 export const REAL_LIGHTING_FLOORS = [
-  '/assets/board/backgrounds/back-01.webp',
   '/assets/board/backgrounds/back-02.webp',
   '/assets/board/backgrounds/back-07.webp',
+  '/assets/board/backgrounds/back-01.webp',
 ] as const;
 
+const BACKGROUND_NAMES: Record<string, string> = {
+  '/assets/board/backgrounds/back-02.webp': 'Underworld',
+  '/assets/board/backgrounds/back-07.webp': 'Table Top',
+  '/assets/board/backgrounds/back-01.webp': 'Tunnel',
+};
+
 export type LightingMode = 'real' | 'studio';
-export const DEFAULT_LIGHTING_MODE: LightingMode = 'real';
+export const DEFAULT_LIGHTING_MODE: LightingMode = 'studio';
 const DEFAULT_BACKGROUND: Record<LightingMode, string> = {
-  real: '/assets/board/backgrounds/back-07.webp',
+  real: '/assets/board/backgrounds/back-02.webp',
   studio: '/assets/board/backgrounds/back-02.webp',
 };
 
@@ -40,8 +42,9 @@ export const shippedFloorUrl = (url: string) => url.replace(/^(\/assets\/board\/
 /** The lighting mode and the background last chosen in each mode. */
 export type BackgroundChoice = { mode: LightingMode; background: Record<LightingMode, string> };
 
-const MODE_KEY = 'ouroboros.lightingMode';
-const BACKGROUND_KEY = 'ouroboros.boardBackground';
+/** v3 and v2: both were saved on every load, so everyone moves to Studio lighting on Underworld once. */
+const MODE_KEY = 'ouroboros.lightingMode.v3';
+const BACKGROUND_KEY = 'ouroboros.boardBackground.v2';
 
 export function loadBackgroundChoice(): BackgroundChoice {
   const choice: BackgroundChoice = { mode: DEFAULT_LIGHTING_MODE, background: { ...DEFAULT_BACKGROUND } };
@@ -72,6 +75,7 @@ export function stepBackground(choice: BackgroundChoice, step: number): Backgrou
 
 export function boardBackgroundLabel(url: string): string {
   if (url === NO_BOARD_BACKGROUND) return 'None';
+  if (BACKGROUND_NAMES[url]) return BACKGROUND_NAMES[url];
   const file = url.split('/').pop() ?? url;
   return file.replace(/\.[^.]+$/, '');
 }

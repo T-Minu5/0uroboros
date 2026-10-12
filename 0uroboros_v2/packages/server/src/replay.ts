@@ -19,6 +19,7 @@ export function replayGame(replay: ReplayRecord, content: CompiledContent, strat
   const session = createSession({
     content, strategicMarket: true, evaluationContent: true,
     carryover: replay.settings.carryover, priorityPreference: replay.settings.priorityPreference,
+    noLocations: replay.settings.noLocations, noTrailingRewards: replay.settings.noTrailingRewards,
     random: seededRandom(replay.seed), aiSeats: replay.aiSeats, seatNames: replay.seatNames, recordDecisions: false,
     ...(profile ? { strategy: profile } : {}),
     now: () => clock.now,

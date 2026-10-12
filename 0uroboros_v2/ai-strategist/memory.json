@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 7,
-    "plan": "I will focus on building a strong economy through Cycle 4 by prioritizing high-value Crypto cards like Kilo-Coin and Mega-Cache, aiming for a Crypto target of 12. In Cycles 5-8, I will integrate more Restore cards for Server stability while balancing my strategy with Drain and early VP acquisition. From Cycle 9 onwards, I will aggressively attack enemy Servers and prioritize VP card purchases. I will closely monitor the new Location 'Nothing ever happens here' for its impact on strategies and adjust my approach accordingly. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft between attacks, deck engine, Server Restore, and VP collection. From Cycle 9 onwards, aggressive attacks on enemy Servers will be prioritized, with heavy investments in VP cards. I will assess the new Locations 'The Might Meek' and 'The Nudge' for potential adjustments in strategy, particularly concerning board Power and VP gains, as they could shift the balance of power in critical Cycles. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos fro (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -28,7 +28,7 @@
     },
     "cardBias": {}
   },
-  "plan": "I will focus on building a strong economy through Cycle 4 by prioritizing high-value Crypto cards like Kilo-Coin and Mega-Cache, aiming for a Crypto target of 12. In Cycles 5-8, I will integrate more Restore cards for Server stability while balancing my strategy with Drain and early VP acquisition. From Cycle 9 onwards, I will aggressively attack enemy Servers and prioritize VP card purchases. I will closely monitor the new Location 'Nothing ever happens here' for its impact on strategies and adjust my approach accordingly. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft between attacks, deck engine, Server Restore, and VP collection. From Cycle 9 onwards, aggressive attacks on enemy Servers will be prioritized, with heavy investments in VP cards. I will assess the new Locations 'The Might Meek' and 'The Nudge' for potential adjustments in strategy, particularly concerning board Power and VP gains, as they could shift the balance of power in critical Cycles. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos fro (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -79,7 +79,44 @@
     "cardBias": {},
     "vpFromCycle": 10
   },
-  "experiment": null,
+  "experiment": {
+    "id": "x060-power",
+    "theoryId": null,
+    "supportsTheory": true,
+    "hypothesis": "Valuing Power higher wins more Locations and their rewards.",
+    "prediction": "More Locations won and more wins than the current best.",
+    "change": {
+      "weights": {
+        "power": 1.31
+      }
+    },
+    "source": "heuristic",
+    "menuId": "power",
+    "changeSummary": "power weight 1.01→1.31",
+    "proposedBy": 7,
+    "proposedAt": "2026-10-12T00:47:37.152Z",
+    "stage": "lab",
+    "lab": null,
+    "field": {
+      "experiment": {
+        "games": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "margin": 0
+      },
+      "control": {
+        "games": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "margin": 0
+      }
+    },
+    "verdict": null,
+    "concludedBy": null,
+    "concludedAt": null
+  },
   "experiments": [
     {
       "id": "x001-restore-importance",
@@ -4417,9 +4454,337 @@
       "verdict": "league 34/48 for the experiment vs 33/48 for the current best against t-5@v1.5, dv-8@v89, t-5@v1.4 (margin -3.6/game) → inconclusive. Kept the current best.",
       "concludedBy": 7,
       "concludedAt": "2026-10-08T17:14:20.844Z"
+    },
+    {
+      "id": "x056-monitor-nothing-happens-here",
+      "theoryId": "monitor-nothing-happens-here",
+      "supportsTheory": true,
+      "hypothesis": "Integrating strategies that account for the new Location 'Nothing ever happens here' will improve my performance against opponents.",
+      "prediction": "Wins or VP/Server margin will increase by at least 5% when adapting strategies around this Location.",
+      "change": {
+        "weights": {
+          "power": 1.2
+        }
+      },
+      "source": "model",
+      "changeSummary": "power weight 1.01→1.2",
+      "proposedBy": 7,
+      "proposedAt": "2026-10-09T03:52:01.230Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          62020,
+          62021,
+          62022,
+          62023,
+          62024,
+          62025,
+          62026,
+          62027,
+          62028,
+          62029,
+          62030,
+          62031,
+          62032,
+          62033,
+          62034,
+          62035,
+          62036,
+          62037,
+          62038,
+          62039,
+          62040,
+          62041,
+          62042,
+          62043
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 26,
+        "controlWins": 28,
+        "ties": 3,
+        "meanMargin": -1.8,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "dv-8@v1.1",
+            "strat-g@v1.5"
+          ],
+          "pairs": 48,
+          "experimentPoints": 27.5,
+          "controlPoints": 28.5,
+          "marginGain": -1.8
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 27.5/48 for the experiment vs 28.5/48 for the current best against dv-8@v1.1, strat-g@v1.5 (margin -1.8/game) → rejected. Kept the current best.",
+      "concludedBy": 7,
+      "concludedAt": "2026-10-12T00:30:48.635Z"
+    },
+    {
+      "id": "x057-drain",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing Drain higher ends games by Server destruction before the opponent's engine pays off.",
+      "prediction": "Earlier Server kills and more wins than the current best.",
+      "change": {
+        "weights": {
+          "drain": 2.75
+        }
+      },
+      "source": "heuristic",
+      "menuId": "drain",
+      "changeSummary": "drain weight 2.25→2.75",
+      "proposedBy": 7,
+      "proposedAt": "2026-10-12T00:30:48.635Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          62116,
+          62117,
+          62118,
+          62119,
+          62120,
+          62121,
+          62122,
+          62123,
+          62124,
+          62125,
+          62126,
+          62127,
+          62128,
+          62129,
+          62130,
+          62131,
+          62132,
+          62133,
+          62134,
+          62135,
+          62136,
+          62137,
+          62138,
+          62139
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 32,
+        "controlWins": 37,
+        "ties": 0,
+        "meanMargin": -2.4,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "strat-g@v1.5",
+            "t-5@v1.8",
+            "dv-8@v1.1"
+          ],
+          "pairs": 48,
+          "experimentPoints": 32,
+          "controlPoints": 37.5,
+          "marginGain": -2.4
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 32/48 for the experiment vs 37.5/48 for the current best against strat-g@v1.5, t-5@v1.8, dv-8@v1.1 (margin -2.4/game) → rejected. Kept the current best.",
+      "concludedBy": 7,
+      "concludedAt": "2026-10-12T00:35:00.753Z"
+    },
+    {
+      "id": "x058-leaner",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "A stricter purchase bar (fewer, better cards) keeps the deck sharp.",
+      "prediction": "More wins with a smaller deck than the current best.",
+      "change": {
+        "minBuyScore": 2.22,
+        "dilution": 1.03
+      },
+      "source": "heuristic",
+      "menuId": "leaner",
+      "changeSummary": "min buy score 1.72→2.22, dilution 0.83→1.03",
+      "proposedBy": 7,
+      "proposedAt": "2026-10-12T00:35:00.754Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          62308,
+          62309,
+          62310,
+          62311,
+          62312,
+          62313,
+          62314,
+          62315,
+          62316,
+          62317,
+          62318,
+          62319,
+          62320,
+          62321,
+          62322,
+          62323,
+          62324,
+          62325,
+          62326,
+          62327,
+          62328,
+          62329,
+          62330,
+          62331
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 27,
+        "controlWins": 26,
+        "ties": 1,
+        "meanMargin": 0.8,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.1",
+            "t-5@v1.6"
+          ],
+          "pairs": 48,
+          "experimentPoints": 27.5,
+          "controlPoints": 26.5,
+          "marginGain": 0.8
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 27.5/48 for the experiment vs 26.5/48 for the current best against vp-dog@v1.1, t-5@v1.6 (margin +0.8/game) → inconclusive. Kept the current best.",
+      "concludedBy": 7,
+      "concludedAt": "2026-10-12T00:42:03.942Z"
+    },
+    {
+      "id": "x059-thinner",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing deck thinning higher draws the best cards more often.",
+      "prediction": "More wins and bigger mid-game Wallets than the current best.",
+      "change": {
+        "weights": {
+          "thin": 2.07
+        }
+      },
+      "source": "heuristic",
+      "menuId": "thinner",
+      "changeSummary": "thin weight 1.67→2.07",
+      "proposedBy": 7,
+      "proposedAt": "2026-10-12T00:42:03.942Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          62476,
+          62477,
+          62478,
+          62479,
+          62480,
+          62481,
+          62482,
+          62483,
+          62484,
+          62485,
+          62486,
+          62487,
+          62488,
+          62489,
+          62490,
+          62491,
+          62492,
+          62493,
+          62494,
+          62495,
+          62496,
+          62497,
+          62498,
+          62499
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 28,
+        "controlWins": 29,
+        "ties": 0,
+        "meanMargin": -1.2,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "t-5@v1.4",
+            "strat-g@v1.6",
+            "dv-8@v1.1"
+          ],
+          "pairs": 48,
+          "experimentPoints": 28,
+          "controlPoints": 29,
+          "marginGain": -1.2
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 28/48 for the experiment vs 29/48 for the current best against t-5@v1.4, strat-g@v1.6, dv-8@v1.1 (margin -1.2/game) → rejected. Kept the current best.",
+      "concludedBy": 7,
+      "concludedAt": "2026-10-12T00:47:37.152Z"
     }
   ],
-  "experimentCount": 55,
+  "experimentCount": 60,
   "theories": [
     {
       "id": "no-shyte",
@@ -4701,6 +5066,16 @@
     {
       "id": "monitor-nothing-happens-here",
       "text": "The Location 'Nothing ever happens here' may shift strategies significantly by providing a neutral space.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 7,
+      "updatedBy": 7
+    },
+    {
+      "id": "evaluate-new-locations",
+      "text": "Assessing the impact of new Locations like 'The Might Meek' and 'The Nudge' will enhance my strategic decisions.",
       "status": "proposed",
       "confidence": 0.5,
       "support": 0,
@@ -4711,1504 +5086,1504 @@
   ],
   "notes": [
     {
-      "version": 3,
-      "at": "2026-10-08T05:16:06.106Z",
-      "text": "Cycle 11: My economy is struggling against the human's aggressive VP acquisition; focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:06.107Z",
-      "text": "New experiment x044-the-nudge-impact: Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies. Change: restore weight 1.3→1.6. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:24.867Z",
-      "text": "v1.3 online (server start). Read the notebook: 3 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:29.328Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is critical for survival."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:29.328Z",
-      "text": "Cycle 13: The human's early VP acquisition pressures my strategy; I must adjust my timing for VP focus."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:29.328Z",
-      "text": "Cycle 12: The human's Draft wallet consistently outpaces mine; I need to improve my acquisition strategy."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:29.328Z",
-      "text": "Cycle 11: My economy struggles against the human's aggressive VP acquisition; focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:53.738Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:57.789Z",
-      "text": "Cycle 14: Integrating more Restore cards is critical for stabilizing my Servers against aggressive VP strategies."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:57.789Z",
-      "text": "Cycle 14: The human's Draft wallet consistently outpaces mine; I need to improve my acquisition strategy."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:57.789Z",
-      "text": "Cycle 13: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:16:57.789Z",
-      "text": "Cycle 12: The human's early VP acquisition pressures my strategy; I must adjust my timing for VP focus."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:17:42.102Z",
-      "text": "v1.3 online (server start). Read the notebook: 3 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:17:46.326Z",
-      "text": "Cycle 14: The human's aggressive VP strategies continue to pressure my economy; I need to adapt my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:17:46.326Z",
-      "text": "Cycle 13: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:17:46.326Z",
-      "text": "Cycle 12: The human's early VP acquisition pressures my strategy; I must adjust my timing for VP focus."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:40.948Z",
-      "text": "v1.3 online (server start). Read the notebook: 3 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:47.180Z",
-      "text": "Cycle 14: The human's aggressive VP strategies continue to pressure my economy; I need to adapt my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:47.180Z",
-      "text": "Cycle 13: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:47.180Z",
-      "text": "Cycle 12: I lost most Locations due to low board Power; defensive cards are crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:47.180Z",
-      "text": "Cycle 11: My economy is struggling against the human's aggressive VP acquisition; focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:47.180Z",
-      "text": "Cycle 10: The human's Draft wallet consistently outpaces mine; I need to improve my acquisition strategy."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:48.159Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:53.482Z",
-      "text": "Cycle 14: Adapting to aggressive VP strategies is critical; focus on integrating more Restore cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:53.482Z",
-      "text": "Cycle 13: The human's aggressive strategy continues to pressure my economy; I need to improve my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:53.482Z",
-      "text": "Cycle 12: I lost most Locations due to low board Power; defensive cards are crucial for survival."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:27:53.482Z",
-      "text": "Cycle 11: My economy is struggling against the human's aggressive VP acquisition; focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:10.130Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 14: My Servers remain vulnerable due to aggressive VP strategies; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 13: The human's economy outpaced mine significantly; I need to improve card acquisition strategies."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 12: The Nudge incentivizes early VP strategies, altering my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 11: Defensive cards are key as I lost many Locations due to low board Power; I need stronger cards early."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 10: My economy is struggling against aggressive human VP acquisition; I must focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:14.232Z",
-      "text": "Cycle 9: I observed that integrating more Restore cards is critical for stabilizing my Servers."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:43.005Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:46.795Z",
-      "text": "Cycle 14: My Servers remain vulnerable due to aggressive VP strategies; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:46.795Z",
-      "text": "Cycle 13: The human's aggressive strategy continues to pressure my economy; I need to improve my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:46.795Z",
-      "text": "Cycle 12: I lost most Locations due to low board Power; defensive cards are crucial for survival."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:46.795Z",
-      "text": "Cycle 11: My economy is struggling against the human's aggressive VP acquisition; focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:54.367Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:58.209Z",
-      "text": "Cycle 14: The human's aggressive VP strategies continue to pressure my economy; I need to improve my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:58.209Z",
-      "text": "Cycle 13: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:28:58.209Z",
-      "text": "Cycle 12: The Nudge incentivizes early VP strategies, altering my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:30:47.265Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:30:52.624Z",
-      "text": "Cycle 14: My economy is struggling against the human's aggressive VP acquisition; I must focus on high-value cards earlier."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:30:52.624Z",
-      "text": "Cycle 13: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:30:52.624Z",
-      "text": "Cycle 12: I lost most Locations due to low board Power; defensive cards are crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T05:30:52.624Z",
-      "text": "Cycle 11: My Servers remain vulnerable due to aggressive VP strategies; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:10:59.486Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:07.916Z",
-      "text": "Cycle 14: The human's VP acquisition is aggressive; I need to focus on stronger board Power early."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:07.916Z",
-      "text": "Cycle 13: My economy is struggling; I must prioritize high-value Crypto cards sooner."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:07.916Z",
-      "text": "Cycle 12: The Nudge seems to incentivize early VP strategies; I need to adjust my timing for VP acquisition accordingly."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:07.916Z",
-      "text": "Cycle 11: Defensive strategies are crucial as my Servers are vulnerable; integrating more Restore cards is a must."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:07.916Z",
-      "text": "Cycle 10: Observing the human's aggressive playstyle; they consistently outpace my Draft wallet."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:18.843Z",
-      "text": "v1.3 online (server start). Read the notebook: 4 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:28.922Z",
-      "text": "Cycle 14: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:28.922Z",
-      "text": "Cycle 13: The human's aggressive VP strategies are overwhelming; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:28.922Z",
-      "text": "Cycle 12: The Nudge rewards early VP strategies; I must adapt my approach accordingly."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:28.922Z",
-      "text": "Cycle 11: My economy is lagging; focus on high-value cards earlier is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:11:28.922Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:01.394Z",
-      "text": "v1.3 online (server start). Read the notebook: 3 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:14.371Z",
-      "text": "Cycle 14: My economy struggles against aggressive VP strategies; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:14.371Z",
-      "text": "Cycle 13: Defensive cards are key as I lost many Locations due to low board Power; I need stronger cards early."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:14.371Z",
-      "text": "Cycle 12: I observed that integrating more Restore cards is critical for stabilizing my Servers."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:14.371Z",
-      "text": "Cycle 11: My Servers remain vulnerable; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:12:14.371Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:16:56.741Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:17:02.932Z",
-      "text": "Cycle 12: The Nudge's potential impact on VP strategies is significant; adjust timing for VP acquisition accordingly."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:17:02.932Z",
-      "text": "Cycle 11: My economy is lagging; I need to prioritize high-value cards sooner to keep up with aggressive opponents."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:17:02.932Z",
-      "text": "Cycle 10: Defensive strategies are crucial as I lost many Locations due to low board Power; I need stronger cards early."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:17:02.932Z",
-      "text": "Cycle 9: Observing the human's aggressive playstyle; they consistently outpace my Draft wallet."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:17:02.932Z",
-      "text": "Cycle 8: My board Power is too low; I must focus on acquiring strong Power cards in the early game."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:13.021Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:17.099Z",
-      "text": "Cycle 14: My economy struggled against the human's aggressive VP acquisition; adjust focus on high-value cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:17.099Z",
-      "text": "Cycle 13: Low board Power hindered my ability to win Locations; prioritize stronger early game cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:17.099Z",
-      "text": "Cycle 12: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:17.099Z",
-      "text": "Cycle 11: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:18.752Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 14: Opponent's aggressive VP acquisition is overwhelming; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 13: My economy is lagging; focus on high-value cards earlier is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 12: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 11: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:20:24.020Z",
-      "text": "Cycle 9: My Servers remain vulnerable; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:28.671Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:33.500Z",
-      "text": "Cycle 14: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:33.500Z",
-      "text": "Cycle 13: The human's aggressive VP strategies are overwhelming; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:33.500Z",
-      "text": "Cycle 12: The Nudge rewards early VP strategies; I must adapt my approach accordingly."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:33.500Z",
-      "text": "Cycle 11: My economy is lagging; focus on high-value cards earlier is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:21:33.500Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:05.678Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:09.464Z",
-      "text": "Cycle 14: The human's aggressive VP strategies are overwhelming; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:09.464Z",
-      "text": "Cycle 13: My economy struggles against aggressive VP strategies; I need to adjust my timing for VP acquisition."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:09.464Z",
-      "text": "Cycle 12: Integrating more Restore cards is critical for stabilizing my Servers."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:09.464Z",
-      "text": "Cycle 11: My Servers remain vulnerable; restoring power is crucial."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:22:09.464Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:28.274Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:34.086Z",
-      "text": "Cycle 14: My economy struggled against the human's aggressive VP acquisition; adjust focus on high-value cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:34.086Z",
-      "text": "Cycle 13: Low board Power hindered my ability to win Locations; prioritize stronger early game cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:34.086Z",
-      "text": "Cycle 12: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:34.086Z",
-      "text": "Cycle 11: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:34.086Z",
-      "text": "Cycle 10: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:38.937Z",
-      "text": "v1.3 online (server start). Read the notebook: 2 active theories, 43 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:44.012Z",
-      "text": "Cycle 14: My economy struggled against the human's aggressive VP acquisition; adjust focus on high-value cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:44.012Z",
-      "text": "Cycle 13: Low board Power hindered my ability to win Locations; prioritize stronger early game cards."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:44.012Z",
-      "text": "Cycle 12: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:44.012Z",
-      "text": "Cycle 11: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T06:23:44.012Z",
-      "text": "Cycle 10: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T08:15:06.026Z",
-      "text": "Theory the-nudge-impact was contradicted from x044-the-nudge-impact (league 21.5/48 for the experiment vs 23.5/48 for the current best against t-5@v90, vp-dog@v1.0, dv-8@v91 (margin -2.5/game) → rejected); now 0 for / 1 against."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T08:15:06.026Z",
-      "text": "Experiment x044-the-nudge-impact rejected: league 21.5/48 for the experiment vs 23.5/48 for the current best against t-5@v90, vp-dog@v1.0, dv-8@v91 (margin -2.5/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 3,
-      "at": "2026-10-08T08:15:06.026Z",
-      "text": "New experiment x045-vp-earlier: Valuing VP cards two Cycles earlier banks points before the race is decided. Change: VP from Cycle 12→10. Prediction: A better final VP margin than the current best."
-    },
-    {
-      "version": 4,
-      "at": "2026-10-08T08:18:13.209Z",
-      "text": "Now v1.4: adopted x045-vp-earlier (VP from Cycle 12→10)."
-    },
-    {
-      "version": 4,
-      "at": "2026-10-08T08:18:13.209Z",
-      "text": "Experiment x045-vp-earlier adopted: league 9.5/48 for the experiment vs 5/48 for the current best against vp-dog@v1.0, dv-8@v1.1 (margin +7.7/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 4,
-      "at": "2026-10-08T08:18:13.212Z",
-      "text": "New experiment x046-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2→2.5. Prediction: Earlier Server kills and more wins than the current best."
-    },
-    {
-      "version": 4,
-      "at": "2026-10-08T08:21:19.064Z",
-      "text": "Experiment x046-drain rejected: league 17/48 for the experiment vs 20/48 for the current best against dv-8@v1.1, strat-g@v1.2 (margin -4.2/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 4,
-      "at": "2026-10-08T08:21:19.064Z",
-      "text": "New experiment x047-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.5→2, dilution 0.9→1.1. Prediction: More wins with a smaller deck than the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:22:13.951Z",
-      "text": "Now v1.5: adopted x047-leaner (min buy score 1.5→2, dilution 0.9→1.1)."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:22:13.951Z",
-      "text": "Experiment x047-leaner adopted: league 24/48 for the experiment vs 17/48 for the current best against dv-8@v90, t-5@v1.3, vp-dog@v1.0 (margin +6.5/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:22:13.958Z",
-      "text": "New experiment x048-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.68→2.08. Prediction: More wins and bigger mid-game Wallets than the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:25:13.935Z",
-      "text": "Experiment x048-thinner inconclusive: league 36/48 for the experiment vs 35/48 for the current best against t-5@v1.3 (margin +0.6/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:25:13.935Z",
-      "text": "New experiment x049-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1→1.3. Prediction: More Locations won and more wins than the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:26:17.583Z",
-      "text": "Experiment x049-power rejected: league 11/48 for the experiment vs 14.5/48 for the current best against vp-dog@v1.0, dv-8@v1.1, strat-g@v1.3 (margin -2.9/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:26:17.583Z",
-      "text": "New experiment x050-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 0.8→1.05. Prediction: More wins and a better margin than the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T08:29:16.146Z",
-      "text": "Experiment x050-disrupt inconclusive: league 34.5/48 for the experiment vs 33.5/48 for the current best against t-5@v90, t-5@v1.3, strat-g@v1.4 (margin +0.9/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:32.760Z",
-      "text": "v1.5 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Cycle 14: My economy was insufficient against the human's aggressive VP strategy."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Cycle 13: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Cycle 12: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Cycle 11: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Cycle 10: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:37.502Z",
-      "text": "Model experiment \"Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:40.827Z",
-      "text": "v1.5 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "Cycle 11: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "Cycle 10: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:47:46.460Z",
-      "text": "New experiment x051-higher-crypto-target: Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents. Change: Crypto target 11→12. Prediction: More wins and better VP margins than the current best."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:10.514Z",
-      "text": "v1.5 online (server start). Read the notebook: 3 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:14.271Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:14.271Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:14.271Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:34.263Z",
-      "text": "v1.5 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:37.226Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:37.226Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:37.226Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:56.132Z",
-      "text": "v1.5 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:59.538Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:59.538Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:48:59.538Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 5,
-      "at": "2026-10-08T15:49:13.214Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Three phases: economy and deck engine through Cycle 4 (high-value Crypto, draw, Actions, thinning); a balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. It now includes 4 mentor tips, which replace my adopted dilution. Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:13.214Z",
-      "text": "Now v1.6: the designer changed the baseline or style this profile is built on."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:13.214Z",
-      "text": "v1.6 online (server start). Read the notebook: 3 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:17.600Z",
-      "text": "Cycle 14: My economy was insufficient against the human's aggressive VP strategy."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:17.600Z",
-      "text": "Cycle 13: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:17.600Z",
-      "text": "Cycle 12: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:17.600Z",
-      "text": "Cycle 11: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:56.491Z",
-      "text": "v1.6 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:59.918Z",
-      "text": "Cycle 14: My economy was insufficient against the human's aggressive VP strategy."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:59.918Z",
-      "text": "Cycle 13: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:59.918Z",
-      "text": "Cycle 12: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:59.918Z",
-      "text": "Cycle 11: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:49:59.918Z",
-      "text": "Cycle 10: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:12.134Z",
-      "text": "v1.6 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:15.330Z",
-      "text": "Cycle 14: My economy was insufficient against the human's aggressive VP strategy."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:15.330Z",
-      "text": "Cycle 13: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:15.330Z",
-      "text": "Cycle 12: Defensive strategies are crucial; integrating more Restore cards is essential for Server stability."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:15.330Z",
-      "text": "Cycle 11: The Nudge's impact on VP strategies must be closely monitored for effective timing adjustments."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:22.793Z",
-      "text": "v1.6 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:31.675Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:31.675Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:31.675Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:51.113Z",
-      "text": "v1.6 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:54.839Z",
-      "text": "Cycle 14: My economy faltered against aggressive VP strategies; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:54.839Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:54.839Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:50:54.839Z",
-      "text": "Cycle 11: My Servers were vulnerable; need to integrate more Restore cards for defense."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:51:01.091Z",
-      "text": "v1.6 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:51:04.061Z",
-      "text": "Cycle 14: I need to focus on winning more Locations to enhance my board Power."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:51:04.061Z",
-      "text": "Cycle 14: The new Locations are impacting strategies; monitor them closely for VP acquisition."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:51:04.061Z",
-      "text": "Cycle 13: My economy needs improvement; I must secure higher-value Crypto earlier."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:51:04.061Z",
-      "text": "Cycle 12: Defensive strategies are crucial; integrate more Restore cards for Server stability."
-    },
-    {
-      "version": 6,
-      "at": "2026-10-08T15:52:48.664Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Three phases: economy and deck engine through Cycle 4 (high-value Crypto, draw, Actions, thinning); a balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. It now includes 5 designer hand-offs (mentor tips or coaching), which replace my adopted min buy score. Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:48.664Z",
-      "text": "Now v1.7: the designer changed the baseline or style this profile is built on."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:48.664Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 50 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:52.247Z",
-      "text": "Cycle 14 showed my need for a stronger economy against aggressive VP strategies."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:52.247Z",
-      "text": "Locations like 'Nothing ever happens here' can shift strategies; I need to monitor their impact."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:52.247Z",
-      "text": "I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:52.247Z",
-      "text": "The human's economy is consistently higher; I must adjust my Draft strategy to keep pace."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T15:52:52.247Z",
-      "text": "My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:02:12.399Z",
-      "text": "Experiment x051-higher-crypto-target inconclusive: league 28.5/48 for the experiment vs 28.5/48 for the current best against t-5@v1.1, vp-dog@v1.0, dv-8@v1.1 (margin -0.2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:02:12.399Z",
-      "text": "New experiment x052-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: Crypto target 11.67→12, crypto weight 2.04→2.34. Prediction: Bigger mid-game Wallets and more wins than the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:04:28.820Z",
-      "text": "Experiment x052-crypto inconclusive: league 41.5/48 for the experiment vs 43/48 for the current best against t-5@v1.3 (margin +4.4/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:29.625Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Three phases: economy and deck engine through Cycle 4 (high-value Crypto, draw, Actions, thinning); a balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:29.625Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 52 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Cycle 14: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Cycle 14: Human's economy is consistently higher; I must adjust my Draft strategy to keep pace."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Cycle 13: I struggled with board Power; consider integrating higher Power cards sooner."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:11:37.258Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will allow for a stronger economy and better Drain pushes in the late game.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:50.540Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 52 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "Cycle 14: Human's economy was significantly ahead; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "Cycle 13: My board Power is too low; I lost many Locations due to this."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "Cycle 12: Need to integrate more Restore cards for Server stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "Cycle 11: Human's Draft wallet consistently outpaces mine; I must adjust my Draft strategy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "New Location 'Nothing ever happens here' may shift strategies; I need to monitor its impact closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T16:52:55.176Z",
-      "text": "New experiment x053-increasing-the-handcryptotar: Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents. Change: Crypto target 11.67→12. Prediction: I will have a higher average Wallet by Cycle 5 and win more games than the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T17:07:16.146Z",
-      "text": "Experiment x053-increasing-the-handcryptotar inconclusive: league 13.5/48 for the experiment vs 13.5/48 for the current best against dv-8@v1.1, vp-dog@v1.1 (margin +0.3/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T17:07:16.146Z",
-      "text": "New experiment x054-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T17:10:45.696Z",
-      "text": "Experiment x054-restore inconclusive: league 34/48 for the experiment vs 33/48 for the current best against t-5@v1.4, vp-dog@v1.1, t-5@v1.5 (margin -0.5/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T17:10:45.697Z",
-      "text": "New experiment x055-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T17:14:20.844Z",
-      "text": "Experiment x055-draw inconclusive: league 34/48 for the experiment vs 33/48 for the current best against t-5@v1.5, dv-8@v89, t-5@v1.4 (margin -3.6/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:17.897Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Cycle 14: I need to bolster my board Power to win more Locations."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Cycle 14: Human's economy is consistently higher; I must adjust my Draft strategy to keep pace."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Cycle 14: New Location 'Nothing ever happens here' may shift strategies; monitor its impact closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:24:32.914Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:23.692Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:31.696Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:31.696Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:31.696Z",
-      "text": "Cycle 13: Human's economy was significantly ahead; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:31.696Z",
-      "text": "Cycle 12: The new Locations may shift strategies; monitor their effects on VP acquisition closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T18:25:31.697Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:45.383Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0. New cards since last version: Babba Yaga."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "Cycle 14: The human's economy was significantly ahead; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "New Location 'Nothing ever happens here' may shift strategies; monitor its impact closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "Integrate more Restore cards for Server stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T21:32:50.140Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will allow for a stronger economy and better Drain pushes in the late game.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:28:56.005Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Cycle 14: My Servers are vulnerable; I need to integrate more Restore cards for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Cycle 14: The human's economy consistently outpaces mine; I must adjust my Draft strategy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Cycle 14: New Location 'Nothing ever happens here' may shift strategies; monitor its impact closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; I need to improve this."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Cycle 14: I need to secure higher-value Crypto earlier to keep pace with the human's economy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:01.384Z",
-      "text": "Model experiment \"Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:14.669Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:19.380Z",
-      "text": "Cycle 14: Human's economy consistently outpaces mine; I must secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:19.380Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:19.380Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:19.380Z",
-      "text": "Cycle 14: Monitor the new Location 'Nothing ever happens here' for its strategic implications."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:29:19.380Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:03.286Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 14: My Servers are vulnerable; integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 14: The human's economy was significantly ahead; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 13: Warning: my Servers are at 275. Defense (Restore) matters now."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 13: I lost most Locations this Cycle; my board Power is too low."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Cycle 14: New Location 'Nothing ever happens here' may shift strategies; monitor its impact closely."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:30:09.381Z",
-      "text": "Model experiment \"Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.\" was skipped: it would not change the current best."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:36.195Z",
-      "text": "Rule change from the designer: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP, 40 VP for both. Server damage now moves the score more: Drain pressure and finishing a damaged Server swing games, Restore protects more VP, and the trailing-player count weighs damage more. Re-check theories and plans built on the old values."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:36.195Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.038Z",
-      "text": "Cycle 14: Need to secure higher-value Crypto earlier to keep pace with the human's economy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.038Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stability."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.038Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; this must improve."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.038Z",
-      "text": "Cycle 14: Monitor the new Location 'Nothing ever happens here' for strategic implications."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.038Z",
-      "text": "Cycle 14: My Servers are vulnerable; defense (Restore) matters now."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-08T23:40:41.039Z",
-      "text": "Model experiment \"Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:19.927Z",
-      "text": "v1.7 online (server start). Read the notebook: 2 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Cycle 14: Human's economy consistently outpaces mine; I must secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stability against aggressive opponents."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; I must improve this."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Cycle 14: Monitor the new Location 'Nothing ever happens here' for strategic implications."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Cycle 14: Warning: my Servers are vulnerable; defense (Restore) matters now."
-    },
-    {
       "version": 7,
-      "at": "2026-10-09T01:11:25.157Z",
-      "text": "Model experiment \"Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
+      "at": "2026-10-09T07:14:42.999Z",
+      "text": "Cycle 14: Update on the experiment regarding 'Nothing ever happens here'."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:18.431Z",
+      "at": "2026-10-09T07:45:06.020Z",
       "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "Cycle 14 showed weaknesses in my economy; I need to secure higher-value Crypto earlier."
+      "at": "2026-10-09T07:45:11.168Z",
+      "text": "Cycle 14: My board Power remains too low; need to contest more Locations."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "Integrating more Restore cards is essential for stability against aggressive opponents."
+      "at": "2026-10-09T07:45:11.168Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "I lost many Locations due to low board Power; this must improve."
+      "at": "2026-10-09T07:45:11.168Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "Monitor the new Location 'Nothing ever happens here' for strategic implications."
+      "at": "2026-10-09T07:45:11.168Z",
+      "text": "Cycle 14: High-value Crypto remains essential; human's economy is outpacing mine."
     },
     {
       "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "My Servers are vulnerable; defense (Restore) matters now."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:23:28.439Z",
-      "text": "The human consistently outpaced my Draft wallet; adjustments are needed."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T01:23:28.440Z",
-      "text": "Model experiment \"Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:00.562Z",
-      "text": "Rule change from the designer: destroying an enemy Primary Server now gives +12 VP and a Backup +20 VP (was 16 and 24), 32 VP for both. Server damage now moves the score less: finishing a Server is worth less than before, VP cards carry more of the score, Restore protects fewer VP, and the trailing-player count weighs damage less. Re-check theories and plans built on the old values."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:00.562Z",
+      "at": "2026-10-09T07:45:53.839Z",
       "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Cycle 13: Warning: my Servers are at 275. Defense (Restore) matters now."
+      "at": "2026-10-09T07:45:57.914Z",
+      "text": "High-value Crypto acquisition remains critical; human's economy outpaces mine in recent games."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Cycle 14: The human's economy was significantly ahead; I need to secure higher-value Crypto earlier."
+      "at": "2026-10-09T07:45:57.914Z",
+      "text": "My board Power is too low; I consistently lose Locations, affecting my strategy."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Cycle 14: I lost most Locations this Cycle; my board Power is too low."
+      "at": "2026-10-09T07:45:57.914Z",
+      "text": "Integrate more Restore cards to stabilize Servers against aggressive plays."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Cycle 14: Monitor the new Location 'Nothing ever happens here' for strategic implications."
+      "at": "2026-10-09T07:45:57.914Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Rule change: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP; I need to adjust my strategies accordingly."
+      "at": "2026-10-09T07:45:57.914Z",
+      "text": "Monitoring the impact of 'Nothing ever happens here' for its influence on strategies."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Integrating more Restore cards is essential for stability against aggressive opponents."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:06.155Z",
-      "text": "Model experiment \"Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:21.565Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 55 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "Cycle 14 showed weaknesses in my economy; I need to secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "Integrating more Restore cards is essential for stability against aggressive opponents."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "I lost many Locations due to low board Power; I must improve this."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "Warning: my Servers are vulnerable; defense (Restore) matters now."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "The human's economy consistently outpaces mine; I must secure higher-value Crypto earlier."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:27.121Z",
-      "text": "Model experiment \"Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-09T02:56:49.151Z",
+      "at": "2026-10-09T07:47:15.359Z",
       "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.380Z",
-      "text": "Cycle 14: My economy is lagging; I need to secure higher-value Crypto earlier."
+      "at": "2026-10-09T07:47:20.485Z",
+      "text": "Cycle 14: My board Power remains too low; consistently losing Locations, impacting my strategy."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.380Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stability against aggressive opponents."
+      "at": "2026-10-09T07:47:20.485Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.380Z",
-      "text": "Cycle 14: I lost many Locations due to low board Power; I must improve this."
+      "at": "2026-10-09T07:47:20.485Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.380Z",
-      "text": "Cycle 14: Warning: my Servers are vulnerable; defense (Restore) matters now."
+      "at": "2026-10-09T07:47:20.485Z",
+      "text": "Cycle 14: High-value Crypto remains essential; human's economy is outpacing mine."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.380Z",
-      "text": "Cycle 14: The human's Draft wallet consistently outpaces mine; adjustments are needed."
+      "at": "2026-10-09T07:49:27.078Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
     },
     {
       "version": 7,
-      "at": "2026-10-09T02:56:54.381Z",
-      "text": "Model experiment \"Increasing the handCryptoTarget to 12 will enhance my mid-game economy and performance against aggressive opponents.\" was skipped: the same change was tested recently."
+      "at": "2026-10-09T07:49:31.523Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:49:31.523Z",
+      "text": "Cycle 14: My board Power remains too low, leading to losses in Locations; I need to contest Nodes more effectively."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:49:31.523Z",
+      "text": "Cycle 14: Early VP acquisition is crucial; I will prioritize VP cards in the midgame."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:49:31.523Z",
+      "text": "Cycle 14: I need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:49:31.523Z",
+      "text": "Cycle 14: Monitoring 'Nothing ever happens here' for potential shifts in strategy and economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:52:42.520Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:52:46.476Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:52:46.476Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:52:46.476Z",
+      "text": "Cycle 14: Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:52:46.476Z",
+      "text": "Cycle 14: High-value Crypto remains essential; human's economy is outpacing mine."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:55:33.634Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:55:37.922Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:55:37.922Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:55:37.922Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T07:55:37.922Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:09.413Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "Focus on acquiring high-value Crypto early; my economy is lagging behind."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "My board Power is too low; I consistently lose Locations, affecting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T15:57:14.185Z",
+      "text": "Need to contest Nodes more effectively to secure advantageous Locations."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:15.336Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:19.591Z",
+      "text": "Monitoring the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:19.591Z",
+      "text": "Cycle 14: My board Power remains too low; consistently losing Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:19.591Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:19.591Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:24:19.591Z",
+      "text": "Cycle 14: High-value Crypto remains essential; human's economy is outpacing mine."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:49.247Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:53.163Z",
+      "text": "Cycle 14: My economy is lagging behind; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:53.163Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:53.163Z",
+      "text": "Cycle 14: Early VP acquisition is crucial; I will prioritize VP cards in the midgame."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:53.163Z",
+      "text": "Cycle 14: I need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:32:53.163Z",
+      "text": "Monitoring 'Nothing ever happens here' for potential shifts in strategy and economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:43:29.876Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:43:33.691Z",
+      "text": "My economy is lagging; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:43:33.691Z",
+      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:43:33.691Z",
+      "text": "My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-09T21:43:33.691Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-10T01:38:05.976Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-10T01:38:10.500Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-10T01:38:10.500Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-10T01:38:10.500Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-10T01:38:10.500Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:05:56.874Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0. New Locations: The Might Meek, Cull the Meek, Loose Change, Renew, Pay to Play?, Peep my shit, Wreck my shit ."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:07.086Z",
+      "text": "Focus on acquiring high-value Crypto early; my economy is lagging behind."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:07.086Z",
+      "text": "Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:07.086Z",
+      "text": "My board Power is too low; I consistently lose Locations, affecting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:07.086Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:07.086Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:49.617Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:53.841Z",
+      "text": "Cycle 14: My board Power remains too low; consistently losing Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:53.841Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:53.841Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:53.841Z",
+      "text": "Cycle 14: High-value Crypto remains essential; human's economy is outpacing mine."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:06:53.841Z",
+      "text": "Cycle 14: Monitor the impact of 'Nothing ever happens here' for potential shifts in strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:40.200Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:45.026Z",
+      "text": "Cycle 14: My economy is lagging; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:45.026Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:45.026Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:45.026Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T08:13:45.026Z",
+      "text": "Monitoring the impact of 'Nothing ever happens here' for potential shifts in strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:22:05.927Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:06.269Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:09.505Z",
+      "text": "My economy needs improvement; focus on acquiring high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:09.505Z",
+      "text": "Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:09.505Z",
+      "text": "My board Power is too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:09.505Z",
+      "text": "Early VP acquisition remains crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:09.505Z",
+      "text": "Monitor the influence of 'Nothing ever happens here' on my strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:24.179Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:27.252Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:27.252Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:27.252Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:27.252Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:40.913Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:43.305Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:46.611Z",
+      "text": "Integrate more Restore cards to stabilize Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:46.611Z",
+      "text": "My board Power is too low; I consistently lose Locations, affecting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:46.611Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:46.611Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:49.193Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:52.182Z",
+      "text": "Cycle 14: My economy is lagging; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:52.182Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:52.182Z",
+      "text": "Cycle 14: My board Power remains too low; consistently losing Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:52.182Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:24:52.182Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential shifts in strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:25:08.457Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:25:11.771Z",
+      "text": "Cycle 14: Need to improve board Power; consistently losing Locations."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:25:11.771Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:25:11.771Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:25:11.771Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' on my strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:56.864Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:59.609Z",
+      "text": "Cycle 14: My economy needs improvement; focus on acquiring high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:59.609Z",
+      "text": "Cycle 14: Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:59.609Z",
+      "text": "Cycle 14: My board Power is too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:59.609Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:29:59.609Z",
+      "text": "Cycle 14: Monitor the influence of 'Nothing ever happens here' on my strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:12.045Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:15.384Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:15.384Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:15.384Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:15.384Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:39.752Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:42.853Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:42.853Z",
+      "text": "My board Power is too low; I consistently lose Locations, affecting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:42.853Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:42.853Z",
+      "text": "Integrate more Restore cards to stabilize Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:30:42.853Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:31:58.314Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:02.060Z",
+      "text": "Cycle 14: My economy needs improvement; focus on acquiring high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:02.060Z",
+      "text": "Cycle 14: Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:02.060Z",
+      "text": "Cycle 14: My board Power is too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:02.060Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:02.060Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:21.717Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:25.857Z",
+      "text": "Cycle 14: My economy needs improvement; focus on high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:25.857Z",
+      "text": "Cycle 14: Integrate more Restore cards to stabilize Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:25.857Z",
+      "text": "Cycle 14: My board Power is too low; consistently losing Locations."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:25.857Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:32:25.857Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' on my strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:33:56.620Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:00.255Z",
+      "text": "Cycle 14: The human's Draft wallet (17) significantly outpaces mine (3). I need to enhance my economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:00.255Z",
+      "text": "Cycle 14: My board Power is too low, leading to losses in most Locations; I must prioritize high-Power cards."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:00.255Z",
+      "text": "Cycle 14: Early VP acquisition remains vital to keep pace with the human's economy, especially before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:00.255Z",
+      "text": "Cycle 14: I should integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:00.255Z",
+      "text": "Cycle 14: Monitoring the influence of 'Nothing ever happens here' on my strategies is essential."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:41.032Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:44.897Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:44.897Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:44.898Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:34:44.898Z",
+      "text": "Cycle 14: Human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:41:33.107Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:41:36.811Z",
+      "text": "Cycle 14: My economy needs improvement; focus on acquiring high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:41:36.811Z",
+      "text": "Cycle 14: Integrate more Restore cards to stabilize Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:41:36.811Z",
+      "text": "Cycle 14: My board Power is too low; consistently losing Locations."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:41:36.811Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:23.074Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:27.426Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for its influence on strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:27.426Z",
+      "text": "Cycle 14: My economy needs improvement; focus on acquiring high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:27.426Z",
+      "text": "Integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:27.426Z",
+      "text": "My board Power is too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T22:49:27.426Z",
+      "text": "Early VP acquisition is crucial to keep pace with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:07.626Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:12.666Z",
+      "text": "Cycle 14: Focusing on high-value Crypto is crucial to compete with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:12.666Z",
+      "text": "Cycle 14: Integrating more Restore cards is necessary for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:12.666Z",
+      "text": "Cycle 14: My board Power remains low, leading to losses in Locations; adjustments needed."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:12.666Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy, particularly before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:08:12.666Z",
+      "text": "Cycle 14: Monitoring 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:42.765Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:46.438Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' on my strategies."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:46.438Z",
+      "text": "Cycle 14: The human's Draft wallet (17) significantly outpaces mine (3). I need to enhance my economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:46.438Z",
+      "text": "Cycle 14: My board Power is too low, leading to losses in most Locations; I must prioritize high-Power cards."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:46.438Z",
+      "text": "Cycle 14: Early VP acquisition remains vital to keep pace with the human's economy, especially before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:09:46.438Z",
+      "text": "Cycle 14: I should integrate more Restore cards to stabilize my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:20.930Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:24.620Z",
+      "text": "Cycle 14: My board Power remains too low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:24.620Z",
+      "text": "Cycle 14: Early VP acquisition remains crucial to match human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:24.620Z",
+      "text": "Cycle 14: Need to secure more Restore cards for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:24.620Z",
+      "text": "Cycle 14: The human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:13:24.620Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:14:59.611Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:15:02.368Z",
+      "text": "Cycle 14: I need to improve my economy; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:15:02.368Z",
+      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:15:02.368Z",
+      "text": "My board Power is too low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:15:02.368Z",
+      "text": "Early VP acquisition is vital to match the human's economy and maintain competitiveness."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:03.249Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "Cycle 14: My economy needs improvement; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "My board Power remains low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "Early VP acquisition is vital to match the human's economy, especially before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "Monitor the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:06.673Z",
+      "text": "The human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:18:58.116Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:19:01.195Z",
+      "text": "Early VP acquisition is vital to match the human's economy, particularly before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:19:01.195Z",
+      "text": "Monitoring 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:19:01.195Z",
+      "text": "My board Power remains low, leading to losses in Locations; adjustments needed."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:19:01.195Z",
+      "text": "Cycle 14: Focusing on high-value Crypto is crucial to compete with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-11T23:19:01.195Z",
+      "text": "Integrating more Restore cards is necessary for Server stability against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:36.647Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 55 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:42.511Z",
+      "text": "Cycle 14: High-value Crypto acquisition is crucial to compete with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:42.511Z",
+      "text": "Cycle 14: My board Power remains too low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:42.511Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:42.511Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:28:42.511Z",
+      "text": "Cycle 14: The human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:30:48.635Z",
+      "text": "Theory monitor-nothing-happens-here was contradicted from x056-monitor-nothing-happens-here (league 27.5/48 for the experiment vs 28.5/48 for the current best against dv-8@v1.1, strat-g@v1.5 (margin -1.8/game) → rejected); now 0 for / 1 against."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:30:48.635Z",
+      "text": "Experiment x056-monitor-nothing-happens-here rejected: league 27.5/48 for the experiment vs 28.5/48 for the current best against dv-8@v1.1, strat-g@v1.5 (margin -1.8/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:30:48.635Z",
+      "text": "New experiment x057-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:35:00.753Z",
+      "text": "Experiment x057-drain rejected: league 32/48 for the experiment vs 37.5/48 for the current best against strat-g@v1.5, t-5@v1.8, dv-8@v1.1 (margin -2.4/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:35:00.754Z",
+      "text": "New experiment x058-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:42:03.942Z",
+      "text": "Experiment x058-leaner inconclusive: league 27.5/48 for the experiment vs 26.5/48 for the current best against vp-dog@v1.1, t-5@v1.6 (margin +0.8/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:42:03.942Z",
+      "text": "New experiment x059-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:47:37.152Z",
+      "text": "Experiment x059-thinner rejected: league 28/48 for the experiment vs 29/48 for the current best against t-5@v1.4, strat-g@v1.6, dv-8@v1.1 (margin -1.2/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:47:37.152Z",
+      "text": "New experiment x060-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.01→1.31. Prediction: More Locations won and more wins than the current best."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:16.010Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:20.454Z",
+      "text": "Cycle 14: My economy needs improvement; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:20.454Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:20.454Z",
+      "text": "Cycle 14: My board Power remains low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:20.454Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy, particularly before the race heats up."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:20.454Z",
+      "text": "Cycle 14: The human's Draft wallet outpaces mine significantly; I need to focus on acquiring more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:25.907Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:30.533Z",
+      "text": "Cycle 14: My economy is weak; I need to acquire more high-value Crypto early to compete."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:30.533Z",
+      "text": "Cycle 14: My board Power remains low, leading to losses in Locations; adjustments needed."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:30.533Z",
+      "text": "Cycle 14: Early VP acquisition is crucial to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:30.533Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T00:50:30.533Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:35.274Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:41.135Z",
+      "text": "Cycle 14: My economy needs improvement; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:41.135Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:41.135Z",
+      "text": "Cycle 14: My board Power remains low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:41.135Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:01:41.135Z",
+      "text": "Cycle 14: I need to monitor the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:38.870Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:43.101Z",
+      "text": "Cycle 14: My economy remains weak, high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:43.101Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:43.101Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:43.101Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:03:43.101Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:06:44.414Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:06:49.341Z",
+      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:06:49.341Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:06:49.341Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:06:49.341Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:10:38.198Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:10:42.703Z",
+      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:10:42.703Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:10:42.703Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:10:42.703Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:24.033Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:28.295Z",
+      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:28.295Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:28.295Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:28.295Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:11:28.295Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:28.055Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:33.020Z",
+      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:33.020Z",
+      "text": "My economy needs improvement; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:33.020Z",
+      "text": "My board Power remains low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:33.020Z",
+      "text": "Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:12:33.020Z",
+      "text": "Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:31.872Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:37.400Z",
+      "text": "Cycle 14: High-value Crypto acquisition remains crucial for my economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:37.400Z",
+      "text": "Cycle 14: My board Power is low; I consistently lose Locations, impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:37.400Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:37.400Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:44.645Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:49.263Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:49.263Z",
+      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:49.263Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:49.263Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:14:49.263Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:09.062Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:13.568Z",
+      "text": "Cycle 14: High-value Crypto acquisition remains crucial for my economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:13.568Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:13.568Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:13.568Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:45.971Z",
+      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:50.842Z",
+      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:50.842Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:50.842Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:50.842Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:18:50.842Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:21:38.733Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:21:43.274Z",
+      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:21:43.274Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:21:43.274Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:21:43.274Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:21.950Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:26.841Z",
+      "text": "Cycle 14: My board Power is low; I lost many Locations impacting my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:26.841Z",
+      "text": "Cycle 14: Early VP acquisition remains critical to compete with the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:26.841Z",
+      "text": "Cycle 14: Integration of Restore cards is essential for stabilizing my Servers."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:26.841Z",
+      "text": "Cycle 14: The human's Draft wallet significantly exceeds mine; I need to improve my economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:50.885Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:55.911Z",
+      "text": "Cycle 13: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:55.911Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:55.911Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:22:55.911Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:34.471Z",
+      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:40.485Z",
+      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:40.485Z",
+      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:40.485Z",
+      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:40.485Z",
+      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+    },
+    {
+      "version": 7,
+      "at": "2026-10-12T01:28:40.485Z",
+      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
     }
   ],
   "cardNotes": {
@@ -6312,7 +6687,14 @@
     "z-mobile": "Evaluate its ability to gain power based on the number of cards moved, which could synergize well with mobility strategies.",
     "t-moble": "Monitor its performance in gaining power through card movement, as it offers flexibility in placement.",
     "location-4044n9xw": "Watch who wins this new Location and how it shifts the economy.",
-    "card-a2qeb5kn": "endgame Drain finisher; est. hand value 5.1 early / 13.2 late at cost 10. Untested."
+    "card-a2qeb5kn": "endgame Drain finisher; est. hand value 5.1 early / 13.2 late at cost 10. Untested.",
+    "location-hak8535x": "New Location: \"Ongoing: +1 Power to the weakest revealed card on each side.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "location-udhywjrh": "New Location: \"On collapse: Destroy the weakest revealed card on each side.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "location-xsglnved": "New Location: \"Ongoing: +1 Crypto to the losing player.\" Read: winning it hands the other player about 7.34 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.",
+    "location-yybkdh5m": "New Location: \"Start of turn 3: Reset the Power of all cards here.\" Read: contest it: holding it is worth about 1.62 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "location-25kpy0uk": "New Location: \"On collapse: Winner may pay 2 Crypto, and get +4 Power to a random card in their deck.\" Read: winning it hands the other player about 3.68 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.",
+    "location-adm0cvxt": "New Location: \"Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.\" Read: contest it: holding it is worth about 2.7 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "location-m78m3xz4": "New Location: \"On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.\" Read: winning it hands the other player about 1 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy."
   },
   "knownCards": [
     "eval-signal-surveyor",
@@ -6422,7 +6804,6 @@
     "backup-failure",
     "penny-for-the-poor",
     "wind-fall",
-    "moving-mod",
     "thin-the-heard",
     "sludge-core",
     "get-out",
@@ -6433,7 +6814,14 @@
     "location-huzvzstj",
     "location-t91bjxd9",
     "location-f83zsdwl",
-    "location-4044n9xw"
+    "location-4044n9xw",
+    "location-hak8535x",
+    "location-udhywjrh",
+    "location-xsglnved",
+    "location-yybkdh5m",
+    "location-25kpy0uk",
+    "location-adm0cvxt",
+    "location-m78m3xz4"
   ],
   "cardStats": {
     "sudo-demiurge": {
@@ -7712,7 +8100,7 @@
     },
     {
       "label": "strat-g@v1.7",
-      "savedAt": "2026-10-09T02:56:54.381Z",
+      "savedAt": "2026-10-12T01:28:40.485Z",
       "profile": {
         "version": 7,
         "plan": "",

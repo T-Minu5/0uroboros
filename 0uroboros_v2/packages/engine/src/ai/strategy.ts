@@ -409,3 +409,33 @@ export function keepValue(card: Card, profile: StrategyProfile, context: Strateg
   if (card.type === 'VP' && permanent) return (card.vp ?? 0) > 0 ? 50 + (card.vp ?? 0) : -10;
   return hand;
 }
+
+/** Below this keep value a card is deck clutter whatever the deck holds (Shyte-Coin, Glitch). */
+export const JUNK_KEEP_VALUE = 1.5;
+/** Thinning never takes a deck below this many cards, junk aside. */
+export const MIN_THIN_DECK = 8;
+
+/**
+ * Which of the controller's own `candidates` to trash, weakest first, up to `limit`. Junk always goes. Any other card
+ * goes when it falls below the bar a purchase must clear (`dilution` x the average card of the rest of the deck), so
+ * starting cards are trashed once better cards have replaced them, while the deck keeps MIN_THIN_DECK cards and Crypto
+ * is kept until the rest of the deck still meets the profile's `handCryptoTarget`.
+ */
+export function thinningPicks(candidates: readonly Card[], profile: StrategyProfile, context: StrategyContext, limit: number): Card[] {
+  const value = (card: Card) => keepValue(card, profile, context, true);
+  let owned = [...context.owned];
+  const picks: Card[] = [];
+  for (const card of [...candidates].sort((a, b) => value(a) - value(b))) {
+    if (picks.length >= limit) break;
+    const rest = owned.filter(item => item.id !== card.id);
+    if (value(card) >= JUNK_KEEP_VALUE) {
+      if (rest.length < MIN_THIN_DECK) break;
+      const average = rest.length ? rest.reduce((sum, item) => sum + handValue(item, profile, context), 0) / rest.length : 0;
+      if (value(card) >= profile.dilution * average) break;
+      if (card.type === 'Crypto' && cryptoPerHand(rest) < profile.handCryptoTarget) continue;
+    }
+    picks.push(card);
+    owned = rest;
+  }
+  return picks;
+}

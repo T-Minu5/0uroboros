@@ -19,6 +19,8 @@ const root = process.cwd();
 const check = process.argv.includes('--check');
 const MANIFEST = resolve(root, 'packages/content/art-manifest.json');
 const STUDIO_ONLY = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts', 'src/studio.tsx', 'src/agents.tsx']);
+// Written by vite.config.ts at build time (and served by the dev server) from the songs in assets/music.
+const GENERATED = new Set(['assets/music/playlist.json']);
 
 const readJson = p => JSON.parse(readFileSync(p, 'utf8'));
 const nameKey = name => name.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
@@ -28,7 +30,7 @@ const files = new Set();
 const missing = [];
 const add = (path, why) => {
   const clean = decodeURIComponent(path).replace(/^\/+/, '');
-  if (!clean.startsWith('assets/')) return;
+  if (!clean.startsWith('assets/') || GENERATED.has(clean)) return;
   const abs = resolve(root, clean);
   if (!existsSync(abs) || !statSync(abs).isFile()) {
     // Vite's publicDir (public/assets/...) is copied by Vite itself and is not part of the manifest.

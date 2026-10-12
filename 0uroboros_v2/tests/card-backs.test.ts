@@ -3,10 +3,9 @@ import { CARD_BACKS, DEFAULT_CARD_BACK, cardBackMarkup, cardBackSrc, loadCardBac
 import { playerColor } from '../src/playerTheme';
 
 describe('card backs', () => {
-  it('draws every SVG back on the palette black with its linework glowing in the player colour', () => {
+  it('draws every back as SVG on the palette black with its linework glowing in the player colour', () => {
     for (const back of CARD_BACKS) {
-      if ('image' in back) continue;
-      const markup = cardBackMarkup(back.id, '#fa0048')!;
+      const markup = cardBackMarkup(back.id, '#fa0048');
       expect(markup, back.id).toContain('<path');
       expect(markup, back.id).toContain('fill="#030012"');
       expect(markup, back.id).toContain('flood-color="#fa0048"');
@@ -25,7 +24,10 @@ describe('card backs', () => {
     const red = playerColor('red'), cyan = playerColor('cyan');
     expect(cardBackSrc('infinity', red)).toBe(cardBackSrc('infinity', red));
     expect(cardBackSrc('infinity', red)).not.toBe(cardBackSrc('infinity', cyan));
-    expect(cardBackSrc('silicone', red)).toBe(cardBackSrc('silicone', cyan));
+  });
+
+  it('no longer offers the Silicone image back', () => {
+    expect(CARD_BACKS.map(back => back.id)).not.toContain('silicone');
   });
 });
 
@@ -43,8 +45,10 @@ describe('card back setting', () => {
     expect(loadCardBacks()).toEqual(['eye', 'delta']);
   });
 
-  it('ignores unknown backs', () => {
+  it('ignores unknown backs, including the removed Silicone', () => {
     store.set('ouroboros.cardBacks', JSON.stringify(['eye', 'sword']));
+    expect(loadCardBacks()).toEqual([DEFAULT_CARD_BACK, DEFAULT_CARD_BACK]);
+    store.set('ouroboros.cardBacks', JSON.stringify(['silicone', 'eye']));
     expect(loadCardBacks()).toEqual([DEFAULT_CARD_BACK, DEFAULT_CARD_BACK]);
   });
 });

@@ -1,8 +1,7 @@
 import { createContext, useContext, type CSSProperties } from 'react';
-import { GOLD_GRADIENT } from './boardMaterials';
 
 /** The colours a player may claim. */
-export type PlayerColorId = 'red' | 'gold' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink';
+export type PlayerColorId = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink';
 /** One choice per `PlayerId`; index 0 is the local player. */
 export type ColorTheme = [PlayerColorId, PlayerColorId];
 
@@ -37,7 +36,7 @@ export type PlayerColor = ColorSource & {
 /** Deep and base stops hold the rim's hue at roughly 35% and 16% lightness, following the authored gold. */
 const PALETTE: Record<PlayerColorId, ColorSource> = {
  red:    {label: 'Red',    accent: '#fa0048', tube: '#ff1f5e', light: '#ffa8c2', inlay: {rim: '#fa0048', deep: '#94002b', base: '#440014'}},
- gold:   {label: 'Gold',   accent: '#ffcc12', tube: '#ffcc12', light: '#ffe9a8', inlay: GOLD_GRADIENT},
+ orange: {label: 'Orange', accent: '#EB9D00', tube: '#EB9D00', light: '#f7d899', inlay: {rim: '#EB9D00', deep: '#8b5d00', base: '#402a00'}},
  yellow: {label: 'Yellow', accent: '#fff700', tube: '#fff833', light: '#fffbb0', inlay: {rim: '#fff700', deep: '#948f00', base: '#444200'}},
  green:  {label: 'Green',  accent: '#1fffb1', tube: '#3affbc', light: '#b4ffe6', inlay: {rim: '#1fffb1', deep: '#1a9470', base: '#0d4433'}},
  cyan:   {label: 'Cyan',   accent: '#27e2ff', tube: '#08dfff', light: '#a8f0ff', inlay: {rim: '#27e2ff', deep: '#16788f', base: '#0a3544'}},
@@ -46,7 +45,7 @@ const PALETTE: Record<PlayerColorId, ColorSource> = {
  pink:   {label: 'Pink',   accent: '#ff0ba1', tube: '#ff2fb0', light: '#ffa8dc', inlay: {rim: '#ff0ba1', deep: '#94065e', base: '#440230'}},
 };
 /** Settings swatch order. */
-export const PLAYER_COLOR_IDS = ['red', 'gold', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink'] as const;
+export const PLAYER_COLOR_IDS = ['red', 'orange', 'yellow', 'green', 'cyan', 'blue', 'purple', 'pink'] as const;
 /** Used until a player saves their own choice. */
 export const DEFAULT_THEME: ColorTheme = ['cyan', 'purple'];
 
@@ -67,7 +66,9 @@ const STORAGE_KEY = '0uroboros.colorTheme';
 const isChoice = (value: unknown): value is PlayerColorId => (PLAYER_COLOR_IDS as readonly unknown[]).includes(value);
 export function loadColorTheme(): ColorTheme {
  try {
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+  const raw: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+  // Orange replaced Gold in the palette.
+  const saved = Array.isArray(raw) ? raw.map(choice => choice === 'gold' ? 'orange' : choice) : raw;
   if (Array.isArray(saved) && saved.length === 2 && saved.every(isChoice) && saved[0] !== saved[1]) return [saved[0], saved[1]];
  } catch { /* Unreadable storage falls back to the default. */ }
  return DEFAULT_THEME;

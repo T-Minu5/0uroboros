@@ -21,6 +21,8 @@
 .game-configure-vp label{display:flex;align-items:center;gap:6px;font-size:11px;color:#aab3c5}
 .game-configure-vp input{width:58px}
 .game-configure-vp button{padding:5px 9px;font-size:11px}
+.game-configure-check{cursor:pointer}
+.game-configure-row.game-configure-check input{width:18px;height:18px;padding:0;accent-color:#27e2ff;cursor:pointer}
 .game-configure .deck-picker{margin-bottom:12px}
 
 .deck-picker{margin:0 0 16px;padding:0;border:0;min-width:0}

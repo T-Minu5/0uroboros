@@ -1,0 +1,901 @@
+{
+  "gameId": "game-mv0jjhai",
+  "version": 7,
+  "startedAt": "2026-10-09T05:45:35.333Z",
+  "finished": false,
+  "notes": [
+    "Cycle 1: VP 2-2 (human-me), Servers 3400/3450, Locations won 1-4, Draft wallets 6/6. Human bought nothing; I bought The Inbetweener."
+  ],
+  "report": {
+    "strategyVersion": 7,
+    "strategyExperiment": null,
+    "cycle": 2,
+    "phase": "runtime",
+    "winner": null,
+    "endedReason": null,
+    "finalVP": [
+      2,
+      2
+    ],
+    "servers": [
+      3400,
+      3450
+    ],
+    "purchases": [
+      {
+        "cycle": 1,
+        "owner": 1,
+        "definitionId": "the-inbetweener",
+        "name": "The Inbetweener",
+        "category": "Base",
+        "cost": 4
+      }
+    ],
+    "cycles": [
+      {
+        "cycle": 1,
+        "vp": [
+          2,
+          2
+        ],
+        "servers": [
+          3400,
+          3450
+        ],
+        "wallet": [
+          6,
+          6
+        ],
+        "locationsWon": [
+          1,
+          4
+        ],
+        "locations": [
+          {
+            "id": "backup-failure",
+            "name": "Backup failure",
+            "winner": 0
+          },
+          {
+            "id": "sludge-core",
+            "name": "Sludge core",
+            "winner": 1
+          },
+          {
+            "id": "boost-juice",
+            "name": "Boost Juice",
+            "winner": 1
+          },
+          {
+            "id": "moving-mod",
+            "name": "Moving mod",
+            "winner": 1
+          },
+          {
+            "id": "loser-s-luck",
+            "name": "Loser's luck",
+            "winner": 1
+          }
+        ],
+        "circuit": {
+          "rewardId": "reward-n1tqlwwb",
+          "name": "Money or Power",
+          "eligible": [
+            1
+          ],
+          "claimed": [
+            1
+          ]
+        },
+        "deckSize": [
+          10,
+          10
+        ],
+        "market": [
+          {
+            "id": "the-inbetweener",
+            "name": "The Inbetweener",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "rezz-blade",
+            "name": "Rezz Blade",
+            "category": "Chaos",
+            "cost": 5,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "slash-dot",
+            "name": "Slash-Dot",
+            "category": "Base",
+            "cost": 4,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "card-93h8cciw",
+            "name": "501.AR",
+            "category": "VP",
+            "cost": 3,
+            "stock": [
+              2,
+              2
+            ]
+          },
+          {
+            "id": "astra-ascii",
+            "name": "Astra Ascii",
+            "category": "Base",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "kilo-cycle",
+            "name": "Kilo Cycle",
+            "category": "Base",
+            "cost": 7,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "card-m7dztzir",
+            "name": "Bumpster",
+            "category": "Chaos",
+            "cost": 3,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "veil-of-cthulhu",
+            "name": "Veil of Cthulhu",
+            "category": "Chaos",
+            "cost": 12,
+            "stock": [
+              8,
+              8
+            ]
+          },
+          {
+            "id": "zenith-worx",
+            "name": "Zenith Worx",
+            "category": "VP",
+            "cost": 10,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "quantum-archive",
+            "name": "Quantum Archive",
+            "category": "VP",
+            "cost": 4,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "zenith-wetware",
+            "name": "Zenith Wetware",
+            "category": "VP",
+            "cost": 11,
+            "stock": [
+              4,
+              4
+            ]
+          },
+          {
+            "id": "byte-coin",
+            "name": "Byte-Coin",
+            "category": "Crypto",
+            "cost": 3,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "kilo-coin",
+            "name": "Kilo-Coin",
+            "category": "Crypto",
+            "cost": 6,
+            "stock": [
+              16,
+              16
+            ]
+          },
+          {
+            "id": "mega-cache",
+            "name": "Mega-Cache",
+            "category": "Crypto",
+            "cost": 9,
+            "stock": [
+              8,
+              8
+            ]
+          }
+        ]
+      }
+    ],
+    "decks": [
+      {
+        "byte-coin": 2,
+        "shyte-coin": 2,
+        "basic-encryption": 2,
+        "dotkrawler": 1,
+        "slash-dot": 1,
+        "rezz-blade": 1,
+        "night-scythe": 1
+      },
+      {
+        "byte-coin": 2,
+        "slash-dot": 1,
+        "night-scythe": 1,
+        "basic-encryption": 2,
+        "shyte-coin": 2,
+        "dotkrawler": 1,
+        "the-inbetweener": 1,
+        "rezz-blade": 1
+      }
+    ],
+    "aiSeats": [
+      1
+    ],
+    "telemetry": {
+      "events": 99,
+      "drainDealt": [
+        50,
+        150
+      ],
+      "restoreDone": [
+        50,
+        0
+      ],
+      "drainBySource": {
+        "card": [
+          0,
+          100
+        ],
+        "location": [
+          50,
+          50
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "restoreBySource": {
+        "card": [
+          50,
+          0
+        ],
+        "location": [
+          0,
+          0
+        ],
+        "circuit": [
+          0,
+          0
+        ]
+      },
+      "wastedRestores": [
+        1,
+        2
+      ],
+      "restoreEvents": [
+        2,
+        2
+      ],
+      "drainEvents": [
+        1,
+        2
+      ],
+      "drawn": [
+        5,
+        5
+      ],
+      "actionsGained": [
+        2,
+        4
+      ],
+      "cryptoGained": [
+        6,
+        6
+      ],
+      "vpGained": [
+        0,
+        0
+      ],
+      "destructions": [],
+      "cards": {
+        "basic-encryption": {
+          "definitionId": "basic-encryption",
+          "name": "Basic Encryption",
+          "cost": 3,
+          "type": "VP",
+          "plays": [
+            2,
+            2
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            50,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "slash-dot": {
+          "definitionId": "slash-dot",
+          "name": "Slash-Dot",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            1,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            3,
+            3
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "rezz-blade": {
+          "definitionId": "rezz-blade",
+          "name": "Rezz Blade",
+          "cost": 5,
+          "type": "Character",
+          "cardClass": "Attack",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            100
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "dotkrawler": {
+          "definitionId": "dotkrawler",
+          "name": "Dotkrawler",
+          "cost": 4,
+          "type": "Character",
+          "cardClass": "Action",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            1
+          ],
+          "actions": [
+            0,
+            2
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "night-scythe": {
+          "definitionId": "night-scythe",
+          "name": "Night Scythe",
+          "cost": 2,
+          "type": "Character",
+          "cardClass": "Utility",
+          "plays": [
+            0,
+            1
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "shyte-coin": {
+          "definitionId": "shyte-coin",
+          "name": "Shyte-Coin",
+          "cost": 0,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            2,
+            2
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "byte-coin": {
+          "definitionId": "byte-coin",
+          "name": "Byte-Coin",
+          "cost": 3,
+          "type": "Crypto",
+          "plays": [
+            0,
+            0
+          ],
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            4,
+            4
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "locations": {
+        "loser-s-luck": {
+          "name": "Loser's luck",
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            2,
+            0
+          ],
+          "actions": [
+            2,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "sludge-core": {
+          "name": "Sludge core",
+          "drain": [
+            0,
+            50
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        },
+        "backup-failure": {
+          "name": "Backup failure",
+          "drain": [
+            50,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "draw": [
+            0,
+            0
+          ],
+          "actions": [
+            0,
+            0
+          ],
+          "crypto": [
+            0,
+            0
+          ],
+          "vp": [
+            0,
+            0
+          ]
+        }
+      },
+      "circuit": {},
+      "perCycle": [
+        {
+          "cycle": 1,
+          "drain": [
+            50,
+            150
+          ],
+          "restore": [
+            50,
+            0
+          ],
+          "events": 98
+        },
+        {
+          "cycle": 2,
+          "drain": [
+            0,
+            0
+          ],
+          "restore": [
+            0,
+            0
+          ],
+          "events": 1
+        }
+      ],
+      "failedOutcomes": [
+        2,
+        2
+      ],
+      "randomResults": 0,
+      "choices": [
+        0,
+        4
+      ]
+    },
+    "decisions": [
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 2,
+        "location": "Boost Juice",
+        "priority": 10.5,
+        "nodeScore": 61.83,
+        "locationStake": 0,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Basic Encryption",
+        "definitionId": "basic-encryption",
+        "node": 0,
+        "location": "Backup failure",
+        "priority": 10.5,
+        "nodeScore": 33.3,
+        "locationStake": -8.9,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 1,
+        "owner": 1,
+        "card": "Slash-Dot",
+        "definitionId": "slash-dot",
+        "node": 4,
+        "location": "Loser's luck",
+        "priority": 7.5,
+        "nodeScore": 15,
+        "locationStake": -15.88,
+        "options": 3
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Rezz Blade",
+        "definitionId": "rezz-blade",
+        "node": 1,
+        "location": "Sludge core",
+        "priority": 9.5,
+        "nodeScore": 63.06,
+        "locationStake": 1.02,
+        "options": 4
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "card": "Dotkrawler",
+        "definitionId": "dotkrawler",
+        "node": 0,
+        "location": "Backup failure",
+        "priority": 9,
+        "nodeScore": 45.18,
+        "locationStake": -3.94,
+        "options": 4
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 2,
+        "owner": 1,
+        "source": "Dotkrawler",
+        "prompt": "Push or pull 1 power.",
+        "picked": [
+          "Push 1 power to Sludge core"
+        ],
+        "method": "random"
+      },
+      {
+        "kind": "deploy",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "card": "Night Scythe",
+        "definitionId": "night-scythe",
+        "node": 3,
+        "location": "Moving mod",
+        "priority": 0.5,
+        "nodeScore": 69.12,
+        "locationStake": 3.04,
+        "options": 5
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "source": "Night Scythe",
+        "prompt": "Night Scythe: select up to 1 card to trash.",
+        "picked": [],
+        "method": "strategy"
+      },
+      {
+        "kind": "circuit",
+        "cycle": 1,
+        "owner": 1,
+        "rewardId": "reward-n1tqlwwb",
+        "name": "Money or Power"
+      },
+      {
+        "kind": "choice",
+        "cycle": 1,
+        "turn": 3,
+        "owner": 1,
+        "source": "a private Circuit Reward",
+        "prompt": "a private Circuit Reward: choose an effect.",
+        "picked": [
+          "+2 Power to your deck's top card"
+        ],
+        "method": "strategy"
+      },
+      {
+        "kind": "draft",
+        "cycle": 1,
+        "owner": 1,
+        "wallet": 6,
+        "phase": "economy",
+        "bought": "The Inbetweener",
+        "cost": 4,
+        "plan": [
+          "The Inbetweener"
+        ],
+        "alternatives": [
+          {
+            "name": "The Inbetweener",
+            "cost": 4,
+            "score": 4.9
+          },
+          {
+            "name": "Kilo-Coin",
+            "cost": 6,
+            "score": 4.6
+          },
+          {
+            "name": "Slash-Dot",
+            "cost": 4,
+            "score": 2.84
+          },
+          {
+            "name": "Rezz Blade",
+            "cost": 5,
+            "score": 1.71
+          },
+          {
+            "name": "Byte-Coin",
+            "cost": 3,
+            "score": 1.68
+          }
+        ],
+        "offered": [
+          {
+            "id": "the-inbetweener",
+            "score": 4.9
+          },
+          {
+            "id": "rezz-blade",
+            "score": 1.71
+          },
+          {
+            "id": "slash-dot",
+            "score": 2.84
+          },
+          {
+            "id": "card-93h8cciw",
+            "score": -2.27
+          },
+          {
+            "id": "card-m7dztzir",
+            "score": -1.04
+          },
+          {
+            "id": "quantum-archive",
+            "score": -0.88
+          },
+          {
+            "id": "byte-coin",
+            "score": 1.68
+          },
+          {
+            "id": "kilo-coin",
+            "score": 4.6
+          }
+        ]
+      },
+      {
+        "kind": "draft-end",
+        "cycle": 1,
+        "owner": 1,
+        "walletLeft": 2,
+        "phase": "economy"
+      }
+    ]
+  }
+}

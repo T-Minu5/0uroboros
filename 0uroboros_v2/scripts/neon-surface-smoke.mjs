@@ -98,8 +98,8 @@ async function fieldState(page) {
 let page;
 try {
   const context = await browser.newContext({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: 1 });
-  // The image, video and None floors this checks are the Studio lighting list.
-  await context.addInitScript(() => { localStorage.setItem('ouroboros.boardStyle', 'neon'); localStorage.setItem('ouroboros.lightingMode', 'studio'); });
+  // The image and None floors this checks are the Studio lighting list.
+  await context.addInitScript(() => { localStorage.setItem('ouroboros.boardStyle.v2', 'neon'); localStorage.setItem('ouroboros.lightingMode.v3', 'studio'); });
   page = await context.newPage();
   watchErrors(page);
   await page.goto(URL);
@@ -133,7 +133,7 @@ try {
   assert(image.edge.time > 0, 'decorative time should advance under normal motion');
   report.checks.push('Static floor is connected to live glass uniforms');
 
-  await chooseBackground(page, 'back-03');
+  await chooseBackground(page, 'Table Top');
   await page.waitForTimeout(1000);
   const image2 = await sample(page);
   report.samples.imageSwitched = image2;
@@ -141,19 +141,6 @@ try {
   assert.notEqual(image2.floor.map, image.floor.map);
   await page.screenshot({ path: 'docs/evidence/neon-v2-surfaces.png' });
   report.checks.push('Switching static images updates the floor source while glass remains live');
-
-  await chooseBackground(page, 'background-01');
-  const video = await waitForSample(page, () => {
-    let glass = false, canvas = false;
-    window.__boardFinish?.composer?.passes?.[0]?.scene?.traverse(o => {
-      if (o.name === 'frosted-glass-field') glass = o.material?.uniforms?.uHasFloor?.value === 1;
-      if (o.userData?.scanBackground) canvas = Boolean(o.material?.map?.isCanvasTexture);
-    });
-    return glass && canvas;
-  }, 'video', 25000);
-  assert.equal(video.glass.hasFloor, 1);
-  assert.equal(video.floor.canvas, true);
-  report.checks.push('Video background reaches the glass after decode');
 
   await chooseBackground(page, 'None');
   const none = await waitForSample(page, () => {
@@ -183,7 +170,7 @@ try {
   assert.deepEqual(await fieldState(page), before);
   await chooseStyle(page, 'Neon');
   assert.deepEqual(await fieldState(page), before);
-  assert.equal(await page.evaluate(() => localStorage.getItem('ouroboros.boardStyle')), 'neon');
+  assert.equal(await page.evaluate(() => localStorage.getItem('ouroboros.boardStyle.v2')), 'neon');
   report.checks.push('Actual Classic and Neon radios preserve deployed cards, Servers, and Node anchors');
 
   for (let i = 0; i < 4; i++) {
@@ -206,7 +193,7 @@ try {
   await context.close();
 
   const reducedContext = await browser.newContext({ viewport: { width: 1400, height: 900 }, reducedMotion: 'reduce' });
-  await reducedContext.addInitScript(() => localStorage.setItem('ouroboros.boardStyle', 'neon'));
+  await reducedContext.addInitScript(() => localStorage.setItem('ouroboros.boardStyle.v2', 'neon'));
   const reducedPage = await reducedContext.newPage();
   watchErrors(reducedPage);
   await reducedPage.goto(URL);

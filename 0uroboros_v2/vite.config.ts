@@ -1,9 +1,16 @@
 import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
-import { createReadStream, cpSync, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
+import { createReadStream, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 
 const ART_MANIFEST = JSON.parse(readFileSync(resolve('packages/content/art-manifest.json'), 'utf8')) as { files: string[] };
+
+const AUDIO_TYPES: Record<string,string> = {'.mp3':'audio/mpeg','.m4a':'audio/mp4','.aac':'audio/aac','.ogg':'audio/ogg','.oga':'audio/ogg','.wav':'audio/wav','.flac':'audio/flac'};
+const MUSIC_DIR = resolve('assets/music');
+/** Songs in assets/music, read on every request so newly added files play without a restart. */
+const musicFiles = () => existsSync(MUSIC_DIR)
+ ? readdirSync(MUSIC_DIR).filter(name => !name.startsWith('.') && AUDIO_TYPES[extname(name).toLowerCase()]).sort()
+ : [];
 
 // Server code is loaded through Vite, never imported here: importing it would make Vite restart in-process on every server edit,
 // and each in-process restart leaks the previous server's memory. `npm run dev` restarts the whole process instead (see package.json).
@@ -51,17 +58,23 @@ export default defineConfig({
     // `?url` / `?import` requests are Vite resolving a source import, not the browser fetching the file.
     if (/[?&](url|import)(&|=|$)/.test(request.url ?? '')) return next();
     const rawPath = decodeURIComponent((request.url ?? '').split('?')[0] ?? '').replace(/^\/+/, '');
+    if (rawPath === 'music/playlist.json') {
+     response.setHeader('Content-Type', 'application/json');
+     response.setHeader('Cache-Control', 'no-store');
+     response.end(JSON.stringify(musicFiles()));
+     return;
+    }
     const filePath = resolve('assets', rawPath);
     const assetsRoot = resolve('assets');
     if (!filePath.startsWith(assetsRoot) || !existsSync(filePath) || !statSync(filePath).isFile()) return next();
-    const mime: Record<string,string> = {'.glb':'model/gltf-binary','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp','.mp4':'video/mp4'};
+    const mime: Record<string,string> = {'.glb':'model/gltf-binary','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp','.mp4':'video/mp4',...AUDIO_TYPES};
     if (!mime[extname(filePath).toLowerCase()]) return next();
     const type = mime[extname(filePath).toLowerCase()] ?? 'application/octet-stream';
     const stat = statSync(filePath);
     response.setHeader('Content-Type', type);
     response.setHeader('Accept-Ranges', 'bytes');
     const range = request.headers.range;
-    if (range && type.startsWith('video/')) {
+    if (range && (type.startsWith('video/') || type.startsWith('audio/'))) {
      const match = /bytes=(\d+)-(\d*)/.exec(range);
      if (match) {
       const start = Number(match[1]);
@@ -85,6 +98,10 @@ export default defineConfig({
     cpSync(resolve(file), resolve(OUT_DIR, file));
    }
    if (!CLIENT) for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve(OUT_DIR, 'assets', folder), { recursive: true });
+   const songs = musicFiles();
+   mkdirSync(resolve(OUT_DIR, 'assets/music'), { recursive: true });
+   for (const song of songs) cpSync(resolve(MUSIC_DIR, song), resolve(OUT_DIR, 'assets/music', song));
+   writeFileSync(resolve(OUT_DIR, 'assets/music/playlist.json'), JSON.stringify(songs));
   },
  }, {
   name: 'local-authoring-content-api',

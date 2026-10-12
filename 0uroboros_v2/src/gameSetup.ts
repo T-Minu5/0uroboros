@@ -4,16 +4,18 @@ import { defaultServerVP, type Servers } from '@0uroboros/engine/game';
 export const TURN_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);
 export const SERVER_VP_MAX = 50;
 
-export type GameSetup = { serverVP: Servers; turnSeconds: number | null };
+export type GameSetup = { serverVP: Servers; turnSeconds: number | null; noLocations: boolean; noTrailingRewards: boolean };
 
 const SETUP_KEY = 'ouroboros.gameSetup';
 const clampInt = (value: unknown, min: number, max: number, fallback: number) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback;
 
 export function sanitizeGameSetup(raw: unknown): GameSetup {
-  const value = (raw && typeof raw === 'object' ? raw : {}) as { serverVP?: Partial<Servers>; turnSeconds?: unknown };
+  const value = (raw && typeof raw === 'object' ? raw : {}) as { serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; noTrailingRewards?: unknown };
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
     turnSeconds: typeof value.turnSeconds === 'number' && TURN_TIMER_CHOICES.includes(value.turnSeconds) ? value.turnSeconds : null,
+    noLocations: value.noLocations === true,
+    noTrailingRewards: value.noTrailingRewards === true,
   };
 }
 

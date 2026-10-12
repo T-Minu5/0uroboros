@@ -76,7 +76,7 @@ export const T_5: StrategistIdentity = {
     'Choices: hit the opponent\'s best economy and draw cards; trash my own dead Crypto.',
     'Arc: Chaos from Cycle 3, the Primary down in the midgame, the Backup by Cycles 10-13; VP cards only to close out a won race.',
   ],
-  envelope: { economyUntilCycle: [1, 4], chaosFromCycle: [3, 6], vpFromCycle: [9, 15], handCryptoTarget: [6, 10], weights: { drain: [2.4, 5], chaos: [2, 5], restore: [0, 1], vp: [0.5, 2], crypto: [0.6, 1.6], thin: [0.5, 1.8] } },
+  envelope: { economyUntilCycle: [1, 4], chaosFromCycle: [3, 6], vpFromCycle: [9, 15], handCryptoTarget: [6, 10], weights: { drain: [2.4, 5], chaos: [2, 5], restore: [0, 1], vp: [0.5, 2], crypto: [0.6, 1.6], thin: [0.5, 5] } },
   foundingNotes: ['Founding style: pure aggression. Minimal economy, Chaos and Drain from Cycle 3, both enemy Servers destroyed by Cycles 10-13. The goal is destruction; the damage it takes is both Servers\' integrity in the current rules, which may change. Learning may sharpen the attack; it may not turn it into an engine or a VP deck.'],
 };
 

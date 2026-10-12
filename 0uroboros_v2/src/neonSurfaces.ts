@@ -11,7 +11,8 @@ export const NEON_SURFACES: { id: NeonSurface; label: string }[] = [
 ];
 export const DEFAULT_NEON_SURFACE: NeonSurface = 'glass';
 
-const STORAGE_KEY = 'ouroboros.neonSurface';
+/** v2: the finish was saved on every load, so everyone moves to the Frosted default once. */
+const STORAGE_KEY = 'ouroboros.neonSurface.v2';
 
 /** A retired finish (such as the old clear liquid) loads as the default. */
 export function loadNeonSurface(): NeonSurface {

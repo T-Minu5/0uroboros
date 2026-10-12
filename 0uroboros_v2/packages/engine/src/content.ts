@@ -43,6 +43,8 @@ const REWARDS: readonly (Omit<CircuitRewardDefinition, 'effect'> & { effect: Leg
   { id: "integrity_patch", name: "Integrity patch", text: "Heal up to 400 to your Primary Server. Cannot revive a destroyed Primary.", cost: 0, effect: { kind: "restorePrimary", amount: 400 } },
 ];
 export const EVALUATION_LOCATIONS: readonly EvaluationLocation[] = LOCATIONS.map(location => migrateLocation(location));
+/** The authored Location every Node shows in a "No Locations" game; this copy stands in when a pack lacks it. */
+export const NO_MANS_LAND: EvaluationLocation = { id: "location-f83zsdwl", name: "No Man's Land", rule: "Nothing ever happens here", reward: "Nothing ever happens here", effects: [] };
 export const EVALUATION_CIRCUIT_REWARDS: readonly CircuitRewardDefinition[] = REWARDS.map(reward => {
   const effects = migrateRewardEffects(reward);
   return { ...reward, effect: effects[0], effects };

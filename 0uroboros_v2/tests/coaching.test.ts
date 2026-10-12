@@ -11,7 +11,7 @@ import { clampToEnvelope, DV_8, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from "../
 const document = (authored as unknown as { document: ContentDocument }).document;
 const content = compileForSelfPlay(document);
 const location = (name: string) => {
-  const found = content.locations.find(entry => entry.name === name);
+  const found = content.locations.find(entry => entry.name.trim().toLowerCase() === name.toLowerCase());
   if (!found) throw new Error(`missing Location ${name}`);
   return found;
 };
@@ -20,9 +20,9 @@ const designed = (identity: typeof STRAT_G) => clampToEnvelope({ ...identity.bas
 
 describe("Location valuation", () => {
   it("prices from the winner's seat: loser-paying Locations are negative, draw/Drain/VP ones positive, symmetric ones even", () => {
-    for (const name of ["Login the calvary", "Loser's luck"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeLessThan(0);
-    for (const name of ["Signal tower", "Data breach", "Sludge core", "Wind fall"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeGreaterThan(0);
-    for (const name of ["Code cull", "Sacrificial LLM", "No man's land"]) expect(Math.abs(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake)).toBeLessThan(0.5);
+    for (const name of ["Login the Calvary", "Loser's Luck", "Code Cull"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeLessThan(0);
+    for (const name of ["Signal tower", "Data Breach", "Sludge core", "Wind fall"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeGreaterThan(0);
+    for (const name of ["Trash compactor", "Sacrificial LLM", "No Man's Land"]) expect(Math.abs(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake)).toBeLessThan(0.5);
   });
 
   it("stakes are the mirror image for the two players", () => {
@@ -39,7 +39,7 @@ describe("Location valuation", () => {
   });
 
   it("reads give agents and Eco-Strat a plain verdict per Location", () => {
-    expect(locationRead(location("Loser's luck"))).toMatch(/concede/);
+    expect(locationRead(location("Loser's Luck"))).toMatch(/concede/);
     expect(locationRead(location("Signal tower"))).toMatch(/^contest it/);
     const facts = systemFacts(document);
     expect(facts.rules.locations).toMatch(/winner/);
