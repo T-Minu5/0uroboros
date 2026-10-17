@@ -72,10 +72,8 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
      <button className='primary-button' disabled={locked||claimed} onClick={claim}>{claimed?'Claimed':'Claim'}</button>
     </>:<div className='privilege-copy'><small>CIRCUIT</small><h2>Opponent privilege</h2><p>You can still buy from the market.</p></div>}
    </section>
-   <aside className='draft-wallet-hero' data-draft-resource='0-wallet' aria-label='Crypto wallet'>
+   <aside className='draft-clock-hero' aria-label='Draft timer'>
     <div className='draft-clock'>{view.draftEnded?'DONE':`${seconds}s`}</div>
-    <div className='wallet-hero-value'><Icon name='crypto'/><b key={local.wallet}>{local.wallet}</b></div>
-    <small>Wallet</small>
    </aside>
   </header>
 

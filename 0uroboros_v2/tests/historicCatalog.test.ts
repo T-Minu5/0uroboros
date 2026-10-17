@@ -38,10 +38,10 @@ describe('Historic catalog activation',()=>{
   expect(EVALUATION_BASE_CARDS.some(card=>card.id==='owl-king')).toBe(true);
   expect(EVALUATION_CHAOS_CARDS.some(card=>card.id==='sudo-demiurge')).toBe(true);
  });
- it('deals 2 Base and 2 Chaos game cards (8 each), three VP game cards (4 each), the three currencies, and a separate Draft offer of three Base/Chaos cards and a Solar-monk',()=>{
+ it('deals 2 Base and 2 Chaos game cards (8 each), three VP game cards (4 each), no Crypto piles, and a separate Draft offer of three Base/Chaos cards and a Solar-monk',()=>{
   const market=createStrategicMarket(()=>0.31);
   expect(market.filter(p=>p.category==='Base')).toHaveLength(2);expect(market.filter(p=>p.category==='Chaos')).toHaveLength(2);expect(market.filter(p=>p.category==='VP')).toHaveLength(3);
-  expect(market.filter(p=>p.category==='Crypto').map(p=>[p.card.definitionId,p.supply])).toEqual([['byte-coin',16],['kilo-coin',16],['mega-cache',8]]);
+  expect(market.filter(p=>p.category==='Crypto')).toEqual([]);
   expect(market.filter(p=>p.category==='Base'||p.category==='Chaos').every(p=>p.supply===8&&!p.rotating)).toBe(true);
   expect(market.filter(p=>p.category==='VP').every(p=>p.supply===4&&!p.rotating&&p.card.cardClass!=='Solar-monk')).toBe(true);
   const gameIds=new Set(market.map(p=>p.card.definitionId??p.card.id));
@@ -84,7 +84,7 @@ describe('Historic catalog activation',()=>{
   }
   const ids=(cards:readonly {id:string;definitionId?:string}[])=>new Set(cards.map(card=>card.definitionId??card.id));
   expect(seen.VP).toEqual(ids(bundledContent.vpCards.filter(card=>card.cardClass!=='Solar-monk')));
-  expect(seen.Crypto).toEqual(new Set(['byte-coin','kilo-coin','mega-cache']));
+  expect(seen.Crypto).toEqual(new Set());
   expect(bundledContent.baseCards.some(card=>card.cardClass==='Runtime')).toBe(true);
   expect(seen.Character).toEqual(ids([...bundledContent.baseCards.filter(card=>card.cardClass!=='Runtime'),...bundledContent.chaosCards]));
   expect(bundledContent.vpCards.length).toBeGreaterThan(3);

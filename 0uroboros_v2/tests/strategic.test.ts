@@ -34,7 +34,7 @@ function cycle(session: RuntimeSession, play = false) {
 function draft(session: RuntimeSession) { cycle(session); return Date.now(); }
 
 describe("Strategic evaluation Draft", () => {
-  it("deals 2 Base and 2 Chaos game cards (1 Attack or Hacker, 1 Horror) and three VP game cards plus the currencies, then adds a Draft offer of three Base/Chaos cards and any Solar-monk", () => {
+  it("deals 2 Base and 2 Chaos game cards (1 Attack or Hacker, 1 Horror) and three VP game cards with no Crypto piles, then adds a Draft offer of three Base/Chaos cards and any Solar-monk", () => {
     expect(EVALUATION_BASE_CARDS.length).toBeGreaterThan(12); expect(EVALUATION_VP_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CRYPTO_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CHAOS_CARDS.length).toBeGreaterThanOrEqual(5);
     const piles = createStrategicMarket(seededRandom(41));
     const characters = (list: typeof piles) => list.filter(pile => pile.category === "Base" || pile.category === "Chaos");
@@ -43,7 +43,7 @@ describe("Strategic evaluation Draft", () => {
     expect(piles.filter(pile => pile.category === "VP")).toHaveLength(3);
     expect(characters(piles).every(pile => pile.supply === 8)).toBe(true);
     expect(piles.filter(pile => pile.category === "VP").every(pile => pile.supply === 4 && pile.card.cardClass !== "Solar-monk")).toBe(true);
-    expect(piles.filter(pile => pile.category === "Crypto").map(pile => [pile.card.name, pile.supply])).toEqual([["Byte-Coin", 16], ["Kilo-Coin", 16], ["Mega-Cache", 8]]);
+    expect(piles.filter(pile => pile.category === "Crypto")).toEqual([]);
     const other = createStrategicMarket(seededRandom(99));
     expect(new Set(characters(piles).map(pile => pile.id))).not.toEqual(new Set(characters(other).map(pile => pile.id)));
     const session = make(); draft(session);
@@ -52,7 +52,7 @@ describe("Strategic evaluation Draft", () => {
     expect(offer.filter(pile => pile.category === "VP").every(pile => pile.card.cardClass === "Solar-monk")).toBe(true);
     expect(offer.every(pile => pile.supply === 4 && pile.remaining?.join() === "2,2")).toBe(true);
     const game = session.state.market.filter(pile => !pile.rotating);
-    expect(game).toHaveLength(10);
+    expect(game).toHaveLength(7);
     expect(offer.every(pile => !game.some(fixed => fixed.card.definitionId === pile.card.definitionId))).toBe(true);
   });
 

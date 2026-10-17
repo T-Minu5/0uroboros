@@ -37,8 +37,11 @@ export const DRAFT_OFFER_COUNT=3;
 /** Each Draft also rotates in one Solar-monk, when any is enabled; Solar-monks are never game cards. */
 export const DRAFT_SOLAR_MONK_COUNT=1;
 export const DRAFT_COPIES_PER_PLAYER=2;
-/** The three currencies are always buyable, whatever else the game deals. */
-export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=[{cardId:'byte-coin',supply:16},{cardId:'kilo-coin',supply:16},{cardId:'mega-cache',supply:8}];
+/**
+ * v3: Crypto cards are not sold in Draft. Crypto still exists as a spendable resource; Character
+ * (and other) effects credit the Wallet. Kept as an empty list so authoring and AI facts stay aligned.
+ */
+export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=[];
 
 function cardId(card:Card){return card.definitionId??card.id;}
 
@@ -70,8 +73,8 @@ function pickChaos(pool:readonly PoolEntry[],random:RandomSource):PoolEntry[]{
 }
 
 /**
- * Game setup: 2 Base game cards and 1 Attack or Hacker and 1 Horror game card (shared supply of 8 each), 3 Volume VP
- * game cards (4 each), plus the currency piles. These persist all game; Draft offers are added on top each round.
+ * Game setup: 2 Base game cards and 1 Attack or Hacker and 1 Horror game card (shared supply of 8 each), and 3 Volume VP
+ * game cards (4 each). These persist all game; Draft offers are added on top each round. Crypto piles are omitted in v3.
  */
 export function createStrategicMarket(random:RandomSource,content?:MarketContent):MarketPile[]{
  const pool=characterPool(content);

@@ -137,7 +137,8 @@ describe('generated cards and card class metadata', () => {
     starter.generated=true;
     expect(validateContent(document)).toEqual([]);
     document.cards.find(card=>card.definitionId==='kilo-coin')!.generated=true;
-    expect(validateContent(document)).toEqual(['cards: kilo-coin is a Draft currency and must remain enabled as a non-Generated Crypto card']);
+    // v3: Crypto cards are not Draft currency piles, so Generated Crypto is allowed.
+    expect(validateContent(document)).toEqual([]);
   });
 
   it('lets Generated cards take any type and class while keeping them out of Draft', () => {

@@ -32,18 +32,23 @@ const sameSpan = (a: HandSpan | null, b: HandSpan | null) =>
   !!a && !!b && (Object.keys(a) as (keyof HandSpan)[]).every(key => Math.abs(a[key] - b[key]) < .5);
 
 /**
- * Measures the gap between the local effect bank and the wallet, inset by `HAND_MARGIN`, as left/right offsets
- * within the hand zone's positioned parent. Both are projected HUD anchors that settle after resizes, so it polls.
+ * Measures the gap between the local effect bank and the right-side HUD (turn dock, or host edge when the
+ * Crypto wallet is hidden), inset by `HAND_MARGIN`, as left/right offsets within the hand zone's positioned parent.
+ * Those anchors settle after resizes, so it polls.
  */
 export function useHandSpan(zone: RefObject<HTMLElement | null>): HandSpan | null {
   const [span, setSpan] = useState<HandSpan | null>(null);
   useEffect(() => {
     const measure = () => {
-      const host = zone.current?.offsetParent, bank = document.querySelector('.bank-dock.near'), wallet = document.querySelector('.crypto-cache');
-      if (!host || !bank || !wallet) { setSpan(null); return; }
-      const h = host.getBoundingClientRect(), b = bank.getBoundingClientRect(), w = wallet.getBoundingClientRect();
-      if (!b.width || !w.width) return;
-      const left = b.right - h.left + HAND_MARGIN, right = h.right - w.left + HAND_MARGIN;
+      const host = zone.current?.offsetParent, bank = document.querySelector('.bank-dock.near');
+      const rightHud = document.querySelector('.crypto-cache') ?? document.querySelector('.turn-dock');
+      if (!host || !bank) { setSpan(null); return; }
+      const h = host.getBoundingClientRect(), b = bank.getBoundingClientRect();
+      if (!b.width) return;
+      const left = b.right - h.left + HAND_MARGIN;
+      const right = rightHud
+        ? h.right - rightHud.getBoundingClientRect().left + HAND_MARGIN
+        : HAND_MARGIN;
       const card = zone.current?.querySelector<HTMLElement>('.hand-card');
       const next = { left, right, room: Math.max(0, h.width - left - right), cardWidth: card?.offsetWidth || 120, cardHeight: card?.offsetHeight || 168 };
       setSpan(prev => (sameSpan(prev, next) ? prev : next));

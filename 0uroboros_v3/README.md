@@ -2,6 +2,12 @@
 
 This branch explores a new game mechanic. The shipping game stays on `main`, tagged **`v2-standard-deck`**.
 
+## v3 rules so far
+
+- **No Crypto cards in Draft.** Byte-Coin / Kilo-Coin / Mega-Cache piles are gone from the market.
+- **Crypto wallet HUD is hidden.** Spendable Crypto still exists (console Crypto number + Draft purchases); it comes from Character effects (and any held Crypto cards that still resolve at Draft).
+- Crypto cards that remain in a starting deck stay in the hand fan rather than a separate wallet.
+
 ## How to work
 
 - **Ship / fix the live game:** stay on `main` (or check out tag `v2-standard-deck`). Deploy from there.

@@ -45,13 +45,13 @@ describe('authored content', () => {
     expect(() => compileContent(document)).toThrow(/Invalid authored content/);
   });
 
-  it('rejects disabled starting deck cards and Draft currencies', () => {
+  it('rejects disabled starting deck cards', () => {
     const document = createDefaultContent();
     document.cards.find(card => card.definitionId === 'byte-coin')!.enabled = false;
     expect(validateContent(document)).toEqual(expect.arrayContaining([
       'startingDecks[0].cards[0].cardId: unknown card byte-coin',
-      'cards: byte-coin is a Draft currency and must remain enabled as a non-Generated Crypto card',
     ]));
+    expect(validateContent(document).some(error => /Draft currency/.test(error))).toBe(false);
   });
 
   it('seeds the Standard starting deck and resolves the active deck into one card per copy', () => {
