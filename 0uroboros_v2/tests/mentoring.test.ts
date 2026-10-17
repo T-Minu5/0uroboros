@@ -60,7 +60,8 @@ describe("mentor tips", () => {
     const t5 = designed(T_5);
     const step = translateTip(t5, { handCryptoTarget: 16, economyUntilCycle: 7, weights: { crypto: 1.9, vp: 3.8 } }, T_5.envelope);
     expect(step.change.handCryptoTarget).toBe(t5.handCryptoTarget + 2);
-    expect(step.change.economyUntilCycle).toBe(4);
+    // T-5's economy is locked at Cycle 4 for the shared early opener; the tip cannot move it.
+    expect(step.change.economyUntilCycle).toBeUndefined();
     expect(step.change.weights?.crypto).toBeCloseTo(t5.weights.crypto * 1.4, 2);
     expect(step.change.weights?.vp).toBeLessThanOrEqual(2);
     expect(step.limited).toBe(false);
@@ -94,7 +95,8 @@ describe("mentor tips", () => {
     const tips = baselineTips(store, "t-5")!;
     expect(tips.lines[0]).toMatch(/^Tip from VP-Dog \(#1\): /);
     const baseline = baselineOf(T_5, tips);
-    expect(baseline.playbook).toEqual([...T_5.playbook!, ...tips.lines]);
+    expect(baseline.playbook).toEqual(expect.arrayContaining([...T_5.playbook!, ...tips.lines]));
+    expect(baseline.playbook[0]).toMatch(/Cycles 1-4/);
     inside(baseline.profile, T_5.envelope);
     expect(baseline.profile.handCryptoTarget).toBeGreaterThan(designed(T_5).handCryptoTarget);
     expect(baseline.profile.weights.drain).toBe(designed(T_5).weights.drain);

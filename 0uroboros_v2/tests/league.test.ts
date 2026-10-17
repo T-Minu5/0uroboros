@@ -6,9 +6,19 @@ import authored from "../content/authored-content.json";
 import { DEFAULT_STRATEGY, type StrategyProfile } from "@0uroboros/engine/ai/strategy";
 import { serverMaximums } from "@0uroboros/engine/game";
 import { createStrategist, type LeagueOutcome, type Snapshot } from "../server/aiStrategist";
-import { createLeague, eloUpdate, expectedScore, kFactor, leagueGameCount, sampleOpponent, type LeagueMember } from "../server/agents/league";
+import { createLeague, eloUpdate, expectedScore, kFactor, leagueGameCount, sampleOpponent, trialGamesPerLearner, type ActiveRun, type LeagueMember } from "../server/agents/league";
 import { clampToEnvelope, DV_8, STRAT_G, T_5, VP_DOG, type StrategistIdentity, type StyleEnvelope } from "../server/agents/roster";
 import type { GameEvidence } from "../server/agents/evidence";
+import type { SelfPlayResult } from "@0uroboros/engine/ai/selfPlay";
+
+const onlineMember = (
+  identity: { id: string; name: string },
+  agent: { start: () => Promise<void>; leagueSnapshots: () => readonly { label: string; savedAt: string; profile: StrategyProfile }[]; leagueTrialArms: LeagueMember["trialArms"]; concludeLeagueTrial: LeagueMember["concludeTrial"] },
+  extra: Partial<LeagueMember> = {},
+): LeagueMember => ({
+  id: identity.id, name: identity.name, active: () => true, online: () => true,
+  start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms, concludeTrial: agent.concludeLeagueTrial, ...extra,
+});
 
 async function workspace() {
   const root = await mkdtemp(join(tmpdir(), "league-"));
@@ -113,7 +123,8 @@ describe("league agents", () => {
       const after = agentFor(root, T_5);
       await after.ready;
       expect(after.memory().baseline.plan).toBe(T_5.baseline.plan);
-      expect(after.memory().baseline.playbook).toEqual(T_5.playbook);
+      expect(after.memory().baseline.playbook).toEqual(expect.arrayContaining(T_5.playbook!));
+      expect(after.memory().baseline.playbook[0]).toMatch(/Cycles 1-4/);
       expect(after.memory().profile.vpFromCycle).toBe(T_5.baseline.vpFromCycle);
       expect(after.memory().notes.some(item => /designer updated my baseline/.test(item.text))).toBe(true);
       const again = agentFor(root, T_5);
@@ -205,12 +216,11 @@ describe("league runs", () => {
       const outcomes: LeagueOutcome[] = [];
       const published: GameEvidence[] = [];
       const agents = [STRAT_G, T_5, DV_8].map(identity => ({ identity, agent: agentFor(root, identity) }));
-      const members: LeagueMember[] = agents.map(({ identity, agent }) => ({
-        id: identity.id, name: identity.name, active: () => true, start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms,
+      const members: LeagueMember[] = agents.map(({ identity, agent }) => onlineMember(identity, agent, {
         concludeTrial: (id, outcome) => { outcomes.push(structuredClone(outcome)); return agent.concludeLeagueTrial(id, outcome); },
       }));
       const league = createLeague({
-        root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined,
+        root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined, autoResume: false,
         harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never,
         document: async () => (authored as unknown as { document: unknown }).document,
         settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: true }),
@@ -261,23 +271,22 @@ describe("league runs", () => {
         "t-5@v88": { agent: "t-5", elo: 900, games: 50, wins: 10, losses: 40, ties: 0 },
         "t-5@v1.1": { agent: "t-5", elo: 1300, games: 50, wins: 40, losses: 10, ties: 0, since: "2026-10-08T00:00:00.000Z" },
       } }));
-      const member: LeagueMember = { id: "t-5", name: "T-5", active: () => true, start: async () => undefined, snapshots: () => [{ label: "t-5@v1.2", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "unused" }), concludeTrial: async () => "" };
-      const league = createLeague({ root: join(root, "league"), members: [member], log: () => undefined, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
+      const member: LeagueMember = { id: "t-5", name: "T-5", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [{ label: "t-5@v1.2", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "unused" }), concludeTrial: async () => "" };
+      const league = createLeague({ root: join(root, "league"), members: [member], log: () => undefined, autoResume: false, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
       await new Promise(done => setTimeout(done, 20));
       expect(league.status().table[0]).toMatchObject({ agent: "t-5", label: "t-5@v1.2", elo: 1300 });
     } finally { await rm(root, { recursive: true, force: true }); }
   });
 
-  it("stops mid-run without concluding a partial trial", async () => {
+  it("stops mid-run and concludes the partial trial as inconclusive", async () => {
     const root = await workspace();
     try {
-      const concluded: string[] = [];
+      const concluded: { id: string; outcome: LeagueOutcome }[] = [];
       const agents = [T_5, DV_8].map(identity => ({ identity, agent: agentFor(root, identity) }));
-      const members: LeagueMember[] = agents.map(({ identity, agent }) => ({
-        id: identity.id, name: identity.name, active: () => true, start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms,
-        concludeTrial: (id, outcome) => { concluded.push(id); return agent.concludeLeagueTrial(id, outcome); },
+      const members: LeagueMember[] = agents.map(({ identity, agent }) => onlineMember(identity, agent, {
+        concludeTrial: (id, outcome) => { concluded.push({ id, outcome }); return agent.concludeLeagueTrial(id, outcome); },
       }));
-      const league = createLeague({ root: join(root, "league"), members, log: () => undefined, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => (authored as unknown as { document: unknown }).document, settings: () => ({ rounds: 3, seedsPerBlock: 2, ecoObserves: false }) });
+      const league = createLeague({ root: join(root, "league"), members, log: () => undefined, autoResume: false, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => (authored as unknown as { document: unknown }).document, settings: () => ({ rounds: 3, seedsPerBlock: 2, ecoObserves: false }) });
       league.run();
       // One pairing × 2 seeds × 2 seats of rating games, then stop two games into the first trial.
       while (!(league.status().phase === "trial" && league.status().games >= 6)) await new Promise(done => setTimeout(done, 10));
@@ -287,7 +296,142 @@ describe("league runs", () => {
       expect(league.status()).toMatchObject({ running: false, stopping: false });
       expect(league.status().lastRun).toMatchObject({ stopped: true });
       expect(league.status().lastRun!.games).toBeLessThan(leagueGameCount(2, { rounds: 3, seedsPerBlock: 2 }));
-      expect(concluded).toEqual([]);
+      expect(concluded).toHaveLength(1);
+      expect(concluded[0].outcome.pairs).toBeLessThan(concluded[0].outcome.seeds.length * 2);
+      expect(agents[0].agent.memory().experiments.at(-1)?.stage).toBe("inconclusive");
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }, 60_000);
+
+  it("shrinks total when every trial is skipped and finishes without marking stopped", async () => {
+    const root = await workspace();
+    try {
+      const snap = (id: string) => [{ label: `${id}@v1`, savedAt: "", profile: DEFAULT_STRATEGY }];
+      const members: LeagueMember[] = [
+        { id: "a", name: "A", active: () => true, online: () => true, start: async () => undefined, snapshots: () => snap("a"), trialArms: async () => ({ ok: false, reason: "no experiment" }), concludeTrial: async () => "" },
+        { id: "b", name: "B", active: () => true, online: () => true, start: async () => undefined, snapshots: () => snap("b"), trialArms: async () => ({ ok: false, reason: "no experiment" }), concludeTrial: async () => "" },
+      ];
+      const settings = { rounds: 1, seedsPerBlock: 1, ecoObserves: false };
+      const ratingOnly = 1 * 1 * 2; // one pair × seeds × seats
+      const league = createLeague({
+        root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined, autoResume: false,
+        harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never,
+        document: async () => (authored as unknown as { document: unknown }).document,
+        settings: () => settings,
+      });
+      expect(league.run()).toEqual({ ok: true });
+      await league.idle();
+      const status = league.status();
+      expect(status.lastRun).toMatchObject({ stopped: false, games: ratingOnly, trialsSkipped: 2 });
+      expect(status.games).toBe(ratingOnly);
+      expect(status.total).toBe(ratingOnly);
+      expect(status.trialsSkipped).toBe(2);
+      expect(status.total).toBe(leagueGameCount(2, settings, 1) - 2 * trialGamesPerLearner(settings, 1));
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }, 60_000);
+
+  it("continues the run when playSelfPlayGame throws", async () => {
+    const root = await workspace();
+    try {
+      const real = await import("@0uroboros/engine/ai/selfPlay");
+      let calls = 0;
+      const members: LeagueMember[] = [
+        { id: "a", name: "A", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [{ label: "a@v1", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "skip" }), concludeTrial: async () => "" },
+        { id: "b", name: "B", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [{ label: "b@v1", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "skip" }), concludeTrial: async () => "" },
+      ];
+      const league = createLeague({
+        root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined, autoResume: false,
+        harness: async () => ({
+          compileForSelfPlay: real.compileForSelfPlay as never,
+          playSelfPlayGame: (options) => {
+            calls++;
+            if (calls === 1) throw new Error("simulated play crash");
+            return real.playSelfPlayGame(options as never) as SelfPlayResult;
+          },
+        }),
+        document: async () => (authored as unknown as { document: unknown }).document,
+        settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }),
+      });
+      expect(league.run()).toEqual({ ok: true });
+      await league.idle();
+      expect(league.status().running).toBe(false);
+      expect(league.status().lastRun?.stopped).toBe(false);
+      expect(league.status().playErrors).toBe(1);
+      expect(league.status().lastRun!.games).toBeGreaterThanOrEqual(2);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }, 60_000);
+
+  it("resumes from an activeRun checkpoint at the saved round and nextSeed", async () => {
+    const root = await workspace();
+    try {
+      await mkdir(join(root, "league"), { recursive: true });
+      const settings = { rounds: 2, seedsPerBlock: 1, ecoObserves: false };
+      const checkpoint: ActiveRun = {
+        startedAt: "2026-10-15T00:00:00.000Z", settings, memberIds: ["a", "b"], round: 2, phase: "rating",
+        ratedPairs: [], finishedLearners: [], games: 4, total: 20, trialsSkipped: 2, playErrors: 0, trials: [], nextSeed: 50_100,
+      };
+      await writeFile(join(root, "league/ratings.json"), JSON.stringify({
+        schema: 1, nextSeed: 50_050, games: 4, runs: [], headToHead: {}, ratings: {
+          "a@v1": { agent: "a", elo: 1200, games: 2, wins: 1, losses: 1, ties: 0, since: "2026-10-15T00:00:00.000Z" },
+          "b@v1": { agent: "b", elo: 1200, games: 2, wins: 1, losses: 1, ties: 0, since: "2026-10-15T00:00:00.000Z" },
+        }, activeRun: checkpoint,
+      }));
+      const members: LeagueMember[] = [
+        { id: "a", name: "A", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [{ label: "a@v1", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "skip" }), concludeTrial: async () => "" },
+        { id: "b", name: "B", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [{ label: "b@v1", savedAt: "", profile: DEFAULT_STRATEGY }], trialArms: async () => ({ ok: false, reason: "skip" }), concludeTrial: async () => "" },
+      ];
+      const league = createLeague({
+        root: join(root, "league"), members, blocksPerTrial: 1, log: () => undefined, autoResume: true,
+        harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never,
+        document: async () => (authored as unknown as { document: unknown }).document,
+        settings: () => settings,
+      });
+      while (!league.status().running) await new Promise(done => setTimeout(done, 10));
+      expect(league.status().resuming).toBe(true);
+      expect(league.status().lastRun).toMatchObject({ interrupted: true, games: 4 });
+      await league.idle();
+      const status = league.status();
+      expect(status.running).toBe(false);
+      expect(status.lastRun?.interrupted).not.toBe(true);
+      expect(status.lastRun?.rounds).toBe(2);
+      expect(status.lastRun!.games).toBeGreaterThan(4);
+      const saved = JSON.parse(await readFile(join(root, "league/ratings.json"), "utf8")) as { activeRun: null; nextSeed: number };
+      expect(saved.activeRun).toBeNull();
+      expect(saved.nextSeed).toBeGreaterThan(50_100);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }, 60_000);
+
+  it("refuses to start when an active member is offline", async () => {
+    const root = await workspace();
+    try {
+      const members: LeagueMember[] = [
+        { id: "a", name: "A", active: () => true, online: () => true, start: async () => undefined, snapshots: () => [], trialArms: async () => ({ ok: false, reason: "" }), concludeTrial: async () => "" },
+        { id: "b", name: "B", active: () => true, online: () => false, start: async () => undefined, snapshots: () => [], trialArms: async () => ({ ok: false, reason: "" }), concludeTrial: async () => "" },
+      ];
+      const league = createLeague({ root: join(root, "league"), members, autoResume: false, log: () => undefined, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
+      expect(league.run()).toMatchObject({ ok: false, reason: expect.stringMatching(/online.*B/) });
+    } finally { await rm(root, { recursive: true, force: true }); }
+  });
+});
+
+describe("league fallback experiments", () => {
+  it("proposes an envelope-clamped fallback when the menu is exhausted", async () => {
+    const root = await workspace();
+    try {
+      const agent = agentFor(root, T_5);
+      await agent.ready;
+      const seeds = [1, 2];
+      const reject = (): LeagueOutcome => ({ opponents: ["dv-8@v1"], seeds, games: 8, invalid: 0, pairs: 4, experimentPoints: 1, controlPoints: 3, experimentWins: 1, controlWins: 3, ties: 0, marginGain: -2 });
+      for (let i = 0; i < 24; i++) {
+        const asked = await agent.leagueTrialArms();
+        if (!asked.ok) throw new Error(asked.reason);
+        await agent.concludeLeagueTrial(asked.arms.experimentId, reject());
+      }
+      const fallback = await agent.leagueTrialArms();
+      expect(fallback.ok).toBe(true);
+      if (!fallback.ok) return;
+      expect(fallback.arms.experimentId).toMatch(/fallback/);
+      inside(fallback.arms.experiment, T_5.envelope);
+      inside(fallback.arms.control, T_5.envelope);
     } finally { await rm(root, { recursive: true, force: true }); }
   }, 60_000);
 });

@@ -98,7 +98,7 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
       <header>
         <span className='league-faces'>{MEMBERS.map(member => <AgentAvatar key={member.id} agent={member.id} size={22}/>)}</span>
         <span><strong>AI league</strong><small>{leagueBusy
-          ? `Round ${league.round || 1}/${league.rounds} · ${league.phase === 'trial' && league.learner ? `${league.learner} learning` : 'rating games'}`
+          ? `${league.resuming ? 'Resuming · ' : ''}Round ${league.round || 1}/${league.rounds} · ${league.phase === 'trial' && league.learner ? `${league.learner} learning` : 'rating games'}`
           : `${players} playing · Elo · last ${league.window} snapshots · ${Math.round(league.latestRatio * 100)}% latest`}</small></span>
       </header>
       <table className='league-table'>
@@ -120,8 +120,8 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
       <Choice label='Rounds per run' values={LEAGUE_ROUNDS} value={pick(LEAGUE_ROUNDS, rounds, 3)} unit={count => `${count}`} disabled={leagueBusy} onChange={count => void update({ league: { rounds: count } })}/>
       <Choice label='Seeds per block' values={LEAGUE_SEEDS} value={pick(LEAGUE_SEEDS, seedsPerBlock, 4)} unit={count => `${count}`} disabled={leagueBusy} onChange={count => void update({ league: { seedsPerBlock: count } })}/>
       {leagueBusy
-        ? <Progress label={`${league.games}/${league.total} games${league.stopping ? ' · stopping…' : ''}`} value={league.games} total={league.total}/>
-        : league.lastRun ? <p className='test-games-result'>Last run: {league.lastRun.games} games over {league.lastRun.rounds} round{league.lastRun.rounds === 1 ? '' : 's'}{league.lastRun.stopped ? ' (stopped)' : ''} · {adopted} change{adopted === 1 ? '' : 's'} adopted of {league.lastRun.trials.length} tested.</p> : null}
+        ? <Progress label={`${league.games}/${league.total}${league.phase === 'rating' ? ' rating' : ' games'}${(league.trialsSkipped ?? 0) > 0 ? ` · trials skipped: ${league.trialsSkipped}` : ''}${league.stopping ? ' · stopping…' : ''}`} value={league.games} total={Math.max(league.total, 1)}/>
+        : league.lastRun ? <p className='test-games-result'>Last run: {league.lastRun.games} games over {league.lastRun.rounds} round{league.lastRun.rounds === 1 ? '' : 's'}{league.lastRun.interrupted ? ' (interrupted)' : league.lastRun.stopped ? ' (stopped)' : ''}{(league.lastRun.trialsSkipped ?? 0) > 0 ? ` · ${league.lastRun.trialsSkipped} trial${league.lastRun.trialsSkipped === 1 ? '' : 's'} skipped` : ''} · {adopted} change{adopted === 1 ? '' : 's'} adopted of {league.lastRun.trials.length} tested.</p> : null}
       <div className='agents-actions'>
         {leagueBusy
           ? <button type='button' disabled={league.stopping} onClick={() => void act('league', 'stop')}>Stop league</button>

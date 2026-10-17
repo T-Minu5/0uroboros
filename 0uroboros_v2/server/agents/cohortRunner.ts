@@ -46,8 +46,8 @@ export async function runCohort(options: CohortOptions) {
   for (let attempt = 0; valid < options.target && attempt < options.target + (options.maxExtraAttempts ?? options.target); attempt++) {
     if (options.shouldStop?.()) { await options.eco.updateCohort(cohortId, { status: 'cancelled', note: `stopped after ${valid} valid games` }); return { cohortId, valid, invalid, status: 'cancelled' as const }; }
     const seed = seedBase + attempt;
-    // Let the dev server answer requests between games.
-    await new Promise(resolve => setImmediate(resolve));
+    // Let the dev server answer requests between games (every few games is enough for /api/agents/status).
+    if (attempt % 8 === 0) await new Promise(resolve => setImmediate(resolve));
     const result = harness.playSelfPlayGame({ content, seed, strategy: structuredClone(strategy), recordDecisions: true });
     await options.eco.updateCohort(cohortId, { seed });
     if (result.report) {

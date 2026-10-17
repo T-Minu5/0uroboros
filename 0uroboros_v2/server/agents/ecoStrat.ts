@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
-import { DECKBUILDING_BASICS } from './deckbuilding';
+import { DECKBUILDING_BASICS, EARLY_ECONOMY_PLAYBOOK } from './deckbuilding';
 import { isHumanSource, type GameEvidence } from './evidence';
 import { archetypeResults, BLOWOUT_MARGIN, cardDemand, CLOSE_MARGIN, cohortMetrics, gameMetrics, isBlowoutMargin, isCloseMargin, type ArchetypeResults, type CardDemand, type CohortMetrics, type GameMetrics } from './ecoMetrics';
 import { LEAGUE_ROSTER } from './roster';
@@ -173,8 +173,16 @@ export function createEcoStrat(options: EcoStratOptions) {
   /** One task touches the journal at a time. League games arrive in bursts far faster than they can be read, so they wait in their own lane and everything else goes first. */
   type Job = { task: () => Promise<unknown>; resolve: (value: never) => void; reject: (error: unknown) => void };
   const lanes: { first: Job[]; league: Job[] } = { first: [], league: [] };
+  /** Drop oldest league observes beyond this so a long league run cannot grow unbounded in memory. */
+  const LEAGUE_BACKLOG_CAP = 64;
   let draining = false;
   const serialize = <T>(task: () => Promise<T>, lane: keyof typeof lanes = 'first'): Promise<T> => new Promise<T>((resolve, reject) => {
+    if (lane === 'league') {
+      while (lanes.league.length >= LEAGUE_BACKLOG_CAP) {
+        const dropped = lanes.league.shift();
+        dropped?.resolve(undefined as never);
+      }
+    }
     lanes[lane].push({ task, resolve: resolve as (value: never) => void, reject });
     void drain();
   });
@@ -284,7 +292,7 @@ export function createEcoStrat(options: EcoStratOptions) {
     return null;
   }
 
-  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? All numbers you receive were computed by deterministic code; do not recompute or invent numbers, cite the ones given. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. ${DECKBUILDING_BASICS} Use these basics to judge deck-building play: an AI that never trashes its weak starting cards, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
+  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? All numbers you receive were computed by deterministic code; do not recompute or invent numbers, cite the ones given. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. ${DECKBUILDING_BASICS} Shared early economy every AI player is taught (Cycles 1-4): ${EARLY_ECONOMY_PLAYBOOK.join(' ')} Use these basics to judge deck-building play: an AI that skips the early Kilo/Mega line, never trashes Basic Encryption and Shyte in that order, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
 
   async function study() {
     return serialize(async () => {

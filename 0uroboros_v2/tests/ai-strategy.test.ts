@@ -25,15 +25,43 @@ describe("opponent draft strategy", () => {
     expect(plan).toContain("mega-cache");
   });
 
-  it("values deck-cycling Characters over low Crypto in the economy phase", () => {
-    expect(draftScore(byId("slash-dot"), DEFAULT_STRATEGY, context(2))).toBeGreaterThan(draftScore(byId("byte-coin"), DEFAULT_STRATEGY, context(2)));
-    expect(draftScore(byId("shiva-of-cern"), DEFAULT_STRATEGY, context(3))).toBeGreaterThan(draftScore(byId("kilo-coin"), DEFAULT_STRATEGY, context(3)));
+  it("values deck-cycling Characters over low Crypto after the shared early economy", () => {
+    expect(draftScore(byId("slash-dot"), DEFAULT_STRATEGY, context(5))).toBeGreaterThan(draftScore(byId("byte-coin"), DEFAULT_STRATEGY, context(5)));
+    expect(draftScore(byId("shiva-of-cern"), DEFAULT_STRATEGY, context(5))).toBeGreaterThan(draftScore(byId("kilo-coin"), DEFAULT_STRATEGY, context(5)));
+  });
+
+  it("opens Cycles 1-4 on Kilo then Mega-Cache, and Byte when Kilo is out of reach", () => {
+    const standard = ["byte-coin", "byte-coin", "shyte-coin", "shyte-coin", "basic-encryption", "basic-encryption", "dotkrawler", "slash-dot", "rezz-blade", "night-scythe"].map(byId);
+    const unique = (list: Card[], tag: string) => list.map((card, index) => ({ ...card, id: `${card.id}#${tag}${index}` }));
+    const deck = unique(standard, "std");
+    expect(deck.reduce((sum, card) => sum + (card.cryptoValue ?? 0), 0)).toBe(6);
+    expect(planDraft([option("kilo-coin"), option("byte-coin"), option("slash-dot"), option("h3x1-d3x1")], 6, DEFAULT_STRATEGY, context(1, deck))).toEqual(["kilo-coin"]);
+    expect(planDraft([option("byte-coin"), option("slash-dot"), option("h3x1-d3x1")], 5, DEFAULT_STRATEGY, context(1, deck))).toEqual(["byte-coin"]);
+    const withKilo = [...deck, { ...byId("kilo-coin"), id: "kilo#owned" }];
+    expect(planDraft([option("mega-cache"), option("kilo-coin"), option("slash-dot")], 9, DEFAULT_STRATEGY, context(2, withKilo))).toContain("mega-cache");
+    expect(planDraft([option("basic-encryption"), option("vault-encryption")], 10, DEFAULT_STRATEGY, context(2, deck))).toEqual([]);
+  });
+
+  it("trashes Basic Encryption first, keeps Crypto until a Kilo, then trashes Shyte", () => {
+    const unique = (list: Card[], tag: string) => list.map((card, index) => ({ ...card, id: `${card.id}#${tag}${index}` }));
+    const standard = unique(["byte-coin", "byte-coin", "shyte-coin", "shyte-coin", "basic-encryption", "basic-encryption", "dotkrawler", "slash-dot", "rezz-blade", "night-scythe"].map(byId), "e");
+    const pick = (...names: string[]) => names.map(name => standard.find(card => card.name === name)!);
+    const hand = pick("Basic Encryption", "Basic Encryption", "Shyte-Coin", "Byte-Coin", "Slash-Dot");
+    const beforeKilo = thinningPicks(hand, DEFAULT_STRATEGY, context(2, standard), 3).map(card => card.name);
+    expect(beforeKilo[0]).toBe("Basic Encryption");
+    expect(beforeKilo).not.toContain("Shyte-Coin");
+    expect(beforeKilo).not.toContain("Byte-Coin");
+    const withKilo = [...standard, { ...byId("kilo-coin"), id: "kilo#1" }];
+    const afterKilo = thinningPicks(hand, DEFAULT_STRATEGY, context(2, withKilo), 4).map(card => card.name);
+    expect(afterKilo.filter(name => name === "Basic Encryption").length).toBeGreaterThan(0);
+    expect(afterKilo).toContain("Shyte-Coin");
+    expect(afterKilo).not.toContain("Byte-Coin");
   });
 
   it("stays within the wallet and skips purchases that only dilute the deck", () => {
     const options = ["slash-dot", "root-rune", "kilo-coin", "night-scythe", "basic-encryption"].map(id => option(id));
     for (const wallet of [0, 3, 7, 12, 20]) {
-      const plan = planDraft(options, wallet, DEFAULT_STRATEGY, context(4));
+      const plan = planDraft(options, wallet, DEFAULT_STRATEGY, context(5));
       expect(plan.reduce((sum, id) => sum + byId(id).cost, 0)).toBeLessThanOrEqual(wallet);
     }
     expect(planDraft([option("basic-encryption")], 10, DEFAULT_STRATEGY, context(3))).toEqual([]);
@@ -41,7 +69,7 @@ describe("opponent draft strategy", () => {
 
   it("pivots into Chaos for the endgame and buys only VP in the final Draft", () => {
     const blade = byId("h3x1-d3x1"), slash = byId("slash-dot");
-    const early = draftScore(blade, DEFAULT_STRATEGY, context(3)) - draftScore(slash, DEFAULT_STRATEGY, context(3));
+    const early = draftScore(blade, DEFAULT_STRATEGY, context(4)) - draftScore(slash, DEFAULT_STRATEGY, context(4));
     const late = draftScore(blade, DEFAULT_STRATEGY, context(10)) - draftScore(slash, DEFAULT_STRATEGY, context(10));
     expect(late).toBeGreaterThan(early);
     const final = planDraft(["delta-wave", "shiva-of-cern", "mega-cache", "zenith-worx", "vault-encryption"].map(id => option(id)), 20, DEFAULT_STRATEGY, context(16));
@@ -54,16 +82,16 @@ describe("opponent draft strategy", () => {
     const deck = unique(starter, "s");
     const profile = { ...DEFAULT_STRATEGY, dilution: 1 };
     const characters = deck.filter(card => card.type !== "VP" && card.type !== "Crypto");
-    expect(thinningPicks([...characters, unique([byId("shyte-coin")], "j")[0]], profile, context(3, deck), 5).map(card => card.name)).toEqual(["Shyte-Coin"]);
+    expect(thinningPicks([...characters, unique([byId("shyte-coin")], "j")[0]], profile, context(5, deck), 5).map(card => card.name)).toEqual(["Shyte-Coin"]);
     const strong = unique(cards.filter(card => card.type !== "VP" && card.type !== "Crypto" && !starter.some(item => item.id === card.id))
-      .sort((a, b) => handValue(b, profile, context(3)) - handValue(a, profile, context(3))).slice(0, 10), "m");
+      .sort((a, b) => handValue(b, profile, context(5)) - handValue(a, profile, context(5))).slice(0, 10), "m");
     const upgraded = [...deck, ...strong];
-    const picks = thinningPicks(deck, profile, context(3, upgraded), 10);
+    const picks = thinningPicks(deck, profile, context(5, upgraded), 10);
     expect(picks.length).toBeGreaterThan(0);
     expect(picks.every(card => card.type !== "VP")).toBe(true);
-    expect(picks.filter(card => card.type === "Crypto")).toEqual([]);
-    expect(thinningPicks(deck, profile, context(3, deck.slice(0, 8)), 10)).toEqual([]);
-    expect(thinningPicks(deck, { ...profile, handCryptoTarget: 2 }, context(3, upgraded), 10).some(card => card.type === "Crypto")).toBe(true);
+    expect(thinningPicks(deck, { ...profile, handCryptoTarget: 20 }, context(5, upgraded), 10).filter(card => card.type === "Crypto")).toEqual([]);
+    expect(thinningPicks(deck, profile, context(5, deck.slice(0, 8)), 10)).toEqual([]);
+    expect(thinningPicks(deck, { ...profile, handCryptoTarget: 2 }, context(5, upgraded), 10).some(card => card.type === "Crypto")).toBe(true);
   });
 
   it("clamps untrusted profiles", () => {

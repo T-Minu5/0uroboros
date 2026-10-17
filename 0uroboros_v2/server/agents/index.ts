@@ -93,7 +93,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
   }
 
   const member = (id: string, name: string, agent: typeof strategist, active: () => boolean): LeagueMember => ({
-    id, name, active, start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms, concludeTrial: agent.concludeLeagueTrial,
+    id, name, active, online: () => agent.status().state === 'online', start: agent.start, snapshots: agent.leagueSnapshots, trialArms: agent.leagueTrialArms, concludeTrial: agent.concludeLeagueTrial,
   });
   const league = createLeague({
     root: resolve(cwd, 'ai-agents/league'),

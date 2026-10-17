@@ -1,5 +1,5 @@
 {
-  "revision": 328,
+  "revision": 329,
   "document": {
     "version": 2,
     "cards": [
@@ -4869,7 +4869,7 @@
         ]
       }
     ],
-    "activeStartingDeckId": "deck-aozfccs1",
+    "activeStartingDeckId": "deck-standard",
     "mods": [
       {
         "id": "mod-r3emmf8z",

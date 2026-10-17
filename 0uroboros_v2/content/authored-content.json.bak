@@ -1,5 +1,5 @@
 {
-  "revision": 327,
+  "revision": 328,
   "document": {
     "version": 2,
     "cards": [
@@ -5002,7 +5002,7 @@
               "where": "board",
               "relation": "self"
             },
-            "amount": 3,
+            "amount": 1,
             "pick": {
               "mode": "choose"
             }

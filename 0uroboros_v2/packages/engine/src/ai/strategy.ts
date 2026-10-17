@@ -6,6 +6,15 @@ import type { AnyEffect, ChoiceOption, EffectStep, Who } from '../effects/types'
 export const STRATEGY_RELEASE = 1;
 export const versionLabel = (revision: number) => revision < 0 ? `before v${STRATEGY_RELEASE}.0` : `v${STRATEGY_RELEASE}.${Math.round(revision)}`;
 
+/** Every AI player follows the shared money-and-thinning opener through this Cycle, then returns to its own objective. */
+export const EARLY_ECONOMY_THROUGH = 4;
+const EARLY_JUNK_VP = new Set(['basic-encryption']);
+const EARLY_CRYPTO_UPGRADE = new Set(['kilo-coin', 'mega-cache']);
+const earlyEconomy = (cycle: number) => cycle >= 1 && cycle <= EARLY_ECONOMY_THROUGH;
+const cardId = (card: Card) => card.definitionId ?? card.id;
+const ownsUpgrade = (owned: readonly Card[]) => owned.some(card => EARLY_CRYPTO_UPGRADE.has(cardId(card)));
+const deckCrypto = (owned: readonly Card[]) => owned.reduce((sum, card) => sum + (card.type === 'Crypto' ? card.cryptoValue ?? 0 : 0), 0);
+
 /** Relative worth of each effect family, in "hand points" (roughly one point of Node Power). */
 export type StrategyWeights = {
   power: number;
@@ -64,7 +73,7 @@ export type StrategyProfile = {
 
 export const DEFAULT_STRATEGY: StrategyProfile = {
   version: 0,
-  plan: 'Short economy of strong draw/Action Base cards (big Crypto only when it beats the Base options, never Shyte-Coin), then pivot into Chaos early for the Drain race, finishing on VP cards.',
+  plan: 'Shared early economy through Cycle 4 (Kilo-Coin then Mega-Cache; trash Basic Encryption, then Shyte after a Kilo), then pivot into Chaos for the Drain race, finishing on VP cards.',
   economyUntilCycle: 4,
   chaosFromCycle: 5,
   vpFromCycle: 12,
@@ -273,20 +282,32 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
   const dilution = profile.dilution * average * uses;
   const copies = owned.filter(item => definition(item) === definition(card)).length + plannedCopies;
   const bias = profile.cardBias[definition(card)] ?? 0;
+  const id = definition(card);
+  const opening = earlyEconomy(context.cycle);
 
   if (card.type === 'Crypto') {
     if ((card.cryptoValue ?? 0) < profile.minCryptoValue) return -Infinity;
+    if (opening) {
+      // Shared opener: Kilo first (6 Crypto = starting-deck total), then as many Mega-Cache as the Wallet allows; Byte only as the Cycle-1 fallback when Kilo is out of reach.
+      if (id === 'mega-cache') return 24 - plannedCopies * 2 + bias;
+      if (id === 'kilo-coin') return (ownsUpgrade(owned) ? 12 : 30) - plannedCopies * 2 + bias;
+      if (id === 'byte-coin') return ownsUpgrade(owned) ? 2 + bias : 8 - plannedCopies * 3 + bias;
+    }
     const need = Math.min(1, Math.max(0.15, (profile.handCryptoTarget - cryptoPerHand(owned)) / profile.handCryptoTarget));
     const decay = 1 / (1 + 0.25 * plannedCopies);
     return (profile.weights.crypto * (card.cryptoValue ?? 0) * (0.4 + need) * m.econ) * decay - dilution + bias;
   }
   if (card.type === 'VP') {
+    if (opening && EARLY_JUNK_VP.has(id)) return -Infinity;
+    if (opening) return -Infinity;
     const points = profile.weights.vp * (card.vp ?? 0) * m.vp;
     return points + handValue(card, profile, context) * uses * 0.5 - dilution + bias;
   }
+  if (opening && isChaos(card)) return -Infinity;
   const chaos = isChaos(card)
     ? (strategyPhase(profile, context.cycle) === 'endgame' ? profile.weights.chaos : (-0.5 + 1.5 * midgameShare(profile, context.cycle)) * profile.weights.chaos)
     : 0;
+  // Early opener still values draw, Actions and trash enablers (Night Scythe) once Crypto buys are scored above them.
   const value = (handValue(card, profile, context) + chaos) * uses;
   return value / (1 + 0.5 * copies) - dilution + bias;
 }
@@ -402,10 +423,22 @@ export function locationRead(location: LocationRules, profile: StrategyProfile =
 
 /**
  * Lower means the AI would rather lose it. Trashing removes a card for good, so positive VP cards
- * are protected; a discard keeps the card owned, so only its hand value matters.
+ * are protected; a discard keeps the card owned, so only its hand value matters. In Cycles 1-4 the
+ * shared early economy overrides that for Basic Encryption and for Crypto until a Kilo (or Mega) is owned.
  */
 export function keepValue(card: Card, profile: StrategyProfile, context: StrategyContext, permanent: boolean): number {
   const hand = handValue(card, profile, context) + (profile.cardBias[definition(card)] ?? 0);
+  const id = definition(card);
+  if (permanent && earlyEconomy(context.cycle)) {
+    if (EARLY_JUNK_VP.has(id)) return -20;
+    if (id === 'shyte-coin') {
+      // Keep Shyte until a Kilo/Mega lands; Cycle 1 may trash one Shyte when the deck no longer prints 6 Crypto for a Kilo.
+      if (ownsUpgrade(context.owned)) return 0.5;
+      if (context.cycle === 1 && deckCrypto(context.owned) < 6) return 1;
+      return 40;
+    }
+    if (card.type === 'Crypto') return 45 + (card.cryptoValue ?? 0);
+  }
   if (card.type === 'VP' && permanent) return (card.vp ?? 0) > 0 ? 50 + (card.vp ?? 0) : -10;
   return hand;
 }
@@ -416,23 +449,40 @@ export const JUNK_KEEP_VALUE = 1.5;
 export const MIN_THIN_DECK = 8;
 
 /**
- * Which of the controller's own `candidates` to trash, weakest first, up to `limit`. Junk always goes. Any other card
- * goes when it falls below the bar a purchase must clear (`dilution` x the average card of the rest of the deck), so
- * starting cards are trashed once better cards have replaced them, while the deck keeps MIN_THIN_DECK cards and Crypto
- * is kept until the rest of the deck still meets the profile's `handCryptoTarget`.
+ * Which of the controller's own `candidates` to trash, weakest first, up to `limit`. Junk always goes. In Cycles 1-4
+ * Basic Encryption goes first, then Shyte only after a Kilo/Mega (or one Shyte on Cycle 1 when the deck prints under 6
+ * Crypto). After the opener, cards go when they fall below the purchase bar, while the deck keeps MIN_THIN_DECK cards
+ * and Crypto stays until the rest of the deck still meets `handCryptoTarget`.
  */
 export function thinningPicks(candidates: readonly Card[], profile: StrategyProfile, context: StrategyContext, limit: number): Card[] {
   const value = (card: Card) => keepValue(card, profile, context, true);
   let owned = [...context.owned];
   const picks: Card[] = [];
+  let earlyShyteTrashed = 0;
   for (const card of [...candidates].sort((a, b) => value(a) - value(b))) {
     if (picks.length >= limit) break;
     const rest = owned.filter(item => item.id !== card.id);
+    const id = definition(card);
+    if (earlyEconomy(context.cycle) && card.type === 'Crypto') {
+      if (EARLY_CRYPTO_UPGRADE.has(id) || id === 'byte-coin') continue;
+      if (id === 'shyte-coin') {
+        if (ownsUpgrade(owned)) { /* trash after upgrade */ }
+        else if (context.cycle === 1 && deckCrypto(owned) < 6 && earlyShyteTrashed < 1) earlyShyteTrashed++;
+        else continue;
+      }
+    } else if (card.type === 'Crypto' && (card.cryptoValue ?? 0) >= profile.minCryptoValue && cryptoPerHand(rest) < profile.handCryptoTarget) {
+      // Keep Crypto worth keeping (not Shyte) that still funds the hand target, even when endgame econ makes it look like junk.
+      continue;
+    }
     if (value(card) >= JUNK_KEEP_VALUE) {
       if (rest.length < MIN_THIN_DECK) break;
+      if (earlyEconomy(context.cycle) && EARLY_JUNK_VP.has(id)) {
+        picks.push(card);
+        owned = rest;
+        continue;
+      }
       const average = rest.length ? rest.reduce((sum, item) => sum + handValue(item, profile, context), 0) / rest.length : 0;
       if (value(card) >= profile.dilution * average) break;
-      if (card.type === 'Crypto' && cryptoPerHand(rest) < profile.handCryptoTarget) continue;
     }
     picks.push(card);
     owned = rest;

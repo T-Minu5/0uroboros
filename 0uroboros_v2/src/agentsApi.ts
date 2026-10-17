@@ -22,11 +22,11 @@ export type LearnerStatus = {
 };
 export type HeadToHead = { a: string; b: string; aWins: number; bWins: number; ties: number };
 export type LeagueStatus = {
-  running: boolean; stopping: boolean; phase: 'rating' | 'trial' | null; round: number; rounds: number; learner: string | null;
-  games: number; total: number; startedAt: string | null; error: string | null;
+  running: boolean; stopping: boolean; resuming?: boolean; phase: 'rating' | 'trial' | null; round: number; rounds: number; learner: string | null;
+  games: number; total: number; trialsSkipped?: number; playErrors?: number; startedAt: string | null; error: string | null;
   table: { agent: string; label: string | null; elo: number | null; games: number; wins: number; losses: number; ties: number }[];
   headToHead: HeadToHead[];
-  lastRun: { startedAt: string; finishedAt: string; rounds: number; games: number; stopped: boolean; trials: { agent: string; experimentId: string; result: string }[] } | null;
+  lastRun: { startedAt: string; finishedAt: string; rounds: number; games: number; stopped: boolean; interrupted?: boolean; trialsSkipped?: number; playErrors?: number; trials: { agent: string; experimentId: string; result: string }[] } | null;
   window: number; latestRatio: number; blocksPerTrial: number; ratedSnapshots: number;
   /** Agents this far below the leader take a second trial each round. */
   catchUpGap: number; catchUp: string[];

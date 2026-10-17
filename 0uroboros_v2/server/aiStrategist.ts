@@ -8,7 +8,7 @@ import { CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_OFFER_COUNT, DRAFT_PHASE
 import { defaultServerVP, serverMaximums, type Card, type Servers } from '@0uroboros/engine/game';
 import type { MatchReport } from '@0uroboros/engine/runtime';
 import { isLocalRequest } from './contentApi';
-import { DECKBUILDING_BASICS, DECKBUILDING_PROFILE_NOTE } from './agents/deckbuilding';
+import { DECKBUILDING_BASICS, DECKBUILDING_PROFILE_NOTE, EARLY_ECONOMY_PLAYBOOK } from './agents/deckbuilding';
 import { withChange, type BaselineTips, type Tip } from './agents/mentoring';
 import { clampToEnvelope, describeEnvelope, type StrategistIdentity } from './agents/roster';
 
@@ -178,12 +178,11 @@ const FIELD_GAMES_PER_ARM = 2;
 const COMPLETE_GAME = /^(Cycle 16 final Draft complete\.|Both Servers destroyed)/;
 
 const BASELINE_PLAYBOOK = [
-  'Phase 1, economy and deck engine (Cycles 1-4): buy high-value Crypto (never Shyte-Coin), draw, Action and thinning cards; skip Chaos and VP unless nothing else is worth the Wallet.',
   'Phase 2, midgame (Cycles 5-8): balance four things every Draft: attacks (Chaos and Drain), the deck engine, Server Restore and VP collection. No single pillar takes the whole Wallet.',
   'Phase 3, endgame (Cycles 9-16): attack the enemy Servers like crazy, deploying every Drain card I draw first, and spend most of each Wallet on VP cards. The final Draft buys only VP.',
-  'Draft: score every card from its actual effects (no fixed table) and buy the best set the whole Wallet affords; skip cards that would only dilute the deck.',
+  'Draft after Cycle 4: score every card from its actual effects (no fixed table) and buy the best set the whole Wallet affords; skip cards that would only dilute the deck.',
   'Deploy: Action and draw cards first so they fuel later turns; contest Nodes whose Location pays the winner, and do not fight for Locations that pay the loser.',
-  'Choices: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch) and hit the opponent\'s best cards.',
+  'Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch) and hit the opponent\'s best cards.',
 ];
 
 const RULES_SUMMARY = `0uroboros is a two-player deckbuilder over 16 Cycles. Both players start with the same starting deck (listed under STARTING DECK). Each Cycle draws a fresh hand of 5 and has three Runtime turns: players deploy Character cards face-down onto five Nodes (some open on turn 1, more on later turns, up to 4 cards per side per Node). Each Character costs 1 Action; a player has 2 Actions on turn 1, then unspent Actions carry over plus 1 per turn plus Action effects. VP cards deploy for 0 Actions; Crypto cannot be deployed. Revealed cards fire effects (draw, Actions, Crypto, Drain, Restore, Power shifts, thinning, ...). At Wave Collapse the higher Power wins each Node and its Location reward; whoever won more Locations is eligible for a random Circuit Reward (a tie makes both eligible); rewards marked "trailing" instead go to the player behind on VP counting Server damage dealt as that share of the Server's destruction VP. Then the Draft: Crypto cards in hand convert into the Wallet (by their printed value; Shyte-Coin is worth 1) and players buy cards into their Discard. The Wallet resets every Cycle. Drain damages the enemy Servers (currently Primary ${serverMaximums.primary}, Backup ${serverMaximums.backup}, ${serverMaximums.primary + serverMaximums.backup} in all; the designer may rebalance these, so plan around destroying both Servers rather than a fixed damage number): destroying a Primary gives the destroyer +${defaultServerVP.primary} VP, a Backup +${defaultServerVP.backup} VP, and the game ends when a player loses both Servers (most VP still wins). Otherwise the most VP after the Cycle 16 Draft wins. VP cards score while owned. Market each game: ${GAME_BASE_COUNT} random Base piles, ${GAME_CHAOS_COUNT} random Chaos piles (${GAME_CHAOS_MIX}) (${GAME_PILE_SUPPLY} copies each) and ${GAME_VP_COUNT} VP piles (${GAME_VP_SUPPLY} copies each) plus ${CURRENCY_PILES.map(pile => `${pile.cardId.replace(/(^|-)(\w)/g, (_, dash: string, letter: string) => dash + letter.toUpperCase())} (${pile.supply})`).join(', ')}; each Draft adds ${DRAFT_OFFER_COUNT} rotating Base/Chaos offers and ${DRAFT_SOLAR_MONK_COUNT} rotating Solar-monk (a VP card that is also a Character), each limited to ${DRAFT_COPIES_PER_PLAYER} copies per player, and each offer slot leans to the Cycle's phase (${DRAFT_PHASE_SUMMARY}), so plan purchases around what each phase brings. Cards bought in the Cycle 16 Draft are only worth their VP.`;
@@ -248,7 +247,7 @@ export function baselineOf(identity?: StrategistIdentity, tips?: BaselineTips | 
   const designed = identity ? clampToEnvelope({ ...identity.baseline, cardBias: {} }, identity.envelope) : { ...DEFAULT_STRATEGY, cardBias: {} };
   const tipped = tips ? withChange(designed, tips.change) : designed;
   const profile = identity ? clampToEnvelope(tipped, identity.envelope) : tipped;
-  return { profile, plan: profile.plan, playbook: [...(identity?.playbook ?? BASELINE_PLAYBOOK), ...(tips?.lines ?? [])], since: now() };
+  return { profile, plan: profile.plan, playbook: [...EARLY_ECONOMY_PLAYBOOK, ...(identity?.playbook ?? BASELINE_PLAYBOOK), ...(tips?.lines ?? [])], since: now() };
 }
 
 type TipTheme = { score: (p: StrategyProfile) => number; change: (p: StrategyProfile) => ProfileChange; text: (p: StrategyProfile) => string };
@@ -865,6 +864,33 @@ export function createStrategist(options: StrategistOptions = {}) {
     return false;
   }
 
+  /** When the menu is exhausted, nudge one envelope-clamped field so a league trial can still run. */
+  function proposeFallbackExperiment(): boolean {
+    const profile = memory.profile;
+    const weightKeys = Object.keys(profile.weights) as (keyof StrategyWeights)[];
+    const attempts: ProfileChange[] = [
+      ...weightKeys.map(key => ({ weights: { [key]: profile.weights[key] + 0.25 } })),
+      { dilution: profile.dilution + 0.15 },
+      { dilution: Math.max(0, profile.dilution - 0.15) },
+      { minBuyScore: profile.minBuyScore + 0.25 },
+      { handCryptoTarget: profile.handCryptoTarget + 1 },
+    ];
+    for (let i = 0; i < attempts.length; i++) {
+      const change = boundChange(attempts[i]);
+      if (!change || rejectedRecently(describeChange(profile, change, cardName))) continue;
+      const menuId = `fallback-${memory.experimentCount + 1}-${i}`;
+      createExperiment({
+        theoryId: null, supportsTheory: true, menuId,
+        hypothesis: 'A small envelope-clamped nudge while the experiment menu has nothing left to try.',
+        prediction: 'More wins or a better margin than the current best.',
+        change, source: 'heuristic',
+      });
+      log(`proposed fallback experiment ${memory.experiment!.id}`);
+      return true;
+    }
+    return false;
+  }
+
   function creditTheory(experiment: Experiment, success: boolean, reason: string) {
     const theory = experiment.theoryId ? memory.theories.find(item => item.id === experiment.theoryId) : undefined;
     if (!theory) return;
@@ -965,7 +991,7 @@ export function createStrategist(options: StrategistOptions = {}) {
     if (!online) return { ok: false, reason: bootError ? `${name} failed to boot: ${bootError}` : `${name} is not online yet.` };
     return serialize(async () => {
       if (!memory.experiment) {
-        proposeFromMenu();
+        if (!proposeFromMenu() && !proposeFallbackExperiment()) log(`${name} skipped: menu empty and fallback failed`);
         memory.plan = withSchedule(memory.mode === 'llm' ? memory.plan : heuristicPlan(memory, memory.version), memory.profile);
         await persist();
       }
