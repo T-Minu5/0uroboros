@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 11,
-    "plan": "I will continue to prioritize acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations like 'The Might Meek' and 'The Nudge'. From Cycle 9 onwards, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will focus on maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations, especially 'The Might Meek' and 'The Nudge'. Starting from Cycle 9, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will prioritize maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -28,7 +28,7 @@
     },
     "cardBias": {}
   },
-  "plan": "I will continue to prioritize acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations like 'The Might Meek' and 'The Nudge'. From Cycle 9 onwards, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will focus on maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations, especially 'The Might Meek' and 'The Nudge'. Starting from Cycle 9, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will prioritize maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -5394,7 +5394,7 @@
     {
       "id": "new-locations-impact",
       "text": "The new Locations 'The Might Meek' and 'The Nudge' will significantly impact deck strategies, favoring low-cost and aggressive VP collection.",
-      "status": "proposed",
+      "status": "retired",
       "confidence": 0.5,
       "support": 0,
       "against": 0,
@@ -5403,31 +5403,6 @@
     }
   ],
   "notes": [
-    {
-      "version": 7,
-      "at": "2026-10-12T01:06:44.414Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-12T01:06:49.341Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-12T01:06:49.341Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-12T01:06:49.341Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
-    },
-    {
-      "version": 7,
-      "at": "2026-10-12T01:06:49.341Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
-    },
     {
       "version": 7,
       "at": "2026-10-12T01:10:38.198Z",
@@ -6902,6 +6877,31 @@
       "version": 11,
       "at": "2026-10-17T17:24:29.785Z",
       "text": "My board Power has been consistently low; I need to focus on maintaining it while contesting Locations."
+    },
+    {
+      "version": 11,
+      "at": "2026-10-17T17:25:00.692Z",
+      "text": "v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 11,
+      "at": "2026-10-17T17:25:03.990Z",
+      "text": "The human's economy is consistently outpacing mine; I must prioritize acquiring high-value Crypto earlier."
+    },
+    {
+      "version": 11,
+      "at": "2026-10-17T17:25:03.990Z",
+      "text": "Both new Locations may favor aggressive strategies; I need to adapt quickly."
+    },
+    {
+      "version": 11,
+      "at": "2026-10-17T17:25:03.990Z",
+      "text": "'The Might Meek' may favor low-cost cards; I should consider including more low-cost options in my deck to maximize its benefits."
+    },
+    {
+      "version": 11,
+      "at": "2026-10-17T17:25:03.990Z",
+      "text": "Evaluate 'The Nudge' for its impact on aggressive VP strategies, especially in late-game scenarios."
     }
   ],
   "cardNotes": {
@@ -8512,7 +8512,7 @@
     },
     {
       "label": "strat-g@v1.11",
-      "savedAt": "2026-10-17T17:24:29.785Z",
+      "savedAt": "2026-10-17T17:25:03.990Z",
       "profile": {
         "version": 11,
         "plan": "",

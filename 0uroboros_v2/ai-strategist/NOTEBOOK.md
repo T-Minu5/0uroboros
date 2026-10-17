@@ -16,7 +16,7 @@ League snapshots (newest first): strat-g@v1.11, strat-g@v1.10, strat-g@v1.9, str
 
 ### Plan of play
 
-I will continue to prioritize acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations like 'The Might Meek' and 'The Nudge'. From Cycle 9 onwards, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will focus on maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+I will maintain my focus on acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations, especially 'The Might Meek' and 'The Nudge'. Starting from Cycle 9, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will prioritize maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best)
 
@@ -88,7 +88,7 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 - none yet
 
 ### Under test
-- **new-locations-impact** (untested · v1.11): The new Locations 'The Might Meek' and 'The Nudge' will significantly impact deck strategies, favoring low-cost and aggressive VP collection.
+- none
 
 ### Refuted
 - none yet
@@ -174,6 +174,11 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 
 ## Recent notes
 
+- v1.11 · 2026-10-17 17:25 · Evaluate 'The Nudge' for its impact on aggressive VP strategies, especially in late-game scenarios.
+- v1.11 · 2026-10-17 17:25 · 'The Might Meek' may favor low-cost cards; I should consider including more low-cost options in my deck to maximize its benefits.
+- v1.11 · 2026-10-17 17:25 · Both new Locations may favor aggressive strategies; I need to adapt quickly.
+- v1.11 · 2026-10-17 17:25 · The human's economy is consistently outpacing mine; I must prioritize acquiring high-value Crypto earlier.
+- v1.11 · 2026-10-17 17:25 · v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
 - v1.11 · 2026-10-17 17:24 · My board Power has been consistently low; I need to focus on maintaining it while contesting Locations.
 - v1.11 · 2026-10-17 17:24 · I need to watch how the new Locations interact with my cards and adjust my strategy accordingly.
 - v1.11 · 2026-10-17 17:24 · Both new Locations may favor aggressive strategies; I need to adapt quickly.
@@ -209,11 +214,6 @@ Baseline weights: power 1.01, draw 2.48, actions 1.49, crypto 2.04, drain 2.25, 
 - v1.11 · 2026-10-16 20:07 · New experiment x117-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.69→2.09. Prediction: Fewer losses by Server destruction than the current best.
 - v1.11 · 2026-10-16 20:07 · Experiment x116-fallback-116-4 inconclusive: league 30.5/48 for the experiment vs 30/48 for the current best against t-5@v1.8, t-5@v1.5, strat-g@v1.7 (margin +1.9/game) → inconclusive. Kept the current best.
 - v1.11 · 2026-10-16 20:06 · New experiment x116-fallback-116-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.25→2.5. Prediction: More wins or a better margin than the current best.
-- v1.11 · 2026-10-16 20:03 · Experiment x115-crypto inconclusive: league 29/48 for the experiment vs 28/48 for the current best against dv-8@v1.3, t-5@v1.4, vp-dog@v1.6 (margin +2.2/game) → inconclusive. Kept the current best.
-- v1.11 · 2026-10-16 20:01 · New experiment x115-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: crypto weight 2.34→2.64. Prediction: Bigger mid-game Wallets and more wins than the current best.
-- v1.11 · 2026-10-16 20:01 · Experiment x114-disrupt rejected: league 35/48 for the experiment vs 36/48 for the current best against t-5@v1.7, dv-8@v1.3, t-5@v1.6 (margin -0.9/game) → rejected. Kept the current best.
-- v1.11 · 2026-10-16 19:56 · New experiment x114-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best.
-- v1.11 · 2026-10-16 19:56 · Experiment x113-fallback-113-3 inconclusive: league 34/48 for the experiment vs 33/48 for the current best against dv-8@v1.0, t-5@v1.8, dv-8@v1.2 (margin +3.7/game) → inconclusive. Kept the current best.
 
 ## Version history
 
