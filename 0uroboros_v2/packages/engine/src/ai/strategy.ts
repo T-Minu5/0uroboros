@@ -73,7 +73,7 @@ export type StrategyProfile = {
 
 export const DEFAULT_STRATEGY: StrategyProfile = {
   version: 0,
-  plan: 'Shared early economy through Cycle 4 (Kilo-Coin then Mega-Cache; trash Basic Encryption, then Shyte after a Kilo), then pivot into Chaos for the Drain race, finishing on VP cards.',
+  plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption, then Shyte after a better Crypto source), then pivot into Chaos for the Drain race, finishing on VP cards.',
   economyUntilCycle: 4,
   chaosFromCycle: 5,
   vpFromCycle: 12,
@@ -288,7 +288,7 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
   if (card.type === 'Crypto') {
     if ((card.cryptoValue ?? 0) < profile.minCryptoValue) return -Infinity;
     if (opening) {
-      // Shared opener: Kilo first (6 Crypto = starting-deck total), then as many Mega-Cache as the Wallet allows; Byte only as the Cycle-1 fallback when Kilo is out of reach.
+      // Shared opener when Crypto shelf cards are offered: Kilo first, then Mega-Cache; Byte only as the Cycle-1 fallback when Kilo is out of reach. Without the shelf, Character Crypto income is scored via handValue below.
       if (id === 'mega-cache') return 24 - plannedCopies * 2 + bias;
       if (id === 'kilo-coin') return (ownsUpgrade(owned) ? 12 : 30) - plannedCopies * 2 + bias;
       if (id === 'byte-coin') return ownsUpgrade(owned) ? 2 + bias : 8 - plannedCopies * 3 + bias;

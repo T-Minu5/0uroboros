@@ -403,6 +403,18 @@ export function createLeague(options: LeagueOptions) {
   }
   function stop() { if (state.running) state.stop = true; }
 
+  /** Clears Elo, head-to-head and game counts. Run history is kept; refuses while a run is in progress. */
+  async function resetRatings(): Promise<{ ok: true } | { ok: false; reason: string }> {
+    await load();
+    if (state.running) return { ok: false, reason: 'Stop the league run before resetting Elo.' };
+    const nextSeed = store.nextSeed;
+    const runs = store.runs;
+    store = { ...emptyStore(), nextSeed, runs, activeRun: null };
+    await save();
+    log(`Elo reset: all ratings back to unrated (next snapshot starts at ${ELO_START}).`);
+    return { ok: true };
+  }
+
   /** The rating of an agent's latest snapshot, else its newest rated one. */
   function memberElo(member: LeagueMember): number | null {
     const label = member.snapshots().at(-1)?.label ?? null;
@@ -460,5 +472,5 @@ export function createLeague(options: LeagueOptions) {
     begin(members, checkpoint.settings, checkpoint, true);
   }).catch(() => undefined);
 
-  return { run, stop, status, idle: () => done, running: () => state.running, load };
+  return { run, stop, resetRatings, status, idle: () => done, running: () => state.running, load };
 }

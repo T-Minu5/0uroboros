@@ -28,11 +28,11 @@ Card biases: none.
 
 ## Baseline strategy (protected)
 
-The designer's playbook, in force since 2026-10-17. Learning never edits it; changes are layered on top only when an experiment earns them.
+The designer's playbook, in force since 2026-10-26. Learning never edits it; changes are layered on top only when an experiment earns them.
 
-- Cycles 1-4 (all AI players, before your own objective): acquire Crypto and trash the weak starters. The Standard starting deck prints exactly 6 Crypto (2 Byte-Coin at 2 each + 2 Shyte-Coin at 1 each), which is exactly the cost of one Kilo-Coin (cost 6, prints 3). One Kilo-Coin replaces three Shyte-Coins of Crypto.
-- Cycles 1-4 Draft: buy a Kilo-Coin as soon as the Wallet can pay 6. If Cycle 1's Wallet is under 6, buy a Byte-Coin instead. Then buy as many Mega-Cache as the Wallet allows. Skip Shyte-Coin; skip Chaos and market VP unless nothing else is worth buying.
-- Cycles 1-4 trash order: Basic Encryption first (both copies). Do not trash any Crypto until you own a Kilo-Coin (or Mega-Cache). Once you have a Kilo-Coin, trash the Shyte-Coins. Aim to have both Basic Encryption and both Shyte-Coins gone by the end of Cycle 4. Night Scythe and other trash effects are for this.
+- Cycles 1-4 (all AI players, before your own objective): raise Wallet income and trash the weak starters. The current Standard starting deck is weaker than older builds: 6× Shyte-Coin (1 Crypto each), 1× Basic Encryption, 1× Night Scythe, 1× Doom Loop, 1× Rezz Razor. It still prints 6 Crypto from Shyte alone, but with no Byte-Coin and fewer strong Characters, so early hands are softer — and that softness is the flexibility: many more cards in the pack now print Crypto, so you shape the economy by Draft picks, not by a fixed starter engine.
+- Cycles 1-4 Draft: prefer cards that raise future Wallet — Characters that gain Crypto (the Draft's Crypto-gain slots especially), plus draw/Action/trash that set up your plan. Skip Shyte-Coin; skip Chaos and market VP unless nothing else is worth buying. When the Crypto shelf is ON, buy a Kilo-Coin as soon as the Wallet can pay 6 (Byte-Coin if Cycle 1 is under 6), then as many Mega-Cache as the Wallet allows. When the shelf is OFF (common default), there are no Crypto card piles: Crypto comes from Character effects and any Crypto you already hold.
+- Cycles 1-4 trash order: Basic Encryption first. Do not trash Shyte-Coins until you have a better Crypto source in the deck (a Kilo/Mega from the shelf, or a Character that reliably prints 2+ Crypto). Once you do, trash Shyte-Coins. Aim to have Basic Encryption and most Shyte-Coins gone by the end of Cycle 4. Night Scythe and other trash effects are for this.
 - From Cycle 5: follow your own objective and style (aggression, engine, pure VP, or balanced). The early economy is done.
 - Phase 2, midgame (Cycles 5-8): balance four things every Draft: attacks (Chaos and Drain), the deck engine, Server Restore and VP collection. No single pillar takes the whole Wallet.
 - Phase 3, endgame (Cycles 9-16): attack the enemy Servers like crazy, deploying every Drain card I draw first, and spend most of each Wallet on VP cards. The final Draft buys only VP.
@@ -129,7 +129,7 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - **Not a total loss**: New Location: "if you have 0 or less Power here, +2 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.11. Untested; watch who wins it and how it shifts the economy.
 - **Absolute Horror**: New Location: "If you have 3 or more Horror cards here, Drain -200 from the other player's server." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.16. Untested; watch who wins it and how it shifts the economy.
 - **Spice of Lyfe**: New Location: "While in play: if you have an Action and a Horror here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Kanada**: utility; est. hand value -0.3 early / -0.3 late at cost 3. Untested.
+- **Doom Loop**: utility; est. hand value -0.3 early / -0.3 late at cost 3. Untested.
 
 ## Card results (complete games where a side bought it)
 
@@ -157,7 +157,7 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - Data Breach: seen 27, I won 11, human won 15
 - location-qn2xfxg2: seen 27, I won 11, human won 14
 - Occult Archive: seen 27, I won 13, human won 12
-- Sacrificial LLM: seen 25, I won 13, human won 3
+- breach_relay: seen 25, I won 13, human won 3
 - Sludge core: seen 25, I won 8, human won 11
 - Ticking-tacking: seen 25, I won 13, human won 7
 - Buggie Smalls: seen 24, I won 11, human won 6
@@ -169,6 +169,27 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Recent notes
 
+- v1.12 · 2026-10-26 06:58 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:58 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:58 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:53 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:53 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:53 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:53 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Adopted changes stay layered on top, clamped to my style.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 06:52 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Surge Splitter, Jump ship.
+- v1.12 · 2026-10-26 06:52 · The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Kilo-Coin then Mega-Cache; trash Basic Encryption, then Shyte after a Kilo); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Adopted changes stay layered on top, clamped to my style.
 - v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
@@ -188,27 +209,6 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - v1.12 · 2026-10-26 02:02 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 02:02 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 01:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-26 00:06 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Shyte-Coin.
-- v1.12 · 2026-10-25 20:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 20:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 18:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 18:38 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 18:24 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 18:24 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-25 18:24 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Dolly DoS, Ghetto Blaster, Not a Total Loss, Rezz-Rizz, Pihkal hound, Delete.Detritus.exe.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 
 ## Version history
 

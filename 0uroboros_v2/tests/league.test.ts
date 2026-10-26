@@ -200,8 +200,9 @@ describe("league agents", () => {
         expect(prompt).toContain(VP_DOG.persona);
         expect(prompt).toMatch(/16 Cycles/);
         expect(prompt).toMatch(/most VP still wins/);
-        expect(prompt).toMatch(/2 random Base piles, 2 random Chaos piles \(1 Attack or Hacker \+ 1 Horror\) \(8 copies each\) and 3 VP piles \(4 copies each\)/);
-        expect(prompt).toMatch(/1 rotating Solar-monk/);
+        expect(prompt).toMatch(/draftCrypto/);
+        expect(prompt).toMatch(/weaker than older builds/);
+        expect(prompt).toMatch(/1 rotating Solar-monk|Solar-monk/);
         for (const foreign of [T_5.persona, DV_8.persona, "T-5", "DV-8", "Strat-G"]) expect(prompt).not.toContain(foreign);
       }
       expect(await readFile(join(root, "vp-dog/NOTEBOOK.md"), "utf8")).toContain("pure economy");
@@ -275,6 +276,12 @@ describe("league runs", () => {
       const league = createLeague({ root: join(root, "league"), members: [member], log: () => undefined, autoResume: false, harness: async () => await import("@0uroboros/engine/ai/selfPlay") as never, document: async () => null, settings: () => ({ rounds: 1, seedsPerBlock: 1, ecoObserves: false }) });
       await new Promise(done => setTimeout(done, 20));
       expect(league.status().table[0]).toMatchObject({ agent: "t-5", label: "t-5@v1.2", elo: 1300 });
+      const cleared = await league.resetRatings();
+      expect(cleared).toEqual({ ok: true });
+      expect(league.status().table[0]).toMatchObject({ agent: "t-5", elo: null, wins: 0, losses: 0, ties: 0 });
+      expect(league.status().ratedSnapshots).toBe(0);
+      const saved = JSON.parse(await readFile(join(root, "league/ratings.json"), "utf8")) as { ratings: object; headToHead: object; games: number };
+      expect(saved).toMatchObject({ ratings: {}, headToHead: {}, games: 0 });
     } finally { await rm(root, { recursive: true, force: true }); }
   });
 

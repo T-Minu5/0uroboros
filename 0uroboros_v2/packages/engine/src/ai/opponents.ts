@@ -16,7 +16,7 @@ export const DEFAULT_OPPONENTS: readonly AuthoredOpponent[] = [
     id: 'strat-g', name: 'Strat-G', style: 'Balanced',
     profile: {
       ...DEFAULT_STRATEGY, cardBias: {},
-      plan: 'Shared early economy through Cycle 4 (Kilo-Coin then Mega-Cache; trash Basic Encryption, then Shyte after a Kilo); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP.',
+      plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP.',
       economyUntilCycle: STRAT_G_PHASES.economyUntilCycle, chaosFromCycle: STRAT_G_PHASES.endgameFromCycle, vpFromCycle: STRAT_G_PHASES.endgameFromCycle, midgameMix: STRAT_G_PHASES.midgameMix,
       weights: { ...DEFAULT_STRATEGY.weights, drain: 2.4, vp: 2.6 },
     },
@@ -25,7 +25,7 @@ export const DEFAULT_OPPONENTS: readonly AuthoredOpponent[] = [
     id: 't-5', name: 'T-5', style: 'Pure aggression',
     profile: {
       ...DEFAULT_STRATEGY, cardBias: {},
-      plan: 'Shared early economy through Cycle 4 (Kilo then Mega-Cache; trash Basic Encryption and Shyte), then pure aggression: Chaos and Drain to destroy both Servers, whatever their integrity, by Cycles 10-13. VP cards only to close out a won race.',
+      plan: 'Shared early economy through Cycle 4 (Character Crypto income, or Kilo/Mega when the shelf is on; trash Basic Encryption and Shyte once replaced), then pure aggression: Chaos and Drain to destroy both Servers, whatever their integrity, by Cycles 10-13. VP cards only to close out a won race.',
       economyUntilCycle: 4, chaosFromCycle: 5, vpFromCycle: 11, handCryptoTarget: 7, minBuyScore: 0.5, dilution: 0.3,
       weights: { power: 1.4, draw: 1.2, actions: 1.2, crypto: 0.8, drain: 3.4, restore: 0.5, vp: 1.4, duration: 0.6, thin: 0.8, disrupt: 1.4, chaos: 2.8 },
     },
@@ -34,7 +34,7 @@ export const DEFAULT_OPPONENTS: readonly AuthoredOpponent[] = [
     id: 'dv-8', name: 'DV-8', style: 'Engine',
     profile: {
       ...DEFAULT_STRATEGY, cardBias: {},
-      plan: 'Shared early economy through Cycle 4 (Kilo then Mega-Cache; trash Basic Encryption and Shyte), then engine: keep thinning, buy draw, Action and big Crypto through Cycle 7, defend with Restore, Chaos only late, heavy VP from Cycle 13.',
+      plan: 'Shared early economy through Cycle 4 (Character Crypto income, or Kilo/Mega when the shelf is on; trash Basic Encryption and Shyte once replaced), then engine: keep thinning, buy draw, Action and high Crypto income through Cycle 7, defend with Restore, Chaos only late, heavy VP from Cycle 13.',
       economyUntilCycle: 7, chaosFromCycle: 10, vpFromCycle: 13, handCryptoTarget: 12, minBuyScore: 1.2, dilution: 0.9,
       weights: { power: 0.9, draw: 2.2, actions: 1.6, crypto: 1.3, drain: 1, restore: 1.8, vp: 2.8, duration: 1, thin: 2.4, disrupt: 0.6, chaos: 0.8 },
     },
@@ -43,7 +43,7 @@ export const DEFAULT_OPPONENTS: readonly AuthoredOpponent[] = [
     id: 'vp-dog', name: 'VP-Dog', style: 'Pure economy',
     profile: {
       ...DEFAULT_STRATEGY, cardBias: {},
-      plan: 'Shared early economy through Cycle 4 (Kilo then Mega-Cache; trash Basic Encryption and Shyte), then pure economy: finish Crypto/draw/Actions in Cycle 5, then the most VP the Wallet affords every Draft from Cycle 6, aiming for 25+ VP bought by Cycles 11-14. Restore when the Servers take real damage; Chaos and Drain almost never.',
+      plan: 'Shared early economy through Cycle 4 (Character Crypto income, or Kilo/Mega when the shelf is on; trash Basic Encryption and Shyte once replaced), then pure economy: finish Crypto/draw/Actions in Cycle 5, then the most VP the Wallet affords every Draft from Cycle 6, aiming for 25+ VP bought by Cycles 11-14. Restore when the Servers take real damage; Chaos and Drain almost never.',
       economyUntilCycle: 5, chaosFromCycle: 13, vpFromCycle: 6, handCryptoTarget: 13, minBuyScore: 0.6, dilution: 0.4,
       weights: { power: 0.8, draw: 1.8, actions: 1.3, crypto: 1.8, drain: 0.5, restore: 1.6, vp: 3.8, duration: 0.8, thin: 1.4, disrupt: 0.4, chaos: 0.3 },
     },

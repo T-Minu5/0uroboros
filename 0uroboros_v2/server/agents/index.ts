@@ -290,9 +290,14 @@ export function createAgentSystem(options: AgentSystemOptions) {
         start();
         reply(response, 200, status()); return;
       }
-      const leagueAction = /^\/api\/agents\/league\/(run|stop)$/.exec(path)?.[1];
+      const leagueAction = /^\/api\/agents\/league\/(run|stop|reset)$/.exec(path)?.[1];
       if (leagueAction && request.method === 'POST') {
         if (leagueAction === 'stop') { league.stop(); reply(response, 202, status()); return; }
+        if (leagueAction === 'reset') {
+          const cleared = await league.resetRatings();
+          if (!cleared.ok) { reply(response, 409, { error: cleared.reason }); return; }
+          reply(response, 200, status()); return;
+        }
         if (!settings.read().agentsEnabled) { reply(response, 409, { error: 'AI agents are switched off.' }); return; }
         if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         if (mentoring.running || coaching.running) { reply(response, 409, { error: 'Wait for the mentoring or coaching hand-off to finish.' }); return; }
