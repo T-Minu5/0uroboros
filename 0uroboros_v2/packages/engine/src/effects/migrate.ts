@@ -51,8 +51,16 @@ export function migrateCard<T extends Card>(card: T): StepCard<T> {
   } as StepCard<T>;
 }
 
-type LocationLike = { effects: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[]; startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[] };
-type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3'> & { effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[] };
+type LocationConditionLike = { id: string; kind: string; effects: readonly AnyEffect[]; [key: string]: unknown };
+type LocationLike = {
+  effects: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[];
+  startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[]; conditions?: readonly LocationConditionLike[];
+};
+type StepLocationCondition = Omit<LocationConditionLike, 'effects'> & { effects: EffectStep[] };
+type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3' | 'conditions'> & {
+  effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[];
+  conditions?: StepLocationCondition[];
+};
 type LegacyLocationSchedule = { schedule?: readonly { at: number; effects: readonly AnyEffect[] }[] };
 
 /** Older Locations fired `schedule` entries after turn 2 or 3; each now runs at the start of that turn instead. */
@@ -69,7 +77,7 @@ export function liftLocationSchedule<T extends object>(location: T & LegacyLocat
 
 /** A Location with its collapse, Ongoing and start-of-turn lists in winner/loser terms and On Play in played/other terms. */
 export function migrateLocation<T extends LocationLike>(location: T): StepLocation<T> {
-  const { effects, ongoing, onPlay, startTurn2, startTurn3, ...rest } = liftLocationSchedule(location);
+  const { effects, ongoing, onPlay, startTurn2, startTurn3, conditions, ...rest } = liftLocationSchedule(location);
   return {
     ...rest,
     effects: migrateEffects(effects, 'location'),
@@ -77,6 +85,12 @@ export function migrateLocation<T extends LocationLike>(location: T): StepLocati
     ...(onPlay ? { onPlay: migrateEffects(onPlay, 'locationPlay') } : {}),
     ...(startTurn2 ? { startTurn2: migrateEffects(startTurn2, 'location') } : {}),
     ...(startTurn3 ? { startTurn3: migrateEffects(startTurn3, 'location') } : {}),
+    ...(conditions?.length ? {
+      conditions: conditions.map(condition => ({
+        ...condition,
+        effects: migrateEffects(condition.effects, 'locationCondition'),
+      })),
+    } : {}),
   } as StepLocation<T>;
 }
 
@@ -183,7 +197,13 @@ function migrateLegacy(effect: LegacyEffect, scope: Scope): EffectStep {
       action: 'transferPower', amount: effect.amount ?? 1, target: { type: 'node', which: 'neighbours' },
       ...(effect.direction ? { direction: effect.direction } : {}), ...(effect.flow ? { flow: effect.flow } : {}), ...common,
     };
-    case 'morph': return { action: 'morph', formIds: [...(effect.formIds ?? [])], ...(effect.selection ? { selection: effect.selection } : {}), ...common };
+    case 'morph': return {
+      action: 'morph', formIds: [...(effect.formIds ?? [])],
+      ...(effect.selection ? { selection: effect.selection } : {}),
+      ...(effect.cycleForms ? { cycleForms: true } : {}),
+      ...(effect.resetAfterCycle ? { resetAfterCycle: true } : {}),
+      ...common,
+    };
     case 'choice': return {
       action: 'choice', ...(effect.prompt ? { prompt: effect.prompt } : {}),
       options: effect.options?.length ? options(effect.options, scope) : legacyChoiceOptions(scope), ...common,

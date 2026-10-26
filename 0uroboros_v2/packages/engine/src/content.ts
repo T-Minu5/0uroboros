@@ -1,6 +1,8 @@
 import type { LegacyEffect } from './game';
 import { migrateLocation, migrateRewardEffects } from './effects/migrate';
 import type { AnyEffect } from './effects/types';
+import type { LocationCondition } from './locationConditions';
+export type { LocationCondition, LocationConditionKind, ConditionComparison } from './locationConditions';
 
 /** Exact recovered fixtures approved by Mel for this evaluation build. */
 /** Location and Circuit lists hold catalog steps; the engine still reads older saved effects through migration. */
@@ -20,6 +22,8 @@ export type EvaluationLocation = {
   startTurn2?: readonly LocationRewardEffect[];
   /** At the start of Runtime turn 3. Only dealt to the first 4 reveal positions. */
   startTurn3?: readonly LocationRewardEffect[];
+  /** Once-per-seat rewards while this Location is in play (revealed cards currently on the Node). */
+  conditions?: readonly LocationCondition[];
 };
 export type CircuitRewardEffect = AnyEffect;
 export type CircuitRewardDefinition = {

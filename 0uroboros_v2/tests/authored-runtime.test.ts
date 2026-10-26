@@ -87,42 +87,29 @@ describe('authored content in RuntimeSession', () => {
     expect(last).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'crypto', cardId: byteInstance.id, amount: 9 })]));
   });
 
-  it('builds game cards and each Draft offer from enabled authored pools and costs', () => {
+  it('builds each Draft offer from enabled authored pools and costs with no fixed piles', () => {
     const document = createDefaultContent();
     document.cards.find(card => identity(card) === 'slash-dot')!.cost = 11;
     document.cards.find(card => identity(card) === 'eval-relocation-relay')!.cost = 1;
-    const base = new Set(['slash-dot', 'dash-dot', 'dotkrawler', 'eval-cycle-cache', 'eval-relocation-relay', 'eval-signal-amplifier']);
-    const chaos = new Set(['rezz-razor', 'rezz-blade', 'eval-hostile-reroute', 'eval-power-siphon', 'veil-of-cthulhu']);
-    document.cards.forEach(card => {
-      if (card.pool === 'Base') card.enabled = base.has(identity(card));
-      if (card.pool === 'Chaos') card.enabled = chaos.has(identity(card));
-    });
-    document.startingDecks![0].cards = document.startingDecks![0].cards.filter(entry => entry.cardId !== 'night-scythe');
     const session = make(document);
-    const characters = (pile: { category: string }) => pile.category === 'Base' || pile.category === 'Chaos';
-    const game = session.state.market.filter(pile => characters(pile) && !pile.rotating);
-    expect(game).toHaveLength(4);
-    expect(game.filter(pile => base.has(identity(pile.card)))).toHaveLength(2);
-    expect(game.filter(pile => chaos.has(identity(pile.card)))).toHaveLength(2);
-    expect(game.some(pile => identity(pile.card) === 'veil-of-cthulhu')).toBe(true);
+    expect(session.state.market.filter(pile => !pile.rotating)).toEqual([]);
     const offers: string[][] = [];
     for (let round = 0; round < 3; round++) {
       empty(session);
       session.state.turn = 3;
       session.endTurn(); finish(session);
       const offer = session.state.market.filter(pile => pile.rotating);
-      expect(offer).toHaveLength(3);
-      expect(offer.every(pile => !game.some(fixed => identity(fixed.card) === identity(pile.card)))).toBe(true);
-      expect(offer.every(pile => base.has(identity(pile.card)) || chaos.has(identity(pile.card)))).toBe(true);
+      expect(offer.length).toBeGreaterThanOrEqual(8);
+      expect(offer.every(pile => pile.rotating && pile.remaining?.join() === '2,2')).toBe(true);
       offers.push(offer.map(pile => identity(pile.card)));
-      for (const pile of [...game, ...offer]) {
+      for (const pile of offer) {
         if (identity(pile.card) === 'slash-dot') expect(pile.card.cost).toBe(11);
         if (identity(pile.card) === 'eval-relocation-relay') expect(pile.card.cost).toBe(1);
       }
       session.endDraft(0); session.endDraft(1); session.nextCycle();
     }
-    expect(offers[1].some(id => offers[0].includes(id))).toBe(false);
-    expect(offers[2].some(id => offers[1].includes(id))).toBe(false);
+    expect(offers[1].some(id => !offers[0].includes(id))).toBe(true);
+    expect(offers[2].some(id => !offers[1].includes(id))).toBe(true);
   });
 
   it('resolves authored Location and Circuit effects during Collapse and Draft', () => {

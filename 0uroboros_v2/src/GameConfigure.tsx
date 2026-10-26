@@ -37,12 +37,12 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
   const choice = resolveOpponent(opponents, opponent);
   const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds, noLocations, noTrailingRewards } = setup;
+  const { serverVP, turnSeconds, noLocations, noTrailingRewards, midCycleDraw, draftCrypto } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
     `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
-    ...(noLocations ? ['No Locations'] : []), ...(noTrailingRewards ? ['No trailing rewards'] : []),
+    ...(midCycleDraw ? ['Turn 2–3 draws'] : []), ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(noTrailingRewards ? ['No trailing rewards'] : []),
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
@@ -70,6 +70,14 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
           <button type='button' title={`Back to ${defaultServerVP.primary} / ${defaultServerVP.backup}`} disabled={disabled || (serverVP.primary === defaultServerVP.primary && serverVP.backup === defaultServerVP.backup)} onClick={() => onChange({ ...setup, serverVP: { ...defaultServerVP } })}>Reset</button>
         </div>
       </div>
+      <label className='game-configure-row game-configure-check'>
+        <span>Turn 2 &amp; 3 draws <small>Each player draws 1 card at the start of Runtime turns 2 and 3</small></span>
+        <input aria-label='Turn 2 and 3 draws' type='checkbox' disabled={disabled} checked={midCycleDraw} onChange={event => onChange({ ...setup, midCycleDraw: event.target.checked })} />
+      </label>
+      <label className='game-configure-row game-configure-check'>
+        <span>Draft Crypto <small>Shyte-Coin, Byte-Coin, Kilo-Coin and Mega-Cache stay available beside the offer</small></span>
+        <input aria-label='Draft Crypto' type='checkbox' disabled={disabled} checked={draftCrypto} onChange={event => onChange({ ...setup, draftCrypto: event.target.checked })} />
+      </label>
       <label className='game-configure-row game-configure-check'>
         <span>No Locations <small>Every Node is No Man's Land for the whole game</small></span>
         <input aria-label='No Locations' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />

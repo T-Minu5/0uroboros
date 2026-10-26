@@ -170,19 +170,20 @@ async function shop(cycle) {
       } else throw new Error('Opponent completed during early-end test; Draft cannot resume');
     } else report.coverage.endResumeSkipped = 'Opponent was already ready on first Draft entry';
     const counts = await page.locator('.market-card').evaluateAll(els => ({
-      characters: els.filter(el => el.dataset.category === 'Base' || el.dataset.category === 'Chaos').length,
       draftOffers: els.filter(el => el.dataset.pileId?.startsWith('Draft:')).length,
-      VP: els.filter(el => el.dataset.category === 'VP').length,
       Crypto: els.filter(el => el.dataset.category === 'Crypto').length,
+      fixed: els.filter(el => !el.dataset.pileId?.startsWith('Draft:')).length,
     }));
-    if (JSON.stringify(counts) !== JSON.stringify({ characters: 6, draftOffers: 3, VP: 3, Crypto: 3 })) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
+    // Ten rotating Draft offers only; no fixed piles; Crypto card piles none in v3.
+    if (counts.draftOffers !== 10 || counts.fixed !== 0 || counts.Crypto !== 0) throw new Error(`Market pile count mismatch: ${JSON.stringify(counts)}`);
     report.coverage.marketCounts = counts;
     report.coverage.marketLayout = await page.evaluate(() => ({
-      row1: document.querySelectorAll('.character-row')[0]?.querySelectorAll('.market-card').length ?? 0,
-      row2: document.querySelectorAll('.character-row')[1]?.querySelectorAll('.market-card').length ?? 0,
-      resources: document.querySelectorAll('.resource-row .market-card').length,
+      top: document.querySelectorAll('[data-market-section="draft-top"] .market-card').length,
+      bottom: document.querySelectorAll('[data-market-section="draft-bottom"] .market-card').length,
+      base: document.querySelectorAll('.market-row-base .market-card').length,
+      vp: document.querySelectorAll('.market-vp-grid .market-card').length,
     }));
-    if (JSON.stringify(report.coverage.marketLayout) !== JSON.stringify({ row1: 6, row2: 0, resources: 6 })) {
+    if (report.coverage.marketLayout.top !== 5 || report.coverage.marketLayout.bottom !== 5 || report.coverage.marketLayout.base !== 0 || report.coverage.marketLayout.vp !== 0) {
       throw new Error(`Market layout mismatch: ${JSON.stringify(report.coverage.marketLayout)}`);
     }
   }

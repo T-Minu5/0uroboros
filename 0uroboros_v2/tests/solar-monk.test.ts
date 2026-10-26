@@ -51,20 +51,20 @@ describe('Solar-monks', () => {
     expect(validateContent(document).some(error => error.includes('Solar-monk is a VP subtype'))).toBe(true);
   });
 
-  it('rotate one into each Draft offer and are never a game pile', () => {
+  it('rotate one into each Draft offer slot and are never a fixed game pile', () => {
     const content = compileContent(createDefaultContent());
     const plain = { ...content, vpCards: content.vpCards.filter(card => card.cardClass !== 'Solar-monk') };
-    const withMonks = { ...plain, vpCards: [...plain.vpCards, monk(), monk({ id: 'dama', definitionId: 'dama-de-fuego', name: 'Dama de Fuego' })] };
+    const withMonks = { ...plain, vpCards: [...plain.vpCards, monk({ cost: 5 }), monk({ id: 'dama', definitionId: 'dama-de-fuego', name: 'Dama de Fuego', cost: 4 })] };
+    expect(createStrategicMarket(seededRandom(1), withMonks)).toEqual([]);
     for (let seed = 1; seed <= 10; seed++) {
-      const market = createStrategicMarket(seededRandom(seed), withMonks);
-      expect(market.filter(pile => pile.category === 'VP')).toHaveLength(3);
-      expect(market.some(pile => pile.card.cardClass === 'Solar-monk')).toBe(false);
-      const offer = draftOffer(seededRandom(seed), withMonks, new Set(market.map(pile => pile.card.definitionId ?? pile.card.id)));
-      expect(offer.filter(pile => pile.card.cardClass === 'Solar-monk')).toEqual([expect.objectContaining({ category: 'VP', rotating: true, supply: 4, remaining: [2, 2] })]);
-      const next = draftOffer(seededRandom(seed + 50), withMonks, new Set(), new Set(offer.map(pile => pile.card.definitionId ?? pile.card.id)));
-      expect(next.find(pile => pile.card.cardClass === 'Solar-monk')!.id).not.toBe(offer.find(pile => pile.card.cardClass === 'Solar-monk')!.id);
+      const offer = draftOffer(seededRandom(seed), withMonks, new Set(), new Set(), 8);
+      const monks = offer.filter(pile => pile.card.cardClass === 'Solar-monk');
+      expect(monks).toEqual([expect.objectContaining({ category: 'VP', rotating: true, supply: 4, remaining: [2, 2] })]);
+      expect(offer[4]?.card.cardClass).toBe('Solar-monk');
+      const next = draftOffer(seededRandom(seed + 50), withMonks, new Set(), new Set(offer.map(pile => pile.card.definitionId ?? pile.card.id)), 8);
+      expect(next.find(pile => pile.card.cardClass === 'Solar-monk')!.id).not.toBe(monks[0].id);
     }
-    expect(draftOffer(seededRandom(1), plain).some(pile => pile.category === 'VP')).toBe(false);
+    expect(draftOffer(seededRandom(1), plain, new Set(), new Set(), 8).some(pile => pile.card.cardClass === 'Solar-monk')).toBe(false);
   });
 
   it('spend an Action when played, and Apollo Ascii resets Power on both sides here', () => {

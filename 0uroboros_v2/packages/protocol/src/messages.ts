@@ -57,6 +57,10 @@ export const RoomSettingsSchema = z.object({
   noLocations: z.boolean().default(false),
   /** Circuit Rewards that go to the trailing player are never drawn. */
   noTrailingRewards: z.boolean().default(false),
+  /** Each player draws 1 at the start of Runtime turns 2 and 3. */
+  midCycleDraw: z.boolean().default(true),
+  /** Persistent Crypto card shelf in Draft. */
+  draftCrypto: z.boolean().default(false),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

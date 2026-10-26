@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import source from '../assets/card_art/cards.json';
 import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, draftOffer, draftPhase, createStrategicMarket } from '@0uroboros/engine/evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_SLOTS, cardGainsCryptoInRange, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
@@ -38,59 +38,50 @@ describe('Historic catalog activation',()=>{
   expect(EVALUATION_BASE_CARDS.some(card=>card.id==='owl-king')).toBe(true);
   expect(EVALUATION_CHAOS_CARDS.some(card=>card.id==='sudo-demiurge')).toBe(true);
  });
- it('deals 2 Base and 2 Chaos game cards (8 each), three VP game cards (4 each), no Crypto piles, and a separate Draft offer of three Base/Chaos cards and a Solar-monk',()=>{
-  const market=createStrategicMarket(()=>0.31);
-  expect(market.filter(p=>p.category==='Base')).toHaveLength(2);expect(market.filter(p=>p.category==='Chaos')).toHaveLength(2);expect(market.filter(p=>p.category==='VP')).toHaveLength(3);
-  expect(market.filter(p=>p.category==='Crypto')).toEqual([]);
-  expect(market.filter(p=>p.category==='Base'||p.category==='Chaos').every(p=>p.supply===8&&!p.rotating)).toBe(true);
-  expect(market.filter(p=>p.category==='VP').every(p=>p.supply===4&&!p.rotating&&p.card.cardClass!=='Solar-monk')).toBe(true);
-  const gameIds=new Set(market.map(p=>p.card.definitionId??p.card.id));
-  const offer=draftOffer(()=>.71,undefined,gameIds);
-  expect(offer.filter(p=>p.category==='Base'||p.category==='Chaos')).toHaveLength(3);
-  expect(offer.filter(p=>p.category==='VP').every(p=>p.card.cardClass==='Solar-monk')).toBe(true);
+ it('starts with no fixed piles and deals a 10-slot rotating Draft offer (2 copies each)',()=>{
+  expect(createStrategicMarket(()=>0.31)).toEqual([]);
+  const offer=draftOffer(()=>.71,bundledContent,new Set(),new Set(),1);
+  expect(offer).toHaveLength(DRAFT_SLOTS.length);
   expect(offer.every(p=>p.rotating&&p.remaining?.join()==='2,2'&&p.supply===4)).toBe(true);
-  expect(offer.every(p=>!gameIds.has(p.card.definitionId??p.card.id))).toBe(true);
-  const next=draftOffer(()=>.71,undefined,gameIds,new Set(offer.map(p=>p.card.definitionId??p.card.id)));
+  expect(['Action','Utility']).toContain(offer[0].card.cardClass);
+  expect(['Action','Utility']).toContain(offer[1].card.cardClass);
+  expect(offer[2].category).toBe('Chaos');
+  expect(offer[3].category).toBe('Chaos');
+  expect(isSolarMonk(offer[4].card)).toBe(true);
+  expect(cardGainsCryptoInRange(offer[5].card,1,3)).toBe(true);
+  expect(cardGainsCryptoInRange(offer[6].card,1,6)).toBe(true);
+  expect(offer[7].card.cardClass).toBe('Attack');
+  expect(offer[8].card.cardClass).toBe('Horror');
+  expect(offer[9].card.type).toBe('VP');
+  expect(isSolarMonk(offer[9].card)).toBe(false);
+  const ids=offer.map(p=>p.card.definitionId??p.card.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  const next=draftOffer(()=>.71,bundledContent,new Set(),new Set(ids),1);
   expect(next.every(p=>!offer.some(previous=>previous.id===p.id))).toBe(true);
-  const other=createStrategicMarket(()=>0.77);
-  expect(new Set(market.map(p=>p.id))).not.toEqual(new Set(other.map(p=>p.id)));
  });
- it('leans each Draft offer slot to the Cycle phase at its share, and still rotates the offer',()=>{
-  const expected:[number,string[]|'Chaos',number][]=[[2,['Action','Utility'],.75],[6,['Runtime','Attack','Hacker'],.6],[10,'Chaos',.75],[15,['Horror'],.75]];
-  for(const [cycle,favoured,share] of expected){
-   expect(draftPhase(cycle).share).toBe(share);
-   let hits=0,slots=0;
-   for(let seed=1;seed<=1500;seed++){
-    const random=seededRandom(seed);
-    const gameIds=new Set(createStrategicMarket(random,bundledContent).map(p=>p.card.definitionId??p.card.id));
-    const offer=draftOffer(random,bundledContent,gameIds,new Set(),cycle);
-    expect(offer).toHaveLength(4);
-    expect(offer.filter(p=>p.card.cardClass==='Solar-monk')).toHaveLength(1);
-    for(const pile of offer.filter(p=>p.category!=='VP')){slots++;if(favoured==='Chaos'?pile.category==='Chaos':favoured.includes(pile.card.cardClass??''))hits++;}
-   }
-   expect(Math.abs(hits/slots-share)).toBeLessThan(.03);
+ it('caps offer costs at 1–7 in Cycles 1–4 and still rotates later',()=>{
+  for(let seed=1;seed<=80;seed++){
+   const offer=draftOffer(seededRandom(seed),bundledContent,new Set(),new Set(),2);
+   for(const pile of offer)expect(pile.card.cost,pile.card.name).toBeGreaterThanOrEqual(1);
+   for(const pile of offer)expect(pile.card.cost,pile.card.name).toBeLessThanOrEqual(7);
   }
+  const late=draftOffer(seededRandom(3),bundledContent,new Set(),new Set(),14);
+  expect(late.length).toBeGreaterThanOrEqual(8);
   const random=seededRandom(9);
   const first=draftOffer(random,bundledContent,new Set(),new Set(),14);
   const next=draftOffer(random,bundledContent,new Set(),new Set(first.map(p=>p.card.definitionId??p.card.id)),14);
   expect(next.every(p=>!first.some(previous=>previous.id===p.id))).toBe(true);
  });
- it('samples game cards from every draftable Base (except Runtime), Chaos and VP card, never Generated ones',()=>{
-  const seen={VP:new Set<string>(),Crypto:new Set<string>(),Character:new Set<string>()};
-  for(let seed=1;seed<=400;seed++){
-   const market=createStrategicMarket(seededRandom(seed),bundledContent);
-   expect([market.filter(p=>p.category==='Base').length,market.filter(p=>p.category==='Chaos').length]).toEqual([2,2]);
-   for(const pile of market)seen[pile.category==='Base'||pile.category==='Chaos'?'Character':pile.category].add(pile.card.definitionId??pile.card.id);
+ it('samples Draft slots across many seeds without Fixed piles or Generated-only identities as the whole market',()=>{
+  const seen=new Set<string>();
+  for(let seed=1;seed<=200;seed++){
+   expect(createStrategicMarket(seededRandom(seed),bundledContent)).toEqual([]);
+   const offer=draftOffer(seededRandom(seed),bundledContent,new Set(),new Set(),8);
+   expect(offer.length).toBeGreaterThanOrEqual(8);
+   for(const pile of offer)seen.add(pile.card.definitionId??pile.card.id);
   }
-  const ids=(cards:readonly {id:string;definitionId?:string}[])=>new Set(cards.map(card=>card.definitionId??card.id));
-  expect(seen.VP).toEqual(ids(bundledContent.vpCards.filter(card=>card.cardClass!=='Solar-monk')));
-  expect(seen.Crypto).toEqual(new Set());
-  expect(bundledContent.baseCards.some(card=>card.cardClass==='Runtime')).toBe(true);
-  expect(seen.Character).toEqual(ids([...bundledContent.baseCards.filter(card=>card.cardClass!=='Runtime'),...bundledContent.chaosCards]));
-  expect(bundledContent.vpCards.length).toBeGreaterThan(3);
-  const generated=bundledContent.cards.filter(card=>card.generated).map(card=>card.definitionId??card.id);
-  expect(generated).toEqual(expect.arrayContaining(['glitch','owl-king']));
-  for(const id of generated)expect(seen.VP.has(id)||seen.Crypto.has(id)||seen.Character.has(id),id).toBe(false);
+  expect(seen.size).toBeGreaterThan(20);
+  expect(seen.has('glitch')).toBe(false);
  });
  it('retains assigned Power and applies approved defaults only to newly introduced identities',()=>{
   expect(byId('slash-dot').power).toBe(3);expect(byId('root-rune').power).toBe(3);expect(byId('chronos-cache').power).toBe(1);

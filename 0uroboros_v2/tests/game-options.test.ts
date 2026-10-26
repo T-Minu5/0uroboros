@@ -64,10 +64,10 @@ describe("No trailing rewards", () => {
 
 describe("online tables", () => {
   it("defaults both options off and hands them to the room's session", () => {
-    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false });
+    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: true });
-    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: true });
+    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true });
+    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
     expect(room.session!.state.nodes.map(node => node.location?.name)).toEqual(Array(5).fill("No Man's Land"));
   });
@@ -81,9 +81,9 @@ describe("setup and look defaults", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("keeps both game options through a save, off unless set", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, noTrailingRewards: false });
-    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: "yes" })).toMatchObject({ noLocations: true, noTrailingRewards: false });
+  it("keeps game options through a save, with mid-cycle draws on unless set off", () => {
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false });
+    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: "yes", midCycleDraw: false, draftCrypto: true })).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: false, draftCrypto: true });
   });
 
   it("defaults the board to Neon once, then keeps a saved Classic", () => {

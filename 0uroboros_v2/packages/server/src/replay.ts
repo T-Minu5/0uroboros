@@ -20,6 +20,7 @@ export function replayGame(replay: ReplayRecord, content: CompiledContent, strat
     content, strategicMarket: true, evaluationContent: true,
     carryover: replay.settings.carryover, priorityPreference: replay.settings.priorityPreference,
     noLocations: replay.settings.noLocations, noTrailingRewards: replay.settings.noTrailingRewards,
+    midCycleDraw: replay.settings.midCycleDraw, draftCrypto: replay.settings.draftCrypto,
     random: seededRandom(replay.seed), aiSeats: replay.aiSeats, seatNames: replay.seatNames, recordDecisions: false,
     ...(profile ? { strategy: profile } : {}),
     now: () => clock.now,

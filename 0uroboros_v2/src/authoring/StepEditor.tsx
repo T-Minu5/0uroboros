@@ -73,7 +73,7 @@ function CardDefinitionPicker({ label, cards, value, onChange }: { label: string
   </div>;
 }
 
-function MorphFormPicker({ cards, values, selection, onChange, onSelectionChange }: { cards: readonly CatalogCard[]; values: readonly string[]; selection: 'sequential' | 'random'; onChange: (ids: string[]) => void; onSelectionChange: (selection: 'sequential' | 'random') => void }) {
+function MorphFormPicker({ cards, values, selection, cycleForms, onChange, onSelectionChange, onCycleFormsChange }: { cards: readonly CatalogCard[]; values: readonly string[]; selection: 'sequential' | 'random'; cycleForms?: boolean; onChange: (ids: string[]) => void; onSelectionChange: (selection: 'sequential' | 'random') => void; onCycleFormsChange: (cycle: boolean) => void }) {
   const [search, setSearch] = useState('');
   const available = enabledCards(cards).filter(card => card.type !== 'Crypto');
   const allMatching = available.filter(card => `${card.name} ${definitionId(card)}`.toLowerCase().includes(search.toLowerCase()));
@@ -88,7 +88,7 @@ function MorphFormPicker({ cards, values, selection, onChange, onSelectionChange
     onChange(next);
   };
   return <div className="au-morph-forms">
-    <Select label="How forms are chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Sequential evolution', random: 'Random selected form' }} onChange={onSelectionChange} />
+    <Select label="How forms are chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Evolve after play (cleanup)', random: 'Random morph on resolve' }} onChange={onSelectionChange} />
     <div className="au-morph-sequence"><b>{selection === 'sequential' ? 'Evolution order' : 'Selected forms'}</b>{values.length === 0 && <span className="au-morph-empty">Select at least one form before saving.</span>}{values.map((id, index) => <div className="au-morph-sequence-item" key={id}><span>{index + 1}. {cards.find(card => definitionId(card) === id)?.name ?? 'Unavailable saved form'}</span><span className="au-morph-order-actions">{selection === 'sequential' && <><button type="button" disabled={index === 0} aria-label={`Move form ${index + 1} earlier`} onClick={() => move(index, -1)}>↑</button><button type="button" disabled={index === values.length - 1} aria-label={`Move form ${index + 1} later`} onClick={() => move(index, 1)}>↓</button></>}<button type="button" aria-label={`Remove form ${index + 1}`} onClick={() => toggle(id, false)}>×</button></span></div>)}</div>
     <label className="au-recipe-field"><span>Forms this card can become</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search Character or VP cards" aria-label="Search morph forms" /></label>
     <div className="au-morph-form-list">
@@ -96,7 +96,28 @@ function MorphFormPicker({ cards, values, selection, onChange, onSelectionChange
       {matching.map(card => <label className="au-morph-form" key={definitionId(card)}><input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />{card.art && <img src={card.art} alt="" />}<span>{card.name}</span></label>)}
     </div>
     {allMatching.length > matching.length && <small>Showing the first 24 matches. Search by name to find more forms.</small>}
-    <small>{selection === 'sequential' ? 'Each trigger advances to the next form; the final form remains in place.' : 'Each trigger picks one selected form at random.'} Power changes carry over to the new form.</small>
+    {selection === 'sequential' && <label className="au-recipe-check"><input type="checkbox" checked={Boolean(cycleForms)} onChange={event => onCycleFormsChange(event.target.checked)} /><span>Cycle forms: after the last form, return to the first</span></label>}
+    <small>{selection === 'sequential' ? 'After this card is played, it advances one form at cleanup. Later forms keep evolving from the same recipe — they do not need their own Morph effect.' : 'Transforms immediately; the new form resolves On Reveal as if played.'} Power changes carry over.</small>
+  </div>;
+}
+
+function GainCardPicker({ cards, values, selection, onChange, onSelectionChange }: { cards: readonly CatalogCard[]; values: readonly string[]; selection: 'sequential' | 'random'; onChange: (ids: string[]) => void; onSelectionChange: (selection: 'sequential' | 'random') => void }) {
+  const [search, setSearch] = useState('');
+  const available = enabledCards(cards);
+  const allMatching = available.filter(card => `${card.name} ${definitionId(card)}`.toLowerCase().includes(search.toLowerCase()));
+  const matching = allMatching.slice(0, 24);
+  const unknown = values.filter(id => !available.some(card => definitionId(card) === id));
+  const toggle = (id: string, checked: boolean) => onChange(checked ? [...values, id] : values.filter(value => value !== id));
+  return <div className="au-morph-forms">
+    <Select label="How the gained card is chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Always the first selected card', random: 'Random from selected cards' }} onChange={onSelectionChange} />
+    <div className="au-morph-sequence"><b>{values.length <= 1 ? 'Card to gain' : 'Gain pool'}</b>{values.length === 0 && <span className="au-morph-empty">Select at least one card before saving.</span>}{values.map((id, index) => <div className="au-morph-sequence-item" key={id}><span>{index + 1}. {cards.find(card => definitionId(card) === id)?.name ?? 'Unavailable saved card'}</span><span className="au-morph-order-actions"><button type="button" aria-label={`Remove card ${index + 1}`} onClick={() => toggle(id, false)}>×</button></span></div>)}</div>
+    <label className="au-recipe-field"><span>Cards that can be gained</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search card names" aria-label="Search cards to gain" /></label>
+    <div className="au-morph-form-list">
+      {unknown.map(id => <label className="au-morph-form" key={id}><input type="checkbox" checked onChange={() => toggle(id, false)} /><span>Unavailable saved card</span></label>)}
+      {matching.map(card => <label className="au-morph-form" key={definitionId(card)}><input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />{card.art && <img src={card.art} alt="" />}<span>{card.name}</span></label>)}
+    </div>
+    {allMatching.length > matching.length && <small>Showing the first 24 matches. Search by name to find more cards.</small>}
+    <small>{selection === 'random' && values.length > 1 ? 'Each copy picks one selected card at random.' : values.length > 1 ? 'Always gains the first selected card.' : 'Gains a copy of the selected card.'}</small>
   </div>;
 }
 
@@ -264,7 +285,13 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {spec.chooser && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
-    {step.action === 'gainCard' && <CardDefinitionPicker label="Card to gain" cards={enabledCards(cards)} value={step.cardId} onChange={cardId => patch({ cardId })} />}
+    {step.action === 'gainCard' && <GainCardPicker
+      cards={cards}
+      values={step.cardIds?.length ? step.cardIds : step.cardId ? [step.cardId] : []}
+      selection={step.selection ?? (step.cardIds && step.cardIds.length > 1 ? 'random' : 'sequential')}
+      onChange={cardIds => patch({ cardIds: cardIds.length ? cardIds : undefined, cardId: undefined, selection: cardIds.length > 1 ? (step.selection ?? 'random') : undefined })}
+      onSelectionChange={selection => patch({ selection: selection === 'sequential' && !(step.cardIds && step.cardIds.length > 1) ? undefined : selection })}
+    />}
     {step.action === 'attachModifier' && <>
       <ModifierPicker step={step} onChange={patch} />
       {step.target?.type === 'card' && step.target.where === 'collection' && <>
@@ -273,7 +300,18 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       </>}
     </>}
     {step.action === 'removeModifier' && <ModifierPicker step={step} onChange={patch} />}
-    {step.action === 'morph' && <MorphFormPicker cards={cards} values={step.formIds ?? []} selection={step.selection ?? 'sequential'} onChange={formIds => patch({ formIds })} onSelectionChange={selection => patch({ selection })} />}
+    {step.action === 'morph' && <>
+      <MorphFormPicker
+        cards={cards}
+        values={step.formIds ?? []}
+        selection={step.selection ?? 'sequential'}
+        cycleForms={step.cycleForms}
+        onChange={formIds => patch({ formIds })}
+        onSelectionChange={selection => patch({ selection, cycleForms: selection === 'random' ? undefined : step.cycleForms })}
+        onCycleFormsChange={cycle => patch({ cycleForms: cycle || undefined })}
+      />
+      <label className="au-recipe-check"><input type="checkbox" checked={Boolean(step.resetAfterCycle)} onChange={event => patch({ resetAfterCycle: event.target.checked || undefined })} /><span>Reset after Cycle: return to the original form during end-of-Cycle cleanup</span></label>
+    </>}
     {step.action === 'choice' && <div className="au-step-grid">
       <label className="au-recipe-field au-step-wide"><span>Prompt</span><input aria-label="Choice prompt" value={step.prompt ?? ''} placeholder="Choose one effect" onChange={event => patch({ prompt: event.target.value || undefined })} /></label>
       <label className="au-recipe-field"><span>Options picked</span><NumberInput aria-label="Options picked" min={1} max={Math.max(1, step.options?.length ?? 2)} value={step.choose?.count ?? 1} onChange={value => { if (value === undefined) return; const count = Math.max(1, Math.round(value)); patch({ choose: count === 1 && (step.choose?.chooser ?? 'self') === 'self' ? undefined : { count, chooser: step.choose?.chooser ?? 'self' } }); }} /></label>

@@ -1,5 +1,7 @@
 import { isSolarMonk, type Card, type RandomSource } from './game';
-import { migrateCard } from './effects/migrate';
+export { isSolarMonk };
+import { migrateCard, migrateEffects } from './effects/migrate';
+import type { AnyEffect } from './effects/types';
 import { HISTORIC_CARDS, HISTORIC_SOURCE_METADATA, historicCategory } from './historicCatalog';
 import { CARD_ART_PLACEHOLDER } from './cardArtwork';
 export { HISTORIC_CARDS, HISTORIC_SOURCE_METADATA, HISTORIC_EXCLUSIONS } from './historicCatalog';
@@ -24,26 +26,46 @@ export const EVALUATION_CHAOS_CARDS:readonly Card[]=[...retainedChaos,...HISTORI
 export const EVALUATION_VP_CARDS:readonly Card[]=HISTORIC_CARDS.filter(card=>card.type==='VP');
 export const EVALUATION_CRYPTO_CARDS:readonly Card[]=HISTORIC_CARDS.filter(card=>card.type==='Crypto');
 export const EVALUATION_ALL_CARDS:readonly Card[]=[...EVALUATION_BASE_CARDS,...EVALUATION_CHAOS_CARDS,...EVALUATION_VP_CARDS,...EVALUATION_CRYPTO_CARDS];
-/** Game cards: 2 from the Base pool (Runtime cards excluded), 1 Attack or Hacker and 1 Horror from the Chaos pool. */
-export const GAME_BASE_COUNT=2;
+
+/** @deprecated Fixed game piles are gone; kept for authoring/AI copy that still mentions legacy mix. */
+export const GAME_BASE_COUNT=0;
 export const GAME_CHAOS_GROUPS:readonly {label:string;classes:readonly NonNullable<Card['cardClass']>[]}[]=[{label:'Attack or Hacker',classes:['Attack','Hacker']},{label:'Horror',classes:['Horror']}];
-export const GAME_CHAOS_COUNT=GAME_CHAOS_GROUPS.length;
-export const GAME_CHAOS_MIX=GAME_CHAOS_GROUPS.map(group=>`1 ${group.label}`).join(' + ');
-export const GAME_CHARACTER_COUNT=GAME_BASE_COUNT+GAME_CHAOS_COUNT;
-export const GAME_VP_COUNT=3;
+export const GAME_CHAOS_COUNT=0;
+export const GAME_CHAOS_MIX='none (fixed Chaos piles removed)';
+export const GAME_CHARACTER_COUNT=0;
+export const GAME_VP_COUNT=0;
 export const GAME_PILE_SUPPLY=8;
 export const GAME_VP_SUPPLY=4;
-export const DRAFT_OFFER_COUNT=3;
-/** Each Draft also rotates in one Solar-monk, when any is enabled; Solar-monks are never game cards. */
+
+/** Ten ordered rotating offers each Draft (top 5 + bottom 5). */
+export const DRAFT_OFFER_COUNT=10;
 export const DRAFT_SOLAR_MONK_COUNT=1;
 export const DRAFT_COPIES_PER_PLAYER=2;
+/** Cycles 1–4 only offer cards costing 1–7 Crypto. */
+export const DRAFT_EARLY_COST_MAX=7;
+export const DRAFT_EARLY_CYCLES=4;
+
 /**
- * v3: Crypto cards are not sold in Draft. Crypto still exists as a spendable resource; Character
- * (and other) effects credit the Wallet. Kept as an empty list so authoring and AI facts stay aligned.
+ * Persistent Crypto shelf when the `draftCrypto` setup option is on. Shared supply (not per-seat).
+ * Order is the 2×2 Draft grid: Shyte / Byte on top, Kilo / Mega below.
  */
-export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=[];
+export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=[
+ {cardId:'shyte-coin',supply:16},
+ {cardId:'byte-coin',supply:16},
+ {cardId:'kilo-coin',supply:16},
+ {cardId:'mega-cache',supply:8},
+];
 
 function cardId(card:Card){return card.definitionId??card.id;}
+
+/** The four Crypto card piles for Draft when the setting is enabled. */
+export function createCryptoPiles(content?:MarketContent):MarketPile[]{
+ const crypto=content?.cryptoCards??EVALUATION_CRYPTO_CARDS;
+ return CURRENCY_PILES.flatMap(({cardId:id,supply})=>{
+  const card=crypto.find(entry=>cardId(entry)===id);
+  return card?[{id:`Crypto:${id}`,card:structuredClone(card),category:'Crypto' as const,supply}]:[];
+ });
+}
 
 function pick<T>(items:readonly T[],count:number,random:RandomSource):T[]{
  const shuffled=[...items];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}return shuffled.slice(0,Math.max(0,count));
@@ -61,80 +83,119 @@ export const isGameBaseCard=(card:Card)=>card.cardClass!=='Runtime';
 /** A Chaos card's class; unclassed built-in cards follow their historic type (power cards are Horrors). */
 export const chaosClassOf=(card:Card)=>card.cardClass??(HISTORIC_SOURCE_METADATA[cardId(card)]?.types.includes('power')?'Horror':'Attack');
 
-function pickChaos(pool:readonly PoolEntry[],random:RandomSource):PoolEntry[]{
- const chaos=pool.filter(({category})=>category==='Chaos');
- const chosen:PoolEntry[]=[];
- for(const group of GAME_CHAOS_GROUPS){
-  const left=chaos.filter(entry=>!chosen.includes(entry));
-  const matching=left.filter(({card})=>group.classes.includes(chaosClassOf(card)));
-  chosen.push(...pick(matching.length?matching:left,1,random));
- }
- return chosen;
-}
+type PoolEntry={card:Card;category:MarketCategory};
 
-/**
- * Game setup: 2 Base game cards and 1 Attack or Hacker and 1 Horror game card (shared supply of 8 each), and 3 Volume VP
- * game cards (4 each). These persist all game; Draft offers are added on top each round. Crypto piles are omitted in v3.
- */
-export function createStrategicMarket(random:RandomSource,content?:MarketContent):MarketPile[]{
- const pool=characterPool(content);
- const characters=[
-  ...pick(pool.filter(({card,category})=>category==='Base'&&isGameBaseCard(card)),GAME_BASE_COUNT,random),
-  ...pickChaos(pool,random),
- ];
- const vpPool=content?.vpCards??EVALUATION_VP_CARDS;
- const vp=pick(vpPool.filter(card=>!isSolarMonk(card)),GAME_VP_COUNT,random);
- const crypto=content?.cryptoCards??EVALUATION_CRYPTO_CARDS;
- const currency=CURRENCY_PILES.flatMap(({cardId:id,supply})=>{const card=crypto.find(entry=>cardId(entry)===id);return card?[{card,supply}]:[];});
- return [
-  ...characters.map(({card,category})=>({id:`${category}:${cardId(card)}`,card:structuredClone(card),category,supply:GAME_PILE_SUPPLY})),
-  ...vp.map(card=>({id:`VP:${cardId(card)}`,card:structuredClone(card),category:'VP' as const,supply:GAME_VP_SUPPLY})),
-  ...currency.map(({card,supply})=>({id:`Crypto:${cardId(card)}`,card:structuredClone(card),category:'Crypto' as const,supply})),
- ];
-}
-
-type PoolEntry={card:Card;category:'Base'|'Chaos'};
-/** Each Draft offer slot comes from the phase's favoured cards with probability `share`, otherwise from the rest of the pool. */
-export type DraftPhase={from:number;to:number;favours:string;share:number;matches:(entry:PoolEntry)=>boolean};
-const ofClass=(...classes:NonNullable<Card['cardClass']>[])=>({card}:PoolEntry)=>card.cardClass!==undefined&&classes.includes(card.cardClass);
-export const DRAFT_PHASES:readonly DraftPhase[]=[
- {from:1,to:4,favours:'Action and Utility',share:.75,matches:ofClass('Action','Utility')},
- {from:5,to:8,favours:'Runtime, Attack and Hacker',share:.6,matches:ofClass('Runtime','Attack','Hacker')},
- {from:9,to:12,favours:'Chaos',share:.75,matches:({category})=>category==='Chaos'},
- {from:13,to:16,favours:'Horror',share:.75,matches:ofClass('Horror')},
-];
-export const draftPhase=(cycle:number)=>DRAFT_PHASES.find(phase=>cycle>=phase.from&&cycle<=phase.to)??DRAFT_PHASES[cycle<1?0:DRAFT_PHASES.length-1];
-export const DRAFT_PHASE_SUMMARY=DRAFT_PHASES.map(phase=>`Cycles ${phase.from}-${phase.to} ${phase.favours} ${Math.round(phase.share*100)}%`).join('; ');
-
-/**
- * One Draft round's offer: 3 Base/Chaos cards (Runtime included) that are not game cards and 1 Solar-monk, each limited
- * to 2 copies per player.
- * With a Cycle, each slot leans to that Cycle's phase (see DRAFT_PHASES). Last round's offer is avoided while
- * the pool has enough other cards, so the offer changes every round.
- */
-export function draftOffer(random:RandomSource,content?:MarketContent,gameIds:ReadonlySet<string>=new Set(),previousIds:ReadonlySet<string>=new Set(),cycle?:number):MarketPile[]{
- const eligible:PoolEntry[]=characterPool(content).filter(({card})=>!gameIds.has(cardId(card)));
- const isFresh=({card}:PoolEntry)=>!previousIds.has(cardId(card));
- let chosen:PoolEntry[];
- if(cycle===undefined){
-  const fresh=eligible.filter(isFresh);
-  chosen=fresh.length>=DRAFT_OFFER_COUNT?pick(fresh,DRAFT_OFFER_COUNT,random):[...fresh,...pick(eligible.filter(entry=>!fresh.includes(entry)),DRAFT_OFFER_COUNT-fresh.length,random)];
- }else{
-  const phase=draftPhase(cycle);
-  chosen=[];
-  while(chosen.length<DRAFT_OFFER_COUNT){
-   const left=eligible.filter(entry=>!chosen.includes(entry));
-   if(!left.length)break;
-   const fresh=left.filter(isFresh);
-   const from=fresh.length?fresh:left;
-   const favoured=random()<phase.share;
-   const group=from.filter(entry=>phase.matches(entry)===favoured);
-   chosen.push(pick(group.length?group:from,1,random)[0]);
+/** Collect gainCrypto / legacy crypto amounts from nested steps (choices, then, schedules). */
+function collectCryptoAmounts(effects:readonly AnyEffect[]|undefined,into:number[]=[]):number[]{
+ if(!effects?.length)return into;
+ for(const step of migrateEffects(effects,'card')){
+  if(step.action==='gainCrypto')into.push(step.amount??0);
+  if(step.options)for(const option of step.options){
+   collectCryptoAmounts(option.effects,into);
+   if(option.cost)collectCryptoAmounts(option.cost,into);
   }
+  if(step.then)collectCryptoAmounts(step.then,into);
  }
- // Drawn after the Base/Chaos slots so the Solar-monk leaves the rest of a seeded offer unchanged.
- const monks=(content?.vpCards??EVALUATION_VP_CARDS).filter(card=>isSolarMonk(card)&&!gameIds.has(cardId(card)));
- const freshMonks=monks.filter(card=>!previousIds.has(cardId(card)));
- const offered:{card:Card;category:MarketCategory}[]=[...chosen,...pick(freshMonks.length?freshMonks:monks,DRAFT_SOLAR_MONK_COUNT,random).map(card=>({card,category:'VP' as const}))];
- return offered.map(({card,category})=>({id:`Draft:${cardId(card)}`,card:structuredClone(card),category,supply:DRAFT_COPIES_PER_PLAYER*2,remaining:[DRAFT_COPIES_PER_PLAYER,DRAFT_COPIES_PER_PLAYER],rotating:true}));
+ return into;
+}
+
+/** True when the card has at least one Crypto-gain amount in [min, max] inclusive. */
+export function cardGainsCryptoInRange(card:Card,min:number,max:number):boolean{
+ const amounts=[
+  ...collectCryptoAmounts(card.onReveal),
+  ...collectCryptoAmounts(card.onCollapse),
+  ...collectCryptoAmounts(card.recurring),
+  ...(card.schedule??[]).flatMap(entry=>collectCryptoAmounts(entry.effects)),
+ ];
+ return amounts.some(amount=>amount>=min&&amount<=max);
+}
+
+/**
+ * Persistent market piles at session start. Rotating offers are filled at each Draft.
+ * When `draftCrypto` is on, the four Crypto cards sit as a fixed shelf beside the offer.
+ */
+export function createStrategicMarket(_random:RandomSource,content?:MarketContent,opts?:{draftCrypto?:boolean}):MarketPile[]{
+ return opts?.draftCrypto?createCryptoPiles(content):[];
+}
+
+/** Slot rules for the 10 rotating Draft offers, in UI order (top row then bottom row). */
+export type DraftSlot={
+ id:string;
+ label:string;
+ category:(card:Card)=>MarketCategory;
+ matches:(entry:PoolEntry)=>boolean;
+};
+
+export const DRAFT_SLOTS:readonly DraftSlot[]=[
+ {id:'action-utility-1',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility'},
+ {id:'action-utility-2',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility'},
+ {id:'chaos-1',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
+ {id:'chaos-2',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
+ {id:'solar-monk',label:'Solar Monk',category:()=>'VP',matches:({card})=>isSolarMonk(card)},
+ {id:'crypto-1-3',label:'Gain Crypto 1–3',category:entry=>entry.category,matches:({card})=>cardGainsCryptoInRange(card,1,3)},
+ {id:'crypto-1-6',label:'Gain Crypto 1–6',category:entry=>entry.category,matches:({card})=>cardGainsCryptoInRange(card,1,6)},
+ {id:'attack',label:'Attack',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Attack'},
+ {id:'horror',label:'Horror',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Horror'},
+ {id:'vp',label:'VP',category:()=>'VP',matches:({card})=>card.type==='VP'&&!isSolarMonk(card)},
+];
+
+export const DRAFT_SLOT_SUMMARY=DRAFT_SLOTS.map(slot=>slot.label).join(' → ');
+/** @deprecated Phase weighting removed; kept for any leftover imports. */
+export type DraftPhase={from:number;to:number;favours:string;share:number;matches:(entry:PoolEntry)=>boolean};
+export const DRAFT_PHASES:readonly DraftPhase[]=[];
+export const draftPhase=(_cycle:number):DraftPhase=>({from:1,to:16,favours:'slot rules',share:1,matches:()=>true});
+export const DRAFT_PHASE_SUMMARY=`10 fixed slots: ${DRAFT_SLOT_SUMMARY}. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost.`;
+
+function allPool(content?:MarketContent):PoolEntry[]{
+ const characters=characterPool(content);
+ const vp=(content?.vpCards??EVALUATION_VP_CARDS).map(card=>({card,category:'VP' as const}));
+ return [...characters,...vp];
+}
+
+function inEarlyCost(card:Card,cycle?:number){
+ if(cycle===undefined||cycle>DRAFT_EARLY_CYCLES)return true;
+ const cost=Math.max(0,card.cost);
+ return cost>=1&&cost<=DRAFT_EARLY_COST_MAX;
+}
+
+function pickForSlot(
+ slot:DraftSlot,
+ pool:readonly PoolEntry[],
+ taken:ReadonlySet<string>,
+ previousIds:ReadonlySet<string>,
+ random:RandomSource,
+ cycle?:number,
+):PoolEntry|undefined{
+ const unused=pool.filter(entry=>slot.matches(entry)&&!taken.has(cardId(entry.card)));
+ if(!unused.length)return undefined;
+ const withCost=unused.filter(({card})=>inEarlyCost(card,cycle));
+ const prefer=withCost.length?withCost:unused;
+ const fresh=prefer.filter(({card})=>!previousIds.has(cardId(card)));
+ const from=fresh.length?fresh:prefer;
+ return pick(from,1,random)[0];
+}
+
+/**
+ * One Draft round: 10 ordered rotating offers (2 copies per player). Slot order is top row then
+ * bottom row. Last round's identities are avoided while the pool allows. `gameIds` is ignored
+ * (fixed piles removed).
+ */
+export function draftOffer(random:RandomSource,content?:MarketContent,_gameIds:ReadonlySet<string>=new Set(),previousIds:ReadonlySet<string>=new Set(),cycle?:number):MarketPile[]{
+ const pool=allPool(content);
+ const taken=new Set<string>();
+ const offered:{card:Card;category:MarketCategory}[]=[];
+ for(const slot of DRAFT_SLOTS){
+  const entry=pickForSlot(slot,pool,taken,previousIds,random,cycle);
+  if(!entry)continue;
+  taken.add(cardId(entry.card));
+  offered.push({card:entry.card,category:slot.category(entry)});
+ }
+ return offered.map(({card,category})=>({
+  id:`Draft:${cardId(card)}`,
+  card:structuredClone(card),
+  category,
+  supply:DRAFT_COPIES_PER_PLAYER*2,
+  remaining:[DRAFT_COPIES_PER_PLAYER,DRAFT_COPIES_PER_PLAYER] as [number,number],
+  rotating:true,
+ }));
 }

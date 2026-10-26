@@ -50,7 +50,7 @@
 /* 4px of breathing room was added around the numeral, which grows the circle 24 -> 32 and is
    re-centred on where it used to sit so it still breaks the corner the same way. */
 .cf-power.card-power-value{position:absolute;z-index:8;top:calc(-6 * var(--cf-u));right:calc(-8 * var(--cf-u));display:grid;place-items:center;width:calc(32 * var(--cf-u));height:calc(32 * var(--cf-u));margin:0;padding:calc(8 * var(--cf-u));border:calc(2 * var(--cf-u)) solid var(--cf-line);border-radius:99px;color:#fff;background:var(--cf-power-bg,linear-gradient(180deg,var(--cf-edge-start),var(--cf-edge-end)));box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;font:500 calc(14 * var(--cf-u))/1 Inter,system-ui,sans-serif;letter-spacing:.07em;text-shadow:0 1px 2px #000c}
-.cf-power.card-power-value.boosted{border-color:var(--cyan,#27e2ff);color:var(--cyan,#27e2ff);background:linear-gradient(180deg,#0b4a5c,#08222b);box-shadow:0 0 9px #27e2ff77}
+.cf-power.card-power-value.boosted{border-color:var(--yellow,#ffff00);color:var(--yellow,#ffff00);background:linear-gradient(180deg,#5c5c0b,#2b2b08);box-shadow:0 0 9px #ffff0077}
 .cf-power.card-power-value.reduced{border-color:var(--pink,#ff0ba1);color:var(--pink,#ff0ba1);background:linear-gradient(180deg,#5c0b40,#2b0820);box-shadow:0 0 9px #ff0ba177}
 .cf-power.card-power-value.power-changing{animation:cf-power-pulse 650ms ease-in-out infinite alternate}
 @keyframes cf-power-pulse{to{transform:scale(1.12)}}

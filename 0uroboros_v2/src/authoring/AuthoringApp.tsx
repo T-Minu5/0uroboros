@@ -1,5 +1,5 @@
 import { useContext, useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
-import { POWER_SOURCES, type Card, type CardModifier, type PowerSource } from '@0uroboros/engine/game';
+import { CARD_CLASSES, POWER_SOURCES, isSolarMonk, type Card, type CardModifier, type PowerSource } from '@0uroboros/engine/game';
 import { MOD_HOOK_LABELS, createStep, describeCard, describeLocation, describeMod, describeSteps, modBadge } from '@0uroboros/engine/effects/catalog';
 import { BUILTIN_MODIFIERS, type EffectStep, type ModDefinition, type ModifierKind } from '@0uroboros/engine/effects/types';
 import { BUILTIN_MOD_FIELDS, DEFAULT_BUILTIN_MODS, builtinMod, setBuiltinModDetails, type BuiltinModDetails } from '@0uroboros/engine/builtinMods';
@@ -17,6 +17,10 @@ import {
   type ContentDocument,
   type StartingDeck,
 } from '@0uroboros/engine/authoring/contentModel';
+import {
+  CONDITION_COMPARISONS, CONDITION_KIND_LABELS, LOCATION_CONDITION_KINDS, createLocationCondition,
+  type ConditionComparison, type LocationCondition, type LocationConditionKind,
+} from '@0uroboros/engine/locationConditions';
 import { getBundledDocument } from '../contentPack/contentStore';
 import { ModsContext, StepList } from './StepEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
@@ -28,7 +32,6 @@ import { describeIssues, type Issue } from './validationIssues';
 import { CardFace } from '../CardFace';
 import { CARD_STYLE_COLORS, CARD_STYLE_ICONS, type CardStyle } from '../cardPresentation';
 import { refreshDepthStatus, regenerateDepth, servedArtPath, useDepthEntry, useDepthJob } from '../depthArt/depthManifest';
-import { isSolarMonk } from '@0uroboros/engine/game';
 import { cardClasses, vpClasses, cardClassOf, cardCategoryLabel, matchesCardFilter, newCardCategory, sortCards, primaryCardFilters, primaryFilterOf, secondaryFiltersFor, isGeneratedCard, poolForClass, type CardClass, type CardFilter, type CardSort } from './cardBrowser';
 import './authoring.css';
 import './authoring-workbench.css';
@@ -317,6 +320,9 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
     const copy = describeLocation(next, asCards(cards), mods);
     update({ ...next, rule: copy, reward: copy });
   };
+  const conditions = location.conditions ?? [];
+  const setConditions = (next: LocationCondition[]) => syncHooks({ conditions: next.length ? next : undefined });
+  const replaceCondition = (index: number, condition: LocationCondition) => setConditions(conditions.map((entry, at) => at === index ? condition : entry));
   return <div className="au-properties au-standalone-properties"><section className="au-panel"><SectionTitle title="Location properties" /><div className="au-field-grid">
     <TextField field="name" label="Name" value={location.name} onChange={name => patch({ name })} />
   </div>
@@ -336,8 +342,56 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
       <StepList field="startTurn2" title="Start of turn 2" description="When Runtime turn 2 begins. A Location with these effects is only dealt as one of the first 3 revealed, so it is always open by then. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.startTurn2 ?? []} onChange={startTurn2 => syncHooks({ startTurn2: startTurn2.length ? startTurn2 : undefined })} />
       <StepList field="startTurn3" title="Start of turn 3" description="When Runtime turn 3 begins. A Location with these effects is only dealt as one of the first 4 revealed. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.startTurn3 ?? []} onChange={startTurn3 => syncHooks({ startTurn3: startTurn3.length ? startTurn3 : undefined })} />
     </section>
+    <section className="au-panel au-effects-panel">
+      <SectionTitle eyebrow="While in play" title="Conditions" description="Each seat is checked on its own revealed cards here. The reward awards once per seat the first time that seat meets the formula." />
+      {conditions.map((condition, index) => (
+        <LocationConditionEditor
+          key={condition.id}
+          index={index}
+          condition={condition}
+          cards={asCards(cards)}
+          onChange={next => replaceCondition(index, next)}
+          onRemove={() => setConditions(conditions.filter((_, at) => at !== index))}
+        />
+      ))}
+      <button type="button" className="au-button au-button-subtle" onClick={() => setConditions([...conditions, createLocationCondition()])}>+ Add condition</button>
+    </section>
     <details className="au-property-section"><summary>Identity</summary><IdentityFields id={location.id} /></details>
     <AdvancedJson key={location.id} item={location} onApply={item => applyAdvanced(item as AuthoredLocation)} onPendingChange={onPendingChange} />
+  </div>;
+}
+
+function LocationConditionEditor({ index, condition, cards, onChange, onRemove }: {
+  index: number; condition: LocationCondition; cards: Card[];
+  onChange: (condition: LocationCondition) => void; onRemove: () => void;
+}) {
+  const changeKind = (kind: LocationConditionKind) => onChange({ ...createLocationCondition(kind), id: condition.id, effects: condition.effects });
+  return <div className="au-schedule" data-field={`conditions.${index}`}>
+    <div className="au-schedule-fields au-field-grid">
+      <SelectField field={`conditions.${index}.kind`} label={`Condition ${index + 1}`} value={condition.kind} options={LOCATION_CONDITION_KINDS} labels={CONDITION_KIND_LABELS} onChange={changeKind} />
+      {condition.kind === 'subtypeCount' && <>
+        <NumberField field={`conditions.${index}.count`} label="Count" value={condition.count} min={1} onChange={count => onChange({ ...condition, count: count ?? 1 })} />
+        <SelectField field={`conditions.${index}.cardClass`} label="Subtype" value={condition.cardClass ?? 'Attack'} options={CARD_CLASSES} onChange={cardClass => onChange({ ...condition, cardClass })} />
+      </>}
+      {condition.kind === 'subtypePair' && <>
+        <SelectField field={`conditions.${index}.cardClassA`} label="Subtype A" value={condition.cardClassA ?? 'Attack'} options={CARD_CLASSES} onChange={cardClassA => onChange({ ...condition, cardClassA })} />
+        <SelectField field={`conditions.${index}.cardClassB`} label="Subtype B" value={condition.cardClassB ?? 'Horror'} options={CARD_CLASSES} onChange={cardClassB => onChange({ ...condition, cardClassB })} />
+      </>}
+      {(condition.kind === 'powerThreshold' || condition.kind === 'cardCountThreshold') && <>
+        <NumberField field={`conditions.${index}.amount`} label={condition.kind === 'powerThreshold' ? 'Power' : 'Cards'} value={condition.amount} min={0} onChange={amount => onChange({ ...condition, amount: amount ?? 0 })} />
+        <SelectField field={`conditions.${index}.comparison`} label="Comparison" value={condition.comparison ?? 'orMore'} options={CONDITION_COMPARISONS} labels={{ orMore: 'or more', orLess: 'or less' } satisfies Record<ConditionComparison, string>} onChange={comparison => onChange({ ...condition, comparison })} />
+      </>}
+      <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove condition {index + 1}</button>
+    </div>
+    <StepList
+      field={`conditions.${index}`}
+      title={`Condition ${index + 1} reward`}
+      description="Awarded once to the seat that meets the formula. “You” is that seat."
+      scope="locationCondition"
+      cards={cards}
+      steps={condition.effects}
+      onChange={effects => onChange({ ...condition, effects })}
+    />
   </div>;
 }
 

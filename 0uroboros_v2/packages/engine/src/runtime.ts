@@ -1,4 +1,7 @@
 import { EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, type MarketPile } from "./evaluationMarket";
+import {
+  describeConditionPredicate, meetsLocationCondition, revealedHere, type LocationCondition,
+} from "./locationConditions";
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, NO_MANS_LAND, type LocationRewardEffect, type CircuitRewardDefinition } from "./content";
 import type { CompiledContent } from './authoring/contentModel';
 import {
@@ -27,6 +30,7 @@ export type LocationDefinition = {
   onPlay?: readonly LocationRewardEffect[];
   startTurn2?: readonly LocationRewardEffect[];
   startTurn3?: readonly LocationRewardEffect[];
+  conditions?: readonly LocationCondition[];
 };
 /** The last reveal position (0-based) a Location may be dealt to: start of turn 2 needs the first 3 reveals, start of turn 3 the first 4. */
 export const latestRevealSlot = (location: Pick<LocationDefinition, 'startTurn2' | 'startTurn3'>) =>
@@ -62,7 +66,11 @@ export type SessionConfig = {
   noLocations?: boolean;
   /** Circuit Rewards that go to the trailing player are never drawn. */
   noTrailingRewards?: boolean;
-  /** The clock Draft deadlines and purchase cooldowns read; defaults to Date.now. Inject for tests and servers. */
+  /** Each player draws 1 at the start of Runtime turns 2 and 3. Defaults on. */
+  midCycleDraw?: boolean;
+  /** Persistent Crypto card shelf in Draft (Shyte / Byte / Kilo / Mega). Defaults off. */
+  draftCrypto?: boolean;
+  /** The clock Draft deadlines read; defaults to Date.now. Inject for tests and servers. */
   now?: () => number;
 };
 export type PurchaseRecord = { cycle: number; owner: PlayerId; definitionId: string; name: string; category: MarketPile["category"]; cost: number };
@@ -308,7 +316,6 @@ export class RuntimeSession {
   private serial = 0;
   private order = 0;
   private acquired = 0;
-  private purchaseTimes = new Map<string, number>();
   private config: SessionConfig;
   private choiceResolver: ((ids: string[]) => RuntimeEvent) | null = null;
   private botDraftAt: [number, number] = [0, 0];
@@ -316,6 +323,16 @@ export class RuntimeSession {
   /** Turn-timed cards whose duration ended on the board: they keep their Power until Collapse, then go to Discard. */
   private expiredOnBoard = new Set<string>();
   private morphProgress = new Map<string, Map<string, number>>();
+  /** Pre-morph card snapshots for morphs with `resetAfterCycle`; restored during end-of-Cycle cleanup. */
+  private morphOrigins = new Map<string, Card>();
+  /** Sequential evolve recipes attached to a physical card id (persist across forms). */
+  private morphRecipes = new Map<string, { formIds: readonly string[]; cycleForms?: boolean }>();
+  /** Sequential morphs that resolved during play; applied at end-of-Cycle cleanup. */
+  private pendingEvolve = new Set<string>();
+  /** Card instances revealed this Cycle — eligible for recipe auto-advance at cleanup. */
+  private playedThisCycle = new Set<string>();
+  /** Physical cards that already advanced via an immediate sequential Morph this Cycle (skip cleanup re-advance). */
+  private evolvedThisCycle = new Set<string>();
   private collapseStartedNodes = new Set<number>();
   private collapseResolvedNodes = new Set<number>();
   private collapseEffectCards = new Set<string>();
@@ -333,6 +350,8 @@ export class RuntimeSession {
   private bankResolvedCycle = 0;
   private decisions: DecisionRecord[] = [];
   private telemetry: TelemetryCollector;
+  /** Location condition awards this Cycle: `node:conditionId:owner`. */
+  private awardedLocationConditions = new Set<string>();
 
   constructor(config: SessionConfig) {
     if (typeof config.carryover !== "boolean" || !["higher", "lower"].includes(config.priorityPreference)) throw new Error("Explicit Action carryover and priority policy are required.");
@@ -354,7 +373,7 @@ export class RuntimeSession {
     this.randomizeBoard();
     this.setupEvaluationLocations();
     // After board/location shuffle so seeded location layouts stay stable.
-    if (config.strategicMarket) this.state.market = createStrategicMarket(this.config.random, this.config.content);
+    if (config.strategicMarket) this.state.market = createStrategicMarket(this.config.random, this.config.content, { draftCrypto: !!config.draftCrypto });
     this.refreshScores();
     this.telemetry = new TelemetryCollector(() => ({ cycle: this.state.cycle, turn: this.state.turn }), cardId => {
       const card = this.findCard(cardId);
@@ -428,6 +447,7 @@ export class RuntimeSession {
       if (swap >= 0) [locations[at], locations[swap]] = [locations[swap], locations[at]];
     }
     this.state.nodes.forEach((node, i) => { node.location = locations[i] ?? null; });
+    this.awardedLocationConditions.clear();
   }
 
   get pendingCount() { return this.state.choice ? 0 : this.queue.length; }
@@ -855,11 +875,27 @@ export class RuntimeSession {
       const wins = this.locationWins();
       if (wins[0] !== wins[1]) this.state.priority = wins[0] > wins[1] ? 0 : 1;
       if (this.state.turn < 3) {
-        this.queue.push(() => this.enqueueLocationStartTurn());
-        this.queue.push(() => this.enqueueLocationOngoing());
         this.state.turn++;
         this.relocatedThisTurn.clear();
         this.state.players.forEach(player => { player.actions = runtimeActions(this.state.turn, player.actions, player.pendingActions, this.config.carryover); player.pendingActions = 0; });
+        // Turns 2 and 3: each player draws 1 before planning (setup setting; defaults on).
+        // Draw inside the event callback so the UI sees a before/after hand diff and can animate arrivals.
+        if (this.config.midCycleDraw !== false) {
+          const turn = this.state.turn;
+          for (const owner of [0, 1] as PlayerId[]) {
+            this.queue.push(() => {
+              const player = this.state.players[owner];
+              const before = player.hand.length;
+              Object.assign(player, drawCards(player, 1, this.config.random));
+              const drawn = player.hand.length - before;
+              return this.event("draw", `${this.say(owner, "You draw", "draws")} ${drawn} for Runtime turn ${turn}.`, {
+                owner, targetOwner: owner, target: "hand", amount: drawn, before, after: player.hand.length,
+              });
+            });
+          }
+        }
+        this.queue.push(() => this.enqueueLocationStartTurn());
+        this.queue.push(() => this.enqueueLocationOngoing());
         // Opening-window effects resolve before the next planning boundary.
         // Actions earned here belong to the following Runtime turn.
         this.expireRuntimeTimers();
@@ -898,6 +934,7 @@ export class RuntimeSession {
       this.queue.push(() => {
         placement.revealed = true;
         placement.revealSequence = ++this.revealCounter;
+        this.playedThisCycle.add(placement.card.id);
         if(this.turnTimed(placement.card)) {
           const duration=placement.card.duration ?? 0, cycleBound=placement.card.durationPeriod !== "runtime";
           const timer:RuntimeTimer={placement,age:1,formStartAge:1,formExpiresAt:duration===99||cycleBound?Infinity:duration,morphTriggers:[],...(cycleBound?{cycleBound}:{})};
@@ -925,6 +962,9 @@ export class RuntimeSession {
         this.queue.unshift(...effects.slice(1).map(effect=>()=>effect.action==="morph"?this.resolveMorph(placement,effect,true):this.resolveStep(ctx,effect)));
         return effects[0].action==="morph"?this.resolveMorph(placement,effects[0],true):this.resolveStep(ctx,effects[0]);
       });
+      if (this.state.nodes[placement.node]?.location?.conditions?.length) {
+        this.queueLocationConditionCheck(placement.node);
+      }
     }
   }
 
@@ -1077,21 +1117,62 @@ export class RuntimeSession {
     const formIds=effect.formIds;
     if(!formIds?.length)throw new Error("Morph requires at least one form card.");
     if(effect.selection!==undefined && effect.selection!=="sequential" && effect.selection!=="random")throw new Error("Morph selection must be sequential or random.");
+    const selection=effect.selection??"sequential";
+    const current=deployed?.card??banked!.card;
+    // Evolve (sequential): remember the recipe on this physical card and advance at cleanup after a play.
+    // Runtime/scheduled morphs (nextTurn) and Collapse still advance immediately. Random morphs always do.
+    if(selection==="sequential"){
+      this.morphRecipes.set(id,{formIds:[...formIds],...(effect.cycleForms?{cycleForms:true}:{})});
+      if(effect.resetAfterCycle && !this.morphOrigins.has(id))this.morphOrigins.set(id,structuredClone(current));
+      const defer= !nextTurn && this.state.phase!=="collapse";
+      if(defer){
+        this.pendingEvolve.add(id);
+        return this.event("morph",`${current.name} will evolve after this play.`,{
+          node:deployed?.node,owner,cardId:id,targetCardId:id,targetOwner:owner,
+          source:"card",sourceName:current.name,amount:0,
+        });
+      }
+      const event=this.applyMorphTransform(placement,deployed,banked,formIds,selection,effect.cycleForms,undefined,nextTurn,false);
+      this.evolvedThisCycle.add(id);
+      return event;
+    }
+    return this.applyMorphTransform(placement,deployed,banked,formIds,selection,effect.cycleForms,effect.resetAfterCycle,nextTurn,true);
+  }
+
+  /** Apply a morph/evolve transform onto the live board or Bank card. */
+  private applyMorphTransform(
+    placement: Deployment,
+    deployed: Deployment | undefined,
+    banked: { card: Card; order: number; expiresCycle?: number } | undefined,
+    formIds: readonly string[],
+    selection: "sequential" | "random",
+    cycleForms: boolean | undefined,
+    resetAfterCycle: boolean | undefined,
+    nextTurn: boolean,
+    runFormReveal: boolean,
+  ): RuntimeEvent {
+    const id=placement.card.id, owner=placement.owner;
     const definitions=formIds.map(formId=>{
       const form=(this.config.content?.cards??EVALUATION_ALL_CARDS).find(card=>(card.definitionId??card.id)===formId);
       if(!form)throw new Error(`Morph form unavailable: ${formId}`);
       if(form.type!=="Character" && form.type!=="VP")throw new Error(`Morph form must be Character or VP: ${formId}`);
       return form;
     });
-    const current=deployed?.card??banked!.card;
+    const current=deployed?.card??banked?.card??placement.card;
+    if(resetAfterCycle && !this.morphOrigins.has(id))this.morphOrigins.set(id,structuredClone(current));
     const before=deployed?this.cardPower(deployed,false):this.printedPower(current);
     const key=JSON.stringify(formIds);
     const progress=this.morphProgress.get(id)??new Map<string,number>();
-    const index=effect.selection==="random" ? Math.floor(this.config.random()*definitions.length) : Math.min((progress.get(key)??-1)+1,definitions.length-1);
+    let index:number;
+    if(selection==="random")index=Math.floor(this.config.random()*definitions.length);
+    else{
+      const prev=progress.get(key)??-1;
+      index=cycleForms ? (prev+1)%definitions.length : Math.min(prev+1,definitions.length-1);
+      progress.set(key,index);
+      this.morphProgress.set(id,progress);
+    }
     const next:Card={...structuredClone(definitions[index]),id};
     if(current.powerDelta)next.powerDelta=current.powerDelta;
-    if(effect.selection!=="random")progress.set(key,index);
-    this.morphProgress.set(id,progress);
     let timer=this.runtimeTimers.get(id);
     if(timer)this.rememberMorphTriggers(timer,current);
     if(deployed)deployed.card=next;
@@ -1123,11 +1204,82 @@ export class RuntimeSession {
     }
     this.recalculate();
     this.refreshScores();
+    // Random morph: new form On Reveals as if played. Evolve never does — the next play is that form.
+    if(runFormReveal){
+      const formReveal=this.hookEffects(next,'onReveal');
+      if(formReveal.length){
+        const source=deployed??(banked?{card:next,owner,node:-1,order:banked.order,revealed:true}:placement);
+        const ctx=this.cardContext(source);
+        this.queue.unshift(...formReveal.map(step=>()=>step.action==="morph"?this.resolveMorph(source,step):this.resolveStep(ctx,step)));
+      }
+    }
     const after=deployed?this.cardPower(deployed,false):this.printedPower(next);
     return this.event("morph",`${current.name} morphs into ${next.name}.`,{
       node:deployed?.node,owner,cardId:id,targetCardId:id,definitionId:next.definitionId??next.id,targetOwner:owner,
       source:"card",sourceName:current.name,before,after,
     });
+  }
+
+  /** Advance every card that learned an evolve recipe and was played this Cycle (or explicitly pending). */
+  private applyPendingEvolutions(): RuntimeEvent[] {
+    const ids=new Set<string>([
+      ...this.pendingEvolve,
+      ...[...this.playedThisCycle].filter(id=>this.morphRecipes.has(id)&&!this.evolvedThisCycle.has(id)),
+    ]);
+    this.pendingEvolve.clear();
+    this.evolvedThisCycle.clear();
+    const events:RuntimeEvent[]=[];
+    for(const id of ids){
+      const recipe=this.morphRecipes.get(id);
+      if(!recipe)continue;
+      let deployed:Deployment|undefined;
+      let owner:PlayerId=0;
+      for(const node of this.state.nodes)for(const side of [0,1] as PlayerId[]){
+        const found=node.cards[side].find(item=>item.card.id===id);
+        if(found){deployed=found;owner=side;}
+      }
+      const bankedOwner=this.state.players.findIndex(player=>player.bank.some(entry=>entry.card.id===id)) as PlayerId|-1;
+      const banked=bankedOwner>=0?this.state.players[bankedOwner].bank.find(entry=>entry.card.id===id):undefined;
+      if(bankedOwner>=0)owner=bankedOwner;
+      if(!deployed&&!banked)continue;
+      const placement=deployed??{card:banked!.card,owner,node:-1,order:banked!.order,revealed:true};
+      events.push(this.applyMorphTransform(placement,deployed,banked,recipe.formIds,"sequential",recipe.cycleForms,undefined,false,false));
+    }
+    this.playedThisCycle.clear();
+    return events;
+  }
+
+  /** Restore morphs marked `resetAfterCycle` to the form they had before morphing. */
+  private restoreMorphOrigins(): string[] {
+    if(!this.morphOrigins.size)return [];
+    const origins=this.morphOrigins;
+    const restored=new Set<string>();
+    const apply=(card:Card)=>{
+      const origin=origins.get(card.id);
+      if(!origin||restored.has(card.id)&&card.definitionId===(origin.definitionId??origin.id))return card;
+      const next:Card={...structuredClone(origin),id:card.id};
+      if(card.powerDelta)next.powerDelta=card.powerDelta;
+      restored.add(card.id);
+      return next;
+    };
+    for(const node of this.state.nodes)for(const side of node.cards)for(const placement of side){
+      if(origins.has(placement.card.id))placement.card=apply(placement.card);
+    }
+    for(const player of this.state.players){
+      for(const entry of player.bank)if(origins.has(entry.card.id))entry.card=apply(entry.card);
+      for(const zone of [player.hand,player.discard,player.draw,player.destroyed]){
+        for(let i=0;i<zone.length;i++)if(origins.has(zone[i].id))zone[i]=apply(zone[i]);
+      }
+    }
+    for(const id of origins.keys()){
+      this.morphProgress.delete(id);
+      const timer=this.runtimeTimers.get(id);
+      if(timer)timer.placement.card=apply(timer.placement.card);
+    }
+    for(const id of restored){this.morphRecipes.delete(id);this.pendingEvolve.delete(id);}
+    this.morphOrigins=new Map();
+    if(restored.size){this.recalculate();this.refreshScores();}
+    return [...restored];
   }
 
   /* ------------------------------------------------------------------ effect steps */
@@ -1172,6 +1324,18 @@ export class RuntimeSession {
     return { scope: "locationPlay", node: placement.node, winner: this.state.nodes[placement.node].winner, played: placement.owner, source: placement, label: { source: "location", sourceName: location.name, node: placement.node } };
   }
 
+  /** Condition rewards resolve as the seat that met the formula. */
+  private locationConditionContext(node: number, owner: PlayerId): EffectContext {
+    const location = this.state.nodes[node].location!;
+    return {
+      scope: "locationCondition",
+      node,
+      winner: this.state.nodes[node].winner,
+      source: this.locationSyntheticPlacement(node, owner),
+      label: { source: "location", sourceName: location.name, node },
+    };
+  }
+
   private circuitContext(owner: PlayerId, name: string): EffectContext {
     return { scope: "circuit", source: { card: { id: `circuit:${name}`, name, type: "Character", cost: 0, art: "", effect: name }, owner, node: -1, order: 0, revealed: true }, label: { source: "circuit", sourceName: name } };
   }
@@ -1210,7 +1374,7 @@ export class RuntimeSession {
 
   /** Who acts when `recipient` is targeted: the controller, the On Play card's owner, or the Location winner. */
   private actorFor(ctx: EffectContext, recipient: PlayerId, hostile: boolean): PlayerId {
-    if (ctx.scope === "card" || ctx.scope === "circuit") return ctx.source.owner;
+    if (ctx.scope === "card" || ctx.scope === "circuit" || ctx.scope === "locationCondition") return ctx.source.owner;
     if (ctx.scope === "locationPlay") return ctx.played!;
     return ctx.winner ?? (hostile ? (1 - recipient) as PlayerId : recipient);
   }
@@ -1262,7 +1426,42 @@ export class RuntimeSession {
     return this.labelled(ctx, this.dispatchStep(ctx, step));
   }
 
+  /** Rewrite player targets to `self` so a follow-up runs only for the player who just paid or accepted. */
+  private personalizeForActor(step: EffectStep): EffectStep {
+    const rewrite = (entry: EffectStep): EffectStep => ({
+      ...entry,
+      ...(entry.target && "who" in entry.target ? { target: { ...entry.target, who: "self" as const } } : {}),
+      ...(entry.then?.length ? { then: entry.then.map(rewrite) } : {}),
+      ...(entry.options ? { options: entry.options.map(option => ({
+        ...option,
+        ...(option.cost ? { cost: option.cost.map(rewrite) } : {}),
+        effects: option.effects.map(rewrite),
+      })) } : {}),
+    });
+    return rewrite(step);
+  }
+
   private dispatchStep(ctx: EffectContext, step: EffectStep): RuntimeEvent {
+    // Optional pay/gain for several players: each is asked on their own, and `then` runs only for whoever accepts.
+    const who = step.target && "who" in step.target ? step.target.who : "self";
+    const multiOptional = !!(step.optional && step.then?.length && !OPTIONAL_INSIDE.has(step.action)
+      && (step.action === "payCrypto" || step.action === "draw" || step.action === "gainActions" || step.action === "gainCrypto" || step.action === "gainVP")
+      && (who === "both" || who === "any" || (who === "winner" && ctx.winner === null) || (who === "leastVP" && this.whoPlayers(ctx, "leastVP", false).length > 1)));
+    if (multiOptional) {
+      return this.forEachRecipient(ctx, step, false, (acting, recipient) => {
+        const head = this.personalizeForActor({ ...step, optional: false, then: undefined });
+        const follow = (step.then ?? []).map(next => this.personalizeForActor(next));
+        const label = describeStep(head, ctx.scope, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
+        const accept = step.action === "payCrypto" ? label : "Accept";
+        const decline = () => this.event("choice", `${acting.source.card.name}: optional ${ACTIONS[step.action].label.toLowerCase()} skipped.`, { ...this.base(acting), owner: recipient });
+        const canAccept = step.action !== "payCrypto" || this.canPay(acting, head);
+        const options = [
+          ...(canAccept ? [{ id: "resolve", label: accept, resolve: () => this.resolveChained(acting, follow, () => this.dispatchStep(acting, head)) }] : []),
+          { id: "skip", label: canAccept ? "Decline" : "Can't pay", resolve: decline },
+        ];
+        return this.requestChoice({ ...acting.source, owner: recipient }, `${acting.source.card.name}: ${label}?`, options);
+      });
+    }
     // Hand and Discard costs run their own `then` once paid; next-reveal targets carry it on the waiting trigger.
     if (step.then?.length && step.action !== "discardCards" && step.action !== "trashCards" && !(step.target?.type === "card" && step.target.relation === "next")) {
       const { then, ...head } = step;
@@ -1272,8 +1471,8 @@ export class RuntimeSession {
       const { optional: _optional, ...required } = step;
       const label = describeStep(required, ctx.scope, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
       return this.requestChoice(ctx.source, `${ctx.source.card.name}: ${label}?`, [
-        { id: "resolve", label: "Resolve", resolve: () => this.resolveStep(ctx, required) },
-        { id: "skip", label: "Skip", resolve: () => this.event("choice", `${ctx.source.card.name}: optional ${ACTIONS[step.action].label.toLowerCase()} skipped.`, this.base(ctx)) },
+        { id: "resolve", label: step.action === "payCrypto" ? label : "Resolve", resolve: () => this.resolveStep(ctx, required) },
+        { id: "skip", label: step.action === "payCrypto" ? "Decline" : "Skip", resolve: () => this.event("choice", `${ctx.source.card.name}: optional ${ACTIONS[step.action].label.toLowerCase()} skipped.`, this.base(ctx)) },
       ]);
     }
     switch (step.action) {
@@ -1395,18 +1594,34 @@ export class RuntimeSession {
   private gainCards(ctx: EffectContext, step: EffectStep, targetOwner: PlayerId): RuntimeEvent {
     const amount = step.amount ?? 1;
     if (!Number.isInteger(amount) || amount < 0 || amount > 100) throw new Error("Gain count must be an integer from 0 to 100.");
-    const definition = (this.config.content?.cards ?? EVALUATION_ALL_CARDS).find(card => (card.definitionId ?? card.id) === step.cardId || card.id === step.cardId);
-    if (!definition) throw new Error(`Gain definition unavailable: ${step.cardId}`);
+    const catalog = this.config.content?.cards ?? EVALUATION_ALL_CARDS;
+    const byId = (id: string) => catalog.find(card => (card.definitionId ?? card.id) === id || card.id === id);
+    const poolIds = step.cardIds?.length ? [...step.cardIds] : step.cardId ? [step.cardId] : [];
+    if (!poolIds.length) throw new Error("Gain requires a card or a pool of cards.");
+    const pool = poolIds.map(id => {
+      const definition = byId(id);
+      if (!definition) throw new Error(`Gain definition unavailable: ${id}`);
+      return definition;
+    });
+    const pick = () => {
+      if (pool.length === 1 || step.selection === "sequential") return pool[0];
+      return pool[Math.floor(this.config.random() * pool.length)];
+    };
     const zone = step.target?.type === "zone" ? step.target.zone : "deck";
     const player = this.state.players[targetOwner];
     const before = player.hand.length;
-    const cards = Array.from({ length: amount }, () => ({ ...structuredClone(definition), id: `${targetOwner}:generated-${++this.acquired}` }));
+    const cards = Array.from({ length: amount }, () => {
+      const definition = pick();
+      return { ...structuredClone(definition), id: `${targetOwner}:generated-${++this.acquired}` };
+    });
     if (zone === "hand") player.hand.push(...cards);
     else if (zone === "discard") player.discard.push(...cards);
     else player.draw.unshift(...cards);
     this.refreshScores();
     const destination = zone === "hand" ? "hand" : zone === "discard" ? "Discard" : "the top of the deck";
-    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${definition.name} to ${destination}.`, { owner: ctx.source.owner, cardId: cards[0]?.id, definitionId: definition.definitionId, source: "card", sourceName: ctx.source.card.name, amount, targetOwner, ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}) });
+    const names = [...new Set(cards.map(card => card.name))];
+    const label = names.length === 1 ? names[0] : names.join(" / ");
+    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${label} to ${destination}.`, { owner: ctx.source.owner, cardId: cards[0]?.id, definitionId: cards[0]?.definitionId, source: "card", sourceName: ctx.source.card.name, amount, targetOwner, ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}) });
   }
 
   private millStep(ctx: EffectContext, step: EffectStep, targetOwner: PlayerId): RuntimeEvent {
@@ -1879,6 +2094,7 @@ export class RuntimeSession {
         const before = this.cardPower(target, false);
         this.healCardPower(target.card, step.action === "healCard" ? step.amount ?? 1 : undefined);
         this.recalculate();
+        if (target.revealed) this.queueLocationConditionCheck(target.node);
         const after = this.cardPower(target, false);
         return this.event("power", `${source.card.name}: ${step.action === "healCard" ? "heal" : "restore"} ${target.card.name} Power ${before} → ${after}.`, {
           ...this.base(ctx), targetCardId: target.card.id, targetOwner: target.owner, amount: after - before, before, after, targetNode: target.node,
@@ -1932,6 +2148,7 @@ export class RuntimeSession {
     }
     this.recalculate();
     this.refreshScores();
+    if (hit.length || removed.length) this.queueLocationConditionCheck(node);
     if (!hit.length && !removed.length) return this.event("trash", `${name}: No target.`, { ...detail, amount: 0 });
     const parts = [
       ...(hit.length ? [`${destroy ? "destroy" : "trash"} ${hit.join(", ")}`] : []),
@@ -1949,6 +2166,7 @@ export class RuntimeSession {
     if (!targets.length) return this.event("power", `${name}: No target.`, { ...base, amount: 0 });
     for (const target of targets) setPowerDelta(target.card, (target.card.powerDelta ?? 0) + amount);
     this.recalculate();
+    this.queueLocationConditionCheck(node);
     return this.event("power", `${name}: ${amount < 0 ? "" : "+"}${amount} Power to ${targets.length} revealed card${targets.length === 1 ? "" : "s"} here.`, { ...base, amount, after: targets.length });
   }
 
@@ -1959,12 +2177,15 @@ export class RuntimeSession {
     const index = lane?.findIndex(item => item.card.id === card.id) ?? -1;
     const bank = this.state.players[owner].bank;
     const bankIndex = bank.findIndex(item => item.card.id === card.id);
+    const fromBoard = index >= 0;
+    const wasRevealed = fromBoard && !!lane![index]?.revealed;
     if (index >= 0) lane!.splice(index, 1);
     else if (bankIndex >= 0) bank.splice(bankIndex, 1);
     else return this.event("trash", `${card.name}: No target.`, { ...base, target: "trash", amount: 0 });
     this.stripModifiers(card);
     const trashed = this.retire(card, owner, "trash");
     this.recalculate(); this.refreshScores();
+    if (wasRevealed && node >= 0) this.queueLocationConditionCheck(node);
     return this.event("trash", trashed ? `${card.name} enters shared Trash.` : `${card.name} is removed from the game.`, { ...base, ...(trashed ? { target: "trash" as const } : {}), amount: 1 });
   }
 
@@ -2084,6 +2305,7 @@ export class RuntimeSession {
         this.state.nodes[leg.to].powerModifiers[owner] += leg.amount;
       }
       this.recalculate();
+      this.queueLocationConditionCheck(...new Set(legs.flatMap(leg => [leg.from, leg.to])));
       const away = others.map(target => `Node ${target + 1}`).join(" and ");
       return this.event("power", `${card.name}: ${pushed ? `push ${formatAmount(total)} power from Node ${node + 1} to ${away}` : `pull ${formatAmount(total)} power from ${away} to Node ${node + 1}`}.`, { ...base, sourceNode: legs[0].from, targetNode: legs[0].to, amount: total });
     };
@@ -2194,6 +2416,55 @@ export class RuntimeSession {
     return this.event("reward", callbacks.length ? "Location ongoing effects resolve." : "No Location ongoing effects.", { amount: callbacks.length });
   }
 
+  /**
+   * Awards unmet Location conditions for open Nodes (or `focus` Nodes). Each seat is checked on its own
+   * revealed cards / Power here; a seat receives the reward once per Cycle the first time it qualifies.
+   */
+  private enqueueLocationConditions(...focus: number[]): RuntimeEvent {
+    if (this.state.phase === "draft" || this.state.phase === "gameover") {
+      return this.event("reward", "No Location conditions outside Runtime.", { amount: 0 });
+    }
+    this.recalculate();
+    const open = new Set(
+      this.state.phase === "collapse"
+        ? this.state.nodes.map((_, index) => index)
+        : legalNodes(this.state.turn, this.state.nodeOrder),
+    );
+    const nodes = focus.length ? focus.filter(node => open.has(node)) : [...open];
+    const callbacks: (() => RuntimeEvent)[] = [];
+    let awards = 0;
+    for (const node of nodes) {
+      const location = this.state.nodes[node].location;
+      if (!location?.conditions?.length) continue;
+      const placements = this.state.nodes[node].cards.flat();
+      for (const condition of location.conditions) {
+        for (const owner of [0, 1] as PlayerId[]) {
+          const key = `${node}:${condition.id}:${owner}`;
+          if (this.awardedLocationConditions.has(key)) continue;
+          const revealed = revealedHere(placements, owner);
+          const power = this.state.nodes[node].powers[owner];
+          if (!meetsLocationCondition(condition, revealed, power)) continue;
+          this.awardedLocationConditions.add(key);
+          awards++;
+          const predicate = describeConditionPredicate(condition);
+          const ctx = this.locationConditionContext(node, owner);
+          const effects = this.steps(condition.effects, "locationCondition");
+          callbacks.push(() => this.event("reward", `Node ${node + 1} — ${location.name}: ${predicate} — ${this.say(owner, "You qualify", "qualifies")}.`, {
+            node, owner, source: "location", sourceName: location.name, amount: 1,
+          }));
+          for (const step of effects) callbacks.push(() => this.resolveStep(ctx, step));
+        }
+      }
+    }
+    this.queue.unshift(...callbacks);
+    return this.event("reward", awards ? `Location conditions: ${awards} awarded.` : "No Location conditions met.", { amount: awards });
+  }
+
+  private queueLocationConditionCheck(...nodes: number[]) {
+    if (!nodes.length) this.queue.push(() => this.enqueueLocationConditions());
+    else this.queue.push(() => this.enqueueLocationConditions(...nodes));
+  }
+
   private resolveScheduledEffect(placement: Deployment, step: EffectStep, timing: "start" | "end"): RuntimeEvent {
     const active = this.state.players[placement.owner].bank.some(entry => entry.card.id === placement.card.id) || this.state.nodes.some(node => node.cards[placement.owner].some(item => item.card.id === placement.card.id));
     if (!active) return this.event("bank", `${placement.card.name}: scheduled effect source is no longer active.`, { owner: placement.owner, cardId: placement.card.id, source: "card", sourceName: placement.card.name });
@@ -2234,6 +2505,7 @@ export class RuntimeSession {
     this.state.movedTotal++;
     if (!source.card.id.startsWith("location:")) this.state.players[source.owner].moved++;
     this.recalculate();
+    if (target.revealed) this.queueLocationConditionCheck(from, destination);
     return this.event("move", `${source === target ? target.card.name : `${source.card.name}: ${target.card.name}`} moves from Node ${from + 1} to Node ${destination + 1}.`, {
       node: source.node >= 0 ? source.node : undefined, owner: source.owner, cardId: source.card.id,
       targetCardId: target.card.id, targetOwner: target.owner, sourceNode: from, targetNode: destination,
@@ -2250,11 +2522,14 @@ export class RuntimeSession {
     const lane = this.state.nodes[target.node]?.cards[target.owner];
     const index = lane ? lane.indexOf(target) : -1;
     if (index < 0) return this.event("trash", `${source.card.name}: No target.`, { ...detail, amount: 0 });
+    const wasRevealed = target.revealed;
+    const atNode = target.node;
     lane!.splice(index, 1);
     this.stripModifiers(target.card);
     const kept = this.retire(target.card, target.owner, zone);
     this.recalculate();
     this.refreshScores();
+    if (wasRevealed) this.queueLocationConditionCheck(atNode);
     return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${target.card.name}.` : `${source.card.name}: ${target.card.name} is removed from the game.`, { ...detail, ...(kept && zone === "trash" ? { target: "trash" as const } : {}), amount: 1 });
   }
 
@@ -2278,6 +2553,7 @@ export class RuntimeSession {
       setPowerDelta(source.card, (source.card.powerDelta ?? 0) + (before - after));
     }
     this.recalculate();
+    if (target.revealed) this.queueLocationConditionCheck(target.node);
     return this.event("power", `${source.card.name}: ${target.card.name} Power ${before} → ${after}.${steal && before > after ? ` ${source.card.name} steals ${before - after}.` : ""}`, {
       node: source.node >= 0 ? source.node : undefined, owner: source.owner, cardId: source.card.id,
       targetCardId: target.card.id, targetOwner: target.owner, source: "card", sourceName: source.card.name,
@@ -2366,6 +2642,9 @@ export class RuntimeSession {
     });
     this.queue.push(() => {
       this.nextRevealTriggers = [];
+      // Evolve after play while cards are still on the board / in Bank, then optional reset-after-cycle.
+      const evolved=this.applyPendingEvolutions();
+      const resetIds=this.restoreMorphOrigins();
       this.state.players.forEach((player, owner) => {
         player.discard.push(...player.hand.filter(card => card.type !== "Crypto"));
         player.hand = player.hand.filter(card => card.type === "Crypto");
@@ -2387,7 +2666,9 @@ export class RuntimeSession {
       // Build this queue now, after all Location draws and cleanup. Capturing the
       // hand while initially constructing Collapse would omit Signal tower draws.
       this.enqueueDraftTransition();
-      return this.event("collapse", "End of Cycle. Deployed cards and remaining non-Crypto hand enter Discard.");
+      const evolveNote=evolved.length?` ${evolved.length} card${evolved.length===1?'':'s'} evolved.`:'';
+      const resetNote=resetIds.length?` Morphs reset to original form (${resetIds.length}).`:'';
+      return this.event("collapse", `End of Cycle. Deployed cards and remaining non-Crypto hand enter Discard.${evolveNote}${resetNote}`);
     });
   }
 
@@ -2430,7 +2711,7 @@ export class RuntimeSession {
     this.state.draftEndsAt = this.now() + 90_000;
     this.state.draftEnded = false;
     this.state.draftReady = [0, 1].map(seat => !this.config.strategicMarket && this.aiSeats.includes(seat as PlayerId)) as [boolean, boolean];
-    this.purchaseTimes.clear(); this.botDraftAt = [0, 0];
+    this.botDraftAt = [0, 0];
     if (this.config.strategicMarket) {
       const identity = (pile: MarketPile) => pile.card.definitionId ?? pile.card.id;
       const persistent = this.state.market.filter(pile => !pile.rotating);
@@ -2482,8 +2763,6 @@ export class RuntimeSession {
     if (this.state.draftEndsAt !== null && now > this.state.draftEndsAt) throw new Error("Draft deadline has passed.");
     const pile = this.state.market.find(item => item.id === pileId);
     if (!pile || (pile.remaining ? pile.remaining[owner] : pile.supply) <= 0) throw new Error("Pile is unavailable.");
-    const cooldownKey = `${owner}:${pileId}`;
-    if (now - (this.purchaseTimes.get(cooldownKey) ?? -Infinity) < 2000) throw new Error("This pile is on its two-second purchase cooldown.");
     const player = this.state.players[owner];
     const cost = Math.max(0, pile.card.cost);
     if (player.wallet < cost) throw new Error("Insufficient Wallet.");
@@ -2492,7 +2771,6 @@ export class RuntimeSession {
     if (pile.remaining) pile.remaining[owner]--;
     const card = { ...pile.card, id: `${owner}:acquired-${++this.acquired}` };
     player.discard.push(card);
-    this.purchaseTimes.set(cooldownKey, now);
     this.purchases.push({ cycle: this.state.cycle, owner, definitionId: pile.card.definitionId ?? pile.card.id, name: pile.card.name, category: pile.category, cost });
     this.refreshScores();
     return this.event("purchase", `${this.say(owner, "You acquire", "acquires")} ${pile.card.name} to Discard for ${cost} Crypto.`, { owner, targetOwner: owner, cardId: card.id, definitionId: card.definitionId, target: "wallet", amount: cost, before: player.wallet + cost, after: player.wallet });
@@ -2539,8 +2817,7 @@ export class RuntimeSession {
       this.recordDecision({ kind: "draft-end", cycle: this.state.cycle, owner, walletLeft: player.wallet, phase });
       return this.endDraft(owner);
     }
-    const ready = plan.find(id => now - (this.purchaseTimes.get(`${owner}:${id}`) ?? -Infinity) >= 2000);
-    if (!ready) return null;
+    const ready = plan[0];
     const pileName = (id: string) => this.state.market.find(pile => pile.id === id)?.card.name ?? id;
     const bought = this.state.market.find(pile => pile.id === ready)!;
     const scored = affordable.map(pile => ({ pile, score: draftScore(pile.card, strategy, context) }));

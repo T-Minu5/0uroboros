@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, chaosClassOf, createStrategicMarket } from "@0uroboros/engine/evaluationMarket";
-import { createDefaultContent } from "@0uroboros/engine/authoring/contentModel";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, cardGainsCryptoInRange, chaosClassOf, createCryptoPiles, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
 import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
+import { bundledContent } from "../src/contentPack/contentStore";
 
-const make = (seed = 41) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
+const make = (seed = 41) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed), content: bundledContent });
 const card = (name: string, id = name): Card => ({ ...EVALUATION_BASE_CARDS.find(card => card.name === name)!, id });
 const chaosCard = (name: string, id = name): Card => ({ ...EVALUATION_CHAOS_CARDS.find(card => card.name === name)!, id });
 const vpCard = (name: string, id = name): Card => ({ ...EVALUATION_VP_CARDS.find(card => card.name === name)!, id });
@@ -34,67 +34,157 @@ function cycle(session: RuntimeSession, play = false) {
 function draft(session: RuntimeSession) { cycle(session); return Date.now(); }
 
 describe("Strategic evaluation Draft", () => {
-  it("deals 2 Base and 2 Chaos game cards (1 Attack or Hacker, 1 Horror) and three VP game cards with no Crypto piles, then adds a Draft offer of three Base/Chaos cards and any Solar-monk", () => {
+  it("has no fixed piles and deals a 10-slot rotating Draft with 2 copies per player", () => {
     expect(EVALUATION_BASE_CARDS.length).toBeGreaterThan(12); expect(EVALUATION_VP_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CRYPTO_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CHAOS_CARDS.length).toBeGreaterThanOrEqual(5);
-    const piles = createStrategicMarket(seededRandom(41));
-    const characters = (list: typeof piles) => list.filter(pile => pile.category === "Base" || pile.category === "Chaos");
-    expect(characters(piles)).toHaveLength(4);
-    expect(piles.filter(pile => pile.category === "Base").every(pile => pile.card.cardClass !== "Runtime")).toBe(true);
-    expect(piles.filter(pile => pile.category === "VP")).toHaveLength(3);
-    expect(characters(piles).every(pile => pile.supply === 8)).toBe(true);
-    expect(piles.filter(pile => pile.category === "VP").every(pile => pile.supply === 4 && pile.card.cardClass !== "Solar-monk")).toBe(true);
-    expect(piles.filter(pile => pile.category === "Crypto")).toEqual([]);
-    const other = createStrategicMarket(seededRandom(99));
-    expect(new Set(characters(piles).map(pile => pile.id))).not.toEqual(new Set(characters(other).map(pile => pile.id)));
+    expect(createStrategicMarket(seededRandom(41))).toEqual([]);
+    expect(CURRENCY_PILES.map(pile => pile.cardId)).toEqual(["shyte-coin", "byte-coin", "kilo-coin", "mega-cache"]);
+    expect(createCryptoPiles(bundledContent).map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
     const session = make(); draft(session);
     const offer = session.state.market.filter(pile => pile.rotating);
-    expect(characters(offer)).toHaveLength(3);
-    expect(offer.filter(pile => pile.category === "VP").every(pile => pile.card.cardClass === "Solar-monk")).toBe(true);
+    expect(session.state.market.filter(pile => !pile.rotating)).toEqual([]);
+    expect(offer.length).toBeGreaterThanOrEqual(8);
     expect(offer.every(pile => pile.supply === 4 && pile.remaining?.join() === "2,2")).toBe(true);
-    const game = session.state.market.filter(pile => !pile.rotating);
-    expect(game).toHaveLength(7);
-    expect(offer.every(pile => !game.some(fixed => fixed.card.definitionId === pile.card.definitionId))).toBe(true);
+    const built = draftOffer(seededRandom(41), bundledContent, new Set(), new Set(), 8);
+    expect(built).toHaveLength(DRAFT_SLOTS.length);
+    expect(["Action", "Utility"]).toContain(built[0].card.cardClass);
+    expect(["Action", "Utility"]).toContain(built[1].card.cardClass);
+    expect(built[2].category).toBe("Chaos");
+    expect(built[3].category).toBe("Chaos");
+    expect(isSolarMonk(built[4].card)).toBe(true);
+    expect(cardGainsCryptoInRange(built[5].card, 1, 3)).toBe(true);
+    expect(cardGainsCryptoInRange(built[6].card, 1, 6)).toBe(true);
+    expect(chaosClassOf(built[7].card)).toBe("Attack");
+    expect(chaosClassOf(built[8].card)).toBe("Horror");
+    expect(built[9].card.type).toBe("VP");
+    expect(isSolarMonk(built[9].card)).toBe(false);
   });
 
-  it("keeps shared game-card purchases atomic while Draft offer stock and cooldowns belong to each player", () => {
+  it("adds a persistent Crypto shelf when the Draft Crypto setting is on", () => {
+    expect(createStrategicMarket(seededRandom(41), bundledContent, { draftCrypto: true }).map(pile => pile.id)).toEqual([
+      "Crypto:shyte-coin", "Crypto:byte-coin", "Crypto:kilo-coin", "Crypto:mega-cache",
+    ]);
+    const session = createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(41), content: bundledContent, draftCrypto: true });
+    draft(session);
+    const crypto = session.state.market.filter(pile => pile.category === "Crypto");
+    expect(crypto).toHaveLength(4);
+    expect(crypto.every(pile => !pile.rotating && pile.remaining === undefined)).toBe(true);
+    expect(crypto.map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
+    expect(session.state.market.filter(pile => pile.rotating)).toHaveLength(DRAFT_SLOTS.length);
+    session.state.players[0].wallet = 20;
+    const before = crypto[1].supply;
+    session.buy("Crypto:byte-coin");
+    expect(crypto[1].supply).toBe(before - 1);
+    expect(session.state.players[0].discard.some(card => card.name === "Byte-Coin")).toBe(true);
+    session.endDraft(0); session.endDraft(1); session.nextCycle(); cycle(session);
+    expect(session.state.market.filter(pile => pile.category === "Crypto").map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
+    expect(session.state.market.find(pile => pile.id === "Crypto:byte-coin")!.supply).toBe(before - 1);
+  });
+
+  it("tracks per-player Draft stock with no purchase cooldown", () => {
     const session = make(); const now = draft(session);
     session.state.players.forEach(player => { player.wallet = 80; });
-    const shared = session.state.market.find(pile => !pile.rotating && pile.category !== "Crypto")!;
-    shared.supply = 1;
-    session.buy(shared.id, now, 0);
-    const untouched = session.state.players[1].wallet;
-    expect(() => session.buy(shared.id, now, 1)).toThrow(/unavailable/);
-    expect(session.state.players[1].wallet).toBe(untouched);
     const offered = session.state.market.find(pile => pile.rotating)!;
-    session.state.players.forEach(player => { player.wallet = Math.max(player.wallet, 80); });
     session.buy(offered.id, now, 0); session.buy(offered.id, now, 1);
     expect(offered.remaining).toEqual([1, 1]);
-    expect(() => session.buy(offered.id, now + 1999, 0)).toThrow(/cooldown/);
-    session.buy(offered.id, now + 2000, 0);
+    session.buy(offered.id, now + 100, 0);
     expect(offered.remaining).toEqual([0, 1]);
-    expect(() => session.buy(offered.id, now + 4000, 0)).toThrow(/unavailable/);
+    expect(() => session.buy(offered.id, now + 200, 0)).toThrow(/unavailable/);
     const previousOffer = session.state.market.filter(pile => pile.rotating).map(pile => pile.id);
     session.endDraft(0); session.endDraft(1); session.nextCycle(); cycle(session);
-    expect(session.state.market.find(pile => pile.id === shared.id)!.supply).toBe(0);
     const offer = session.state.market.filter(pile => pile.rotating);
-    expect(offer).toHaveLength(3);
+    expect(offer.length).toBeGreaterThanOrEqual(8);
     expect(offer.every(pile => pile.supply === 4 && pile.remaining?.join() === "2,2")).toBe(true);
     expect(offer.every(pile => !previousOffer.includes(pile.id))).toBe(true);
   });
 
-  it("deals one Attack or Hacker and one Horror Chaos game card on every seed, from built-in and authored content", () => {
-    const classes = (piles: ReturnType<typeof createStrategicMarket>) => piles.filter(pile => pile.category === "Chaos").map(pile => chaosClassOf(pile.card));
-    const content = { baseCards: EVALUATION_BASE_CARDS, vpCards: EVALUATION_VP_CARDS, cryptoCards: EVALUATION_CRYPTO_CARDS, chaosCards: createDefaultContent().cards.filter(card => card.pool === "Chaos").map(({ pool: _pool, enabled: _enabled, ...card }) => card as Card) };
+  it("fills Attack and Horror Draft slots from Chaos on every seed", () => {
     for (let seed = 1; seed <= 40; seed++) {
-      for (const piles of [createStrategicMarket(seededRandom(seed)), createStrategicMarket(seededRandom(seed), content)]) {
-        const [first, second] = classes(piles);
-        expect(classes(piles)).toHaveLength(2);
-        expect(["Attack", "Hacker"]).toContain(first);
-        expect(second).toBe("Horror");
-      }
+      const offer = draftOffer(seededRandom(seed), bundledContent, new Set(), new Set(), 8);
+      expect(chaosClassOf(offer[7].card)).toBe("Attack");
+      expect(chaosClassOf(offer[8].card)).toBe("Horror");
     }
     expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Veil of Cthulhu")!)).toBe("Horror");
     expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Nyx Luna")!)).toBe("Attack");
+  });
+
+  it("enforces every Draft slot rule round-by-round across early and late Cycles", () => {
+    const assertOffer = (offer: ReturnType<typeof draftOffer>, cycle: number, label: string) => {
+      expect(offer, label).toHaveLength(DRAFT_SLOTS.length);
+      const ids = offer.map(pile => pile.card.definitionId ?? pile.card.id);
+      expect(new Set(ids).size, `${label}: unique cards`).toBe(offer.length);
+      for (const [index, pile] of offer.entries()) {
+        const slot = DRAFT_SLOTS[index];
+        const entry = { card: pile.card, category: pile.category };
+        expect(slot.matches(entry), `${label} slot ${index} (${slot.label}): ${pile.card.name}`).toBe(true);
+        expect(pile.category, `${label} slot ${index} category`).toBe(slot.category(entry));
+        expect(pile.rotating).toBe(true);
+        expect(pile.supply).toBe(DRAFT_COPIES_PER_PLAYER * 2);
+        expect(pile.remaining).toEqual([DRAFT_COPIES_PER_PLAYER, DRAFT_COPIES_PER_PLAYER]);
+        if (cycle <= DRAFT_EARLY_CYCLES) {
+          const cost = Math.max(0, pile.card.cost);
+          expect(cost, `${label} early cost for ${pile.card.name}`).toBeGreaterThanOrEqual(1);
+          expect(cost, `${label} early cost for ${pile.card.name}`).toBeLessThanOrEqual(DRAFT_EARLY_COST_MAX);
+        }
+      }
+      expect(["Action", "Utility"]).toContain(offer[0].card.cardClass);
+      expect(["Action", "Utility"]).toContain(offer[1].card.cardClass);
+      expect(offer[2].category).toBe("Chaos");
+      expect(offer[3].category).toBe("Chaos");
+      expect(isSolarMonk(offer[4].card)).toBe(true);
+      expect(cardGainsCryptoInRange(offer[5].card, 1, 3)).toBe(true);
+      expect(cardGainsCryptoInRange(offer[6].card, 1, 6)).toBe(true);
+      expect(offer[7].category).toBe("Chaos");
+      expect(chaosClassOf(offer[7].card)).toBe("Attack");
+      expect(offer[8].category).toBe("Chaos");
+      expect(chaosClassOf(offer[8].card)).toBe("Horror");
+      expect(offer[9].card.type).toBe("VP");
+      expect(isSolarMonk(offer[9].card)).toBe(false);
+    };
+
+    for (const cycle of [1, 2, 3, 4, 5, 8, 12, 16] as const) {
+      for (let seed = 1; seed <= 24; seed++) {
+        assertOffer(draftOffer(seededRandom(seed * 17 + cycle), bundledContent, new Set(), new Set(), cycle), cycle, `cycle ${cycle} seed ${seed}`);
+      }
+    }
+
+    // Chained rounds: each offer avoids the previous identities when the pool allows.
+    for (let seed = 1; seed <= 12; seed++) {
+      let previous = new Set<string>();
+      for (const cycle of [1, 2, 3, 4, 5, 6] as const) {
+        const offer = draftOffer(seededRandom(seed * 31 + cycle), bundledContent, new Set(), previous, cycle);
+        assertOffer(offer, cycle, `chain seed ${seed} cycle ${cycle}`);
+        const ids = offer.map(pile => pile.card.definitionId ?? pile.card.id);
+        if (previous.size) expect(ids.every(id => !previous.has(id)) || offer.length === DRAFT_SLOTS.length).toBe(true);
+        previous = new Set(ids);
+      }
+    }
+  });
+
+  it("enforces slot rules on live session Drafts for Cycles 1 through 5", () => {
+    const session = make(19);
+    let previousIds = new Set<string>();
+    for (let cycle = 1; cycle <= 5; cycle++) {
+      draft(session);
+      expect(session.state.cycle).toBe(cycle);
+      expect(session.state.phase).toBe("draft");
+      const offer = session.state.market.filter(pile => pile.rotating);
+      expect(session.state.market.filter(pile => !pile.rotating)).toEqual([]);
+      expect(offer).toHaveLength(DRAFT_SLOTS.length);
+      for (const [index, pile] of offer.entries()) {
+        const slot = DRAFT_SLOTS[index];
+        expect(slot.matches({ card: pile.card, category: pile.category }), `live cycle ${cycle} slot ${slot.label}: ${pile.card.name}`).toBe(true);
+        expect(pile.remaining).toEqual([2, 2]);
+        if (cycle <= DRAFT_EARLY_CYCLES) {
+          const cost = Math.max(0, pile.card.cost);
+          expect(cost).toBeGreaterThanOrEqual(1);
+          expect(cost).toBeLessThanOrEqual(DRAFT_EARLY_COST_MAX);
+        }
+      }
+      const ids = offer.map(pile => pile.card.definitionId ?? pile.card.id);
+      if (previousIds.size) expect(ids.some(id => previousIds.has(id))).toBe(false);
+      previousIds = new Set(ids);
+      session.endDraft(0); session.endDraft(1); session.nextCycle();
+    }
   });
 
   it("supports separate End Draft, undo until both finish, and authoritative expiry", () => {
@@ -194,7 +284,9 @@ describe("Strategic card systems", () => {
   });
 
   it("supports Hacker cards that mill and swing Server integrity", () => {
-    const session = make(); empty(session); const node = session.view().openNodes[0];
+    // Mid-cycle draws would reshuffle the milled Discard back into Draw after reveal.
+    const session = createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(41), content: bundledContent, midCycleDraw: false });
+    empty(session); const node = session.view().openNodes[0];
     session.state.players[0].servers = { primary: 1500, backup: 1500 };
     session.state.players[1].servers = { primary: 2000, backup: 1500 };
     session.state.players[1].draw = [card("Dash Relay", "mill-1"), card("Slash-Dot", "mill-2"), card("Cache Crawler", "mill-3")];
@@ -416,11 +508,13 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     const session = make(); draft(session);
     session.state.cycle = 16;
     const before = session.view().players[0].totalVP;
-    const vpPiles = session.state.market.filter(pile => pile.category === "VP");
-    expect(vpPiles).toHaveLength(3);
-    const printed = vpPiles.map(pile => pile.card.vp!), bought = printed.reduce((sum, vp) => sum + vp, 0);
-    session.state.players[0].wallet = vpPiles.reduce((sum, pile) => sum + pile.card.cost, 0) + 3;
-    for (const pile of vpPiles) session.buy(pile.id);
+    // Volume VP slot (index 9) plus any Solar-monk VP in the offer.
+    const vpPiles = session.state.market.filter(pile => pile.category === "VP" && pile.card.vp);
+    expect(vpPiles.length).toBeGreaterThanOrEqual(1);
+    const buy = vpPiles.filter(pile => !isSolarMonk(pile.card)).slice(0, 1);
+    const printed = buy.map(pile => pile.card.vp!), bought = printed.reduce((sum, vp) => sum + vp, 0);
+    session.state.players[0].wallet = buy.reduce((sum, pile) => sum + pile.card.cost, 0) + 3;
+    for (const pile of buy) session.buy(pile.id);
     expect(session.state.players[0].wallet).toBe(3);
     expect(session.view().players[0].totalVP).toBe(before + bought);
     expect(session.state.players[0].discard.filter(card => card.id.includes("acquired")).map(card => card.vp)).toEqual(printed);

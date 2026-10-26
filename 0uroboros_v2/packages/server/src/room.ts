@@ -195,6 +195,7 @@ export class Room {
       content: this.config.content, strategicMarket: true, evaluationContent: true,
       carryover: this.settings.carryover, priorityPreference: this.settings.priorityPreference,
       noLocations: this.settings.noLocations, noTrailingRewards: this.settings.noTrailingRewards,
+      midCycleDraw: this.settings.midCycleDraw, draftCrypto: this.settings.draftCrypto,
       random: seededRandom(this.config.seed), aiSeats, seatNames: names, recordDecisions: false,
       ...(this.config.strategy ? { strategy: this.config.strategy } : {}),
       now: () => this.now,

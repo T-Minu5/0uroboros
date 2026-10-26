@@ -28,33 +28,27 @@ try{
   const layout=await page.evaluate(()=>{
    const footer=document.querySelector('.draft-footer').getBoundingClientRect();
    const button=document.querySelector('.draft-end-controls button').getBoundingClientRect();
-   const rows={
-    characters:document.querySelectorAll('.character-row').length,
-    row1:document.querySelectorAll('.character-row')[0]?.querySelectorAll('.market-card').length??0,
-    row2:document.querySelectorAll('.character-row')[1]?.querySelectorAll('.market-card').length??0,
-    resources:document.querySelectorAll('.resource-row .market-card').length,
-   };
+   const top=[...document.querySelectorAll('[data-market-section="draft-top"] .market-card')];
+   const bottom=[...document.querySelectorAll('[data-market-section="draft-bottom"] .market-card')];
    const cards=[...document.querySelectorAll('.market-card')];
    const box=el=>el.querySelector('.market-art').getBoundingClientRect();
-   const characterW=box(document.querySelector('.character-row .market-card')).width;
-   const resourceBoxes=[...document.querySelectorAll('.resource-row .market-card')].map(box);
+   const topBox=top[0]?box(top[0]):null;
+   const bottomBox=bottom[0]?box(bottom[0]):null;
    return {
     fullCards:cards.every(card=>{const b=box(card);return Math.abs(b.height/b.width-236/170)<.02;}),
     costBadges:document.querySelectorAll('.market-art [data-card-cost]').length,
-    acquireBars:document.querySelectorAll('.acquire-label').length,
     acquireButtons:document.querySelectorAll('.market-card .market-acquire').length,
-    resourceScale:Math.round(resourceBoxes[0].width/characterW*100)/100,
-    resourcesOneRow:resourceBoxes.every(b=>Math.abs(b.top-resourceBoxes[0].top)<1),
+    topAboveBottom:topBox&&bottomBox?topBox.bottom<=bottomBox.top+2:false,
     boardOverflow:(el=>el.scrollHeight-el.clientHeight)(document.querySelector('.draft-market-board')),
     walletColor:getComputedStyle(document.querySelector('.draft-wallet-hero .wallet-hero-value b')).color,
     footerBottom:footer.bottom,
     buttonVisible:button.top>=66&&button.bottom<=innerHeight-8&&button.right<=innerWidth,
     cardCount:cards.length,
-    rows,
+    rows:{top:top.length,bottom:bottom.length,base:document.querySelectorAll('.market-row-base .market-card').length,vp:document.querySelectorAll('.market-vp-grid .market-card').length},
     overflow:document.querySelector('.strategic-draft').scrollWidth>innerWidth,
    };
   });
-  if(!layout.fullCards||layout.costBadges!==0||layout.acquireButtons!==12||layout.acquireBars||!layout.resourcesOneRow||layout.resourceScale>=1||layout.walletColor!=='rgb(31, 255, 177)'||!layout.buttonVisible||layout.cardCount!==12||layout.rows.row1!==6||layout.rows.row2!==0||layout.rows.resources!==6||layout.overflow)throw new Error(JSON.stringify(layout));
+  if(!layout.fullCards||layout.costBadges!==0||!layout.topAboveBottom||layout.walletColor!=='rgb(31, 255, 177)'||!layout.buttonVisible||layout.rows.top!==5||layout.rows.bottom!==5||layout.rows.base!==0||layout.rows.vp!==0||layout.cardCount!==10||layout.overflow)throw new Error(JSON.stringify(layout));
   report.layouts.push({width,...layout});
   await page.screenshot({path:`docs/evidence/strategic-draft-scrolled-${width}.png`});
  }

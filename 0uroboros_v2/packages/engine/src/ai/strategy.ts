@@ -358,7 +358,11 @@ export function deployPriority(card: Card, profile: StrategyProfile, context: St
 }
 
 /** A Location's effect lists, as content and the runtime carry them. */
-export type LocationRules = { effects?: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[]; startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[] };
+export type LocationRules = {
+  effects?: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[];
+  startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[];
+  conditions?: readonly { effects: readonly AnyEffect[] }[];
+};
 /**
  * What a Location is worth to one player in hand points: `win` if they hold the Node when its effects fire, `lose` if
  * the other player does (the mirror image), and `reveal` for each of their cards revealed there. `stake` is win − lose:
@@ -404,8 +408,13 @@ export function locationStakes(location: LocationRules, profile: StrategyProfile
     [locationStepsOf(location.startTurn2, 'location'), turn < 2 ? 1 : 0],
     [locationStepsOf(location.startTurn3, 'location'), turn < 3 ? 1 : 0],
   ];
+  // Condition rewards are seat-personal (once if met); price lightly as reveal-side value.
+  const conditionValue = (location.conditions ?? []).reduce((sum, condition) => {
+    const steps = migrateEffects(condition.effects, 'locationCondition');
+    return sum + steps.reduce((total, step) => total + effectValue(step, w, m), 0) * 0.5;
+  }, 0);
   const win = round2(timed.reduce((sum, [steps, times]) => sum + (times ? times * seatValue(steps, 'winner', w, m) : 0), 0));
-  return { win, lose: round2(-win), stake: round2(2 * win), reveal: round2(seatValue(locationStepsOf(location.onPlay, 'locationPlay'), 'played', w, m)) };
+  return { win, lose: round2(-win), stake: round2(2 * win), reveal: round2(seatValue(locationStepsOf(location.onPlay, 'locationPlay'), 'played', w, m) + conditionValue) };
 }
 const round2 = (value: number) => Math.round(value * 100) / 100 || 0;
 

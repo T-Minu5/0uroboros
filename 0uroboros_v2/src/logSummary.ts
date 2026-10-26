@@ -8,7 +8,7 @@ export type PlayerSummary = { owner: PlayerId; lines: string[] };
 type Play = {
   owner: PlayerId; card: string; node?: number; kind: 'play' | 'trigger' | 'location' | 'circuit';
   drained: Map<PlayerId, number>; restored: number; cards: number; actions: number; crypto: number; vp: number;
-  trashed?: number; destroyed?: number; notes: string[];
+  trashedNames: string[]; destroyedNames: string[]; notes: string[];
 };
 
 const plural = (n: number, word: string) => `${n} ${word}${Math.abs(n) === 1 ? '' : 's'}`;
@@ -18,7 +18,19 @@ const detail = (event: RuntimeEvent) => event.text.replace(/^[^:]*:\s*/, '').tri
 const cardName = (event: RuntimeEvent) => event.text.replace(/ reveals\.$/, '');
 
 function newPlay(owner: PlayerId, card: string, kind: Play['kind'], node?: number): Play {
-  return { owner, card, node, kind, drained: new Map(), restored: 0, cards: 0, actions: 0, crypto: 0, vp: 0, notes: [] };
+  return { owner, card, node, kind, drained: new Map(), restored: 0, cards: 0, actions: 0, crypto: 0, vp: 0, trashedNames: [], destroyedNames: [], notes: [] };
+}
+
+/** Pull the affected card name from engine trash/destroy event text. */
+function affectedCardName(text: string): string | undefined {
+  const named =
+    /(?:trashes|destroys) (.+?)(?: from | to |\.|$)/i.exec(text)
+    ?? /^(.+?) enters shared Trash/i.exec(text)
+    ?? /: (.+?) enters (?:shared Trash|Discard)/i.exec(text)
+    ?? /(?:trash|destroy) (.+?)\.?$/i.exec(text);
+  const name = named?.[1]?.trim();
+  if (!name || /^(no target|this card)$/i.test(name)) return undefined;
+  return name.replace(/\.$/, '');
 }
 
 function absorb(play: Play, event: RuntimeEvent, names: SeatNames) {
@@ -34,10 +46,15 @@ function absorb(play: Play, event: RuntimeEvent, names: SeatNames) {
     case 'actions': if (amount > 0) { if (mine) play.actions += amount; else note(`Giving ${names[to]} ${plural(amount, 'action')}`); } return;
     case 'crypto': if (amount) { if (mine) play.crypto += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${Math.abs(amount)} Crypto`); } return;
     case 'vp': if (amount) { if (mine) play.vp += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${plural(Math.abs(amount), 'VP').replace(/VPs$/, 'VP')}`); } return;
-    case 'trash':
-      if (/ destroys /.test(event.text)) play.destroyed = (play.destroyed ?? 0) + amount;
-      else play.trashed = (play.trashed ?? 0) + amount;
+    case 'trash': {
+      const name = affectedCardName(event.text);
+      if (/ destroys /.test(event.text)) {
+        if (name) play.destroyedNames.push(name);
+        else if (amount > 0) play.destroyedNames.push(...Array.from({ length: amount }, () => 'a card'));
+      } else if (name) play.trashedNames.push(name);
+      else if (amount > 0) play.trashedNames.push(...Array.from({ length: amount }, () => 'a card'));
       return;
+    }
     case 'power': {
       if (!amount) return;
       const pull = /pull (\d+) power from Node (\d+) to Node (\d+)/i.exec(event.text);
@@ -55,8 +72,8 @@ function sentence(play: Play, names: SeatNames): string | null {
   const actions = [
     ...[...play.drained].map(([to, amount]) => `Draining ${amount} from ${to === play.owner ? 'their own' : possessive(names[to])} Server`),
     ...(play.restored ? [`Restoring ${play.restored}`] : []),
-    ...(play.trashed !== undefined ? [`Trashing ${plural(play.trashed, 'card')}`] : []),
-    ...(play.destroyed !== undefined ? [`Destroying ${plural(play.destroyed, 'card')}`] : []),
+    ...(play.trashedNames.length ? [`Trashing ${joinAnd(play.trashedNames)}`] : []),
+    ...(play.destroyedNames.length ? [`Destroying ${joinAnd(play.destroyedNames)}`] : []),
     ...play.notes,
   ];
   const gains = [

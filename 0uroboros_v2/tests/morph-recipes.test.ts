@@ -75,17 +75,30 @@ describe('Morph recipes', () => {
     expect(game.view().players[0].totalVP).toBe(6);
   });
 
-  it('completes authored onReveal order without running the new form reveal, then retains sequence progress after Discard', () => {
-    const morph: EvaluationEffect = { kind: 'morph', formIds: ['form-a', 'form-b'], selection: 'sequential' };
-    const a = card('form-a', { onReveal: [{ kind: 'crypto', amount: 99 }, morph] });
-    const b = card('form-b');
-    const { game } = make([a, b]);
+  it('random morph runs the new form On Reveal immediately, then continues the original reveal list', () => {
+    const morph: EvaluationEffect = { kind: 'morph', formIds: ['form-a', 'form-b'], selection: 'random' };
+    const a = card('form-a', { onReveal: [{ kind: 'crypto', amount: 99 }] });
+    const b = card('form-b', { onReveal: [{ kind: 'crypto', amount: 7 }] });
+    const { game } = make([a, b], () => 0.1);
     deploy(game, card('evolver', { onReveal: [{ kind: 'crypto', amount: 1 }, morph, { kind: 'crypto', amount: 2 }] }));
     const first = finish(game);
     expect(first.filter(event => event.cardId === 'evolver' && ['crypto', 'morph'].includes(event.kind)).map(event => [event.kind, event.amount, event.definitionId])).toEqual([
-      ['crypto', 1, undefined], ['morph', undefined, 'form-a'], ['crypto', 2, undefined],
+      ['crypto', 1, undefined], ['morph', undefined, 'form-a'], ['crypto', 99, undefined], ['crypto', 2, undefined],
     ]);
-    expect(game.state.players[0].wallet).toBe(3);
+    expect(game.state.players[0].wallet).toBe(102);
+    expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('form-a');
+  });
+
+  it('sequential evolve defers until cleanup, then keeps advancing from the same recipe without form Morph effects', () => {
+    const morph: EvaluationEffect = { kind: 'morph', formIds: ['form-a', 'form-b'], selection: 'sequential' };
+    const a = card('form-a', { onReveal: [{ kind: 'crypto', amount: 11 }] });
+    const b = card('form-b', { onReveal: [{ kind: 'crypto', amount: 22 }] });
+    const { game } = make([a, b]);
+    deploy(game, card('evolver', { onReveal: [{ kind: 'crypto', amount: 1 }, morph] }));
+    const reveal = finish(game);
+    expect(reveal.filter(event => event.kind === 'morph').map(event => event.amount)).toEqual([0]);
+    expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('evolver');
+    expect(game.state.players[0].wallet).toBe(1);
     game.endTurn(); finish(game);
     game.endTurn(); finish(game);
     expect(game.state.players[0].discard.find(item => item.id === 'evolver')?.definitionId).toBe('form-a');
@@ -94,11 +107,50 @@ describe('Morph recipes', () => {
     const returned = game.state.players[0].hand.find(item => item.id === 'evolver')!;
     expect(returned.definitionId).toBe('form-a');
     game.deploy(returned.id, 0); game.endTurn();
-    const replay = finish(game);
-    expect(replay.filter(event => event.cardId === 'evolver' && ['crypto', 'morph'].includes(event.kind)).map(event => [event.kind, event.amount, event.definitionId])).toEqual([
-      ['crypto', 99, undefined], ['morph', undefined, 'form-b'],
-    ]);
-    expect(game.state.nodes[0].cards[0][0].card.id).toBe('evolver');
+    expect(finish(game).some(event => event.kind === 'crypto' && event.amount === 11)).toBe(true);
+    game.endTurn(); finish(game);
+    game.endTurn(); finish(game);
+    expect(game.state.players[0].discard.find(item => item.id === 'evolver')?.definitionId).toBe('form-b');
+  });
+
+  it('cycleForms wraps sequential evolution back to the first form', () => {
+    const morph: EvaluationEffect = { kind: 'morph', formIds: ['alpha', 'bravo', 'charlie'], selection: 'sequential', cycleForms: true };
+    const forms = [
+      card('alpha', { onReveal: [{ kind: 'crypto', amount: 1 }] }),
+      card('bravo', { onReveal: [{ kind: 'crypto', amount: 2 }] }),
+      card('charlie', { onReveal: [{ kind: 'crypto', amount: 3 }] }),
+    ];
+    const { game } = make(forms);
+    deploy(game, card('infantry', { onReveal: [morph] }));
+    const playThrough = () => {
+      finish(game);
+      game.endTurn(); finish(game);
+      game.endTurn(); finish(game);
+      game.endDraft(0); game.endDraft(1); game.nextCycle(); finish(game);
+      game.state.nodeOrder = [0, 1, 2, 3, 4];
+    };
+    playThrough();
+    expect(game.state.players[0].hand.find(item => item.id === 'infantry')?.definitionId).toBe('alpha');
+    game.deploy('infantry', 0); game.endTurn(); playThrough();
+    expect(game.state.players[0].hand.find(item => item.id === 'infantry')?.definitionId).toBe('bravo');
+    game.deploy('infantry', 0); game.endTurn(); playThrough();
+    expect(game.state.players[0].hand.find(item => item.id === 'infantry')?.definitionId).toBe('charlie');
+    game.deploy('infantry', 0); game.endTurn(); playThrough();
+    expect(game.state.players[0].hand.find(item => item.id === 'infantry')?.definitionId).toBe('alpha');
+  });
+
+  it('resetAfterCycle restores the original form during end-of-Cycle cleanup', () => {
+    const morph: EvaluationEffect = { kind: 'morph', formIds: ['form-a'], selection: 'sequential', resetAfterCycle: true };
+    const a = card('form-a', { power: 4, onReveal: [{ kind: 'crypto', amount: 5 }] });
+    const { game } = make([a]);
+    deploy(game, card('evolver', { power: 2, onReveal: [morph] }));
+    finish(game);
+    expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('evolver');
+    game.endTurn(); finish(game);
+    game.endTurn(); finish(game);
+    // Evolve applies, then reset restores the original form before banking/discard.
+    expect(game.state.players[0].discard.find(item => item.id === 'evolver')?.definitionId).toBe('evolver');
+    expect(game.state.players[0].discard.find(item => item.id === 'evolver')?.power).toBe(2);
   });
 
   it('uses session RNG for random forms and keeps ordered progress separate per list and card instance', () => {
@@ -110,12 +162,13 @@ describe('Morph recipes', () => {
     deploy(low, card('random-source', { onReveal: [{ kind: 'morph', formIds: ['form-a', 'form-b'], selection: 'random' }] }));
     expect(finish(low)).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'morph', definitionId: 'form-a' })]));
     const game = make(forms).game;
-    const first = card('first', { onReveal: [
+    // Runtime-scheduled Morph still advances immediately (nextTurn), so progress stays per list.
+    const first = card('first', { duration: 2, durationPeriod: 'runtime', schedule: [{ at: 1, effects: [
       { kind: 'morph', formIds: ['form-a', 'form-b'] },
       { kind: 'morph', formIds: ['form-b', 'form-a'] },
       { kind: 'morph', formIds: ['form-a', 'form-b'] },
-    ] });
-    const second = card('second', { onReveal: [{ kind: 'morph', formIds: ['form-a', 'form-b'] }] });
+    ] }] });
+    const second = card('second', { duration: 2, durationPeriod: 'runtime', schedule: [{ at: 1, effects: [{ kind: 'morph', formIds: ['form-a', 'form-b'] }] }] });
     game.state.players[0].hand.push(first, second);
     game.deploy('first', 0); game.deploy('second', 0); game.endTurn();
     const events = finish(game).filter(event => event.kind === 'morph');
@@ -123,14 +176,15 @@ describe('Morph recipes', () => {
     expect(events.filter(event => event.cardId === 'second').map(event => event.definitionId)).toEqual(['form-a']);
   });
 
-  it('runs a duration-one form exactly once after Morph from a source without a timer', () => {
+  it('runs a duration-one form exactly once after a random Morph from a source without a timer', () => {
     const form=card('timed-form',{duration:1,durationPeriod:'runtime',onReveal:[{kind:'crypto',amount:99}],schedule:[{at:1,effects:[{kind:'crypto',amount:4}]}]});
     const {game}=make([form]);
-    deploy(game,card('source',{onReveal:[{kind:'morph',formIds:['timed-form']}]}));
+    deploy(game,card('source',{onReveal:[{kind:'morph',formIds:['timed-form'],selection:'random'}]}));
     while(game.pendingCount){const event=game.step()!.event;if(event.kind==='morph')break;}
     expect(game.state.players[0].wallet).toBe(0);
     const later=finish(game);
-    expect(later.filter(event=>event.kind==='crypto').map(event=>event.amount)).toEqual([4]);
+    // Random Morph queues the form On Reveal, then the form's opening schedule fires once.
+    expect(later.filter(event=>event.kind==='crypto').map(event=>event.amount)).toEqual([99,4]);
     expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('timed-form');
     game.endTurn();
     expect(finish(game).filter(event=>event.kind==='crypto')).toHaveLength(0);
@@ -148,12 +202,17 @@ describe('Morph recipes', () => {
       { at: 2, effects: [{ kind: 'crypto', amount: 44 }] },
     ] });
     const { game } = make([a, b]);
-    deploy(game, card('scheduled-source', { duration: 4, durationPeriod: 'runtime', onReveal: [morph], schedule: [{ at: 2, effects: [morph] }] }));
+    // Scheduled Morph advances immediately (nextTurn). finish() drains through the next turn's opening window.
+    deploy(game, card('scheduled-source', { duration: 4, durationPeriod: 'runtime', schedule: [
+      { at: 1, effects: [morph] },
+      { at: 2, effects: [morph] },
+    ] }));
     const first = finish(game);
     expect(first.filter(event => event.kind === 'morph').map(event => event.definitionId)).toEqual(['form-a', 'form-b']);
-    expect(first.filter(event => event.kind === 'crypto').map(event => event.amount)).toEqual([11, 22]);
+    expect(first.filter(event => event.kind === 'crypto').map(event => event.amount)).toEqual([11]);
     game.endTurn();
     const third = finish(game);
+    // nextTurn Morph shifts formStartAge, so form-a's at:2 is skipped when the at:2 Morph replaces it.
     expect(third.filter(event => event.kind === 'crypto').map(event => event.amount)).toEqual([33]);
     game.endTurn(); finish(game);
     expect(game.state.players[0].bank.find(entry => entry.card.id === 'scheduled-source')?.card.definitionId).toBe('form-b');
@@ -190,9 +249,11 @@ describe('Morph recipes', () => {
   it('preserves intentionally repeated identical Morph steps in one scheduled recipe', () => {
     const { game } = make([card('form-a'), card('form-b'), card('form-c')]);
     const repeated: EvaluationEffect = { kind: 'morph', formIds: ['form-a', 'form-b'] };
-    deploy(game, card('source', { duration: 2, durationPeriod: 'runtime', onReveal: [{ kind: 'morph', formIds: ['form-c'] }], schedule: [
+    deploy(game, card('source', { duration: 2, durationPeriod: 'runtime', schedule: [
+      { at: 1, effects: [{ kind: 'morph', formIds: ['form-c'] }] },
       { at: 2, effects: [repeated, repeated] },
     ] }));
+    // finish() covers opening Morph plus the next turn's scheduled repeats.
     expect(finish(game).filter(event => event.kind === 'morph').map(event => event.definitionId)).toEqual(['form-c', 'form-a', 'form-b']);
   });
 
@@ -236,7 +297,8 @@ describe('Morph recipes', () => {
   it('rejects unavailable and Crypto forms without changing the active card', () => {
     for (const formIds of [['missing-form'], ['byte-coin']]) {
       const { game } = make([]);
-      deploy(game, card('source', { onReveal: [{ kind: 'morph', formIds }] }));
+      // Random morph transforms immediately (sequential evolve would only register until cleanup).
+      deploy(game, card('source', { onReveal: [{ kind: 'morph', formIds, selection: 'random' }] }));
       expect(game.step()?.event.kind).toBe('reveal');
       expect(() => game.step()).toThrow(formIds[0] === 'byte-coin' ? /Character or VP/ : /unavailable/);
       expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('source');

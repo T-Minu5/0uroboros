@@ -7,6 +7,7 @@ export const LOCATION_TRIGGERS = {
  onCollapse: {label: 'On collapse'},
  ongoing: {label: 'Ongoing'},
  startTurn: {label: 'Start of turn'},
+ whileInPlay: {label: 'While in play'},
 } as const satisfies Record<string, {label: string}>;
 export type LocationTrigger = keyof typeof LOCATION_TRIGGERS;
 export const LOCATION_TRIGGER_COLOR = '#ffffff';

@@ -1,6 +1,7 @@
 import { CARD_CLASSES, VP_CLASSES, type Card, type CardClass, type PowerSource } from '../game';
 import { builtinMod } from '../builtinMods';
 import { locationTriggerPrefix } from '../locationTriggers';
+import { describeConditionPredicate, type LocationCondition } from '../locationConditions';
 import { formatAmount, transferFlow, transferText } from '../transferText';
 import {
   DECK_ENDS, MOD_HOOKS, filterClasses, isBuiltinModifier, scopedWho,
@@ -12,12 +13,13 @@ import {
 export type Role = 'ally' | 'enemy' | 'both' | 'any';
 export type Family = 'Resources' | 'Servers' | 'Zones' | 'Board' | 'Flow';
 export const FAMILIES: readonly Family[] = ['Resources', 'Servers', 'Zones', 'Board', 'Flow'];
-export const SCOPES: readonly Scope[] = ['card', 'location', 'locationPlay', 'circuit'];
+export const SCOPES: readonly Scope[] = ['card', 'location', 'locationPlay', 'locationCondition', 'circuit'];
 
 const ROLE_WHO: Record<Scope, Record<Role, readonly Who[]>> = {
   card: { ally: ['self'], enemy: ['opponent'], both: ['both'], any: ['any'] },
   location: { ally: ['winner'], enemy: ['loser'], both: ['both'], any: ['any'] },
   locationPlay: { ally: ['played', 'winner'], enemy: ['other', 'loser'], both: ['both'], any: ['any'] },
+  locationCondition: { ally: ['self'], enemy: ['opponent'], both: ['both'], any: ['any'] },
   circuit: { ally: ['self'], enemy: ['opponent'], both: ['both'], any: ['any'] },
 };
 
@@ -59,11 +61,11 @@ const server = (roles: readonly Role[], servers: readonly ServerSlot[] = ['auto'
 
 export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   draw: { id: 'draw', label: 'Draw cards', family: 'Resources', help: 'Draw from the deck into hand, shuffling Discard in when the deck runs out.', targets: [player()], amount: { label: 'Cards', min: 0, max: 100, default: 1 } },
-  gainActions: { id: 'gainActions', label: 'Gain Actions', family: 'Resources', help: 'Actions for the next Runtime turn.', targets: [player()], amount: { label: 'Actions', min: 0, max: 20, default: 1 }, scopes: ['card', 'location', 'locationPlay'] },
+  gainActions: { id: 'gainActions', label: 'Gain Actions', family: 'Resources', help: 'Actions for the next Runtime turn.', targets: [player()], amount: { label: 'Actions', min: 0, max: 20, default: 1 }, scopes: ['card', 'location', 'locationPlay', 'locationCondition'] },
   gainCrypto: { id: 'gainCrypto', label: 'Gain Crypto', family: 'Resources', help: 'Crypto for the coming Draft.', targets: [player()], amount: { label: 'Crypto', min: 0, max: 100, default: 2 } },
-  payCrypto: { id: 'payCrypto', label: 'Pay Crypto', family: 'Resources', help: 'Spend Crypto gained this Cycle. As a Choice option cost, the option is unavailable without enough Crypto.', targets: [player(['ally'])], amount: { label: 'Crypto', min: 1, max: 100, default: 1 } },
+  payCrypto: { id: 'payCrypto', label: 'Pay Crypto', family: 'Resources', help: 'Spend Crypto gained this Cycle. Optional with follow-ups: each targeted player may accept or decline. As a Choice option cost, the option is unavailable without enough Crypto.', targets: [player(['ally', 'both'])], amount: { label: 'Crypto', min: 1, max: 100, default: 1 }, optional: true },
   gainVP: { id: 'gainVP', label: 'Gain Victory Points', family: 'Resources', help: 'Negative amounts take Victory Points away.', targets: [player()], amount: { label: 'Victory Points', min: -100, max: 100, default: 1 } },
-  gainCard: { id: 'gainCard', label: 'Gain a card', family: 'Resources', help: 'Create new copies of a card in hand, on top of the deck, or in Discard.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['hand', 'deck', 'discard'] }], amount: { label: 'Copies', min: 0, max: 100, default: 1 } },
+  gainCard: { id: 'gainCard', label: 'Gain a card', family: 'Resources', help: 'Create new copies of a card (or a random card from a chosen pool) in hand, on top of the deck, or in Discard.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['hand', 'deck', 'discard'] }], amount: { label: 'Copies', min: 0, max: 100, default: 1 } },
   damageServer: { id: 'damageServer', label: 'Drain', family: 'Servers', help: '"Available" hits the Primary Server, or the Backup once the Primary is gone. Destroying an enemy Server scores destruction VP.', targets: [server(['enemy', 'ally', 'both'])], amount: { label: 'Damage', min: 0, max: 5000, default: 100 } },
   repairServer: { id: 'repairServer', label: 'Repair', family: 'Servers', help: 'Repair Server points, never above the maximum. A destroyed Server cannot be repaired.', targets: [server(['ally', 'enemy', 'both'])], amount: { label: 'Repair', min: 0, max: 5000, default: 100 } },
   destroyServer: { id: 'destroyServer', label: 'Destroy your backup', family: 'Servers', help: 'Set a Server to zero. Scores no destruction VP.', targets: [server(['ally', 'enemy', 'both'], ['backup', 'primary', 'both'])] },
@@ -83,7 +85,7 @@ export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   attachModifier: { id: 'attachModifier', label: 'Attach a mod', family: 'Board', help: 'A permanent mod on a Character, on the board or in any zone. Mods stack.', targets: [{ type: 'card', roles: SIDES, where: [...POWERED, 'collection'], relations: ['previous', 'next'] }], amount: { label: 'Aura Power', min: 1, max: 10, default: 1 }, picks: ['choose', 'random', 'first'], chooser: true },
   removeModifier: { id: 'removeModifier', label: 'Remove mods', family: 'Board', help: 'Strip every mod from a card, or every copy of one mod. Only cards carrying a matching mod can be picked.', targets: [{ type: 'card', roles: ['enemy', 'ally', 'any', 'both'], where: [...POWERED, 'collection'], relations: ['self', 'previous', 'next'] }], picks: ['choose', 'random', 'first', 'all'], chooser: true },
   transferPower: { id: 'transferPower', label: 'Node Power', family: 'Board', help: 'Shift this card’s side of Node Power to or from neighbouring Nodes until the Cycle ends.', targets: [{ type: 'node', which: ['neighbours'] }], amount: { label: 'Power', min: 0.5, max: 20, default: 1, integer: false }, scopes: ['card'] },
-  morph: { id: 'morph', label: 'Morph', family: 'Board', help: 'Turn this card into another card, keeping its Power changes.', scopes: ['card'] },
+  morph: { id: 'morph', label: 'Morph', family: 'Board', help: 'Random: transform on resolve and the new form On Reveals. Evolve (sequential): after this card is played, advance one form at cleanup — later forms keep evolving from the same recipe. Cycle forms to wrap the list; optionally reset to the original form at end of Cycle.', scopes: ['card'] },
   choice: { id: 'choice', label: 'Choice', family: 'Flow', help: 'Offer options; each runs its own steps. Options can cost something to pick.' },
   random: { id: 'random', label: 'Random', family: 'Flow', help: 'Run one option picked at random.' },
 };
@@ -552,11 +554,17 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
     case 'payCrypto': return `Pay ${formatAmount(amount)} Crypto`;
     case 'gainVP': return `${amount < 0 ? '-' : '+'}${formatAmount(Math.abs(amount))} VP${recipient(who, scope, amount < 0)}`;
     case 'gainCard': {
-      const name = cardName(cards, step.cardId) ?? 'unavailable card';
+      const pool = step.cardIds?.length ? step.cardIds : step.cardId ? [step.cardId] : [];
+      const names = pool.map(id => cardName(cards, id) ?? 'unavailable card');
+      const name = names.length > 1
+        ? (step.selection === 'sequential' ? names.join(' → ') : `random ${names.join(' or ')}`)
+        : (names[0] ?? 'unavailable card');
       const zone = step.target?.type === 'zone' ? step.target.zone : 'deck';
       const owner = possessive(who, scope);
       const where = zone === 'hand' ? (who === 'self' ? '' : ` in ${owner} hand`) : zone === 'discard' ? ` in ${owner} Discard` : ` on top of ${owner} deck`;
-      const copies = amount === 1 ? `${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${name}` : `${formatAmount(amount)} ${name}${/s$/i.test(name) ? '' : /(x|z|ch|sh)$/i.test(name) ? 'es' : 's'}`;
+      const copies = names.length > 1
+        ? (amount === 1 ? name : `${formatAmount(amount)} (${name})`)
+        : amount === 1 ? `${/^[aeiou]/i.test(name) ? 'an' : 'a'} ${name}` : `${formatAmount(amount)} ${name}${/s$/i.test(name) ? '' : /(x|z|ch|sh)$/i.test(name) ? 'es' : 's'}`;
       return `Gain ${copies}${where}`;
     }
     case 'damageServer': return short && who === 'opponent'
@@ -635,7 +643,10 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
     case 'morph': {
       const names = (step.formIds ?? []).map(id => cardName(cards, id) ?? 'an unavailable form');
       if (!names.length) return 'Choose forms for this card';
-      return step.selection === 'random' ? `Morph this card into a random form: ${names.join(' or ')}` : `Evolve this card through ${names.join(' → ')}`;
+      const body = step.selection === 'random'
+        ? `Morph this card into a random form: ${names.join(' or ')}`
+        : `After this card is played, evolve through ${names.join(' → ')}${step.cycleForms ? ', then repeat' : ''}`;
+      return step.resetAfterCycle ? `${body}. Reset to its original form at end of Cycle` : body;
     }
     case 'choice': {
       const options = (step.options ?? []).map(option => optionText(option, scope, cards, mods));
@@ -707,7 +718,13 @@ export function describeCard(card: CardSteps, cards: readonly Card[] = [], mods:
 type LocationSteps = {
   effects?: readonly EffectStep[]; ongoing?: readonly EffectStep[]; onPlay?: readonly EffectStep[];
   startTurn2?: readonly EffectStep[]; startTurn3?: readonly EffectStep[];
+  conditions?: readonly LocationCondition[];
 };
+/** One condition: While in play predicate, then reward effects. */
+export function describeCondition(condition: LocationCondition, cards: readonly Card[] = [], mods: readonly ModDefinition[] = []): string {
+  const reward = condition.effects.length ? describeSteps(condition.effects, 'locationCondition', cards, mods) : '';
+  return `${locationTriggerPrefix('whileInPlay')} ${describeConditionPredicate(condition)}${reward ? `, ${reward}` : ''}.`;
+}
 /** Location plate copy: each hook's effects under its timing prefix. */
 export function describeLocation(location: LocationSteps, cards: readonly Card[] = [], mods: readonly ModDefinition[] = []): string {
   const parts: string[] = [];
@@ -716,6 +733,7 @@ export function describeLocation(location: LocationSteps, cards: readonly Card[]
   if (location.onPlay?.length) parts.push(`${locationTriggerPrefix('onReveal')} ${describeSteps(location.onPlay, 'locationPlay', cards, mods)}`);
   if (location.startTurn2?.length) parts.push(`${locationTriggerPrefix('startTurn', 2)} ${describeSteps(location.startTurn2, 'location', cards, mods)}`);
   if (location.startTurn3?.length) parts.push(`${locationTriggerPrefix('startTurn', 3)} ${describeSteps(location.startTurn3, 'location', cards, mods)}`);
+  for (const condition of location.conditions ?? []) parts.push(describeCondition(condition, cards, mods));
   return parts.join(' ');
 }
 
@@ -740,7 +758,7 @@ function mergeServerPairs(steps: readonly EffectStep[]): EffectStep[] {
 export type ValidationCards = { enabledIds: ReadonlySet<string>; types: ReadonlyMap<string, Card['type']>; modIds?: ReadonlySet<string> };
 const record = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value);
 const idPattern = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
-const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'cardId', 'modifier', 'formIds', 'selection', 'direction', 'flow', 'prompt', 'options', 'choose']);
+const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'cardId', 'cardIds', 'modifier', 'formIds', 'selection', 'cycleForms', 'resetAfterCycle', 'direction', 'flow', 'prompt', 'options', 'choose']);
 
 function amountIssue(spec: AmountSpec, value: unknown): string | null {
   if (spec.integer === false) {
@@ -799,10 +817,31 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
     else if (typeof step.amount === 'number' && step.min > step.amount) errors.push(`${p}.min: cannot exceed amount`);
   }
   if (step.destination !== undefined && !spec.destinations?.includes(step.destination)) errors.push(`${p}.destination: expected ${(spec.destinations ?? []).join(', ') || 'none'}`);
-  if (step.cardId !== undefined || action === 'gainCard') {
-    if (typeof step.cardId !== 'string' || !idPattern.test(step.cardId)) errors.push(`${p}.cardId: use 1–80 letters, numbers, underscores or hyphens`);
-    else if (action !== 'gainCard' && action !== 'attachModifier') errors.push(`${p}.cardId: unsupported field`);
-    else if (!cards.enabledIds.has(step.cardId)) errors.push(`${p}.cardId: unknown card ${step.cardId}`);
+  if (action === 'gainCard') {
+    const pool = step.cardIds as unknown;
+    if (pool !== undefined) {
+      if (!Array.isArray(pool) || pool.length > 64) errors.push(`${p}.cardIds: expected up to 64 IDs`);
+      else {
+        if (!pool.length) errors.push(`${p}.cardIds: select at least one card`);
+        if (new Set(pool).size !== pool.length) errors.push(`${p}.cardIds: each card may appear only once`);
+        pool.forEach((id, at) => {
+          if (typeof id !== 'string' || !idPattern.test(id) || !cards.enabledIds.has(id)) errors.push(`${p}.cardIds[${at}]: unknown or disabled card ${String(id)}`);
+        });
+      }
+    }
+    if (step.cardId !== undefined) {
+      if (typeof step.cardId !== 'string' || !idPattern.test(step.cardId)) errors.push(`${p}.cardId: use 1–80 letters, numbers, underscores or hyphens`);
+      else if (!cards.enabledIds.has(step.cardId)) errors.push(`${p}.cardId: unknown card ${step.cardId}`);
+    }
+    if (pool === undefined && step.cardId === undefined) errors.push(`${p}.cardId: pick a card, or a pool of cards`);
+    if (step.selection !== undefined && !['sequential', 'random'].includes(String(step.selection))) errors.push(`${p}.selection: expected sequential or random`);
+  } else if (step.cardId !== undefined || step.cardIds !== undefined) {
+    if (step.cardIds !== undefined) errors.push(`${p}.cardIds: unsupported field`);
+    if (step.cardId !== undefined) {
+      if (typeof step.cardId !== 'string' || !idPattern.test(step.cardId)) errors.push(`${p}.cardId: use 1–80 letters, numbers, underscores or hyphens`);
+      else if (action !== 'attachModifier') errors.push(`${p}.cardId: unsupported field`);
+      else if (!cards.enabledIds.has(step.cardId)) errors.push(`${p}.cardId: unknown card ${step.cardId}`);
+    }
   }
   if (MOD_ACTIONS.includes(action)) {
     const known = isBuiltinModifier(step.modifier) || (typeof step.modifier === 'string' && !!cards.modIds?.has(step.modifier));
@@ -821,9 +860,16 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
       });
     }
     if (step.selection !== undefined && !['sequential', 'random'].includes(String(step.selection))) errors.push(`${p}.selection: expected sequential or random`);
+    if (step.cycleForms !== undefined) {
+      if (typeof step.cycleForms !== 'boolean') errors.push(`${p}.cycleForms: expected true or false`);
+      else if (step.cycleForms && step.selection === 'random') errors.push(`${p}.cycleForms: only for sequential evolution`);
+    }
+    if (step.resetAfterCycle !== undefined && typeof step.resetAfterCycle !== 'boolean') errors.push(`${p}.resetAfterCycle: expected true or false`);
   } else {
     if (step.formIds !== undefined) errors.push(`${p}.formIds: unsupported field`);
-    if (step.selection !== undefined) errors.push(`${p}.selection: unsupported field`);
+    if (action !== 'gainCard' && step.selection !== undefined) errors.push(`${p}.selection: unsupported field`);
+    if (step.cycleForms !== undefined) errors.push(`${p}.cycleForms: unsupported field`);
+    if (step.resetAfterCycle !== undefined) errors.push(`${p}.resetAfterCycle: unsupported field`);
   }
   if (action === 'transferPower') {
     if (step.direction !== undefined && !['choice', 'left', 'right', 'split'].includes(String(step.direction))) errors.push(`${p}.direction: expected choice, left, right or split`);

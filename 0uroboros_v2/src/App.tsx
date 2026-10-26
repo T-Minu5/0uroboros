@@ -127,6 +127,8 @@ export function App(){
  const [bankArrivals,setBankArrivals]=useState<string[]>([]);
  const [opponentDraw,setOpponentDraw]=useState(0);
  const [cashFlight,setCashFlight]=useState<{card:Card;x:number;y:number;w:number;h:number;dx:number;dy:number;duration:number}|null>(null);
+ /** Crypto cards mid-flight to the spendable Crypto total; hidden in the hand so they don't sit still then vanish. */
+ const [cashed,setCashed]=useState<string[]>([]);
  const [boardScan,setBoardScan]=useState(false);
  const [boardScanTone,setBoardScanTone]=useState<BoardScanTone>('open');
  /** Session-end beat: cyan sweep, then the singularity, then the result card. */
@@ -209,9 +211,20 @@ export function App(){
   }
   const redeemed=before?.players[0].hand.find(card=>card.id===event.cardId&&card.type==='Crypto');
   if(event.kind==='crypto'&&event.owner===0&&redeemed){
-   const source=document.querySelector(`.hand-card[data-card-id="${CSS.escape(redeemed.id)}"]`),target=document.querySelector('[data-resource="0-wallet"]');
-   if(source&&target){const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();setCashFlight({card:redeemed,x:a.x,y:a.y,w:a.width,h:a.height,dx:b.x+b.width/2-a.x-a.width/2,dy:b.y+b.height/2-a.y-a.height/2,duration});}
-   later(()=>{setCashFlight(null);setView(resolved.view);},duration*.72);
+   // Hide the hand copy for the whole redeem beat. Auto-resolve credits the wallet while the
+   // card is still in hand — clearing cashed early would flash it back before enterDraft.
+   setCashed(ids=>ids.includes(redeemed.id)?ids:[...ids,redeemed.id]);
+   const source=document.querySelector(`.hand-card[data-card-id="${CSS.escape(redeemed.id)}"]`);
+   const target=document.querySelector('[data-resource="0-wallet"], [data-draft-resource="0-wallet"]');
+   if(source&&target){
+    const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();
+    setCashFlight({card:redeemed,x:a.x,y:a.y,w:a.width,h:a.height,dx:b.x+b.width/2-a.x-a.width/2,dy:b.y+b.height/2-a.y-a.height/2,duration});
+   }
+   later(()=>{
+    setCashFlight(null);
+    setView(resolved.view);
+    if(!resolved.view.players[0].hand.some(card=>card.id===redeemed.id))setCashed(ids=>ids.filter(id=>id!==redeemed.id));
+   },duration*.72);
    later(pump,duration);return;
   }
 
@@ -236,10 +249,10 @@ export function App(){
   setDealing(true);setBusy(true);resolvingRef.current=true;
   setNotice(`${snapshot.players[0].hand.length} cards drawn.`);
   setArrivals(snapshot.players[0].hand.map(card=>card.id));later(()=>setArrivals([]),1100);
-  setClosedNodes([]);setCollapseNode(null);setAwardNode(null);setSelectionNode(null);
+  setCashed([]);setClosedNodes([]);setCollapseNode(null);setAwardNode(null);setSelectionNode(null);
   later(()=>{setDealing(false);if(client.current?.pendingCount){pump();return;}setBusy(false);resolvingRef.current=false;setNotice(`${snapshot.players[0].hand.length} cards dealt.`);},scanTotal+2100);
  }
- async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const picked=resolveOpponent(opponents,opponent);const agent=picked?.id??opponent;const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(agent)]);setContent(snapshot);const published=resolveOpponent(snapshot.opponents,agent);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief&&!brief.disabled?brief.profile:published?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});client.current=new LocalClient(session);logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=agent;strategistActive.current=!!brief&&!brief.disabled;setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
+ async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const picked=resolveOpponent(opponents,opponent);const agent=picked?.id??opponent;const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(agent)]);setContent(snapshot);const published=resolveOpponent(snapshot.opponents,agent);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:setup.midCycleDraw,draftCrypto:setup.draftCrypto,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief&&!brief.disabled?brief.profile:published?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});client.current=new LocalClient(session);logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=agent;strategistActive.current=!!brief&&!brief.disabled;setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
  /** Runs one command on either client; the continuation is immediate for a local table and follows the ack online. */
  function act(action:()=>RuntimeEvent|void|null|Promise<RuntimeEvent|void|null>,after?:()=>void,failed?:()=>void){
   attempt(action,event=>{if(event){record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);}const snapshot=client.current?.view();if(snapshot){setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}after?.();kick();},error=>{setNotice(error instanceof Error?error.message:'Action unavailable.');failed?.();kick();});
@@ -299,7 +312,7 @@ export function App(){
   });
   return next;
  }
- const roomRules=()=>({turnSeconds:setup.turnSeconds??0,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards});
+ const roomRules=()=>({turnSeconds:setup.turnSeconds??0,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:setup.midCycleDraw,draftCrypto:setup.draftCrypto});
  const createOnline=(mode:RoomMode,name:string)=>{const picked=resolveOpponent(opponents,opponent);void onlineClient().createRoom(mode,name,{...roomRules(),...(mode==='ai'&&picked?{opponent:picked.id}:{})}).catch(()=>undefined);};
  const quickMatch=(name:string)=>{void onlineClient().quickMatch(name,roomRules()).catch(()=>undefined);};
  const cancelQuickMatch=()=>{online.current?.cancelQuickMatch();};
@@ -379,7 +392,7 @@ export function App(){
  const movable=new Set(view?.movableCardIds??[]);
  const nodes:BoardNode[]=view?view.nodes.map((n,i)=>({cards:n.cards.map((cards,side)=>cards.map(p=>({id:p.card.id,card:'hidden'in p.card?undefined:p.card,revealed:p.revealed,planned:view.planningCardIds.includes(p.card.id),movable:side===0&&!('hidden'in p.card)&&movable.has(p.card.id)}))) as BoardNode['cards'],powers:n.powers,weight:view.weights[i],title:n.location?.name??'Location pending',text:n.location?.rule??'No approved Location content',reward:n.location?.reward})):blankNodes;
  // v3: Crypto wallet HUD is hidden; Crypto cards stay in the hand fan until Draft resolves them into spendable Crypto.
- const local=view?.players[0]; const fieldHand=local?.hand??[];
+ const local=view?.players[0]; const fieldHand=local?.hand.filter(card=>!cashed.includes(card.id))??[];
  const phase=view?.phase??'setup';
  // Session end plays as one beat: a cyan sweep across the board, the singularity swallowing
  // it, and only then the result card. Showing the modal immediately would cover the collapse.

@@ -30,9 +30,9 @@
 .transfer-node.is-over .transfer-diamond{border-color:#ffe7a8;box-shadow:0 0 0 3px #ffd36b55,0 0 18px #ffd36baa}
 .transfer-node.is-origin .transfer-diamond{border-style:dashed}
 .transfer-stage.is-dragging .transfer-node:not(.is-target,.is-over,.is-origin) .transfer-diamond{opacity:.45}
-.transfer-diamond.is-gaining{border-color:#1fffb1;background:#0d2b24}
+.transfer-diamond.is-gaining{border-color:var(--yellow,#ffff00);background:#2b2b08}
 .transfer-diamond.is-losing{border-color:#ff7a95;background:#2b1219}
-.transfer-delta{position:absolute;top:0;right:38px;font:700 11px Orbitron,Inter,sans-serif;font-style:normal;color:#1fffb1;pointer-events:none}
+.transfer-delta{position:absolute;top:0;right:38px;font:700 11px Orbitron,Inter,sans-serif;font-style:normal;color:var(--yellow,#ffff00);pointer-events:none}
 .transfer-diamond.is-losing+.transfer-delta{color:#ff7a95}
 .transfer-node-id{position:absolute;top:0;left:38px;font:700 10px Orbitron,Inter,sans-serif;letter-spacing:.5px;color:#8fd9e8;pointer-events:none}
 .is-center .transfer-node-id{color:#52eaff}
@@ -45,7 +45,7 @@
 /* The lifted Power rides just above the pointer so the drop target stays visible. */
 .transfer-badge{position:fixed;z-index:130;display:grid;place-items:center;width:34px;height:34px;margin:-46px 0 0 -17px;transform:rotate(45deg);border:2px solid #ffd36b;border-radius:6px;background:#2a2412;box-shadow:0 10px 22px #000b,0 0 14px #ffd36b88;pointer-events:none;transition:border-color .12s,background .12s,box-shadow .12s}
 .transfer-badge b{transform:rotate(-45deg);font:700 15px Orbitron,Inter,sans-serif;color:#fff3cf}
-.transfer-badge.can-drop{border-color:#1fffb1;background:#0d2b24;box-shadow:0 10px 22px #000b,0 0 18px #1fffb1aa}
+.transfer-badge.can-drop{border-color:var(--yellow,#ffff00);background:#2b2b08;box-shadow:0 10px 22px #000b,0 0 18px #ffff00aa}
 .transfer-dragging,.transfer-dragging *{cursor:grabbing!important;user-select:none!important}
 
 @media (prefers-reduced-motion:reduce){.transfer-arcs path,.transfer-diamond,.transfer-badge{transition:none}.transfer-node:is(.is-source,.is-target) .transfer-diamond{animation:none;box-shadow:0 0 12px #ffd36b88}}

@@ -123,6 +123,58 @@ describe('location hooks and in-location targeting', () => {
     expect(game.state.nodes[4].cards[0][0].card.powerDelta ?? 0).toBe(0);
   });
 
+  it('asks each player to pay 1 Crypto for +3 Cards on Pay to Play at start of turn 3', () => {
+    const document = createDefaultContent();
+    const payToPlay: EffectStep = {
+      action: 'payCrypto',
+      optional: true,
+      amount: 1,
+      target: { type: 'player', who: 'both' },
+      then: [{ action: 'draw', amount: 3, target: { type: 'player', who: 'both' } }],
+    };
+    document.locations.forEach(location => {
+      location.enabled = true;
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
+      location.startTurn2 = undefined;
+      location.startTurn3 = undefined;
+    });
+    document.locations[0].startTurn3 = [payToPlay];
+    const content = compileContent(document);
+    // Both seats human so neither choice is auto-picked.
+    const game = createSession({
+      carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
+      random: seededRandom(11), content, aiSeats: [], midCycleDraw: false,
+    });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach((player, owner) => {
+      player.hand = [];
+      player.draw = [card(`${owner}a`), card(`${owner}b`), card(`${owner}c`), card(`${owner}d`)];
+      player.discard = [];
+      player.wallet = 2;
+    });
+    game.state.nodes.forEach((node, index) => {
+      node.location = { ...structuredClone(content.locations[0]), id: `loc-${index}`, effects: [{ kind: 'crypto', amount: 0 }], startTurn3: index === 0 ? [payToPlay] : undefined };
+      node.winner = null;
+    });
+    game.state.turn = 2;
+    game.state.phase = 'runtime';
+    game.endTurn(0);
+    game.endTurn(1);
+    finish(game);
+    expect(game.state.choice?.owner).toBe(0);
+    expect(game.state.choice?.prompt).toMatch(/Pay 1 Crypto/);
+    expect(game.state.choice?.options.map(option => option.id)).toEqual(['resolve', 'skip']);
+    game.choose('resolve', 0);
+    finish(game);
+    expect(game.state.choice?.owner).toBe(1);
+    game.choose('skip', 1);
+    finish(game);
+    expect(game.state.players[0].wallet).toBe(1);
+    expect(game.state.players[0].hand).toHaveLength(3);
+    expect(game.state.players[1].wallet).toBe(2);
+    expect(game.state.players[1].hand).toHaveLength(0);
+  });
+
   it('fires start-of-turn-2 effects when turn 2 begins, not on other turns', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => { location.enabled = true; location.effects = steps([{ kind: 'crypto', amount: 0 }]); });

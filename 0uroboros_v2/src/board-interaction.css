@@ -143,7 +143,7 @@
 .world-anchor :is(.location-plate,.sealed-location).transfer-plate.is-over { border-color:#ffe7a8; box-shadow:inset 0 0 16px #ffd36b55,0 0 26px #ffd36bcc; filter:brightness(1.2); }
 .board-canvas:has(.transfer-target) .field-card { pointer-events:none; }
 .board-canvas .world-anchor .power-badge.local.transfer-loss b { color:#ff7a95; text-shadow:0 0 8px #ff7a9588,0 1px 2px #000; }
-.board-canvas .world-anchor .power-badge.local.transfer-gain b { color:#1fffb1; text-shadow:0 0 8px #1fffb188,0 1px 2px #000; }
+.board-canvas .world-anchor .power-badge.local.transfer-gain b { color:var(--yellow,#ffff00); text-shadow:0 0 8px #ffff0088,0 1px 2px #000; }
 @media(prefers-reduced-motion:reduce){
  .world-anchor .lane-drop-target.transfer-target:is(.is-source,.is-target),.world-anchor :is(.location-plate,.sealed-location).transfer-plate:is(.is-source,.is-target) { animation:none; box-shadow:0 0 18px #ffd36b77; }
 }

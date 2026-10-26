@@ -568,6 +568,15 @@
       "height": 300,
       "focus": 0.4111
     },
+    "/assets/card_art/uploads/501-ar-2.png": {
+      "sha": "36bf9423630e9f2194b7dd5d37364b35c1da00dba67995a8b0bc2cdf69f8bc06",
+      "v": 2,
+      "color": "/assets/card_art/depth/36bf9423630e9f2194b7-v2.color.webp",
+      "depth": "/assets/card_art/depth/36bf9423630e9f2194b7-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4002
+    },
     "/assets/card_art/uploads/501-ar.png": {
       "sha": "26e043aeb8845713c2e56875a9888b9dd3d51afb172cf05aa0afe7705b3ebd9d",
       "v": 2,
@@ -577,6 +586,33 @@
       "height": 300,
       "focus": 0.5137
     },
+    "/assets/card_art/uploads/agent-reaper.png": {
+      "sha": "c13e9db8b16a42eabdb1103dc74c1673a653afa2118e6e2771a6d9d181ebe442",
+      "v": 2,
+      "color": "/assets/card_art/depth/c13e9db8b16a42eabdb1-v2.color.webp",
+      "depth": "/assets/card_art/depth/c13e9db8b16a42eabdb1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5203
+    },
+    "/assets/card_art/uploads/amatera-5u.png": {
+      "sha": "2b08fbebff3bbed49b70e01115a767219b72cecf0057052f3324c40e5a9e11d4",
+      "v": 2,
+      "color": "/assets/card_art/depth/2b08fbebff3bbed49b70-v2.color.webp",
+      "depth": "/assets/card_art/depth/2b08fbebff3bbed49b70-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5115
+    },
+    "/assets/card_art/uploads/astra-wraith.png": {
+      "sha": "c4cdad5818c5b6fa78a07ec4d3cf6097b945dd62df3cf4f0a752f24d78d47a58",
+      "v": 2,
+      "color": "/assets/card_art/depth/c4cdad5818c5b6fa78a0-v2.color.webp",
+      "depth": "/assets/card_art/depth/c4cdad5818c5b6fa78a0-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5102
+    },
     "/assets/card_art/uploads/dama-de-fuego.png": {
       "sha": "11717fb5452b11ca3deebfe425000641b7f61dbb6b4e3bfe5068442fc0a6cddd",
       "v": 2,
@@ -585,6 +621,141 @@
       "width": 400,
       "height": 300,
       "focus": 0.447
+    },
+    "/assets/card_art/uploads/danda.png": {
+      "sha": "d958a7b210f75298f73ba2ae79872d9cc64b1cf62c70b9c28a2c960c3f86c574",
+      "v": 2,
+      "color": "/assets/card_art/depth/d958a7b210f75298f73b-v2.color.webp",
+      "depth": "/assets/card_art/depth/d958a7b210f75298f73b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3751
+    },
+    "/assets/card_art/uploads/delete-detritus.png": {
+      "sha": "51c0515f19ce05e3e01174a00ea70c6263e5935ffacbe09c244422b70da561b6",
+      "v": 2,
+      "color": "/assets/card_art/depth/51c0515f19ce05e3e011-v2.color.webp",
+      "depth": "/assets/card_art/depth/51c0515f19ce05e3e011-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3021
+    },
+    "/assets/card_art/uploads/dolly-dos.png": {
+      "sha": "23981cfb8ba3ad10fd8f4ab47ae0eeecc2b9f9ca40cb25804df2a76c3ad9379f",
+      "v": 2,
+      "color": "/assets/card_art/depth/23981cfb8ba3ad10fd8f-v2.color.webp",
+      "depth": "/assets/card_art/depth/23981cfb8ba3ad10fd8f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5285
+    },
+    "/assets/card_art/uploads/ghetto-blaster.png": {
+      "sha": "3321652bfa5836a4f3c14b057e4054ad0e2c5d2299e017fcdfbe7105b3f4497c",
+      "v": 2,
+      "color": "/assets/card_art/depth/3321652bfa5836a4f3c1-v2.color.webp",
+      "depth": "/assets/card_art/depth/3321652bfa5836a4f3c1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3719
+    },
+    "/assets/card_art/uploads/h3l3-ios.png": {
+      "sha": "fea00c2987742a6541aeeb9d5df14cc11a3eec826a52bccb494fa829d961c0ad",
+      "v": 2,
+      "color": "/assets/card_art/depth/fea00c2987742a6541ae-v2.color.webp",
+      "depth": "/assets/card_art/depth/fea00c2987742a6541ae-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4306
+    },
+    "/assets/card_art/uploads/hell-hound-form.png": {
+      "sha": "6ae1b2d42225e1a5f251933685d1eb41eba12a0d7bda3c8f9cd9217a09177048",
+      "v": 2,
+      "color": "/assets/card_art/depth/6ae1b2d42225e1a5f251-v2.color.webp",
+      "depth": "/assets/card_art/depth/6ae1b2d42225e1a5f251-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.552
+    },
+    "/assets/card_art/uploads/i0n.png": {
+      "sha": "921afea44c4376a851eeb8931a0812319a800949c09254a2ca215b83959b644a",
+      "v": 2,
+      "color": "/assets/card_art/depth/921afea44c4376a851ee-v2.color.webp",
+      "depth": "/assets/card_art/depth/921afea44c4376a851ee-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4775
+    },
+    "/assets/card_art/uploads/kinich.png": {
+      "sha": "1d8e9dfffc803a41b7f3abdb5243a1a093780cdf6f10f7eb8847f76fc4a9fbc5",
+      "v": 2,
+      "color": "/assets/card_art/depth/1d8e9dfffc803a41b7f3-v2.color.webp",
+      "depth": "/assets/card_art/depth/1d8e9dfffc803a41b7f3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.402
+    },
+    "/assets/card_art/uploads/mary-mallon-1.png": {
+      "sha": "94cf8852a895f86dd466cd45733a179f885e4d5832fa55ef9878aac4ee5b490f",
+      "v": 2,
+      "color": "/assets/card_art/depth/94cf8852a895f86dd466-v2.color.webp",
+      "depth": "/assets/card_art/depth/94cf8852a895f86dd466-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3955
+    },
+    "/assets/card_art/uploads/not-a-total-loss.png": {
+      "sha": "10fbd67f449f442f9c9267f5d980f7d1423f533fcec01bb81480ad6d287fc6aa",
+      "v": 2,
+      "color": "/assets/card_art/depth/10fbd67f449f442f9c92-v2.color.webp",
+      "depth": "/assets/card_art/depth/10fbd67f449f442f9c92-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3553
+    },
+    "/assets/card_art/uploads/pihkal-hound.png": {
+      "sha": "e91fd7840f6324e5a00b8de75b054b50a7017625f4f79554fc5a039cf493a691",
+      "v": 2,
+      "color": "/assets/card_art/depth/e91fd7840f6324e5a00b-v2.color.webp",
+      "depth": "/assets/card_art/depth/e91fd7840f6324e5a00b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5498
+    },
+    "/assets/card_art/uploads/rezz-rizz.png": {
+      "sha": "14048e9de2f2957555cac193cadb567366d66aa963b18373bf5706a94ff4ee40",
+      "v": 2,
+      "color": "/assets/card_art/depth/14048e9de2f2957555ca-v2.color.webp",
+      "depth": "/assets/card_art/depth/14048e9de2f2957555ca-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.338
+    },
+    "/assets/card_art/uploads/skinwalker.png": {
+      "sha": "bdc402fa51a64d8307b3661840e05d66ae1ea06439e7e3df66bf9cbe95d2bee0",
+      "v": 2,
+      "color": "/assets/card_art/depth/bdc402fa51a64d8307b3-v2.color.webp",
+      "depth": "/assets/card_art/depth/bdc402fa51a64d8307b3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2959
+    },
+    "/assets/card_art/uploads/sun-scythe.png": {
+      "sha": "bce823a85c9a3a3a1b66b2ef281279c505f833dac345a1348a28672119110c5a",
+      "v": 2,
+      "color": "/assets/card_art/depth/bce823a85c9a3a3a1b66-v2.color.webp",
+      "depth": "/assets/card_art/depth/bce823a85c9a3a3a1b66-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6855
+    },
+    "/assets/card_art/uploads/the-shoggoth.png": {
+      "sha": "71efc63e5cd20c413d691737e2dc2990d6b96c2c5623b88d9d19114a6796dae9",
+      "v": 2,
+      "color": "/assets/card_art/depth/71efc63e5cd20c413d69-v2.color.webp",
+      "depth": "/assets/card_art/depth/71efc63e5cd20c413d69-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3136
     },
     "/assets/card_art/volume/10vp-b.png": {
       "sha": "4402fe11289c1fec569f6a409d3184d6214c0844af37e17f816875e167865d27",

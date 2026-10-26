@@ -82,9 +82,9 @@ describe('shared card presentation', () => {
     expect(endless).toContain('icon-infinite.svg');
   });
 
-  it('colours raised Power Cyan and lowered Power Pink', () => {
+  it('colours raised Power Solar yellow and lowered Power Pink', () => {
     const css = readFileSync('src/card-face.css', 'utf8');
-    expect(css).toMatch(/\.cf-power\.card-power-value\.boosted\{[^}]*color:var\(--cyan/);
+    expect(css).toMatch(/\.cf-power\.card-power-value\.boosted\{[^}]*color:var\(--yellow/);
     expect(css).toMatch(/\.cf-power\.card-power-value\.reduced\{[^}]*color:var\(--pink/);
   });
 });

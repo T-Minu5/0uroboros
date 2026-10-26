@@ -1,7 +1,7 @@
 import type { Card, CardType, LegacyEffect } from '../game';
 
 /** Where an effect list lives; it decides who "you" is and which targets make sense. */
-export type Scope = 'card' | 'location' | 'locationPlay' | 'circuit';
+export type Scope = 'card' | 'location' | 'locationPlay' | 'locationCondition' | 'circuit';
 
 /**
  * Whose cards, zones or Servers a step touches, relative to the effect's controller.
@@ -72,10 +72,22 @@ export type EffectStep = {
   then?: readonly EffectStep[];
   destination?: Destination;
   cardId?: string;
+  /**
+   * Gain a card: optional pool of definition IDs. When set (and longer than one), each copy is
+   * picked from this list (`selection`, default `random`). A single `cardId` still means exactly that card.
+   */
+  cardIds?: readonly string[];
   /** Attach: the mod to attach. Remove: the mod to strip; absent strips every mod. */
   modifier?: ModifierRef;
   formIds?: readonly string[];
   selection?: 'sequential' | 'random';
+  /**
+   * Sequential morph (evolve) only: after the last form, wrap back to the first instead of staying there.
+   * Evolution advances when the card is cleaned up after being played, not on Reveal.
+   */
+  cycleForms?: boolean;
+  /** Morph only: restore this card to the form it had before morphing, during end-of-Cycle cleanup. */
+  resetAfterCycle?: boolean;
   direction?: 'choice' | 'left' | 'right' | 'split';
   flow?: 'either' | 'push' | 'pull';
   prompt?: string;
@@ -96,5 +108,6 @@ export const isStep = (effect: AnyEffect): effect is EffectStep => typeof (effec
 export function scopedWho(who: 'self' | 'opponent', scope: Scope): Who {
   if (scope === 'location') return who === 'self' ? 'winner' : 'loser';
   if (scope === 'locationPlay') return who === 'self' ? 'played' : 'other';
+  // locationCondition and circuit: you = the seat that met / claimed it.
   return who;
 }

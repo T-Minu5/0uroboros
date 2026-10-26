@@ -38,6 +38,10 @@ export type LegacyEffect = {
   destination?: "top" | "discard" | "hand";
   formIds?: readonly string[];
   selection?: "sequential" | "random";
+  /** Sequential morph: wrap to the first form after the last instead of stopping. */
+  cycleForms?: boolean;
+  /** Morph only: restore the card to its pre-morph form during end-of-Cycle cleanup. */
+  resetAfterCycle?: boolean;
   /** Location board: which side(s) to take cards from. */
   boardSide?: "either" | "winner" | "loser" | "both" | "played" | "other";
   /** Location board: pick the card by UI choice or at random (moves also randomize destination when random). */

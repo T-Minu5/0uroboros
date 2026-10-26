@@ -30,6 +30,59 @@ const setLocation = (game: RuntimeSession, node: number, patch: { effects?: AnyE
 };
 
 describe('engine fixes', () => {
+  it('draws one card for each player at the start of Runtime turns 2 and 3', () => {
+    const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, aiSeats: [], random: seededRandom(3) });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.nodes.forEach((node, index) => {
+      node.location = { ...structuredClone(node.location!), id: `quiet-${index}`, name: `Quiet ${index + 1}`, effects: [], ongoing: [], onPlay: [] };
+    });
+    game.state.players.forEach((player, owner) => {
+      player.hand = [card(`${owner}-h`)];
+      player.draw = [card(`${owner}-d1`), card(`${owner}-d2`), card(`${owner}-d3`)];
+      player.discard = [];
+      player.wallet = 0;
+    });
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.endTurn(0);
+    game.endTurn(1);
+    const toTurn2 = finish(game);
+    expect(toTurn2.filter(event => event.kind === 'draw' && /Runtime turn 2/.test(event.text))).toHaveLength(2);
+    expect(game.state.players[0].hand).toHaveLength(2);
+    expect(game.state.players[1].hand).toHaveLength(2);
+    expect(game.state.turn).toBe(2);
+    game.endTurn(0);
+    game.endTurn(1);
+    const toTurn3 = finish(game);
+    expect(toTurn3.filter(event => event.kind === 'draw' && /Runtime turn 3/.test(event.text))).toHaveLength(2);
+    expect(game.state.players[0].hand).toHaveLength(3);
+    expect(game.state.players[1].hand).toHaveLength(3);
+    expect(game.state.turn).toBe(3);
+  });
+
+  it('skips mid-cycle draws when the setting is off', () => {
+    const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, aiSeats: [], midCycleDraw: false, random: seededRandom(3) });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.nodes.forEach((node, index) => {
+      node.location = { ...structuredClone(node.location!), id: `quiet-${index}`, name: `Quiet ${index + 1}`, effects: [], ongoing: [], onPlay: [] };
+    });
+    game.state.players.forEach((player, owner) => {
+      player.hand = [card(`${owner}-h`)];
+      player.draw = [card(`${owner}-d1`), card(`${owner}-d2`)];
+      player.discard = [];
+      player.wallet = 0;
+    });
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.endTurn(0);
+    game.endTurn(1);
+    const toTurn2 = finish(game);
+    expect(toTurn2.filter(event => event.kind === 'draw' && /Runtime turn/.test(event.text))).toHaveLength(0);
+    expect(game.state.players[0].hand).toHaveLength(1);
+    expect(game.state.players[1].hand).toHaveLength(1);
+    expect(game.state.turn).toBe(2);
+  });
+
   it('resolves start-of-turn-3 Location effects before turn 3 planning', () => {
     const game = session();
     setLocation(game, 0, { startTurn3: [{ kind: 'boostPowerAtLocation', amount: 1 }] });

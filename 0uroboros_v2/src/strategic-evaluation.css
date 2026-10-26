@@ -1,52 +1,52 @@
 .draft-overlay.strategic-draft{
- padding:16px 24px 0;
+ padding:10px 20px 0;
  overflow:hidden;
- display:flex;flex-direction:column;gap:12px;
+ display:flex;flex-direction:column;gap:8px;
  inset:66px 0 36px;
  height:auto;max-height:none;
  box-sizing:border-box;
 }
 .draft-topbar{
- max-width:1280px;width:100%;margin:0 auto;
- display:flex;align-items:stretch;justify-content:space-between;gap:20px;
+ max-width:1400px;width:100%;margin:0 auto;
+ display:flex;align-items:stretch;justify-content:space-between;gap:16px;
  flex:0 0 auto;
 }
 .strategic-draft .circuit-privilege.compact{
- flex:1 1 auto;max-width:520px;margin:0;padding:10px 14px;
- display:flex;align-items:center;gap:14px;
+ flex:1 1 auto;max-width:560px;margin:0;padding:8px 12px;
+ display:flex;align-items:center;gap:12px;
  border:1px solid #5a4a78;border-radius:10px;
  background:linear-gradient(120deg,#1a1528,#12131f);
 }
 .privilege-icon-wrap{
- position:relative;width:56px;height:56px;flex:0 0 auto;
+ position:relative;width:48px;height:48px;flex:0 0 auto;
  display:grid;place-items:center;
 }
 .privilege-icon-wrap .privilege-symbol{
- position:relative;z-index:2;width:28px;height:28px;
+ position:relative;z-index:2;width:24px;height:24px;
  display:grid;place-items:center;
 }
-.privilege-icon-wrap .privilege-symbol .icon{width:22px;height:22px}
+.privilege-icon-wrap .privilege-symbol .icon{width:18px;height:18px}
 .loop-ring{
- position:absolute;inset:4px;border-radius:50%;
+ position:absolute;inset:3px;border-radius:50%;
  border:2px solid transparent;
  border-top-color:#c9a227;border-right-color:#c9a22788;
  animation:draft-loop-spin 2.4s linear infinite;
  pointer-events:none;
 }
 .loop-ring.reverse{
- inset:10px;
+ inset:9px;
  border-top-color:#27e2ff;border-right-color:#27e2ff66;border-left-color:transparent;border-bottom-color:transparent;
  animation-duration:3.2s;animation-direction:reverse;
 }
 @keyframes draft-loop-spin{to{transform:rotate(360deg)}}
 .strategic-draft .circuit-privilege.compact .privilege-copy{flex:1 1 auto;min-width:0}
 .strategic-draft .circuit-privilege.compact .privilege-copy>small{font:600 9px Orbitron;letter-spacing:1px;color:#bca7d5}
-.strategic-draft .circuit-privilege.compact .privilege-copy>h2{margin:2px 0 4px;font:600 15px Orbitron;color:#eff4ff}
+.strategic-draft .circuit-privilege.compact .privilege-copy>h2{margin:2px 0 2px;font:600 14px Orbitron;color:#eff4ff}
 .strategic-draft .circuit-privilege.compact .privilege-copy>p{
- margin:0;font-size:11px;line-height:1.35;color:#c7ccdc;
+ margin:0;font-size:11px;line-height:1.3;color:#c7ccdc;
  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
-.strategic-draft .circuit-privilege.compact .primary-button{flex:0 0 auto;min-height:36px;padding:8px 14px;font-size:11px}
+.strategic-draft .circuit-privilege.compact .primary-button{flex:0 0 auto;min-height:32px;padding:6px 12px;font-size:11px}
 
 .cycle-summary{
  flex:1 1 auto;min-width:0;
@@ -54,55 +54,60 @@
  padding:0;border:0;border-radius:0;background:transparent;
 }
 .cycle-summary .draft-clock{display:none}
-.cycle-summary dl{margin:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.cycle-summary dl{margin:0;display:flex;flex-wrap:wrap;gap:6px 16px}
 .cycle-summary dl>div{display:flex;align-items:baseline;gap:8px;min-width:0}
 .cycle-summary dt{font-size:9px;color:#8e98ad;letter-spacing:.4px}
 .cycle-summary dd{margin:0;font:600 13px Orbitron;color:#e8ecf6}
+.cycle-summary [data-draft-resource='0-wallet'] dd{color:#1fffb1}
 
-.draft-clock-hero{
- display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;min-width:72px
-}
-.draft-clock-hero .draft-clock{font:700 14px Orbitron;color:#ffcc12;line-height:1}
 .draft-wallet-hero{
- flex:0 0 auto;min-width:160px;
- display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;
- padding:4px 0 4px 12px;
+ flex:0 0 auto;min-width:120px;
+ display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:0;
+ padding:0 0 0 8px;
 }
-.draft-wallet-hero .draft-clock{font:700 14px Orbitron;color:#ffcc12;line-height:1;margin-bottom:2px}
+.draft-wallet-hero .draft-clock{font:700 13px Orbitron;color:#ffcc12;line-height:1;margin-bottom:2px}
 .draft-wallet-hero .wallet-hero-value{
- display:flex;align-items:center;gap:10px;color:#1fffb1;
+ display:flex;align-items:center;gap:8px;color:#1fffb1;
 }
-.draft-wallet-hero .wallet-hero-value .icon{width:28px;height:32px}
+.draft-wallet-hero .wallet-hero-value .icon{width:22px;height:26px}
 .draft-wallet-hero .wallet-hero-value b{
- font:700 52px/1 Orbitron;color:#1fffb1;
+ font:700 40px/1 Orbitron;color:#1fffb1;
  animation:wallet-tick .35s ease-out;
 }
-.draft-wallet-hero>small{font-size:11px;color:#8abca7;letter-spacing:.6px}
+.draft-wallet-hero>small{font-size:10px;color:#8abca7;letter-spacing:.6px}
 @keyframes wallet-tick{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:none}}
 
+/* Ten rotating offers: top row of 5, bottom row of 5 (engine slot order). Optional Crypto 2×2 sits to the right. */
 .draft-market-board{
- max-width:1280px;width:100%;margin:0 auto;
- display:grid;gap:12px;
+ max-width:1400px;width:100%;margin:0 auto;
+ display:flex;flex-direction:row;align-items:center;justify-content:center;
  flex:1 1 0;min-height:0;
- overflow:auto;align-content:start;
+ overflow:hidden;gap:22px;padding-top:6px;
+ --draft-card-w:clamp(68px,min(calc((100vw - 80px) / 5.6),calc((100dvh - 300px) / 3.1)),120px);
 }
-/* One Character row plus the smaller VP/Currency row fit the board height (≈2.6 card widths tall plus ~500px of Draft chrome and group labels).
-   The Character row holds 7 cards (3 offers + 4 game cards) and 124px of gaps, so the width caps at (1280 - 124) / 7. */
-.draft-market-board{--draft-card-w:clamp(110px,min(calc((100dvh - 500px) * .38),calc((100vw - 190px) / 7)),164px);--draft-resource-w:calc(var(--draft-card-w) * .82)}
-.market-hint{margin:0;font-size:11px;color:#9ea8bb;letter-spacing:.2px}
-.market-band,.market-band.resources{display:grid;gap:12px;justify-content:stretch;margin:0}
-/* The power badge overhangs the card's top-right edge, so rows and gaps leave room for it. */
-.market-row{display:flex;flex-wrap:wrap;align-items:flex-start;padding-top:8px}
-.character-row{gap:14px 34px}
-.market-group{display:flex;flex-wrap:wrap;gap:14px 18px}
-.market-group>.market-card{width:var(--draft-card-w)}
-.market-group-label{flex-basis:100%;margin:0 0 -6px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#c6cfdf}
-.market-group-label small{margin-left:6px;font-size:10px;font-weight:400;letter-spacing:.2px;text-transform:none;color:#8f9ab0}
-.resource-row{gap:14px 34px}
-.resource-row .market-card{width:var(--draft-resource-w)}
+.market-main{
+ display:flex;flex-direction:column;gap:12px;min-width:0;flex:0 1 auto;
+}
+.market-crypto{
+ display:flex;flex-direction:column;gap:6px;flex:0 0 auto;align-self:center;min-width:0;
+ padding-left:6px;border-left:1px solid #ffffff18;
+}
+.market-crypto-grid{
+ display:grid;grid-template-columns:repeat(2,var(--draft-card-w));gap:8px 10px;justify-content:center;
+}
+.market-crypto-grid>.market-card{width:var(--draft-card-w);flex:0 0 auto}
+.market-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.market-cards{display:flex;flex-wrap:nowrap;gap:8px 10px;min-width:0;justify-content:center}
+.market-group>.market-card,
+.market-cards>.market-card{width:var(--draft-card-w);flex:0 0 auto}
+.market-group-label{
+ margin:0;font-size:10px;font-weight:600;letter-spacing:.7px;
+ text-transform:uppercase;color:#c6cfdf;white-space:nowrap;
+}
+.market-group-label small{margin-left:5px;font-size:9px;font-weight:400;letter-spacing:.2px;text-transform:none;color:#8f9ab0}
 
 .strategic-draft .market-card{
- display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:0;padding:0;
+ display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0;padding:0;
  background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;
 }
 .strategic-draft .market-art,
@@ -112,37 +117,36 @@
  transition:transform .16s ease,filter .2s ease;
 }
 .strategic-draft .market-art>.cf-card{width:100%;height:100%}
-.strategic-draft .market-art:hover{transform:translateY(-4px)}
-.strategic-draft .market-art:focus-visible{outline:2px solid #1fffb1;outline-offset:4px}
+.strategic-draft .market-art:hover{transform:translateY(-3px)}
+.strategic-draft .market-art:focus-visible{outline:2px solid #1fffb1;outline-offset:3px}
 .strategic-draft .market-card.unavailable .market-art{filter:saturate(.7) brightness(.72)}
 .strategic-draft .market-card.sold-out .market-art{filter:grayscale(1) brightness(.45)}
 .strategic-draft .market-card.just-acquired{border:0;box-shadow:none}
 .strategic-draft .market-card.just-acquired .market-art{animation:market-acquired .6s ease-out}
 @keyframes market-acquired{from{transform:scale(1.05);filter:brightness(1.45)}}
-/* Same badge treatment the card cost used to carry, stretched to the card's width. */
 .strategic-draft .market-card>.market-acquire,
 .strategic-draft .market-card>.market-acquire:hover{
- display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px 4px;
- width:100%;min-height:28px;padding:5px 6px;margin:0;
- border:1px solid #1fffb1;border-radius:8px;color:#1fffb1;background:#003246;
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 3px;
+ width:100%;min-height:24px;padding:4px 5px;margin:0;
+ border:1px solid #1fffb1;border-radius:7px;color:#1fffb1;background:#003246;
  box-shadow:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000000d;
- font:500 12px/1 Inter,system-ui,sans-serif;text-shadow:none;
+ font:500 11px/1 Inter,system-ui,sans-serif;text-shadow:none;
  transition:background .16s ease,box-shadow .16s ease,opacity .2s ease;
 }
 .strategic-draft .market-card>.market-acquire.can-afford:hover{background:#004a5c;box-shadow:0 0 12px #1fffb140}
 .strategic-draft .market-acquire:focus-visible{outline:2px solid #1fffb1;outline-offset:3px}
 .strategic-draft .market-card>.market-acquire[aria-disabled="true"]{cursor:default;opacity:.45}
-.strategic-draft .market-acquire>.market-acquire-label{display:inline-flex;align-items:center;gap:4px;color:#1fffb1;letter-spacing:.02em;white-space:nowrap}
-.strategic-draft .market-acquire-label .icon{display:block;width:10px;height:12px}
+.strategic-draft .market-acquire>.market-acquire-label{display:inline-flex;align-items:center;gap:3px;color:#1fffb1;letter-spacing:.02em;white-space:nowrap}
+.strategic-draft .market-acquire-label .icon{display:block;width:9px;height:11px}
 .strategic-draft .market-acquire-label b{font:inherit}
-.strategic-draft .market-acquire>.market-acquire-remain{margin-left:auto;font:400 10px/1 Inter,system-ui,sans-serif;color:#8fd9c1;white-space:nowrap}
+.strategic-draft .market-acquire>.market-acquire-remain{margin-left:auto;font:400 9px/1 Inter,system-ui,sans-serif;color:#8fd9c1;white-space:nowrap}
 .strategic-draft .market-card.just-acquired>.market-acquire{background:#00594a}
 
 .draft-footer{
- max-width:1280px;width:100%;margin:0 auto;
+ max-width:1400px;width:100%;margin:0 auto;
  flex:0 0 auto;
- display:flex;align-items:center;justify-content:space-between;gap:20px;
- padding:12px 4px 18px;border-top:1px solid #2f3448;
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ padding:8px 4px 12px;border-top:1px solid #2f3448;
  background:#0b0d19;
  position:relative;z-index:2;
 }
@@ -200,20 +204,24 @@
 @media(prefers-reduced-motion:reduce){.choice-backdrop,.choice-dialog{animation:none}}
 .effect-path.move,.effect-path.probability,.effect-path.bank,.effect-path.trash{color:#c4a0f3}
 @media(max-width:1100px){
- .draft-market-board{--draft-card-w:clamp(110px,min(calc((100dvh - 500px) * .38),calc((100vw - 170px) / 7)),136px)}
- .character-row,.resource-row{column-gap:22px}
- .draft-topbar{flex-direction:column;align-items:stretch}
- .draft-clock-hero,.draft-wallet-hero{align-items:flex-start;padding-left:0}
- .cycle-summary{width:100%}
+ .draft-market-board{--draft-card-w:clamp(64px,min(calc((100vw - 180px) / 6.2),calc((100dvh - 320px) / 3.1)),110px)}
+ .market-cards{gap:6px 8px}
+ .market-vp-grid{margin-left:32px}
+ .market-vp-grid>.market-cards{gap:6px 8px}
+ .draft-topbar{gap:12px}
  .draft-overlay.strategic-draft{inset:58px 0 36px}
 }
 @media(max-width:760px){
- .draft-market-board{--draft-card-w:calc(50vw - 40px);--draft-resource-w:calc(33vw - 30px)}
- .character-row,.resource-row{column-gap:18px}
+ .draft-market-board{
+  --draft-card-w:clamp(56px,calc((100vw - 48px) / 4.5),96px);--draft-resource-w:var(--draft-card-w);
+  flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;overflow:auto;gap:12px;
+ }
+ .market-vp-grid{margin-left:0}
+ .market-currency{margin-left:0}
  .choice-options{grid-template-columns:1fr}
  .draft-footer{flex-wrap:wrap}
- .draft-wallet-hero .wallet-hero-value b{font-size:40px}
- .draft-overlay.strategic-draft{padding:12px 14px 0}
+ .draft-wallet-hero .wallet-hero-value b{font-size:32px}
+ .draft-overlay.strategic-draft{padding:10px 12px 0}
 }
 @media(prefers-reduced-motion:reduce){
  .bank-slot.active-source{animation:none}

@@ -326,7 +326,7 @@
 @keyframes draft-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.draft-overlay{animation:none}}
 /* Resource language: gold VP/healing, green Crypto, blue draw, cyan Actions. */
-:root{--gold:#ffcc12;--green:#1fffb1;--blue:#4185ff;--cyan:#27e2ff;--player-primary:#ff8a1f;--player-secondary:#b24cff}
+:root{--gold:#ffcc12;--yellow:#ffff00;--green:#1fffb1;--blue:#4185ff;--cyan:#27e2ff;--player-primary:#ff8a1f;--player-secondary:#b24cff}
 .icon{display:inline-block;background-color:currentColor;mask-size:contain;mask-position:center;mask-repeat:no-repeat;-webkit-mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat}
 .world-anchor .resources{display:flex;justify-content:space-between;gap:12px;margin-top:5px}
 .world-anchor .resources>span{display:flex;flex-direction:column;gap:3px;min-width:43px;align-items:center}
@@ -377,7 +377,7 @@
 .world-anchor .power-badge.opponent.winning b{color:#ffcc12;text-shadow:0 0 5px #fff,0 0 12px #ffcc12}
 .world-anchor .location-plate>.location-reward{color:#d9d5e5}
 .resource-crypto,.market-card>button:last-child>span,.inspect-stats>span:nth-child(2){color:var(--green)}
-.inspect-stats b.power-boosted{color:var(--cyan)}.inspect-stats b.power-reduced{color:var(--pink)}
+.inspect-stats b.power-boosted{color:var(--yellow,#ffff00)}.inspect-stats b.power-reduced{color:var(--pink)}
 .resource-vp,.world-anchor .server.server-restore .server-readout b{color:var(--gold)}
 .resource-draw{color:var(--blue)}
 .world-anchor .pile-deck,.world-anchor .pile-deck b{color:#fff}

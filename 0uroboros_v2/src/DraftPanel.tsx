@@ -19,16 +19,16 @@ type Props = {
  claim:()=>void; end:()=>void; undo:()=>void;
 };
 
-const byCost=(piles:MarketPile[])=>[...piles].sort((a,b)=>a.card.cost-b.card.cost||a.card.name.localeCompare(b.card.name));
-
 export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,acquire,claim,end,undo}:Props){
  const local=view.players[0],opponent=view.players[1];
  const locked=busy||view.draftEnded||view.draftReady[0]||seconds===0;
  const privilege=view.circuitReward.definition;
- const offers=byCost(view.market.filter(pile=>pile.rotating));
- const gameCharacters=byCost(view.market.filter(pile=>!pile.rotating&&(pile.category==='Base'||pile.category==='Chaos')));
- const gameVP=byCost(view.market.filter(pile=>!pile.rotating&&pile.category==='VP'));
- const currency=byCost(view.market.filter(pile=>!pile.rotating&&pile.category==='Crypto'));
+ // Engine order: top 5 then bottom 5 — never re-sort by cost.
+ const offers=view.market.filter(pile=>pile.rotating);
+ const topRow=offers.slice(0,5);
+ const bottomRow=offers.slice(5,10);
+ // Persistent Crypto shelf (setup option), kept in engine order for the 2×2 grid.
+ const cryptoPiles=view.market.filter(pile=>!pile.rotating&&pile.category==='Crypto');
  const vpEarned=Math.max(0,local.totalVP-(cycleStart?.vp??0));
  const integrityDelta=local.servers.primary+local.servers.backup-(cycleStart?.integrity??0);
  const locationsWon=view.nodes.filter(node=>node.winner===0).length;
@@ -36,13 +36,13 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
  const eligible=view.circuitEligible.includes(0);
  const claimed=view.circuitReward.claimed.includes(0);
 
- const renderPile=(pile:MarketPile,size:'character'|'compact')=>{
+ const renderPile=(pile:MarketPile)=>{
   const stock=pile.remaining?.[0]??pile.supply;
-  const cooling=!!acquired[pile.id]&&now-acquired[pile.id].at<2000;
-  const affordable=!cooling&&stock>0&&pile.card.cost<=local.wallet;
+  const justBought=!!acquired[pile.id]&&now-acquired[pile.id].at<600;
+  const affordable=stock>0&&pile.card.cost<=local.wallet;
   const unavailable=locked||!affordable;
-  const state=cooling?'Added':stock===0?'Gone':pile.card.cost>local.wallet?'Too costly':'Acquire';
-  return <article className={`market-card ${size} ${pile.category.toLowerCase()} ${pile.rotating?'rotating':''} ${cooling?'just-acquired':''} ${stock===0?'sold-out':''} ${unavailable?'unavailable':''}`} key={pile.id} data-pile-id={pile.id} data-market-id={pile.id} data-card-name={pile.card.name} data-category={pile.category} data-stock={stock} data-cost={pile.card.cost}>
+  const state=stock===0?'Gone':pile.card.cost>local.wallet?'Too costly':'Acquire';
+  return <article className={`market-card character ${pile.category.toLowerCase()} ${pile.rotating?'rotating':''} ${justBought?'just-acquired':''} ${stock===0?'sold-out':''} ${unavailable?'unavailable':''}`} key={pile.id} data-pile-id={pile.id} data-market-id={pile.id} data-card-name={pile.card.name} data-category={pile.category} data-stock={stock} data-cost={pile.card.cost}>
    <button className='market-art' aria-label={`Inspect ${pile.card.name}`}
     onClick={()=>inspect(pile.card)} onContextMenu={event=>{event.preventDefault();inspect(pile.card);}}>
     <CardFace card={pile.card} context='preview'/>
@@ -72,30 +72,33 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
      <button className='primary-button' disabled={locked||claimed} onClick={claim}>{claimed?'Claimed':'Claim'}</button>
     </>:<div className='privilege-copy'><small>CIRCUIT</small><h2>Opponent privilege</h2><p>You can still buy from the market.</p></div>}
    </section>
-   <aside className='draft-clock-hero' aria-label='Draft timer'>
+   <aside className='draft-wallet-hero' data-draft-resource='0-wallet' aria-label='Crypto to spend'>
     <div className='draft-clock'>{view.draftEnded?'DONE':`${seconds}s`}</div>
+    <div className='wallet-hero-value'><Icon name='crypto'/><b key={local.wallet}>{local.wallet}</b></div>
+    <small>Crypto</small>
    </aside>
   </header>
 
   <div className='draft-market-board' aria-label='Full market'>
-   <p className='market-hint'>Tap a card for details · Acquire to add it to your deck</p>
-   <section className='market-band characters' data-market-section='characters'>
-    <div className='market-row character-row'>
-     {offers.length>0&&<div className='market-group' data-market-section='draft'><h3 className='market-group-label'>This round <small>max {DRAFT_COPIES_PER_PLAYER} each</small></h3>{offers.map(pile=>renderPile(pile,'character'))}</div>}
-     <div className='market-group' data-market-section='game'><h3 className='market-group-label'>Game cards</h3>{gameCharacters.map(pile=>renderPile(pile,'character'))}</div>
-    </div>
-   </section>
-   <section className='market-band resources' data-market-section='resources'>
-    <div className='market-row resource-row'>
-     <div className='market-group' data-market-section='vp'><h3 className='market-group-label'>Game VP</h3>{gameVP.map(pile=>renderPile(pile,'compact'))}</div>
-     {currency.length>0&&<div className='market-group' data-market-section='currency'><h3 className='market-group-label'>Currency</h3>{currency.map(pile=>renderPile(pile,'compact'))}</div>}
-    </div>
-   </section>
+   <div className='market-main'>
+    {topRow.length>0&&<div className='market-group market-row-offers' data-market-section='draft-top'>
+     <h3 className='market-group-label'>This round <small>max {DRAFT_COPIES_PER_PLAYER} each</small></h3>
+     <div className='market-cards'>{topRow.map(renderPile)}</div>
+    </div>}
+    {bottomRow.length>0&&<div className='market-group market-row-offers' data-market-section='draft-bottom'>
+     <div className='market-cards'>{bottomRow.map(renderPile)}</div>
+    </div>}
+   </div>
+   {cryptoPiles.length>0&&<aside className='market-crypto' data-market-section='draft-crypto' aria-label='Crypto shelf'>
+    <h3 className='market-group-label'>Crypto</h3>
+    <div className='market-crypto-grid'>{cryptoPiles.map(renderPile)}</div>
+   </aside>}
   </div>
 
   <footer className='draft-footer'>
    <aside className='cycle-summary' aria-label='Cycle summary'>
     <dl>
+     <div data-draft-resource='0-wallet'><dt>Crypto</dt><dd>{local.wallet}</dd></div>
      <div data-draft-resource='0-vp'><dt>VP</dt><dd>+{vpEarned}</dd></div>
      <div><dt>Integrity</dt><dd>{integrityDelta>0?`+${integrityDelta}`:integrityDelta}</dd></div>
      <div><dt>Locations</dt><dd>{locationsWon}–{locationsLost}</dd></div>

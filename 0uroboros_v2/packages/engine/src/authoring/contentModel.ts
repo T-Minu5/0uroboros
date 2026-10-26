@@ -1,11 +1,12 @@
 import { expandDeck, starterEffects, CARD_CLASSES, POWER_SOURCES, DEFAULT_STARTING_DECK, MIN_STARTING_DECK_SIZE, VP_CLASSES, type Card, type CardClass, type DeckEntry, type LegacyEffect } from '../game';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, CURRENCY_PILES, GAME_BASE_COUNT, GAME_CHAOS_GROUPS, GAME_CHARACTER_COUNT, DRAFT_OFFER_COUNT, GAME_VP_COUNT } from '../evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, CURRENCY_PILES, DRAFT_OFFER_COUNT, cardGainsCryptoInRange } from '../evaluationMarket';
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, type EvaluationLocation, type CircuitRewardDefinition } from '../content';
 import { CARD_ART_PLACEHOLDER } from '../cardArtwork';
 import { HISTORIC_SOURCE_METADATA } from '../historicCatalog';
 import { describeLocation, validateSteps, type ValidationCards } from '../effects/catalog';
 import { liftLocationSchedule, migrateCard, migrateEffects, migrateLocation, migrateRewardEffects } from '../effects/migrate';
 import { MOD_HOOKS, isBuiltinModifier, type AnyEffect, type EffectStep, type ModDefinition, type Scope } from '../effects/types';
+import { validateLocationCondition, type LocationCondition } from '../locationConditions';
 import { BUILTIN_MOD_FIELDS, BUILTIN_MOD_LIMITS, type BuiltinModOverrides } from '../builtinMods';
 import { defaultOpponents, isCanonicalProfile, type AuthoredOpponent } from '../ai/opponents';
 export type { AuthoredOpponent } from '../ai/opponents';
@@ -21,7 +22,10 @@ export type AuthoredCard = Omit<Card, keyof CardHooks> & CardHooks & {
   generated?: boolean;
   storyText?: string;
 };
-type LocationHooks = { effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[] };
+type LocationHooks = {
+  effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[];
+  startTurn2?: EffectStep[]; startTurn3?: EffectStep[]; conditions?: LocationCondition[];
+};
 export type AuthoredLocation = Omit<EvaluationLocation, keyof LocationHooks> & LocationHooks & { enabled: boolean };
 export type AuthoredCircuitReward = Omit<CircuitRewardDefinition, 'effect' | 'effects'> & { effects: EffectStep[]; enabled: boolean };
 export type StartingDeck = { id: string; name: string; cards: DeckEntry[] };
@@ -296,13 +300,22 @@ export function validateContent(value: unknown): string[] {
   locations.forEach((item, index) => {
     const p = `locations[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a location object`); return; }
-    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'ongoing', 'onPlay', 'startTurn2', 'startTurn3', 'enabled'], p, errors);
+    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'ongoing', 'onPlay', 'startTurn2', 'startTurn3', 'conditions', 'enabled'], p, errors);
     requiredId(item.id, `${p}.id`, errors); requiredText(item.name, `${p}.name`, errors, 200);
     requiredText(item.rule, `${p}.rule`, errors, 2000); requiredText(item.reward, `${p}.reward`, errors, 2000);
     if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
     steps(item.effects, `${p}.effects`, 'location');
     for (const hook of ['ongoing', 'startTurn2', 'startTurn3']) if (item[hook] !== undefined) steps(item[hook], `${p}.${hook}`, 'location');
     if (item.onPlay !== undefined) steps(item.onPlay, `${p}.onPlay`, 'locationPlay');
+    if (item.conditions !== undefined) {
+      if (!Array.isArray(item.conditions) || item.conditions.length > 20) errors.push(`${p}.conditions: expected up to 20 conditions`);
+      else item.conditions.forEach((condition, at) => {
+        const cp = `${p}.conditions[${at}]`;
+        if (!record(condition)) { errors.push(`${cp}: expected a condition object`); return; }
+        errors.push(...validateLocationCondition(condition as LocationCondition, cp));
+        if (Array.isArray(condition.effects)) steps(condition.effects, `${cp}.effects`, 'locationCondition');
+      });
+    }
   });
   mods.forEach((item, index) => {
     const p = `mods[${index}]`;
@@ -329,11 +342,15 @@ export function validateContent(value: unknown): string[] {
   });
   const draftable = cards.filter(record).filter(card => card.enabled === true && card.generated !== true);
   const count = (pool: CardPool) => draftable.filter(card => card.pool === pool).length;
-  const characterMinimum = GAME_CHARACTER_COUNT + DRAFT_OFFER_COUNT;
-  if (count('Base') + count('Chaos') < characterMinimum) errors.push(`cards: at least ${characterMinimum} enabled non-Generated Base or Chaos cards required (${GAME_CHARACTER_COUNT} game cards + ${DRAFT_OFFER_COUNT} Draft offers)`);
-  if (draftable.filter(card => card.pool === 'Base' && card.cardClass !== 'Runtime').length < GAME_BASE_COUNT) errors.push(`cards: at least ${GAME_BASE_COUNT} enabled non-Generated Base cards that are not Runtime required for game cards`);
-  for (const group of GAME_CHAOS_GROUPS) if (!draftable.some(card => card.pool === 'Chaos' && group.classes.includes(card.cardClass as CardClass))) errors.push(`cards: at least 1 enabled non-Generated ${group.label} Chaos card required for game cards`);
-  if (draftable.filter(card => card.pool === 'VP' && card.cardClass !== 'Solar-monk').length < GAME_VP_COUNT) errors.push(`cards: at least ${GAME_VP_COUNT} enabled non-Generated Volume VP cards required`);
+  if (count('Base') + count('Chaos') < DRAFT_OFFER_COUNT) errors.push(`cards: at least ${DRAFT_OFFER_COUNT} enabled non-Generated Base or Chaos cards required for Draft offers`);
+  if (draftable.filter(card => card.cardClass === 'Action' || card.cardClass === 'Utility').length < 2) errors.push('cards: at least 2 enabled non-Generated Action or Utility cards required for Draft');
+  if (count('Chaos') < 2) errors.push('cards: at least 2 enabled non-Generated Chaos cards required for Draft');
+  if (!draftable.some(card => card.pool === 'Chaos' && card.cardClass === 'Attack')) errors.push('cards: at least 1 enabled non-Generated Attack Chaos card required for Draft');
+  if (!draftable.some(card => card.pool === 'Chaos' && card.cardClass === 'Horror')) errors.push('cards: at least 1 enabled non-Generated Horror Chaos card required for Draft');
+  if (draftable.filter(card => card.pool === 'VP' && card.cardClass !== 'Solar-monk').length < 1) errors.push('cards: at least 1 enabled non-Generated Volume VP card required for Draft');
+  const asCard = (item: Record<string, unknown>) => item as unknown as Card;
+  if (!draftable.some(card => cardGainsCryptoInRange(asCard(card), 1, 3))) errors.push('cards: at least 1 enabled card that gains 1–3 Crypto required for Draft');
+  if (!draftable.some(card => cardGainsCryptoInRange(asCard(card), 1, 6))) errors.push('cards: at least 1 enabled card that gains 1–6 Crypto required for Draft');
   for (const { cardId } of CURRENCY_PILES) {
     const card = cards.find(item => record(item) && (item.definitionId ?? item.id) === cardId);
     if (!record(card) || card.enabled !== true || card.generated === true || card.type !== 'Crypto') errors.push(`cards: ${cardId} is a Draft currency and must remain enabled as a non-Generated Crypto card`);

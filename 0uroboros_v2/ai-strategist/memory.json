@@ -1,34 +1,34 @@
 {
   "schema": 1,
-  "version": 11,
-  "mode": "llm",
+  "version": 12,
+  "mode": "heuristic",
   "profile": {
-    "version": 11,
-    "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations, especially 'The Might Meek' and 'The Nudge'. Starting from Cycle 9, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will prioritize maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "version": 12,
+    "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
     "midgameMix": 0.5,
     "handCryptoTarget": 12,
     "minCryptoValue": 2,
-    "minBuyScore": 1.72,
-    "dilution": 0.83,
+    "minBuyScore": 0.75,
+    "dilution": 0.5,
     "weights": {
       "power": 1.26,
-      "draw": 2.48,
-      "actions": 1.49,
+      "draw": 1.6,
+      "actions": 1.1,
       "crypto": 2.34,
-      "drain": 2.25,
+      "drain": 2.4,
       "restore": 1.69,
-      "vp": 2.66,
+      "vp": 2.6,
       "duration": 0.8,
-      "thin": 1.67,
+      "thin": 1.2,
       "disrupt": 1.05,
-      "chaos": 1.45
+      "chaos": 1.5
     },
     "cardBias": {}
   },
-  "plan": "I will maintain my focus on acquiring high-value Crypto early, aiming for a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection, while adapting to the new Locations, especially 'The Might Meek' and 'The Nudge'. Starting from Cycle 9, I will aggressively target enemy Servers and invest heavily in VP cards, leveraging the dynamics introduced by these new Locations. I will prioritize maintaining board Power to contest crucial Nodes effectively. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -37,22 +37,22 @@
       "chaosFromCycle": 9,
       "vpFromCycle": 9,
       "midgameMix": 0.5,
-      "handCryptoTarget": 11.67,
+      "handCryptoTarget": 9,
       "minCryptoValue": 2,
-      "minBuyScore": 1.72,
-      "dilution": 0.83,
+      "minBuyScore": 0.75,
+      "dilution": 0.5,
       "weights": {
-        "power": 1.01,
-        "draw": 2.48,
-        "actions": 1.49,
-        "crypto": 2.04,
-        "drain": 2.25,
+        "power": 1,
+        "draw": 1.6,
+        "actions": 1.1,
+        "crypto": 1,
+        "drain": 2.4,
         "restore": 1,
-        "vp": 2.66,
+        "vp": 2.6,
         "duration": 0.8,
-        "thin": 1.67,
+        "thin": 1.2,
         "disrupt": 0.8,
-        "chaos": 1.45
+        "chaos": 1.5
       },
       "cardBias": {}
     },
@@ -66,14 +66,9 @@
       "Phase 3, endgame (Cycles 9-16): attack the enemy Servers like crazy, deploying every Drain card I draw first, and spend most of each Wallet on VP cards. The final Draft buys only VP.",
       "Draft after Cycle 4: score every card from its actual effects (no fixed table) and buy the best set the whole Wallet affords; skip cards that would only dilute the deck.",
       "Deploy: Action and draw cards first so they fuel later turns; contest Nodes whose Location pays the winner, and do not fight for Locations that pay the loser.",
-      "Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch) and hit the opponent's best cards.",
-      "Tip from VP-Dog (#1): Focus on acquiring high-value Crypto (Kilo-Coin, Mega-Cache) early to build a strong economy. Aim for a hand Crypto target of 15 by Cycle 5.",
-      "Tip from DV-8 (#1): Focus on thinning your deck to access key cards faster. Maintain a draw weight of 2.4 to improve your engine's efficiency.",
-      "Tip from VP-Dog (#2): Prioritize drawing cards and thinning your deck to cycle to high-value cards faster. Increase draw weight to 2.3 for better mid-game efficiency.",
-      "Tip from DV-8 (#2): Prioritize VP cards earlier in the game to secure points before the race heats up. Shift your VP from Cycle 13 to Cycle 11. (limited by my style: no change to my profile)",
-      "Coaching from the designer: play 25% closer to my competitors (average of T-5 v1.3, DV-8 v1.1, VP-Dog v1.1): Crypto target 11→11.67, min buy score 2→1.72, dilution 0.9→0.83, power weight 1→1.01, draw weight 2.6→2.48, actions weight 1.5→1.49, crypto weight 2.1→2.04, drain weight 2.4→2.25, vp weight 2.6→2.66, thin weight 1.68→1.67, chaos weight 1.5→1.45. My three phases stay as they are."
+      "Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch) and hit the opponent's best cards."
     ],
-    "since": "2026-10-16T01:01:28.761Z"
+    "since": "2026-10-17T18:48:03.570Z"
   },
   "adopted": {
     "weights": {
@@ -5404,1504 +5399,1504 @@
   ],
   "notes": [
     {
-      "version": 7,
-      "at": "2026-10-12T01:10:38.198Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:41:36.192Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:10:42.703Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:41:38.954Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:10:42.703Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:41:41.792Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:10:42.703Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:41:44.598Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:10:42.703Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:41:47.304Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:24.033Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:41:50.031Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:28.295Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:41:52.719Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:28.295Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:41:55.585Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:28.295Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:42:00.046Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:28.295Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:42:02.736Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:11:28.295Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:42:05.588Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:28.055Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:42:08.510Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:33.020Z",
-      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:42:11.135Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:33.020Z",
-      "text": "My economy needs improvement; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:42:16.186Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:33.020Z",
-      "text": "My board Power remains low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:42:18.951Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:33.020Z",
-      "text": "Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:42:21.704Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:12:33.020Z",
-      "text": "Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:42:24.523Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:31.872Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:42:27.269Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:37.400Z",
-      "text": "Cycle 14: High-value Crypto acquisition remains crucial for my economy."
+      "version": 12,
+      "at": "2026-10-18T18:42:30.058Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:37.400Z",
-      "text": "Cycle 14: My board Power is low; I consistently lose Locations, impacting my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:42:32.856Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:37.400Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:42:36.414Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:37.400Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:42:39.060Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:44.645Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:42:41.825Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:49.263Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:42:44.629Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:49.263Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:42:47.456Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:49.263Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:42:53.098Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:49.263Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:42:55.800Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:14:49.263Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:42:58.460Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:09.062Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:43:01.131Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:13.568Z",
-      "text": "Cycle 14: High-value Crypto acquisition remains crucial for my economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:03.827Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:13.568Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:43:06.910Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:13.568Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:09.727Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:13.568Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:43:12.584Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:45.971Z",
-      "text": "v1.7 online (server start). Read the notebook: 0 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:43:15.442Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:50.842Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:43:18.306Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:50.842Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:43:21.203Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:50.842Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:43:24.046Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:50.842Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:28.133Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:18:50.842Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:43:30.622Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:21:38.733Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:43:33.408Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:21:43.274Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:43:36.222Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:21:43.274Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:43:38.857Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:21:43.274Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:43:43.284Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:21:43.274Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:45.867Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:21.950Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:43:48.699Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:26.841Z",
-      "text": "Cycle 14: My board Power is low; I lost many Locations impacting my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:43:51.586Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:26.841Z",
-      "text": "Cycle 14: Early VP acquisition remains critical to compete with the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:54.322Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:26.841Z",
-      "text": "Cycle 14: Integration of Restore cards is essential for stabilizing my Servers."
+      "version": 12,
+      "at": "2026-10-18T18:43:57.015Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:26.841Z",
-      "text": "Cycle 14: The human's Draft wallet significantly exceeds mine; I need to improve my economy."
+      "version": 12,
+      "at": "2026-10-18T18:43:59.724Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:50.885Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:44:02.446Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:55.911Z",
-      "text": "Cycle 13: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:44:05.242Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:55.911Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:44:08.430Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:55.911Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:44:11.337Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:22:55.911Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:44:13.901Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:34.471Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:44:17.923Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:40.485Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:44:20.540Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:40.485Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:44:22.980Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:40.485Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:44:25.829Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:40.485Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:44:29.088Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-12T01:28:40.485Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:44:31.899Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:28.761Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Kilo-Coin then Mega-Cache; trash Basic Encryption, then Shyte after a Kilo); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
+      "version": 12,
+      "at": "2026-10-18T18:44:36.223Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:28.762Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:44:38.904Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:33.467Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:44:41.618Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:33.467Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:44:44.389Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:33.467Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:44:47.134Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:33.467Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:44:49.924Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:46.532Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:44:55.264Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:50.526Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:44:58.181Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:50.526Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:45:00.797Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:50.526Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:45:03.673Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:50.526Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:45:06.406Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:01:50.526Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:45:09.008Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:07.832Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 59 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:45:14.259Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:11.870Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:45:17.041Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:11.870Z",
-      "text": "Cycle 14: My board Power is low; I lost many Locations impacting my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:45:19.870Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:11.870Z",
-      "text": "Cycle 14: Integrating Restore cards is essential for stabilizing my Servers."
+      "version": 12,
+      "at": "2026-10-18T18:45:22.744Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:11.870Z",
-      "text": "Cycle 14: The human's Draft wallet significantly exceeds mine; I need to improve my economy."
+      "version": 12,
+      "at": "2026-10-18T18:45:25.337Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:05:11.870Z",
-      "text": "Cycle 13: I need to focus on acquiring more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:45:28.121Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T01:16:19.441Z",
-      "text": "Experiment x060-power rejected: league 23.5/48 for the experiment vs 25/48 for the current best against vp-dog@v1.1, t-5@v1.8 (margin -0.7/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:45:33.467Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:07.815Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:45:36.318Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:45:39.189Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:45:42.018Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:45:44.981Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:45:49.437Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "Cycle 14: Monitoring the impact of 'Nothing ever happens here' for potential strategy shifts."
+      "version": 12,
+      "at": "2026-10-18T18:45:52.117Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:48:11.870Z",
-      "text": "New experiment x061-evaluate-new-locations: Analyzing the effects of 'The Might Meek' and 'The Nudge' will improve my strategy for managing Power and VP collection. Change: power weight 1.01→1.1, vp weight 2.66→2.8. Prediction: Winning more Locations and achieving higher VP totals against opponents."
+      "version": 12,
+      "at": "2026-10-18T18:45:54.773Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:52:33.802Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:45:57.530Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:52:38.030Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:46:00.481Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:52:38.030Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:46:03.379Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:52:38.030Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:46:07.602Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:52:38.030Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:46:10.408Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:53:06.703Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:46:13.138Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:53:09.627Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:46:15.886Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:53:09.627Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:46:18.946Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:53:09.627Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:46:21.460Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:53:09.627Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:46:24.665Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:58:47.816Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:46:27.419Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:58:51.428Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:46:30.159Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:58:51.428Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:46:33.227Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:58:51.428Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:46:35.618Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:58:51.428Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:46:38.380Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:24.178Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:46:43.440Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:27.167Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:46:46.190Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:27.167Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:46:49.078Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:27.167Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:46:51.874Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:27.167Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:46:54.687Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:35.019Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:46:57.507Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:38.027Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:47:00.870Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:38.027Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:47:04.143Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:38.027Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:47:07.048Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:38.027Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:47:09.872Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:44.567Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:47:12.372Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:48.063Z",
-      "text": "Location analysis is crucial; 'The Might Meek' may enhance Power distribution, while 'The Nudge' can affect VP dynamics significantly."
+      "version": 12,
+      "at": "2026-10-18T18:47:15.095Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:48.063Z",
-      "text": "My economy remains weak; I need to prioritize high-value Crypto acquisitions earlier."
+      "version": 12,
+      "at": "2026-10-18T18:47:20.344Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:48.063Z",
-      "text": "The human's early VP acquisition is critical; I must match or exceed their early game tempo."
+      "version": 12,
+      "at": "2026-10-18T18:47:23.014Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:48.063Z",
-      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:47:25.593Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:51.064Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:47:28.300Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:54.014Z",
-      "text": "Cycle 14: My economy is still weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:47:31.174Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:54.014Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:47:36.457Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:54.014Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:47:39.066Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T04:59:54.014Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:47:41.844Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:00.428Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:47:44.773Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:03.298Z",
-      "text": "Cycle 14: My economy remains weak; I need to acquire more high-value Crypto early."
+      "version": 12,
+      "at": "2026-10-18T18:47:47.518Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:03.298Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:47:50.425Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:03.298Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:47:54.422Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:03.298Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:47:57.052Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:24.541Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:47:59.790Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:27.869Z",
-      "text": "Location analysis is crucial; 'The Might Meek' may enhance Power distribution, while 'The Nudge' can affect VP dynamics significantly."
+      "version": 12,
+      "at": "2026-10-18T18:48:02.522Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:27.869Z",
-      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:48:05.471Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:27.869Z",
-      "text": "My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:48:08.640Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:27.869Z",
-      "text": "Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:48:13.067Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:33.411Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:48:15.917Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:36.016Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:48:18.613Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:36.016Z",
-      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:48:21.335Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:36.016Z",
-      "text": "My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:48:24.134Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:00:36.016Z",
-      "text": "Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:48:26.933Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:02:40.124Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:48:31.815Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:02:44.238Z",
-      "text": "Cycle 14: My economy remains weak; high-value Crypto acquisition is crucial."
+      "version": 12,
+      "at": "2026-10-18T18:48:34.710Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:02:44.238Z",
-      "text": "Cycle 14: Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:48:38.224Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:02:44.238Z",
-      "text": "Cycle 14: My board Power is low; consistently losing Locations impacts my strategy."
+      "version": 12,
+      "at": "2026-10-18T18:48:40.862Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:02:44.238Z",
-      "text": "Cycle 14: Early VP acquisition is vital to match the human's economy."
+      "version": 12,
+      "at": "2026-10-18T18:48:43.562Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:03:08.751Z",
-      "text": "v1.7 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:48:46.375Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:03:12.844Z",
-      "text": "Location analysis is crucial; 'The Might Meek' may enhance Power distribution."
+      "version": 12,
+      "at": "2026-10-18T18:48:49.222Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:03:12.844Z",
-      "text": "My economy remains weak; I need to prioritize high-value Crypto acquisitions earlier."
+      "version": 12,
+      "at": "2026-10-18T18:48:51.908Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:03:12.844Z",
-      "text": "The human's early VP acquisition is critical; I must match or exceed their tempo."
+      "version": 12,
+      "at": "2026-10-18T18:48:54.572Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:03:12.844Z",
-      "text": "Integrating more Restore cards is essential for stabilizing my Servers against aggressive plays."
+      "version": 12,
+      "at": "2026-10-18T18:48:57.425Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:12:14.462Z",
-      "text": "Theory evaluate-new-locations was contradicted from x061-evaluate-new-locations (league 17.5/48 for the experiment vs 21/48 for the current best against dv-8@v1.1, vp-dog@v1.0 (margin -2.2/game) → rejected); now 0 for / 1 against."
+      "version": 12,
+      "at": "2026-10-18T18:49:00.270Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:12:14.462Z",
-      "text": "Experiment x061-evaluate-new-locations rejected: league 17.5/48 for the experiment vs 21/48 for the current best against dv-8@v1.1, vp-dog@v1.0 (margin -2.2/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:02.931Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 7,
-      "at": "2026-10-16T05:18:59.953Z",
-      "text": "New experiment x062-fallback-62-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.01→1.26. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:05.566Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:19:45.269Z",
-      "text": "Now v1.8: adopted x062-fallback-62-0 (power weight 1.01→1.26)."
+      "version": 12,
+      "at": "2026-10-18T18:49:08.694Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:19:45.269Z",
-      "text": "Experiment x062-fallback-62-0 adopted: league 25/48 for the experiment vs 19/48 for the current best against t-5@v1.4, strat-g@v1.6, vp-dog@v1.0 (margin +5.7/game) → promising. Adopted into the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:11.400Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:19:45.272Z",
-      "text": "New experiment x063-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 0.8→1.05. Prediction: More wins and a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:14.014Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:22:05.384Z",
-      "text": "Experiment x063-disrupt inconclusive: league 23.5/48 for the experiment vs 22.5/48 for the current best against dv-8@v1.1, t-5@v1.8, vp-dog@v1.2 (margin -1.8/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:16.615Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:24:21.383Z",
-      "text": "New experiment x064-fallback-64-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:19.441Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:25:11.867Z",
-      "text": "Experiment x064-fallback-64-0 rejected: league 15/48 for the experiment vs 20/48 for the current best against vp-dog@v1.2, dv-8@v1.1, vp-dog@v1.0 (margin -2.5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:23.816Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 8,
-      "at": "2026-10-16T05:25:11.867Z",
-      "text": "New experiment x065-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: Crypto target 11.67→12, crypto weight 2.04→2.34. Prediction: Bigger mid-game Wallets and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:26.462Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:27:22.042Z",
-      "text": "Now v1.9: adopted x065-crypto (Crypto target 11.67→12, crypto weight 2.04→2.34)."
+      "version": 12,
+      "at": "2026-10-18T18:49:29.553Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:27:22.042Z",
-      "text": "Experiment x065-crypto adopted: league 26/48 for the experiment vs 22/48 for the current best against vp-dog@v1.1, dv-8@v1.1 (margin +3.7/game) → promising. Adopted into the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:32.056Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:29:35.666Z",
-      "text": "New experiment x066-fallback-66-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.48→2.73. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:34.782Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:30:23.230Z",
-      "text": "Experiment x066-fallback-66-1 rejected: league 28/48 for the experiment vs 29/48 for the current best against strat-g@v1.8, strat-g@v1.5 (margin -5.9/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:39.339Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:30:23.230Z",
-      "text": "New experiment x067-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. Prediction: Fewer losses by Server destruction than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:41.871Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:32:35.998Z",
-      "text": "Experiment x067-restore inconclusive: league 20.5/48 for the experiment vs 21.5/48 for the current best against t-5@v1.7, strat-g@v1.6, vp-dog@v1.3 (margin +0.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:44.655Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:32:35.998Z",
-      "text": "New experiment x068-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:47.565Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T05:35:37.871Z",
-      "text": "Experiment x068-draw inconclusive: league 15.5/48 for the experiment vs 15.5/48 for the current best against vp-dog@v1.2, vp-dog@v1.1, strat-g@v1.6 (margin +1.9/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:50.326Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:40:14.093Z",
-      "text": "New experiment x069-fallback-69-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.49→1.74. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:53.079Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:41:04.231Z",
-      "text": "Experiment x069-fallback-69-2 rejected: league 18.5/48 for the experiment vs 23.5/48 for the current best against vp-dog@v1.0, strat-g@v1.8, dv-8@v1.1 (margin -5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:49:58.273Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:41:04.231Z",
-      "text": "New experiment x070-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:00.888Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:44:07.343Z",
-      "text": "Experiment x070-drain rejected: league 22/48 for the experiment vs 25/48 for the current best against dv-8@v1.1, vp-dog@v1.4, t-5@v1.7 (margin -6/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:03.725Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:44:07.343Z",
-      "text": "New experiment x071-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:06.590Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:49:35.345Z",
-      "text": "Experiment x071-leaner inconclusive: league 24/48 for the experiment vs 26/48 for the current best against strat-g@v1.6, vp-dog@v1.2, t-5@v1.8 (margin +1.9/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:09.230Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:49:35.346Z",
-      "text": "New experiment x072-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:12.004Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:54:13.421Z",
-      "text": "Experiment x072-thinner rejected: league 27/48 for the experiment vs 28/48 for the current best against dv-8@v1.1, vp-dog@v1.4, strat-g@v1.5 (margin -1.5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:15.138Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:54:13.421Z",
-      "text": "New experiment x073-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:17.824Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:56:29.488Z",
-      "text": "Experiment x073-power inconclusive: league 24/48 for the experiment vs 24.5/48 for the current best against t-5@v1.6, dv-8@v1.1, vp-dog@v1.3 (margin +0.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:20.521Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:58:44.401Z",
-      "text": "New experiment x074-fallback-74-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.34→2.59. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:23.031Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T07:59:33.387Z",
-      "text": "Experiment x074-fallback-74-3 inconclusive: league 21.5/48 for the experiment vs 18/48 for the current best against vp-dog@v1.4, dv-8@v1.1, t-5@v1.7 (margin +5.4/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:25.801Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T08:01:05.519Z",
-      "text": "New experiment x075-fallback-75-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.25→2.5. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:28.544Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T08:01:53.050Z",
-      "text": "Experiment x075-fallback-75-4 rejected: league 24.5/48 for the experiment vs 26.5/48 for the current best against strat-g@v1.6, vp-dog@v1.1, t-5@v1.8 (margin -2.5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:31.525Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T08:01:53.051Z",
-      "text": "New experiment x076-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: crypto weight 2.34→2.64. Prediction: Bigger mid-game Wallets and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:34.105Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T08:04:48.629Z",
-      "text": "Experiment x076-crypto inconclusive: league 31/48 for the experiment vs 31/48 for the current best against t-5@v1.6 (margin -2.6/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:36.962Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 9,
-      "at": "2026-10-16T08:04:48.630Z",
-      "text": "New experiment x077-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 0.8→1.05. Prediction: More wins and a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:39.764Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T08:07:56.967Z",
-      "text": "Now v1.10: adopted x077-disrupt (disrupt weight 0.8→1.05)."
+      "version": 12,
+      "at": "2026-10-18T18:50:42.590Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T08:07:56.967Z",
-      "text": "Experiment x077-disrupt adopted: league 26/48 for the experiment vs 21/48 for the current best against strat-g@v1.7, t-5@v1.8, vp-dog@v1.5 (margin +1.1/game) → promising. Adopted into the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:45.296Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T14:52:55.317Z",
-      "text": "New experiment x078-fallback-78-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:47.975Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T14:53:41.624Z",
-      "text": "Experiment x078-fallback-78-0 rejected: league 24.5/48 for the experiment vs 25.5/48 for the current best against t-5@v1.4, vp-dog@v1.5, t-5@v1.6 (margin -5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:50.682Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:00:30.821Z",
-      "text": "New experiment x079-fallback-79-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.48→2.73. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:53.171Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:01:14.254Z",
-      "text": "Experiment x079-fallback-79-1 inconclusive: league 36/48 for the experiment vs 36/48 for the current best against t-5@v1.8 (margin -1.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:55.941Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:01:14.254Z",
-      "text": "New experiment x080-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. Prediction: Fewer losses by Server destruction than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:50:58.635Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:03:33.157Z",
-      "text": "Experiment x080-restore inconclusive: league 23/48 for the experiment vs 23/48 for the current best against strat-g@v1.7, t-5@v1.7, dv-8@v1.2 (margin -0.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:01.579Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:03:33.158Z",
-      "text": "New experiment x081-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:04.351Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:06:41.201Z",
-      "text": "Experiment x081-draw inconclusive: league 18/48 for the experiment vs 18/48 for the current best against t-5@v1.8, vp-dog@v1.5 (margin -1.3/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:07.099Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:10:28.439Z",
-      "text": "New experiment x082-fallback-82-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.49→1.74. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:09.861Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:11:12.854Z",
-      "text": "Experiment x082-fallback-82-2 rejected: league 29.5/48 for the experiment vs 30/48 for the current best against dv-8@v1.2, t-5@v1.6, t-5@v1.4 (margin -0.8/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:12.666Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:11:12.855Z",
-      "text": "New experiment x083-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:15.351Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:15:47.872Z",
-      "text": "Experiment x083-drain inconclusive: league 31/48 for the experiment vs 31/48 for the current best against strat-g@v1.8, dv-8@v1.2, t-5@v1.8 (margin -2.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:17.972Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:15:47.872Z",
-      "text": "New experiment x084-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:20.905Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:19:04.921Z",
-      "text": "Experiment x084-leaner rejected: league 21.5/48 for the experiment vs 23.5/48 for the current best against dv-8@v1.2, vp-dog@v1.5 (margin -2.1/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:23.695Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:19:04.921Z",
-      "text": "New experiment x085-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:26.443Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:57:36.863Z",
-      "text": "Experiment x085-thinner inconclusive: league 23.5/48 for the experiment vs 24/48 for the current best against t-5@v1.8, dv-8@v1.2 (margin +0.3/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:29.087Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T15:57:36.863Z",
-      "text": "New experiment x086-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:32.109Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:00:43.108Z",
-      "text": "Experiment x086-power inconclusive: league 22.5/48 for the experiment vs 19.5/48 for the current best against dv-8@v1.2, strat-g@v1.6 (margin +2.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:34.916Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:26:58.019Z",
-      "text": "New experiment x087-fallback-87-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.34→2.59. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:37.850Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:27:46.207Z",
-      "text": "Experiment x087-fallback-87-3 rejected: league 16.5/48 for the experiment vs 24.5/48 for the current best against strat-g@v1.7, vp-dog@v1.3, dv-8@v1.2 (margin -7.9/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:40.567Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:27:46.207Z",
-      "text": "New experiment x088-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:43.230Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:30:53.210Z",
-      "text": "Experiment x088-disrupt inconclusive: league 27/48 for the experiment vs 25/48 for the current best against dv-8@v1.2, strat-g@v1.7 (margin +2.5/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:45.967Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:30:53.210Z",
-      "text": "New experiment x089-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: crypto weight 2.34→2.64. Prediction: Bigger mid-game Wallets and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:51.069Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:36:12.323Z",
-      "text": "Experiment x089-crypto inconclusive: league 29.5/48 for the experiment vs 32/48 for the current best against t-5@v1.8, dv-8@v1.2, vp-dog@v1.3 (margin +0.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:54.059Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:40:13.783Z",
-      "text": "New experiment x090-fallback-90-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.25→2.5. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:56.834Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:41:03.499Z",
-      "text": "Experiment x090-fallback-90-4 inconclusive: league 15.5/48 for the experiment vs 14.5/48 for the current best against strat-g@v1.8, vp-dog@v1.5 (margin -0.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:51:59.578Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:44:49.829Z",
-      "text": "New experiment x091-fallback-91-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:02.277Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:45:38.974Z",
-      "text": "Experiment x091-fallback-91-0 inconclusive: league 22.5/48 for the experiment vs 21.5/48 for the current best against vp-dog@v1.5, t-5@v1.8, dv-8@v1.2 (margin +0.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:05.254Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:49:25.971Z",
-      "text": "New experiment x092-fallback-92-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.48→2.73. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:09.006Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:50:13.509Z",
-      "text": "Experiment x092-fallback-92-1 inconclusive: league 27/48 for the experiment vs 26/48 for the current best against t-5@v1.5, dv-8@v1.0, dv-8@v1.2 (margin -2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:11.784Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 10,
-      "at": "2026-10-16T16:50:13.510Z",
-      "text": "New experiment x093-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.3→1.69. Prediction: Fewer losses by Server destruction than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:14.455Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T16:53:27.938Z",
-      "text": "Now v1.11: adopted x093-restore (restore weight 1.3→1.69)."
+      "version": 12,
+      "at": "2026-10-18T18:52:17.157Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T16:53:27.938Z",
-      "text": "Experiment x093-restore adopted: league 29/48 for the experiment vs 22.5/48 for the current best against dv-8@v1.2, strat-g@v1.8 (margin +3.3/game) → promising. Adopted into the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:19.918Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T16:53:27.940Z",
-      "text": "New experiment x094-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:22.772Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:05:13.682Z",
-      "text": "Experiment x094-draw inconclusive: league 24.5/48 for the experiment vs 23/48 for the current best against vp-dog@v1.5, t-5@v1.8, vp-dog@v1.4 (margin +0.3/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:27.606Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:07:33.676Z",
-      "text": "New experiment x095-fallback-95-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.49→1.74. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:30.431Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:08:18.094Z",
-      "text": "Experiment x095-fallback-95-2 inconclusive: league 29/48 for the experiment vs 28/48 for the current best against t-5@v1.8, t-5@v1.7, strat-g@v1.7 (margin +1.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:32.985Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:08:18.094Z",
-      "text": "New experiment x096-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:35.985Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:12:49.985Z",
-      "text": "Experiment x096-drain inconclusive: league 25.5/48 for the experiment vs 27.5/48 for the current best against strat-g@v1.8, vp-dog@v1.6, t-5@v1.8 (margin +1/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:38.771Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:12:49.985Z",
-      "text": "New experiment x097-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:41.546Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:15:04.713Z",
-      "text": "Experiment x097-leaner inconclusive: league 26.5/48 for the experiment vs 26.5/48 for the current best against t-5@v1.4, vp-dog@v1.6, t-5@v1.8 (margin +2.8/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:46.138Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:15:04.713Z",
-      "text": "New experiment x098-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:48.808Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:18:18.677Z",
-      "text": "Experiment x098-thinner inconclusive: league 22/48 for the experiment vs 21/48 for the current best against t-5@v1.8, vp-dog@v1.6 (margin -0.4/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:51.685Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:18:18.677Z",
-      "text": "New experiment x099-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:54.411Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:20:34.793Z",
-      "text": "Experiment x099-power inconclusive: league 29/48 for the experiment vs 27/48 for the current best against dv-8@v1.2, t-5@v1.8, vp-dog@v1.2 (margin +1/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:57.194Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:22:57.454Z",
-      "text": "New experiment x100-fallback-100-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.34→2.59. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:52:59.844Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:23:40.810Z",
-      "text": "Experiment x100-fallback-100-3 rejected: league 26/48 for the experiment vs 28/48 for the current best against t-5@v1.8, vp-dog@v1.6 (margin -4.5/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:05.104Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:23:40.810Z",
-      "text": "New experiment x101-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:08.195Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:25:59.316Z",
-      "text": "Experiment x101-disrupt inconclusive: league 16.5/48 for the experiment vs 15.5/48 for the current best against vp-dog@v1.5, t-5@v1.8, vp-dog@v1.6 (margin +0.4/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:11.257Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:25:59.316Z",
-      "text": "New experiment x102-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: crypto weight 2.34→2.64. Prediction: Bigger mid-game Wallets and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:13.910Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:29:07.738Z",
-      "text": "Experiment x102-crypto inconclusive: league 25/48 for the experiment vs 24/48 for the current best against dv-8@v1.2, strat-g@v1.8 (margin -1.3/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:16.077Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:31:27.937Z",
-      "text": "New experiment x103-fallback-103-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.25→2.5. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:18.902Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:32:16.562Z",
-      "text": "Experiment x103-fallback-103-4 rejected: league 25.5/48 for the experiment vs 26.5/48 for the current best against dv-8@v1.2, vp-dog@v1.3 (margin -0.6/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:21.648Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T17:32:16.562Z",
-      "text": "New experiment x104-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.69→2.09. Prediction: Fewer losses by Server destruction than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:24.069Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:13:18.980Z",
-      "text": "Experiment x104-restore inconclusive: league 24.5/48 for the experiment vs 23/48 for the current best against vp-dog@v1.6, t-5@v1.8, strat-g@v1.7 (margin -1.1/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:26.565Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:15:37.199Z",
-      "text": "New experiment x105-fallback-105-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:29.471Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:16:25.490Z",
-      "text": "Experiment x105-fallback-105-0 inconclusive: league 30/48 for the experiment vs 28/48 for the current best against dv-8@v1.3, vp-dog@v1.5, t-5@v1.7 (margin +2.1/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:33.505Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:21:03.622Z",
-      "text": "New experiment x106-fallback-106-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.48→2.73. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:35.926Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:21:48.062Z",
-      "text": "Experiment x106-fallback-106-1 rejected: league 28/48 for the experiment vs 29.5/48 for the current best against dv-8@v1.2, dv-8@v1.1, t-5@v1.5 (margin -1.8/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:38.621Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:21:48.062Z",
-      "text": "New experiment x107-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:41.448Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:26:25.855Z",
-      "text": "Experiment x107-draw rejected: league 31/48 for the experiment vs 31.5/48 for the current best against t-5@v1.8, dv-8@v1.1 (margin -3.4/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:45.006Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:30:06.850Z",
-      "text": "New experiment x108-fallback-108-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.49→1.74. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:47.745Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:30:56.130Z",
-      "text": "Experiment x108-fallback-108-2 rejected: league 16.5/48 for the experiment vs 19.5/48 for the current best against vp-dog@v1.2, dv-8@v1.3, vp-dog@v1.6 (margin -3.8/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:50.495Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:30:56.130Z",
-      "text": "New experiment x109-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:53.206Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:33:11.979Z",
-      "text": "Experiment x109-drain inconclusive: league 11/48 for the experiment vs 8/48 for the current best against vp-dog@v1.2, vp-dog@v1.6 (margin +4.5/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:55.663Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:33:11.979Z",
-      "text": "New experiment x110-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:53:58.508Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:36:13.647Z",
-      "text": "Experiment x110-leaner inconclusive: league 31.5/48 for the experiment vs 32/48 for the current best against dv-8@v1.3, t-5@v1.8, t-5@v1.6 (margin +2.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:02.479Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:36:13.648Z",
-      "text": "New experiment x111-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:05.024Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:39:18.341Z",
-      "text": "Experiment x111-thinner rejected: league 25/48 for the experiment vs 27/48 for the current best against vp-dog@v1.6, t-5@v1.5, dv-8@v1.3 (margin -2.6/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:07.592Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:39:18.341Z",
-      "text": "New experiment x112-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:10.339Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:52:58.485Z",
-      "text": "Experiment x112-power rejected: league 12/48 for the experiment vs 18.5/48 for the current best against vp-dog@v1.5, vp-dog@v1.2, t-5@v1.8 (margin -3.7/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:12.982Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:55:20.020Z",
-      "text": "New experiment x113-fallback-113-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.34→2.59. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:15.547Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:56:05.823Z",
-      "text": "Experiment x113-fallback-113-3 inconclusive: league 34/48 for the experiment vs 33/48 for the current best against dv-8@v1.0, t-5@v1.8, dv-8@v1.2 (margin +3.7/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:19.097Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T19:56:05.823Z",
-      "text": "New experiment x114-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:21.733Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:01:23.686Z",
-      "text": "Experiment x114-disrupt rejected: league 35/48 for the experiment vs 36/48 for the current best against t-5@v1.7, dv-8@v1.3, t-5@v1.6 (margin -0.9/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:24.487Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:01:23.686Z",
-      "text": "New experiment x115-crypto: Valuing high-value Crypto more (and aiming for a richer hand) out-buys the opponent mid-game. Change: crypto weight 2.34→2.64. Prediction: Bigger mid-game Wallets and more wins than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:27.195Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:03:44.779Z",
-      "text": "Experiment x115-crypto inconclusive: league 29/48 for the experiment vs 28/48 for the current best against dv-8@v1.3, t-5@v1.4, vp-dog@v1.6 (margin +2.2/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:29.908Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:06:16.621Z",
-      "text": "New experiment x116-fallback-116-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.25→2.5. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:32.627Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:07:00.827Z",
-      "text": "Experiment x116-fallback-116-4 inconclusive: league 30.5/48 for the experiment vs 30/48 for the current best against t-5@v1.8, t-5@v1.5, strat-g@v1.7 (margin +1.9/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:36.819Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:07:00.827Z",
-      "text": "New experiment x117-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 1.69→2.09. Prediction: Fewer losses by Server destruction than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:39.664Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:11:27.227Z",
-      "text": "Experiment x117-restore inconclusive: league 29.5/48 for the experiment vs 27/48 for the current best against dv-8@v1.3, strat-g@v1.8, t-5@v1.6 (margin +0.6/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:42.574Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:15:10.305Z",
-      "text": "New experiment x118-fallback-118-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:45.376Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:15:57.680Z",
-      "text": "Experiment x118-fallback-118-0 rejected: league 23.5/48 for the experiment vs 24/48 for the current best against dv-8@v1.2, dv-8@v1.3, strat-g@v1.9 (margin -3.7/game) → rejected. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:48.076Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:18:17.527Z",
-      "text": "New experiment x119-fallback-119-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.48→2.73. Prediction: More wins or a better margin than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:54:58.966Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:19:07.211Z",
-      "text": "Experiment x119-fallback-119-1 inconclusive: league 23/48 for the experiment vs 23/48 for the current best against t-5@v1.8, vp-dog@v1.6, dv-8@v1.1 (margin -0.3/game) → inconclusive. Kept the current best."
+      "version": 12,
+      "at": "2026-10-18T18:55:01.845Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-16T20:19:07.211Z",
-      "text": "New experiment x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+      "version": 12,
+      "at": "2026-10-18T18:55:04.900Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:21.904Z",
-      "text": "v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:55:07.616Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:26.875Z",
-      "text": "The human's economy is consistently outpacing mine; I need to prioritize acquiring high-value Crypto earlier to avoid falling behind."
+      "version": 12,
+      "at": "2026-10-18T18:55:10.327Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:26.875Z",
-      "text": "Both new Locations have potential to shift strategies; 'The Might Meek' may favor aggressive decks while 'The Nudge' could pressure my VP strategy."
+      "version": 12,
+      "at": "2026-10-18T18:55:12.973Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:26.875Z",
-      "text": "I need to watch how the new Locations interact with my cards and adjust my strategy accordingly."
+      "version": 12,
+      "at": "2026-10-18T18:55:16.088Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:29.615Z",
-      "text": "v1.11 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-18T18:55:18.755Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:34.314Z",
-      "text": "Monitor how 'The Might Meek' may favor low-cost cards, potentially enhancing my board Power."
+      "version": 12,
+      "at": "2026-10-18T18:55:25.923Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:34.314Z",
-      "text": "Evaluate 'The Nudge' for its impact on aggressive VP strategies, particularly in the late game."
+      "version": 12,
+      "at": "2026-10-19T01:12:12.644Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Banishing Ritual, amatera-5u, Danda, H3l3-iOS, Kinich."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:34.314Z",
-      "text": "Keep an eye on the human's economy; they consistently outpace mine in recent games."
+      "version": 12,
+      "at": "2026-10-20T05:40:26.743Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Sun Scythe, Astra Wraith, Mary Mallon, Merchant of Chaos, The Heisenberg Hag, Entropic Infantry."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:47.944Z",
-      "text": "v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-20T05:40:30.268Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:51.115Z",
-      "text": "Evaluate the impact of new Locations on my strategy, especially 'The Might Meek' favoring low-cost cards."
+      "version": 12,
+      "at": "2026-10-20T05:40:33.207Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:51.115Z",
-      "text": "Focus on thinning my deck to improve access to high-value cards as the game progresses."
+      "version": 12,
+      "at": "2026-10-20T05:40:36.472Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:05:51.115Z",
-      "text": "Continue to prioritize high-value Crypto early to avoid falling behind in economy."
+      "version": 12,
+      "at": "2026-10-20T05:40:38.927Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:07:15.566Z",
-      "text": "v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-20T05:40:43.685Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:07:19.090Z",
-      "text": "Monitor the human's economy closely; they have consistently outpaced mine in recent games."
+      "version": 12,
+      "at": "2026-10-25T18:24:20.210Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Dolly DoS, Ghetto Blaster, Not a Total Loss, Rezz-Rizz, Pihkal hound, Delete.Detritus.exe."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:07:19.090Z",
-      "text": "Evaluate the impact of 'The Nudge' on aggressive VP strategies, especially in late-game scenarios."
+      "version": 12,
+      "at": "2026-10-25T18:24:28.239Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:07:19.090Z",
-      "text": "'The Might Meek' may favor low-cost cards; I should consider including more low-cost options in my deck to maximize its benefits."
+      "version": 12,
+      "at": "2026-10-25T18:24:45.315Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T03:07:19.090Z",
-      "text": "Adjust my strategy based on the new Locations to improve my chances of winning key Nodes."
+      "version": 12,
+      "at": "2026-10-25T18:38:09.749Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:14.747Z",
-      "text": "v1.11 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-25T18:38:15.723Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:19.305Z",
-      "text": "Both new Locations may favor aggressive strategies; I need to adapt quickly."
+      "version": 12,
+      "at": "2026-10-25T20:38:02.356Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:19.305Z",
-      "text": "The human's economy remains a significant threat; I must prioritize high-value Crypto earlier."
+      "version": 12,
+      "at": "2026-10-25T20:38:05.287Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:19.305Z",
-      "text": "My board Power has been consistently low; I need to focus on maintaining it while contesting Locations."
+      "version": 12,
+      "at": "2026-10-26T00:06:17.877Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Shyte-Coin."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:26.728Z",
-      "text": "v1.11 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-26T01:38:00.059Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:29.785Z",
-      "text": "The human's economy is consistently outpacing mine; I must prioritize acquiring high-value Crypto earlier."
+      "version": 12,
+      "at": "2026-10-26T01:38:03.063Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:29.785Z",
-      "text": "Both new Locations may favor aggressive strategies; I need to adapt quickly."
+      "version": 12,
+      "at": "2026-10-26T01:38:20.739Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:29.785Z",
-      "text": "I need to watch how the new Locations interact with my cards and adjust my strategy accordingly."
+      "version": 12,
+      "at": "2026-10-26T01:38:26.177Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:24:29.785Z",
-      "text": "My board Power has been consistently low; I need to focus on maintaining it while contesting Locations."
+      "version": 12,
+      "at": "2026-10-26T01:38:37.039Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:25:00.692Z",
-      "text": "v1.11 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+      "version": 12,
+      "at": "2026-10-26T01:38:39.460Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:25:03.990Z",
-      "text": "The human's economy is consistently outpacing mine; I must prioritize acquiring high-value Crypto earlier."
+      "version": 12,
+      "at": "2026-10-26T01:38:49.099Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:25:03.990Z",
-      "text": "Both new Locations may favor aggressive strategies; I need to adapt quickly."
+      "version": 12,
+      "at": "2026-10-26T01:42:19.581Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:25:03.990Z",
-      "text": "'The Might Meek' may favor low-cost cards; I should consider including more low-cost options in my deck to maximize its benefits."
+      "version": 12,
+      "at": "2026-10-26T01:42:25.454Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     },
     {
-      "version": 11,
-      "at": "2026-10-17T17:25:03.990Z",
-      "text": "Evaluate 'The Nudge' for its impact on aggressive VP strategies, especially in late-game scenarios."
+      "version": 12,
+      "at": "2026-10-26T01:42:34.591Z",
+      "text": "v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
     }
   ],
   "cardNotes": {
@@ -7012,11 +7007,25 @@
     "location-yybkdh5m": "New Location: \"Start of turn 3: Reset the Power of all cards here.\" Read: contest it: holding it is worth about 1.62 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
     "location-25kpy0uk": "New Location: \"On collapse: Winner may pay 2 Crypto, and get +4 Power to a random card in their deck.\" Read: winning it hands the other player about 3.68 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.",
     "location-adm0cvxt": "New Location: \"Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.\" Read: contest it: holding it is worth about 2.7 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
-    "location-m78m3xz4": "New Location: \"On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.\" Read: winning it hands the other player about 1 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy."
+    "location-m78m3xz4": "New Location: \"On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.\" Read: winning it hands the other player about 1 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.",
+    "card-q6u1qrf2": "utility; est. hand value -0.7 early / -0.7 late at cost 5. Untested.",
+    "card-ncwu37n8": "utility; est. hand value 0 early / 0 late at cost 7. Untested.",
+    "location-ty1ts899": "New Location: \"On collapse: +3 Crypto to the winning player.\" Read: contest it: holding it is worth about 12.64 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "location-ums3714k": "New Location: \"On collapse: +2 Crypto to each player.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "card-xfjyn66m": "3 VP finisher, deck-cycling draw engine; est. hand value 7.3 early / 7.3 late at cost 6. Untested.",
+    "card-0206lpse": "1 VP finisher, economy; est. hand value 10 early / 6.5 late at cost 4. Untested.",
+    "card-3xd9rr8e": "4 VP finisher, Server defense; est. hand value 8.1 early / 6.3 late at cost 7. Untested.",
+    "card-6iyioksi": "2 VP finisher; est. hand value 4.9 early / 4.9 late at cost 8. Untested.",
+    "card-55s9aexv": "1 VP finisher; est. hand value 0 early / 0 late at cost 3. Untested.",
+    "card-tgyg8mea": "1 VP finisher; est. hand value 2 early / 2 late at cost 5. Untested.",
+    "card-7nro1nwm": "utility; est. hand value 1.3 early / 1.3 late at cost 8. Untested.",
+    "card-24pbfbzu": "utility; est. hand value 5.7 early / 5.7 late at cost 11. Untested.",
+    "card-dtwoicuu": "Action engine; est. hand value 6.6 early / 6.6 late at cost 4. Untested.",
+    "card-ofxi9tfh": "utility; est. hand value 2.5 early / 2.5 late at cost 8. Untested.",
+    "card-bdk9d9h3": "light Drain; est. hand value 4.5 early / 7.2 late at cost 5. Untested.",
+    "card-jabbhu7e": "utility; est. hand value 5.5 early / 2 late at cost 4. Untested."
   },
   "knownCards": [
-    "eval-signal-surveyor",
-    "eval-burn-ledger",
     "eval-forked-signal",
     "atomic-unit",
     "atomic-mass",
@@ -7039,6 +7048,7 @@
     "summon-the-acolytes",
     "temporal-rift",
     "ghost-key",
+    "banishing-ritual",
     "opulent-void",
     "sacrifical-sigil",
     "byte-heist",
@@ -7074,35 +7084,35 @@
     "neural-wetware",
     "zenith-worx",
     "zenith-wetware",
+    "shyte-coin",
     "byte-coin",
     "kilo-coin",
     "mega-cache",
-    "eval-relocation-relay",
     "eval-hostile-reroute",
-    "eval-signal-amplifier",
-    "eval-power-siphon",
-    "sleek-z",
-    "salem-surge",
-    "foder-fox",
     "trash-collector",
     "kim-dracula",
-    "hack-attack",
     "jinx-001",
-    "card-m7dztzir",
-    "card-ot1vjma3",
-    "card-u994kue3",
-    "card-3c9ng7g8",
-    "card-56k08pz8",
-    "card-728y2mjz",
     "apollo-ascii",
     "card-20fn3o2h",
     "card-93h8cciw",
     "card-k78ew0ce",
     "card-099bvoal",
     "rezz-rizz",
-    "z-mobile",
-    "t-moble",
-    "card-a2qeb5kn"
+    "card-a2qeb5kn",
+    "card-q6u1qrf2",
+    "card-ncwu37n8",
+    "card-xfjyn66m",
+    "card-0206lpse",
+    "card-3xd9rr8e",
+    "card-6iyioksi",
+    "card-55s9aexv",
+    "card-tgyg8mea",
+    "card-7nro1nwm",
+    "card-24pbfbzu",
+    "card-dtwoicuu",
+    "card-ofxi9tfh",
+    "card-bdk9d9h3",
+    "card-jabbhu7e"
   ],
   "knownLocations": [
     "data_exchange",
@@ -7127,19 +7137,19 @@
     "get-out",
     "hit-em",
     "kull-kode",
-    "location-qn2xfxg2",
     "location-sz68enux",
     "location-huzvzstj",
     "location-t91bjxd9",
     "location-f83zsdwl",
-    "location-4044n9xw",
     "location-hak8535x",
     "location-udhywjrh",
     "location-xsglnved",
     "location-yybkdh5m",
     "location-25kpy0uk",
     "location-adm0cvxt",
-    "location-m78m3xz4"
+    "location-m78m3xz4",
+    "location-ty1ts899",
+    "location-ums3714k"
   ],
   "cardStats": {
     "sudo-demiurge": {
@@ -8241,38 +8251,17 @@
       "plan": "I will maintain focus on acquiring high-value Crypto early, targeting a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, deck engine, Server Restore, and VP collection. From Cycle 9 onwards, I will aggressively target enemy Servers while investing heavily in VP cards. I will also analyze the effects of new Locations 'The Might Meek' and 'The Nudge' to enhance my strategies for managing Power dynamics and VP acquisition. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
       "games": 0,
       "aiWins": 0
+    },
+    {
+      "version": 12,
+      "bootedAt": "2026-10-17T18:48:03.602Z",
+      "mode": "heuristic",
+      "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+      "games": 0,
+      "aiWins": 0
     }
   ],
   "snapshots": [
-    {
-      "label": "strat-g@v1.2",
-      "savedAt": "2026-10-08T04:13:23.071Z",
-      "profile": {
-        "version": 2,
-        "plan": "",
-        "economyUntilCycle": 4,
-        "chaosFromCycle": 5,
-        "vpFromCycle": 12,
-        "handCryptoTarget": 9,
-        "minCryptoValue": 2,
-        "minBuyScore": 1.5,
-        "dilution": 0.7,
-        "weights": {
-          "power": 1,
-          "draw": 1.6,
-          "actions": 1.1,
-          "crypto": 1.5,
-          "drain": 2,
-          "restore": 1.3,
-          "vp": 2.2,
-          "duration": 0.8,
-          "thin": 1.2,
-          "disrupt": 0.8,
-          "chaos": 1.5
-        },
-        "cardBias": {}
-      }
-    },
     {
       "label": "strat-g@v1.3",
       "savedAt": "2026-10-08T06:23:44.012Z",
@@ -8536,6 +8525,36 @@
           "thin": 1.67,
           "disrupt": 1.05,
           "chaos": 1.45
+        },
+        "cardBias": {}
+      }
+    },
+    {
+      "label": "strat-g@v1.12",
+      "savedAt": "2026-10-26T01:42:34.608Z",
+      "profile": {
+        "version": 12,
+        "plan": "",
+        "economyUntilCycle": 4,
+        "chaosFromCycle": 9,
+        "vpFromCycle": 9,
+        "midgameMix": 0.5,
+        "handCryptoTarget": 12,
+        "minCryptoValue": 2,
+        "minBuyScore": 0.75,
+        "dilution": 0.5,
+        "weights": {
+          "power": 1.26,
+          "draw": 1.6,
+          "actions": 1.1,
+          "crypto": 2.34,
+          "drain": 2.4,
+          "restore": 1.69,
+          "vp": 2.6,
+          "duration": 0.8,
+          "thin": 1.2,
+          "disrupt": 1.05,
+          "chaos": 1.5
         },
         "cardBias": {}
       }

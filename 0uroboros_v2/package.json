@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "NODE_OPTIONS=--max-old-space-size=8192 node --watch-path=server --watch-path=packages/engine/src/ai/strategy.ts --watch-path=packages/engine/src/effects/migrate.ts --watch-preserve-output node_modules/vite/bin/vite.js",
+    "dev": "NODE_OPTIONS=--max-old-space-size=8192 node --watch-path=server --watch-path=packages/engine/src/ai --watch-path=packages/engine/src/effects --watch-preserve-output node_modules/vite/bin/vite.js",
     "build": "npm run depth:check && npm run assets:check && tsc --noEmit && npm run lint:boundaries && vite build",
     "build:site": "node scripts/build-site.mjs",
     "build:client": "npm run assets:check && tsc --noEmit && npm run lint:boundaries && OUROBOROS_TARGET=client vite build && node scripts/check-client-bundle.mjs dist/client",

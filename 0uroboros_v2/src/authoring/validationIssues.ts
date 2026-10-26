@@ -23,7 +23,7 @@ const FIELD_LABELS: Record<string, string> = {
 const BUILTIN_FIELD_LABELS: Record<string, string> = { name: 'Name', badge: 'Badge', text: 'Mod text' };
 const HOOK_LABELS: Record<IssueSection, Record<string, string>> = {
   cards: { onReveal: 'On reveal', onCollapse: 'On collapse', recurring: 'Recurring' },
-  locations: { effects: 'On collapse', ongoing: 'Ongoing', onPlay: 'On reveal', startTurn2: 'Start of turn 2', startTurn3: 'Start of turn 3' },
+  locations: { effects: 'On collapse', ongoing: 'Ongoing', onPlay: 'On reveal', startTurn2: 'Start of turn 2', startTurn3: 'Start of turn 3', conditions: 'Conditions' },
   circuitRewards: { effects: 'On claim' },
   mods: { onReveal: 'When revealed', onCollapse: 'When its Location collapses', recurring: 'Each later Runtime turn' },
   startingDecks: {},

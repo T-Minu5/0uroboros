@@ -1,6 +1,6 @@
 .card-effect-flight{position:fixed;z-index:85;pointer-events:none;filter:drop-shadow(0 0 8px #8b42ff) drop-shadow(0 12px 12px #0009);will-change:transform}
 .world-anchor .deployment-grid.effect-move-destination{outline:1px solid #aa61ff;outline-offset:6px;box-shadow:0 0 24px #8b42ff77;border-radius:8px}
-.effect-path.power{color:#26e3f0}
+.effect-path.power{color:var(--yellow,#ffff00)}
 .topline nav .authoring-link{color:#b7a4da;font-size:11px;text-decoration:none;padding:8px;border:1px solid #65517866;border-radius:5px}
 .topline nav .bg-picker{display:inline-flex;align-items:center;gap:4px;margin-left:2px}
 .topline nav .bg-picker-btn{min-width:28px;padding:6px 8px;font-size:14px;line-height:1;border-color:#65517866;background:#151029;color:#d4c4ea}
