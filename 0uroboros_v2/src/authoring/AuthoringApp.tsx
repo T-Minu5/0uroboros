@@ -366,6 +366,15 @@ function LocationConditionEditor({ index, condition, cards, onChange, onRemove }
   onChange: (condition: LocationCondition) => void; onRemove: () => void;
 }) {
   const changeKind = (kind: LocationConditionKind) => onChange({ ...createLocationCondition(kind), id: condition.id, effects: condition.effects });
+  const comboClasses: CardClass[] = condition.kind === 'subtypePair'
+    ? (condition.cardClasses?.length
+      ? condition.cardClasses
+      : [condition.cardClassA ?? 'Attack', condition.cardClassB ?? 'Horror'])
+    : [];
+  const setComboClasses = (cardClasses: CardClass[]) => {
+    const { cardClassA: _a, cardClassB: _b, ...rest } = condition;
+    onChange({ ...rest, cardClasses });
+  };
   return <div className="au-schedule" data-field={`conditions.${index}`}>
     <div className="au-schedule-fields au-field-grid">
       <SelectField field={`conditions.${index}.kind`} label={`Condition ${index + 1}`} value={condition.kind} options={LOCATION_CONDITION_KINDS} labels={CONDITION_KIND_LABELS} onChange={changeKind} />
@@ -374,11 +383,44 @@ function LocationConditionEditor({ index, condition, cards, onChange, onRemove }
         <SelectField field={`conditions.${index}.cardClass`} label="Subtype" value={condition.cardClass ?? 'Attack'} options={CARD_CLASSES} onChange={cardClass => onChange({ ...condition, cardClass })} />
       </>}
       {condition.kind === 'subtypePair' && <>
-        <SelectField field={`conditions.${index}.cardClassA`} label="Subtype A" value={condition.cardClassA ?? 'Attack'} options={CARD_CLASSES} onChange={cardClassA => onChange({ ...condition, cardClassA })} />
-        <SelectField field={`conditions.${index}.cardClassB`} label="Subtype B" value={condition.cardClassB ?? 'Horror'} options={CARD_CLASSES} onChange={cardClassB => onChange({ ...condition, cardClassB })} />
+        {comboClasses.map((cls, at) => (
+          <SelectField
+            key={at}
+            field={`conditions.${index}.cardClasses.${at}`}
+            label={`Subtype ${at + 1}`}
+            value={cls}
+            options={CARD_CLASSES}
+            onChange={next => setComboClasses(comboClasses.map((entry, i) => i === at ? next : entry))}
+          />
+        ))}
+        {comboClasses.length > 2 && comboClasses.map((_, at) => (
+          <button
+            key={`remove-${at}`}
+            type="button"
+            className="au-button au-button-subtle"
+            onClick={() => setComboClasses(comboClasses.filter((_, i) => i !== at))}
+          >
+            Remove subtype {at + 1}
+          </button>
+        ))}
+        {comboClasses.length < 4 && (
+          <button
+            type="button"
+            className="au-button au-button-subtle"
+            onClick={() => setComboClasses([...comboClasses, CARD_CLASSES.find(entry => !comboClasses.includes(entry)) ?? 'Utility'])}
+          >
+            + Add subtype
+          </button>
+        )}
       </>}
       {(condition.kind === 'powerThreshold' || condition.kind === 'cardCountThreshold') && <>
-        <NumberField field={`conditions.${index}.amount`} label={condition.kind === 'powerThreshold' ? 'Power' : 'Cards'} value={condition.amount} min={0} onChange={amount => onChange({ ...condition, amount: amount ?? 0 })} />
+        <NumberField
+          field={`conditions.${index}.amount`}
+          label={condition.kind === 'powerThreshold' ? 'Power' : 'Cards'}
+          value={condition.amount}
+          min={condition.kind === 'powerThreshold' ? -99 : 0}
+          onChange={amount => onChange({ ...condition, amount: amount ?? 0 })}
+        />
         <SelectField field={`conditions.${index}.comparison`} label="Comparison" value={condition.comparison ?? 'orMore'} options={CONDITION_COMPARISONS} labels={{ orMore: 'or more', orLess: 'or less' } satisfies Record<ConditionComparison, string>} onChange={comparison => onChange({ ...condition, comparison })} />
       </>}
       <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove condition {index + 1}</button>
@@ -386,7 +428,7 @@ function LocationConditionEditor({ index, condition, cards, onChange, onRemove }
     <StepList
       field={`conditions.${index}`}
       title={`Condition ${index + 1} reward`}
-      description="Awarded once to the seat that meets the formula. “You” is that seat."
+      description="Awarded once to the seat that meets the formula. Resource effects always go to that seat; card/server targets are relative to them."
       scope="locationCondition"
       cards={cards}
       steps={condition.effects}

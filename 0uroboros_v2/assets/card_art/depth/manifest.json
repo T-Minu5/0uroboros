@@ -649,6 +649,15 @@
       "height": 300,
       "focus": 0.5285
     },
+    "/assets/card_art/uploads/doom-loop.png": {
+      "sha": "d5460f0a34e54bc892aa307f1a57e979654458d664707f28a9ad913e23d1c26f",
+      "v": 2,
+      "color": "/assets/card_art/depth/d5460f0a34e54bc892aa-v2.color.webp",
+      "depth": "/assets/card_art/depth/d5460f0a34e54bc892aa-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5872
+    },
     "/assets/card_art/uploads/ghetto-blaster.png": {
       "sha": "3321652bfa5836a4f3c14b057e4054ad0e2c5d2299e017fcdfbe7105b3f4497c",
       "v": 2,
@@ -747,6 +756,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.6855
+    },
+    "/assets/card_art/uploads/surge-splitter.png": {
+      "sha": "b849475ead862b389b3a4ad24c6caeeca54469b39316d67a076f1e2793c7b8e2",
+      "v": 2,
+      "color": "/assets/card_art/depth/b849475ead862b389b3a-v2.color.webp",
+      "depth": "/assets/card_art/depth/b849475ead862b389b3a-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3956
     },
     "/assets/card_art/uploads/the-shoggoth.png": {
       "sha": "71efc63e5cd20c413d691737e2dc2990d6b96c2c5623b88d9d19114a6796dae9",

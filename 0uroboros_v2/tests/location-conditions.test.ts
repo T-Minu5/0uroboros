@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 import { starterCards, type Card } from '@0uroboros/engine/game';
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
-import { describeCondition, describeLocation } from '@0uroboros/engine/effects/catalog';
+import { describeCondition, describeLocation, whoLabel } from '@0uroboros/engine/effects/catalog';
 import {
-  createLocationCondition, meetsLocationCondition, revealedHere, type LocationCondition,
+  createLocationCondition, meetsLocationCondition, normalizeLocationCondition, revealedHere,
+  validateLocationCondition, type LocationCondition,
 } from '@0uroboros/engine/locationConditions';
+import { migrateLocation } from '@0uroboros/engine/effects/migrate';
 import type { EffectStep } from '@0uroboros/engine/effects/types';
 
 const card = (id: string, extra: Partial<Card> = {}): Card =>
@@ -88,6 +90,61 @@ describe('location condition helpers', () => {
     expect(revealedHere(revealed, 0)).toHaveLength(1);
     expect(meetsLocationCondition(condition, revealedHere(revealed, 0), 2)).toBe(false);
   });
+
+  it('coerces condition player rewards to the qualifying seat on migrate', () => {
+    const [both] = migrateEffects([{ action: 'gainCrypto', amount: 2, target: { type: 'player', who: 'both' } }], 'locationCondition');
+    const [enemy] = migrateEffects([{ action: 'draw', amount: 1, target: { type: 'player', who: 'opponent' } }], 'locationCondition');
+    const [any] = migrateEffects([{ action: 'gainVP', amount: 1, target: { type: 'player', who: 'any' } }], 'locationCondition');
+    expect(both.target).toEqual({ type: 'player', who: 'self' });
+    expect(enemy.target).toEqual({ type: 'player', who: 'self' });
+    expect(any.target).toEqual({ type: 'player', who: 'self' });
+    const [drain] = migrateEffects([{ action: 'damageServer', amount: 100, target: { type: 'server', who: 'opponent', server: 'auto' } }], 'locationCondition');
+    expect(drain.target).toEqual({ type: 'server', who: 'opponent', server: 'auto' });
+  });
+
+  it('labels condition Whose relative to the qualifying seat', () => {
+    expect(whoLabel('self', 'locationCondition')).toBe('Qualifying seat');
+    expect(whoLabel('self', 'locationCondition', 'card')).toBe("Qualifying seat's");
+    expect(whoLabel('opponent', 'locationCondition')).toBe('Other player');
+  });
+
+  it('allows negative power thresholds', () => {
+    const condition = createLocationCondition('powerThreshold');
+    condition.amount = -2;
+    condition.comparison = 'orLess';
+    expect(validateLocationCondition(condition, 'c')).toEqual([]);
+    expect(meetsLocationCondition(condition, [], -3)).toBe(true);
+    expect(meetsLocationCondition(condition, [], -1)).toBe(false);
+    expect(describeCondition(condition)).toMatch(/-2 or less Power here/i);
+    condition.comparison = 'orMore';
+    expect(meetsLocationCondition(condition, [], -2)).toBe(true);
+    expect(meetsLocationCondition(condition, [], -3)).toBe(false);
+  });
+
+  it('supports 2–4 subtype combos and migrates legacy A/B', () => {
+    const trio = createLocationCondition('subtypePair');
+    trio.cardClasses = ['Attack', 'Horror', 'Utility'];
+    expect(validateLocationCondition(trio, 'c')).toEqual([]);
+    expect(describeCondition(trio)).toMatch(/an Attack, a Horror, and a Utility here/i);
+    const revealed = [
+      { card: card('a', { cardClass: 'Attack' }), owner: 0 as const, node: 0, order: 1, revealed: true },
+      { card: card('h', { cardClass: 'Horror' }), owner: 0 as const, node: 0, order: 2, revealed: true },
+    ];
+    expect(meetsLocationCondition(trio, revealedHere(revealed, 0), 0)).toBe(false);
+    revealed.push({ card: card('u', { cardClass: 'Utility' }), owner: 0 as const, node: 0, order: 3, revealed: true });
+    expect(meetsLocationCondition(trio, revealedHere(revealed, 0), 0)).toBe(true);
+
+    const legacy = normalizeLocationCondition({
+      id: 'legacy', kind: 'subtypePair', cardClassA: 'Action', cardClassB: 'Horror', effects: [],
+    });
+    expect(legacy.cardClasses).toEqual(['Action', 'Horror']);
+    expect(legacy).not.toHaveProperty('cardClassA');
+    const migrated = migrateLocation({
+      effects: [],
+      conditions: [{ id: 'old', kind: 'subtypePair', cardClassA: 'Attack', cardClassB: 'Horror', effects: [] }],
+    });
+    expect(migrated.conditions?.[0].cardClasses).toEqual(['Attack', 'Horror']);
+  });
 });
 
 /** Deploy one card for seat 0 onto a node and resolve the reveal window. */
@@ -125,8 +182,7 @@ describe('location conditions runtime', () => {
     const condition: LocationCondition = {
       id: 'pair',
       kind: 'subtypePair',
-      cardClassA: 'Attack',
-      cardClassB: 'Horror',
+      cardClasses: ['Attack', 'Horror'],
       effects: gainCrypto(4),
     };
     const game = quietSession([condition]);

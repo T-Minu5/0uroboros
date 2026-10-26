@@ -1,4 +1,5 @@
 import type { Card, LegacyEffect } from '../game';
+import { normalizeLocationCondition, type LocationCondition } from '../locationConditions';
 import { ACTIONS } from './catalog';
 import { isStep, scopedWho, type AnyEffect, type ChoiceOption, type EffectStep, type PickMode, type Scope, type Target, type Who } from './types';
 
@@ -17,6 +18,35 @@ export function legacyChoiceOptions(scope: Scope): ChoiceOption[] {
   ];
 }
 
+/** Condition rewards credit the qualifying seat; player targets never name opponent/both/any. */
+function lockConditionPlayerTargets(step: EffectStep, scope: Scope): EffectStep {
+  if (scope !== 'locationCondition') return step;
+  let next = step;
+  if (next.target?.type === 'player' && next.target.who !== 'self') {
+    next = { ...next, target: { ...next.target, who: 'self' } };
+  }
+  if (next.pick?.chooser === 'opponent') {
+    const { chooser: _chooser, ...pick } = next.pick;
+    next = { ...next, pick };
+  }
+  if (next.choose?.chooser === 'opponent') {
+    const count = next.choose.count ?? 1;
+    next = { ...next, choose: count === 1 ? undefined : { count, chooser: 'self' } };
+  }
+  if (next.then?.length) next = { ...next, then: next.then.map(entry => lockConditionPlayerTargets(entry, scope)) };
+  if (next.options?.length) {
+    next = {
+      ...next,
+      options: next.options.map(option => ({
+        ...option,
+        effects: option.effects.map(entry => lockConditionPlayerTargets(entry, scope)),
+        ...(option.cost?.length ? { cost: option.cost.map(entry => lockConditionPlayerTargets(entry, scope)) } : {}),
+      })),
+    };
+  }
+  return next;
+}
+
 /** Converts every legacy effect in a list and leaves new steps as they are. A legacy `chain`
     marker makes everything after it wait in that effect's `then`. */
 export function migrateEffects(effects: readonly AnyEffect[] | undefined, scope: Scope): EffectStep[] {
@@ -27,10 +57,10 @@ export function migrateEffects(effects: readonly AnyEffect[] | undefined, scope:
     if (!isStep(effect) && effect.chain && index < effects.length - 1) {
       const { chain: _chain, ...head } = effect;
       const step = migrateEffect(head, scope);
-      output.push({ ...step, then: [...(step.then ?? []), ...migrateEffects(effects.slice(index + 1), scope)] });
+      output.push(lockConditionPlayerTargets({ ...step, then: [...(step.then ?? []), ...migrateEffects(effects.slice(index + 1), scope)] }, scope));
       break;
     }
-    output.push(migrateEffect(effect, scope));
+    output.push(lockConditionPlayerTargets(migrateEffect(effect, scope), scope));
   }
   return output;
 }
@@ -86,8 +116,8 @@ export function migrateLocation<T extends LocationLike>(location: T): StepLocati
     ...(startTurn2 ? { startTurn2: migrateEffects(startTurn2, 'location') } : {}),
     ...(startTurn3 ? { startTurn3: migrateEffects(startTurn3, 'location') } : {}),
     ...(conditions?.length ? {
-      conditions: conditions.map(condition => ({
-        ...condition,
+      conditions: conditions.map(condition => normalizeLocationCondition({
+        ...(condition as LocationCondition),
         effects: migrateEffects(condition.effects, 'locationCondition'),
       })),
     } : {}),

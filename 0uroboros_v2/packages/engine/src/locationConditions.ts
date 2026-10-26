@@ -15,9 +15,14 @@ export type LocationCondition = {
   count?: number;
   /** subtypeCount: required card class. */
   cardClass?: CardClass;
-  /** subtypePair: first required class. */
+  /**
+   * subtypePair: 2–4 required classes (at least one revealed card of each).
+   * Prefer this over legacy `cardClassA` / `cardClassB`.
+   */
+  cardClasses?: CardClass[];
+  /** @deprecated Use `cardClasses`. Still read when `cardClasses` is absent. */
   cardClassA?: CardClass;
-  /** subtypePair: second required class. */
+  /** @deprecated Use `cardClasses`. Still read when `cardClasses` is absent. */
   cardClassB?: CardClass;
   /** powerThreshold / cardCountThreshold: threshold value. */
   amount?: number;
@@ -33,13 +38,38 @@ export const CONDITION_COMPARISONS: readonly ConditionComparison[] = ['orMore', 
 
 export const CONDITION_KIND_LABELS: Record<LocationConditionKind, string> = {
   subtypeCount: 'Subtype count',
-  subtypePair: 'Subtype pair',
+  subtypePair: 'Subtype combo',
   powerThreshold: 'Power threshold',
   cardCountThreshold: 'Card count threshold',
 };
 
+export const SUBTYPE_COMBO_MIN = 2;
+export const SUBTYPE_COMBO_MAX = 4;
+
 const classOf = (card: Card): CardClass | undefined =>
   card.cardClass ?? (card.type === 'VP' ? 'Volume' : undefined);
+
+const isCardClass = (value: unknown): value is CardClass =>
+  typeof value === 'string' && CARD_CLASSES.includes(value as CardClass);
+
+/** Required subtypes for a subtypePair condition (legacy A/B folded in). */
+export function subtypeClassesOf(condition: LocationCondition): CardClass[] {
+  if (Array.isArray(condition.cardClasses) && condition.cardClasses.length) {
+    return condition.cardClasses.filter(isCardClass).slice(0, SUBTYPE_COMBO_MAX);
+  }
+  return [condition.cardClassA, condition.cardClassB].filter(isCardClass);
+}
+
+/** Drop legacy A/B fields and ensure subtypePair uses `cardClasses`. */
+export function normalizeLocationCondition(condition: LocationCondition): LocationCondition {
+  if (condition.kind !== 'subtypePair') return condition;
+  const classes = subtypeClassesOf(condition);
+  const cardClasses = classes.length >= SUBTYPE_COMBO_MIN
+    ? classes.slice(0, SUBTYPE_COMBO_MAX)
+    : (['Attack', 'Horror'] as CardClass[]);
+  const { cardClassA: _a, cardClassB: _b, ...rest } = condition;
+  return { ...rest, cardClasses };
+}
 
 /** Revealed placements owned by `owner` currently on the Node. */
 export function revealedHere(placements: readonly Deployment[], owner: PlayerId): Deployment[] {
@@ -59,10 +89,10 @@ export function meetsLocationCondition(
       return revealed.filter(placement => classOf(placement.card) === cls).length >= need;
     }
     case 'subtypePair': {
-      const a = condition.cardClassA, b = condition.cardClassB;
-      if (!a || !b) return false;
+      const need = subtypeClassesOf(condition);
+      if (need.length < SUBTYPE_COMBO_MIN) return false;
       const classes = new Set(revealed.map(placement => classOf(placement.card)).filter(Boolean) as CardClass[]);
-      return classes.has(a) && classes.has(b);
+      return need.every(cls => classes.has(cls));
     }
     case 'powerThreshold': {
       const amount = condition.amount ?? 0;
@@ -76,7 +106,15 @@ export function meetsLocationCondition(
   }
 }
 
-const article = (cls: CardClass) => (/^[AEIOU]/i.test(cls) ? 'an' : 'a');
+/** Indefinite article for printed class names ("an Attack", "a Utility"). */
+const article = (cls: CardClass) => (cls === 'Attack' || cls === 'Action' ? 'an' : 'a');
+
+function describeSubtypeList(classes: readonly CardClass[]): string {
+  const parts = classes.map(cls => `${article(cls)} ${cls}`);
+  if (parts.length <= 1) return parts[0] ?? 'a card';
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
 
 /** Printed predicate for a Location condition (without the reward effects). */
 export function describeConditionPredicate(condition: LocationCondition): string {
@@ -89,9 +127,9 @@ export function describeConditionPredicate(condition: LocationCondition): string
         : `if you have ${n} or more ${cls} cards here`;
     }
     case 'subtypePair': {
-      const a = condition.cardClassA ?? 'Attack';
-      const b = condition.cardClassB ?? 'Horror';
-      return `if you have ${article(a)} ${a} and ${article(b)} ${b} here`;
+      const classes = subtypeClassesOf(condition);
+      const list = classes.length >= SUBTYPE_COMBO_MIN ? classes : (['Attack', 'Horror'] as CardClass[]);
+      return `if you have ${describeSubtypeList(list)} here`;
     }
     case 'powerThreshold': {
       const amount = condition.amount ?? 0;
@@ -119,11 +157,27 @@ export function validateLocationCondition(condition: LocationCondition, path: st
         errors.push(`${path}.count: expected integer from 1 to 8`);
       }
       break;
-    case 'subtypePair':
-      if (!CARD_CLASSES.includes(condition.cardClassA as CardClass)) errors.push(`${path}.cardClassA: expected a card class`);
-      if (!CARD_CLASSES.includes(condition.cardClassB as CardClass)) errors.push(`${path}.cardClassB: expected a card class`);
+    case 'subtypePair': {
+      const classes = subtypeClassesOf(condition);
+      if (classes.length < SUBTYPE_COMBO_MIN || classes.length > SUBTYPE_COMBO_MAX) {
+        errors.push(`${path}.cardClasses: expected ${SUBTYPE_COMBO_MIN}–${SUBTYPE_COMBO_MAX} card classes`);
+      }
+      classes.forEach((cls, at) => {
+        if (!isCardClass(cls)) errors.push(`${path}.cardClasses.${at}: expected a card class`);
+      });
+      if (new Set(classes).size !== classes.length) {
+        errors.push(`${path}.cardClasses: subtypes must be unique`);
+      }
       break;
+    }
     case 'powerThreshold':
+      if (typeof condition.amount !== 'number' || !Number.isFinite(condition.amount) || condition.amount < -99 || condition.amount > 99) {
+        errors.push(`${path}.amount: expected a number from -99 to 99`);
+      }
+      if (condition.comparison !== undefined && !CONDITION_COMPARISONS.includes(condition.comparison)) {
+        errors.push(`${path}.comparison: expected orMore or orLess`);
+      }
+      break;
     case 'cardCountThreshold':
       if (typeof condition.amount !== 'number' || !Number.isFinite(condition.amount) || condition.amount < 0 || condition.amount > 99) {
         errors.push(`${path}.amount: expected a number from 0 to 99`);
@@ -143,7 +197,7 @@ export function createLocationCondition(kind: LocationConditionKind = 'subtypeCo
     case 'subtypeCount':
       return { id, kind, count: 2, cardClass: 'Attack', effects: [] };
     case 'subtypePair':
-      return { id, kind, cardClassA: 'Attack', cardClassB: 'Horror', effects: [] };
+      return { id, kind, cardClasses: ['Attack', 'Horror'], effects: [] };
     case 'powerThreshold':
       return { id, kind, amount: 5, comparison: 'orMore', effects: [] };
     case 'cardCountThreshold':

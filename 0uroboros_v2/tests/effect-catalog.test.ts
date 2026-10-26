@@ -32,7 +32,7 @@ describe('effect catalog', () => {
     expect(ids('location')).not.toContain('morph');
     expect(ids('circuit')).not.toContain('moveCard');
     expect(ids('circuit')).toContain('destroyCard');
-    expect(targetsFor('destroyCard', 'circuit')[0]).toMatchObject({ where: ['hand', 'bank', 'wallet', 'deckTop', 'deckBottom', 'deck'] });
+    expect(targetsFor('destroyCard', 'circuit')[0]).toMatchObject({ where: ['hand', 'bank', 'wallet', 'deckTop', 'deckBottom', 'discard', 'deck'] });
     expect(ids('circuit')).toContain('healCard');
     for (const scope of SCOPES) expect(ids(scope)).toContain('bump');
     expect(ACTION_IDS.every(id => SCOPES.some(scope => ids(scope).includes(id)))).toBe(true);
@@ -54,7 +54,7 @@ describe('effect catalog', () => {
   it('gives card effects every place, either side and who chooses', () => {
     for (const action of ['destroyCard', 'trashCard'] as const) {
       const [spec] = targetsFor(action, 'card');
-      expect(spec).toMatchObject({ where: ['board', 'thisNode', 'hand', 'bank', 'wallet', 'deckTop', 'deckBottom', 'deck'] });
+      expect(spec).toMatchObject({ where: ['board', 'thisNode', 'hand', 'bank', 'wallet', 'deckTop', 'deckBottom', 'discard', 'deck'] });
       expect(whoChoices(spec, 'card')).toEqual(expect.arrayContaining(['self', 'opponent']));
     }
     for (const action of ['moveCard', 'changePower', 'healCard', 'restoreCard', 'destroyCard', 'trashCard', 'attachModifier', 'removeModifier'] as const) expect(ACTIONS[action].chooser).toBe(true);

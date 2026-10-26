@@ -53,7 +53,7 @@ const PLAYERS: readonly Role[] = ['ally', 'enemy', 'both'];
 const SIDES: readonly Role[] = ['ally', 'enemy', 'any', 'both'];
 const BOARD: readonly CardWhere[] = ['board', 'thisNode'];
 /** Every place a card effect can reach. Crypto has no Power, so Power and mod effects skip the wallet. */
-const ANYWHERE: readonly CardWhere[] = [...BOARD, 'hand', 'bank', 'wallet', 'deckTop', 'deckBottom'];
+const ANYWHERE: readonly CardWhere[] = [...BOARD, 'hand', 'bank', 'wallet', 'deckTop', 'deckBottom', 'discard'];
 const POWERED: readonly CardWhere[] = [...BOARD, 'hand', 'bank', 'deckTop', 'deckBottom'];
 const RANKED: readonly PickMode[] = ['choose', 'random', 'all', 'weakest', 'strongest', 'first'];
 const player = (roles: readonly Role[] = PLAYERS): TargetSpec => ({ type: 'player', roles });
@@ -73,7 +73,7 @@ export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   trashCards: { id: 'trashCards', label: 'Trash', family: 'Zones', help: 'Up to this many cards go to the shared Trash.', targets: [{ type: 'card', roles: PLAYERS, where: ['hand', 'discard', 'deck'] }], amount: { label: 'Cards', min: 1, max: 20, default: 1 }, picks: ['choose', 'random'], chooser: true, optional: true, min: true },
   mill: { id: 'mill', label: 'Mill', family: 'Zones', help: 'Move cards from the top of a deck.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 0, max: 50, default: 1 }, destinations: ['discard', 'trash'] },
   scry: { id: 'scry', label: 'Inspect', family: 'Zones', help: 'Look at the top cards and keep, discard or trash each.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 } },
-  recover: { id: 'recover', label: 'Recover', family: 'Zones', help: 'Take cards back from the shared Trash or your destroyed pile.', targets: [{ type: 'card', roles: ['ally'], where: ['trash', 'destroyed'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], destinations: ['discard', 'hand', 'top'] },
+  recover: { id: 'recover', label: 'Recover', family: 'Zones', help: 'Take cards back from the shared Trash, your Discard, or your destroyed pile.', targets: [{ type: 'card', roles: ['ally'], where: ['trash', 'destroyed', 'discard'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], destinations: ['discard', 'hand', 'top'] },
   stealCrypto: { id: 'stealCrypto', label: 'Steal', family: 'Zones', help: 'Take Crypto cards from the enemy wallet into your hand.', targets: [{ type: 'zone', roles: ['enemy'], zones: ['wallet'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['random', 'choose'], chooser: true },
   bump: { id: 'bump', label: 'Bump', family: 'Zones', help: 'Send cards from the Effect Bank or wallet to their owner’s Discard.', targets: [{ type: 'zone', roles: ['enemy', 'ally', 'both'], zones: ['bank', 'wallet', 'bankOrWallet'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], chooser: true },
   moveCard: { id: 'moveCard', label: 'Move a card', family: 'Board', help: 'Move a revealed card to another open Node with room.', targets: [{ type: 'card', roles: SIDES, where: BOARD, relations: ['self', 'previous', 'next'] }], picks: ['choose', 'random'], chooser: true, optional: true },
@@ -131,7 +131,8 @@ const BOARD_TARGETS: readonly TargetChoice[] = [
 ];
 const CARD_TARGETS: readonly TargetChoice[] = [
   ...BOARD_TARGETS,
-  cardChoice('hand', 'Card in hand', 'hand'), cardChoice('deckTop', 'Top card', 'deckTop'), cardChoice('deckBottom', 'Bottom card', 'deckBottom'),
+  cardChoice('hand', 'Card in hand', 'hand'), cardChoice('discard', 'Discard pile', 'discard'),
+  cardChoice('deckTop', 'Top card', 'deckTop'), cardChoice('deckBottom', 'Bottom card', 'deckBottom'),
   { ...cardChoice('deck', 'Deck (random)', 'deck'), pick: 'random' }, cardChoice('bank', 'Effect Bank', 'bank'),
 ];
 const SERVER_TARGETS: readonly TargetChoice[] = [
@@ -174,7 +175,14 @@ export const EDITOR_ENTRIES: readonly EditorEntry[] = [
   { key: 'scry', label: 'Inspect', group: 'Deck', action: 'scry', targets: TOP_OF_DECK },
   { key: 'stealCrypto', label: 'Steal', group: 'Deck', action: 'stealCrypto', targets: [{ key: 'wallet', label: 'Wallet', zone: 'wallet' }] },
   { key: 'bump', label: 'Bump', group: 'Deck', action: 'bump', targets: [{ key: 'bank', label: 'Effect Bank', zone: 'bank' }, { key: 'wallet', label: 'Wallet', zone: 'wallet' }, { key: 'bankOrWallet', label: 'Effect Bank or Wallet', zone: 'bankOrWallet' }] },
-  { key: 'recover', label: 'Recover', group: 'Deck', action: 'recover', targets: [{ key: 'trash', label: 'Trash pile', where: 'trash' }] },
+  {
+    key: 'recover', label: 'Recover', group: 'Deck', action: 'recover',
+    targets: [
+      { key: 'trash', label: 'Trash pile', where: 'trash' },
+      { key: 'discard', label: 'Discard pile', where: 'discard' },
+      { key: 'destroyed', label: 'Destroyed pile', where: 'destroyed' },
+    ],
+  },
   { key: 'push', label: 'Push', group: 'Node Power', action: 'transferPower', targets: NODE_TARGETS, preset: () => ({ flow: 'push' }), matches: step => flowOf(step) === 'push' },
   { key: 'pull', label: 'Pull', group: 'Node Power', action: 'transferPower', targets: NODE_TARGETS, preset: () => ({ flow: 'pull' }), matches: step => flowOf(step) === 'pull' },
   { key: 'pushOrPull', label: "Player's choice", group: 'Node Power', action: 'transferPower', targets: NODE_TARGETS, preset: () => ({ flow: undefined }), matches: step => flowOf(step) === 'either' },
@@ -393,9 +401,12 @@ export function clampAmount(spec: AmountSpec, value: number): number {
 
 /** Editor label for a side: `card` reads as whose cards, zones or Servers ("Yours"), `player` as who acts ("You"). */
 export function whoLabel(who: Who, scope: Scope, kind: 'card' | 'player' = 'player'): string {
+  const claimer = scope === 'circuit' || scope === 'locationCondition';
   switch (who) {
-    case 'self': return scope === 'circuit' ? 'Claimer' : kind === 'card' ? 'Yours' : 'You';
-    case 'opponent': return scope === 'circuit' ? 'Other player' : 'Enemy';
+    case 'self':
+      if (scope === 'locationCondition') return kind === 'card' ? "Qualifying seat's" : 'Qualifying seat';
+      return scope === 'circuit' ? 'Claimer' : kind === 'card' ? 'Yours' : 'You';
+    case 'opponent': return claimer ? 'Other player' : 'Enemy';
     case 'winner': return kind === 'card' ? 'Winning' : 'Winning player';
     case 'loser': return kind === 'card' ? 'Losing' : 'Losing player';
     case 'played': return 'Played card’s owner';

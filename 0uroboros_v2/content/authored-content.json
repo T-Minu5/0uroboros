@@ -1,17 +1,17 @@
 {
-  "revision": 552,
+  "revision": 577,
   "document": {
     "version": 2,
     "cards": [
       {
         "id": "eval-signal-surveyor",
         "definitionId": "eval-signal-surveyor",
-        "name": "Signal Surveyor",
+        "name": "Surge Splitter",
         "type": "Character",
-        "power": 3,
-        "cost": 6,
-        "effect": "Push or pull 2 power. +1 Card.",
-        "art": "/assets/card_art/image_placeHolder.png",
+        "power": 4,
+        "cost": 5,
+        "effect": "Push or pull 2 power. +1 Card. +1 Crypto.",
+        "art": "/assets/card_art/uploads/surge-splitter.png",
         "onReveal": [
           {
             "action": "transferPower",
@@ -28,10 +28,18 @@
               "type": "player",
               "who": "self"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
-        "enabled": false,
+        "enabled": true,
         "cardClass": "Utility"
       },
       {
@@ -85,7 +93,7 @@
                 "effects": [
                   {
                     "action": "gainCrypto",
-                    "amount": 1,
+                    "amount": 2,
                     "target": {
                       "type": "player",
                       "who": "self"
@@ -337,6 +345,16 @@
               "who": "self"
             },
             "amount": 1
+          },
+          {
+            "action": "transferPower",
+            "target": {
+              "type": "node",
+              "which": "neighbours"
+            },
+            "amount": 1,
+            "direction": "left",
+            "flow": "push"
           }
         ],
         "pool": "Base",
@@ -584,7 +602,7 @@
         "art": "/assets/card_art/base cards/action/recursive-seance.png",
         "effect": "+1 Crypto for the next 6 turns.",
         "power": 3,
-        "duration": 6,
+        "duration": 9,
         "durationPeriod": "runtime",
         "onReveal": [
           {
@@ -678,7 +696,7 @@
           },
           {
             "action": "gainCrypto",
-            "amount": 1,
+            "amount": 2,
             "target": {
               "type": "player",
               "who": "self"
@@ -913,9 +931,9 @@
         "definitionId": "summon-the-acolytes",
         "name": "Summon the Acolytes",
         "type": "Character",
-        "cost": 3,
+        "cost": 2,
         "art": "/assets/card_art/base cards/utility/summon-the-acolytes.png",
-        "effect": "+4 Cards. Discard up to 3 cards from your hand.",
+        "effect": "+4 Cards, discard 3 cards from your hand. +1 Crypto.",
         "power": 2,
         "onReveal": [
           {
@@ -937,6 +955,14 @@
             "pick": {
               "mode": "choose"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
@@ -951,7 +977,7 @@
         "cost": 4,
         "art": "/assets/card_art/base cards/utility/temporal-rift.png",
         "effect": "Goes into storage. Draw 4 cards on the start of your 4th turn.",
-        "power": 2,
+        "power": 3,
         "onReveal": [],
         "duration": 4,
         "durationPeriod": "runtime",
@@ -1187,7 +1213,7 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/base cards/utility/code-sniper.png",
-        "effect": "Choose one of 3 effects.",
+        "effect": "Choose one: .+2 Actions, +2 Cards or +2 Crypto.",
         "power": 2,
         "onReveal": [
           {
@@ -2698,7 +2724,7 @@
         "power": 2,
         "cost": 2,
         "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Move a revealed card of yours to another open Node.",
+        "effect": "Move a revealed card of yours to another open Node. +1 Crypto.",
         "onReveal": [
           {
             "action": "moveCard",
@@ -2710,10 +2736,18 @@
             "pick": {
               "mode": "random"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
-        "enabled": false,
+        "enabled": true,
         "cardClass": "Utility"
       },
       {
@@ -2724,7 +2758,7 @@
         "power": 2,
         "cost": 3,
         "art": "/assets/card_art/uploads/dolly-dos.png",
-        "effect": "Move a revealed enemy card at this Location to another open Node.",
+        "effect": "Move a revealed enemy card at this Location to another open Node. +1 Crypto",
         "onReveal": [
           {
             "action": "moveCard",
@@ -2749,33 +2783,6 @@
         "pool": "Chaos",
         "enabled": true,
         "cardClass": "Hacker"
-      },
-      {
-        "id": "eval-signal-amplifier",
-        "definitionId": "eval-signal-amplifier",
-        "name": "Signal Amplifier",
-        "type": "Character",
-        "power": 1,
-        "cost": 3,
-        "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Choose a revealed card of yours to give +2 Power.",
-        "onReveal": [
-          {
-            "action": "changePower",
-            "amount": 2,
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board"
-            },
-            "pick": {
-              "mode": "choose"
-            }
-          }
-        ],
-        "pool": "Base",
-        "enabled": false,
-        "cardClass": "Utility"
       },
       {
         "id": "eval-power-siphon",
@@ -2803,30 +2810,6 @@
         "pool": "Chaos",
         "enabled": false,
         "cardClass": "Hacker"
-      },
-      {
-        "id": "sleek-z",
-        "definitionId": "sleek-z",
-        "name": "Sleek Z",
-        "pool": "Base",
-        "type": "Character",
-        "cardClass": "Utility",
-        "enabled": false,
-        "cost": 3,
-        "power": 2,
-        "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Move this card to another open Node.",
-        "onReveal": [
-          {
-            "action": "moveCard",
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board",
-              "relation": "self"
-            }
-          }
-        ]
       },
       {
         "id": "salem-surge",
@@ -2897,13 +2880,22 @@
         "type": "Character",
         "art": "/assets/card_art/base cards/utility/trash-collector.png",
         "enabled": true,
-        "onReveal": [],
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          }
+        ],
         "id": "trash-collector",
         "definitionId": "trash-collector",
         "name": "Trash Collector",
         "power": 0,
         "cost": 5,
-        "effect": "Power is equal to the number of cards in the trash.",
+        "effect": "+1 Power for each card in the Trash. +1 Crypto.",
         "pool": "Base",
         "cardClass": "Utility",
         "powerSource": "trash"
@@ -3471,22 +3463,6 @@
           }
         ],
         "enabled": true
-      },
-      {
-        "id": "z-mobile",
-        "definitionId": "z-mobile",
-        "name": "Z-Mobile",
-        "type": "Character",
-        "cardClass": "Utility",
-        "pool": "Base",
-        "power": 0,
-        "cost": 5,
-        "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Power is equal to the number of cards moved this game. Once each Cycle, you may move this card to another open Node.",
-        "powerSource": "moved",
-        "selfMove": "cycle",
-        "onReveal": [],
-        "enabled": false
       },
       {
         "id": "t-moble",
@@ -4969,6 +4945,46 @@
             "amount": 175
           }
         ]
+      },
+      {
+        "id": "card-vls0e5lo",
+        "definitionId": "card-vls0e5lo",
+        "name": "Doom Loop",
+        "pool": "Base",
+        "type": "Character",
+        "cardClass": "Action",
+        "generated": false,
+        "enabled": true,
+        "cost": 3,
+        "power": 1,
+        "art": "/assets/card_art/uploads/doom-loop.png",
+        "effect": "Trash a Crypto card in your discard pile, then +3 Crypto.",
+        "onReveal": [
+          {
+            "action": "trashCard",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "discard",
+              "filter": {
+                "cardType": "Crypto"
+              }
+            },
+            "pick": {
+              "mode": "random"
+            },
+            "then": [
+              {
+                "action": "gainCrypto",
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                },
+                "amount": 3
+              }
+            ]
+          }
+        ]
       }
     ],
     "locations": [
@@ -5356,30 +5372,6 @@
         ]
       },
       {
-        "id": "moving-mod",
-        "name": "Moving mod",
-        "rule": "On collapse: Attach a “Movable-Mod” to a card in the winning player's deck.",
-        "reward": "On collapse: Attach a “Movable-Mod” to a card in the winning player's deck.",
-        "effects": [
-          {
-            "action": "attachModifier",
-            "target": {
-              "type": "card",
-              "who": "winner",
-              "where": "collection",
-              "filter": {
-                "cardType": "Character"
-              }
-            },
-            "pick": {
-              "mode": "random"
-            },
-            "modifier": "movableEachTurn"
-          }
-        ],
-        "enabled": false
-      },
-      {
         "id": "thin-the-heard",
         "name": "Thin the heard",
         "rule": "On collapse: You may trash up to 2 cards from the winning player's hand.",
@@ -5481,27 +5473,6 @@
         "enabled": true
       },
       {
-        "id": "location-qn2xfxg2",
-        "name": "BumperBall",
-        "rule": "On collapse: Bump a card from the losing player's wallet to discard.",
-        "reward": "On collapse: Bump a card from the losing player's wallet to discard.",
-        "effects": [
-          {
-            "action": "bump",
-            "amount": 1,
-            "target": {
-              "type": "zone",
-              "who": "loser",
-              "zone": "wallet"
-            },
-            "pick": {
-              "mode": "choose"
-            }
-          }
-        ],
-        "enabled": false
-      },
-      {
         "id": "location-sz68enux",
         "name": "FX Bumper",
         "rule": "On collapse: Bump a random card from the losing player's Effect Bank to discard.",
@@ -5573,23 +5544,6 @@
         "reward": "Nothing ever happens here",
         "effects": [],
         "enabled": true
-      },
-      {
-        "id": "location-4044n9xw",
-        "name": "The Nudge",
-        "rule": "On collapse: +1 VP to the player with the least VP.",
-        "reward": "On collapse: +1 VP to the player with the least VP.",
-        "effects": [
-          {
-            "action": "gainVP",
-            "target": {
-              "type": "player",
-              "who": "leastVP"
-            },
-            "amount": 1
-          }
-        ],
-        "enabled": false
       },
       {
         "id": "location-hak8535x",
@@ -5774,6 +5728,89 @@
           }
         ],
         "enabled": true
+      },
+      {
+        "id": "location-b2wbb5kt",
+        "name": "Not a total loss",
+        "rule": "if you have 0 or less Power here, +2 Crypto..",
+        "reward": "if you have 0 or less Power here, +2 Crypto..",
+        "effects": [],
+        "enabled": true,
+        "conditions": [
+          {
+            "id": "cond-zes3iexs",
+            "kind": "powerThreshold",
+            "amount": -1,
+            "comparison": "orLess",
+            "effects": [
+              {
+                "action": "gainCrypto",
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                },
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "location-hgfdhsdp",
+        "name": "Absolute Horror",
+        "rule": "If you have 3 or more Horror cards here, Drain -200 from the other player's server.",
+        "reward": "If you have 3 or more Horror cards here, Drain -200 from the other player's server.",
+        "effects": [],
+        "enabled": true,
+        "conditions": [
+          {
+            "id": "cond-5xanj5zr",
+            "kind": "subtypeCount",
+            "count": 3,
+            "cardClass": "Horror",
+            "effects": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                },
+                "amount": 200
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "location-j4a26tga",
+        "name": "Spice of Lyfe",
+        "rule": "While in play: if you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
+        "reward": "While in play: if you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
+        "effects": [],
+        "enabled": true,
+        "conditions": [
+          {
+            "id": "cond-rlgeh6yx",
+            "kind": "subtypePair",
+            "cardClasses": [
+              "Action",
+              "Horror",
+              "Utility",
+              "Attack"
+            ],
+            "effects": [
+              {
+                "action": "gainCrypto",
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                },
+                "amount": 4
+              }
+            ]
+          }
+        ]
       }
     ],
     "circuitRewards": [

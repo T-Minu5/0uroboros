@@ -126,24 +126,54 @@ function GainCardPicker({ cards, values, selection, onChange, onSelectionChange 
 /** Who a cost may name: only the player paying it. */
 const allyWho = (scope: Scope) => whoChoices({ type: 'player', roles: ['ally'] }, scope);
 
+/** Condition rewards already pick the seat; player targets stay on that seat. */
+function lockConditionStep(step: EffectStep, scope: Scope): EffectStep {
+  if (scope !== 'locationCondition') return step;
+  let next = step;
+  if (next.target?.type === 'player' && next.target.who !== 'self') {
+    next = { ...next, target: { ...next.target, who: 'self' } };
+  }
+  if (next.pick?.chooser === 'opponent') {
+    const { chooser: _chooser, ...pick } = next.pick;
+    next = { ...next, pick };
+  }
+  if (next.choose?.chooser === 'opponent') {
+    const count = next.choose.count ?? 1;
+    next = { ...next, choose: count === 1 ? undefined : { count, chooser: 'self' } };
+  }
+  if (next.then?.length) next = { ...next, then: next.then.map(entry => lockConditionStep(entry, scope)) };
+  if (next.options?.length) {
+    next = {
+      ...next,
+      options: next.options.map(option => ({
+        ...option,
+        effects: option.effects.map(entry => lockConditionStep(entry, scope)),
+        ...(option.cost?.length ? { cost: option.cost.map(entry => lockConditionStep(entry, scope)) } : {}),
+      })),
+    };
+  }
+  return next;
+}
+
 function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectStep; scope: Scope; asCost: boolean; cards: readonly CatalogCard[]; onStep: (step: EffectStep) => void }) {
   const entry = editorEntryFor(step);
   const specs = targetsFor(step.action, scope);
   const choices = entry?.targets ? targetChoicesFor(entry, step, scope) : [];
   if (entry?.fixedTarget || (!specs.length && !choices.length)) return null;
-  const onChange = (target: Target) => onStep({ ...step, target });
+  const onChange = (target: Target) => onStep(lockConditionStep({ ...step, target }, scope));
   const fields: ReactNode[] = [];
   if (entry?.targets) {
     const labels = Object.fromEntries([['', 'Unlisted target'], ...choices.map(choice => [choice.key, choice.label])]) as Record<string, string>;
-    fields.push(<Select key="target" label="Target" value={currentTargetChoice(step, choices)?.key ?? ''} options={choices.map(choice => choice.key)} labels={labels} onChange={key => onStep(applyTargetChoice(step, choices.find(choice => choice.key === key)!, scope))} />);
+    fields.push(<Select key="target" label="Target" value={currentTargetChoice(step, choices)?.key ?? ''} options={choices.map(choice => choice.key)} labels={labels} onChange={key => onStep(lockConditionStep(applyTargetChoice(step, choices.find(choice => choice.key === key)!, scope), scope))} />);
   }
   if (!specs.length) return <div className="au-step-grid">{fields}</div>;
   const target = step.target ?? defaultTarget(specs[0], scope);
   const spec: TargetSpec = matchTargetSpec(step.action, target, scope) ?? specs[0];
-  const whoOptions = spec.type === 'node' ? [] : whoChoices(spec, scope).filter(who => !asCost || allyWho(scope).includes(who));
+  const hidePlayerWho = scope === 'locationCondition' && target.type === 'player';
+  const whoOptions = spec.type === 'node' || hidePlayerWho ? [] : whoChoices(spec, scope).filter(who => !asCost || allyWho(scope).includes(who));
   const whoLabels = Object.fromEntries(whoOptions.map(who => [who, whoLabel(who, scope, target.type === 'player' ? 'player' : 'card')])) as Record<Who, string>;
   if (specs.length > 1 && !entry?.targets) fields.push(<Select key="type" label="Target" value={target.type} options={specs.map(entry => entry.type)} labels={TARGET_TYPE_LABELS} onChange={type => onChange(defaultTarget(specs.find(entry => entry.type === type)!, scope))} />);
-  if (target.type !== 'node') fields.push(<Select key="who" label={target.type === 'card' ? 'Whose cards' : target.type === 'player' ? 'Which player' : 'Whose'} value={target.who} options={whoOptions} labels={whoLabels} onChange={who => onChange({ ...target, who })} />);
+  if (target.type !== 'node' && !hidePlayerWho) fields.push(<Select key="who" label={target.type === 'card' ? 'Whose cards' : target.type === 'player' ? 'Which player' : 'Whose'} value={target.who} options={whoOptions} labels={whoLabels} onChange={who => onChange({ ...target, who })} />);
   if (entry?.targets) {
     if (target.type === 'card' && target.relation === undefined) fields.push(...cardFilters(target, onChange, step.action === 'attachModifier'));
     return <div className="au-step-grid">{fields}</div>;
@@ -256,9 +286,9 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
   const entries = EDITOR_ENTRIES.filter(item => available.some(action => action.id === item.action));
   const fixedPick = entry?.targets ? currentTargetChoice(step, entry.targets)?.pick : undefined;
   const changeTo = (key: string) => {
-    const next = applyEditorEntry(step, EDITOR_ENTRIES.find(item => item.key === key)!, scope, cards);
+    let next = applyEditorEntry(step, EDITOR_ENTRIES.find(item => item.key === key)!, scope, cards);
     if (asCost && next.target && 'who' in next.target && !allyWho(scope).includes(next.target.who)) next.target = { ...next.target, who: scopedWho('self', scope) } as Target;
-    onChange(next);
+    onChange(lockConditionStep(next, scope));
   };
   const amountField = () => {
     const amount = spec.amount!, sign = entry?.sign;
@@ -278,11 +308,11 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {amountShown && spec.amount && amountField()}
     </div>
     <p className="au-recipe-help">{spec.help}</p>
-    <TargetBuilder step={step} scope={scope} asCost={asCost} cards={cards} onStep={next => onChange(stripUndefined(next))} />
+    <TargetBuilder step={step} scope={scope} asCost={asCost} cards={cards} onStep={next => onChange(stripUndefined(lockConditionStep(next, scope)))} />
     {spec.picks && !hasRelation && <div className="au-step-grid">
       {!atDeckEnd && !fixedPick && <Select label="Pick" value={step.pick?.mode ?? spec.picks[0]} options={spec.picks} labels={offBoard ? { ...PICK_LABELS, first: 'First in order' } : PICK_LABELS} onChange={mode => patch({ pick: { ...step.pick, mode: mode as PickMode, ...(mode === 'choose' ? {} : { chooser: undefined }) } })} />}
       {spec.pickCount && (atDeckEnd || step.pick?.mode !== 'all') && <label className="au-recipe-field"><span>How many cards</span><NumberInput aria-label="How many cards" min={1} max={10} value={step.pick?.count ?? 1} onChange={value => { if (value !== undefined) patch({ pick: { mode: step.pick?.mode ?? spec.picks![0], ...step.pick, count: Math.min(10, Math.max(1, Math.round(value))) === 1 ? undefined : Math.min(10, Math.max(1, Math.round(value))) } }); }} /></label>}
-      {spec.chooser && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
+      {spec.chooser && scope !== 'locationCondition' && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
     {step.action === 'gainCard' && <GainCardPicker
@@ -315,7 +345,7 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
     {step.action === 'choice' && <div className="au-step-grid">
       <label className="au-recipe-field au-step-wide"><span>Prompt</span><input aria-label="Choice prompt" value={step.prompt ?? ''} placeholder="Choose one effect" onChange={event => patch({ prompt: event.target.value || undefined })} /></label>
       <label className="au-recipe-field"><span>Options picked</span><NumberInput aria-label="Options picked" min={1} max={Math.max(1, step.options?.length ?? 2)} value={step.choose?.count ?? 1} onChange={value => { if (value === undefined) return; const count = Math.max(1, Math.round(value)); patch({ choose: count === 1 && (step.choose?.chooser ?? 'self') === 'self' ? undefined : { count, chooser: step.choose?.chooser ?? 'self' } }); }} /></label>
-      <Select label="Who picks" value={step.choose?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => { const count = step.choose?.count ?? 1; patch({ choose: count === 1 && chooser === 'self' ? undefined : { count, chooser } }); }} />
+      {scope !== 'locationCondition' && <Select label="Who picks" value={step.choose?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => { const count = step.choose?.count ?? 1; patch({ choose: count === 1 && chooser === 'self' ? undefined : { count, chooser } }); }} />}
     </div>}
     {(step.action === 'choice' || step.action === 'random') && <OptionsEditor step={step} field={field} scope={scope} cards={cards} depth={depth} onChange={options => patch({ options })} />}
     {(spec.optional || spec.min) && <div className="au-step-grid">
@@ -352,7 +382,7 @@ export function StepList({ title, description, field, steps, scope, cards: rawCa
   const { activeStep, setActiveStep, invalid } = useEditorFocus();
   const key = (index: number) => `${field}.${index}`;
   const within = (path: string | null, prefix: string) => path !== null && (path === prefix || path.startsWith(`${prefix}.`));
-  const replace = (index: number, next: EffectStep) => onChange(steps.map((step, at) => at === index ? next : step));
+  const replace = (index: number, next: EffectStep) => onChange(steps.map((step, at) => at === index ? lockConditionStep(next, scope) : step));
   const remove = (index: number) => {
     onChange(steps.filter((_, at) => at !== index));
     if (within(activeStep, key(index))) setActiveStep(null);
@@ -368,6 +398,7 @@ export function StepList({ title, description, field, steps, scope, cards: rawCa
   const add = () => {
     let step = createStep(asCost ? 'payCrypto' : 'draw', scope, cards);
     if (asCost && step.target && 'who' in step.target) step = { ...step, target: { ...step.target, who: scopedWho('self', scope) } as Target };
+    step = lockConditionStep(step, scope);
     onChange([...steps, step]);
     setActiveStep(key(steps.length));
   };

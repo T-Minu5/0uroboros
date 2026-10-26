@@ -90,10 +90,6 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Card and Location notes
 
-- **card-3c9ng7g8**: utility; est. hand value 5.2 early / 5.2 late at cost 1. Untested.
-- **card-56k08pz8**: utility; est. hand value 0.8 early / 0.8 late at cost 1. Untested.
-- **card-728y2mjz**: high Power; est. hand value 6.3 early / 5.5 late at cost 3. Untested.
-- **Apollo Ascii**: Monitor its potential to reset power dynamics significantly.
 - **Dama de Fuego**: 3 VP finisher; est. hand value 3.8 early / 3.8 late at cost 6. Untested.
 - **501.AR**: 1 VP finisher; est. hand value 3.6 early / 3.6 late at cost 4. Untested.
 - **Hot Oil Spa**: Monitor the impact of healing on revealed cards, as it may change strategies for both players.
@@ -130,6 +126,10 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - **Entropic Infantry**: utility; est. hand value 2.5 early / 2.5 late at cost 8. Untested.
 - **Pihkal hound**: light Drain; est. hand value 4.5 early / 7.2 late at cost 5. Untested.
 - **Delete.Detritus.exe**: utility; est. hand value 5.5 early / 2 late at cost 4. Untested.
+- **Not a total loss**: New Location: "if you have 0 or less Power here, +2 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.11. Untested; watch who wins it and how it shifts the economy.
+- **Absolute Horror**: New Location: "If you have 3 or more Horror cards here, Drain -200 from the other player's server." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.16. Untested; watch who wins it and how it shifts the economy.
+- **Spice of Lyfe**: New Location: "While in play: if you have an Action and a Horror here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Kanada**: utility; est. hand value -0.3 early / -0.3 late at cost 3. Untested.
 
 ## Card results (complete games where a side bought it)
 
@@ -169,6 +169,24 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Recent notes
 
+- v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:35 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:34 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:33 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:32 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:32 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Kanada.
+- v1.12 · 2026-10-26 02:18 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:18 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New Locations: Not a total loss, Absolute Horror, Spice of Lyfe.
+- v1.12 · 2026-10-26 02:02 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.12 · 2026-10-26 02:02 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-26 01:42 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
@@ -191,24 +209,6 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 - v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-20 05:40 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Sun Scythe, Astra Wraith, Mary Mallon, Merchant of Chaos, The Heisenberg Hag, Entropic Infantry.
-- v1.12 · 2026-10-19 01:12 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Banishing Ritual, amatera-5u, Danda, H3l3-iOS, Kinich.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:55 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.12 · 2026-10-18 18:54 · v1.12 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
 
 ## Version history
 

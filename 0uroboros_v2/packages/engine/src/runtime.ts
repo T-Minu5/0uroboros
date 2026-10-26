@@ -121,9 +121,19 @@ export type TransferMove = { from: number; to: number; amount: number };
 /** A Power transfer drawn as the chooser's Power at this Node and its neighbours; each option id maps to the moves it makes. */
 export type TransferChoice = { amount: number; center: number; nodes: { node: number; name: string; power: number }[]; moves: Record<string, TransferMove[]> };
 /** `zone` names the pile the options are drawn from, so the choice can be made inside that pile's drawer. */
-export type RuntimeChoice = { id: number; owner: PlayerId; prompt: string; sourceName: string; node?: number; icon?: string; options: ChoiceOption[]; select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice; zone?: "trash"; verb?: string };
+export type ChoiceZone = "trash" | "discard";
+export type RuntimeChoice = {
+  id: number; owner: PlayerId; prompt: string; sourceName: string; node?: number; icon?: string;
+  options: ChoiceOption[]; select?: { min: number; max: number }; groups?: ChoiceGroup[];
+  transfer?: TransferChoice; zone?: ChoiceZone; /** Whose Discard when `zone` is `discard`. */ zoneOwner?: PlayerId; verb?: string;
+};
 /** `aiPick` returns a legal selection when the opponent chooses; without it the opponent picks at random. */
-type ChoiceRequest = { prompt: string; options: ChoiceOption[]; icon?: string; verb?: string; select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice; zone?: "trash"; resolve: (ids: string[]) => RuntimeEvent; aiPick?: () => string[] };
+type ChoiceRequest = {
+  prompt: string; options: ChoiceOption[]; icon?: string; verb?: string;
+  select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice;
+  zone?: ChoiceZone; zoneOwner?: PlayerId;
+  resolve: (ids: string[]) => RuntimeEvent; aiPick?: () => string[];
+};
 export type PlayerState = {
   bank: BankEntry[];
   draw: Card[]; hand: Card[]; discard: Card[]; destroyed: Card[];
@@ -1041,9 +1051,9 @@ export class RuntimeSession {
     return this.event("bank", callbacks.length ? "Mod effects resolve for the new Runtime turn." : "No mod effects this turn.");
   }
 
-  private requestChoice(placement: Deployment, prompt: string, options: (ChoiceOption & { resolve: () => RuntimeEvent })[], icon?: string, zone?: "trash", verb?: string): RuntimeEvent {
+  private requestChoice(placement: Deployment, prompt: string, options: (ChoiceOption & { resolve: () => RuntimeEvent })[], icon?: string, zone?: ChoiceZone, verb?: string, zoneOwner?: PlayerId): RuntimeEvent {
     return this.openChoice(placement, {
-      prompt, icon, zone, verb,
+      prompt, icon, zone, zoneOwner, verb,
       options: options.map(({ resolve: _resolve, ...option }) => option),
       resolve: ([id]) => options.find(option => option.id === id)!.resolve(),
     });
@@ -1062,7 +1072,14 @@ export class RuntimeSession {
       return this.event("choice", `${this.config.seatNames ? this.subject(placement.owner) : placement.owner === 1 ? "Opponent" : "AI"} chooses: ${labels.join(", ") || "nothing"}.`, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
     }
     this.choiceResolver = resolve;
-    this.state.choice = { id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node, ...(icon ? { icon } : {}), ...shape, ...(request.transfer ? { transfer: request.transfer } : {}), ...(request.zone ? { zone: request.zone } : {}), ...(request.verb ? { verb: request.verb } : {}) };
+    this.state.choice = {
+      id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node,
+      ...(icon ? { icon } : {}), ...shape,
+      ...(request.transfer ? { transfer: request.transfer } : {}),
+      ...(request.zone ? { zone: request.zone } : {}),
+      ...(request.zoneOwner !== undefined ? { zoneOwner: request.zoneOwner } : {}),
+      ...(request.verb ? { verb: request.verb } : {}),
+    };
     return this.event("choice", prompt, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
   }
 
@@ -1720,23 +1737,30 @@ export class RuntimeSession {
     });
   }
 
-  /** Cards back from the shared Trash or the recipient's destroyed pile. */
+  /** Cards back from the shared Trash, the recipient's Discard, or their destroyed pile. */
   private recoverStep(ctx: EffectContext, step: EffectStep, recipient: PlayerId): RuntimeEvent {
     const { card } = ctx.source;
-    const fromDestroyed = step.target?.type === "card" && step.target.where === "destroyed";
-    const pile = fromDestroyed ? this.state.players[recipient].destroyed : this.state.trash;
+    const where = step.target?.type === "card" ? step.target.where : "trash";
+    const fromDestroyed = where === "destroyed";
+    const fromDiscard = where === "discard";
+    const pile = fromDestroyed
+      ? this.state.players[recipient].destroyed
+      : fromDiscard
+        ? this.state.players[recipient].discard
+        : this.state.trash;
     const filter = step.target?.type === "card" ? step.target.filter : undefined;
     const candidates = pile.filter(item => matchesFilter(item, filter));
-    const destination = step.destination ?? "discard";
-    if (!candidates.length) return this.noTarget(ctx, step, { target: "trash" });
+    const destination = step.destination ?? (fromDiscard ? "hand" : "discard");
+    if (!candidates.length) return this.noTarget(ctx, step, { target: fromDiscard ? "discard" : "trash", targetOwner: fromDiscard || fromDestroyed ? recipient : undefined });
     const count = Math.min(Math.max(1, step.amount ?? 1), candidates.length);
     const whose = this.whose(recipient, 0, "opponent");
     const placeName = destination === "hand" ? "hand" : destination === "top" ? "deck" : "Discard";
+    const sourceLabel = fromDestroyed ? "the destroyed pile" : fromDiscard ? "Discard" : "shared Trash";
     const recover = (ids: readonly string[]) => {
       const names: string[] = [];
       for (const id of ids) {
         const index = pile.findIndex(item => item.id === id);
-        if (index < 0) throw new Error(`Card is no longer in ${fromDestroyed ? "the destroyed pile" : "shared Trash"}.`);
+        if (index < 0) throw new Error(`Card is no longer in ${sourceLabel}.`);
         const [taken] = pile.splice(index, 1);
         const player = this.state.players[recipient];
         if (destination === "hand") player.hand.push(taken); else if (destination === "top") player.draw.unshift(taken); else player.discard.push(taken);
@@ -1749,12 +1773,23 @@ export class RuntimeSession {
       const pool = [...candidates];
       return recover(Array.from({ length: count }, () => pool.splice(Math.floor(this.config.random() * pool.length), 1)[0].id));
     }
-    const source = fromDestroyed ? "your destroyed pile" : "shared Trash";
+    const source = fromDestroyed ? "your destroyed pile" : fromDiscard ? "your Discard" : "shared Trash";
     const prompt = count === 1 ? `Recover one card from ${source} to your ${placeName}.` : `Recover ${count} cards from ${source} to your ${placeName}.`;
-    if (count === 1) return this.requestChoice(ctx.source, prompt, candidates.map(target => ({ id: target.id, label: target.name, card: this.shownCard(target), resolve: () => recover([target.id]) })), undefined, fromDestroyed ? undefined : "trash", "Recover");
+    const drawerZone: ChoiceZone | undefined = fromDestroyed ? undefined : fromDiscard ? "discard" : "trash";
+    const zoneOwner = fromDiscard ? recipient : undefined;
+    if (count === 1) {
+      return this.requestChoice(
+        ctx.source, prompt,
+        candidates.map(target => ({ id: target.id, label: target.name, card: this.shownCard(target), resolve: () => recover([target.id]) })),
+        undefined, drawerZone, "Recover", zoneOwner,
+      );
+    }
     return this.openChoice(ctx.source, {
       prompt, options: candidates.map(target => ({ id: target.id, label: target.name, card: this.shownCard(target) })),
-      select: { min: count, max: count }, verb: "Recover", ...(fromDestroyed ? {} : { zone: "trash" as const }), resolve: recover,
+      select: { min: count, max: count }, verb: "Recover",
+      ...(drawerZone ? { zone: drawerZone } : {}),
+      ...(zoneOwner !== undefined ? { zoneOwner } : {}),
+      resolve: recover,
     });
   }
 
@@ -1804,6 +1839,7 @@ export class RuntimeSession {
       options: eligible.map(card => ({ id: card.id, label: card.name, card: this.shownCard(card) })),
       select: { min, max }, verb: trash ? "Trash" : "Discard",
       icon: step.action === "discardCards" ? "discard" : undefined,
+      ...(fromDiscard ? { zone: "discard" as const, zoneOwner: victim } : {}),
       resolve: ids => this.runSteps([...ids.map(remove), () => finish(ids.length)]),
       aiPick: () => {
         const context = this.strategyContext(victim);
@@ -1980,10 +2016,12 @@ export class RuntimeSession {
     const whose = mixed ? "either player's" : candidates[0].owner === chooser ? "your" : "the opponent's";
     const id = (entry: ZoneCard) => `card-${entry.card.id}`;
     const options = candidates.map(entry => ({ id: id(entry), label: `${entry.card.name}${mixed ? ` · ${entry.owner === chooser ? "yours" : "opponent's"}` : ""}`, card: this.shownCard(entry.card) }));
+    const discardOwner = where === "discard" && !mixed ? candidates[0].owner : undefined;
     return this.openChoice({ ...ctx.source, owner: chooser }, {
       prompt: `${card.name}: choose ${count === 1 ? "a card" : `${count} cards`} in ${whose} ${ZONE_PLACE_TEXT[where] ?? "cards"} to ${CARD_VERBS[step.action] ?? "affect"}.`,
       options, verb: CHOICE_VERBS[step.action],
       ...(count > 1 || step.optional ? { select: { min: step.optional ? 0 : count, max: count } } : {}),
+      ...(where === "discard" ? { zone: "discard" as const, ...(discardOwner !== undefined ? { zoneOwner: discardOwner } : {}) } : {}),
       aiPick: () => this.aiCardPicks(step, chooser, candidates.map(entry => ({ id: id(entry), owner: entry.owner, power: this.livePower(entry.card) })), count) ?? this.randomSelection({ options, ...(count > 1 ? { select: { min: count, max: count } } : {}) }),
       resolve: ids => ids.length ? apply(candidates.filter(entry => ids.includes(id(entry)))) : this.event("choice", `${card.name}: optional ${CARD_VERBS[step.action] ?? "effect"} skipped.`, this.base(ctx)),
     });
