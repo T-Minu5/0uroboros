@@ -86,7 +86,7 @@ type LocationLike = {
   effects: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[];
   startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[]; conditions?: readonly LocationConditionLike[];
 };
-type StepLocationCondition = Omit<LocationConditionLike, 'effects'> & { effects: EffectStep[] };
+type StepLocationCondition = Omit<LocationCondition, 'effects'> & { effects: EffectStep[] };
 type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3' | 'conditions'> & {
   effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[];
   conditions?: StepLocationCondition[];

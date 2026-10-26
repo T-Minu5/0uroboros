@@ -362,7 +362,7 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
 }
 
 function LocationConditionEditor({ index, condition, cards, onChange, onRemove }: {
-  index: number; condition: LocationCondition; cards: Card[];
+  index: number; condition: LocationCondition; cards: readonly Card[];
   onChange: (condition: LocationCondition) => void; onRemove: () => void;
 }) {
   const changeKind = (kind: LocationConditionKind) => onChange({ ...createLocationCondition(kind), id: condition.id, effects: condition.effects });

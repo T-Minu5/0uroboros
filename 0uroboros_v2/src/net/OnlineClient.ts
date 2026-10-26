@@ -257,7 +257,7 @@ export class OnlineClient implements GameClient {
   undoAllPlanning() { return this.must({ type: 'undoPlanning' }); }
   endTurn() { return this.command({ type: 'endTurn' }); }
   undoEndTurn() { return this.must({ type: 'undoEndTurn' }); }
-  choose(selection: string | string[]) { return this.must({ type: 'choose', selection: typeof selection === 'string' ? [selection] : selection }); }
+  choose(selection: string | readonly string[]) { return this.must({ type: 'choose', selection: typeof selection === 'string' ? [selection] : [...selection] }); }
   claimCircuitReward() { return this.must({ type: 'claimCircuit' }); }
   buy(pileId: string) { return this.must({ type: 'buy', pileId }); }
   endDraft() { return this.must({ type: 'endDraft' }); }

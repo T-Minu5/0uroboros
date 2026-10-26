@@ -36,7 +36,7 @@ export interface GameClient {
   undoAllPlanning(): Maybe<RuntimeEvent>;
   endTurn(): Maybe<RuntimeEvent | null>;
   undoEndTurn(): Maybe<RuntimeEvent>;
-  choose(selection: string | string[]): Maybe<RuntimeEvent>;
+  choose(selection: string | readonly string[]): Maybe<RuntimeEvent>;
   claimCircuitReward(): Maybe<RuntimeEvent>;
   buy(pileId: string): Maybe<RuntimeEvent>;
   endDraft(): Maybe<RuntimeEvent>;
@@ -82,7 +82,7 @@ export class LocalClient implements GameClient {
   undoAllPlanning() { return this.session.undoAllPlanning(); }
   endTurn() { return this.session.endTurn(); }
   undoEndTurn() { return this.session.undoEndTurn(); }
-  choose(selection: string | string[]) { return this.session.choose(selection); }
+  choose(selection: string | readonly string[]) { return this.session.choose(selection); }
   claimCircuitReward() { return this.session.claimCircuitReward(); }
   buy(pileId: string) { return this.session.buy(pileId); }
   endDraft() { return this.session.endDraft(); }

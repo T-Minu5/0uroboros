@@ -1160,7 +1160,7 @@ export class RuntimeSession {
   private applyMorphTransform(
     placement: Deployment,
     deployed: Deployment | undefined,
-    banked: { card: Card; order: number; expiresCycle?: number } | undefined,
+    banked: BankEntry | undefined,
     formIds: readonly string[],
     selection: "sequential" | "random",
     cycleForms: boolean | undefined,
@@ -1255,9 +1255,9 @@ export class RuntimeSession {
         const found=node.cards[side].find(item=>item.card.id===id);
         if(found){deployed=found;owner=side;}
       }
-      const bankedOwner=this.state.players.findIndex(player=>player.bank.some(entry=>entry.card.id===id)) as PlayerId|-1;
-      const banked=bankedOwner>=0?this.state.players[bankedOwner].bank.find(entry=>entry.card.id===id):undefined;
-      if(bankedOwner>=0)owner=bankedOwner;
+      const bankedOwnerIdx=this.state.players.findIndex(player=>player.bank.some(entry=>entry.card.id===id));
+      const banked=bankedOwnerIdx===0||bankedOwnerIdx===1?this.state.players[bankedOwnerIdx].bank.find(entry=>entry.card.id===id):undefined;
+      if(bankedOwnerIdx===0||bankedOwnerIdx===1)owner=bankedOwnerIdx;
       if(!deployed&&!banked)continue;
       const placement=deployed??{card:banked!.card,owner,node:-1,order:banked!.order,revealed:true};
       events.push(this.applyMorphTransform(placement,deployed,banked,recipe.formIds,"sequential",recipe.cycleForms,undefined,false,false));

@@ -122,7 +122,7 @@ export function createStrategicMarket(_random:RandomSource,content?:MarketConten
 export type DraftSlot={
  id:string;
  label:string;
- category:(card:Card)=>MarketCategory;
+ category:(entry:PoolEntry)=>MarketCategory;
  matches:(entry:PoolEntry)=>boolean;
 };
 

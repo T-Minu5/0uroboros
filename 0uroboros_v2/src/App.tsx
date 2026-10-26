@@ -267,7 +267,7 @@ export function App(){
   resolvingRef.current=true;
   attempt(()=>client.current!.claimCircuitReward(),event=>{const next=client.current!.view()!;setBusy(true);setActive(event);record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);const duration=eventTime(event,fastRef.current);later(()=>setView(next),duration*.6);later(()=>{if(client.current?.pendingCount)pump();else{setActive(null);setBusy(false);resolvingRef.current=false;}},duration);},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Privilege unavailable.');});
  }
- function choose(selection:string|string[]){
+ function choose(selection:string|readonly string[]){
   if(!client.current||resolvingRef.current)return;
   const before=client.current.view()!;resolvingRef.current=true;
   attempt(()=>client.current!.choose(selection),event=>{setNotice(isNoTargetEvent(event)?'No target':event.text);setBusy(true);presentResolved(before,{event,view:client.current!.view()!});},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Choice unavailable.');});
