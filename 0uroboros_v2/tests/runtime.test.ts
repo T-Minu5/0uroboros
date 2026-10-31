@@ -193,7 +193,7 @@ describe("Session edge conditions", () => {
     session.endTurn();
     const events = drain(session);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
-    expect(session.state.players[0].destructionVP).toBe(20);
+    expect(session.state.players[0].destructionVP).toBe(16);
     expect(session.state.phase).toBe("gameover");
     expect(events.filter(event => event.kind === "gameover")).toHaveLength(1);
     expect(events.some(event => event.kind === "draft")).toBe(false);
@@ -378,10 +378,10 @@ describe("Approved VP scoring", () => {
     session.state.players[1].destructionVP = 30;
     session.state.players[1].servers = { primary: 0, backup: 20 };
     session.deploy("lethal", 0); session.endTurn(); drain(session);
-    expect(session.state.players[0].totalVP).toBe(20);
+    expect(session.state.players[0].totalVP).toBe(16);
     expect(session.state.players[1].totalVP).toBe(30);
     expect(session.state.winner).toBe(1);
-    expect(session.state.endedReason).toMatch(/Opponent wins, 20 to 30 VP/);
+    expect(session.state.endedReason).toMatch(/Opponent wins, 16 to 30 VP/);
   });
 });
 
@@ -484,6 +484,6 @@ it("targeted Server effects cannot revive or repeatedly award a destroyed server
   session.state.players[0].hand=[{...starterCards[0],id:'targeted',onReveal:[{kind:'drain',target:'backup',amount:100},{kind:'drain',target:'backup',amount:100},{kind:'restore',target:'primary',amount:100}]}];
   session.deploy('targeted',0);session.endTurn();const events=drain(session);
   expect(events.filter(event=>event.kind==='drain').map(event=>event.amount)).toEqual([50,0]);
-  expect(session.state.players[0].destructionVP).toBe(20);
+  expect(session.state.players[0].destructionVP).toBe(16);
   expect(session.state.players[0].servers.primary).toBe(0);
 });

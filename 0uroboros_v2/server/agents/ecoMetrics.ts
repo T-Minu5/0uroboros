@@ -13,11 +13,30 @@ const rate = (hits: number, total: number) => total ? round(hits / total) : null
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
 export type EndedBy = 'destruction' | 'cycle16' | 'other';
-/** Final VP margins: CLOSE_MARGIN or less is a close game, BLOWOUT_MARGIN or more a blowout. */
-export const CLOSE_MARGIN = 5;
-export const BLOWOUT_MARGIN = 15;
-export const isCloseMargin = (margin: number) => margin <= CLOSE_MARGIN;
-export const isBlowoutMargin = (margin: number) => margin >= BLOWOUT_MARGIN;
+/** Final VP margins: below CLOSE_MARGIN is close, above BLOWOUT_MARGIN is a blowout; between is mid. */
+export const CLOSE_MARGIN = 12;
+export const BLOWOUT_MARGIN = 21;
+export const isCloseMargin = (margin: number) => margin < CLOSE_MARGIN;
+export const isBlowoutMargin = (margin: number) => margin > BLOWOUT_MARGIN;
+/**
+ * Reporting targets across a large sample (not hard rules every game must meet).
+ * Destruction endings should land in 75–92%: enough decisive Server kills, but not so many
+ * that Cycle-16 finishes disappear. Cycle 16 should stay at or under 25%.
+ */
+export const TARGET_DESTRUCTION_END_RATE_MIN = 0.75;
+export const TARGET_DESTRUCTION_END_RATE_MAX = 0.92;
+export const TARGET_CYCLE16_MAX_RATE = 0.25;
+/**
+ * Floor: share of games where **each** player destroyed ≥1 of the **other's** Servers
+ * (mutual enemy kills — not “a Server died somewhere” and not a full double-kill).
+ */
+export const TARGET_BOTH_DESTROYED_RATE = 0.40;
+/** @deprecated Prefer TARGET_DESTRUCTION_END_RATE_MIN..MAX; kept as the floor of the band. */
+export const TARGET_DESTRUCTION_END_RATE = TARGET_DESTRUCTION_END_RATE_MIN;
+
+/** Unique enemy Servers this seat destroyed (Primary / Backup). */
+export const enemyServersDestroyed = (m: Pick<GameMetrics, 'destructions'>, seat: Seat) =>
+  new Set(m.destructions.filter(item => item.by === seat && item.victim !== seat).map(item => item.server)).size;
 /** Only for games recorded before each destruction carried its VP; matches the default Server VP of those builds. */
 const UNRECORDED_DESTRUCTION_VP = { primary: 4, backup: 8 };
 export type Archetype = 'economy' | 'aggression' | 'vp' | 'board' | 'balanced' | 'idle';
@@ -39,10 +58,25 @@ export type GameMetrics = {
   locations: { id: string; name: string; winner: Seat | null }[];
   circuit: { cycle: number; rewardId: string; name: string; eligible: number[]; claimed: number[] }[];
   circuitClaims: Pair;
-  timeline: { cycle: number; vp: Pair; servers: Pair; wallet: Pair; deckSize: Pair }[];
+  /**
+   * Per-cycle board state for snowball analysis. `circuitClaims` is cumulative through this Cycle;
+   * `circuitDifferential` is seat0 − seat1 cumulative Circuit claims; `locationsWon` is that Cycle only.
+   */
+  timeline: {
+    cycle: number; vp: Pair; servers: Pair; wallet: Pair; deckSize: Pair;
+    locationsWon: Pair; circuitClaims: Pair; circuitDifferential: number;
+  }[];
+  /** Printed VP from market purchases (VP cards bought). Separates market from destruction/other VP. */
+  marketVp: Pair;
+  /** finalVP − destructionVP − marketVp: location/circuit/effect and starter card VP. */
+  otherVp: Pair;
+  /** End-of-game ScoreBreakdown when the report carries it. */
+  finalScore: [{ cardVP: number; destructionVP: number; locationVP: number; circuitVP: number; effectVP: number; total: number }, { cardVP: number; destructionVP: number; locationVP: number; circuitVP: number; effectVP: number; total: number }] | null;
   vpLeadChanges: number; vpLeaderAt: Record<'4' | '8' | '12', Seat | null>; serverLeaderAt8: Seat | null;
   /** Largest VP deficit the eventual winner overcame (0 if it never trailed). */
   winnerMaxDeficit: number;
+  /** First Cycle a seat held a cumulative Circuit-claim lead of 2+, or null. */
+  circuitLead2At: [number | null, number | null];
   cards: { definitionId: string; name: string; cost: number; type: string; cardClass?: string; bought: Pair; plays: Pair; drain: Pair; restore: Pair; draw: Pair; crypto: Pair; vp: Pair; actions: Pair }[];
   purchaseSimilarity: number;
   ux: { failedOutcomes: Pair; randomResults: number; choices: Pair; events: number; eventsPerCycle: number };
@@ -77,13 +111,30 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const ownPurchases = (seat: Seat) => report.purchases.filter(item => item.owner === seat);
   const destructions = (t?.destructions ?? []).map(item => ({ cycle: item.cycle, victim: item.victim as Seat, server: item.server, by: item.by as Seat, source: item.source, sourceId: item.sourceId, vp: item.vp ?? UNRECORDED_DESTRUCTION_VP[item.server] }));
   const destructionVP = pair(seat => sum(destructions.filter(item => item.by === seat && item.victim !== seat).map(item => item.vp)));
-  const timeline = report.cycles.map(cycle => ({ cycle: cycle.cycle, vp: cycle.vp, servers: cycle.servers, wallet: cycle.wallet, deckSize: cycle.deckSize ?? [0, 0] as Pair }));
+  const cumulativeClaims: Pair = [0, 0];
+  const timeline = report.cycles.map(cycle => {
+    for (const seat of SEATS) if (cycle.circuit?.claimed.includes(seat)) cumulativeClaims[seat]++;
+    const circuitClaims: Pair = [cumulativeClaims[0], cumulativeClaims[1]];
+    return {
+      cycle: cycle.cycle, vp: cycle.vp, servers: cycle.servers, wallet: cycle.wallet, deckSize: cycle.deckSize ?? [0, 0] as Pair,
+      locationsWon: cycle.locationsWon, circuitClaims, circuitDifferential: circuitClaims[0] - circuitClaims[1],
+    };
+  });
   const leader = (values: Pair): Seat | null => values[0] === values[1] ? null : values[0] > values[1] ? 0 : 1;
   let vpLeadChanges = 0, previous: Seat | null = null;
   for (const row of timeline) { const now = leader(row.vp); if (now !== null && previous !== null && now !== previous) vpLeadChanges++; if (now !== null) previous = now; }
   const at = (cycle: number) => timeline.find(row => row.cycle === cycle);
   const winner = report.winner as Seat | null;
   const winnerMaxDeficit = winner === null ? 0 : Math.max(0, ...timeline.map(row => row.vp[1 - winner] - row.vp[winner]));
+  const circuitLead2At = pair(seat => timeline.find(row => row.circuitClaims[seat] - row.circuitClaims[1 - seat] >= 2)?.cycle ?? null);
+  const marketVp = report.marketVp ?? pair(seat => sum(ownPurchases(seat).map(item => item.vp ?? 0)));
+  const otherVp = pair(seat => report.finalVP[seat] - destructionVP[seat] - marketVp[seat]);
+  const finalScore = report.finalScore
+    ? SEATS.map(seat => {
+      const score = report.finalScore![seat];
+      return { cardVP: score.cardVP, destructionVP: score.destructionVP, locationVP: score.locationVP, circuitVP: score.circuitVP, effectVP: score.effectVP, total: score.total };
+    }) as GameMetrics['finalScore']
+    : null;
   const decisions: DecisionRecord[] = report.decisions ?? [];
   const draftEnds = decisions.filter((item): item is Extract<DecisionRecord, { kind: 'draft-end' }> => item.kind === 'draft-end');
   const deploys = decisions.filter((item): item is Extract<DecisionRecord, { kind: 'deploy' }> => item.kind === 'deploy');
@@ -125,7 +176,8 @@ export function gameMetrics(report: MatchReport): GameMetrics {
     locations: report.cycles.flatMap(cycle => cycle.locations.map(location => ({ id: location.id, name: location.name, winner: location.winner as Seat | null }))),
     circuit: report.cycles.filter(cycle => cycle.circuit).map(cycle => ({ cycle: cycle.cycle, rewardId: cycle.circuit!.rewardId, name: cycle.circuit!.name, eligible: [...cycle.circuit!.eligible], claimed: [...cycle.circuit!.claimed] })),
     circuitClaims: pair(seat => report.cycles.filter(cycle => cycle.circuit?.claimed.includes(seat)).length),
-    timeline, vpLeadChanges,
+    timeline, marketVp, otherVp, finalScore, circuitLead2At,
+    vpLeadChanges,
     vpLeaderAt: { '4': at(4) ? leader(at(4)!.vp) : null, '8': at(8) ? leader(at(8)!.vp) : null, '12': at(12) ? leader(at(12)!.vp) : null },
     serverLeaderAt8: at(8) ? leader(at(8)!.servers) : null,
     winnerMaxDeficit,
@@ -235,7 +287,7 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
     },
     seatWins: [decisive.filter(row => row.m.winner === 0).length, decisive.filter(row => row.m.winner === 1).length] as Pair,
     vp: { avgWinner: round(mean(decisive.map(row => row.m.finalVP[row.m.winner!]))), avgLoser: round(mean(decisive.map(row => row.m.finalVP[1 - row.m.winner!]))), avgMargin: avg(m => m.vpMargin), destructionVPShare: round(sum(rows.map(row => sum(row.m.destructionVP))) / Math.max(1, sum(rows.map(row => sum(row.m.finalVP))))),
-      /** Close games (margin <= CLOSE_MARGIN) versus blowouts (>= BLOWOUT_MARGIN), overall and by how the game ended. */
+      /** Close games (margin < CLOSE_MARGIN) versus blowouts (margin > BLOWOUT_MARGIN), overall and by how the game ended. */
       margins: { ...marginsOf(rows), byEnding: { destruction: marginsOf(rows.filter(row => row.m.endedBy === 'destruction')), cycle16: marginsOf(rows.filter(row => row.m.endedBy === 'cycle16')) } },
       /** Where the winner's lead came from: Server-destruction VP versus every other VP source. */
       winnerLead: {
@@ -243,7 +295,26 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
         fromOther: round(mean(decisive.map(row => (row.m.finalVP[row.m.winner!] - row.m.destructionVP[row.m.winner!]) - (row.m.finalVP[loserOf(row)] - row.m.destructionVP[loserOf(row)])))),
       },
       /** Games where both players destroyed at least one enemy Server. */
-      bothDestroyed: rows.filter(row => row.m.destructionVP[0] > 0 && row.m.destructionVP[1] > 0).length },
+      bothDestroyed: rows.filter(row => row.m.destructionVP[0] > 0 && row.m.destructionVP[1] > 0).length,
+      /**
+       * How the winner finished the race: full kill (both enemy Servers) versus winning without
+       * that — e.g. one Server plus enough other VP, or a pure Cycle-16 VP win.
+       */
+      winnerKill: (() => {
+        const destroyedBoth = decisive.filter(row => enemyServersDestroyed(row.m, row.m.winner!) >= 2);
+        const destroyedOne = decisive.filter(row => enemyServersDestroyed(row.m, row.m.winner!) === 1);
+        const destroyedNone = decisive.filter(row => enemyServersDestroyed(row.m, row.m.winner!) === 0);
+        return {
+          games: decisive.length,
+          destroyedBothServers: destroyedBoth.length,
+          destroyedBothServersShare: rate(destroyedBoth.length, decisive.length),
+          didNotDestroyBothServers: destroyedOne.length + destroyedNone.length,
+          didNotDestroyBothServersShare: rate(destroyedOne.length + destroyedNone.length, decisive.length),
+          destroyedOneServer: destroyedOne.length,
+          destroyedNoServers: destroyedNone.length,
+        };
+      })(),
+    },
     damage: {
       avgDrainPerSeat: perSeatAvg((m, seat) => m.drain[seat]), avgRestorePerSeat: perSeatAvg((m, seat) => m.restore[seat]),
       restoreToDrain: totalDrain ? round(totalRestore / totalDrain) : 0,
@@ -255,10 +326,62 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
     },
     circuit: { claimsPerGame: avg(m => sum(m.circuitClaims)), winnerClaimedMore: winnerVs((m, seat) => m.circuitClaims[seat]), rewards: circuit, effectsTotal: circuitEffects },
     locations: { winnerWonMoreLocations: winnerVs((m, seat) => m.locationsWon[seat]), list: locations },
+    vpSources: {
+      avgDestructionVp: perSeatAvg((m, seat) => m.destructionVP[seat]),
+      avgMarketVp: perSeatAvg((m, seat) => m.marketVp[seat]),
+      avgOtherVp: perSeatAvg((m, seat) => m.otherVp[seat]),
+      destructionShare: round(sum(rows.map(row => sum(row.m.destructionVP))) / Math.max(1, sum(rows.map(row => sum(row.m.finalVP))))),
+      marketShare: round(sum(rows.map(row => sum(row.m.marketVp))) / Math.max(1, sum(rows.map(row => sum(row.m.finalVP))))),
+      winnerMarketVpMore: winnerVs((m, seat) => m.marketVp[seat]),
+    },
     snowball: {
       vpLeaderWins: { at4: leaderWins('4'), at8: leaderWins('8'), at12: leaderWins('12') },
       serverLeaderAt8Wins: (() => { const known = decisive.filter(row => row.m.serverLeaderAt8 !== null); return { rate: rate(known.filter(row => row.m.serverLeaderAt8 === row.m.winner).length, known.length), games: known.length }; })(),
       avgLeadChanges: avg(m => m.vpLeadChanges), comebacks5vp: decisive.filter(row => row.m.winnerMaxDeficit >= 5).length,
+      /**
+       * When a seat first holds a 2+ Circuit-claim lead: do they keep claiming Circuits, win more Locations
+       * afterward, and win the game? Tests whether Circuit lead snowballs.
+       */
+      circuitLead2Plus: (() => {
+        type Lead = { row: (typeof rows)[number]; seat: Seat; at: number };
+        const leads: Lead[] = [];
+        for (const row of rows) for (const seat of SEATS) {
+          const at = row.m.circuitLead2At[seat];
+          if (at !== null) leads.push({ row, seat, at });
+        }
+        const after = (lead: Lead) => lead.row.m.timeline.filter(entry => entry.cycle > lead.at);
+        const laterCircuits = (lead: Lead) => {
+          const start = lead.row.m.timeline.find(entry => entry.cycle === lead.at)?.circuitClaims ?? [0, 0];
+          const end = lead.row.m.timeline.at(-1)?.circuitClaims ?? start;
+          return { leader: end[lead.seat] - start[lead.seat], trailer: end[1 - lead.seat] - start[1 - lead.seat] };
+        };
+        const laterLocations = (lead: Lead) => {
+          const rowsAfter = after(lead);
+          return {
+            leader: sum(rowsAfter.map(entry => entry.locationsWon[lead.seat])),
+            trailer: sum(rowsAfter.map(entry => entry.locationsWon[1 - lead.seat])),
+          };
+        };
+        const decisiveLeads = leads.filter(lead => lead.row.m.winner !== null);
+        return {
+          games: new Set(leads.map(lead => lead.row.id)).size,
+          seats: leads.length,
+          avgCycleReached: round(mean(leads.map(lead => lead.at))),
+          keptCircuitLead: rate(leads.filter(lead => {
+            const end = lead.row.m.timeline.at(-1)?.circuitClaims ?? [0, 0];
+            return end[lead.seat] - end[1 - lead.seat] >= 2;
+          }).length, leads.length),
+          gainedMoreCircuitsAfter: rate(leads.filter(lead => {
+            const next = laterCircuits(lead);
+            return next.leader > next.trailer;
+          }).length, leads.length),
+          wonMoreLocationsAfter: rate(leads.filter(lead => {
+            const next = laterLocations(lead);
+            return next.leader > next.trailer;
+          }).length, leads.length),
+          leaderWonGame: rate(decisiveLeads.filter(lead => lead.row.m.winner === lead.seat).length, decisiveLeads.length),
+        };
+      })(),
     },
     economy: {
       avgSpentPerSeat: perSeatAvg((m, seat) => m.economy.spent[seat]), avgPurchasesPerSeat: perSeatAvg((m, seat) => m.economy.purchases[seat]),

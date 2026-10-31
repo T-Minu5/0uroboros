@@ -55,9 +55,9 @@ export const RoomSettingsSchema = z.object({
   opponent: z.string().trim().min(1).max(80).optional(),
   /** Every Node is No Man's Land for the whole game. */
   noLocations: z.boolean().default(false),
-  /** Circuit Rewards that go to the trailing player are never drawn. */
-  noTrailingRewards: z.boolean().default(false),
-  /** Each player draws 1 at the start of Runtime turns 2 and 3. */
+  /** Circuit Rewards that go to the trailing player are never drawn. Defaults on. */
+  noTrailingRewards: z.boolean().default(true),
+  /** Fixed rule: each player draws 1 at the start of Runtime turns 2 and 3. Kept for replay compat; always treated as on. */
   midCycleDraw: z.boolean().default(true),
   /** Persistent Crypto card shelf in Draft. */
   draftCrypto: z.boolean().default(false),

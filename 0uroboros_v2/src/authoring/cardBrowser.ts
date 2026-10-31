@@ -1,6 +1,7 @@
 import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
 import { CARD_CLASSES, VP_CLASSES, type CardClass } from '@0uroboros/engine/game';
 import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
+import { scoreCard } from '@0uroboros/engine/authoring/cardBudget';
 
 export const primaryCardFilters = ['All', 'Base', 'Chaos', 'VP', 'Crypto', 'Generated', 'Disabled'] as const;
 export type PrimaryCardFilter = typeof primaryCardFilters[number];
@@ -15,7 +16,7 @@ export type ChaosSubFilter = typeof chaosSubFilters[number];
 export const cardFilters = [...primaryCardFilters, ...baseSubFilters, ...chaosSubFilters, ...vpSubFilters] as const;
 export type CardFilter = typeof cardFilters[number];
 
-export type CardSort = 'name' | 'cost' | 'power' | 'vp';
+export type CardSort = 'name' | 'cost' | 'power' | 'vp' | 'efficiency';
 export type { CardClass };
 /** Character subtypes; VP subtypes are chosen separately. */
 export const cardClasses: readonly CardClass[] = CARD_CLASSES.filter(cardClass => !VP_CLASSES.includes(cardClass));
@@ -86,6 +87,10 @@ export function cardCategoryLabel(card: AuthoredCard): string {
   return [kind, isGeneratedCard(card) ? 'Generated' : card.pool, !card.enabled ? 'Disabled' : null].filter(Boolean).join(' · ');
 }
 
+export function cardEfficiency(card: AuthoredCard): number {
+  return scoreCard(card).efficiency;
+}
+
 export function sortCards(cards: readonly AuthoredCard[], key: CardSort, direction: 'asc' | 'desc'): AuthoredCard[] {
   const factor = direction === 'asc' ? 1 : -1;
   return [...cards].sort((a, b) => {
@@ -93,7 +98,11 @@ export function sortCards(cards: readonly AuthoredCard[], key: CardSort, directi
       if (a[key] === undefined && b[key] !== undefined) return 1;
       if (b[key] === undefined && a[key] !== undefined) return -1;
     }
-    const comparison = key === 'name' ? a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true }) : (a[key] ?? 0) - (b[key] ?? 0);
+    const comparison = key === 'name'
+      ? a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true })
+      : key === 'efficiency'
+        ? cardEfficiency(a) - cardEfficiency(b)
+        : (a[key] ?? 0) - (b[key] ?? 0);
     return factor * comparison || a.name.localeCompare(b.name) || a.id.localeCompare(b.id);
   });
 }

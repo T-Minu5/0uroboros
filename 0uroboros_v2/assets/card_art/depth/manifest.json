@@ -613,6 +613,15 @@
       "height": 300,
       "focus": 0.5102
     },
+    "/assets/card_art/uploads/chingdai.png": {
+      "sha": "199ccb11986ebcd216ad44e7286aa2c30884e83391255250d5f9bde6c4caaa12",
+      "v": 2,
+      "color": "/assets/card_art/depth/199ccb11986ebcd216ad-v2.color.webp",
+      "depth": "/assets/card_art/depth/199ccb11986ebcd216ad-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3609
+    },
     "/assets/card_art/uploads/dama-de-fuego.png": {
       "sha": "11717fb5452b11ca3deebfe425000641b7f61dbb6b4e3bfe5068442fc0a6cddd",
       "v": 2,
@@ -676,6 +685,15 @@
       "height": 300,
       "focus": 0.4306
     },
+    "/assets/card_art/uploads/hack-n1.png": {
+      "sha": "0ab2100a39e9f7c9779f88d10e3001f30bd4a384887219b19fad50d7b31efff8",
+      "v": 2,
+      "color": "/assets/card_art/depth/0ab2100a39e9f7c9779f-v2.color.webp",
+      "depth": "/assets/card_art/depth/0ab2100a39e9f7c9779f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2733
+    },
     "/assets/card_art/uploads/hell-hound-form.png": {
       "sha": "6ae1b2d42225e1a5f251933685d1eb41eba12a0d7bda3c8f9cd9217a09177048",
       "v": 2,
@@ -721,6 +739,15 @@
       "height": 300,
       "focus": 0.3553
     },
+    "/assets/card_art/uploads/owl-king.png": {
+      "sha": "93185836e3e1ff8585991edb02ea75bcfe5addd78530d1ceb5d450e00e6c3165",
+      "v": 2,
+      "color": "/assets/card_art/depth/93185836e3e1ff858599-v2.color.webp",
+      "depth": "/assets/card_art/depth/93185836e3e1ff858599-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6571
+    },
     "/assets/card_art/uploads/pihkal-hound.png": {
       "sha": "e91fd7840f6324e5a00b8de75b054b50a7017625f4f79554fc5a039cf493a691",
       "v": 2,
@@ -747,6 +774,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.2959
+    },
+    "/assets/card_art/uploads/slash-n1.png": {
+      "sha": "873a4b7386a9c807a74735d7c34fdd9da9bb86a6eb7cf5f299e46613f501bdbc",
+      "v": 2,
+      "color": "/assets/card_art/depth/873a4b7386a9c807a747-v2.color.webp",
+      "depth": "/assets/card_art/depth/873a4b7386a9c807a747-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5028
     },
     "/assets/card_art/uploads/sun-scythe.png": {
       "sha": "bce823a85c9a3a3a1b66b2ef281279c505f833dac345a1348a28672119110c5a",

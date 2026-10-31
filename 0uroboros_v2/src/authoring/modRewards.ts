@@ -3,9 +3,9 @@ import { describeSteps } from '@0uroboros/engine/effects/catalog';
 import type { EffectStep } from '@0uroboros/engine/effects/types';
 import type { AuthoredCircuitReward, AuthoredMod, ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 
-/** Attach the mod to a random Character in the claiming player's deck, Discard or hand. */
+/** Attach the mod to a chosen Character in the claiming player's deck, Discard or hand (engine offers two preferred hosts). */
 export function modRewardEffects(modId: string): EffectStep[] {
-  return [{ action: 'attachModifier', modifier: modId, target: { type: 'card', who: 'self', where: 'collection', filter: { cardType: 'Character' } }, pick: { mode: 'random' } }];
+  return [{ action: 'attachModifier', modifier: modId, target: { type: 'card', who: 'self', where: 'collection', filter: { cardType: 'Character' } }, pick: { mode: 'choose' } }];
 }
 
 const rewardText = (effects: EffectStep[], document: ContentDocument) =>

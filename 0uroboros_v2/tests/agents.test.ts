@@ -79,6 +79,10 @@ describe("self-play and telemetry", () => {
     const decisive = reports.map(item => gameMetrics(item.report)).filter(item => item.winner !== null);
     const meanLead = decisive.reduce((total, item) => total + item.vpMargin, 0) / Math.max(1, decisive.length);
     expect(cohort.vp.winnerLead.fromDestruction + cohort.vp.winnerLead.fromOther).toBeCloseTo(meanLead, 1);
+    const kill = cohort.vp.winnerKill;
+    expect(kill.games).toBe(decisive.length);
+    expect(kill.destroyedBothServers + kill.destroyedOneServer + kill.destroyedNoServers).toBe(kill.games);
+    expect(kill.didNotDestroyBothServers).toBe(kill.destroyedOneServer + kill.destroyedNoServers);
   }, 30_000);
 
   it("scores each Server destruction at the VP the destroyer actually got", () => {
@@ -219,7 +223,7 @@ describe("Eco-Strat isolation", () => {
       const reloaded = ecoFor(root);
       await reloaded.observe(sealEvidence(evidence(23)));
       const refreshed = reloaded.journal().hypotheses.find(item => item.id === "narrow-margins")!;
-      expect(refreshed.statement).toMatch(/leads by 5 VP or less/);
+      expect(refreshed.statement).toMatch(/leads by under 12 VP/);
       expect(refreshed.plain).toBeUndefined();
       expect(refreshed.evidence).toHaveLength(1);
       expect(await readFile(join(root, "ai-strategist/memory.json"), "utf8")).toBe(memoryBefore);
@@ -230,7 +234,7 @@ describe("Eco-Strat isolation", () => {
       expect(markdown.indexOf("<!-- tab: Recommendations -->")).toBeLessThan(markdown.indexOf("<!-- tab: Findings -->"));
       expect(markdown.indexOf("<!-- tab: Findings -->")).toBeLessThan(markdown.indexOf("<!-- tab: Point of view -->"));
       expect(markdown).toMatch(/\| Damage vs healing \|/);
-      expect(markdown).toMatch(/### Your design goals[\s\S]*\*\*Close final scores, narrow margins\.\*\*/);
+      expect(markdown).toMatch(/### Your design goals[\s\S]*\*\*Close \(<12 VP\), mid \(12–21\), blowout \(>21\)\.\*\*/);
       expect(markdown).toMatch(/\*\*Pure aggression destroys both Servers by Cycles 10–13\.\*\* No league games with the pure aggression deck/);
       expect(markdown).toMatch(/\| Close vs blowout \|/);
       expect(markdown).toMatch(/No model was available/);

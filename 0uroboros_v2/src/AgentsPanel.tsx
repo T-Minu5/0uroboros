@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { AGENT_NAMES, AgentAvatar, type AgentId } from './agentAvatars';
 import { AgentReader } from './AgentReader';
-import { cohortPhaseLabel, publishOpponent, useAgents, type AgentsApi, type AgentsStatus, type LearnerStatus } from './agentsApi';
+import {
+  CHAT_KICKOFF_MESSAGE, chatWithStrat, cohortPhaseLabel, formatChatReplyContent, publishOpponent, useAgents,
+  type AgentsApi, type AgentsStatus, type ChatAudience, type ChatHistoryTurn, type ChatReply, type LearnerStatus,
+} from './agentsApi';
 import { versionLabel } from '@0uroboros/engine/ai/strategy';
 
 const REPORT_CADENCE = [5, 10, 20] as const;
@@ -57,6 +60,100 @@ export function ReportControl({ status, act, onRead }: { status: AgentsStatus; a
   </div>;
 }
 
+const CHAT_AUDIENCES: { id: ChatAudience; label: string }[] = [
+  { id: 'strat-g', label: 'Strat-G' },
+  { id: 'eco-strat', label: 'Eco-Strat' },
+  { id: 't-5', label: 'T-5' },
+  { id: 'dv-8', label: 'DV-8' },
+  { id: 'vp-dog', label: 'VP-Dog' },
+  { id: 'both', label: 'Strat+Eco' },
+  { id: 'all', label: 'All' },
+];
+
+const SPEAKER_LABEL: Record<ChatReply['speaker'], string> = {
+  'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog',
+};
+
+type ChatLogEntry =
+  | { kind: 'user'; content: string }
+  | { kind: 'assistant'; reply: ChatReply };
+
+function ChatWithStratPanel() {
+  const [audience, setAudience] = useState<ChatAudience>('both');
+  const [message, setMessage] = useState('');
+  const [history, setHistory] = useState<ChatHistoryTurn[]>([]);
+  const [log, setLog] = useState<ChatLogEntry[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const logEnd = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { logEnd.current?.scrollIntoView({ block: 'nearest' }); }, [log, busy]);
+
+  const send = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || busy) return;
+    setBusy(true); setError('');
+    setLog(prev => [...prev, { kind: 'user', content: trimmed }]);
+    try {
+      const result = await chatWithStrat(audience, trimmed, history);
+      const assistantTurns = result.replies.map(reply => ({
+        role: 'assistant' as const,
+        speaker: reply.speaker,
+        content: formatChatReplyContent(reply),
+      }));
+      setHistory(prev => [...prev, { role: 'user', content: trimmed }, ...assistantTurns]);
+      setLog(prev => [...prev, ...result.replies.map(reply => ({ kind: 'assistant' as const, reply }))]);
+      setMessage('');
+      if (result.error) setError(result.error);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Chat failed.');
+    } finally { setBusy(false); }
+  };
+
+  const ask = (event: FormEvent) => {
+    event.preventDefault();
+    void send(message);
+  };
+
+  return <Fold title='Chat with Strat'>
+    <p className='agents-note'>Temporary Q&amp;A tuner. Agents can complain, ask mechanics questions, and learn from your answers — guidance is written into their notes / Eco journal (profiles stay unchanged). Clear wipes this thread only.</p>
+    <div className='agents-chat-audience' role='radiogroup' aria-label='Chat audience'>
+      {CHAT_AUDIENCES.map(entry => <button key={entry.id} type='button' role='radio' aria-checked={audience === entry.id} disabled={busy} onClick={() => setAudience(entry.id)}>{entry.label}</button>)}
+    </div>
+    <div className='agents-chat-log' aria-live='polite'>
+      {!log.length ? <p className='agents-note'>No messages yet. Open a session for top-3 complaints, or ask anything.</p> : null}
+      {log.map((entry, index) => entry.kind === 'user'
+        ? <article key={`u-${index}`} className='agents-chat-user'><header><strong>You</strong></header><p>{entry.content}</p></article>
+        : <article key={`a-${entry.reply.speaker}-${index}`} className='agents-chat-reply'>
+          <header><strong>{SPEAKER_LABEL[entry.reply.speaker]}</strong><small>{entry.reply.confidence}</small></header>
+          <p className='agents-chat-answer'>{entry.reply.answer}</p>
+          {!!entry.reply.complaints.length && <div className='agents-chat-block'>
+            <h4>Top complaints</h4>
+            <ol>{entry.reply.complaints.map((item, i) => <li key={i}>{item}</li>)}</ol>
+          </div>}
+          {!!entry.reply.questionsForMel.length && <div className='agents-chat-block agents-chat-ask'>
+            <h4>Asks Mel</h4>
+            <ol>{entry.reply.questionsForMel.map((item, i) => <li key={i}>{item}</li>)}</ol>
+          </div>}
+          {!!entry.reply.learned.length && <div className='agents-chat-block'>
+            <h4>Learned</h4>
+            <ul>{entry.reply.learned.map((item, i) => <li key={i}>{item}</li>)}</ul>
+          </div>}
+          {!!entry.reply.sources.length && <p className='agents-chat-sources'>Sources: {entry.reply.sources.map(source => source.id).join(', ')}</p>}
+        </article>)}
+      <div ref={logEnd} />
+    </div>
+    <form className='agents-chat-form' onSubmit={ask}>
+      <textarea value={message} disabled={busy} rows={3} placeholder='Answer their questions, give guidance, or ask your own…' onChange={event => setMessage(event.target.value)}/>
+      <div className='agents-actions'>
+        <button type='button' disabled={busy} onClick={() => void send(CHAT_KICKOFF_MESSAGE)}>{busy ? 'Working…' : 'Open session'}</button>
+        <button type='submit' disabled={busy || !message.trim()}>{busy ? 'Sending…' : 'Send'}</button>
+        <button type='button' disabled={busy || !log.length} onClick={() => { setHistory([]); setLog([]); setError(''); }}>Clear</button>
+      </div>
+    </form>
+    {error && <p className='agents-error'>{error}</p>}
+  </Fold>;
+}
+
 /** Writes the agent's current best into the content pack; players get it once the pack is committed and deployed. */
 function PublishControl({ agent }: { agent: AgentId }) {
   const name = AGENT_NAMES[agent];
@@ -76,8 +173,8 @@ function PublishControl({ agent }: { agent: AgentId }) {
 
 /**
  * Switches and status for Eco-Strat, Strat-G and the league adversaries T-5, DV-8 and VP-Dog, one agent per tab, with a reader for
- * each agent's notebook, journal and reports. `settingsOnly` (the setup screen, where test games have their own column) keeps just the switches; Tuning ›
- * Agents adds status, baseline actions and file paths. Pass `agents` to share one status poll with a sibling panel.
+ * each agent's notebook, journal and reports. Chat with Strat is always shown. `settingsOnly` (Agents page) keeps Status / baseline
+ * actions / Files folded away; a full mount adds those. Pass `agents` to share one status poll with a sibling panel.
  */
 export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: boolean; agents?: AgentsApi }) {
   const polled = useAgents(!agents);
@@ -171,7 +268,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
         <ReportControl status={status} act={post} onRead={setReading}/>
       </>}
       {reader('eco-strat')}
-      <Fold title='About Eco-Strat'><p>Evaluates the economy from finished games. Read-only: it never plays or advises Strat-G.</p></Fold>
+      <Fold title='About Eco-Strat'><p>Evaluates the economy from finished games. Read-only: it never plays or advises Strat-G. Content A/B (try one card change on paired seeds) lives under Agent games → Content A/B.</p></Fold>
       {details&&<>
         <Fold title='Status'><dl>
           <dt>Build</dt><dd>{ecoStrat.build?.label ?? '—'}</dd>
@@ -189,6 +286,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
       </>}
       {ecoStrat.lastError&&<p className='agents-error'>{ecoStrat.lastError}</p>}
     </section>}
+    <ChatWithStratPanel/>
     {details&&<Fold title='Files'><p className='agents-note'>Settings: <code>{status.settingsFile}</code>. API keys stay in <code>.env</code> on the server.</p></Fold>}
     {(error || cohort.error)&&<p className='agents-error'>{error || cohort.error}</p>}
     {reading&&<AgentReader docs={docs} initial={reading} onClose={() => setReading(null)}/>}

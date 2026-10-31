@@ -1,0 +1,412 @@
+{
+  "version": "v1.17",
+  "since": "2026-10-27T16:10:28.346Z",
+  "mode": "llm",
+  "plan": "v1.15 adapts the baseline to prioritize strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand through Cycle 4. Cycles 5-8 balance attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for Server destruction, with VP cards from Cycle 9 and final Draft buys exclusively for VP. The profile now values Restore higher for better server defense and maintains a strict purchase bar to keep the deck sharp. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "profile": {
+    "version": 17,
+    "plan": "v1.15 adapts the baseline to prioritize strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand through Cycle 4. Cycles 5-8 balance attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for Server destruction, with VP cards from Cycle 9 and final Draft buys exclusively for VP. The profile now values Restore higher for better server defense and maintains a strict purchase bar to keep the deck sharp. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "economyUntilCycle": 4,
+    "chaosFromCycle": 9,
+    "vpFromCycle": 9,
+    "midgameMix": 0.5,
+    "handCryptoTarget": 12,
+    "minCryptoValue": 2,
+    "minBuyScore": 1.75,
+    "dilution": 0.9,
+    "weights": {
+      "power": 1.26,
+      "draw": 1.6,
+      "actions": 1.1,
+      "crypto": 2.59,
+      "drain": 2.9,
+      "restore": 2.09,
+      "vp": 2.6,
+      "duration": 0.8,
+      "thin": 1.2,
+      "disrupt": 1.05,
+      "chaos": 1.5
+    },
+    "cardBias": {}
+  },
+  "adopted": {
+    "weights": {
+      "restore": 2.09,
+      "power": 1.26,
+      "crypto": 2.59,
+      "disrupt": 1.05,
+      "drain": 2.9
+    },
+    "cardBias": {},
+    "vpFromCycle": 10,
+    "handCryptoTarget": 12,
+    "minBuyScore": 1.75,
+    "dilution": 0.9
+  },
+  "experiment": null,
+  "theories": [
+    {
+      "id": "no-shyte",
+      "text": "Shyte-Coin is not worth a deck slot: it dilutes draws. Bigger Crypto (Kilo, Mega-Cache) or Characters that draw cards are better buys.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "no-shyte",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "economy-first",
+      "text": "Buying a few high-value Crypto cards (cost 6+) by Cycle 5 builds the economy that wins the late game.",
+      "status": "retired",
+      "confidence": 0.64,
+      "support": 8,
+      "against": 4,
+      "test": "economy-first",
+      "createdBy": -1,
+      "updatedBy": 7
+    },
+    {
+      "id": "draw-engine",
+      "text": "Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.",
+      "status": "retired",
+      "confidence": 0.4,
+      "support": 1,
+      "against": 2,
+      "test": "draw-engine",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "chaos-endgame",
+      "text": "Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +8/+12 VP.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 2,
+      "against": 2,
+      "test": "chaos-endgame",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-aggression",
+      "text": "Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).",
+      "status": "retired",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "test": "early-aggression",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "vp-late",
+      "text": "VP cards are best bought late (Cycle 12+); earlier they clog the hand.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "vp-late",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "drain-race",
+      "text": "Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 1,
+      "against": 1,
+      "test": "drain-race",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-chaos-transition",
+      "text": "Transitioning into Chaos by Cycle 5 is optimal for enhancing Drain and server destruction.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "strong-draw-focus",
+      "text": "Focusing on strong draw/Action Base cards in the early game maximizes efficiency and prepares for later cycles.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "mid-game-vp-acquisition",
+      "text": "Acquiring VP cards in the mid to late game (Cycle 10+) prevents hand clogging and maximizes scoring potential.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "restore-importance",
+      "text": "Including Restore cards earlier in the strategy can help mitigate Server damage and prolong the game.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "high-value-chaos",
+      "text": "Focusing on high-value Chaos cards early (cost 5+) can enhance Drain effects and Server destruction capabilities.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "mid-game-draft-adjustment",
+      "text": "Adjusting my mid-game Draft strategy to aim for at least 10 cards will improve my economy and performance against aggressive opponents.",
+      "status": "retired",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": 0
+    },
+    {
+      "id": "early-vp-strategy",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "high-value-draw-action-focus",
+      "text": "Prioritizing high-value draw and Action cards early maximizes efficiency and prepares for later cycles.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "timely-vp-acquisition",
+      "text": "Adjusting VP acquisition timing based on observed human strategies maximizes scoring potential.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-chaos-priority",
+      "text": "Acquiring high-value Chaos cards early enhances Drain strategies and increases chances of Server destruction.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "healing-hands-impact",
+      "text": "Healing Hands significantly alters defensive strategies by providing consistent server repair.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": 2
+    },
+    {
+      "id": "healing-hands-potential",
+      "text": "The 'Healing Hands' location significantly enhances recovery strategies, making it a priority in future drafts.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "early-vp-focus",
+      "text": "Acquiring VP cards earlier will help secure victories before the Drain race escalates.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 0,
+      "updatedBy": 1
+    },
+    {
+      "id": "early-chaos-pivot",
+      "text": "An early pivot to Chaos (before Cycle 5) provides an aggressive advantage, allowing for immediate pressure on the opponent's Servers.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 2
+    },
+    {
+      "id": "chaos-later",
+      "text": "Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 7
+    },
+    {
+      "id": "the-nudge-impact",
+      "text": "Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 2,
+      "updatedBy": 3
+    },
+    {
+      "id": "healing-impact",
+      "text": "Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 3
+    },
+    {
+      "id": "location-impact",
+      "text": "New Locations may significantly influence VP acquisition strategies; adapt to their effects during gameplay.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 5
+    },
+    {
+      "id": "higher-crypto-target",
+      "text": "Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 5,
+      "updatedBy": 7
+    },
+    {
+      "id": "location-impact-monitoring",
+      "text": "Monitoring the impact of new Locations on strategies is crucial for adapting gameplay.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 5,
+      "updatedBy": 7
+    },
+    {
+      "id": "monitor-nothing-happens-here",
+      "text": "The Location 'Nothing ever happens here' may shift strategies significantly by providing a neutral space.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 7,
+      "updatedBy": 7
+    },
+    {
+      "id": "evaluate-new-locations",
+      "text": "Assessing the impact of new Locations like 'The Might Meek' and 'The Nudge' will enhance my strategic decisions.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 7,
+      "updatedBy": 11
+    },
+    {
+      "id": "location-impact-on-strategy",
+      "text": "New Locations can significantly shift strategies, especially in mid to late game.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 11,
+      "updatedBy": 11
+    },
+    {
+      "id": "new-locations-impact",
+      "text": "The new Locations 'The Might Meek' and 'The Nudge' will significantly impact deck strategies, favoring low-cost and aggressive VP collection.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 11,
+      "updatedBy": 11
+    },
+    {
+      "id": "prioritize-restore",
+      "text": "Prioritizing Restore is essential for server defense.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15
+    },
+    {
+      "id": "aggressive-drain",
+      "text": "Aggressive Drain pushes are crucial as the human's Servers have been vulnerable.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15
+    },
+    {
+      "id": "power-dynamics",
+      "text": "Valuing Power higher wins more Locations and their rewards.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15,
+      "observation": "I lost most Locations in recent Cycles.",
+      "hypothesis": "Increasing Power weight will help secure Locations.",
+      "proposedTest": "Increase power weight by 0.3."
+    },
+    {
+      "id": "restore-value",
+      "text": "Valuing Restore higher keeps my Servers alive long enough to win on VP.",
+      "status": "proposed",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15,
+      "observation": "My Servers are critically low; defense with Restore is essential.",
+      "hypothesis": "Higher Restore weight will improve my Server survivability.",
+      "proposedTest": "Restore weight increased from 2.09 to 2.5."
+    }
+  ]
+}

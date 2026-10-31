@@ -1,0 +1,83 @@
+.runtime-hack-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+}
+
+.runtime-hack-backdrop {
+  pointer-events: auto;
+}
+
+.runtime-hack-modal {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.4rem 1.5rem 1.25rem;
+  border-radius: 1rem;
+  background: linear-gradient(165deg, rgba(12, 22, 34, 0.96), rgba(8, 14, 22, 0.98));
+  border: 1px solid rgba(120, 220, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(80, 200, 255, 0.15);
+  color: #eef8ff;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  text-align: center;
+  animation: runtime-hack-modal 0.35s ease-out both;
+}
+
+.runtime-hack-modal small {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7ad8ea;
+}
+
+.runtime-hack-modal h2 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 650;
+}
+
+.runtime-hack-player {
+  margin: 0;
+  color: #9ef6ff;
+  letter-spacing: 0.02em;
+}
+
+.runtime-hack-formula {
+  margin: 0;
+  max-width: 24rem;
+  color: rgba(220, 236, 248, 0.82);
+  line-height: 1.4;
+}
+
+.runtime-hack-card {
+  width: 9.5rem;
+  margin-top: 0.25rem;
+}
+
+.runtime-hack-reward {
+  margin: 0;
+  color: #9ef6ff;
+}
+
+.runtime-hack-claim {
+  margin-top: 0.35rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 220, 255, 0.55);
+  background: rgba(40, 120, 160, 0.35);
+  color: #eefcff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.runtime-hack-claim:hover {
+  background: rgba(50, 150, 190, 0.5);
+}
+
+@keyframes runtime-hack-modal {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

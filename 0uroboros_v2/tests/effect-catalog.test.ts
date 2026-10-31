@@ -93,4 +93,26 @@ describe('effect catalog', () => {
     expect(describeStep({ action: 'healCard', amount: 2, target: { type: 'card', who: 'self', where: 'hand' }, pick: { mode: 'weakest' } }, 'card')).toBe('Restore the weakest card in your hand +2');
     expect(describeStep({ action: 'restoreCard', target: { type: 'card', who: 'self', where: 'board' }, pick: { mode: 'all' } }, 'card')).toBe('Reset the Power of all your revealed cards');
   });
+
+  it('prints Drain, Aura, Steal Power and Remove Power vocabulary', () => {
+    expect(describeStep({ action: 'damageServer', amount: 100, target: { type: 'server', who: 'opponent', server: 'auto' } }, 'card')).toBe('Drain -100');
+    expect(describeStep({ action: 'damageServer', amount: 75, target: { type: 'server', who: 'opponent', server: 'backup' } }, 'card')).toBe('Drain -75 Backup');
+    expect(describeStep({ action: 'changePower', amount: -2, target: { type: 'card', who: 'opponent', where: 'board' }, pick: { mode: 'choose' } }, 'card')).toBe('Choose a revealed enemy card to steal 2 Power from');
+    expect(describeStep({ action: 'changePower', amount: -2, transfer: false, target: { type: 'card', who: 'opponent', where: 'board' }, pick: { mode: 'choose' } }, 'card')).toBe('Choose a revealed enemy card to remove 2 Power from');
+  });
+
+  it('accepts Remove power’s transfer:false flag, including on location conditions', () => {
+    const remove: EffectStep = {
+      action: 'changePower', amount: -1, transfer: false,
+      target: { type: 'card', who: 'both', where: 'thisNode' }, pick: { mode: 'all' },
+    };
+    for (const scope of ['card', 'locationCondition'] as const) {
+      const errors: string[] = [];
+      validateSteps([remove], 'steps', scope, validation, errors);
+      expect(errors, scope).toEqual([]);
+    }
+    const stray: string[] = [];
+    validateSteps([{ action: 'draw', amount: 1, target: you, transfer: false }], 'steps', 'card', validation, stray);
+    expect(stray).toEqual(['steps[0].transfer: unsupported field']);
+  });
 });

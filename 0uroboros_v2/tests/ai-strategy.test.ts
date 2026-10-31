@@ -239,7 +239,7 @@ describe("strategist agent", () => {
         plan: "Rush Mega Slash, then Drain.",
         notes: ["Mega Slash looks like a stronger Slash-Dot."],
         theories: [{ id: "mega-slash-engine", text: "Mega Slash is the best draw engine.", status: "supported", confidence: 0.9 }, { id: "no-shyte", status: "refuted", confidence: 0 }],
-        experiment: { theoryId: "mega-slash-engine", hypothesis: "Mega Slash out-draws Slash-Dot.", prediction: "More wins.", change: { chaosFromCycle: 12, minCryptoValue: 1, weights: { draw: 50 }, cardBias: { "mega-slash": 6 } } },
+        experiment: { theoryId: "mega-slash-engine", observation: "Mega Slash appeared in the catalog as a stronger Slash-Dot.", hypothesis: "Mega Slash out-draws Slash-Dot.", prediction: "More wins and a better margin than the current best.", change: { chaosFromCycle: 12, minCryptoValue: 1, weights: { draw: 50 }, cardBias: { "mega-slash": 6 } } },
         cardNotes: { "mega-slash": "Draw engine; test it early." },
       }) } }] }), { status: 200 })) as typeof fetch;
       const agent = createStrategist({ root, contentFile, apiKey: "test", fetchImpl, log: () => undefined });
@@ -302,7 +302,7 @@ describe("strategist agent", () => {
       await agent.ready; await agent.idle();
       const experiment = agent.memory().experiment!;
       expect(experiment.stage).toBe("field");
-      for (let game = 0; game < 4; game++) {
+      for (let game = 0; game < 16; game++) {
         const brief = agent.brief();
         const testing = game % 2 === 0;
         expect(brief.experiment?.id ?? null).toBe(testing ? experiment.id : null);
@@ -312,8 +312,8 @@ describe("strategist agent", () => {
       const memory = agent.memory();
       const concluded = memory.experiments.find(item => item.id === experiment.id)!;
       expect(concluded.stage).toBe("adopted");
-      expect(concluded.field.experiment).toMatchObject({ games: 2, wins: 2 });
-      expect(concluded.field.control).toMatchObject({ games: 2, losses: 2 });
+      expect(concluded.field.experiment).toMatchObject({ games: 8, wins: 8 });
+      expect(concluded.field.control).toMatchObject({ games: 8, losses: 8 });
       expect(memory.adopted).toEqual(expect.objectContaining(experiment.change));
       expect(memory.profile).toMatchObject(experiment.change);
       expect(memory.baseline.profile.weights).toEqual(DEFAULT_STRATEGY.weights);

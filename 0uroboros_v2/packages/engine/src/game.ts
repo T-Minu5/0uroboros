@@ -187,7 +187,7 @@ export function setPowerDelta(card: Card, delta: number) {
 }
 export const serverMaximums: Servers = { primary: 2000, backup: 1500 };
 /** VP the destroyer scores for taking each enemy Server to zero. */
-export const defaultServerVP: Servers = { primary: 12, backup: 20 };
+export const defaultServerVP: Servers = { primary: 12, backup: 16 };
 
 /**
  * A player's VP plus, for each enemy Server still standing, the share of its destruction VP matching the share of its

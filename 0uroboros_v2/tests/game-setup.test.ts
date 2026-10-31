@@ -6,12 +6,12 @@ describe('game setup', () => {
     expect(TURN_TIMER_CHOICES).toEqual([35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90]);
   });
 
-  it('defaults to 12 VP for a Primary Server, 20 for a Backup and no turn timer', () => {
-    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 20 }, turnSeconds: null, noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false });
+  it('defaults to 12 VP for a Primary Server, 16 for a Backup, no trailing rewards, and no turn timer', () => {
+    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 16 }, turnSeconds: null, noLocations: false, noTrailingRewards: true, draftCrypto: false });
   });
 
   it('drops saved values the setup can no longer choose', () => {
-    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 } })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null, noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false });
-    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45, midCycleDraw: false, draftCrypto: true })).toEqual({ serverVP: { primary: 10, backup: 20 }, turnSeconds: 45, noLocations: false, noTrailingRewards: false, midCycleDraw: false, draftCrypto: true });
+    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 }, midCycleDraw: false })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null, noLocations: false, noTrailingRewards: true, draftCrypto: false });
+    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45, noTrailingRewards: false, draftCrypto: true })).toEqual({ serverVP: { primary: 10, backup: 16 }, turnSeconds: 45, noLocations: false, noTrailingRewards: false, draftCrypto: true });
   });
 });

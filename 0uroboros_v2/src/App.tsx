@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { SERVER_X, serverZ } from './boardLayout';
-import { BOARD_DROP, BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, NEAR_BANK_FORMER_DROP, type BoardNode } from './BoardScene';
+import { BOARD_DROP, BoardScene, BOARD_SCAN_MS, boardScanTotalMs, FAR_BANK_LIFT, Icon, NEAR_BANK_DROP, NEAR_BANK_FORMER_DROP, type BoardCard, type BoardNode } from './BoardScene';
 import { LocationText } from './LocationText';
 import type { BoardScanTone } from './NeonHorizonScan';
 import { SINGULARITY_MS } from './Singularity';
@@ -40,7 +40,8 @@ import { cardsInPlay, warmCardMedia } from './cardPreload';
 import './card-surfaces.css';
 import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/evaluationMarket';
 import { EndTurnControl } from './EndTurnControl';
-import { eventTime, isNoTargetEvent } from './presentation';
+import { eventTime, isNoTargetEvent, unmetEffectNotice } from './presentation';
+import { RuntimeHackOverlay } from './RuntimeHackOverlay';
 import { useCardPointerDrag, type CardOrigin } from './useCardPointerDrag';
 import { springRelease } from './cardSpring';
 import { bundledContent } from './contentPack/contentStore';
@@ -98,6 +99,7 @@ export function App(){
  const [boardReady,setBoardReady]=useState(false);
  const [priority]=useState<'higher'|'lower'>('higher');
  const [active,setActive]=useState<RuntimeEvent|null>(null);
+ const [runtimeHack,setRuntimeHack]=useState<RuntimeEvent|null>(null);
  const [busy,setBusy]=useState(false);
  const resolvingRef=useRef(false);
  const [flight,setFlight]=useState<{card:Card;x:number;y:number;w:number;h:number;dx:number;dy:number;scale:number;crypto?:boolean;angle?:number;release?:CardOrigin['release']}|null>(null);
@@ -181,16 +183,28 @@ export function App(){
  function pump(){
   let before=client.current?.view()??undefined;
   let next=client.current?.step();
-  while(next&&next.event.kind!=='cycle'&&(quiet(next.event)||eventTime(next.event,fastRef.current)===0)){record(next.event);setView(next.view);before=client.current?.view()??undefined;next=client.current?.step();}
+  while(next&&next.event.kind!=='cycle'&&next.event.kind!=='runtimeHack'&&(quiet(next.event)||eventTime(next.event,fastRef.current)===0)){record(next.event);setView(next.view);before=client.current?.view()??undefined;next=client.current?.step();}
   if(next?.event.kind==='cycle'){record(next.event);setNotice(next.event.text);setView(next.view);showOpening(next.view);return;}
   if(!next){resolvingRef.current=false;isDragging.current=false;setBusy(false);setActive(null);if(client.current?.view()){const snapshot=client.current.view()!;setView(snapshot);if(snapshot.phase==='draft')setNotice(`Draft ready · ${snapshot.players[0].wallet} Crypto to spend${snapshot.circuitEligible.includes(0)?' · Your free Circuit privilege is available.':'.'}`);if(snapshot.phase==='runtime')setNotice(`Turn ${snapshot.turn} · ${snapshot.players[0].actions} Actions available · ${snapshot.priority===0?'You reveal first':'Opponent reveals first'}.`);}return;}
   presentResolved(before,next);
  }
+ function claimRuntimeHack(){
+  setRuntimeHack(null);setActive(null);
+  if(client.current?.pendingCount)pump();
+  else{resolvingRef.current=false;isDragging.current=false;setBusy(false);}
+ }
  function presentResolved(before:SessionView|undefined,resolved:{event:RuntimeEvent;view:SessionView}){
   setActive(resolved.event);record(resolved.event);
-  if(isNoTargetEvent(resolved.event))setNotice('No target');
+  if(isNoTargetEvent(resolved.event))setNotice(unmetEffectNotice(resolved.event));
   const duration=eventTime(resolved.event,fastRef.current);
   const event=resolved.event;
+  if(event.kind==='runtimeHack'){
+   // Award modal only — no board-scan / title cut; checks that do not award stay silent.
+   setView(resolved.view);
+   setRuntimeHack(event);
+   setNotice(event.text);
+   return;
+  }
   if(event.kind==='collapse'&&event.text.startsWith('Wave Collapse')){
    setBoardScanTone('close');setBoardScan(true);
    later(()=>setBoardScan(false),duration);
@@ -253,10 +267,10 @@ export function App(){
   setCashed([]);setClosedNodes([]);setCollapseNode(null);setAwardNode(null);setSelectionNode(null);
   later(()=>{setDealing(false);if(client.current?.pendingCount){pump();return;}setBusy(false);resolvingRef.current=false;setNotice(`${snapshot.players[0].hand.length} cards dealt.`);},scanTotal+2100);
  }
- async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const picked=resolveOpponent(opponents,opponent);const agent=picked?.id??opponent;const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(agent)]);setContent(snapshot);const published=resolveOpponent(snapshot.opponents,agent);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:setup.midCycleDraw,draftCrypto:setup.draftCrypto,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief&&!brief.disabled?brief.profile:published?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});client.current=new LocalClient(session);logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=agent;strategistActive.current=!!brief&&!brief.disabled;setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
+ async function start(){if(!priority||!boardReady||contentLoading)return;setContentLoading(true);setContentError('');try{const picked=resolveOpponent(opponents,opponent);const agent=picked?.id??opponent;const [snapshot,brief]=await Promise.all([loadGameContent(startingDeck?.id),loadStrategist(agent)]);setContent(snapshot);const published=resolveOpponent(snapshot.opponents,agent);const session=createSession({carryover:true,priorityPreference:priority,random:Math.random,serverVP:setup.serverVP,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:true,draftCrypto:setup.draftCrypto,strategicMarket:true,evaluationContent:true,content:snapshot,strategy:brief&&!brief.disabled?brief.profile:published?.profile,strategyExperiment:brief?.experiment?.id??null,recordDecisions:brief?.recordDecisions??true});client.current=new LocalClient(session);logGame.current=`game-${new Date().toISOString().replace(/[:.]/g,'-')}`;strategistGame.current=brief?`game-${Date.now().toString(36)}`:null;strategistAgent.current=agent;strategistActive.current=!!brief&&!brief.disabled;setView(session.view());showOpening(session.view());}catch(error){setContentError(error instanceof Error?error.message:'Content unavailable.');}finally{setContentLoading(false);}}
  /** Runs one command on either client; the continuation is immediate for a local table and follows the ack online. */
  function act(action:()=>RuntimeEvent|void|null|Promise<RuntimeEvent|void|null>,after?:()=>void,failed?:()=>void){
-  attempt(action,event=>{if(event){record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);}const snapshot=client.current?.view();if(snapshot){setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}after?.();kick();},error=>{setNotice(error instanceof Error?error.message:'Action unavailable.');failed?.();kick();});
+  attempt(action,event=>{if(event){record(event);setNotice(isNoTargetEvent(event)?unmetEffectNotice(event):event.text);}const snapshot=client.current?.view();if(snapshot){setView(snapshot);if(event?.kind==='cycle')showOpening(snapshot);}after?.();kick();},error=>{setNotice(error instanceof Error?error.message:'Action unavailable.');failed?.();kick();});
  }
  function acquire(pileId:string){
   if(!client.current||busy)return;
@@ -265,12 +279,12 @@ export function App(){
  function claimPrivilege(){
   if(!client.current||resolvingRef.current)return;
   resolvingRef.current=true;
-  attempt(()=>client.current!.claimCircuitReward(),event=>{const next=client.current!.view()!;setBusy(true);setActive(event);record(event);setNotice(isNoTargetEvent(event)?'No target':event.text);const duration=eventTime(event,fastRef.current);later(()=>setView(next),duration*.6);later(()=>{if(client.current?.pendingCount)pump();else{setActive(null);setBusy(false);resolvingRef.current=false;}},duration);},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Privilege unavailable.');});
+  attempt(()=>client.current!.claimCircuitReward(),event=>{const next=client.current!.view()!;setBusy(true);setActive(event);record(event);setNotice(isNoTargetEvent(event)?unmetEffectNotice(event):event.text);const duration=eventTime(event,fastRef.current);later(()=>setView(next),duration*.6);later(()=>{if(client.current?.pendingCount)pump();else{setActive(null);setBusy(false);resolvingRef.current=false;}},duration);},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Privilege unavailable.');});
  }
  function choose(selection:string|readonly string[]){
   if(!client.current||resolvingRef.current)return;
   const before=client.current.view()!;resolvingRef.current=true;
-  attempt(()=>client.current!.choose(selection),event=>{setNotice(isNoTargetEvent(event)?'No target':event.text);setBusy(true);presentResolved(before,{event,view:client.current!.view()!});},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Choice unavailable.');});
+  attempt(()=>client.current!.choose(selection),event=>{setNotice(isNoTargetEvent(event)?unmetEffectNotice(event):event.text);setBusy(true);presentResolved(before,{event,view:client.current!.view()!});},error=>{resolvingRef.current=false;setNotice(error instanceof Error?error.message:'Choice unavailable.');});
  }
  function endTurn(){
   if(!client.current||resolvingRef.current)return;
@@ -313,7 +327,7 @@ export function App(){
   });
   return next;
  }
- const roomRules=()=>({turnSeconds:setup.turnSeconds??0,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:setup.midCycleDraw,draftCrypto:setup.draftCrypto});
+ const roomRules=()=>({turnSeconds:setup.turnSeconds??0,noLocations:setup.noLocations,noTrailingRewards:setup.noTrailingRewards,midCycleDraw:true,draftCrypto:setup.draftCrypto});
  const createOnline=(mode:RoomMode,name:string)=>{const picked=resolveOpponent(opponents,opponent);void onlineClient().createRoom(mode,name,{...roomRules(),...(mode==='ai'&&picked?{opponent:picked.id}:{})}).catch(()=>undefined);};
  const quickMatch=(name:string)=>{void onlineClient().quickMatch(name,roomRules()).catch(()=>undefined);};
  const cancelQuickMatch=()=>{online.current?.cancelQuickMatch();};
@@ -391,7 +405,15 @@ export function App(){
   canDrop:(node,card)=>!relocateLegal(node,card),
  });
  const movable=new Set(view?.movableCardIds??[]);
- const nodes:BoardNode[]=view?view.nodes.map((n,i)=>({cards:n.cards.map((cards,side)=>cards.map(p=>({id:p.card.id,card:'hidden'in p.card?undefined:p.card,revealed:p.revealed,planned:view.planningCardIds.includes(p.card.id),movable:side===0&&!('hidden'in p.card)&&movable.has(p.card.id)}))) as BoardNode['cards'],powers:n.powers,weight:view.weights[i],title:n.location?.name??'Location pending',text:n.location?.rule??'No approved Location content',reward:n.location?.reward})):blankNodes;
+ const nodes:BoardNode[]=view?view.nodes.map((n,i)=>({
+  cards:n.cards.map((cards,side)=>cards.map(p=>({id:p.card.id,card:'hidden'in p.card?undefined:p.card,revealed:p.revealed,planned:view.planningCardIds.includes(p.card.id),movable:side===0&&!('hidden'in p.card)&&movable.has(p.card.id)}))) as BoardNode['cards'],
+  powers:n.powers,
+  holograms:[
+   n.holograms.filter(h=>h.owner===0).map(h=>({id:h.id,card:h.card,revealed:true,hologram:true})),
+   n.holograms.filter(h=>h.owner===1).map(h=>({id:h.id,card:h.card,revealed:true,hologram:true})),
+  ] as [BoardCard[],BoardCard[]],
+  weight:view.weights[i],title:n.location?.name??'Location pending',text:n.location?.rule??'No approved Location content',reward:n.location?.reward,
+ })):blankNodes;
  // v3: Crypto wallet HUD is hidden; Crypto cards stay in the hand fan until Draft resolves them into spendable Crypto.
  const local=view?.players[0]; const fieldHand=local?.hand.filter(card=>!cashed.includes(card.id))??[];
  const phase=view?.phase??'setup';
@@ -493,6 +515,7 @@ export function App(){
   {!view&&<div className='setup-backdrop'><section className='setup-card'><small>ENTER THE CIRCUIT</small><h1>Every Node.<br/><em>Every possibility.</em></h1><p>Build your deck, plan across five Locations, and compete for control of the Circuit.</p><div className='setup-note'><b>{boardReady?'Your Circuit is ready':'Preparing your table'}</b><span>Control more Locations to earn the Circuit Reward and next reveal priority. Tied counts share the reward. Unused Actions carry forward.</span></div><GameConfigure setup={setup} onChange={changeSetup} decks={deckSource?.decks??null} deckId={startingDeck?.id} onDeck={chooseDeck} opponents={opponents} opponent={opponent} onOpponent={chooseOpponent} disabled={contentLoading}/><button className='primary-button' disabled={!priority||!boardReady||contentLoading||lobby?.status==='waiting'||lobby?.status==='queued'} onClick={start}>{contentLoading?'Loading saved content…':'Enter evaluation build'} <span>↗</span></button>{contentError&&<p role='alert'>{contentError}</p>}<OnlineLobby lobby={lobby??IDLE_LOBBY} saved={savedOnlineSeat} turnSeconds={setup.turnSeconds} disabled={!boardReady||contentLoading} onCreate={createOnline} onQuickMatch={quickMatch} onCancelQuickMatch={cancelQuickMatch} onJoin={joinOnline} onResume={resumeOnline} onLeave={leaveTable}/>{STUDIO_TOOLS?<a className='setup-authoring-link' href='/author' target='_blank' rel='noreferrer'>Open Content Studio ↗</a>:platform().kind==='web'&&<a className='setup-authoring-link' href='/download/'>Download for desktop ↗</a>}<p className='setup-fineprint'>Actions carry over. This evaluation pack adds Location rewards and Circuit privileges. The provisional market adds economy, scoring, Duration and tactical effects. Both players purchase cards.</p></section></div>}
   {draftOpen&&view&&<DraftPanel view={view} busy={busy} now={now} seconds={seconds} acquired={acquired} cycleStart={cycleStart} inspect={setSelected} acquire={acquire} claim={claimPrivilege} end={()=>act(()=>client.current!.endDraft())} undo={()=>act(()=>client.current!.undoEndDraft())}/>}
   {locationInspect!==null&&view?.nodes[locationInspect].location&&<div className='modal-backdrop' onClick={()=>setLocationInspect(null)}><section className='location-inspect' role='dialog' aria-modal='true' aria-label={`Inspect Location ${view.nodes[locationInspect].location!.name}`} onClick={event=>event.stopPropagation()}><button className='close' aria-label='Close Location inspect' onClick={()=>setLocationInspect(null)}>×</button><small>NODE {locationInspect+1} · LOCATION</small><h2>{view.nodes[locationInspect].location!.name}</h2><p><LocationText text={view.nodes[locationInspect].location!.rule}/></p><div className='location-inspect-reward'><small>LOCATION REWARD</small><p><LocationText text={view.nodes[locationInspect].location!.reward}/></p></div><footer>Location Rewards resolve here during Wave Collapse. The Circuit Reward is a separate Draft offering.</footer></section></div>}
+  {runtimeHack&&<RuntimeHackOverlay event={runtimeHack} playerName={runtimeHack.owner===0?(client.current?.seatNames?.[0]??'You'):(client.current?.seatNames?.[1]??'Opponent')} rewardCard={(runtimeHack.rewardCardId?content.cards.find(card=>(card.definitionId??card.id)===runtimeHack.rewardCardId):null)??null} onClaim={claimRuntimeHack}/>}
   {catalogOpen&&<CardCatalog content={content} canTest={!!view&&phase==='runtime'&&!busy&&!view.canUndoPlanning} close={()=>setCatalogOpen(false)} inspect={setSelected} add={addTestCard}/>}
   {selected&&!dragged&&<div className='modal-backdrop' onClick={()=>setSelected(null)}><section className='inspect' role='dialog' aria-modal='true' aria-label={`Inspect ${selected.name}`} onClick={e=>e.stopPropagation()}><button className='close' aria-label='Close card inspect' onClick={()=>setSelected(null)}>×</button><div className='inspect-art'><CardFace card={selected} context={phase==='draft'?'draft':'runtime'} video={selectedClip?{src:selectedClip,loop:true,sound:videoSound}:undefined}/>{selectedClip&&<button className='inspect-sound' aria-pressed={videoSound} onClick={()=>setVideoSound(on=>!on)}>{videoSound?'Sound on':'Sound off'}</button>}</div><div className='inspect-copy'><small>{selected.type}</small><h2>{selected.name}</h2><div className='inspect-stats'><span>POWER <b className={selected.power===undefined||selected.basePower===undefined||selected.power===selected.basePower?undefined:selected.power>selected.basePower?'power-boosted':'power-reduced'}>{selected.power??'—'}</b></span>{phase==='draft'&&<span>DRAFT COST <b>{selected.cost}</b></span>}</div><p>{selected.effect}</p>{selected.storyText&&<div className='source-card-text'><small>STORY</small><p>{selected.storyText}</p></div>}{selected.modifiers?.length?<div className='source-card-text'><small>MODS</small><ul>{selected.modifiers.map(modifier=><li key={modifier.id}>{modifierText(modifier,content?.cards??[])}{modifier.sourceName&&<em> · from {modifier.sourceName}</em>}</li>)}</ul></div>:null}{sourceCard&&<div className='source-card-text'><small>ORIGINAL CARD EFFECTS</small><ul>{sourceCard.effects.map((text,index)=><li key={index}>{text}</li>)}</ul>{sourceCard.effects.some(text=>/draft/i.test(text))&&<p className='content-note'>Each +Draft now transfers 1 of your Power between this Location and a neighbor.</p>}</div>}<small>{selected.type==='Crypto'?'Held Crypto resolves automatically for Draft.':`Runtime deployment: ${isCharacterCard(selected)?'1 Action':'0 Actions'}.`}</small>{selected.type==='VP'&&<p className='content-note'>{selected.vp??2} scoring VP while owned in an active zone.</p>}{selected.duration&&<p className='content-note'>Duration {selected.duration===99?'∞':selected.duration}. {selected.durationPeriod==='runtime'?'Measured in Runtime turns; scheduled effects follow the card text.':'The deployment Cycle counts as the first Cycle.'}</p>}{!busy&&phase==='runtime'&&local?.hand.some(c=>c.id===selected.id)&&selected.type!=='Crypto'&&<div className='inspect-deploy'><span>Deploy to Node</span>{[0,1,2,3,4].map(n=><button key={n} disabled={!!legal(n,selected)} title={legal(n,selected)??`Deploy to Node ${n+1}`} onClick={()=>deploy(n,selected)}>{n+1}</button>)}</div>}</div></section></div>}
   {panel==='log'&&<div className='panel-backdrop' onClick={()=>setPanel(null)}><LogDrawer events={history} cycles={client.current?.cycleHistory()??[]} live={view?{cycle:view.cycle,turn:view.turn,phase:view.phase}:null} colors={[playerColors[0].accent,playerColors[1].accent]} names={client.current?.seatNames??[savedPlayerName()||'You',opponentName(opponents,strategistAgent.current||opponent)]} close={()=>setPanel(null)}/></div>}

@@ -14,9 +14,12 @@ import {
   type AuthoredCircuitReward,
   type AuthoredLocation,
   type AuthoredMod,
+  type AuthoredRuntimeHack,
   type ContentDocument,
+  type RuntimeHackWindow,
   type StartingDeck,
 } from '@0uroboros/engine/authoring/contentModel';
+import { RUNTIME_HACK_WINDOWS, suggestRuntimeHackFormula } from '@0uroboros/engine/runtimeHacks';
 import {
   CONDITION_COMPARISONS, CONDITION_KIND_LABELS, LOCATION_CONDITION_KINDS, createLocationCondition,
   type ConditionComparison, type LocationCondition, type LocationConditionKind,
@@ -32,28 +35,37 @@ import { describeIssues, type Issue } from './validationIssues';
 import { CardFace } from '../CardFace';
 import { CARD_STYLE_COLORS, CARD_STYLE_ICONS, type CardStyle } from '../cardPresentation';
 import { refreshDepthStatus, regenerateDepth, servedArtPath, useDepthEntry, useDepthJob } from '../depthArt/depthManifest';
+import { scoreCard } from '@0uroboros/engine/authoring/cardBudget';
 import { cardClasses, vpClasses, cardClassOf, cardCategoryLabel, matchesCardFilter, newCardCategory, sortCards, primaryCardFilters, primaryFilterOf, secondaryFiltersFor, isGeneratedCard, poolForClass, type CardClass, type CardFilter, type CardSort } from './cardBrowser';
 import './authoring.css';
 import './authoring-workbench.css';
 import '../card-surfaces.css';
 
-const SORT_LABEL: Record<CardSort, string> = { name: 'Name', cost: 'Cost', power: 'Power', vp: 'VP' };
-type Section = 'cards' | 'locations' | 'circuitRewards' | 'mods' | 'startingDecks';
+const SORT_LABEL: Record<CardSort, string> = { name: 'Name', cost: 'Cost', power: 'Power', vp: 'VP', efficiency: 'Eff' };
+type Section = 'cards' | 'locations' | 'circuitRewards' | 'runtimeHacks' | 'mods' | 'startingDecks';
 /** A built-in mod shown in the Card mods list. It is not part of the document and cannot be edited. */
 type BuiltinMod = { id: ModifierKind; name: string; enabled: true; builtin: true };
-type Item = AuthoredCard | AuthoredLocation | AuthoredCircuitReward | AuthoredMod | StartingDeck | BuiltinMod;
+type Item = AuthoredCard | AuthoredLocation | AuthoredCircuitReward | AuthoredRuntimeHack | AuthoredMod | StartingDeck | BuiltinMod;
 type SaveStatus = 'loading' | 'ready' | 'saving' | 'saved' | 'error' | 'conflict' | 'offline';
 type Notice = { text: string; restoreId?: string };
 
-const SECTION_KEYS: readonly Section[] = ['cards', 'locations', 'circuitRewards', 'mods', 'startingDecks'];
+const SECTION_KEYS: readonly Section[] = ['cards', 'locations', 'circuitRewards', 'runtimeHacks', 'mods', 'startingDecks'];
 const sections: { key: Section; label: string; singular: string }[] = [
   { key: 'cards', label: 'Cards', singular: 'card' },
   { key: 'locations', label: 'Locations', singular: 'location' },
   { key: 'circuitRewards', label: 'Circuit rewards', singular: 'circuit reward' },
+  { key: 'runtimeHacks', label: 'Runtime hacks', singular: 'Runtime Hack' },
   { key: 'mods', label: 'Card mods', singular: 'card mod' },
   { key: 'startingDecks', label: 'Starting decks', singular: 'starting deck' },
 ];
-const ID_PREFIX: Record<Section, string> = { cards: 'card', locations: 'location', circuitRewards: 'reward', mods: 'mod', startingDecks: 'deck' };
+const ID_PREFIX: Record<Section, string> = { cards: 'card', locations: 'location', circuitRewards: 'reward', runtimeHacks: 'hack', mods: 'mod', startingDecks: 'deck' };
+const HACK_WINDOW_LABELS: Record<RuntimeHackWindow, string> = {
+  game: 'Same game',
+  cycle: 'Same Cycle',
+  turn: 'Same Runtime turn',
+  location: 'Same location, same game',
+  locationCycle: 'Same location, same Cycle',
+};
 const isDeck = (item: Item): item is StartingDeck => 'cards' in item;
 const isBuiltin = (item: Item): item is BuiltinMod => 'builtin' in item;
 const builtinModItems = (): BuiltinMod[] => BUILTIN_MODIFIERS.map(id => ({ id, name: builtinMod(id).name, enabled: true, builtin: true }));
@@ -117,7 +129,7 @@ function readError(value: unknown, fallback: string) {
 function isDocument(value: unknown): value is ContentDocument {
   if (!value || typeof value !== 'object') return false;
   const record = value as Record<string, unknown>;
-  return (record.version === CONTENT_VERSION || record.version === 1) && Array.isArray(record.cards) && Array.isArray(record.locations) && Array.isArray(record.circuitRewards);
+  return (record.version === CONTENT_VERSION || record.version === 1 || record.version === 2) && Array.isArray(record.cards) && Array.isArray(record.locations) && Array.isArray(record.circuitRewards);
 }
 
 const POWER_SOURCE_LABELS: Record<PowerSource | 'none', string> = {
@@ -260,6 +272,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
   };
   const changeClass = (cardClass: CardClass) => patch({ cardClass, pool: poolForClass(card.type, cardClass) });
   const schedule = card.schedule ?? [];
+  const budget = useMemo(() => scoreCard(card), [card]);
   return <div className="au-card-workspace"><CardPreview card={card} onBrowseArt={() => setArtOpen(true)} /><div className="au-properties">
     <section className="au-panel">
       <SectionTitle title="Card properties" />
@@ -285,6 +298,36 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
         </div>}
       </div>
       <TextField field="storyText" label="Story text" value={card.storyText ?? ''} onChange={storyText => patch({ storyText: storyText || undefined })} multiline hint="Flavour only. Shown in the card inspect overlay, never on the card face." />
+    </section>
+    <section className="au-panel au-balance-panel" data-band={budget.band}>
+      <SectionTitle
+        eyebrow="Authoring"
+        title="Balance"
+        description="Efficiency E = printed value V ÷ baseline B(cost). Anchors Mel named as balanced set E≈1. Hard numbers only (Power, Crypto, draw, Actions, Drain, Restore, VP). Soft effects are flagged, not scored. Drain/Restore scale with full Server integrity."
+      />
+      <div className="au-balance-hero">
+        <div className="au-balance-score">
+          <span className="au-balance-eff" data-band={budget.band}>{budget.efficiency.toFixed(2)}</span>
+          <span className="au-balance-delta" data-band={budget.band}>{budget.deltaPct >= 0 ? '+' : ''}{budget.deltaPct.toFixed(0)}%</span>
+          <span className="au-balance-band" data-band={budget.band}>{budget.band === 'near' ? 'Near baseline' : budget.band === 'over' ? 'Over budget' : 'Under budget'}</span>
+        </div>
+        <p className="au-balance-meta">V {budget.value} · B {budget.baseline}{budget.density !== null ? ` · Density ${budget.density} Power/slot` : ''}</p>
+      </div>
+      {budget.parts.length > 0 && (
+        <ul className="au-balance-parts">
+          {budget.parts.map(part => (
+            <li key={part.id}><span>{part.label}</span><b>{part.credit >= 0 ? '+' : ''}{part.credit}</b></li>
+          ))}
+        </ul>
+      )}
+      {budget.soft.length > 0 && (
+        <ul className="au-balance-soft">
+          {budget.soft.map(flag => (
+            <li key={flag.id}><b>Soft</b> {flag.reason}</li>
+          ))}
+        </ul>
+      )}
+      <p className="au-balance-formula">{budget.formula} Weights live in <code>packages/engine/src/authoring/cardBudget.ts</code>.</p>
     </section>
     <section className="au-panel au-effects-panel">
       <SectionTitle eyebrow="Unique to this card" title="Card effects" description="Select a step to edit it. The preview updates as you go." />
@@ -451,6 +494,42 @@ function CircuitEditor({ item: reward, cards, update, applyAdvanced, onPendingCh
     <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unique to this reward" title="Reward effects" description="An ordered recipe for the player claiming this reward. Select a step to edit it." /><StepList field="effects" title="On claim" scope="circuit" cards={asCards(cards)} steps={reward.effects} onChange={syncText} /></section>
     <details className="au-property-section"><summary>Identity</summary><IdentityFields id={reward.id} /></details>
     <AdvancedJson key={reward.id} item={reward} onApply={item => applyAdvanced(item as AuthoredCircuitReward)} onPendingChange={onPendingChange} />
+  </div>;
+}
+
+function RuntimeHackEditor({ item: hack, cards, update, applyAdvanced, onPendingChange }: EditorProps<AuthoredRuntimeHack>) {
+  const patch = (changes: Partial<AuthoredRuntimeHack>) => update({ ...hack, ...changes });
+  const enabled = cards.filter(card => card.enabled);
+  const selected = new Set(hack.cards);
+  const names = hack.cards.map(id => enabled.find(card => (card.definitionId ?? card.id) === id)?.name ?? id);
+  const toggleCard = (id: string) => {
+    const next = selected.has(id) ? hack.cards.filter(entry => entry !== id) : [...hack.cards, id].slice(0, 6);
+    patch({ cards: next, formula: suggestRuntimeHackFormula(hack.window, next.map(cardId => enabled.find(card => (card.definitionId ?? card.id) === cardId)?.name ?? cardId)) });
+  };
+  return <div className="au-properties au-standalone-properties"><section className="au-panel"><SectionTitle title="Runtime Hack properties" description="Secret combo unlocks. After the completing card’s reveal effects resolve, both seats see the celebration; only the unlocking seat gets the reward." /><div className="au-field-grid">
+    <TextField field="name" label="Name" value={hack.name} onChange={name => patch({ name })} />
+    <label className="au-field" data-field="window"><span>Window</span>
+      <select aria-label="Window" value={hack.window} onChange={event => {
+        const window = event.target.value as RuntimeHackWindow;
+        patch({ window, formula: suggestRuntimeHackFormula(window, names) });
+      }}>
+        {RUNTIME_HACK_WINDOWS.map(window => <option key={window} value={window}>{HACK_WINDOW_LABELS[window]}</option>)}
+      </select>
+    </label>
+    <TextField field="formula" className="au-span-all" label="Formula" value={hack.formula} onChange={formula => patch({ formula })} multiline hint="Shown in the award modal. Suggest updates when you change the window or cards." />
+  </div></section>
+    <section className="au-panel"><SectionTitle eyebrow="Combo" title="Required cards" description="2–6 enabled cards. Order does not matter. Reveal counts, not face-down deploy." />
+      <div className="au-hack-cards" data-field="cards" role="group" aria-label="Required cards">
+        {enabled.map(card => {
+          const id = card.definitionId ?? card.id;
+          return <label key={id} className="au-hack-card-option"><input type="checkbox" checked={selected.has(id)} disabled={!selected.has(id) && hack.cards.length >= 6} onChange={() => toggleCard(id)} /><span>{card.name}</span></label>;
+        })}
+      </div>
+      <button type="button" className="au-button au-button-subtle" onClick={() => patch({ formula: suggestRuntimeHackFormula(hack.window, names) })}>Suggest formula from selection</button>
+    </section>
+    <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unlock reward" title="Reward effects" description="Usually Gain a card into hand. Runs for the unlocking seat once per game." /><StepList field="effects" title="On unlock" scope="runtimeHack" cards={asCards(cards)} steps={hack.effects} onChange={effects => patch({ effects })} /></section>
+    <details className="au-property-section"><summary>Identity</summary><IdentityFields id={hack.id} /></details>
+    <AdvancedJson key={hack.id} item={hack} onApply={item => applyAdvanced(item as AuthoredRuntimeHack)} onPendingChange={onPendingChange} />
   </div>;
 }
 
@@ -754,13 +833,14 @@ export function AuthoringApp() {
 
   function addItem() {
     if (!leaveJsonDraft()) return;
-    const name = section === 'cards' ? 'New card' : section === 'locations' ? 'New location' : section === 'startingDecks' ? 'New deck' : section === 'mods' ? 'New mod' : 'New circuit reward';
+    const name = section === 'cards' ? 'New card' : section === 'locations' ? 'New location' : section === 'startingDecks' ? 'New deck' : section === 'mods' ? 'New mod' : section === 'runtimeHacks' ? 'New Runtime Hack' : 'New circuit reward';
     const id = createId(section, list);
     let item: Item;
     if (section === 'cards') { const category = newCardCategory(cardFilter); item = { id, definitionId: id, name, ...category, enabled: cardFilter !== 'Disabled', cost: 0, ...(category.type !== 'Crypto' ? { power: 0 } : { cryptoValue: 1 }), ...(category.type === 'VP' ? { vp: 1 } : {}), art: CARD_ART_PLACEHOLDER, effect: '', onReveal: [] }; }
     else if (section === 'locations') item = { id, name, rule: '', reward: '', effects: [], enabled: true };
     else if (section === 'startingDecks') item = { id, name, cards: [] };
     else if (section === 'mods') item = { id, name, enabled: true, onReveal: [createStep('gainCrypto', 'card')] };
+    else if (section === 'runtimeHacks') item = { id, name, enabled: true, window: 'game', cards: [], formula: suggestRuntimeHackFormula('game', []), effects: [createStep('gainCard', 'runtimeHack')] };
     else item = { id, name, text: '', cost: 0, effects: [], enabled: true };
     const previous = documentRef.current;
     if (section === 'mods') addModWithReward(previous, item as AuthoredMod);
@@ -1002,7 +1082,7 @@ export function AuthoringApp() {
       </nav>}
       <aside className="au-catalog-list" aria-label={`${activeSection.label} catalog`}>
         <div className="au-list-caption"><span>{visible.length} shown{section === 'cards' && search.trim() ? ' · searching all cards' : ''}</span><small>{section === 'cards' ? `${SORT_LABEL[sortKey]} · ${sortDirection === 'asc' ? 'ascending' : 'descending'}` : 'Alphabetical'}</small></div>
-        {section === 'cards' && <div className="au-sort-head"><span aria-hidden="true" />{(['name', 'cost', 'power', 'vp'] as const).map(key => <button type="button" key={key} aria-label={`Sort by ${SORT_LABEL[key]}`} aria-pressed={sortKey === key} onClick={() => sortBy(key)}>{SORT_LABEL[key]}{sortKey === key && <span aria-hidden="true">{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>}</button>)}</div>}
+        {section === 'cards' && <div className="au-sort-head"><span aria-hidden="true" />{(['name', 'cost', 'power', 'vp', 'efficiency'] as const).map(key => <button type="button" key={key} aria-label={`Sort by ${SORT_LABEL[key]}`} aria-pressed={sortKey === key} onClick={() => sortBy(key)}>{SORT_LABEL[key]}{sortKey === key && <span aria-hidden="true">{sortDirection === 'asc' ? ' ↑' : ' ↓'}</span>}</button>)}</div>}
         {selectedHidden && selected && <button type="button" className="au-list-pinned" onClick={() => { setSearch(''); setCardFilter('All'); }}>Editing “{selected.name || 'Untitled'}”, hidden by the current {search ? 'search' : 'filter'}. <u>Show it</u></button>}
         <div className="au-list" role="listbox" aria-label={activeSection.label} ref={listRef} onKeyDown={onListKey}>
           {visible.map((item, index) => {
@@ -1012,7 +1092,10 @@ export function AuthoringApp() {
             const modified = changes.modified.has(key);
             const markers = <>{modified && <i className="au-dot-modified" title="Unsaved changes" aria-label="Unsaved changes" />}{itemIssues && <i className="au-row-flag" title={itemIssues.map(issue => [issue.label, issue.message].filter(Boolean).join(': ')).join('\n')} aria-label={`${itemIssues.length} problems`}>!</i>}</>;
             return <button role="option" aria-selected={isSelected} tabIndex={isSelected || (selectedHidden && index === 0) ? 0 : -1} type="button" key={item.id} data-author-item={item.id} data-tone={'pool' in item ? cardTone(item) : undefined} className={`au-list-item ${section === 'cards' ? 'au-card-row' : 'au-entity-row'} ${isSelected ? 'active' : ''}`} onClick={() => { if (!leaveJsonDraft()) return; selectItem(item.id); }}>
-              {'pool' in item ? <><Artwork card={item} /><span className="au-row-title"><b>{item.name || 'Untitled card'}{markers}</b><small><i className="au-tone-dot" aria-hidden="true" style={{ '--tone': CARD_STYLE_COLORS[subtypeStyle(item)] } as CSSProperties} />{cardCategoryLabel(item)}</small></span><span className="au-row-cost" aria-label={`Cost ${item.cost}`}>{item.cost}</span><span className="au-row-power" aria-label={item.power === undefined ? 'No Power' : `Power ${item.power}`}>{item.power ?? '—'}</span><span className="au-row-vp" aria-label={item.vp === undefined ? 'No VP' : `${item.vp} VP`}>{item.vp ?? '—'}</span></> : <><b>{item.name || 'Untitled'}{markers}{isDeck(item) ? document.activeStartingDeckId === item.id && <em className="au-row-active">In game</em> : isBuiltin(item) ? <em className="au-row-builtin">Built-in</em> : !item.enabled && <em className="au-row-disabled">Disabled</em>}</b><small>{entitySummary(item)}</small></>}
+              {'pool' in item ? (() => {
+                const budget = scoreCard(item);
+                return <><Artwork card={item} /><span className="au-row-title"><b>{item.name || 'Untitled card'}{markers}</b><small><i className="au-tone-dot" aria-hidden="true" style={{ '--tone': CARD_STYLE_COLORS[subtypeStyle(item)] } as CSSProperties} />{cardCategoryLabel(item)}</small></span><span className="au-row-cost" aria-label={`Cost ${item.cost}`}>{item.cost}</span><span className="au-row-power" aria-label={item.power === undefined ? 'No Power' : `Power ${item.power}`}>{item.power ?? '—'}</span><span className="au-row-vp" aria-label={item.vp === undefined ? 'No VP' : `${item.vp} VP`}>{item.vp ?? '—'}</span><span className="au-row-eff" data-band={budget.band} aria-label={`Efficiency ${budget.efficiency.toFixed(2)}`}>{budget.efficiency.toFixed(2)}</span></>;
+              })() : <><b>{item.name || 'Untitled'}{markers}{isDeck(item) ? document.activeStartingDeckId === item.id && <em className="au-row-active">In game</em> : isBuiltin(item) ? <em className="au-row-builtin">Built-in</em> : !item.enabled && <em className="au-row-disabled">Disabled</em>}</b><small>{entitySummary(item)}</small></>}
             </button>;
           })}
           {visible.length === 0 && <div className="au-empty-list">{search
@@ -1029,9 +1112,9 @@ export function AuthoringApp() {
           <ul>{selectedIssues.map((issue, index) => <li key={index}><button type="button" onClick={() => jumpTo(issue)} disabled={!issue.field}>{issue.label && <span>{issue.label}</span>}{issue.message}</button></li>)}</ul>
         </div>}
         <div className="au-editor-content" key={selectedKey}>
-          {isBuiltin(selected) ? <BuiltinModEditor mod={selected} cards={document.cards} document={document} onChange={(field, value) => commit(withBuiltinModField(documentRef.current, selected.id, field, value), `builtinMods:${selected.id}:${field}`)} /> : section === 'startingDecks' ? <DeckEditor deck={selected as StartingDeck} cards={document.cards} active={document.activeStartingDeckId === selected.id} update={value => update(value)} /> : section === 'cards' ? <CardEditor item={selected as AuthoredCard} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : section === 'locations' ? <LocationEditor item={selected as AuthoredLocation} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : section === 'mods' ? <ModEditor item={selected as AuthoredMod} cards={document.cards} document={document} setAwardTrailing={checked => setModRewardsTrailing(selected.id, checked)} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : <CircuitEditor item={selected as AuthoredCircuitReward} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} />}
+          {isBuiltin(selected) ? <BuiltinModEditor mod={selected} cards={document.cards} document={document} onChange={(field, value) => commit(withBuiltinModField(documentRef.current, selected.id, field, value), `builtinMods:${selected.id}:${field}`)} /> : section === 'startingDecks' ? <DeckEditor deck={selected as StartingDeck} cards={document.cards} active={document.activeStartingDeckId === selected.id} update={value => update(value)} /> : section === 'cards' ? <CardEditor item={selected as AuthoredCard} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : section === 'locations' ? <LocationEditor item={selected as AuthoredLocation} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : section === 'mods' ? <ModEditor item={selected as AuthoredMod} cards={document.cards} document={document} setAwardTrailing={checked => setModRewardsTrailing(selected.id, checked)} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : section === 'runtimeHacks' ? <RuntimeHackEditor item={selected as AuthoredRuntimeHack} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} /> : <CircuitEditor item={selected as AuthoredCircuitReward} cards={document.cards} update={value => update(value)} applyAdvanced={value => applyAdvanced(value)} onPendingChange={setAdvancedPending} />}
         </div>
-      </> : <div className="au-empty-editor"><span>◇</span><h2>Create your next {activeSection.singular}</h2><p>{section === 'startingDecks' ? 'Name it, add cards, then choose Load in game to use it.' : section === 'mods' ? 'A mod gives the card it’s attached to extra effects for the rest of the game. Attach it with an “Attach a mod” effect.' : 'Choose properties and build its own effects recipe.'}</p><button className="au-button au-button-primary" type="button" onClick={addItem}>+ New {activeSection.singular}</button></div>}</main>
+      </> : <div className="au-empty-editor"><span>◇</span><h2>Create your next {activeSection.singular}</h2><p>{section === 'startingDecks' ? 'Name it, add cards, then choose Load in game to use it.' : section === 'mods' ? 'A mod gives the card it’s attached to extra effects for the rest of the game. Attach it with an “Attach a mod” effect.' : section === 'runtimeHacks' ? 'Pick the combo window and required cards, then set the unlock reward (usually Gain a card into hand).' : 'Choose properties and build its own effects recipe.'}</p><button className="au-button au-button-primary" type="button" onClick={addItem}>+ New {activeSection.singular}</button></div>}</main>
       </EditorFocusContext.Provider>
       </ModsContext.Provider>
     </div>

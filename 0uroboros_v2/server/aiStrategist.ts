@@ -35,6 +35,11 @@ export type Theory = {
   support: number; against: number; createdBy: number; updatedBy: number;
   /** Built-in theories are scored automatically after every complete game. */
   test?: TheoryTest;
+  /** Structured framing: association evidence ≠ causal proof; "supported" ≠ adoption-ready. */
+  observation?: string;
+  interpretation?: string;
+  hypothesis?: string;
+  proposedTest?: string;
 };
 type TheoryTest = 'no-shyte' | 'economy-first' | 'chaos-endgame' | 'draw-engine' | 'vp-late' | 'early-aggression' | 'drain-race';
 type SideStat = { bought: number; games: number; wins: number };
@@ -173,30 +178,38 @@ const EXPERIMENT_LOG_LIMIT = 60;
 const LAB_SEEDS = 20;
 /** Lab trials per boot or per finished game; the next idea waits for the following one. */
 const LAB_TRIALS_PER_TRIGGER = 3;
-const FIELD_GAMES_PER_ARM = 2;
+/** Human-field games per arm before adopt/reject; fewer stays inconclusive. League A/B remains the primary adoption path. */
+const FIELD_GAMES_PER_ARM = 8;
 /** Only these endings are complete games; concessions and the lookdev "end session" shortcut are not. */
 const COMPLETE_GAME = /^(Cycle 16 final Draft complete\.|Both Servers destroyed)/;
 
 const BASELINE_PLAYBOOK = [
   'Phase 2, midgame (Cycles 5-8): balance four things every Draft: attacks (Chaos and Drain), the deck engine, Server Restore and VP collection. No single pillar takes the whole Wallet.',
   'Phase 3, endgame (Cycles 9-16): attack the enemy Servers like crazy, deploying every Drain card I draw first, and spend most of each Wallet on VP cards. The final Draft buys only VP.',
-  'Draft after Cycle 4: score every card from its actual effects (no fixed table) and buy the best set the whole Wallet affords; skip cards that would only dilute the deck.',
-  'Deploy: Action and draw cards first so they fuel later turns; contest Nodes whose Location pays the winner, and do not fight for Locations that pay the loser.',
-  'Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch) and hit the opponent\'s best cards.',
+  'Draft after Cycle 4: score every card from its actual effects (no fixed table) and by how much it improves the weak starting deck; buy the best set the whole Wallet affords; skip cards that would only dilute the deck.',
+  'Deploy: Action and draw cards first so they fuel later turns; then sequence other reveals so later cards benefit from earlier effects. Contest Nodes whose Location pays the winner; concede Locations that pay the loser or clog my deck when Circuit count allows.',
+  'Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch), pollute the opponent when the effect puts junk in their deck, and hit their best cards.',
 ];
 
-const RULES_SUMMARY = `0uroboros is a two-player deckbuilder over 16 Cycles. Both players start with the same starting deck (listed under STARTING DECK; current Standard is weaker than older builds — mostly Shyte-Coin plus a thin Character/VP core — so early hands are softer and Draft flexibility is higher). Each Cycle draws a fresh hand of 5 and has three Runtime turns (with the midCycleDraw option on by default, each player also draws 1 at the start of turns 2 and 3): players deploy Character cards face-down onto five Nodes (some open on turn 1, more on later turns, up to 4 cards per side per Node). Each Character costs 1 Action; a player has 2 Actions on turn 1, then unspent Actions carry over plus 1 per turn plus Action effects. VP cards deploy for 0 Actions; Crypto cannot be deployed. Revealed cards fire effects (draw, Actions, Crypto, Drain, Restore, Power shifts, thinning, ...). At Wave Collapse the higher Power wins each Node and its Location reward; whoever won more Locations is eligible for a random Circuit Reward (a tie makes both eligible); rewards marked "trailing" instead go to the player behind on VP counting Server damage dealt as that share of the Server's destruction VP. Then the Draft: spendable Crypto (from Character effects — many cards now print Crypto — and any held Crypto cards that resolve by printed value) is used to buy cards into Discard. Crypto resets every Cycle. Crypto card piles exist only when the draftCrypto setup option is on (default off); without that shelf, Wallet income is Character-driven. Drain damages the enemy Servers (currently Primary ${serverMaximums.primary}, Backup ${serverMaximums.backup}, ${serverMaximums.primary + serverMaximums.backup} in all; the designer may rebalance these, so plan around destroying both Servers rather than a fixed damage number): destroying a Primary gives the destroyer +${defaultServerVP.primary} VP, a Backup +${defaultServerVP.backup} VP, and the game ends when a player loses both Servers (most VP still wins). Otherwise the most VP after the Cycle 16 Draft wins. VP cards score while owned. There are no fixed game piles. Each Draft offers ${DRAFT_OFFER_COUNT} rotating cards (${DRAFT_COPIES_PER_PLAYER} copies per player): ${DRAFT_PHASE_SUMMARY}. One slot is a Solar-monk when any is enabled (${DRAFT_SOLAR_MONK_COUNT} per offer; VP Character that costs 1 Action). Cycles 1–${DRAFT_EARLY_CYCLES} only offer cards costing 1–${DRAFT_EARLY_COST_MAX} Crypto. Cards bought in the Cycle 16 Draft are only worth their VP. Other setup toggles include noLocations and noTrailingRewards.`;
-const LOCATION_GUIDE = `LOCATIONS: every open Node carries a Location whose rule changes play there; read each one before planning. First read the trigger: "On collapse:" fires once at Wave Collapse at the end of the Cycle, for that Node's winner or loser; "Ongoing:" fires at the start of turns 2 and 3 for whoever leads the Node at that moment, so committing Power early collects it twice; "Start of turn 2:"/"Start of turn 3:" fire once then; "On reveal:" fires for each card revealed there, for that card's owner, whoever wins. Then read who it helps. "The winning player" rewards contesting the Node. "The losing player" (Login the calvary, Loser's luck, Backup failure's Ongoing draw) means winning it hands the opponent the bonus, so commit only what the Circuit count needs or concede it and win elsewhere. Effects on "both sides"/"each side" are even and matter only through the cards each side has there. Gaining a Glitch or Shyte-Coin clogs the deck, so those rewards hurt their receiver. Every Location won also counts toward the Circuit Reward. In play, the runtime prices each open Location with your own weights and phase when it picks Nodes (Drain-heavy profiles fight for Data breach and Sludge core, draw-heavy ones for Signal tower and Wind fall), so Location play follows from your weights and timing; the catalog's "read" column shows how a Location plays.`;
+const RULES_SUMMARY = `0uroboros is a two-player deckbuilder over 16 Cycles. Both players start with the same starting deck (listed under STARTING DECK; current Standard is weaker than older builds — mostly Shyte-Coin plus a thin Character/VP core — so early hands are softer and Draft flexibility is higher). Each Cycle draws a fresh hand of 5 and has three Runtime turns (each player also draws 1 at the start of turns 2 and 3): players deploy Character cards face-down onto five Nodes (some open on turn 1, more on later turns, up to 4 cards per side per Node). Each Character costs 1 Action; a player has 2 Actions on turn 1, then unspent Actions carry over plus 1 per turn plus Action effects. VP cards deploy for 0 Actions; Crypto cannot be deployed. Revealed cards fire effects (draw, Actions, Crypto, Drain, Restore, Power shifts, thinning, ...). At Wave Collapse the higher Power wins each Node and its Location reward; whoever won more Locations is eligible for a random Circuit Reward (a tie makes both eligible); rewards marked "trailing" instead go to the player behind on VP counting Server damage dealt as that share of the Server's destruction VP. Then the Draft: spendable Crypto (from Character effects — many cards now print Crypto — and any held Crypto cards that resolve by printed value) is used to buy cards into Discard. Crypto resets every Cycle. Crypto card piles exist only when the draftCrypto setup option is on (default off); without that shelf, Wallet income is Character-driven. Drain damages the enemy Servers (currently Primary ${serverMaximums.primary}, Backup ${serverMaximums.backup}, ${serverMaximums.primary + serverMaximums.backup} in all; the designer may rebalance these, so plan around destroying both Servers rather than a fixed damage number): destroying a Primary gives the destroyer +${defaultServerVP.primary} VP, a Backup +${defaultServerVP.backup} VP, and the game ends when a player loses both Servers (most VP still wins). Otherwise the most VP after the Cycle 16 Draft wins. VP cards score while owned. There are no fixed game piles. Each Draft offers ${DRAFT_OFFER_COUNT} rotating cards (${DRAFT_COPIES_PER_PLAYER} copies per player): ${DRAFT_PHASE_SUMMARY}. One slot is a Solar-monk when any is enabled (${DRAFT_SOLAR_MONK_COUNT} per offer; VP Character that costs 1 Action). Cycles 1–${DRAFT_EARLY_CYCLES} only offer cards costing 1–${DRAFT_EARLY_COST_MAX} Crypto. Cards bought in the Cycle 16 Draft are only worth their VP. noTrailingRewards is on by default (trailing Circuit Rewards omitted unless Configure includes them). Other setup toggles include noLocations.`;
+const LOCATION_GUIDE = `LOCATIONS: Locations are not passive spaces. Every open Node carries a Location whose rule changes play there; read each one before deciding where to play a card. A Location may benefit a player, hurt a player's deck, change the value of winning or losing that Node, or create a reason to intentionally concede it — winning every Location is not automatically optimal. First read the trigger: "On collapse:" fires once at Wave Collapse at the end of the Cycle, for that Node's winner or loser; "Ongoing:" fires at the start of turns 2 and 3 for whoever leads the Node at that moment, so committing Power early collects it twice; "Start of turn 2:"/"Start of turn 3:" fire once then; "On reveal:" fires for each card revealed there, for that card's owner, whoever wins. Then read who it helps. "The winning player" rewards contesting the Node. "The losing player" (Login the calvary, Loser's luck, Backup failure's Ongoing draw) means winning it hands the opponent the bonus, so commit only what the Circuit count needs or concede it and win elsewhere. Effects on "both sides"/"each side" are even and matter only through the cards each side has there. Gaining a Glitch or Shyte-Coin clogs the deck (deck pollution), so those rewards hurt their receiver and can be used as an attack when you force them onto the opponent. Every Location won also counts toward the Circuit Reward. In play, the runtime prices each open Location with your own weights and phase when it picks Nodes (Drain-heavy profiles fight for Data breach and Sludge core, draw-heavy ones for Signal tower and Wind fall), so Location play follows from your weights and timing; the catalog's "read" column shows how a Location plays.`;
 const PROFILE_GUIDE = `Profile fields (the runtime clamps them): economyUntilCycle [1-12] cycles that favour Crypto/draw/thinning; chaosFromCycle [3-15] first cycle Chaos and Drain are valued fully; vpFromCycle [4-16] first cycle VP cards are valued fully; handCryptoTarget [4-16] Crypto per 5-card hand the economy aims for; minBuyScore [0-4] minimum points for a purchase; dilution [0-1.5] how much a card must beat the deck average; weights [0-5] for power, draw, actions, crypto, drain, restore, vp, duration, thin, disrupt, chaos; cardBias per card definition id [-6..6] points. minCryptoValue stays at the baseline's 2 (never Shyte-Coin) and cannot be experimented on. One experiment moves timing by at most 2 Cycles, a weight by about 30%, and a card bias by 1 point.`;
 
 const FOUNDING_THEORIES: Omit<Theory, 'createdBy' | 'updatedBy'>[] = [
-  { id: 'no-shyte', text: 'Shyte-Coin is not worth a deck slot: it dilutes draws. Characters that print Crypto or draw cards (and Kilo/Mega when the Crypto shelf is on) are better buys.', status: 'proposed', confidence: 0.6, support: 0, against: 0, test: 'no-shyte' },
-  { id: 'economy-first', text: 'Buying Characters that print Crypto (or Kilo/Mega when the Crypto shelf is on) by Cycle 5 builds the economy that wins the late game.', status: 'proposed', confidence: 0.55, support: 0, against: 0, test: 'economy-first' },
-  { id: 'draw-engine', text: 'Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.', status: 'proposed', confidence: 0.55, support: 0, against: 0, test: 'draw-engine' },
-  { id: 'chaos-endgame', text: `Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +${defaultServerVP.primary}/+${defaultServerVP.backup} VP.`, status: 'proposed', confidence: 0.5, support: 0, against: 0, test: 'chaos-endgame' },
-  { id: 'early-aggression', text: 'Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).', status: 'proposed', confidence: 0.4, support: 0, against: 0, test: 'early-aggression' },
-  { id: 'vp-late', text: 'VP cards are best bought late (Cycle 12+); earlier they clog the hand.', status: 'proposed', confidence: 0.5, support: 0, against: 0, test: 'vp-late' },
-  { id: 'drain-race', text: 'Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.', status: 'proposed', confidence: 0.6, support: 0, against: 0, test: 'drain-race' },
+  { id: 'no-shyte', text: 'Shyte-Coin is not worth a deck slot: it dilutes draws. Characters that print Crypto or draw cards (and Kilo/Mega when the Crypto shelf is on) are better buys.', status: 'proposed', confidence: 0.6, support: 0, against: 0, test: 'no-shyte',
+    observation: 'Winner vs loser Shyte-Coin ownership after complete games.', interpretation: 'Fewer Shyte in the winner\'s deck associates with winning.', hypothesis: 'Skipping Shyte and buying better Crypto/draw improves win rate.', proposedTest: 'Experiment: raise thin or crypto weight; measure wins vs current best.' },
+  { id: 'economy-first', text: 'Buying Characters that print Crypto (or Kilo/Mega when the Crypto shelf is on) by Cycle 5 builds the economy that wins the late game.', status: 'proposed', confidence: 0.55, support: 0, against: 0, test: 'economy-first',
+    observation: 'Winner vs loser Kilo/Mega (or equivalent) buys by Cycle 5.', interpretation: 'Early Crypto income associates with late-game wins.', hypothesis: 'Valuing Crypto earlier raises mid-game Wallets and wins.', proposedTest: 'Experiment: raise crypto weight / handCryptoTarget; measure wins and margin.' },
+  { id: 'draw-engine', text: 'Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.', status: 'proposed', confidence: 0.55, support: 0, against: 0, test: 'draw-engine',
+    observation: 'Winner vs loser total draw bought.', interpretation: 'More draw in the winner associates with winning.', hypothesis: 'Higher draw weight cycles best cards more often.', proposedTest: 'Experiment: raise draw weight; measure wins and Locations won.' },
+  { id: 'chaos-endgame', text: `Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +${defaultServerVP.primary}/+${defaultServerVP.backup} VP.`, status: 'proposed', confidence: 0.5, support: 0, against: 0, test: 'chaos-endgame',
+    observation: 'Winner vs loser Chaos buys from Cycle 8.', interpretation: 'Late Chaos associates with winning the Server race.', hypothesis: 'Delaying Chaos two Cycles builds an engine that out-drains early pivots.', proposedTest: 'Experiment: later chaosFromCycle; measure wins and Server timing.' },
+  { id: 'early-aggression', text: 'Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).', status: 'proposed', confidence: 0.4, support: 0, against: 0, test: 'early-aggression',
+    observation: 'Winner vs loser Chaos buys by Cycle 5.', interpretation: 'Early Chaos associates with ending games by destruction.', hypothesis: 'Starting Chaos one Cycle earlier wins the Server race more often.', proposedTest: 'Experiment: earlier chaosFromCycle; measure wins and kill Cycle.' },
+  { id: 'vp-late', text: 'VP cards are best bought late (Cycle 12+); earlier they clog the hand.', status: 'proposed', confidence: 0.5, support: 0, against: 0, test: 'vp-late',
+    observation: 'Winner vs loser share of VP buys from Cycle 12.', interpretation: 'Late VP share associates with winning on points.', hypothesis: 'Opening the VP window two Cycles earlier banks points before the race ends.', proposedTest: 'Experiment: earlier vpFromCycle; measure final VP margin.' },
+  { id: 'drain-race', text: 'Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.', status: 'proposed', confidence: 0.6, support: 0, against: 0, test: 'drain-race',
+    observation: 'Whether Servers were destroyed before Cycle 12.', interpretation: 'Early destruction endings associate with Drain-forward play.', hypothesis: 'Higher Drain weight ends games by destruction before engines pay off.', proposedTest: 'Experiment: raise drain weight; measure destruction rate and wins.' },
 ];
 
 type MenuItem = { id: string; theoryId: string | null; supportsTheory: boolean; hypothesis: string; prediction: string; change: (profile: StrategyProfile) => ProfileChange };
@@ -440,7 +453,10 @@ function testTheory(test: TheoryTest, report: MatchReport, catalog: Catalog): Ev
   }
 }
 
-/** Confidence and status come only from counted evidence; nobody can declare a theory supported. */
+/**
+ * Laplace association score from counted winner/loser (or experiment) evidence.
+ * "supported" means the coded association held often enough — not that the explanation is causal or adoption-ready.
+ */
 function scoreTheory(theory: Theory) {
   theory.confidence = round((theory.support + 1) / (theory.support + theory.against + 2));
   if (theory.status === 'retired') return;
@@ -520,7 +536,11 @@ type NotebookVoice = { name: string; style: string | null; envelope: string | nu
 function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: NotebookVoice = { name: 'Strat-G', style: null, envelope: null, league: false, human: true, defaultOpponent: true }): string {
   const p = memory.profile, r = memory.record, b = memory.baseline;
   const byStatus = (status: TheoryStatus) => memory.theories.filter(theory => theory.status === status);
-  const theoryLine = (theory: Theory) => `- **${theory.id}** (${theory.support + theory.against ? `${Math.round(theory.confidence * 100)}% · ${theory.support} for / ${theory.against} against` : 'untested'} · ${versionLabel(theory.createdBy)}${theory.test ? ' · scored every game' : ''}): ${theory.text}`;
+  const theoryLine = (theory: Theory) => {
+    const assoc = theory.support + theory.against ? `${Math.round(theory.confidence * 100)}% association · ${theory.support} for / ${theory.against} against` : 'untested';
+    const framing = [theory.observation && `obs: ${theory.observation}`, theory.hypothesis && `hyp: ${theory.hypothesis}`, theory.proposedTest && `test: ${theory.proposedTest}`].filter(Boolean).join(' · ');
+    return `- **${theory.id}** (${assoc} · ${versionLabel(theory.createdBy)}${theory.test ? ' · scored every game' : ''}${theory.status === 'supported' ? ' · association only, not adoption-ready' : ''}): ${theory.text}${framing ? `\n  - ${framing}` : ''}`;
+  };
   const cardName = (id: string) => catalog.cards.get(id)?.name ?? catalog.locations.get(id)?.name ?? id;
   const stats = Object.entries(memory.cardStats)
     .map(([id, stat]) => ({ id, stat, games: stat.ai.games + stat.human.games, wins: stat.ai.wins + stat.human.wins }))
@@ -542,8 +562,8 @@ function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: Noteb
         : `Written by ${name}, a league adversary. It plays only AI-vs-AI league games. Each dev-server start reads this notebook (and \`memory.json\`), plans, and leaves notes here. Its version changes only when the profile it plays changes.`,
     ``,
     voice.league
-      ? `How ${name} learns: it plays the protected baseline below plus the changes its experiments have earned. It changes its play only through experiments: one bounded change at a time, played by the league referee as paired games (the experiment and the current best face the same sampled opponents on the same seeds). Code measures the results and adopts or rejects the change. It never sees the other agents' profiles, plans or notebooks, only who it played and the results.`
-      : `How ${name} learns: it plays the protected baseline below plus the changes its experiments have earned. It changes its play only through experiments: one bounded change at a time, screened in seeded self-play against the current best, then played in alternating games against the human. Code measures the results and adopts or rejects the change; theories gain evidence the same way.`,
+      ? `How ${name} learns: it plays the protected baseline below plus the changes its experiments have earned. It changes its play only through experiments: one bounded change at a time, played by the league referee as paired games (the experiment and the current best face the same sampled opponents on the same seeds). Code measures the results and adopts or rejects the change. Theory scores are associations (winner/loser patterns), not causal proof; "supported" is not adoption-ready. It never sees the other agents' profiles, plans or notebooks, only who it played and the results.`
+      : `How ${name} learns: it plays the protected baseline below plus the changes its experiments have earned. It changes its play only through experiments: one bounded change at a time, screened in seeded self-play against the current best, then played in alternating games against the human (${FIELD_GAMES_PER_ARM} complete games per arm before a field verdict). Code measures the results and adopts or rejects the change. Theory scores are associations (winner/loser patterns), not causal proof; "supported" is not adoption-ready. Notes may nominate tests but cannot bypass experiment gates.`,
     ``,
     ...(voice.style ? [`Style: ${voice.style}`, ``] : []),
     ...(voice.envelope ? [`Style envelope (every profile is clamped into it): ${voice.envelope}.`, ``] : []),
@@ -553,9 +573,11 @@ function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: Noteb
     ...(snapshots.length ? [`League snapshots (newest first): ${snapshots.slice(-5).reverse().map(item => item.label).join(', ')}`, ``] : []),
     `### Plan of play`,
     ``,
+    `_Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._`,
+    ``,
     memory.plan,
     ``,
-    `### Profile in play (current best)`,
+    `### Profile in play (current best — executable)`,
     ``,
     profileLine(p),
     ``,
@@ -633,12 +655,12 @@ function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: Noteb
 type ModelAdvice = {
   plan?: string;
   notes?: string[];
-  theories?: { id?: string; text?: string; status?: string }[];
-  experiment?: { theoryId?: string; hypothesis?: string; prediction?: string; change?: ProfileChange } | null;
+  theories?: { id?: string; text?: string; status?: string; observation?: string; interpretation?: string; hypothesis?: string; proposedTest?: string }[];
+  experiment?: { theoryId?: string; hypothesis?: string; prediction?: string; observation?: string; change?: ProfileChange } | null;
   cardNotes?: Record<string, string>;
 };
 
-const ADVICE_REPLY = `Reply with a single JSON object: {"plan": string (<= 600 chars: how you will play the current best, and what the running experiment tests), "notes": string[] (0-6 short notebook entries), "theories": [{"id": kebab-case string, "text": string, "status": "proposed"|"retired"}] (only new or retired theories), "experiment": null or {"theoryId": string, "hypothesis": string, "prediction": string, "change": {new absolute values for any of economyUntilCycle, chaosFromCycle, vpFromCycle, handCryptoTarget, minBuyScore, dilution, "weights": {...}, "cardBias": {definitionId: points}}}, "cardNotes": {card or location id: string}}. Propose an experiment only when the task says none is running.`;
+const ADVICE_REPLY = `Reply with a single JSON object: {"plan": string (<= 600 chars: documentary description of how the numeric profile plays; never invent settings the profile lacks), "notes": string[] (0-6 short notebook entries; notes may nominate tests but cannot adopt changes), "theories": [{"id": kebab-case string, "text": string, "status": "proposed"|"retired", "observation"?: string, "interpretation"?: string, "hypothesis"?: string, "proposedTest"?: string}] (only new or retired theories; status supported/refuted is set by code from association counts), "experiment": null or {"theoryId": string, "observation": string (what you saw), "hypothesis": string, "prediction": string (falsifiable: wins/margin vs current best), "change": {new absolute values for any of economyUntilCycle, chaosFromCycle, vpFromCycle, handCryptoTarget, minBuyScore, dilution, "weights": {...}, "cardBias": {definitionId: points}}}, "cardNotes": {card or location id: string}}. Propose an experiment only when the task says none is running, and only with observation + hypothesis + prediction + a bounded change.`;
 const TIPS_REPLY = 'Reply with a single JSON object: {"tips": [{"text": string (<= 200 chars, specific: name cards, Cycles and numbers), "change": {the values in YOUR OWN profile that embody this tip, as absolute values for any of economyUntilCycle, chaosFromCycle, vpFromCycle, handCryptoTarget, minBuyScore, dilution, "weights": {...}, "cardBias": {definitionId: points}}}]}, best tip first.';
 
 function compactCatalog(catalog: Catalog, profile: StrategyProfile): string {
@@ -647,12 +669,31 @@ function compactCatalog(catalog: Catalog, profile: StrategyProfile): string {
   return `CARDS (id | name | pool | cost | power | effect):\n${cards.join('\n')}\n\nLOCATIONS (id | name | rule | read):\n${locations.join('\n')}`;
 }
 
-/** Strat-G reads the game's outcome and economy, not its own per-decision log. */
+/** Compact decision evidence for debriefs: counts and a few notable choices, not the full raw log. */
+function compactDecisions(decisions: MatchReport['decisions'] | undefined) {
+  if (!decisions?.length) return { recorded: false, counts: {}, randomChoices: 0, notableDrafts: [] as string[], notableChoices: [] as string[] };
+  const counts = { deploy: 0, draft: 0, choice: 0, circuit: 0, 'draft-end': 0 };
+  let randomChoices = 0;
+  const notableDrafts: string[] = [], notableChoices: string[] = [];
+  for (const item of decisions) {
+    if (item.kind in counts) counts[item.kind as keyof typeof counts]++;
+    if (item.kind === 'choice' && item.method === 'random') randomChoices++;
+    if (item.kind === 'draft' && notableDrafts.length < 8) {
+      const alts = (item.alternatives ?? []).slice(0, 3).map(alt => `${alt.name}@${alt.score}`).join(', ');
+      notableDrafts.push(`C${item.cycle} bought ${item.bought} (${item.cost}) [${item.phase}]${alts ? `; alts ${alts}` : ''}`);
+    }
+    if (item.kind === 'choice' && notableChoices.length < 6) notableChoices.push(`C${item.cycle} ${item.source}: ${item.picked.join(', ') || '(none)'} (${item.method})`);
+  }
+  return { recorded: true, counts, randomChoices, notableDrafts, notableChoices };
+}
+
+/** Strat-G reads outcome, economy, and a compact decision summary — not the full per-decision log. */
 function reportForModel(report: MatchReport) {
-  const { decisions: _decisions, telemetry, ...rest } = report;
-  if (!telemetry) return rest;
+  const { decisions, telemetry, ...rest } = report;
+  const decisionSummary = compactDecisions(decisions);
+  if (!telemetry) return { ...rest, decisionSummary };
   const { cards: _cards, perCycle: _perCycle, ...totals } = telemetry;
-  return { ...rest, telemetry: totals };
+  return { ...rest, telemetry: totals, decisionSummary };
 }
 
 function memoryForModel(memory: StrategistMemory) {
@@ -664,7 +705,12 @@ function memoryForModel(memory: StrategistMemory) {
     adoptedChanges: memory.experiments.filter(item => item.stage === 'adopted').map(experiment),
     runningExperiment: memory.experiment ? experiment(memory.experiment) : null,
     recentExperiments: memory.experiments.slice(-8).map(experiment),
-    theories: memory.theories.filter(theory => theory.status !== 'retired').map(({ id, text, status, confidence, support, against }) => ({ id, text, status, confidence: round(confidence), support, against })),
+    theories: memory.theories.filter(theory => theory.status !== 'retired').map(({ id, text, status, confidence, support, against, observation, interpretation, hypothesis, proposedTest }) => ({
+      id, text, status, confidence: round(confidence), support, against,
+      associationOnly: true, adoptionReady: false,
+      ...(observation ? { observation } : {}), ...(interpretation ? { interpretation } : {}),
+      ...(hypothesis ? { hypothesis } : {}), ...(proposedTest ? { proposedTest } : {}),
+    })),
     recentNotes: memory.notes.slice(-30).map(note => `${versionLabel(note.version)}: ${note.text}`),
     cardNotes: memory.cardNotes,
     cardStats: memory.cardStats, locationStats: memory.locationStats,
@@ -705,6 +751,16 @@ export function createStrategist(options: StrategistOptions = {}) {
     memory.notes.push({ version: memory.version, at: now(), text });
     if (memory.notes.length > NOTE_LIMIT) memory.notes = memory.notes.slice(-NOTE_LIMIT);
   };
+
+  /** Designer Chat Q&A teaching: append notes and persist. Does not change the profile. */
+  async function recordGuidance(texts: string[]) {
+    const lines = texts.map(text => text.trim()).filter(Boolean).slice(0, 8);
+    if (!lines.length) return;
+    await serialize(async () => {
+      for (const text of lines) note(text.replace(/^(Designer Q&A:\s*)+/i, 'Designer Q&A: ').slice(0, 600));
+      await persist();
+    });
+  }
 
   /** The current best: the baseline with every adopted change applied. */
   function composeProfile(): StrategyProfile {
@@ -762,7 +818,7 @@ export function createStrategist(options: StrategistOptions = {}) {
           temperature: 0.6,
           response_format: { type: 'json_object' },
           messages: [
-            { role: 'system', content: `You are ${name}, ${!identity || identity.id === 'strat-g' ? 'the strategy agent that plays the AI opponent in the card game 0uroboros' : 'a league adversary in the card game 0uroboros: you play AI-vs-AI league games against other agents whose profiles, plans and notes you never see, and sometimes games against the human'}. ${identity && identity.id !== 'strat-g' || leagueMode ? `YOUR STYLE: ${identity?.persona ?? 'balanced'} Every profile you play is clamped into your style envelope (${identity ? describeEnvelope(identity.envelope) : 'none'}), so propose experiments that sharpen this style rather than abandon it. ` : ''}You play from a protected BASELINE (the designer's playbook below) plus the changes your experiments have earned, and you improve it the way a scientist would: observe games, form hypotheses (theories), test one change at a time as an experiment, and document what you learn. You cannot edit the profile directly and you cannot declare a theory supported or refuted: code runs each experiment (${leagueMode ? 'paired league games: the experiment and your current best face the same sampled opponents, past and present, on the same seeds' : 'a seeded self-play trial against your current best, then alternating games against the human'}) and records the measured result. Think about strategies and archetypes, deck-building and deck size, tempo, resource efficiency (Crypto, Actions, cards), what to Draft and when, Node control, the probability of drawing what you need, damage, healing, VP, Circuit Rewards, card synergies, economic trade-offs, short- versus long-term value, and how to adapt to this opponent. Propose experiments that are small, specific and falsifiable, each tied to a theory, with a prediction the code can check (wins or VP/Server margin against the current best). Do not re-propose a change that was already rejected unless something changed (new cards, new evidence). One game is an anecdote; say so rather than over-generalising. Notes must be specific (name cards, Locations, Cycles, numbers) and must not restate the plan. The plan must agree with the profile numbers.\n\nBASELINE PLAYBOOK:\n- ${memory.baseline.playbook.join('\n- ')}\n\nRULES: ${RULES_SUMMARY}\n\nSTARTING DECK: ${catalog.startingDeck?.map(entry => `${entry.count}x ${entry.name}`).join(', ') ?? 'see the catalog'}.\n\n${DECKBUILDING_BASICS}\n\n${LOCATION_GUIDE}\n\n${PROFILE_GUIDE}\n${DECKBUILDING_PROFILE_NOTE}\n\n${replyFormat}` },
+            { role: 'system', content: `You are ${name}, ${!identity || identity.id === 'strat-g' ? 'the strategy agent that plays the AI opponent in the card game 0uroboros' : 'a league adversary in the card game 0uroboros: you play AI-vs-AI league games against other agents whose profiles, plans and notes you never see, and sometimes games against the human'}. ${identity && identity.id !== 'strat-g' || leagueMode ? `YOUR STYLE: ${identity?.persona ?? 'balanced'} Every profile you play is clamped into your style envelope (${identity ? describeEnvelope(identity.envelope) : 'none'}), so propose experiments that sharpen this style rather than abandon it. ` : ''}You play from a protected BASELINE (the designer's playbook below) plus the changes your experiments have earned, and you improve it the way a scientist would: observe games, form hypotheses (theories), test one change at a time as an experiment, and document what you learn. You cannot edit the profile directly and you cannot declare a theory supported or refuted: code runs each experiment (${leagueMode ? 'paired league games: the experiment and your current best face the same sampled opponents, past and present, on the same seeds' : `a seeded self-play trial against your current best, then alternating games against the human (${FIELD_GAMES_PER_ARM} per arm)`}) and records the measured result. Theory confidence from winner/loser tests is an association score, not causal proof; "supported" means the association held often enough — it is not adoption-ready. Adoption happens only through measured experiments. Notes may nominate tests but cannot bypass experiment gates. The numeric profile governs play; plan text is documentary and must agree with the profile numbers — never invent settings the profile lacks. Prefer asking why a strategy works (mechanism) over memorising isolated situations. Think about strategies and archetypes, deck-building and deck size, thinning, deck pollution as attack, tempo, resource efficiency (Crypto, Actions, cards), what to Draft and when, Location concede vs contest, card-order sequencing, Node control, the probability of drawing what you need, damage, healing, VP, Circuit Rewards, card synergies, economic trade-offs, short- versus long-term value, and how to adapt to this opponent. Propose experiments that are small, specific and falsifiable, each with an observation, a hypothesis, a prediction the code can check (wins or VP/Server margin against the current best), and a bounded numeric change. Do not re-propose a change that was already rejected unless something changed (new cards, new evidence). One game is an anecdote; say so rather than over-generalising. Notes must be specific (name cards, Locations, Cycles, numbers) and must not restate the plan.\n\nBASELINE PLAYBOOK:\n- ${memory.baseline.playbook.join('\n- ')}\n\nRULES: ${RULES_SUMMARY}\n\nSTARTING DECK: ${catalog.startingDeck?.map(entry => `${entry.count}x ${entry.name}`).join(', ') ?? 'see the catalog'}.\n\n${DECKBUILDING_BASICS}\n\n${LOCATION_GUIDE}\n\n${PROFILE_GUIDE}\n${DECKBUILDING_PROFILE_NOTE}\n\n${replyFormat}` },
             { role: 'user', content: `${task}\n\n${JSON.stringify(payload)}` },
           ],
         }),
@@ -789,7 +845,19 @@ export function createStrategist(options: StrategistOptions = {}) {
         if (proposal.status === 'retired' && existing.status !== 'retired') { existing.status = 'retired'; existing.updatedBy = memory.version; }
         else if (proposal.text && !existing.test && !existing.support && !existing.against) { existing.text = proposal.text.slice(0, 400); existing.updatedBy = memory.version; }
       } else if (proposal.text && proposal.status !== 'retired' && !memory.theories.some(theory => theory.status !== 'retired' && sameText(theory.text, proposal.text!))) {
-        memory.theories.push({ id, text: proposal.text.slice(0, 400), status: 'proposed', confidence: 0.5, support: 0, against: 0, createdBy: memory.version, updatedBy: memory.version });
+        memory.theories.push({
+          id, text: proposal.text.slice(0, 400), status: 'proposed', confidence: 0.5, support: 0, against: 0, createdBy: memory.version, updatedBy: memory.version,
+          ...(typeof proposal.observation === 'string' ? { observation: proposal.observation.slice(0, 240) } : {}),
+          ...(typeof proposal.interpretation === 'string' ? { interpretation: proposal.interpretation.slice(0, 240) } : {}),
+          ...(typeof proposal.hypothesis === 'string' ? { hypothesis: proposal.hypothesis.slice(0, 240) } : {}),
+          ...(typeof proposal.proposedTest === 'string' ? { proposedTest: proposal.proposedTest.slice(0, 240) } : {}),
+        });
+      }
+      if (existing && existing.status !== 'retired') {
+        if (typeof proposal.observation === 'string') existing.observation = proposal.observation.slice(0, 240);
+        if (typeof proposal.interpretation === 'string') existing.interpretation = proposal.interpretation.slice(0, 240);
+        if (typeof proposal.hypothesis === 'string') existing.hypothesis = proposal.hypothesis.slice(0, 240);
+        if (typeof proposal.proposedTest === 'string') existing.proposedTest = proposal.proposedTest.slice(0, 240);
       }
     }
     const active = memory.theories.filter(theory => theory.status !== 'retired');
@@ -842,11 +910,15 @@ export function createStrategist(options: StrategistOptions = {}) {
   function proposeFromModel(advice: ModelAdvice | null): boolean {
     const proposal = advice?.experiment;
     if (!proposal || typeof proposal.hypothesis !== 'string' || !proposal.hypothesis.trim()) return false;
+    const observation = typeof proposal.observation === 'string' ? proposal.observation.trim() : '';
+    const prediction = typeof proposal.prediction === 'string' ? proposal.prediction.trim() : '';
+    if (!observation) { note(`Model experiment "${proposal.hypothesis.slice(0, 120)}" was skipped: needs a supporting observation.`); return false; }
+    if (prediction.length < 12) { note(`Model experiment "${proposal.hypothesis.slice(0, 120)}" was skipped: needs a falsifiable prediction.`); return false; }
     const change = boundChange(proposal.change);
     if (!change) { note(`Model experiment "${proposal.hypothesis.slice(0, 120)}" was skipped: it would not change the current best.`); return false; }
     if (rejectedRecently(describeChange(memory.profile, change, cardName))) { note(`Model experiment "${proposal.hypothesis.slice(0, 120)}" was skipped: the same change was tested recently.`); return false; }
     const theoryId = typeof proposal.theoryId === 'string' && memory.theories.some(theory => theory.id === slug(proposal.theoryId!) && theory.status !== 'retired') ? slug(proposal.theoryId) : null;
-    createExperiment({ theoryId, supportsTheory: true, hypothesis: proposal.hypothesis.trim().slice(0, 300), prediction: (proposal.prediction ?? 'More wins and a better margin than the current best.').slice(0, 300), change, source: 'model' });
+    createExperiment({ theoryId, supportsTheory: true, hypothesis: proposal.hypothesis.trim().slice(0, 300), prediction: prediction.slice(0, 300), change, source: 'model' });
     return true;
   }
 
@@ -1336,7 +1408,7 @@ export function createStrategist(options: StrategistOptions = {}) {
     const better = score(exp.field.experiment) > score(exp.field.control) || (score(exp.field.experiment) === score(exp.field.control) && margin(exp.field.experiment) >= margin(exp.field.control));
     const line = `${exp.lab ? `${labLine(exp.lab)}; ` : ''}${fieldLine(exp)}`;
     creditTheory(exp, better, fieldLine(exp));
-    conclude(exp, better ? 'adopted' : 'rejected', `${line}. ${better ? 'Adopted into the current best.' : 'Kept the current best.'} (Small sample: the self-play lab carries most of the weight.)`);
+    conclude(exp, better ? 'adopted' : 'rejected', `${line}. ${better ? 'Adopted into the current best.' : 'Kept the current best.'} (Field: ${FIELD_GAMES_PER_ARM} games/arm; league A/B remains the stronger validation path when available. Change applied from profile diff: ${exp.changeSummary}.)`);
     return `This game completed ${exp.id}.`;
   }
 
@@ -1447,7 +1519,7 @@ export function createStrategist(options: StrategistOptions = {}) {
   /** Resolves once queued debriefs and experiment steps have finished (tests and shutdown). */
   const idle = async () => { for (let last: unknown = null; last !== writes;) { last = writes; await writes; } };
 
-  return { get ready() { return start(); }, start, reboot, shareTips, status, snapshot, middleware, brief, observe, debrief, idle, leagueSnapshots, leagueTrialArms, concludeLeagueTrial, memory: () => memory };
+  return { get ready() { return start(); }, start, reboot, shareTips, status, snapshot, middleware, brief, observe, debrief, idle, leagueSnapshots, leagueTrialArms, concludeLeagueTrial, memory: () => memory, recordGuidance };
 }
 
 function deepFreeze<T>(value: T): T {

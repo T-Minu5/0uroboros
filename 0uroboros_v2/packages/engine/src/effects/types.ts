@@ -1,7 +1,7 @@
 import type { Card, CardType, LegacyEffect } from '../game';
 
 /** Where an effect list lives; it decides who "you" is and which targets make sense. */
-export type Scope = 'card' | 'location' | 'locationPlay' | 'locationCondition' | 'circuit';
+export type Scope = 'card' | 'location' | 'locationPlay' | 'locationCondition' | 'circuit' | 'runtimeHack';
 
 /**
  * Whose cards, zones or Servers a step touches, relative to the effect's controller.
@@ -45,6 +45,7 @@ export type ActionId =
   | 'damageServer' | 'repairServer' | 'destroyServer'
   | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'recover' | 'stealCrypto' | 'bump'
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'
+  | 'createHologram' | 'copyPreviousOnReveal'
   | 'choice' | 'random';
 
 export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
@@ -90,6 +91,11 @@ export type EffectStep = {
   resetAfterCycle?: boolean;
   direction?: 'choice' | 'left' | 'right' | 'split';
   flow?: 'either' | 'push' | 'pull';
+  /**
+   * `changePower` only. Negative amount vs an enemy card normally steals (moves Power onto the source).
+   * Set `transfer: false` to remove Power without giving it to the source.
+   */
+  transfer?: boolean;
   prompt?: string;
   options?: readonly ChoiceOption[];
   /** Choice only: how many options are picked and by whom. Defaults to one, picked by the controller. */
@@ -108,6 +114,6 @@ export const isStep = (effect: AnyEffect): effect is EffectStep => typeof (effec
 export function scopedWho(who: 'self' | 'opponent', scope: Scope): Who {
   if (scope === 'location') return who === 'self' ? 'winner' : 'loser';
   if (scope === 'locationPlay') return who === 'self' ? 'played' : 'other';
-  // locationCondition and circuit: you = the seat that met / claimed it.
+  // locationCondition, circuit and runtimeHack: you = the seat that met / claimed / unlocked it.
   return who;
 }

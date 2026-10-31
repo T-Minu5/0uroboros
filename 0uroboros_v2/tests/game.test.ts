@@ -113,7 +113,7 @@ describe("Canonical engine primitives", () => {
     expect(result).toEqual({ servers: { primary: 0, backup: 1500 }, target: "primary", amount: 50, destructionVP: 12 });
     const next = applyServerEffect(result.servers, "drain", 2000);
     expect(next.servers).toEqual({ primary: 0, backup: 0 });
-    expect(next.destructionVP).toBe(20);
+    expect(next.destructionVP).toBe(16);
     expect(applyServerEffect(next.servers, "drain", 100).destructionVP).toBe(0);
     expect(applyServerEffect({ primary: 50, backup: 1500 }, "drain", 100, { primary: 6, backup: 10 }).destructionVP).toBe(6);
   });

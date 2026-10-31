@@ -36,8 +36,12 @@
 .zone-pick{display:grid;gap:4px}
 .zone-inspect{padding:3px 0;border:0;background:none;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#a8b0c4;cursor:pointer}
 .zone-inspect:hover{color:#eaf0f6}
-.zone-drawer footer{display:flex;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid #ffffff14;font-size:12px;color:#a8b0c4}
+.zone-drawer footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;border-top:1px solid #ffffff14;font-size:12px;color:#a8b0c4}
+.zone-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .zone-confirm{padding:9px 18px;border:1px solid #ffd36b;border-radius:6px;background:#ffd36b;color:#1a1408;font-weight:700;cursor:pointer}
 .zone-confirm:disabled{border-color:#ffffff24;background:#ffffff0d;color:#7d8499;cursor:default}
+.zone-decline,.zone-secondary{padding:9px 14px;border:1px solid #ffffff36;border-radius:6px;background:#ffffff0d;color:#eaf0f6;font-weight:600;cursor:pointer}
+.zone-decline:hover,.zone-secondary:hover{background:#ffffff1f}
+.zone-decline{border-color:#ffffff55}
 
 @media (prefers-reduced-motion:reduce){.zone-drawer,.zone-drawer.open,.zone-scrim{transition:none}}

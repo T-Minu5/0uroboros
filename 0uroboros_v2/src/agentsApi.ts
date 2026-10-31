@@ -68,6 +68,11 @@ export type AgentsStatus = {
     paths: { journal: string; reports: string };
   };
   cohort: { running: boolean; kind: 'baseline' | 'evaluation' | null; phase?: 'studying' | 'researching' | 'playing' | null; seedBase: number | null; valid: number; invalid: number; target: number; error: string | null };
+  contentAb: {
+    running: boolean; experimentId: string | null; cardId: string | null;
+    seedIndex: number; seedCount: number; error: string | null;
+    last: { experimentId: string; cardId: string; patchWinRate: number | null; reportId: string | null } | null;
+  };
 };
 /** What a running Eco-Strat cohort is waiting on; the first run on a new build studies and researches before any game. */
 export const cohortPhaseLabel = (phase: AgentsStatus['cohort']['phase']) =>
@@ -140,6 +145,49 @@ export function useAgents(active = true) {
   }, []);
   const update = useCallback((patch: AgentsPatch) => send('/api/agents/settings', 'PUT', patch), [send]);
   const act = useCallback((agent: 'eco-strat' | 'league' | 'mentoring' | 'coaching', action: string) => send(`/api/agents/${agent}/${action}`, 'POST'), [send]);
+  const runContentAb = useCallback((body: { definitionId: string; changes: Record<string, number | boolean | string>; seedCount: number }) =>
+    send('/api/agents/eco-strat/content-ab', 'POST', body), [send]);
 
-  return { status, error, docs, update, act };
+  return { status, error, docs, update, act, runContentAb, chat: chatWithStrat };
+}
+
+export type ChatAudience = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'both' | 'all';
+export type ChatReply = {
+  speaker: 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog';
+  answer: string;
+  questionsForMel: string[];
+  complaints: string[];
+  learned: string[];
+  confidence: string;
+  sources: { id: string; at?: string }[];
+};
+export type ChatResult = { replies: ChatReply[]; model: string | null; error?: string };
+export type ChatHistoryTurn = { role: 'user' | 'assistant'; content: string; speaker?: string };
+
+/** Temporary Chat Q&A tuner; Mel's guidance is written into agent notes / Eco journal. */
+export async function chatWithStrat(audience: ChatAudience, message: string, history: ChatHistoryTurn[] = []): Promise<ChatResult> {
+  const response = await fetch('/api/agents/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ audience, message, history }),
+  });
+  const value = await response.json() as ChatResult & { error?: string };
+  if (!response.ok && !value.replies?.length) throw new Error(value.error ?? `Chat failed (${response.status}).`);
+  return value;
+}
+
+export const CHAT_KICKOFF_MESSAGE = [
+  'Open a temporary designer Q&A tuning session.',
+  'Give your top 3 complaints about the current design (game health, economy, strategy, or your play style goals).',
+  'Ask up to 2 clarifying questions about mechanics or designer intent you are unsure about.',
+  'Be concrete and cite CONTEXT numbers when you have them; say "not recorded" when you do not.',
+].join(' ');
+
+export function formatChatReplyContent(reply: ChatReply): string {
+  const parts = [reply.answer];
+  if (reply.complaints.length) parts.push(`Complaints:\n${reply.complaints.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+  if (reply.questionsForMel.length) parts.push(`Questions for Mel:\n${reply.questionsForMel.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+  if (reply.learned.length) parts.push(`Learned:\n${reply.learned.map((item, i) => `${i + 1}. ${item}`).join('\n')}`);
+  parts.push(`Confidence: ${reply.confidence}`);
+  return parts.join('\n\n');
 }

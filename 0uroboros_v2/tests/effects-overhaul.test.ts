@@ -154,11 +154,11 @@ describe('authoring effects overhaul', () => {
     expect(game3.state.players[0].wallet).toBe(2);
   });
 
-  it('emits No target events with perceptible presentation timing', () => {
+  it('emits unmet pile events with perceptible presentation timing', () => {
     const game = session();
     const events = finish(playCard(game, card('seeker', [{ kind: 'recover' }])));
     const missed = events.find(event => isNoTargetEvent(event));
-    expect(missed).toMatchObject({ text: expect.stringMatching(/No target/i), amount: 0 });
+    expect(missed).toMatchObject({ text: expect.stringMatching(/Shared Trash is empty|No target/i), amount: 0 });
     expect(eventTime(missed!, false)).toBeGreaterThan(0);
   });
 

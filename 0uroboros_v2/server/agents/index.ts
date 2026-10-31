@@ -8,14 +8,17 @@ import type { MatchReport } from '@0uroboros/engine/runtime';
 import { createStrategist, type StratGGameRecord } from '../aiStrategist';
 import { isLocalRequest } from '../contentApi';
 import { runCohort, type SelfPlayHarness } from './cohortRunner';
+import { runContentAbExperiment } from './contentAbRunner';
 import { createEcoStrat } from './ecoStrat';
 import { createEvidenceBus } from './evidence';
 import { createOnlineEvidence } from './onlineEvidence';
 import { createLeague, type LeagueMember } from './league';
+import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 import { coach, coachingTips, combineTips, createCoachingStore, withoutCoaching, type CoachingStore } from './coaching';
 import { baselineTips, createMentoringStore, handOff, TIPS_PER_MENTOR, type MentoringStore } from './mentoring';
 import { DV_8, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from './roster';
 import { createSettingsStore, dv8Active, ecoStratActive, stratGActive, t5Active, vpDogActive } from './settings';
+import { chatWithStrat, isChatAudience, type ChatAudience, type ChatHistoryTurn, type ChatLearnerId, type LearnerChatBundle } from './chat';
 
 /**
  * Wires the agents for the dev server. Whichever agent the human plays publishes the finished game to an
@@ -130,6 +133,44 @@ export function createAgentSystem(options: AgentSystemOptions) {
   type CohortState = { running: boolean; kind: 'baseline' | 'evaluation' | null; phase: 'studying' | 'researching' | 'playing' | null; seedBase: number | null; cohortId: string | null; valid: number; invalid: number; target: number; error: string | null; stop: boolean };
   let cohort: CohortState = { running: false, kind: null, phase: null, seedBase: null, cohortId: null, valid: 0, invalid: 0, target: 0, error: null, stop: false };
 
+  type ContentAbState = {
+    running: boolean; stop: boolean; experimentId: string | null; cardId: string | null;
+    seedIndex: number; seedCount: number; error: string | null;
+    last: { experimentId: string; cardId: string; patchWinRate: number | null; reportId: string | null } | null;
+  };
+  let contentAb: ContentAbState = { running: false, stop: false, experimentId: null, cardId: null, seedIndex: 0, seedCount: 0, error: null, last: null };
+
+  async function runContentAbFromUi(definitionId: string, changes: Partial<AuthoredCard>, seedCount: number) {
+    contentAb = { running: true, stop: false, experimentId: null, cardId: definitionId, seedIndex: 0, seedCount, error: null, last: contentAb.last };
+    try {
+      if (!eco.hasStudied()) await eco.study();
+      if (!eco.hasResearched()) await eco.research();
+      if (contentAb.stop) return;
+      const result = await runContentAbExperiment({
+        eco,
+        harness: () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as unknown as Promise<SelfPlayHarness>,
+        control: readDocument,
+        patch: { definitionId, changes },
+        stratG: await stratGProfile(),
+        seedCount,
+        log: message => log(`content A/B ${message}`),
+        shouldStop: () => contentAb.stop || !ecoStratActive(settings.read()),
+        onProgress: state => { contentAb = { ...contentAb, experimentId: state.experimentId, seedIndex: state.seedIndex, seedCount: state.seedCount }; },
+      });
+      contentAb.last = {
+        experimentId: result.experimentId,
+        cardId: definitionId,
+        patchWinRate: result.ab.patchWinRate,
+        reportId: result.compare?.entry.id ?? null,
+      };
+    } catch (error) {
+      contentAb.error = error instanceof Error ? error.message : String(error);
+      log(`content A/B failed (gameplay unaffected): ${contentAb.error}`);
+    } finally {
+      contentAb = { ...contentAb, running: false, stop: false };
+    }
+  }
+
   /** Strat-G's current profile, read without touching Strat-G: its live snapshot if online, else its saved memory. */
   async function stratGProfile(): Promise<{ profile: StrategyProfile; version: number; mode: string; plan: string }> {
     if (strategist.status().state === 'online') {
@@ -234,6 +275,10 @@ export function createAgentSystem(options: AgentSystemOptions) {
       coaching: { running: coaching.running, error: coaching.error, store: coaching.store, file: rel(coachingStore.file), phases: STRAT_G_PHASES },
       ecoStrat: eco.status(),
       cohort: { running: cohort.running, kind: cohort.kind, phase: cohort.phase, seedBase: cohort.seedBase, cohortId: cohort.cohortId, valid: cohort.valid, invalid: cohort.invalid, target: cohort.target, error: cohort.error },
+      contentAb: {
+        running: contentAb.running, experimentId: contentAb.experimentId, cardId: contentAb.cardId,
+        seedIndex: contentAb.seedIndex, seedCount: contentAb.seedCount, error: contentAb.error, last: contentAb.last,
+      },
     };
   }
 
@@ -299,11 +344,67 @@ export function createAgentSystem(options: AgentSystemOptions) {
           reply(response, 200, status()); return;
         }
         if (!settings.read().agentsEnabled) { reply(response, 409, { error: 'AI agents are switched off.' }); return; }
-        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         if (mentoring.running || coaching.running) { reply(response, 409, { error: 'Wait for the mentoring or coaching hand-off to finish.' }); return; }
         const started = league.run();
         if (!started.ok) { reply(response, 409, { error: started.reason }); return; }
         reply(response, 202, status()); return;
+      }
+      if (path === '/api/agents/chat' && request.method === 'POST') {
+        const payload = await body(request) as { audience?: unknown; message?: unknown; history?: unknown };
+        const audience = payload.audience as ChatAudience;
+        const message = typeof payload.message === 'string' ? payload.message : '';
+        const history = Array.isArray(payload.history) ? payload.history as ChatHistoryTurn[] : [];
+        if (!message.trim()) { reply(response, 400, { error: 'Message is required.' }); return; }
+        if (!isChatAudience(audience)) { reply(response, 400, { error: 'audience must be strat-g, eco-strat, t-5, dv-8, vp-dog, both, or all.' }); return; }
+        await Promise.all([
+          strategist.start().catch(() => undefined),
+          t5.start().catch(() => undefined),
+          dv8.start().catch(() => undefined),
+          vpDog.start().catch(() => undefined),
+          eco.load().catch(() => undefined),
+        ]);
+        const readNotebook = async (root: string) => {
+          try { return await readFile(resolve(root, 'NOTEBOOK.md'), 'utf8'); } catch { return undefined; }
+        };
+        const learner = async (id: ChatLearnerId, agent: typeof strategist, root: string, agentName: string): Promise<[ChatLearnerId, LearnerChatBundle]> => [
+          id,
+          {
+            memory: agent.memory(),
+            notebookExcerpt: await readNotebook(root),
+            agentName,
+            recordGuidance: texts => agent.recordGuidance(texts),
+          },
+        ];
+        const learners = Object.fromEntries(await Promise.all([
+          learner('strat-g', strategist, stratGRoot, 'Strat-G'),
+          learner('t-5', t5, t5Root, 'T-5'),
+          learner('dv-8', dv8, dv8Root, 'DV-8'),
+          learner('vp-dog', vpDog, vpDogRoot, 'VP-Dog'),
+        ])) as Partial<Record<ChatLearnerId, LearnerChatBundle>>;
+        let lastReportMarkdown: string | null = null;
+        const last = eco.journal().reports.at(-1);
+        if (last) {
+          try { lastReportMarkdown = await readFile(resolve(ecoRoot, last.markdown), 'utf8'); } catch { /* missing file */ }
+        }
+        let ecoFacts: import('./chat').EcoChatFacts | null = null;
+        try {
+          const module = await options.loadModule('/packages/engine/src/ai/systemFacts.ts') as { systemFacts: (document: ContentDocument) => object };
+          ecoFacts = module.systemFacts(await readDocument()) as import('./chat').EcoChatFacts;
+        } catch { /* facts optional; chat still answers from journal */ }
+        const result = await chatWithStrat({
+          audience, message, history,
+          learners,
+          eco: {
+            journal: eco.journal(), lastReportMarkdown, facts: ecoFacts,
+            recordGuidance: async texts => { await eco.recordGuidance(texts); },
+            answerQuestions: async (answer, matching) => { await eco.answerQuestions(answer, matching); },
+          },
+          apiKey: strategistKey ?? (env.ECO_STRAT_DISABLE_MODEL ? undefined : env.OPENAI_API_KEY),
+          stratGModel: env.AI_STRATEGIST_MODEL,
+          ecoModel: env.ECO_STRAT_MODEL?.split(',')[0]?.trim(),
+        });
+        reply(response, result.error && !result.replies.length ? 503 : 200, result); return;
       }
       if (path === '/api/agents/mentoring/ask' && request.method === 'POST') {
         const current = settings.read();
@@ -311,7 +412,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
         if (!vpDogActive(current) || !dv8Active(current) || !t5Active(current) || !stratGActive(current)) { reply(response, 409, { error: 'Mentoring needs VP-Dog, DV-8, T-5 and Strat-G switched on.' }); return; }
         if (mentoring.running) { reply(response, 409, { error: 'Mentoring is already running.' }); return; }
         if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
-        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         void runMentoring();
         reply(response, 202, status()); return;
       }
@@ -321,15 +422,28 @@ export function createAgentSystem(options: AgentSystemOptions) {
         if (!stratGActive(current) || !t5Active(current) || !dv8Active(current) || !vpDogActive(current)) { reply(response, 409, { error: 'Coaching needs Strat-G, T-5, DV-8 and VP-Dog switched on.' }); return; }
         if (coaching.running || mentoring.running) { reply(response, 409, { error: 'Wait for the current hand-off to finish.' }); return; }
         if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
-        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         void runCoaching();
+        reply(response, 202, status()); return;
+      }
+      if (path === '/api/agents/eco-strat/content-ab' && request.method === 'POST') {
+        if (!ecoStratActive(settings.read())) { reply(response, 409, { error: 'Eco-Strat is switched off.' }); return; }
+        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the current Eco-Strat run to finish.' }); return; }
+        if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
+        const payload = await body(request) as { definitionId?: string; changes?: Partial<AuthoredCard>; seedCount?: number };
+        const definitionId = typeof payload.definitionId === 'string' ? payload.definitionId.trim() : '';
+        const changes = payload.changes && typeof payload.changes === 'object' ? payload.changes : null;
+        if (!definitionId) { reply(response, 400, { error: 'Pick a card.' }); return; }
+        if (!changes || !Object.keys(changes).length) { reply(response, 400, { error: 'Provide at least one card change (cost, power, …).' }); return; }
+        const seedCount = Math.min(80, Math.max(1, Math.floor(Number(payload.seedCount) || 10)));
+        void runContentAbFromUi(definitionId, changes, seedCount);
         reply(response, 202, status()); return;
       }
       const action = /^\/api\/agents\/eco-strat\/(study|research|baseline|evaluate|report|archive|stop)$/.exec(path)?.[1];
       if (action && request.method === 'POST') {
-        if (action === 'stop') { cohort.stop = true; reply(response, 202, status()); return; }
+        if (action === 'stop') { cohort.stop = true; contentAb.stop = true; reply(response, 202, status()); return; }
         if (!ecoStratActive(settings.read())) { reply(response, 409, { error: 'Eco-Strat is switched off.' }); return; }
-        if (cohort.running && action !== 'report') { reply(response, 409, { error: 'An evaluation cohort is running.' }); return; }
+        if ((cohort.running || contentAb.running) && action !== 'report') { reply(response, 409, { error: 'An evaluation cohort is running.' }); return; }
         if ((action === 'baseline' || action === 'evaluate') && league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
         if (action === 'evaluate' && eco.status().baseline.status !== 'complete') { reply(response, 409, { error: 'Run the baseline for this build first.' }); return; }
         const task = action === 'study' ? eco.study() : action === 'research' ? eco.research() : action === 'report' ? eco.report('manual') : action === 'archive' ? eco.archive() : runEvaluationCohort(action === 'evaluate' ? 'evaluation' : 'baseline');

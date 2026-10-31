@@ -3,10 +3,13 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { DECKBUILDING_BASICS, EARLY_ECONOMY_PLAYBOOK } from './deckbuilding';
 import { isHumanSource, type GameEvidence } from './evidence';
-import { archetypeResults, BLOWOUT_MARGIN, cardDemand, CLOSE_MARGIN, cohortMetrics, gameMetrics, isBlowoutMargin, isCloseMargin, type ArchetypeResults, type CardDemand, type CohortMetrics, type GameMetrics } from './ecoMetrics';
+import { archetypeResults, BLOWOUT_MARGIN, cardDemand, CLOSE_MARGIN, cohortMetrics, gameMetrics, isBlowoutMargin, isCloseMargin, TARGET_BOTH_DESTROYED_RATE, TARGET_CYCLE16_MAX_RATE, TARGET_DESTRUCTION_END_RATE_MAX, TARGET_DESTRUCTION_END_RATE_MIN, type ArchetypeResults, type CardDemand, type CohortMetrics, type GameMetrics } from './ecoMetrics';
+import { enrichDemandWithBudget, focalBudgetRow } from './ecoBudgetJoin';
+import type { ContentAbReport } from '@0uroboros/engine/ai/contentAb';
+import type { BudgetCard } from '@0uroboros/engine/authoring/cardBudget';
 import { LEAGUE_ROSTER } from './roster';
 import {
-  confidenceOf, createGuardedWriter, emptyJournal, hypothesisSections, pointOfViewSections, readJournal, renderJournal, retractCardVerdicts,
+  appendDesignerGuidance, answerOpenQuestions, confidenceOf, createGuardedWriter, emptyJournal, hypothesisSections, pointOfViewSections, readJournal, renderJournal, retractCardVerdicts,
   type Cohort, type Confidence, type Direction, type Hypothesis, type Journal, type PurchaseLine, type Recommendation, type RemovedSource, type ReportEntry, type ResearchSource,
 } from './ecoJournal';
 
@@ -32,7 +35,8 @@ export const DEFAULT_ECO_MODELS = ['gpt-5', 'gpt-4.1', 'gpt-4o'];
 const RULE_SOURCES = ['packages/engine/src/game.ts', 'packages/engine/src/runtime.ts', 'packages/engine/src/evaluationMarket.ts', 'packages/engine/src/content.ts'];
 const STUDY_DOCS = [
   '0uroboros_v3_1_clean_start/02_CANONICAL_GAME_RULES.md', '0uroboros_v3_1_clean_start/03_STARTER_DECK_AND_CARD_SEMANTICS.md',
-  '0uroboros_v3_1_clean_start/05_DRAFT_REWARDS_ZONES_ENDGAME.md', '0uroboros_v3_1_clean_start/07_UX_PRODUCT_CONTRACT.md',
+  '0uroboros_v3_1_clean_start/04_RUNTIME_REVEAL_PROBABILITY_COLLAPSE.md', '0uroboros_v3_1_clean_start/05_DRAFT_REWARDS_ZONES_ENDGAME.md',
+  '0uroboros_v3_1_clean_start/07_UX_PRODUCT_CONTRACT.md',
   'docs/USER_DECISIONS.md', 'docs/CIRCUIT_CONTROL_REVISION.md', 'docs/STRATEGIC_EVALUATION.md',
 ];
 const MAX_RECOMMENDATIONS = 5;
@@ -59,8 +63,10 @@ function bothServersIntegrity(facts: Facts | null): number | null {
   return typeof rules?.primaryServer === 'number' && typeof rules?.backupServer === 'number' ? rules.primaryServer + rules.backupServer : null;
 }
 export const DESIGN_GOALS = [
-  `Most games should end by Server destruction, usually between Cycles ${T.endCycles[0]} and ${T.endCycles[1]}.`,
-  `Final scores should be close: a narrow winner–loser VP margin (${CLOSE_MARGIN} VP or less is close, ${BLOWOUT_MARGIN} VP or more is a blowout), even when a game ends by destruction.`,
+  `Across a large sample, ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}% of games should end by Server destruction (usually between Cycles ${T.endCycles[0]} and ${T.endCycles[1]}); at most ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}% should reach the full 16 Cycles — enough trade-off that destruction is common and decisive, without every game ending that way.`,
+  `Across a large sample, more than ${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}% of games should see both players destroy at least one opposing Server by the end.`,
+  `Track how often the winner did not destroy both enemy Servers (one Server plus enough other VP, or a pure VP win): that path should remain viable when the race is contested.`,
+  `Final scores: a margin under ${CLOSE_MARGIN} VP is a Close Game, over ${BLOWOUT_MARGIN} VP is a Blowout, and ${CLOSE_MARGIN}–${BLOWOUT_MARGIN} VP inclusive is a normal competitive outcome — even when a game ends by destruction.`,
   `A pure aggression deck should be able to destroy both enemy Servers by Cycles ${T.damageCycles[0]}-${T.damageCycles[1]}. The goal of aggression is Server destruction, not a damage number: the damage that takes is both Servers' full integrity in the current rules (rules.primaryServer + rules.backupServer), which the designer may rebalance, plus whatever the opponent Restores.`,
   `A pure economy deck should be able to buy about ${T.vpBought} or more VP from the market by Cycles ${T.vpBoughtCycles[0]}-${T.vpBoughtCycles[1]}.`,
   'A balanced deck should read its opponent and adapt: against aggression it should have more VP when the aggressor ends the game, and against economy it should destroy the Servers before more VP can be bought.',
@@ -72,7 +78,16 @@ const AGENT_NAMES: Record<string, string> = Object.fromEntries(LEAGUE_ROSTER.map
 /** The agent the human played; games recorded before the opponent could be picked were all against Strat-G. */
 const humanOpponent = (evidence: Pick<GameEvidence, 'source' | 'agent'>) => evidence.agent ?? (evidence.source === 'human-vs-strat-g' ? 'strat-g' : null);
 
-type Facts = { rules?: unknown; market?: unknown; startingDeck?: { name: string; count: number }[]; cards?: { id: string; name: string; pool: string; cost: number; vp?: number }[]; locations?: { id: string; name: string; rule: string; read?: string }[]; circuitRewards?: { id: string; name: string; text: string }[] };
+type Facts = {
+  rules?: Record<string, string | number>;
+  configurable?: { id: string; surface: string; label: string; default: string | number | boolean; cohortDefault: string | number | boolean; notes: string }[];
+  market?: unknown;
+  startingDeck?: { name: string; count: number }[];
+  cards?: { id: string; name: string; pool: string; cost: number; vp?: number }[];
+  locations?: { id: string; name: string; rule: string; read?: string }[];
+  circuitRewards?: { id: string; name: string; text: string }[];
+  mods?: { id: string; name: string; text: string; kind?: string }[];
+};
 export type EcoStratOptions = {
   /** Eco-Strat's own folder; the only place it writes. */
   root: string;
@@ -120,7 +135,7 @@ const FOUNDING: { id: string; topic: string; statement: string; test: FoundingTe
     test: m => { const left = (m.economy.walletLeftAtDraftEnd[0] + m.economy.walletLeftAtDraftEnd[1]) / 2; return left >= 3 ? { direction: 'for', note: `average ${left.toFixed(1)} Crypto left when Drafts ended` } : left <= 1 ? { direction: 'against', note: `average ${left.toFixed(1)} Crypto left` } : { direction: 'neutral', note: `average ${left.toFixed(1)} Crypto left` }; } },
   { id: 'purchase-convergence', topic: 'Strategic diversity', statement: 'Both seats converge on the same purchases, suggesting one dominant line.',
     test: m => m.purchaseSimilarity >= 0.5 ? { direction: 'for', note: `same-game purchase overlap ${Math.round(m.purchaseSimilarity * 100)}%` } : m.purchaseSimilarity <= 0.25 ? { direction: 'against', note: `overlap ${Math.round(m.purchaseSimilarity * 100)}%` } : { direction: 'neutral', note: `overlap ${Math.round(m.purchaseSimilarity * 100)}%` } },
-  { id: 'narrow-margins', topic: 'Final scores', statement: `Final scores are usually close: the winner leads by ${CLOSE_MARGIN} VP or less, even when a game ends by Server destruction.`,
+  { id: 'narrow-margins', topic: 'Final scores', statement: `Final scores are usually close: the winner leads by under ${CLOSE_MARGIN} VP, even when a game ends by Server destruction.`,
     test: m => { const note = `final VP ${m.finalVP[0]}-${m.finalVP[1]}, margin ${m.vpMargin}${m.endedBy === 'destruction' ? ' (Server destruction)' : ''}`; return isCloseMargin(m.vpMargin) ? { direction: 'for', note } : isBlowoutMargin(m.vpMargin) ? { direction: 'against', note } : { direction: 'neutral', note }; } },
 ];
 
@@ -292,7 +307,7 @@ export function createEcoStrat(options: EcoStratOptions) {
     return null;
   }
 
-  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? All numbers you receive were computed by deterministic code; do not recompute or invent numbers, cite the ones given. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. ${DECKBUILDING_BASICS} Shared early economy every AI player is taught (Cycles 1-4): ${EARLY_ECONOMY_PLAYBOOK.join(' ')} Use these basics to judge deck-building play: an AI that skips the early Kilo/Mega line, never trashes Basic Encryption and Shyte in that order, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
+  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? The FACTS object is the implemented game extracted from running code: facts.rules (how Cycles, Actions, Drain/Restore, Collapse, Locations, Circuit Rewards, Draft, zones, mods/holograms and VP scoring work), facts.configurable (every piece Mel can change today — Configure UI, Content Studio, or code constants — with defaults and what cohorts assume), facts.market, facts.cards, facts.locations, facts.circuitRewards, facts.mods and facts.startingDeck. Treat FACTS as authoritative for rules and for what is tunable; design docs may be stale — where they disagree, FACTS win. Before recommending a change, name which configurable id or content piece it targets and stay within those surfaces (do not invent knobs that are not listed). Read setup flags (midCycleDraw, draftCrypto, noLocations, noTrailingRewards, serverVP) before assuming Crypto shelves, mid-cycle draws, Locations or trailing Circuit Rewards are in play. All measured numbers were computed by deterministic code; do not recompute or invent numbers, cite the ones given. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. Distinguish healthy strategic skill from systemic imbalance: a player who thins a weak starting deck, pollutes the opponent with Shyte-Coins or Glitches, intentionally concedes a bad Location, sequences card effects well, or builds a coherent Draft plan is using legitimate skill — do not treat those advantages as balance bugs. Flag systemic imbalance only when one line dominates across many games, strategies, and seats (for example one card, Location, Circuit Reward, Draft slot, cost band, or first-player advantage that repeatedly produces blowouts or prevents Server destruction). Prefer small, testable candidate proposals over large batches; never recommend a change from a few unusual games. ${DECKBUILDING_BASICS} Shared early economy every AI player is taught (Cycles 1-4): ${EARLY_ECONOMY_PLAYBOOK.join(' ')} Use these basics to judge deck-building play: an AI that skips the early Kilo/Mega line, never trashes Basic Encryption and Shyte in that order, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
 
   async function study() {
     return serialize(async () => {
@@ -304,7 +319,7 @@ export function createEcoStrat(options: EcoStratOptions) {
           try { docs.push({ file, excerpt: (await readFile(join(options.projectRoot, file), 'utf8')).slice(0, 6000) }); }
           catch { docs.push({ file, excerpt: '(missing)' }); }
         }
-        const advice = await askModel(`${ROLE}\n\nTask: study the implemented game before observing any games. The FACTS were extracted from the running code and are authoritative; the DOCS are design documents that may be stale. Where they disagree, the code wins: list each disagreement you can see. Reply as {"summary": string (<=900 chars), "economyModel": string[] (resources, sources, sinks, conversions and their rates; <=10), "risks": string[] (economic or balance risks you expect to test; <=8), "docDiscrepancies": string[] (<=10), "hypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars)}] (<=6 testable hypotheses), "questions": string[] (<=6)}.`,
+        const advice = await askModel(`${ROLE}\n\nTask: study the implemented game before observing any games. The FACTS were extracted from the running code and are authoritative (especially facts.rules and facts.configurable); the DOCS are design documents that may be stale. Where they disagree, FACTS win: list each disagreement you can see. In summary and economyModel, show you understand the Cycle loop, Drain/Restore vs Server integrity, Collapse/Circuit, Draft Crypto rules, and which knobs are Configure vs Content Studio vs code constants. Reply as {"summary": string (<=900 chars), "economyModel": string[] (resources, sources, sinks, conversions and their rates; <=10), "risks": string[] (economic or balance risks you expect to test; <=8), "docDiscrepancies": string[] (<=10), "hypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars)}] (<=6 testable hypotheses), "questions": string[] (<=6)}.`,
           { facts, docs }, 'medium', 240_000);
         const cards = facts.cards ?? [];
         journal.study = advice ? {
@@ -312,8 +327,12 @@ export function createEcoStrat(options: EcoStratOptions) {
           economyModel: strings(advice.data.economyModel, 10), risks: strings(advice.data.risks, 8), docDiscrepancies: strings(advice.data.docDiscrepancies, 10),
         } : {
           buildId: build!.id, at: now(), mode: 'deterministic', model: null,
-          summary: `Catalog: ${cards.length} cards (${['Base', 'Chaos', 'VP', 'Crypto'].map(pool => `${cards.filter(card => card.pool === pool).length} ${pool}`).join(', ')}), ${facts.locations?.length ?? 0} Locations, ${facts.circuitRewards?.length ?? 0} Circuit Rewards. Starting deck: ${(facts.startingDeck ?? []).map(entry => `${entry.count}× ${entry.name}`).join(', ')}. No model was available, so this study is the extracted facts only.`,
-          economyModel: [], risks: [], docDiscrepancies: [],
+          summary: `Catalog: ${cards.length} cards (${['Base', 'Chaos', 'VP', 'Crypto'].map(pool => `${cards.filter(card => card.pool === pool).length} ${pool}`).join(', ')}), ${facts.locations?.length ?? 0} Locations, ${facts.circuitRewards?.length ?? 0} Circuit Rewards, ${facts.mods?.length ?? 0} mods. Starting deck: ${(facts.startingDeck ?? []).map(entry => `${entry.count}× ${entry.name}`).join(', ') || 'none'}. Configurable surfaces: ${(facts.configurable ?? []).map(item => item.id).join(', ') || 'none listed'}. Servers ${bothServersIntegrity(facts) ?? FALLBACK_SERVER_INTEGRITY} integrity; destruction VP from facts.rules. No model was available, so this study is the extracted facts only.`,
+          economyModel: [
+            'Wallet Crypto from Character effects (+ optional Draft Crypto shelf when draftCrypto is on); Wallet resets each Cycle',
+            'Drain damages Primary then Backup; destroy awards Configure serverVP; both Servers lost ends the game',
+            'VP = destruction + printed card VP in active zones + Location/Circuit/effect rewards',
+          ], risks: [], docDiscrepancies: [],
         };
         if (advice) {
           for (const proposal of Array.isArray(advice.data.hypotheses) ? advice.data.hypotheses.slice(0, 6) : []) addHypothesis(proposal, 'study');
@@ -634,7 +653,7 @@ Reply as one JSON object:
  "newHypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars stating a general, testable rule; no single-game numbers)}] (<=3),
  "questions": string[] (<=3)}
 
-Final scores: metrics.vp.margins splits games into close (margin of ${CLOSE_MARGIN} VP or less), competitive and blowouts (${BLOWOUT_MARGIN} VP or more), overall and by how the game ended; metrics.vp.winnerLead says how much of the winner's lead came from destroying Servers versus every other VP source, and bothDestroyed counts games where each player destroyed at least one enemy Server. Use these to explain why margins are wide or narrow and what would close them without making destruction endings rare. metrics.cycles.destructionEnd says in which Cycle destruction endings came.
+Final scores: metrics.vp.margins splits games into close (margin under ${CLOSE_MARGIN} VP), mid (${CLOSE_MARGIN}–${BLOWOUT_MARGIN} VP inclusive) and blowouts (over ${BLOWOUT_MARGIN} VP), overall and by how the game ended; metrics.vp.winnerLead says how much of the winner's lead came from destroying Servers versus every other VP source, and bothDestroyed counts games where each player destroyed at least one enemy Server (target more than ${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%). Destruction endings should land in ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}% (Cycle 16 at most ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}%). metrics.vp.winnerKill reports how often the winner destroyed both enemy Servers versus winning without a full kill (one Server + other VP, or no Servers). metrics.vpSources splits final VP into destructionVp, marketVp (printed VP on bought VP cards) and otherVp; use it when separating Server-kill scoring from market VP. metrics.timeline rows carry per-cycle locationsWon, cumulative circuitClaims and circuitDifferential (seat0−seat1). metrics.snowball.circuitLead2Plus tests whether a 2+ Circuit-claim lead snowballs (kept lead, later Circuits/Locations, game win). Use these to explain why margins are wide or narrow and what would close them without pushing destruction endings outside the band. metrics.cycles.destructionEnd says in which Cycle destruction endings came.
 
 Archetypes: ${archetypes ? `archetypes holds ${archetypes.games} league games by the deck archetype in each seat (Balanced, Pure aggression, Engine, Pure economy; each is an AI agent held to that style): win rates, head-to-head records, how often and by which Cycle each destroyed both enemy Servers (the pure aggression goal), how many games each dealt ${integrity} total Server damage (both Servers' full integrity on this build; the designer may change it, so judge aggression by destruction and treat the number only as the current size of the job) and bought ${T.vpBought} VP from the market, and how often it destroyed both Servers yet lost on VP. Judge the archetype goals from these numbers, and when one archetype misses its timing, look for the economy or timing cause (prices, Drain per cost, VP pile values, Restore) rather than blaming the agent. A missed target can also be an AI limitation: say which you think it is.` : 'there are no league games on this build, so the archetype goals cannot be measured yet: say so in their verdicts.'}
 
@@ -719,13 +738,19 @@ Point of view: your own considered view of how a deck-building economy should wo
       ['How games end', `${m.endedBy.destruction} by Server destruction, ${m.endedBy.cycle16} at Cycle 16${m.endedBy.other ? `, ${m.endedBy.other} another way` : ''}`],
       ['Length', `${m.cycles.avg} Cycles on average (${m.cycles.min}–${m.cycles.max}); the first Server falls around Cycle ${m.damage.avgFirstDestructionCycle || 'n/a'}`],
       ['Final score', `winners ${m.vp.avgWinner} VP, losers ${m.vp.avgLoser} VP on average; margin ${m.vp.margins.avgMargin} on average (median ${m.vp.margins.medianMargin})`],
-      ['Close vs blowout', `${m.vp.margins.close} close (≤${CLOSE_MARGIN} VP), ${m.vp.margins.competitive} in between, ${m.vp.margins.blowout} blowouts (≥${BLOWOUT_MARGIN} VP)`],
+      ['Close vs blowout', `${m.vp.margins.close} close (<${CLOSE_MARGIN} VP), ${m.vp.margins.competitive} mid (${CLOSE_MARGIN}–${BLOWOUT_MARGIN} VP), ${m.vp.margins.blowout} blowouts (>${BLOWOUT_MARGIN} VP)`],
+      ['Destruction targets', `${pct(m.games ? m.endedBy.destruction / m.games : null)} ended by Server destruction (target ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}%); ${pct(m.games ? m.endedBy.cycle16 / m.games : null)} reached Cycle 16 (cap ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}%); both players destroyed a Server in ${m.vp.bothDestroyed} of ${m.games} (${pct(m.games ? m.vp.bothDestroyed / m.games : null)}, target >${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%)`],
+      ['Winner without full kill', `${m.vp.winnerKill.didNotDestroyBothServers} of ${m.vp.winnerKill.games} decisive games (${pct(m.vp.winnerKill.didNotDestroyBothServersShare)}) the winner did not destroy both enemy Servers (${m.vp.winnerKill.destroyedOneServer} destroyed one, ${m.vp.winnerKill.destroyedNoServers} destroyed none; ${m.vp.winnerKill.destroyedBothServers} full kills)`],
       ['Seat balance', `${m.seatWins[0]}–${m.seatWins[1]}${m.ties ? `, ${m.ties} tied` : ''}`],
       ['Spending per seat', `${m.economy.avgPurchasesPerSeat} cards for ${m.economy.avgSpentPerSeat} Crypto; ${m.economy.avgWalletLeftAtDraftEnd} Crypto left unspent per Draft`],
       ['Draft budget', `Cycles 1–4: ${m.economy.avgWallet.cycles1to4}, 5–10: ${m.economy.avgWallet.cycles5to10}, 11–16: ${m.economy.avgWallet.cycles11to16} Crypto`],
       ['What gets bought', Object.entries(m.economy.categoryShare).sort((x, y) => y[1] - x[1]).map(([key, value]) => `${key} ${pct(value)}`).join(' · ')],
       ['Damage vs healing', `healing equals ${pct(m.damage.restoreToDrain)} of Drain dealt; ${pct(m.damage.wastedRestoreRate)} of heals were wasted; the winner dealt more Drain in ${pct(m.damage.winnerDrainedMore.rate)} of games`],
       ['Snowballing', `the Cycle 8 VP leader won ${pct(m.snowball.vpLeaderWins.at8.rate)}; ${m.snowball.avgLeadChanges} lead changes per game; ${m.snowball.comebacks5vp} comebacks from 5+ VP down`],
+      ['Circuit lead snowball', m.snowball.circuitLead2Plus.seats
+        ? `a 2+ Circuit lead appeared in ${m.snowball.circuitLead2Plus.games} games (avg Cycle ${m.snowball.circuitLead2Plus.avgCycleReached}); afterward the leader kept the lead ${pct(m.snowball.circuitLead2Plus.keptCircuitLead)}, claimed more Circuits ${pct(m.snowball.circuitLead2Plus.gainedMoreCircuitsAfter)}, won more Locations ${pct(m.snowball.circuitLead2Plus.wonMoreLocationsAfter)}, and won the game ${pct(m.snowball.circuitLead2Plus.leaderWonGame)}`
+        : 'no seat reached a 2+ Circuit-claim lead in this sample'],
+      ['VP sources', `per seat avg destruction ${m.vpSources.avgDestructionVp} VP, market (bought VP cards) ${m.vpSources.avgMarketVp} VP, other ${m.vpSources.avgOtherVp} VP; market is ${pct(m.vpSources.marketShare)} of all VP, destruction ${pct(m.vpSources.destructionShare)}`],
       ['Locations', `the player who won more Locations won the game ${pct(m.locations.winnerWonMoreLocations.rate)} of the time`],
       ['Circuit Rewards', `${m.circuit.claimsPerGame} claims per game; the player who claimed more won ${pct(m.circuit.winnerClaimedMore.rate)}`],
       ['Variety', `${m.diversity.distinctCardsBought} different cards bought; the top three were ${pct(m.diversity.topThreeShare)} of purchases`],
@@ -745,11 +770,13 @@ Point of view: your own considered view of how a deck-building economy should wo
     const aggressionGap = middleRate !== null && aggression?.winRate != null ? Math.round((middleRate - aggression.winRate) * 100) : null;
     const ends = m.cycles.destructionEnd;
     const goals: [string, string, string[]][] = [
-      [`Most games end by Server destruction, in Cycles ${T.endCycles[0]}–${T.endCycles[1]}`, `${m.endedBy.destruction} of ${m.games} games (${pct(m.games ? m.endedBy.destruction / m.games : null)}) ended by Server destruction; the first Server fell around Cycle ${m.damage.avgFirstDestructionCycle || 'n/a'}.${ends.games ? ` ${ends.cycles11to14} of those ${ends.games} ended in Cycles ${T.endCycles[0]}–${T.endCycles[1]} and ${ends.before11} earlier (average Cycle ${ends.avg}).` : ''}`, []],
-      ['Close final scores, narrow margins', `${margins.close} of ${margins.games} games were close (${pct(margins.closeShare)}) and ${margins.blowout} were blowouts (${pct(margins.blowoutShare)}); average margin ${margins.avgMargin} VP, median ${margins.medianMargin}.`, [
+      [`${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}% end by Server destruction (≤${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}% Cycle 16)`, `${m.endedBy.destruction} of ${m.games} games (${pct(m.games ? m.endedBy.destruction / m.games : null)}) ended by Server destruction (target ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}%); ${m.endedBy.cycle16} (${pct(m.games ? m.endedBy.cycle16 / m.games : null)}) reached Cycle 16 (cap ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}%). The first Server fell around Cycle ${m.damage.avgFirstDestructionCycle || 'n/a'}.${ends.games ? ` ${ends.cycles11to14} of those ${ends.games} destruction endings landed in Cycles ${T.endCycles[0]}–${T.endCycles[1]} and ${ends.before11} earlier (average Cycle ${ends.avg}).` : ''}`, []],
+      [`>${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}% of games: both players destroy at least one opposing Server`, `Both players destroyed a Server in ${m.vp.bothDestroyed} of ${m.games} games (${pct(m.games ? m.vp.bothDestroyed / m.games : null)}; target >${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%).`, []],
+      ['Winner without destroying both Servers', `${m.vp.winnerKill.didNotDestroyBothServers} of ${m.vp.winnerKill.games} decisive games (${pct(m.vp.winnerKill.didNotDestroyBothServersShare)}) the winner did not destroy both enemy Servers — ${m.vp.winnerKill.destroyedOneServer} with one Server destroyed, ${m.vp.winnerKill.destroyedNoServers} with none (${m.vp.winnerKill.destroyedBothServers} full kills, ${pct(m.vp.winnerKill.destroyedBothServersShare)}).`, []],
+      [`Close (<${CLOSE_MARGIN} VP), mid (${CLOSE_MARGIN}–${BLOWOUT_MARGIN}), blowout (>${BLOWOUT_MARGIN})`, `${margins.close} of ${margins.games} games were close (${pct(margins.closeShare)}) and ${margins.blowout} were blowouts (${pct(margins.blowoutShare)}); average margin ${margins.avgMargin} VP, median ${margins.medianMargin}.`, [
         ...(endings.destruction.games ? [`Games ended by destruction: ${endings.destruction.games}, average margin ${endings.destruction.avgMargin} VP, ${endings.destruction.close} close, ${endings.destruction.blowout} blowouts.`] : []),
         ...(endings.cycle16.games ? [`Games that reached Cycle 16: ${endings.cycle16.games}, average margin ${endings.cycle16.avgMargin} VP, ${endings.cycle16.close} close, ${endings.cycle16.blowout} blowouts.`] : []),
-        `Where the winner's lead came from: ${m.vp.winnerLead.fromDestruction} VP from destroying Servers, ${m.vp.winnerLead.fromOther} VP from everything else (on average). Both players destroyed a Server in ${m.vp.bothDestroyed} of ${m.games} games.`,
+        `Where the winner's lead came from: ${m.vp.winnerLead.fromDestruction} VP from destroying Servers, ${m.vp.winnerLead.fromOther} VP from everything else (on average).`,
       ]],
       [`Pure aggression destroys both Servers by Cycles ${T.damageCycles[0]}–${T.damageCycles[1]}`, aggression && arch
         ? `The pure aggression deck destroyed both Servers in ${aggression.destroyedBothServers.games} of ${aggression.games} games${by(aggression.destroyedBothServers)} and still lost on VP in ${aggression.lostAfterDestroyingBoth} of them. It dealt ${aggression.avgDrainDealt} Server damage per game on average and reached ${arch.targets.damage.toLocaleString('en-US')} (both Servers' full integrity on this build) in ${aggression.reachedDamageTarget.games} games${by(aggression.reachedDamageTarget)}.`
@@ -839,10 +866,16 @@ Point of view: your own considered view of how a deck-building economy should wo
     ].join('\n');
   }
 
-  async function beginCohort(input: { kind: Cohort['kind']; target: number; seeds: number[]; strategyHash: string; strategyVersion: string }) {
+  async function beginCohort(input: { kind: Cohort['kind']; target: number; seeds: number[]; strategyHash: string; strategyVersion: string; arm?: Cohort['arm'] }) {
     return serialize(async () => {
       await load(); await refreshBuild();
-      const cohort: Cohort = { id: `${input.kind}-${build!.id}-${journal.cohorts.length + 1}`, kind: input.kind, buildId: build!.id, startedAt: now(), target: input.target, seeds: [], strategyHash: input.strategyHash, strategyVersion: input.strategyVersion, status: 'running', validGames: [], invalid: [] };
+      const cohort: Cohort = {
+        id: `${input.kind}-${build!.id}-${journal.cohorts.length + 1}`,
+        kind: input.kind, buildId: build!.id, startedAt: now(), target: input.target, seeds: [],
+        strategyHash: input.strategyHash, strategyVersion: input.strategyVersion, status: 'running',
+        validGames: [], invalid: [],
+        ...(input.arm ? { arm: input.arm } : {}),
+      };
       journal.cohorts.push(cohort);
       await save();
       return cohort.id;
@@ -899,8 +932,131 @@ Point of view: your own considered view of how a deck-building economy should wo
     };
   }
 
+  /** Persist Mel's Chat Q&A teaching into the journal (does not apply balance changes). */
+  async function recordGuidance(texts: string[]) {
+    return serialize(async () => {
+      await load();
+      if (!appendDesignerGuidance(journal, texts, now())) return 0;
+      await save();
+      return texts.length;
+    });
+  }
+
+  /** Mark open journal questions answered from Mel's chat reply. */
+  async function answerQuestions(answer: string, matchingTexts?: string[]) {
+    return serialize(async () => {
+      await load();
+      const count = answerOpenQuestions(journal, answer, matchingTexts, now());
+      if (count) await save();
+      return count;
+    });
+  }
+
+  /**
+   * Content A/B arm compare: metrics + cardDemand for control vs patch cohorts, joined with
+   * cardBudget E for the focal card. Writes reports/{id}.md + .json; does not call the model.
+   */
+  async function reportArmCompare(input: {
+    experimentId: string;
+    controlCohortId: string;
+    patchCohortId: string;
+    cardId: string;
+    ab: ContentAbReport;
+    catalogCards: readonly BudgetCard[];
+  }) {
+    return serialize(async () => {
+      await load(); await refreshBuild();
+      const controlCohort = journal.cohorts.find(item => item.id === input.controlCohortId);
+      const patchCohort = journal.cohorts.find(item => item.id === input.patchCohortId);
+      if (!controlCohort || !patchCohort) throw new Error('arm compare: missing cohort');
+      const controlGames = await loadGames(controlCohort.validGames);
+      const patchGames = await loadGames(patchCohort.validGames);
+      const controlMetrics = cohortMetrics(controlGames.map(game => ({ id: game.id, report: game.evidence.report })));
+      const patchMetrics = cohortMetrics(patchGames.map(game => ({ id: game.id, report: game.evidence.report })));
+      const catalog = input.catalogCards.map(card => ({
+        id: card.definitionId ?? card.id,
+        name: card.name,
+        cost: card.cost ?? 0,
+        pool: (card as { pool?: string }).pool ?? card.type ?? 'Base',
+      }));
+      const controlDemand = cardDemand(controlGames.map(game => ({ id: game.id, report: game.evidence.report })), catalog);
+      const patchDemand = cardDemand(patchGames.map(game => ({ id: game.id, report: game.evidence.report })), catalog);
+      const seatWinRate = controlMetrics.games
+        ? (controlMetrics.seatWins[0] + controlMetrics.seatWins[1]) / (2 * Math.max(1, controlMetrics.decisive))
+        : 0.5;
+      const controlBudget = enrichDemandWithBudget(input.catalogCards, controlDemand, seatWinRate || 0.5);
+      const patchBudget = enrichDemandWithBudget(input.catalogCards, patchDemand, seatWinRate || 0.5);
+      const focalControl = focalBudgetRow(controlBudget, input.cardId);
+      const focalPatch = focalBudgetRow(patchBudget, input.cardId);
+      const pct = (value: number | null) => value === null ? 'n/a' : `${Math.round(value * 100)}%`;
+      const id = `${now().slice(0, 10)}-ab-${input.experimentId}`.replace(/[^a-zA-Z0-9._-]+/g, '-').slice(0, 80);
+      const arms = {
+        experimentId: input.experimentId,
+        cardId: input.cardId,
+        control: {
+          cohortId: controlCohort.id,
+          metrics: controlMetrics,
+          demand: controlDemand,
+          ab: input.ab.control,
+          focal: focalControl,
+        },
+        patch: {
+          cohortId: patchCohort.id,
+          metrics: patchMetrics,
+          demand: patchDemand,
+          ab: input.ab.patch,
+          focal: focalPatch,
+        },
+        patchWinRate: input.ab.patchWinRate,
+        pairedDecided: input.ab.pairedDecided,
+        meanMarginDelta: Math.round((input.ab.patch.meanMargin - input.ab.control.meanMargin) * 10) / 10,
+        disagreements: [...new Set([...controlBudget, ...patchBudget].filter(row => row.flag).map(row => ({ id: row.definitionId, name: row.name, flag: row.flag })))],
+      };
+      const markdown = [
+        `# Content A/B · ${input.cardId}`,
+        '',
+        `Experiment \`${input.experimentId}\` · ${input.ab.seeds.length} paired seeds · patch win rate ${pct(input.ab.patchWinRate)} (${input.ab.pairedDecided} decided pairs).`,
+        '',
+        '## Arm comparison',
+        '',
+        `| Arm | Valid | Seat0 wins | Mean margin | Both destroyed ≥1 enemy Server |`,
+        `| --- | ---: | ---: | ---: | ---: |`,
+        `| Control | ${controlMetrics.games} | ${controlMetrics.seatWins[0]} | ${input.ab.control.meanMargin} | ${controlMetrics.vp.bothDestroyed} (${pct(controlMetrics.games ? controlMetrics.vp.bothDestroyed / controlMetrics.games : null)}; floor >${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%) |`,
+        `| Patch | ${patchMetrics.games} | ${patchMetrics.seatWins[0]} | ${input.ab.patch.meanMargin} | ${patchMetrics.vp.bothDestroyed} (${pct(patchMetrics.games ? patchMetrics.vp.bothDestroyed / patchMetrics.games : null)}) |`,
+        '',
+        `Mean margin Δ (patch − control): **${arms.meanMarginDelta}**.`,
+        '',
+        '## Focal card vs budget',
+        '',
+        focalControl || focalPatch
+          ? [
+            `| Arm | E | Band | Soft | Pick rate | Buyer win | Win Δ | Flag |`,
+            `| --- | ---: | --- | ---: | ---: | ---: | ---: | --- |`,
+            focalControl ? `| Control | ${focalControl.efficiency} | ${focalControl.band} | ${focalControl.softCount} | ${pct(focalControl.pickRate)} | ${pct(focalControl.buyerWinRate)} | ${focalControl.winDelta ?? 'n/a'} | ${focalControl.flag ?? '—'} |` : '| Control | — | — | — | — | — | — | — |',
+            focalPatch ? `| Patch | ${focalPatch.efficiency} | ${focalPatch.band} | ${focalPatch.softCount} | ${pct(focalPatch.pickRate)} | ${pct(focalPatch.buyerWinRate)} | ${focalPatch.winDelta ?? 'n/a'} | ${focalPatch.flag ?? '—'} |` : '| Patch | — | — | — | — | — | — | — |',
+          ].join('\n')
+          : `_Focal card \`${input.cardId}\` had no demand row (never offered in these drafts)._`,
+        '',
+        arms.disagreements.length
+          ? ['## Budget × sim disagreements', '', ...arms.disagreements.map(item => `- **${item.name}** (\`${item.id}\`): ${item.flag}`)].join('\n')
+          : '',
+      ].filter(Boolean).join('\n');
+      const entry: ReportEntry = {
+        id, at: now(), kind: 'manual', buildId: build!.id, games: controlMetrics.games + patchMetrics.games,
+        markdown: `reports/${id}.md`, json: `reports/${id}.json`, model: null,
+      };
+      await writer.write(entry.markdown, `${markdown}\n`);
+      await writer.write(entry.json, `${JSON.stringify({ ...entry, arms }, null, 2)}\n`);
+      journal.reports.push(entry);
+      await save();
+      log(`content A/B report ${id} written.`);
+      return { entry, arms };
+    });
+  }
+
   return {
-    load, study, research, observe, report, beginCohort, updateCohort, archive, status,
+    load, study, research, observe, report, reportArmCompare, beginCohort, updateCohort, archive, status,
+    recordGuidance, answerQuestions,
     hasStudied: () => journal.study?.buildId === build?.id,
     hasResearched: () => !!journal.research,
     journal: () => journal,

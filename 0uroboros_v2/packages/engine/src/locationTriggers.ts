@@ -51,7 +51,7 @@ const EFFECT_PATTERNS: Record<LocationEffect, string> = {
  destroy: String.raw`(?<!the )\bDestroy\b`,
  trash: String.raw`(?<!the |shared )\bTrash\b`,
  powerUp: String.raw`\+${NUMBER} Power\b`,
- powerDown: String.raw`-${NUMBER} Power\b|\bSteal ${NUMBER} Power\b`,
+ powerDown: String.raw`-${NUMBER} Power\b|\bSteal ${NUMBER} Power\b|\bRemove ${NUMBER} Power\b`,
  victory: String.raw`\b(?:Give|Remove) ${NUMBER} Victory Points?\b|[+-]${NUMBER} (?:Victory Points?|VP)\b`,
  reset: String.raw`\bReset the Power of\b|\breset (?:its|their) Power\b`,
  transfer: String.raw`\b(?:Push or pull|Push|Pull|Shift) ${NUMBER} Power\b`,

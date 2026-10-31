@@ -99,21 +99,28 @@ function collectCryptoAmounts(effects:readonly AnyEffect[]|undefined,into:number
  return into;
 }
 
-/** True when the card has at least one Crypto-gain amount in [min, max] inclusive. */
-export function cardGainsCryptoInRange(card:Card,min:number,max:number):boolean{
- const amounts=[
+/** Crypto-gain amounts on the card (onReveal / onCollapse / recurring / schedule), including nested choices. */
+export function cryptoGainAmounts(card:Card):number[]{
+ return [
   ...collectCryptoAmounts(card.onReveal),
   ...collectCryptoAmounts(card.onCollapse),
   ...collectCryptoAmounts(card.recurring),
   ...(card.schedule??[]).flatMap(entry=>collectCryptoAmounts(entry.effects)),
  ];
- return amounts.some(amount=>amount>=min&&amount<=max);
 }
 
-/**
- * Persistent market piles at session start. Rotating offers are filled at each Draft.
- * When `draftCrypto` is on, the four Crypto cards sit as a fixed shelf beside the offer.
- */
+/** True when the card has at least one Crypto-gain amount in [min, max] inclusive. */
+export function cardGainsCryptoInRange(card:Card,min:number,max:number):boolean{
+ return cryptoGainAmounts(card).some(amount=>amount>=min&&amount<=max);
+}
+
+/** True when the card gains any positive Crypto. */
+export function cardGainsCrypto(card:Card):boolean{
+ return cryptoGainAmounts(card).some(amount=>amount>0);
+}
+
+/** Persistent market piles at session start. Rotating offers are filled at each Draft.
+ *  When draftCrypto is on, the four Crypto cards sit as a fixed shelf beside the offer. */
 export function createStrategicMarket(_random:RandomSource,content?:MarketContent,opts?:{draftCrypto?:boolean}):MarketPile[]{
  return opts?.draftCrypto?createCryptoPiles(content):[];
 }
@@ -132,8 +139,8 @@ export const DRAFT_SLOTS:readonly DraftSlot[]=[
  {id:'chaos-1',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
  {id:'chaos-2',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
  {id:'solar-monk',label:'Solar Monk',category:()=>'VP',matches:({card})=>isSolarMonk(card)},
- {id:'crypto-1-3',label:'Gain Crypto 1–3',category:entry=>entry.category,matches:({card})=>cardGainsCryptoInRange(card,1,3)},
- {id:'crypto-1-6',label:'Gain Crypto 1–6',category:entry=>entry.category,matches:({card})=>cardGainsCryptoInRange(card,1,6)},
+ {id:'crypto-cost-2-5',label:'Gain Crypto · cost 2–5',category:entry=>entry.category,matches:({card,category})=>(category==='Base'||category==='Chaos')&&cardGainsCrypto(card)&&card.cost>=2&&card.cost<=5},
+ {id:'crypto-any',label:'Gain Crypto (any)',category:entry=>entry.category,matches:({card,category})=>(category==='Base'||category==='Chaos')&&cardGainsCrypto(card)},
  {id:'attack',label:'Attack',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Attack'},
  {id:'horror',label:'Horror',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Horror'},
  {id:'vp',label:'VP',category:()=>'VP',matches:({card})=>card.type==='VP'&&!isSolarMonk(card)},

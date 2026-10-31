@@ -45,6 +45,22 @@ describe("Location valuation", () => {
     expect(facts.rules.locations).toMatch(/winner/);
     expect(facts.locations.every(entry => entry.read.length > 0)).toBe(true);
   });
+
+  it("exposes full rules primer and Mel's current configurables for Eco-Strat", () => {
+    const facts = systemFacts(document);
+    expect(facts.rules.cycleLoop).toMatch(/Wave Collapse/);
+    expect(facts.rules.collapse).toMatch(/Circuit/);
+    expect(facts.rules.drainRestore).toMatch(/Drain/);
+    expect(facts.rules.mods).toMatch(/Hologram/i);
+    expect(facts.rules.vpSources).toMatch(/destruction/);
+    expect(facts.configurable.map(item => item.id)).toEqual(expect.arrayContaining([
+      "serverVP.primary", "draftCrypto", "noLocations", "noTrailingRewards",
+      "cards", "locations", "circuitRewards", "mods", "serverIntegrity",
+    ]));
+    expect(facts.configurable.find(item => item.id === "draftCrypto")).toMatchObject({ default: false, surface: "configure" });
+    expect(facts.configurable.find(item => item.id === "serverIntegrity")?.surface).toBe("code-constant");
+    expect(facts.mods.some(mod => mod.kind === "builtin")).toBe(true);
+  });
 });
 
 describe("Strat-G three phases", () => {

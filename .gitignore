@@ -4,6 +4,9 @@ dist/
 coverage/
 .vite/
 *.local
+.env
+.env.*
+!.env.example
 
 # Cloned third-party ecosystem, tracked in its own repository.
 shokunin/

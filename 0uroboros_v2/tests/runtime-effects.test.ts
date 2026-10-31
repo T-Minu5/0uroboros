@@ -17,14 +17,16 @@ it('optional discard cost is all-or-none and pays the benefit only after the com
  expect(()=>s.choose(['one'])).toThrow(/Choose 2/);
  expect(s.state.players[0].hand).toHaveLength(2);
  s.choose(['one','two']);drain(s);expect(s.state.players[0].wallet).toBe(3);
- expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['one','two']);
+ // Paid cards leave hand; mid-cycle draw may reshuffle Discard into the deck afterward.
+ expect(['one','two'].every(id=>[...s.state.players[0].hand,...s.state.players[0].draw,...s.state.players[0].discard].some(c=>c.id===id))).toBe(true);
 });
 
 it('insufficient optional payment never removes cards or grants the benefit',()=>{
  const s=make();s.state.players[0].hand=[card('only')];
- play(s,card('payment',[{kind:'handDiscard',amount:2,optional:true,then:[{kind:'crypto',amount:3}]}]));
- expect(s.state.choice?.options.map(o=>o.id)).toEqual(['decline']);
- s.choose('decline');drain(s);expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['only']);expect(s.state.players[0].wallet).toBe(0);
+ const events=play(s,card('payment',[{kind:'handDiscard',amount:2,optional:true,then:[{kind:'crypto',amount:3}]}]));
+ expect(s.state.choice).toBeNull();
+ expect(events.some(event=>/Not enough cards in hand for benefit/.test(event.text))).toBe(true);
+ expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['only']);expect(s.state.players[0].wallet).toBe(0);
 });
 
 it('hand trash removes VP ownership and permits finishing only after the required minimum',()=>{

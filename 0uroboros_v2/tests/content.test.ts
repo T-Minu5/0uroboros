@@ -101,8 +101,8 @@ describe("Evaluation Location content", () => {
     session.state.players[1].servers = { primary: 0, backup: 150 };
     session.endTurn(); const result = drain(session);
     expect(session.state.phase).toBe("gameover");
-    expect(session.state.players[0].destructionVP).toBe(20);
-    expect(session.state.players[0].totalVP).toBe(20);
+    expect(session.state.players[0].destructionVP).toBe(16);
+    expect(session.state.players[0].totalVP).toBe(16);
     expect(session.state.winner).toBe(0);
     expect(result.some(step => step.event.node !== undefined && step.event.node > 1)).toBe(false);
     expect(result.some(step => step.event.text.startsWith("Effect Bank"))).toBe(false);

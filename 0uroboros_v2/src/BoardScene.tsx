@@ -44,8 +44,8 @@ import { Singularity, SingularityContext, useSingularityPass, useSingularityFiel
 import { AUTHORED_NODE_X, AUTHORED_SERVER, SERVER_SHIFT, FAR_SHIFT, LANE_MARK_DX, LANE_MARK_HALF, LANE_MARK_Z, LANE_RIM, LANE_RIM_HX, LANE_RIM_RADIUS, LANE_SCALE, NEON_FAR_RAISE, NEON_FIELD_SHIFT, NEON_STATS_DROP, NODE_GROW, NODE_X, boardZ, warpFarZ, warpX } from './boardLayout';
 
 export { BOARD_SCAN_MS, boardScanTotalMs, NODE_X };
-export type BoardCard = {id:string; card?:Card; revealed:boolean;planned?:boolean;movable?:boolean};
-export type BoardNode = {cards:[BoardCard[],BoardCard[]]; powers:[number,number]; weight:number; title:string; text:string; reward?:string};
+export type BoardCard = {id:string; card?:Card; revealed:boolean;planned?:boolean;movable?:boolean;hologram?:boolean};
+export type BoardNode = {cards:[BoardCard[],BoardCard[]]; powers:[number,number]; holograms?:[BoardCard[],BoardCard[]]; weight:number; title:string; text:string; reward?:string};
 export type BoardEffect = {id:number;kind:string;text:string;node?:number;player?:number;source?:string;sourceCardId?:string;targetCardId?:string;target?:string;targetOwner?:number;before?:number;after?:number};
 export type BoardProps = {
  closedNodes:number[]; collapseNode:number|null; awardNode:number|null; selectionNode:number|null; openNodes:number[];servers:[ServerValues,ServerValues];nodes:BoardNode[];turn:number;phase:string;priority:number;dragged:Card|null;hoveredNode:number|null;
@@ -445,10 +445,13 @@ function NodeRegion({node,index,p}:{node:BoardNode;index:number;p:BoardProps}){
       {node.cards[side].map(c=><button key={c.id} data-card-id={c.id} className={`field-card ${c.revealed||(side===0&&p.planning&&c.planned)?'revealed':'hidden-card'} ${c.movable?'movable-card':''} ${sourceActive&&p.effect?.sourceCardId===c.id?'active-source':''}`} aria-label={c.card&&(c.revealed||side===0)?`Inspect ${c.card.name}${c.movable?' · drag to relocate':''}`:'Face-down card'} draggable={false} onDragStart={event=>event.preventDefault()} onPointerDown={event=>{if(c.movable&&c.card&&p.onFieldDrag)p.onFieldDrag(event,c.card);}} onClick={()=>{if(c.card&&(c.revealed||side===0))p.inspect(c.card);}}>
        {(c.revealed||(side===0&&p.planning&&c.planned))&&c.card?<FieldCardFace card={c.card} effect={c.revealed?p.effect:null} placed={!c.revealed} opponent={side===1} sound={p.videoSound} compact movableCue={Boolean(c.movable)} powerChanging={p.effect?.kind==='power'&&p.effect.targetCardId===c.id}/>:<img src={p.cardBacks?.[side]??servedArtPath(CARD_BACK)} alt='Face-down card'/>}
       </button>)}
+      {(node.holograms?.[side]??[]).map(h=>h.card?<button key={h.id} type='button' data-card-id={h.id} data-hologram='true' className='field-card revealed hologram-card' aria-label={`Hologram of ${h.card.name}`} draggable={false} onDragStart={event=>event.preventDefault()} onClick={()=>p.inspect(h.card!)}>
+       <FieldCardFace card={h.card} effect={null} placed={false} opponent={side===1} sound={false} compact/>
+      </button>:null)}
      </div>
     </Anchor>
     <Anchor position={neon?[x,NODE_POWER_ANCHOR[side].y,NODE_POWER_ANCHOR[side].z]:[x,side===1?.735:.49,side===1?-.98:.98]} mapDepth={!neon}>
-     <div className={`power-badge ${side===0?'local':'opponent'} ${winning?'winning':tied?'tied':'trailing'} ${sourceActive&&!awarding?'score-active':''} ${side===0&&transferDelta?(transferDelta>0?'transfer-gain':'transfer-loss'):''}`} aria-label={`${side===0?'Your':'Opponent'} Node ${index+1} Power ${node.powers[side]}, ${tied?'tied':winning?'leading':'trailing'}${p.priority===side?', priority':''}`}>
+     <div className={`power-badge ${side===0?'local':'opponent'} ${winning?'winning':tied?'tied':'trailing'} ${sourceActive&&!awarding?'score-active':''} ${side===0&&transferDelta?(transferDelta>0?'transfer-gain':'transfer-loss'):''}`} aria-label={`${side===0?'Your':'Opponent'} Node ${index+1} Power ${node.powers[side]}, ${tied?'tied':winning?'leading':'trailing'}${p.priority===side?', priority':''}${(node.holograms?.[side]?.length??0)?`, ${node.holograms![side].length} hologram${node.holograms![side].length===1?'':'s'}`:''}`}>
       <b key={node.powers[side]}>{formatAmount(node.powers[side]+(side===0?transferDelta:0))}</b>
      </div>
     </Anchor>

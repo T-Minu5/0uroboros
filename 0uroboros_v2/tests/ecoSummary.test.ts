@@ -77,7 +77,8 @@ describe("the journal's tabs and summary", () => {
       item.recommendations[2].status = "withdrawn";
       item.recommendations[2].withdrawn = { at: AT, reason: "Starts in every deck." };
       const entry = (id: string, endedBy: string, finalVP: [number, number]) => ({ id, source: "self-play", buildId: "b1", at: AT, valid: true, winner: 0 as const, endedBy, cycles: 12, finalVP });
-      item.games.push(entry("g1", "destruction", [20, 17]), entry("g2", "destruction", [30, 10]), entry("g3", "destruction", [22, 12]), entry("g4", "cycle16", [18, 18]), entry("g5", "cycle16", [40, 20]));
+      // Margins under Mel's bands: close <12, mid 12–21, blowout >21. 3→close, 20→mid, 10→close, 0→close, 22→blowout.
+      item.games.push(entry("g1", "destruction", [20, 17]), entry("g2", "destruction", [30, 10]), entry("g3", "destruction", [22, 12]), entry("g4", "cycle16", [18, 18]), entry("g5", "cycle16", [40, 18]));
       item.games.push({ ...entry("g6", "destruction", [99, 0]), buildId: "old" });
       item.purchases = { at: AT, reportId: "rep-2", buildId: "b1", games: 5, minBuyerGames: 3, startingDeck: ["Rezz Blade"],
         top: [{ name: "Kilo-Coin", cost: 5, copies: 9, buyerGames: 6, buyerWinRate: 0.83 }], bottom: [{ name: "Dud", cost: 2, copies: 4, buyerGames: 4, buyerWinRate: 0.25 }] };
@@ -93,9 +94,9 @@ describe("the journal's tabs and summary", () => {
     expect(summary).toMatch(/### Worst purchases[\s\S]*\| Dud \| 2 \| 4 \| 4 \| 25% \|/);
     expect(summary).toMatch(/Starting-deck cards are left out \(Rezz Blade\)/);
     expect(summary).toMatch(/3 of 5 games on this build \(60%\) ended by Server destruction and 2 \(40%\) went the full 16 Cycles/);
-    expect(summary).toMatch(/\| Server destruction \| 3 \(60%\) \| 1 \| 1 \| 1 \|/);
+    expect(summary).toMatch(/\| Server destruction \| 3 \(60%\) \| 2 \| 1 \| 0 \|/);
     expect(summary).toMatch(/\| Full 16 Cycles \| 2 \(40%\) \| 1 \| 0 \| 1 \|/);
-    expect(summary).toMatch(/\| \*\*All games\*\* \| 5 \(100%\) \| 2 \| 1 \| 2 \|/);
+    expect(summary).toMatch(/\| \*\*All games\*\* \| 5 \(100%\) \| 3 \| 1 \| 1 \|/);
     expect(tabs[4].text).toMatch(/### Withdrawn \(1\)[\s\S]*_Starts in every deck\._[\s\S]*- Withdrawn idea/);
   });
 });

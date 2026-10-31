@@ -14,13 +14,17 @@ describe('effect editor entries', () => {
     expect(new Set(EDITOR_ENTRIES.map(item => item.key)).size).toBe(EDITOR_ENTRIES.length);
   });
 
-  it('stores Add and Remove power as one signed Power change and reads the sign back', () => {
+  it('stores Add, Steal and Remove power as one signed Power change and reads the sign back', () => {
     const start = createStep('changePower', 'card');
-    const removed = applyEditorEntry({ ...start, amount: 3 }, entry('removePower'), 'card');
-    expect(removed).toMatchObject({ action: 'changePower', amount: -3 });
+    const stolen = applyEditorEntry({ ...start, amount: 3 }, entry('stealPower'), 'card');
+    expect(stolen).toMatchObject({ action: 'changePower', amount: -3, transfer: true });
+    expect(editorEntryFor(stolen)?.key).toBe('stealPower');
+    const removed = applyEditorEntry(stolen, entry('removePower'), 'card');
+    expect(removed).toMatchObject({ action: 'changePower', amount: -3, transfer: false });
     expect(editorEntryFor(removed)?.key).toBe('removePower');
     const added = applyEditorEntry(removed, entry('addPower'), 'card');
     expect(added.amount).toBe(3);
+    expect(added.transfer).toBeUndefined();
     expect(editorEntryFor(added)?.key).toBe('addPower');
   });
 
@@ -54,7 +58,7 @@ describe('effect editor entries', () => {
   });
 
   it('lets every Card action that picks cards reach a random deck card and the Effect Bank', () => {
-    for (const key of ['addPower', 'removePower', 'healCard', 'restoreCard', 'trashCard', 'destroyCard']) {
+    for (const key of ['addPower', 'stealPower', 'removePower', 'healCard', 'restoreCard', 'trashCard', 'destroyCard']) {
       const step = applyEditorEntry(createStep(entry(key).action, 'card'), entry(key), 'card');
       const keys = targetChoicesFor(entry(key), step, 'card').map(item => item.key);
       expect(keys, key).toEqual(expect.arrayContaining(['deck', 'bank']));

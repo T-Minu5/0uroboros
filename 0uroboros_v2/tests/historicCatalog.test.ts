@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import source from '../assets/card_art/cards.json';
 import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_SLOTS, cardGainsCryptoInRange, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_SLOTS, cardGainsCrypto, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
@@ -48,8 +48,12 @@ describe('Historic catalog activation',()=>{
   expect(offer[2].category).toBe('Chaos');
   expect(offer[3].category).toBe('Chaos');
   expect(isSolarMonk(offer[4].card)).toBe(true);
-  expect(cardGainsCryptoInRange(offer[5].card,1,3)).toBe(true);
-  expect(cardGainsCryptoInRange(offer[6].card,1,6)).toBe(true);
+  expect(cardGainsCrypto(offer[5].card)).toBe(true);
+  expect(offer[5].card.cost).toBeGreaterThanOrEqual(2);
+  expect(offer[5].card.cost).toBeLessThanOrEqual(5);
+  expect(['Base','Chaos']).toContain(offer[5].category);
+  expect(cardGainsCrypto(offer[6].card)).toBe(true);
+  expect(['Base','Chaos']).toContain(offer[6].category);
   expect(offer[7].card.cardClass).toBe('Attack');
   expect(offer[8].card.cardClass).toBe('Horror');
   expect(offer[9].card.type).toBe('VP');

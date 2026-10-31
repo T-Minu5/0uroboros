@@ -8,9 +8,8 @@ export type GameSetup = {
   serverVP: Servers;
   turnSeconds: number | null;
   noLocations: boolean;
+  /** When true, Circuit Rewards with awardTrailing are never drawn. Defaults on. */
   noTrailingRewards: boolean;
-  /** Each player draws 1 at the start of Runtime turns 2 and 3. Defaults on. */
-  midCycleDraw: boolean;
   /** Persistent Crypto card shelf in Draft. Defaults off. */
   draftCrypto: boolean;
 };
@@ -20,14 +19,13 @@ const clampInt = (value: unknown, min: number, max: number, fallback: number) =>
 
 export function sanitizeGameSetup(raw: unknown): GameSetup {
   const value = (raw && typeof raw === 'object' ? raw : {}) as {
-    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; noTrailingRewards?: unknown; midCycleDraw?: unknown; draftCrypto?: unknown;
+    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; noTrailingRewards?: unknown; draftCrypto?: unknown;
   };
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
     turnSeconds: typeof value.turnSeconds === 'number' && TURN_TIMER_CHOICES.includes(value.turnSeconds) ? value.turnSeconds : null,
     noLocations: value.noLocations === true,
-    noTrailingRewards: value.noTrailingRewards === true,
-    midCycleDraw: value.midCycleDraw !== false,
+    noTrailingRewards: value.noTrailingRewards !== false,
     draftCrypto: value.draftCrypto === true,
   };
 }

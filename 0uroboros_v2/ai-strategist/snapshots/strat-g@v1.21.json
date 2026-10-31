@@ -1,0 +1,30 @@
+{
+  "label": "strat-g@v1.21",
+  "savedAt": "2026-10-28T14:32:17.266Z",
+  "profile": {
+    "version": 21,
+    "plan": "",
+    "economyUntilCycle": 4,
+    "chaosFromCycle": 9,
+    "vpFromCycle": 9,
+    "midgameMix": 0.5,
+    "handCryptoTarget": 12,
+    "minCryptoValue": 2,
+    "minBuyScore": 1.75,
+    "dilution": 0.9,
+    "weights": {
+      "power": 1.26,
+      "draw": 1.6,
+      "actions": 1.1,
+      "crypto": 3.05,
+      "drain": 2.9,
+      "restore": 2.49,
+      "vp": 2.6,
+      "duration": 0.8,
+      "thin": 1.2,
+      "disrupt": 1.37,
+      "chaos": 1.5
+    },
+    "cardBias": {}
+  }
+}

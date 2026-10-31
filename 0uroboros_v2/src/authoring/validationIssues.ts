@@ -2,7 +2,7 @@ import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import { builtinMod } from '@0uroboros/engine/builtinMods';
 import type { ModifierKind } from '@0uroboros/engine/effects/types';
 
-export type IssueSection = 'cards' | 'locations' | 'circuitRewards' | 'mods' | 'startingDecks';
+export type IssueSection = 'cards' | 'locations' | 'circuitRewards' | 'runtimeHacks' | 'mods' | 'startingDecks';
 /** One save-blocking problem from `validateContent`, located on an item, field and recipe step where possible. */
 export type Issue = {
   section: IssueSection | null;
@@ -25,6 +25,7 @@ const HOOK_LABELS: Record<IssueSection, Record<string, string>> = {
   cards: { onReveal: 'On reveal', onCollapse: 'On collapse', recurring: 'Recurring' },
   locations: { effects: 'On collapse', ongoing: 'Ongoing', onPlay: 'On reveal', startTurn2: 'Start of turn 2', startTurn3: 'Start of turn 3', conditions: 'Conditions' },
   circuitRewards: { effects: 'On claim' },
+  runtimeHacks: { effects: 'On unlock', cards: 'Required cards', formula: 'Formula', window: 'Window' },
   mods: { onReveal: 'When revealed', onCollapse: 'When its Location collapses', recurring: 'Each later Runtime turn' },
   startingDecks: {},
 };
@@ -33,8 +34,8 @@ const STEP_LABELS: Record<string, string> = {
   optional: 'Optional', min: 'Minimum selections', prompt: 'Choice prompt', choose: 'How many and who picks', destination: 'Destination',
   direction: 'Direction', flow: 'Flow', modifier: 'Mod', options: 'Choice options', then: 'Then', label: 'Option label', id: 'Option ID',
 };
-const SECTION_NOUN: Record<IssueSection, string> = { cards: 'card', locations: 'Location', circuitRewards: 'Circuit reward', mods: 'card mod', startingDecks: 'starting deck' };
-const SECTION_TITLE: Record<IssueSection, string> = { cards: 'Cards', locations: 'Locations', circuitRewards: 'Circuit rewards', mods: 'Card mods', startingDecks: 'Starting decks' };
+const SECTION_NOUN: Record<IssueSection, string> = { cards: 'card', locations: 'Location', circuitRewards: 'Circuit reward', runtimeHacks: 'Runtime Hack', mods: 'card mod', startingDecks: 'starting deck' };
+const SECTION_TITLE: Record<IssueSection, string> = { cards: 'Cards', locations: 'Locations', circuitRewards: 'Circuit rewards', runtimeHacks: 'Runtime hacks', mods: 'Card mods', startingDecks: 'Starting decks' };
 
 type Segment = { key: string; index?: number };
 
@@ -99,7 +100,7 @@ function locate(section: IssueSection, path: Segment[]): { field: string | null;
 /** Turns `cards[57].schedule[0].effects[1].amount: ...` into "Iterative Incubus · Schedule 1 · step 2 · Count". */
 export function describeIssues(document: ContentDocument, errors: readonly string[]): Issue[] {
   return errors.map(error => {
-    const itemMatch = /^(cards|locations|circuitRewards|mods|startingDecks)\[(\d+)\]((?:\.[^:\s]+)?): (.*)$/.exec(error);
+    const itemMatch = /^(cards|locations|circuitRewards|runtimeHacks|mods|startingDecks)\[(\d+)\]((?:\.[^:\s]+)?): (.*)$/.exec(error);
     if (itemMatch) {
       const section = itemMatch[1] as IssueSection;
       const item = document[section]?.[Number(itemMatch[2])];
@@ -115,7 +116,7 @@ export function describeIssues(document: ContentDocument, errors: readonly strin
     const builtin = /^builtinMods\.([A-Za-z]+)\.(name|badge|text): (.*)$/.exec(error);
     if (builtin) return { section: 'mods', itemId: builtin[1], itemName: builtinMod(builtin[1] as ModifierKind).name, field: `builtinMods.${builtin[1]}.${builtin[2]}`, label: BUILTIN_FIELD_LABELS[builtin[2]], message: humanize(builtin[3]) };
     if (error.startsWith('activeStartingDeckId: ')) return { section: 'startingDecks', itemId: null, itemName: 'Starting decks', field: null, label: '', message: error.slice('activeStartingDeckId: '.length) };
-    const sectionMatch = /^(cards|locations|circuitRewards|mods|startingDecks): (.*)$/.exec(error);
+    const sectionMatch = /^(cards|locations|circuitRewards|runtimeHacks|mods|startingDecks): (.*)$/.exec(error);
     const section = sectionMatch ? sectionMatch[1] as IssueSection : null;
     return { section, itemId: null, itemName: section ? SECTION_TITLE[section] : 'Content', field: null, label: '', message: sectionMatch ? sectionMatch[2] : error };
   });

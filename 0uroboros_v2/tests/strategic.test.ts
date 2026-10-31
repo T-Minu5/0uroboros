@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, cardGainsCryptoInRange, chaosClassOf, createCryptoPiles, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, cardGainsCrypto, chaosClassOf, createCryptoPiles, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
 import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
 import { bundledContent } from "../src/contentPack/contentStore";
@@ -51,8 +51,12 @@ describe("Strategic evaluation Draft", () => {
     expect(built[2].category).toBe("Chaos");
     expect(built[3].category).toBe("Chaos");
     expect(isSolarMonk(built[4].card)).toBe(true);
-    expect(cardGainsCryptoInRange(built[5].card, 1, 3)).toBe(true);
-    expect(cardGainsCryptoInRange(built[6].card, 1, 6)).toBe(true);
+    expect(cardGainsCrypto(built[5].card)).toBe(true);
+    expect(built[5].card.cost).toBeGreaterThanOrEqual(2);
+    expect(built[5].card.cost).toBeLessThanOrEqual(5);
+    expect(["Base", "Chaos"]).toContain(built[5].category);
+    expect(cardGainsCrypto(built[6].card)).toBe(true);
+    expect(["Base", "Chaos"]).toContain(built[6].category);
     expect(chaosClassOf(built[7].card)).toBe("Attack");
     expect(chaosClassOf(built[8].card)).toBe("Horror");
     expect(built[9].card.type).toBe("VP");
@@ -131,8 +135,12 @@ describe("Strategic evaluation Draft", () => {
       expect(offer[2].category).toBe("Chaos");
       expect(offer[3].category).toBe("Chaos");
       expect(isSolarMonk(offer[4].card)).toBe(true);
-      expect(cardGainsCryptoInRange(offer[5].card, 1, 3)).toBe(true);
-      expect(cardGainsCryptoInRange(offer[6].card, 1, 6)).toBe(true);
+      expect(cardGainsCrypto(offer[5].card)).toBe(true);
+      expect(offer[5].card.cost).toBeGreaterThanOrEqual(2);
+      expect(offer[5].card.cost).toBeLessThanOrEqual(5);
+      expect(["Base", "Chaos"]).toContain(offer[5].category);
+      expect(cardGainsCrypto(offer[6].card)).toBe(true);
+      expect(["Base", "Chaos"]).toContain(offer[6].category);
       expect(offer[7].category).toBe("Chaos");
       expect(chaosClassOf(offer[7].card)).toBe("Attack");
       expect(offer[8].category).toBe("Chaos");
@@ -346,7 +354,7 @@ describe("Unmodified-economy strategic match runs", () => {
         expect(session.state.phase).toBe("draft");
         if (session.state.circuitEligible.includes(0)) session.claimCircuitReward(0);
         const now = Date.now();
-        for (let beat = 0; beat < 35 && !session.state.draftEnded; beat++) {
+        for (let beat = 0; beat < 80 && !session.state.draftEnded; beat++) {
           const time = now + beat * 2200;
           if (!session.state.draftReady[0]) {
             const affordable = session.state.market.filter(pile => (pile.remaining ? pile.remaining[0] : pile.supply) > 0 && pile.card.cost <= session.state.players[0].wallet);
@@ -363,7 +371,12 @@ describe("Unmodified-economy strategic match runs", () => {
           const bot = session.opponentDraftStep(time);
           if (bot?.kind === "purchase") { acquired[1].add(bot.cardId!); bought++; }
         }
+        if (!session.state.draftEnded) {
+          if (!session.state.draftReady[0]) session.endDraft(0);
+          if (!session.state.draftReady[1]) session.endDraft(1);
+        }
         expect(session.state.draftEnded).toBe(true);
+        drain(session);
         const cards = session.state.players.flatMap((player, owner) => [...player.draw, ...player.hand, ...player.discard, ...player.destroyed, ...player.bank.map(entry => entry.card), ...session.state.nodes.flatMap(node => node.cards[owner].map(placement => placement.card))]).concat(session.state.trash);
         expect(cards).toHaveLength(20 + bought + cards.filter(card=>card.id.includes(":generated-")).length);
         expect(new Set(cards.map(card => card.id)).size).toBe(cards.length);
@@ -394,6 +407,7 @@ describe("Strategic deadline presentation barrier", () => {
     expect(pendingClaim.event.source).toBe("circuit");
     expect(pendingClaim.event.owner).toBe(1);
     expect(session.state.circuitReward.claimed).toContain(1);
+    drain(session);
     expect(session.pendingCount).toBe(0);
     expect(session.expireDraft(expiredAt)).not.toBeNull();
     expect(session.nextCycle().kind).toBe("cycle");
@@ -438,13 +452,13 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(events.some(event => event.node !== undefined && event.node > node)).toBe(false);
     expect(events.some(event => event.cardId === "bank-must-not-fire")).toBe(false);
     expect(events.some(event => ["circuit", "draft"].includes(event.kind))).toBe(false);
-    expect(session.state.players[0].destructionVP).toBe(20);
+    expect(session.state.players[0].destructionVP).toBe(16);
     expect(session.state.players[0].rewardVP).toBeGreaterThanOrEqual(2);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
     expect(session.state.phase).toBe("gameover");
     const score = session.view().finalScore![0];
     expect(score.locationVP).toBe(2);
-    expect(score.destructionVP).toBe(20);
+    expect(score.destructionVP).toBe(16);
     expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
   });
 

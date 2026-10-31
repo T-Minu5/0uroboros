@@ -30,6 +30,8 @@ export type Observation = {
   occurrences: number; gameIds: string[];
 };
 export type Question = { id: string; at: string; buildId: string; text: string; status: 'open' | 'answered'; answer?: string };
+/** Designer teaching from the temporary Chat Q&A tuner (notes for Eco; does not auto-apply balance). */
+export type DesignerGuidance = { id: string; at: string; text: string };
 export type Recommendation = {
   id: string; at: string; buildId: string; reportId: string; title: string;
   observed: string; evidence: string; likelyCause: string; adjustment: string; expectedEffect: string;
@@ -60,6 +62,14 @@ export type ResearchSource = { url: string; fetchedFrom?: string; accessible: bo
 /** A source taken off the reading list after a model-backed research run found nothing in it. */
 export type RemovedSource = { url: string; title?: string; file?: string; reason: string; at: string };
 export type GameEntry = { id: string; source: string; buildId: string; at: string; valid: boolean; invalidReason?: string; winner: 0 | 1 | null; endedBy: string; cycles: number; finalVP: [number, number]; cohortId?: string; seed?: number };
+/** Content A/B arm: control vs patched document for one focal card. */
+export type CohortArm = {
+  role: 'control' | 'patch';
+  cardId: string;
+  experimentId: string;
+  label?: string;
+};
+
 export type Cohort = {
   id: string; kind: 'baseline' | 'evaluation'; buildId: string; startedAt: string; finishedAt?: string;
   target: number; seeds: number[]; strategyHash: string;
@@ -67,6 +77,8 @@ export type Cohort = {
   strategyVersion: string | number;
   status: 'running' | 'complete' | 'failed' | 'cancelled';
   validGames: string[]; invalid: { seed: number; reason: string }[]; note?: string;
+  /** Present when this cohort is one arm of a content A/B experiment. */
+  arm?: CohortArm;
 };
 export type ReportEntry = { id: string; at: string; kind: 'baseline' | 'periodic' | 'manual'; buildId: string; games: number; markdown: string; json: string; model: string | null };
 export type ErrorEntry = { at: string; scope: string; message: string };
@@ -79,6 +91,8 @@ export type Journal = {
   research: { at: string; sources: ResearchSource[]; concepts: string[]; applications: string[]; model: string | null; removed?: RemovedSource[] } | null;
   pointOfView?: PointOfView | null;
   observations: Observation[]; hypotheses: Hypothesis[]; questions: Question[]; recommendations: Recommendation[];
+  /** Mel's Chat Q&A guidance for this tuning period. */
+  designerGuidance?: DesignerGuidance[];
   games: GameEntry[]; cohorts: Cohort[]; reports: ReportEntry[]; errors: ErrorEntry[];
   gamesSinceReport: number;
   purchases?: PurchaseSummary | null;
@@ -90,8 +104,48 @@ export function emptyJournal(at: string): Journal {
   return {
     schema: 1, agent: 'Eco-Strat', createdAt: at, updatedAt: at, model: { used: null, fallbacks: [] },
     builds: [], currentBuild: null, study: null, research: null,
-    observations: [], hypotheses: [], questions: [], recommendations: [], games: [], cohorts: [], reports: [], errors: [], gamesSinceReport: 0,
+    observations: [], hypotheses: [], questions: [], recommendations: [], designerGuidance: [], games: [], cohorts: [], reports: [], errors: [], gamesSinceReport: 0,
   };
+}
+
+const GUIDANCE_LIMIT = 80;
+
+/** Append designer Q&A lines to the journal (capped). */
+export function appendDesignerGuidance(journal: Journal, texts: string[], at: string): number {
+  const lines = texts.map(text => text.trim()).filter(Boolean).slice(0, 8);
+  if (!lines.length) return 0;
+  const list = journal.designerGuidance ?? (journal.designerGuidance = []);
+  for (const text of lines) {
+    list.push({ id: `dg-${list.length + 1}`, at, text: text.slice(0, 600) });
+  }
+  if (list.length > GUIDANCE_LIMIT) journal.designerGuidance = list.slice(-GUIDANCE_LIMIT);
+  journal.updatedAt = at;
+  return lines.length;
+}
+
+/**
+ * Mark open questions answered when Mel's reply matches prior agent questions
+ * (substring / case-insensitive) or when Mel answers after those questions were asked.
+ */
+export function answerOpenQuestions(journal: Journal, answer: string, matchingTexts: string[] | undefined, at: string): number {
+  const reply = answer.trim().slice(0, 800);
+  if (!reply) return 0;
+  const needles = (matchingTexts ?? []).map(text => text.trim().toLowerCase()).filter(Boolean);
+  let answered = 0;
+  for (const item of journal.questions) {
+    if (item.status !== 'open') continue;
+    const hay = item.text.trim().toLowerCase();
+    const hit = needles.length
+      ? needles.some(needle => hay.includes(needle) || needle.includes(hay) || hay.slice(0, 48) === needle.slice(0, 48))
+      : false;
+    if (!hit && needles.length) continue;
+    if (!needles.length) continue;
+    item.status = 'answered';
+    item.answer = reply;
+    answered++;
+  }
+  if (answered) journal.updatedAt = at;
+  return answered;
 }
 
 /** Measured evidence counts fully; Eco-Strat's own interpretations count half. */
@@ -256,7 +310,7 @@ function summarySections(journal: Journal): string[] {
     ...(games.length ? [
       `${destruction.length} of ${games.length} games on this build${share(destruction.length, games.length)} ended by Server destruction and ${full.length}${share(full.length, games.length)} went the full 16 Cycles.`,
       ``,
-      `| Ending | Games | Close (≤${CLOSE_MARGIN} VP) | Mid | Blowout (≥${BLOWOUT_MARGIN} VP) |`, '| --- | --- | --- | --- | --- |',
+      `| Ending | Games | Close (<${CLOSE_MARGIN} VP) | Mid | Blowout (>${BLOWOUT_MARGIN} VP) |`, '| --- | --- | --- | --- | --- |',
       row('Server destruction', destruction), row('Full 16 Cycles', full), ...(other.length ? [row('Other', other)] : []), row('**All games**', games),
     ] : ['_No games on this build yet._']),
     ``,
@@ -300,6 +354,10 @@ export function renderJournal(journal: Journal): string {
     `## Open questions`,
     ``,
     ...(journal.questions.some(item => item.status === 'open') ? journal.questions.filter(item => item.status === 'open').slice(-10).map(item => `- ${item.text} (${date(item.at)})`) : ['- none']),
+    ``,
+    `## Designer Q&A guidance`,
+    ``,
+    ...((journal.designerGuidance?.length) ? journal.designerGuidance.slice(-12).reverse().map(item => `- ${item.text} (${date(item.at)})`) : ['- none yet']),
     ``,
     `<!-- tab: Recommendations -->`,
     `## Recommendations (candidates only, never applied automatically)`,

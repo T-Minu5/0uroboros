@@ -101,6 +101,28 @@
 .au-derived > p { color: var(--au-muted); font-size: 13px; }
 .au-recipe-help { margin: 8px 0 0; color: var(--au-muted); font-size: 12px; line-height: 1.45; }
 
+/* Card balance budget */
+.au-balance-panel { display: grid; gap: 12px; }
+.au-balance-hero { display: grid; gap: 6px; }
+.au-balance-score { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 14px; }
+.au-balance-eff { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.au-balance-delta { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.au-balance-band { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--au-surface-2); color: var(--au-muted); }
+.au-balance-eff[data-band="near"], .au-balance-delta[data-band="near"] { color: var(--au-success); }
+.au-balance-band[data-band="near"] { color: var(--au-success); background: #7fd4a61a; }
+.au-balance-eff[data-band="under"], .au-balance-delta[data-band="under"] { color: var(--au-dim); }
+.au-balance-band[data-band="under"] { color: var(--au-dim); }
+.au-balance-eff[data-band="over"], .au-balance-delta[data-band="over"] { color: var(--au-warn); }
+.au-balance-band[data-band="over"] { color: var(--au-warn); background: #f0b75a1a; }
+.au-balance-meta { color: var(--au-muted); font-size: 12px; }
+.au-balance-parts, .au-balance-soft { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.au-balance-parts li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 10px; border-radius: 6px; background: var(--au-surface-2); font-size: 12px; color: var(--au-muted); }
+.au-balance-parts li b { color: var(--au-text); font-variant-numeric: tabular-nums; }
+.au-balance-soft li { padding: 6px 10px; border-left: 2px solid var(--au-warn); color: var(--au-muted); font-size: 12px; line-height: 1.4; }
+.au-balance-soft li b { color: var(--au-warn); margin-right: 6px; }
+.au-balance-formula { margin: 0; color: var(--au-dim); font-size: 11px; line-height: 1.45; }
+.au-balance-formula code { color: var(--au-muted); font-size: 11px; }
+
 /* Problems that block saving */
 .au-issues { margin: 14px 24px 0; padding: 12px 14px; border: 1px solid #7a3f4a; border-radius: 9px; background: var(--au-danger-soft); color: var(--au-text); }
 .au-issues > b { display: block; margin-bottom: 6px; color: var(--au-danger); font-size: 13px; }
@@ -154,3 +176,5 @@
 @media (prefers-reduced-motion: reduce) {
   .authoring-app *, .au-art-dialog * { transition: none !important; scroll-behavior: auto !important; }
 }
+
+.au-hack-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(11rem,1fr));gap:.45rem;max-height:16rem;overflow:auto;padding:.25rem 0}.au-hack-card-option{display:flex;gap:.45rem;align-items:flex-start;font-size:.9rem;line-height:1.3;padding:.35rem .45rem;border-radius:.45rem;background:rgba(255,255,255,.03)}.au-hack-card-option input{margin-top:.15rem}

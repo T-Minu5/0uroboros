@@ -1,5 +1,5 @@
 import { expandDeck, starterEffects, CARD_CLASSES, POWER_SOURCES, DEFAULT_STARTING_DECK, MIN_STARTING_DECK_SIZE, VP_CLASSES, type Card, type CardClass, type DeckEntry, type LegacyEffect } from '../game';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, CURRENCY_PILES, DRAFT_OFFER_COUNT, cardGainsCryptoInRange } from '../evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, CURRENCY_PILES, DRAFT_OFFER_COUNT, cardGainsCrypto } from '../evaluationMarket';
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, type EvaluationLocation, type CircuitRewardDefinition } from '../content';
 import { CARD_ART_PLACEHOLDER } from '../cardArtwork';
 import { HISTORIC_SOURCE_METADATA } from '../historicCatalog';
@@ -7,9 +7,11 @@ import { describeLocation, validateSteps, type ValidationCards } from '../effect
 import { liftLocationSchedule, migrateCard, migrateEffects, migrateLocation, migrateRewardEffects } from '../effects/migrate';
 import { MOD_HOOKS, isBuiltinModifier, type AnyEffect, type EffectStep, type ModDefinition, type Scope } from '../effects/types';
 import { validateLocationCondition, type LocationCondition } from '../locationConditions';
+import { RUNTIME_HACK_WINDOWS, type AuthoredRuntimeHack, type RuntimeHackDefinition } from '../runtimeHacks';
 import { BUILTIN_MOD_FIELDS, BUILTIN_MOD_LIMITS, type BuiltinModOverrides } from '../builtinMods';
 import { defaultOpponents, isCanonicalProfile, type AuthoredOpponent } from '../ai/opponents';
 export type { AuthoredOpponent } from '../ai/opponents';
+export type { AuthoredRuntimeHack, RuntimeHackDefinition, RuntimeHackWindow } from '../runtimeHacks';
 
 export type CardPool = 'Base' | 'Chaos' | 'VP' | 'Crypto';
 export type { CardClass } from '../game';
@@ -30,12 +32,14 @@ export type AuthoredLocation = Omit<EvaluationLocation, keyof LocationHooks> & L
 export type AuthoredCircuitReward = Omit<CircuitRewardDefinition, 'effect' | 'effects'> & { effects: EffectStep[]; enabled: boolean };
 export type StartingDeck = { id: string; name: string; cards: DeckEntry[] };
 export type AuthoredMod = ModDefinition & { enabled: boolean };
-export const CONTENT_VERSION = 2;
+export const CONTENT_VERSION = 3;
 export type ContentDocument = {
   version: typeof CONTENT_VERSION;
   cards: AuthoredCard[];
   locations: AuthoredLocation[];
   circuitRewards: AuthoredCircuitReward[];
+  /** Absent in older saves; those load with none. */
+  runtimeHacks?: AuthoredRuntimeHack[];
   /** Absent in older saves; those load with none. */
   mods?: AuthoredMod[];
   /** Edited name, badge or text of the built-in mods; anything left out keeps its default. */
@@ -54,6 +58,8 @@ export type CompiledContent = {
   cryptoCards: Card[];
   locations: EvaluationLocation[];
   circuitRewards: CircuitRewardDefinition[];
+  /** Enabled Runtime Hacks. */
+  runtimeHacks: RuntimeHackDefinition[];
   /** Enabled authored mods. */
   mods?: ModDefinition[];
   /** The active starting deck, one entry per copy, dealt identically to both players. */
@@ -114,6 +120,7 @@ export function createDefaultContent(): ContentDocument {
     cards,
     locations: EVALUATION_LOCATIONS.map(location => ({ ...migrateLocation(structuredClone(location)), enabled: true })),
     circuitRewards: EVALUATION_CIRCUIT_REWARDS.map(({ effect: _effect, effects: _effects, ...reward }) => ({ ...structuredClone(reward), effects: migrateRewardEffects(EVALUATION_CIRCUIT_REWARDS.find(item => item.id === reward.id)!), enabled: true })),
+    runtimeHacks: [],
     mods: [],
     startingDecks: [defaultStartingDeck()],
     activeStartingDeckId: DEFAULT_DECK_ID,
@@ -225,17 +232,19 @@ function validateBuiltinMods(value: unknown, errors: string[]) {
 export function validateContent(value: unknown): string[] {
   const errors: string[] = [];
   if (!record(value)) return ['document: expected an object'];
-  extraFields(value, ['version', 'cards', 'locations', 'circuitRewards', 'mods', 'builtinMods', 'startingDecks', 'activeStartingDeckId', 'opponents'], 'document', errors);
+  extraFields(value, ['version', 'cards', 'locations', 'circuitRewards', 'runtimeHacks', 'mods', 'builtinMods', 'startingDecks', 'activeStartingDeckId', 'opponents'], 'document', errors);
   validateBuiltinMods(value.builtinMods, errors);
   if (value.version !== CONTENT_VERSION) errors.push(`version: expected ${CONTENT_VERSION}${value.version === 1 ? ' (load the document through upgradeDocument first)' : ''}`);
   for (const field of ['cards', 'locations', 'circuitRewards'] as const) {
     if (!Array.isArray(value[field])) errors.push(`${field}: expected an array`);
     else if (value[field].length > 500) errors.push(`${field}: limit is 500`);
   }
+  if (value.runtimeHacks !== undefined && (!Array.isArray(value.runtimeHacks) || value.runtimeHacks.length > 200)) errors.push('runtimeHacks: expected up to 200 Runtime Hacks');
   const cards = Array.isArray(value.cards) ? value.cards.slice(0, 501) : [];
   const locations = Array.isArray(value.locations) ? value.locations.slice(0, 501) : [];
   const rewards = Array.isArray(value.circuitRewards) ? value.circuitRewards.slice(0, 501) : [];
-  checkUnique(cards, 'cards', errors); checkUnique(locations, 'locations', errors); checkUnique(rewards, 'circuitRewards', errors);
+  const hacks = Array.isArray(value.runtimeHacks) ? value.runtimeHacks.slice(0, 201) : [];
+  checkUnique(cards, 'cards', errors); checkUnique(locations, 'locations', errors); checkUnique(rewards, 'circuitRewards', errors); checkUnique(hacks, 'runtimeHacks', errors);
   const identities = new Set<string>();
   cards.forEach((card, index) => {
     if (!record(card)) return;
@@ -326,7 +335,9 @@ export function validateContent(value: unknown): string[] {
     requiredText(item.name, `${p}.name`, errors, 80);
     if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
     for (const hook of MOD_HOOKS) if (item[hook] !== undefined) steps(item[hook], `${p}.${hook}`, 'card');
-    if (!MOD_HOOKS.some(hook => Array.isArray(item[hook]) && (item[hook] as unknown[]).length)) errors.push(`${p}.onReveal: add at least one effect`);
+    const hasHooks = MOD_HOOKS.some(hook => Array.isArray(item[hook]) && (item[hook] as unknown[]).length);
+    // Engine-recognized mods (e.g. Aura Farming) may ship with no authored hooks.
+    if (!hasHooks && item.id !== 'aura-farming') errors.push(`${p}.onReveal: add at least one effect`);
   });
   rewards.forEach((item, index) => {
     const p = `circuitRewards[${index}]`;
@@ -340,6 +351,40 @@ export function validateContent(value: unknown): string[] {
     steps(item.effects, `${p}.effects`, 'circuit');
     if (Array.isArray(item.effects) && !item.effects.length) errors.push(`${p}.effects: add at least one effect`);
   });
+  hacks.forEach((item, index) => {
+    const p = `runtimeHacks[${index}]`;
+    if (!record(item)) { errors.push(`${p}: expected a Runtime Hack object`); return; }
+    extraFields(item, ['id', 'name', 'enabled', 'window', 'cards', 'formula', 'effects'], p, errors);
+    requiredId(item.id, `${p}.id`, errors);
+    requiredText(item.name, `${p}.name`, errors, 200);
+    if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
+    if (!RUNTIME_HACK_WINDOWS.includes(item.window as AuthoredRuntimeHack['window'])) errors.push(`${p}.window: expected ${RUNTIME_HACK_WINDOWS.join(', ')}`);
+    if (typeof item.formula === 'string' && item.formula.length > 500) errors.push(`${p}.formula: max 500 characters`);
+    else if (item.enabled !== false) requiredText(item.formula, `${p}.formula`, errors, 500);
+    // Disabled drafts may be incomplete; compile drops them. Enabled hacks need a full combo + reward.
+    if (item.enabled === false) {
+      if (item.cards !== undefined && !Array.isArray(item.cards)) errors.push(`${p}.cards: expected an array`);
+      else if (Array.isArray(item.cards)) {
+        if (item.cards.length > 6) errors.push(`${p}.cards: list at most 6 card definition IDs`);
+        item.cards.forEach((cardId, at) => {
+          if (typeof cardId !== 'string' || !id(cardId)) errors.push(`${p}.cards[${at}]: invalid card id`);
+          else if (!cardIds.has(cardId)) errors.push(`${p}.cards[${at}]: unknown or disabled card ${cardId}`);
+        });
+      }
+      if (item.effects !== undefined) steps(item.effects, `${p}.effects`, 'runtimeHack');
+      return;
+    }
+    if (!Array.isArray(item.cards) || item.cards.length < 2 || item.cards.length > 6) errors.push(`${p}.cards: list 2–6 card definition IDs`);
+    else {
+      if (new Set(item.cards).size !== item.cards.length) errors.push(`${p}.cards: each card may appear only once`);
+      item.cards.forEach((cardId, at) => {
+        if (typeof cardId !== 'string' || !id(cardId)) errors.push(`${p}.cards[${at}]: invalid card id`);
+        else if (!cardIds.has(cardId)) errors.push(`${p}.cards[${at}]: unknown or disabled card ${cardId}`);
+      });
+    }
+    steps(item.effects, `${p}.effects`, 'runtimeHack');
+    if (Array.isArray(item.effects) && !item.effects.length) errors.push(`${p}.effects: add at least one effect`);
+  });
   const draftable = cards.filter(record).filter(card => card.enabled === true && card.generated !== true);
   const count = (pool: CardPool) => draftable.filter(card => card.pool === pool).length;
   if (count('Base') + count('Chaos') < DRAFT_OFFER_COUNT) errors.push(`cards: at least ${DRAFT_OFFER_COUNT} enabled non-Generated Base or Chaos cards required for Draft offers`);
@@ -349,8 +394,13 @@ export function validateContent(value: unknown): string[] {
   if (!draftable.some(card => card.pool === 'Chaos' && card.cardClass === 'Horror')) errors.push('cards: at least 1 enabled non-Generated Horror Chaos card required for Draft');
   if (draftable.filter(card => card.pool === 'VP' && card.cardClass !== 'Solar-monk').length < 1) errors.push('cards: at least 1 enabled non-Generated Volume VP card required for Draft');
   const asCard = (item: Record<string, unknown>) => item as unknown as Card;
-  if (!draftable.some(card => cardGainsCryptoInRange(asCard(card), 1, 3))) errors.push('cards: at least 1 enabled card that gains 1–3 Crypto required for Draft');
-  if (!draftable.some(card => cardGainsCryptoInRange(asCard(card), 1, 6))) errors.push('cards: at least 1 enabled card that gains 1–6 Crypto required for Draft');
+  const gainsCrypto = (card: Record<string, unknown>) => cardGainsCrypto(asCard(card));
+  if (!draftable.some(card => gainsCrypto(card) && (card.pool === 'Base' || card.pool === 'Chaos') && typeof card.cost === 'number' && card.cost >= 2 && card.cost <= 5)) {
+    errors.push('cards: at least 1 enabled Base/Chaos card that gains Crypto and costs 2–5 required for Draft');
+  }
+  if (!draftable.some(card => gainsCrypto(card) && (card.pool === 'Base' || card.pool === 'Chaos'))) {
+    errors.push('cards: at least 1 enabled Base/Chaos card that gains Crypto required for Draft');
+  }
   for (const { cardId } of CURRENCY_PILES) {
     const card = cards.find(item => record(item) && (item.definitionId ?? item.id) === cardId);
     if (!record(card) || card.enabled !== true || card.generated === true || card.type !== 'Crypto') errors.push(`cards: ${cardId} is a Draft currency and must remain enabled as a non-Generated Crypto card`);
@@ -371,8 +421,11 @@ type LegacyLibrary = Map<string, { scope: string; effects: AnyEffect[] }>;
 Location after-turn schedules, then the founding opponents for saves that predate them. Anything else is returned unchanged. */
 export function upgradeDocument(value: unknown): unknown {
   if (!record(value)) return value;
-  const upgraded = liftLocationSchedules(value.version === 1 ? upgradeVersion1(value) : value);
-  return upgraded.opponents === undefined ? { ...upgraded, opponents: defaultOpponents() } : upgraded;
+  let upgraded = liftLocationSchedules(value.version === 1 ? upgradeVersion1(value) : value) as Record<string, unknown>;
+  if (upgraded.runtimeHacks === undefined) upgraded = { ...upgraded, runtimeHacks: [] };
+  if (upgraded.opponents === undefined) upgraded = { ...upgraded, opponents: defaultOpponents() };
+  if (upgraded.version === 2 || upgraded.version === 1) upgraded = { ...upgraded, version: CONTENT_VERSION };
+  return upgraded;
 }
 
 const AFTER_TURN_COPY = /\bAfter turn [23]:/i;
@@ -436,6 +489,12 @@ Hand-shortened Location copy is kept. */
 export function normalizeDocument(value: ContentDocument | unknown): ContentDocument {
   const copy = withOpponents(withStartingDecks(structuredClone(upgradeDocument(value)) as ContentDocument));
   copy.mods ??= [];
+  copy.runtimeHacks ??= [];
+  for (const hack of copy.runtimeHacks) {
+    hack.effects = migrateEffects(hack.effects ?? [], 'runtimeHack');
+    if (typeof hack.formula !== 'string') hack.formula = '';
+    if (!Array.isArray(hack.cards)) hack.cards = [];
+  }
   for (const location of copy.locations) {
     if (location.rule?.trim()) continue;
     const text = describeLocation(location, copy.cards as unknown as Card[], copy.mods.filter(mod => mod.enabled));
@@ -458,9 +517,10 @@ export function compileContent(doc: ContentDocument): CompiledContent {
   }
   const locations = normalized.locations.filter(location => location.enabled).map(({ enabled: _enabled, ...location }) => location);
   const circuitRewards = normalized.circuitRewards.filter(reward => reward.enabled).map(({ enabled: _enabled, ...reward }) => ({ ...reward, effect: reward.effects[0] }));
+  const runtimeHacks = normalized.runtimeHacks!.filter(hack => hack.enabled).map(({ enabled: _enabled, ...hack }) => hack);
   const mods = normalized.mods!.filter(mod => mod.enabled).map(({ enabled: _enabled, ...mod }) => mod);
   const activeDeck = normalized.startingDecks!.find(deck => deck.id === normalized.activeStartingDeckId)!;
   const startingDeck = expandDeck(activeDeck.cards, cards);
   const opponents = normalized.opponents!.map(opponent => structuredClone(opponent));
-  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, locations, circuitRewards, mods, startingDeck, opponents };
+  return { cards, baseCards: cardsByPool.Base, chaosCards: cardsByPool.Chaos, vpCards: cardsByPool.VP, cryptoCards: cardsByPool.Crypto, locations, circuitRewards, runtimeHacks, mods, startingDeck, opponents };
 }

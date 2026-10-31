@@ -53,7 +53,7 @@ describe('card-level aura', () => {
   });
 
   it('prints its own ability text', () => {
-    expect(describeCard({ aura: 2 })).toBe('Your other cards here have +2 Power.');
+    expect(describeCard({ aura: 2 })).toBe('Aura +2.');
     expect(describeCard({ selfMove: 'cycle' })).toBe('Once each Cycle, you may move this card to another open Node.');
     expect(describeCard({ powerSource: 'movedByOwner', selfMove: 'cycle' })).toBe('+1 Power for each card you have moved this game. Once each Cycle, you may move this card to another open Node.');
   });

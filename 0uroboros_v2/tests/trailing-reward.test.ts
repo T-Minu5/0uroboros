@@ -18,7 +18,7 @@ function drain(session: RuntimeSession) {
   }
 }
 function cycleEnd(locationWinner: PlayerId, setup: (session: RuntimeSession) => void) {
-  const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: trailingContent });
+  const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: trailingContent, noTrailingRewards: false });
   session.state.players.forEach(player => { player.draw = []; player.hand = []; player.discard = []; player.destroyed = []; player.rewardVP = 0; });
   session.state.turn = 3;
   session.state.nodes.forEach(node => { node.location = null; });

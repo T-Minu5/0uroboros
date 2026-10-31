@@ -15,6 +15,13 @@ export type StratGEvidence = {
   version: number; mode: string; plan: string; notes: string[];
   theories: { id: string; text: string; status: string; confidence: number; support: number; against: number }[];
 };
+export type EvidenceArm = {
+  role: 'control' | 'patch';
+  cardId: string;
+  experimentId: string;
+  label?: string;
+};
+
 export type GameEvidence = {
   id: string; source: EvidenceSource; recordedAt: string;
   /** Present for self-play games. */
@@ -27,6 +34,8 @@ export type GameEvidence = {
   agent?: string;
   /** League games: the agent id in each seat; human games: `human` and the agent. */
   seats?: [string, string];
+  /** Content A/B: which document arm produced this game. */
+  arm?: EvidenceArm;
 };
 
 export function deepFreeze<T>(value: T): T {

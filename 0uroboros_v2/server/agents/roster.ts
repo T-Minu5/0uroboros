@@ -55,7 +55,7 @@ export function describeEnvelope(envelope: StyleEnvelope): string {
 export const STRAT_G: StrategistIdentity = {
   id: 'strat-g', name: 'Strat-G', archetype: 'Balanced',
   style: 'Balanced in three phases: economy and engine (Cycles 1-4), a balanced midgame (5-8), then all-out Server attacks and VP buying (9-16).',
-  persona: `You play the designer's balanced line in three phases, and you plan every game around them. Cycles 1-4 follow the shared early economy (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption then Shyte after a better Crypto source) before your own line — the current starting deck is weaker than older builds, which gives more Draft flexibility. Phase 2 (Cycles ${STRAT_G_PHASES.economyUntilCycle + 1}-${STRAT_G_PHASES.endgameFromCycle - 1}): a balance of attacks, deck engine, Server Restore and VP collection. Phase 3 (Cycles ${STRAT_G_PHASES.endgameFromCycle}-16): attack the enemy Servers like crazy and spend mostly on VP. The phase Cycles are fixed by the designer, so experiment on weights, the buy bar, dilution and card biases, not on timing. Adapt to the opponent without abandoning that shape.`,
+  persona: `You play the designer's balanced line in three phases, and you plan every game around them. Cycles 1-4 follow the shared early economy (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption then Shyte after a better Crypto source) before your own line — the current starting deck is weaker than older builds, which gives more Draft flexibility; value cards by how they upgrade that weak start. Read Locations before deploying; concede bad ones when Circuit count allows. Sequence reveals so later cards benefit from earlier effects; treat polluting the opponent with Shyte/Glitch as a real attack. Phase 2 (Cycles ${STRAT_G_PHASES.economyUntilCycle + 1}-${STRAT_G_PHASES.endgameFromCycle - 1}): a balance of attacks, deck engine, Server Restore and VP collection. Phase 3 (Cycles ${STRAT_G_PHASES.endgameFromCycle}-16): attack the enemy Servers like crazy and spend mostly on VP. The phase Cycles are fixed by the designer, so experiment on weights, the buy bar, dilution and card biases, not on timing. The numeric profile governs play; documentary plans do not rewrite it. Adapt to the opponent without abandoning that shape.`,
   baseline: opponentBaseline('strat-g'),
   envelope: {
     economyUntilCycle: [STRAT_G_PHASES.economyUntilCycle, STRAT_G_PHASES.economyUntilCycle],
@@ -72,8 +72,8 @@ export const T_5: StrategistIdentity = {
   baseline: opponentBaseline('t-5'),
   playbook: [
     'Draft from Cycle 5: cheap Power, Action and Drain cards first; further Crypto income only when nothing aggressive is affordable. Never Shyte-Coin.',
-    'Deploy: commit Power early to win Nodes and their rewards; Drain cards go out as soon as they are drawn.',
-    'Choices from Cycle 5: hit the opponent\'s best economy and draw cards; trash my own dead Crypto.',
+    'Deploy: commit Power early to win Nodes and their rewards when the Location helps; concede Locations that clog or pay the loser; Drain cards go out as soon as they are drawn, sequenced after Action/draw fuel.',
+    'Choices from Cycle 5: hit the opponent\'s best economy and draw cards; pollute their deck when possible; trash my own dead Crypto.',
     'Arc: after the shared early economy, Chaos and Drain hard; Primary down in the midgame, Backup by Cycles 10-13; VP cards only to close out a won race.',
   ],
   envelope: { economyUntilCycle: [4, 4], chaosFromCycle: [5, 7], vpFromCycle: [9, 15], handCryptoTarget: [6, 10], weights: { drain: [2.4, 5], chaos: [2, 5], restore: [0, 1], vp: [0.5, 2], crypto: [0.6, 1.6], thin: [0.5, 5] } },
@@ -87,8 +87,8 @@ export const DV_8: StrategistIdentity = {
   baseline: opponentBaseline('dv-8'),
   playbook: [
     'Draft from Cycle 5: keep thinning, draw and Action cards and high Crypto income (Character Crypto lines, or Kilo/Mega when the shelf is on) through the long economy; skip anything that dilutes the deck. Never Shyte-Coin.',
-    'Deploy: draw and Action cards first so the engine chains; Restore whenever the Servers take real damage.',
-    'Choices from Cycle 5: trash my own junk aggressively (remaining Shyte, Glitch, weak Crypto) to keep the deck thin.',
+    'Deploy: draw and Action cards first so the engine chains, then sequence other reveals; read Locations and concede ones that hurt the engine; Restore whenever the Servers take real damage.',
+    'Choices from Cycle 5: trash my own junk aggressively (remaining Shyte, Glitch, weak Crypto) to keep the deck thin; pollution on the opponent is welcome when the effect offers it.',
     'Arc: after the shared early economy, survive pressure, let the engine take over, Chaos only as a late finisher, then heavy VP buying from Cycle 13.',
   ],
   envelope: { economyUntilCycle: [5, 10], chaosFromCycle: [8, 15], vpFromCycle: [11, 16], handCryptoTarget: [9, 16], weights: { thin: [1.8, 5], draw: [1.8, 5], chaos: [0, 1.2], drain: [0, 1.5] } },
@@ -102,7 +102,7 @@ export const VP_DOG: StrategistIdentity = {
   baseline: opponentBaseline('vp-dog'),
   playbook: [
     'Draft from Cycle 5: finish Crypto income upgrades (Character Crypto lines, or Kilo/Mega when the shelf is on) plus draw and Action cards; from Cycle 6 spend most of every Wallet on VP piles, most VP per Crypto first. Never Shyte-Coin; skip Chaos.',
-    'Deploy: draw and Action cards first, VP cards whenever they are drawn (they cost no Actions); Restore as soon as the Servers take real damage.',
+    'Deploy: draw and Action cards first, then VP cards whenever they are drawn (they cost no Actions); read Locations — concede attack-only Nodes when defending Servers matters more; Restore as soon as the Servers take real damage.',
     'Choices from Cycle 5: trash any remaining junk (Shyte-Coin, Glitch) so the strong Crypto income comes up more often; protect my Servers before hurting the opponent.',
     'Arc: shared early economy through Cycle 4, then VP every Draft from the midgame, 25+ VP bought by Cycles 11-14, staying ahead on VP whenever my Servers are in danger.',
   ],

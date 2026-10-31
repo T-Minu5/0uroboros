@@ -4,14 +4,14 @@ import { createModReward, followModRename, isModReward } from '../src/authoring/
 import { createStep } from '@0uroboros/engine/effects/catalog';
 
 const mod = (name: string): AuthoredMod => ({ id: 'mod-test', name, enabled: true, onReveal: [createStep('gainCrypto', 'card')] });
-const doc = (mods: AuthoredMod[], circuitRewards: ContentDocument['circuitRewards'] = []): ContentDocument => ({ version: 2, cards: [], locations: [], circuitRewards, mods });
+const doc = (mods: AuthoredMod[], circuitRewards: ContentDocument['circuitRewards'] = []): ContentDocument => ({ version: 3, cards: [], locations: [], circuitRewards, mods, runtimeHacks: [] });
 
 describe('Circuit rewards made with card mods', () => {
-  it('attaches the new mod to a random Character in the claiming player’s deck', () => {
+  it('attaches the new mod to a chosen Character in the claiming player’s deck', () => {
     const giver = mod('The Giver');
     const reward = createModReward('reward-test', giver, doc([giver]));
     expect(reward).toMatchObject({ id: 'reward-test', name: 'The Giver', cost: 0, enabled: true, text: 'Attach the “The Giver” mod to a Character in your deck.' });
-    expect(reward.effects).toEqual([{ action: 'attachModifier', modifier: 'mod-test', target: { type: 'card', who: 'self', where: 'collection', filter: { cardType: 'Character' } }, pick: { mode: 'random' } }]);
+    expect(reward.effects).toEqual([{ action: 'attachModifier', modifier: 'mod-test', target: { type: 'card', who: 'self', where: 'collection', filter: { cardType: 'Character' } }, pick: { mode: 'choose' } }]);
     expect(isModReward(reward, 'mod-test')).toBe(true);
     expect(isModReward(reward, 'mod-other')).toBe(false);
   });

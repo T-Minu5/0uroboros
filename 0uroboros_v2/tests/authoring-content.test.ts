@@ -9,9 +9,10 @@ const steps = (effects: Parameters<typeof migrateEffects>[0]) => migrateEffects(
 const findCard = (document: ReturnType<typeof createDefaultContent>, id: string) => document.cards.find(card => card.definitionId === id)!;
 
 describe('authored content', () => {
-  it('seeds a playable version 2 document including the existing catalog and the new effect examples', () => {
+  it('seeds a playable version 3 document including the existing catalog and the new effect examples', () => {
     const document = createDefaultContent();
-    expect(document.version).toBe(2);
+    expect(document.version).toBe(3);
+    expect(document.runtimeHacks).toEqual([]);
     expect(validateContent(document)).toEqual([]);
     const compiled = compileContent(document);
     expect(compiled.cards.length).toBeGreaterThan(74);

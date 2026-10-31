@@ -18,9 +18,9 @@ export function legacyChoiceOptions(scope: Scope): ChoiceOption[] {
   ];
 }
 
-/** Condition rewards credit the qualifying seat; player targets never name opponent/both/any. */
+/** Condition / Runtime Hack rewards credit the unlocking seat; player targets never name opponent/both/any. */
 function lockConditionPlayerTargets(step: EffectStep, scope: Scope): EffectStep {
-  if (scope !== 'locationCondition') return step;
+  if (scope !== 'locationCondition' && scope !== 'runtimeHack') return step;
   let next = step;
   if (next.target?.type === 'player' && next.target.who !== 'self') {
     next = { ...next, target: { ...next.target, who: 'self' } };
