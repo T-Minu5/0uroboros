@@ -1,5 +1,6 @@
 import type { Card, LegacyEffect } from '../game';
 import { normalizeLocationCondition, type LocationCondition } from '../locationConditions';
+import type { LocationEvent } from '../locationEvents';
 import { ACTIONS } from './catalog';
 import { isStep, scopedWho, type AnyEffect, type ChoiceOption, type EffectStep, type PickMode, type Scope, type Target, type Who } from './types';
 
@@ -18,9 +19,9 @@ export function legacyChoiceOptions(scope: Scope): ChoiceOption[] {
   ];
 }
 
-/** Condition / Runtime Hack rewards credit the unlocking seat; player targets never name opponent/both/any. */
+/** Condition / event / Runtime Hack rewards credit the unlocking seat; player targets never name opponent/both/any. */
 function lockConditionPlayerTargets(step: EffectStep, scope: Scope): EffectStep {
-  if (scope !== 'locationCondition' && scope !== 'runtimeHack') return step;
+  if (scope !== 'locationCondition' && scope !== 'locationEvent' && scope !== 'runtimeHack') return step;
   let next = step;
   if (next.target?.type === 'player' && next.target.who !== 'self') {
     next = { ...next, target: { ...next.target, who: 'self' } };
@@ -82,14 +83,22 @@ export function migrateCard<T extends Card>(card: T): StepCard<T> {
 }
 
 type LocationConditionLike = { id: string; kind: string; effects: readonly AnyEffect[]; [key: string]: unknown };
+type LocationEventLike = { id: string; kind: string; effects: readonly AnyEffect[]; [key: string]: unknown };
+type LocationWhileLike = { id: string; kind: string; effects?: readonly AnyEffect[]; powerBonus?: number; [key: string]: unknown };
 type LocationLike = {
   effects: readonly AnyEffect[]; ongoing?: readonly AnyEffect[]; onPlay?: readonly AnyEffect[];
   startTurn2?: readonly AnyEffect[]; startTurn3?: readonly AnyEffect[]; conditions?: readonly LocationConditionLike[];
+  events?: readonly LocationEventLike[];
+  whiles?: readonly LocationWhileLike[];
 };
 type StepLocationCondition = Omit<LocationCondition, 'effects'> & { effects: EffectStep[] };
-type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3' | 'conditions'> & {
+type StepLocationEvent = Omit<LocationEvent, 'effects'> & { effects: EffectStep[] };
+type StepLocationWhile = Omit<LocationWhileLike, 'effects'> & { effects?: EffectStep[]; powerBonus?: number };
+type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3' | 'conditions' | 'events' | 'whiles'> & {
   effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[];
   conditions?: StepLocationCondition[];
+  events?: StepLocationEvent[];
+  whiles?: StepLocationWhile[];
 };
 type LegacyLocationSchedule = { schedule?: readonly { at: number; effects: readonly AnyEffect[] }[] };
 
@@ -107,7 +116,7 @@ export function liftLocationSchedule<T extends object>(location: T & LegacyLocat
 
 /** A Location with its collapse, Ongoing and start-of-turn lists in winner/loser terms and On Play in played/other terms. */
 export function migrateLocation<T extends LocationLike>(location: T): StepLocation<T> {
-  const { effects, ongoing, onPlay, startTurn2, startTurn3, conditions, ...rest } = liftLocationSchedule(location);
+  const { effects, ongoing, onPlay, startTurn2, startTurn3, conditions, events, whiles, ...rest } = liftLocationSchedule(location);
   return {
     ...rest,
     effects: migrateEffects(effects, 'location'),
@@ -119,6 +128,18 @@ export function migrateLocation<T extends LocationLike>(location: T): StepLocati
       conditions: conditions.map(condition => normalizeLocationCondition({
         ...(condition as LocationCondition),
         effects: migrateEffects(condition.effects, 'locationCondition'),
+      })),
+    } : {}),
+    ...(events?.length ? {
+      events: events.map(event => ({
+        ...(event as LocationEvent),
+        effects: migrateEffects(event.effects, 'locationEvent'),
+      })),
+    } : { events: [] }),
+    ...(whiles?.length ? {
+      whiles: whiles.map(entry => ({
+        ...entry,
+        ...(entry.effects ? { effects: migrateEffects(entry.effects, 'locationEvent') } : {}),
       })),
     } : {}),
   } as StepLocation<T>;

@@ -103,7 +103,9 @@ const SOFT_ACTIONS: Partial<Record<ActionId, string>> = {
 
 type Curve = { alpha: number; beta: number; gamma: number };
 
-export type BudgetCard = Card & {
+export type BudgetCard = Omit<Card, 'art' | 'effect' | 'powerSource'> & {
+  art?: string;
+  effect?: string;
   onReveal?: EffectStep[];
   onCollapse?: EffectStep[];
   recurring?: EffectStep[];
@@ -180,7 +182,7 @@ function walkSteps(
 
     const amount = step.amount ?? 0;
     let credit = 0;
-    let label = step.action;
+    let label: string = step.action;
 
     switch (step.action) {
       case 'draw':
@@ -213,7 +215,7 @@ function walkSteps(
         break;
       case 'changePower': {
         const who = step.target && 'who' in step.target ? step.target.who : 'self';
-        if (who === 'self' || who === 'ally' || who === undefined) {
+        if (who === 'self' || who === undefined) {
           credit = BUDGET_WEIGHTS.changePower * amount;
           label = `${amount >= 0 ? '+' : ''}${amount} Power (printed change)`;
         } else {
@@ -293,7 +295,7 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
     value += credit;
   }
   if (card.aura) soft.push({ id: 'aura', reason: 'Power aura depends on other allies at the Location.' });
-  if (card.powerSource && card.powerSource !== 'none') {
+  if (card.powerSource) {
     soft.push({ id: 'powerSource', reason: 'Live Power bonus depends on game state.' });
   }
   if (card.selfMove) soft.push({ id: 'selfMove', reason: 'Self-move is mobility utility, not a fixed resource credit.' });

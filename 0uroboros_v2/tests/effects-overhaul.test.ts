@@ -302,7 +302,7 @@ describe('authoring effects overhaul', () => {
   });
 
   it('offers previous and next targets for attach and Power changes', () => {
-    expect(targetsFor('attachModifier', 'card')[0]).toMatchObject({ relations: ['previous', 'next'] });
+    expect(targetsFor('attachModifier', 'card')[0]).toMatchObject({ relations: ['self', 'previous', 'next'] });
     expect(describeStep({ action: 'attachModifier', modifier: 'movableEachTurn', target: { type: 'card', who: 'self', where: 'board', relation: 'next' } }, 'card', catalog)).toMatch(/next revealed/);
     expect(describeStep({ action: 'changePower', amount: 2, target: { type: 'card', who: 'opponent', where: 'board', relation: 'previous' } }, 'card', catalog)).toMatch(/previously revealed enemy card/);
   });

@@ -2,7 +2,11 @@ import type { LegacyEffect } from './game';
 import { migrateLocation, migrateRewardEffects } from './effects/migrate';
 import type { AnyEffect } from './effects/types';
 import type { LocationCondition } from './locationConditions';
+import type { LocationEvent, LocationPassives } from './locationEvents';
+import type { LocationWhile } from './locationWhiles';
 export type { LocationCondition, LocationConditionKind, ConditionComparison } from './locationConditions';
+export type { LocationEvent, LocationEventKind, LocationPassives } from './locationEvents';
+export type { LocationWhile, LocationWhileKind } from './locationWhiles';
 
 /** Exact recovered fixtures approved by Mel for this evaluation build. */
 /** Location and Circuit lists hold catalog steps; the engine still reads older saved effects through migration. */
@@ -24,6 +28,12 @@ export type EvaluationLocation = {
   startTurn3?: readonly LocationRewardEffect[];
   /** Once-per-seat rewards while this Location is in play (revealed cards currently on the Node). */
   conditions?: readonly LocationCondition[];
+  /** Event triggers that fire when something happens at this Node. */
+  events?: readonly LocationEvent[];
+  /** Continuous While formulas (live Power bonus and/or Ongoing-cadence effects). */
+  whiles?: readonly LocationWhile[];
+  /** Always-on Location rules (move legality, Power scale). */
+  passives?: LocationPassives;
 };
 export type CircuitRewardEffect = AnyEffect;
 export type CircuitRewardDefinition = {

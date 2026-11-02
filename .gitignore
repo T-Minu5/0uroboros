@@ -10,3 +10,6 @@ coverage/
 
 # Cloned third-party ecosystem, tracked in its own repository.
 shokunin/
+
+# Local sorting bin for untracked clutter
+review these files/

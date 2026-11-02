@@ -1,7 +1,7 @@
 import type { Card, CardType, LegacyEffect } from '../game';
 
 /** Where an effect list lives; it decides who "you" is and which targets make sense. */
-export type Scope = 'card' | 'location' | 'locationPlay' | 'locationCondition' | 'circuit' | 'runtimeHack';
+export type Scope = 'card' | 'location' | 'locationPlay' | 'locationCondition' | 'locationEvent' | 'circuit' | 'runtimeHack';
 
 /**
  * Whose cards, zones or Servers a step touches, relative to the effect's controller.
@@ -23,7 +23,7 @@ export type CardWhere = 'board' | 'thisNode' | 'hand' | 'wallet' | 'deck' | 'dec
 export const DECK_ENDS: readonly CardWhere[] = ['deckTop', 'deckBottom'];
 export type CardClass = NonNullable<Card['cardClass']>;
 /** `cardClass` matches any one of the listed classes; older content stores a single class. */
-export type CardFilter = { cardType?: CardType; cardClass?: CardClass | readonly CardClass[] };
+export type CardFilter = { cardType?: CardType; cardClass?: CardClass | readonly CardClass[]; definitionId?: string };
 export const filterClasses = (filter?: CardFilter): readonly CardClass[] =>
   filter?.cardClass === undefined ? [] : typeof filter.cardClass === 'string' ? [filter.cardClass] : filter.cardClass;
 export type Relation = 'self' | 'previous' | 'next';
@@ -45,7 +45,8 @@ export type ActionId =
   | 'damageServer' | 'repairServer' | 'destroyServer'
   | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'recover' | 'stealCrypto' | 'bump'
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'
-  | 'createHologram' | 'copyPreviousOnReveal'
+  | 'createHologram' | 'copyPreviousOnReveal' | 'sacrificeCards'
+  | 'stealDeckCard' | 'deckSwap' | 'placeCard' | 'copyText'
   | 'choice' | 'random';
 
 export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
@@ -76,8 +77,13 @@ export type EffectStep = {
   /**
    * Gain a card: optional pool of definition IDs. When set (and longer than one), each copy is
    * picked from this list (`selection`, default `random`). A single `cardId` still means exactly that card.
+   * When neither `cardId` nor `cardIds` is set, `filter` (+ optional `maxCost`) picks from the catalog.
    */
   cardIds?: readonly string[];
+  /** Gain-by-filter / copyText: match cards by type, class, and/or definitionId. */
+  filter?: CardFilter;
+  /** Gain-by-filter: highest printed cost allowed (inclusive). */
+  maxCost?: number;
   /** Attach: the mod to attach. Remove: the mod to strip; absent strips every mod. */
   modifier?: ModifierRef;
   formIds?: readonly string[];

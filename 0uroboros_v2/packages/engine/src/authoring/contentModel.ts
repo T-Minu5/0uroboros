@@ -7,6 +7,8 @@ import { describeLocation, validateSteps, type ValidationCards } from '../effect
 import { liftLocationSchedule, migrateCard, migrateEffects, migrateLocation, migrateRewardEffects } from '../effects/migrate';
 import { MOD_HOOKS, isBuiltinModifier, type AnyEffect, type EffectStep, type ModDefinition, type Scope } from '../effects/types';
 import { validateLocationCondition, type LocationCondition } from '../locationConditions';
+import { validateLocationEvent, validateLocationPassives, type LocationEvent, type LocationPassives } from '../locationEvents';
+import { validateLocationWhile, type LocationWhile } from '../locationWhiles';
 import { RUNTIME_HACK_WINDOWS, type AuthoredRuntimeHack, type RuntimeHackDefinition } from '../runtimeHacks';
 import { BUILTIN_MOD_FIELDS, BUILTIN_MOD_LIMITS, type BuiltinModOverrides } from '../builtinMods';
 import { defaultOpponents, isCanonicalProfile, type AuthoredOpponent } from '../ai/opponents';
@@ -27,6 +29,7 @@ export type AuthoredCard = Omit<Card, keyof CardHooks> & CardHooks & {
 type LocationHooks = {
   effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[];
   startTurn2?: EffectStep[]; startTurn3?: EffectStep[]; conditions?: LocationCondition[];
+  events?: LocationEvent[]; whiles?: LocationWhile[]; passives?: LocationPassives;
 };
 export type AuthoredLocation = Omit<EvaluationLocation, keyof LocationHooks> & LocationHooks & { enabled: boolean };
 export type AuthoredCircuitReward = Omit<CircuitRewardDefinition, 'effect' | 'effects'> & { effects: EffectStep[]; enabled: boolean };
@@ -309,7 +312,7 @@ export function validateContent(value: unknown): string[] {
   locations.forEach((item, index) => {
     const p = `locations[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a location object`); return; }
-    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'ongoing', 'onPlay', 'startTurn2', 'startTurn3', 'conditions', 'enabled'], p, errors);
+    extraFields(item, ['id', 'name', 'rule', 'reward', 'effects', 'ongoing', 'onPlay', 'startTurn2', 'startTurn3', 'conditions', 'events', 'whiles', 'passives', 'enabled'], p, errors);
     requiredId(item.id, `${p}.id`, errors); requiredText(item.name, `${p}.name`, errors, 200);
     requiredText(item.rule, `${p}.rule`, errors, 2000); requiredText(item.reward, `${p}.reward`, errors, 2000);
     if (typeof item.enabled !== 'boolean') errors.push(`${p}.enabled: expected boolean`);
@@ -325,6 +328,25 @@ export function validateContent(value: unknown): string[] {
         if (Array.isArray(condition.effects)) steps(condition.effects, `${cp}.effects`, 'locationCondition');
       });
     }
+    if (item.events !== undefined) {
+      if (!Array.isArray(item.events) || item.events.length > 20) errors.push(`${p}.events: expected up to 20 events`);
+      else item.events.forEach((event, at) => {
+        const ep = `${p}.events[${at}]`;
+        if (!record(event)) { errors.push(`${ep}: expected an event object`); return; }
+        errors.push(...validateLocationEvent(event as LocationEvent, ep));
+        if (Array.isArray(event.effects)) steps(event.effects, `${ep}.effects`, 'locationEvent');
+      });
+    }
+    if (item.whiles !== undefined) {
+      if (!Array.isArray(item.whiles) || item.whiles.length > 20) errors.push(`${p}.whiles: expected up to 20 while entries`);
+      else item.whiles.forEach((entry, at) => {
+        const wp = `${p}.whiles[${at}]`;
+        if (!record(entry)) { errors.push(`${wp}: expected a while object`); return; }
+        errors.push(...validateLocationWhile(entry as LocationWhile, wp));
+        if (Array.isArray(entry.effects)) steps(entry.effects, `${wp}.effects`, 'locationEvent');
+      });
+    }
+    if (item.passives !== undefined) errors.push(...validateLocationPassives(item.passives as LocationPassives, `${p}.passives`));
   });
   mods.forEach((item, index) => {
     const p = `mods[${index}]`;

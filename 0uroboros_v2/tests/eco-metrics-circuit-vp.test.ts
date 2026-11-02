@@ -5,6 +5,7 @@ import { cohortMetrics, gameMetrics } from '../server/agents/ecoMetrics';
 const emptyTelemetry = {
   events: 0, failedOutcomes: [0, 0] as [number, number], randomResults: 0, choices: [0, 0] as [number, number],
   drainDealt: [0, 0] as [number, number], restoreDone: [0, 0] as [number, number], restoreEvents: [0, 0] as [number, number],
+  drainEvents: [0, 0] as [number, number],
   wastedRestores: [0, 0] as [number, number], drainBySource: {}, restoreBySource: {}, destructions: [],
   cards: {}, locations: {}, circuit: {}, perCycle: [], vpGained: [0, 0] as [number, number],
   cryptoGained: [0, 0] as [number, number], drawn: [0, 0] as [number, number], actionsGained: [0, 0] as [number, number],
@@ -13,7 +14,7 @@ const emptyTelemetry = {
 function report(partial: Partial<MatchReport> & Pick<MatchReport, 'cycles' | 'purchases' | 'finalVP'>): MatchReport {
   return {
     strategyVersion: 1, cycle: partial.cycles.at(-1)?.cycle ?? 1, phase: 'gameover', winner: 0, endedReason: 'Cycle 16 final Draft complete.',
-    servers: [3500, 3500], decks: [{}, {}], aiSeats: [1], telemetry: emptyTelemetry as MatchReport['telemetry'], decisions: [],
+    servers: [3500, 3500], decks: [{}, {}], aiSeats: [1], telemetry: emptyTelemetry as unknown as MatchReport['telemetry'], decisions: [],
     ...partial,
   };
 }
@@ -71,7 +72,7 @@ describe('Eco metrics Circuit differential and market VP', () => {
           { cycle: 9, victim: 0, server: 'primary', by: 1, source: 'card', sourceId: 'z', vp: 4 },
           { cycle: 11, victim: 0, server: 'backup', by: 1, source: 'card', sourceId: 'w', vp: 4 },
         ],
-      } as MatchReport['telemetry'],
+      } as unknown as MatchReport['telemetry'],
     }));
     expect(m.marketVp).toEqual([6, 2]);
     expect(m.destructionVP).toEqual([8, 8]);

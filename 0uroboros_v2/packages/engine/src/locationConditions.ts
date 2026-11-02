@@ -5,7 +5,14 @@ import type { EffectStep } from './effects/types';
 export type ConditionComparison = 'orMore' | 'orLess';
 
 /** Formulas that award a Location reward once per seat while the Location is in play. */
-export type LocationConditionKind = 'subtypeCount' | 'subtypePair' | 'powerThreshold' | 'cardCountThreshold';
+export type LocationConditionKind =
+  | 'subtypeCount'
+  | 'subtypePair'
+  | 'powerThreshold'
+  | 'cardCountThreshold'
+  | 'drainFromNode'
+  | 'soloCard'
+  | 'cardPlayedHere';
 
 export type LocationCondition = {
   /** Stable id for once-per-seat tracking within a Cycle. */
@@ -13,7 +20,7 @@ export type LocationCondition = {
   kind: LocationConditionKind;
   /** subtypeCount: required count of matching revealed cards. */
   count?: number;
-  /** subtypeCount: required card class. */
+  /** subtypeCount / cardPlayedHere: required card class. */
   cardClass?: CardClass;
   /**
    * subtypePair: 2–4 required classes (at least one revealed card of each).
@@ -24,14 +31,25 @@ export type LocationCondition = {
   cardClassA?: CardClass;
   /** @deprecated Use `cardClasses`. Still read when `cardClasses` is absent. */
   cardClassB?: CardClass;
-  /** powerThreshold / cardCountThreshold: threshold value. */
+  /** powerThreshold / cardCountThreshold / drainFromNode: threshold value. */
   amount?: number;
   comparison?: ConditionComparison;
+  /** cardPlayedHere: optional specific card identity (definitionId). */
+  definitionId?: string;
   effects: EffectStep[];
+};
+
+/** Runtime extras that state formulas may need beyond the current board. */
+export type LocationConditionExtras = {
+  /** Drain dealt from this Node by this seat this Cycle. */
+  drainFromNode?: number;
+  /** Whether this seat has revealed a matching card here this Cycle. */
+  cardPlayedHere?: boolean;
 };
 
 export const LOCATION_CONDITION_KINDS: readonly LocationConditionKind[] = [
   'subtypeCount', 'subtypePair', 'powerThreshold', 'cardCountThreshold',
+  'drainFromNode', 'soloCard', 'cardPlayedHere',
 ];
 
 export const CONDITION_COMPARISONS: readonly ConditionComparison[] = ['orMore', 'orLess'];
@@ -41,6 +59,9 @@ export const CONDITION_KIND_LABELS: Record<LocationConditionKind, string> = {
   subtypePair: 'Subtype combo',
   powerThreshold: 'Power threshold',
   cardCountThreshold: 'Card count threshold',
+  drainFromNode: 'Drain from this Node',
+  soloCard: 'Only one card here',
+  cardPlayedHere: 'Card played here',
 };
 
 export const SUBTYPE_COMBO_MIN = 2;
@@ -76,10 +97,15 @@ export function revealedHere(placements: readonly Deployment[], owner: PlayerId)
   return placements.filter(placement => placement.revealed && placement.owner === owner);
 }
 
+function compareThreshold(value: number, amount: number, comparison: ConditionComparison = 'orMore'): boolean {
+  return comparison === 'orLess' ? value <= amount : value >= amount;
+}
+
 export function meetsLocationCondition(
   condition: LocationCondition,
   revealed: readonly Deployment[],
   power: number,
+  extras: LocationConditionExtras = {},
 ): boolean {
   switch (condition.kind) {
     case 'subtypeCount': {
@@ -94,15 +120,16 @@ export function meetsLocationCondition(
       const classes = new Set(revealed.map(placement => classOf(placement.card)).filter(Boolean) as CardClass[]);
       return need.every(cls => classes.has(cls));
     }
-    case 'powerThreshold': {
-      const amount = condition.amount ?? 0;
-      return (condition.comparison ?? 'orMore') === 'orLess' ? power <= amount : power >= amount;
-    }
-    case 'cardCountThreshold': {
-      const amount = condition.amount ?? 0;
-      const count = revealed.length;
-      return (condition.comparison ?? 'orMore') === 'orLess' ? count <= amount : count >= amount;
-    }
+    case 'powerThreshold':
+      return compareThreshold(power, condition.amount ?? 0, condition.comparison);
+    case 'cardCountThreshold':
+      return compareThreshold(revealed.length, condition.amount ?? 0, condition.comparison);
+    case 'drainFromNode':
+      return compareThreshold(extras.drainFromNode ?? 0, condition.amount ?? 0, condition.comparison);
+    case 'soloCard':
+      return revealed.length === 1;
+    case 'cardPlayedHere':
+      return extras.cardPlayedHere === true;
   }
 }
 
@@ -123,23 +150,39 @@ export function describeConditionPredicate(condition: LocationCondition): string
       const n = Math.max(1, condition.count ?? 1);
       const cls = condition.cardClass ?? 'Action';
       return n === 1
-        ? `if you have ${article(cls)} ${cls} card here`
-        : `if you have ${n} or more ${cls} cards here`;
+        ? `Once you have ${article(cls)} ${cls} card here`
+        : `Once you have ${n} or more ${cls} cards here`;
     }
     case 'subtypePair': {
       const classes = subtypeClassesOf(condition);
       const list = classes.length >= SUBTYPE_COMBO_MIN ? classes : (['Attack', 'Horror'] as CardClass[]);
-      return `if you have ${describeSubtypeList(list)} here`;
+      return `Once you have ${describeSubtypeList(list)} here`;
     }
     case 'powerThreshold': {
       const amount = condition.amount ?? 0;
       const cmp = (condition.comparison ?? 'orMore') === 'orLess' ? 'or less' : 'or more';
-      return `if you have ${amount} ${cmp} Power here`;
+      return `Once you have ${amount} ${cmp} Power here`;
     }
     case 'cardCountThreshold': {
       const amount = condition.amount ?? 0;
       const cmp = (condition.comparison ?? 'orMore') === 'orLess' ? 'or less' : 'or more';
-      return `if you have ${amount} ${cmp} cards here`;
+      return `Once you have ${amount} ${cmp} cards here`;
+    }
+    case 'drainFromNode': {
+      const amount = condition.amount ?? 0;
+      const cmp = (condition.comparison ?? 'orMore') === 'orLess' ? 'or less' : 'or more';
+      return `Once you have dealt ${amount} ${cmp} Drain from here`;
+    }
+    case 'soloCard':
+      return 'Once you have only one card here';
+    case 'cardPlayedHere': {
+      if (condition.definitionId) {
+        return `Once you have played ${condition.definitionId} here`;
+      }
+      if (condition.cardClass) {
+        return `Once you have played ${article(condition.cardClass)} ${condition.cardClass} here`;
+      }
+      return 'Once you have played a card here';
     }
   }
 }
@@ -186,6 +229,30 @@ export function validateLocationCondition(condition: LocationCondition, path: st
         errors.push(`${path}.comparison: expected orMore or orLess`);
       }
       break;
+    case 'drainFromNode':
+      if (typeof condition.amount !== 'number' || !Number.isFinite(condition.amount) || condition.amount < 0 || condition.amount > 5000) {
+        errors.push(`${path}.amount: expected a number from 0 to 5000`);
+      }
+      if (condition.comparison !== undefined && !CONDITION_COMPARISONS.includes(condition.comparison)) {
+        errors.push(`${path}.comparison: expected orMore or orLess`);
+      }
+      break;
+    case 'soloCard':
+      break;
+    case 'cardPlayedHere': {
+      const hasClass = condition.cardClass !== undefined;
+      const hasId = condition.definitionId !== undefined && condition.definitionId !== '';
+      if (!hasClass && !hasId) {
+        errors.push(`${path}: expected cardClass and/or definitionId`);
+      }
+      if (hasClass && !isCardClass(condition.cardClass)) {
+        errors.push(`${path}.cardClass: expected a card class`);
+      }
+      if (hasId && (typeof condition.definitionId !== 'string' || !/^[A-Za-z0-9_-]{1,80}$/.test(condition.definitionId))) {
+        errors.push(`${path}.definitionId: use 1–80 letters, numbers, underscores or hyphens`);
+      }
+      break;
+    }
   }
   return errors;
 }
@@ -202,5 +269,11 @@ export function createLocationCondition(kind: LocationConditionKind = 'subtypeCo
       return { id, kind, amount: 5, comparison: 'orMore', effects: [] };
     case 'cardCountThreshold':
       return { id, kind, amount: 3, comparison: 'orMore', effects: [] };
+    case 'drainFromNode':
+      return { id, kind, amount: 100, comparison: 'orMore', effects: [] };
+    case 'soloCard':
+      return { id, kind, effects: [] };
+    case 'cardPlayedHere':
+      return { id, kind, cardClass: 'Attack', effects: [] };
   }
 }

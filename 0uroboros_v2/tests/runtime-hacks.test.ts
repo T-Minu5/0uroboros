@@ -186,8 +186,22 @@ describe('Runtime Hack content', () => {
       'hack-starless-sea', 'hack-burning-blade', 'hack-2-dots-and-a-dash',
     ]);
     expect(compiled.runtimeHacks.find(entry => entry.id === 'hack-burning-blade')).toMatchObject({
-      window: 'locationCycle', cards: ['rezz-razor', 'rezz-blade'],
+      window: 'locationCycle',
+      cards: ['rezz-razor', 'rezz-blade'],
+      effects: [
+        { action: 'gainCard', cardId: 'card-l2ngrv3w', target: { type: 'zone', who: 'self', zone: 'hand' } },
+        { action: 'gainCard', cardId: 'razor-blade-jade', target: { type: 'zone', who: 'opponent', zone: 'hand' } },
+      ],
     });
+    expect(compiled.cards.find(card => (card.definitionId ?? card.id) === 'razor-blade-jade')?.onReveal).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          action: 'destroyCard',
+          target: { type: 'card', who: 'opponent', where: 'thisNode', filter: { definitionId: 'card-l2ngrv3w' } },
+          pick: { mode: 'all' },
+        }),
+      ]),
+    );
   });
 });
 
@@ -248,8 +262,87 @@ describe('Runtime Hack awards', () => {
     expect(session.state.players[0].hand.some(entry => (entry.definitionId ?? entry.id) === 'basic-encryption')).toBe(false);
   });
 
+  it('awards Ching Dai to the unlocker and It\'s a Good Knife to the opponent', () => {
+    const document = createDefaultContent();
+    const has = (id: string) => document.cards.some(entry => (entry.definitionId ?? entry.id) === id);
+    if (!has('card-l2ngrv3w')) {
+      document.cards.push({
+        id: 'card-l2ngrv3w', definitionId: 'card-l2ngrv3w', name: 'Ching Dai', type: 'Character', cost: 0, power: 4,
+        art: '/assets/card_art/image_placeHolder.png', effect: 'Drain -150', pool: 'Chaos', enabled: true,
+        cardClass: 'Horror', generated: true, onReveal: [],
+      });
+    }
+    if (!has('razor-blade-jade')) {
+      document.cards.push({
+        id: 'razor-blade-jade', definitionId: 'razor-blade-jade', name: "It's a Good Knife", type: 'Character', cost: 0, power: 0,
+        art: '/assets/card_art/image_placeHolder.png', effect: 'Drain -1', pool: 'Chaos', enabled: true,
+        cardClass: 'Attack', generated: true, onReveal: [],
+      });
+    }
+    document.runtimeHacks = [{
+      id: 'hack-blade', name: 'The Burning Blade', enabled: true, window: 'locationCycle',
+      cards: ['rezz-razor', 'rezz-blade'],
+      formula: 'You gain Ching Dai; your opponent gains It\'s a Good Knife.',
+      effects: [
+        { action: 'gainCard', amount: 1, cardId: 'card-l2ngrv3w', target: { type: 'zone', who: 'self', zone: 'hand' } },
+        { action: 'gainCard', amount: 1, cardId: 'razor-blade-jade', target: { type: 'zone', who: 'opponent', zone: 'hand' } },
+      ],
+    }];
+    const session = quietSession(document);
+    const razor = placeInHand(session, 0, card('rezz-razor'));
+    const blade = placeInHand(session, 0, card('rezz-blade'));
+    session.deploy(razor.id, 0);
+    session.deploy(blade.id, 0);
+    const events = playOut(session);
+    expect(events.find(event => event.kind === 'runtimeHack')).toMatchObject({
+      definitionId: 'hack-blade', rewardCardId: 'card-l2ngrv3w', owner: 0,
+    });
+    expect(session.state.players[0].hand.some(entry => (entry.definitionId ?? entry.id) === 'card-l2ngrv3w')).toBe(true);
+    expect(session.state.players[1].hand.some(entry => (entry.definitionId ?? entry.id) === 'razor-blade-jade')).toBe(true);
+    expect(session.state.players[0].hand.some(entry => (entry.definitionId ?? entry.id) === 'razor-blade-jade')).toBe(false);
+    expect(session.state.players[1].hand.some(entry => (entry.definitionId ?? entry.id) === 'card-l2ngrv3w')).toBe(false);
+  });
+
   it('defaults new authoring gainCard steps to the unlocker hand', () => {
     const step = createStep('gainCard', 'runtimeHack');
     expect(step.target).toEqual({ type: 'zone', who: 'self', zone: 'hand' });
+  });
+});
+
+describe('It\'s a Good Knife vs Ching Dai', () => {
+  const knifeReveal = [
+    {
+      action: 'destroyCard' as const,
+      target: { type: 'card' as const, who: 'opponent' as const, where: 'thisNode' as const, filter: { definitionId: 'card-l2ngrv3w' } },
+      pick: { mode: 'all' as const },
+    },
+  ];
+
+  it('destroys a revealed Ching Dai at the same Node', () => {
+    const document = createDefaultContent();
+    const session = quietSession(document);
+    const ching = card('ching-dai', { definitionId: 'card-l2ngrv3w', name: 'Ching Dai', power: 4 });
+    session.state.nodes[0].cards[1].push({ card: ching, owner: 1, node: 0, order: 0, revealed: true });
+    const knife = placeInHand(session, 0, card('knife', {
+      definitionId: 'razor-blade-jade', name: "It's a Good Knife", power: 0, onReveal: knifeReveal,
+    }));
+    session.deploy(knife.id, 0);
+    const events = playOut(session);
+    expect(events.some(event => event.kind === 'trash' && /destroys Ching Dai/.test(event.text))).toBe(true);
+    expect(session.state.nodes[0].cards[1].some(placement => placement.card.id === 'ching-dai')).toBe(false);
+    expect(session.state.players[1].destroyed.some(entry => entry.id === 'ching-dai')).toBe(true);
+  });
+
+  it('does not destroy an unrevealed Ching Dai at the same Node', () => {
+    const document = createDefaultContent();
+    const session = quietSession(document);
+    const ching = card('ching-dai', { definitionId: 'card-l2ngrv3w', name: 'Ching Dai', power: 4 });
+    session.state.nodes[0].cards[1].push({ card: ching, owner: 1, node: 0, order: 0, revealed: false });
+    const knife = placeInHand(session, 0, card('knife', {
+      definitionId: 'razor-blade-jade', name: "It's a Good Knife", power: 0, onReveal: knifeReveal,
+    }));
+    session.deploy(knife.id, 0);
+    playOut(session);
+    expect(session.state.nodes[0].cards[1].some(placement => placement.card.id === 'ching-dai')).toBe(true);
   });
 });

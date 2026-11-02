@@ -1,5 +1,5 @@
 {
-  "revision": 697,
+  "revision": 803,
   "document": {
     "version": 3,
     "cards": [
@@ -10,7 +10,7 @@
         "type": "Character",
         "power": 4,
         "cost": 5,
-        "effect": "Push or pull 2 power. +1 Card. +1 Crypto.",
+        "effect": "Push or pull 2 power. +1 Card. +2 Crypto.",
         "art": "/assets/card_art/uploads/surge-splitter.png",
         "onReveal": [
           {
@@ -35,7 +35,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           }
         ],
         "pool": "Base",
@@ -89,7 +89,7 @@
             "options": [
               {
                 "id": "crypto",
-                "label": "+1 Crypto",
+                "label": "+2 Crypto",
                 "effects": [
                   {
                     "action": "gainCrypto",
@@ -125,140 +125,57 @@
       {
         "id": "atomic-unit",
         "definitionId": "atomic-unit",
-        "name": "Atomic Unit",
+        "name": "Atomic Number",
         "type": "Character",
         "cost": 2,
         "art": "/assets/card_art/base cards/action/atomic-unit.png",
-        "effect": "+1 Action.",
-        "power": 1,
+        "effect": "+1 Action for the next 5 turns. You may move this once",
+        "power": 2,
         "duration": 5,
         "durationPeriod": "runtime",
-        "onReveal": [
+        "onReveal": [],
+        "schedule": [],
+        "pool": "Base",
+        "enabled": true,
+        "cardClass": "Action",
+        "recurring": [
           {
             "action": "gainActions",
-            "amount": 1,
             "target": {
               "type": "player",
               "who": "self"
-            }
+            },
+            "amount": 1
           }
         ],
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "gainActions",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 3,
-            "effects": [
-              {
-                "action": "gainActions",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 4,
-            "effects": [
-              {
-                "action": "gainActions",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 5,
-            "effects": [
-              {
-                "action": "gainActions",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
-        "pool": "Base",
-        "enabled": true,
-        "cardClass": "Action"
+        "selfMove": "cycle"
       },
       {
         "id": "atomic-mass",
         "definitionId": "atomic-mass",
-        "name": "Atomic Mass",
+        "name": "Atomic Unit",
         "type": "Character",
         "cost": 2,
         "art": "/assets/card_art/base cards/action/atomic-mass.png",
-        "effect": "+1 Card.",
-        "power": 1,
-        "duration": 3,
+        "effect": " +1 Card for the next 4 turns. You may move this once.",
+        "power": 2,
+        "duration": 4,
         "durationPeriod": "runtime",
-        "onReveal": [
+        "onReveal": [],
+        "schedule": [],
+        "pool": "Base",
+        "enabled": true,
+        "cardClass": "Action",
+        "recurring": [
           {
             "action": "draw",
-            "amount": 1,
             "target": {
               "type": "player",
               "who": "self"
-            }
+            },
+            "amount": 1
           }
-        ],
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 3,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 1,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
-        "pool": "Base",
-        "enabled": true,
-        "cardClass": "Action"
+        ]
       },
       {
         "id": "thorn-shadow",
@@ -269,7 +186,16 @@
         "art": "/assets/card_art/base cards/action/thorn-shadow.png",
         "effect": "+2 Actions,  +1 Crypto for the next 2 Cycles.",
         "power": 1,
-        "onReveal": [],
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          }
+        ],
         "duration": 2,
         "durationPeriod": "cycle",
         "schedule": [],
@@ -302,7 +228,7 @@
         "type": "Character",
         "cost": 3,
         "art": "/assets/card_art/base cards/action/dash-dot.png",
-        "effect": "+1 Card. +1 Actions. +1 Crypto.",
+        "effect": "+1 Card. +2 Actions. +1 Crypto.",
         "power": 3,
         "onReveal": [
           {
@@ -315,7 +241,7 @@
           },
           {
             "action": "gainActions",
-            "amount": 1,
+            "amount": 2,
             "target": {
               "type": "player",
               "who": "self"
@@ -375,7 +301,7 @@
         "cost": 4,
         "art": "/assets/card_art/base cards/action/the-inbetweener.png",
         "effect": "At random: +2 Actions or +2 Cards. Push or pull 1 power. +1 Crypto.",
-        "power": 2,
+        "power": 3,
         "onReveal": [
           {
             "action": "morph",
@@ -392,7 +318,9 @@
             "target": {
               "type": "node",
               "which": "neighbours"
-            }
+            },
+            "flow": "push",
+            "direction": "split"
           },
           {
             "action": "gainCrypto",
@@ -509,23 +437,25 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/quantum-telementry.png",
-        "effect": "+2 Actions. Push or pull 1 power. +2 Crypto.",
-        "power": 2,
+        "effect": "Push 1 power left and right. +2 Actions.  +2 Crypto.",
+        "power": 4,
         "onReveal": [
-          {
-            "action": "gainActions",
-            "amount": 2,
-            "target": {
-              "type": "player",
-              "who": "self"
-            }
-          },
           {
             "action": "transferPower",
             "amount": 1,
             "target": {
               "type": "node",
               "which": "neighbours"
+            },
+            "flow": "push",
+            "direction": "split"
+          },
+          {
+            "action": "gainActions",
+            "amount": 2,
+            "target": {
+              "type": "player",
+              "who": "self"
             }
           },
           {
@@ -575,7 +505,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/recursive-seance.png",
-        "effect": "+1 Crypto for the next 9 turns.",
+        "effect": "+1 Action and +1 Crypto for the next 9 turns.",
         "power": 3,
         "duration": 9,
         "durationPeriod": "runtime",
@@ -585,6 +515,14 @@
         "enabled": true,
         "cardClass": "Action",
         "recurring": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "gainCrypto",
             "target": {
@@ -602,7 +540,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/cowl-obscyra.png",
-        "effect": "+2 Actions. +2 Cards.",
+        "effect": "+2 Actions. +2 Cards. +1 Crypto.",
         "power": 3,
         "onReveal": [
           {
@@ -620,6 +558,14 @@
               "type": "player",
               "who": "self"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
@@ -633,9 +579,17 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/infernal-kernel.png",
-        "effect": "+1 Action. +1 Card. Push or pull 1 power. +1 Crypto.",
+        "effect": "Push or pull 1 power. +1 Action. +1 Card. +1 Crypto.",
         "power": 4,
         "onReveal": [
+          {
+            "action": "transferPower",
+            "amount": 1,
+            "target": {
+              "type": "node",
+              "which": "neighbours"
+            }
+          },
           {
             "action": "gainActions",
             "amount": 1,
@@ -650,14 +604,6 @@
             "target": {
               "type": "player",
               "who": "self"
-            }
-          },
-          {
-            "action": "transferPower",
-            "amount": 1,
-            "target": {
-              "type": "node",
-              "which": "neighbours"
             }
           },
           {
@@ -680,11 +626,20 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/base cards/action/the-tesseract-magi.png",
-        "effect": "+1 Card for the next 7 turns.",
+        "effect": "+2 Crypto and +1 card on reveal. +1 Card for the next 7 turns.",
         "power": 3,
         "duration": 7,
         "durationPeriod": "runtime",
-        "onReveal": [],
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          }
+        ],
         "schedule": [],
         "pool": "Base",
         "enabled": true,
@@ -707,7 +662,7 @@
         "type": "Character",
         "cost": 7,
         "art": "/assets/card_art/base cards/action/root-rune.png",
-        "effect": "+2 Actions. +3 Cards.",
+        "effect": "+2 Actions. +3 Cards. +1 Crypto.",
         "power": 3,
         "onReveal": [
           {
@@ -725,6 +680,14 @@
               "type": "player",
               "who": "self"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
@@ -738,7 +701,7 @@
         "type": "Character",
         "cost": 9,
         "art": "/assets/card_art/base cards/action/astra-ascii.png",
-        "effect": "Push or pull 2 power. +2 Actions. +1 Card. +2 Crypto.",
+        "effect": "Push or pull 2 power. +2 Actions. +1 Card. +3 Crypto.",
         "power": 5,
         "onReveal": [
           {
@@ -759,7 +722,7 @@
           },
           {
             "action": "draw",
-            "amount": 1,
+            "amount": 2,
             "target": {
               "type": "player",
               "who": "self"
@@ -767,7 +730,7 @@
           },
           {
             "action": "gainCrypto",
-            "amount": 2,
+            "amount": 3,
             "target": {
               "type": "player",
               "who": "self"
@@ -785,7 +748,7 @@
         "type": "Character",
         "cost": 10,
         "art": "/assets/card_art/base cards/action/shiva-of-cern.png",
-        "effect": "+1 Action. +4 Cards. +2 Crypto.",
+        "effect": "+1 Action. +4 Cards. +4 Crypto.",
         "power": 4,
         "onReveal": [
           {
@@ -806,7 +769,7 @@
           },
           {
             "action": "gainCrypto",
-            "amount": 2,
+            "amount": 4,
             "target": {
               "type": "player",
               "who": "self"
@@ -1020,9 +983,17 @@
         "type": "Character",
         "cost": 3,
         "art": "/assets/card_art/base cards/utility/ghost-key.png",
-        "effect": "+1 Crypto. Push or pull 1 power. Trash up to 1 card from your hand.",
+        "effect": "+1 Action. +1 Crypto. Push or pull 1 power. You may trash a card from your hand.",
         "power": 2,
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "gainCrypto",
             "amount": 1,
@@ -1087,7 +1058,7 @@
           }
         ],
         "pool": "Base",
-        "enabled": true,
+        "enabled": false,
         "cardClass": "Utility",
         "storyText": "Trim your incoming runtime code."
       },
@@ -1098,7 +1069,7 @@
         "type": "Character",
         "cost": 4,
         "art": "/assets/card_art/base cards/utility/opulent-void.png",
-        "effect": "Trash 1,2, or 3 cards from your hand. +1 Crypto.",
+        "effect": "Trash 1,2, or 3 cards from your hand. +2 Crypto.",
         "power": 2,
         "onReveal": [
           {
@@ -1120,7 +1091,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           }
         ],
         "pool": "Base",
@@ -1181,12 +1152,12 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/utility/byte-heist.png",
-        "effect": "+1 Action. +1 Card. Gain a Byte-Coin on top of your deck.",
+        "effect": "+2 Actions. +1 Card. Gain a Byte-Coin on top of your deck.",
         "power": 3,
         "onReveal": [
           {
             "action": "gainActions",
-            "amount": 1,
+            "amount": 2,
             "target": {
               "type": "player",
               "who": "self"
@@ -1288,9 +1259,17 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/base cards/utility/kilo-cycle.png",
-        "effect": "+3 Crypto.",
+        "effect": "+1 Action. +3 Crypto.",
         "power": 1,
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "gainCrypto",
             "target": {
@@ -1313,9 +1292,25 @@
         "type": "Character",
         "cost": 9,
         "art": "/assets/card_art/base cards/utility/chronos-cache.png",
-        "effect": "+5 Crypto.",
-        "power": 1,
+        "effect": "+1 Action. +1 Card. +5 Crypto.",
+        "power": 3,
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "gainCrypto",
             "target": {
@@ -1337,74 +1332,55 @@
         "name": "Dit Bot",
         "type": "Character",
         "cost": 0,
-        "art": "/assets/card_art/runtimeHacks/dit-bot.png",
-        "effect": "+2 cards",
+        "art": "/assets/card_art/uploads/dit-dot.png",
+        "effect": "For the next 4 Cycles, +2 Actions, +2 Cards,+2 Crypto,+2 Power to a card in hand.",
         "power": 1,
         "duration": 4,
         "durationPeriod": "cycle",
         "onReveal": [],
-        "schedule": [
-          {
-            "at": 2,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 3,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 4,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          },
-          {
-            "at": 5,
-            "effects": [
-              {
-                "action": "draw",
-                "amount": 2,
-                "target": {
-                  "type": "player",
-                  "who": "self"
-                }
-              }
-            ],
-            "timing": "start"
-          }
-        ],
+        "schedule": [],
         "pool": "Base",
         "enabled": true,
         "cardClass": "Utility",
-        "generated": true
+        "generated": true,
+        "recurring": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
+          {
+            "action": "changePower",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "hand"
+            },
+            "amount": 2,
+            "pick": {
+              "mode": "random"
+            }
+          }
+        ]
       },
       {
         "id": "owl-king",
@@ -1613,7 +1589,7 @@
         "type": "Character",
         "cost": 4,
         "art": "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png",
-        "effect": "Discard up to 2 cards from opponent hand. Drain -100.",
+        "effect": "Discard up to 2 cards from opponent hand. +1 Action.Drain -100.",
         "power": 2,
         "onReveal": [
           {
@@ -1628,6 +1604,14 @@
               "mode": "choose",
               "chooser": "opponent"
             }
+          },
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           },
           {
             "action": "damageServer",
@@ -1737,26 +1721,24 @@
         "type": "Character",
         "cost": 4,
         "art": "/assets/card_art/chaos cards/attack/bloodlet-drone.png",
-        "effect": "Drain -50 when played and -Drain 50 for the next 4 Cycles.",
+        "effect": "+1 Action and Drain -50, for the next 4 Cycles.",
         "power": 5,
         "duration": 4,
         "durationPeriod": "cycle",
-        "onReveal": [
-          {
-            "action": "damageServer",
-            "amount": 50,
-            "target": {
-              "type": "server",
-              "who": "opponent",
-              "server": "auto"
-            }
-          }
-        ],
+        "onReveal": [],
         "schedule": [],
         "pool": "Chaos",
         "enabled": true,
         "cardClass": "Attack",
         "recurring": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "damageServer",
             "target": {
@@ -1808,7 +1790,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/chaos cards/attack/1337-speaker.png",
-        "effect": "Drain -200 Backup. +1 Action. +1 Crypto",
+        "effect": "Drain -200 Backup. +1 Action. +2 Crypto",
         "power": 2,
         "onReveal": [
           {
@@ -2117,7 +2099,7 @@
         "type": "Character",
         "cost": 7,
         "art": "/assets/card_art/chaos cards/horrors/iterative-incubus.png",
-        "effect": "Drain -100 + Repair server +100. +1 Action for 4 cycles, + 2 Crypto on 4th",
+        "effect": "Repair server +100. Then +1 Action, and Drain -100 for 4 cycles, + 2 Crypto on 4th",
         "power": 4,
         "duration": 4,
         "durationPeriod": "cycle",
@@ -2446,21 +2428,20 @@
       {
         "id": "razor-blade-jade",
         "definitionId": "razor-blade-jade",
-        "name": "Razor Blade Jade",
+        "name": "A Good Knife",
         "type": "Character",
         "cost": 0,
-        "art": "/assets/card_art/runtimeHacks/razorBladeJade.png",
-        "effect": "-100 Both enemy servers. +1 Action. +1 Card.",
-        "power": 1,
+        "art": "/assets/card_art/uploads/a-good-knife-2.png",
+        "effect": "Drain -1. +1 Action. Aura +1. Destroy Ching Dai if he is revealed at this Node.",
+        "power": 0,
         "onReveal": [
           {
-            "action": "damageServer",
-            "amount": 100,
+            "action": "draw",
             "target": {
-              "type": "server",
-              "who": "opponent",
-              "server": "both"
-            }
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           },
           {
             "action": "gainActions",
@@ -2471,18 +2452,25 @@
             }
           },
           {
-            "action": "draw",
-            "amount": 1,
+            "action": "destroyCard",
             "target": {
-              "type": "player",
-              "who": "self"
+              "type": "card",
+              "who": "opponent",
+              "where": "thisNode",
+              "filter": {
+                "definitionId": "card-l2ngrv3w"
+              }
+            },
+            "pick": {
+              "mode": "all"
             }
           }
         ],
-        "pool": "Chaos",
+        "pool": "Base",
         "enabled": true,
-        "cardClass": "Attack",
-        "generated": true
+        "cardClass": "Utility",
+        "generated": true,
+        "aura": 1
       },
       {
         "id": "basic-encryption",
@@ -2909,8 +2897,24 @@
         "cost": 3,
         "power": 2,
         "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "+3 Power to your next played card.",
+        "effect": "+2 Actions. +2 Cards. +3 Power to your next revealed card.",
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
           {
             "action": "changePower",
             "amount": 3,
@@ -2974,7 +2978,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           }
         ],
         "id": "kim-dracula",
@@ -2982,7 +2986,7 @@
         "name": "Kim Dracula",
         "power": 0,
         "cost": 5,
-        "effect": "Power is equal to the total number of cards destroyed.  +1 Crypto",
+        "effect": "Power is equal to the total number of cards destroyed.  +2 Crypto",
         "pool": "Chaos",
         "cardClass": "Hacker",
         "powerSource": "destroyed"
@@ -3065,30 +3069,34 @@
         "recurring": []
       },
       {
-        "id": "card-m7dztzir",
-        "definitionId": "card-m7dztzir",
-        "name": "Bumpster",
+        "id": "card-ot1vjma3",
+        "definitionId": "card-ot1vjma3",
+        "name": "BumpEffecter",
         "pool": "Chaos",
         "type": "Character",
         "cardClass": "Hacker",
         "generated": false,
-        "enabled": false,
+        "enabled": true,
         "cost": 3,
         "power": 3,
         "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Bump a random card from enemy Crypto wallet to discard.",
+        "effect": "+1 Action. +1 Card. +1 Crypto. Bump a random card from enemy Effect Bank to discard.",
         "onReveal": [
           {
-            "action": "bump",
-            "amount": 1,
+            "action": "gainActions",
             "target": {
-              "type": "zone",
-              "who": "opponent",
-              "zone": "wallet"
+              "type": "player",
+              "who": "self"
             },
-            "pick": {
-              "mode": "random"
-            }
+            "amount": 1
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           },
           {
             "action": "gainCrypto",
@@ -3097,23 +3105,7 @@
               "who": "self"
             },
             "amount": 1
-          }
-        ]
-      },
-      {
-        "id": "card-ot1vjma3",
-        "definitionId": "card-ot1vjma3",
-        "name": "BumpEffecter",
-        "pool": "Chaos",
-        "type": "Character",
-        "cardClass": "Hacker",
-        "generated": false,
-        "enabled": false,
-        "cost": 3,
-        "power": 2,
-        "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Bump a random card from enemy Effect Bank to discard.",
-        "onReveal": [
+          },
           {
             "action": "bump",
             "amount": 1,
@@ -3125,14 +3117,6 @@
             "pick": {
               "mode": "random"
             }
-          },
-          {
-            "action": "gainCrypto",
-            "target": {
-              "type": "player",
-              "who": "self"
-            },
-            "amount": 1
           }
         ],
         "onCollapse": []
@@ -3417,6 +3401,14 @@
             "pick": {
               "mode": "random"
             }
+          },
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
           }
         ]
       },
@@ -3478,9 +3470,17 @@
         "power": 1,
         "cost": 4,
         "art": "/assets/card_art/uploads/rezz-rizz.png",
-        "effect": "+1 Card. +2 Crypto. Aura +1.",
+        "effect": "+1 Action. +1 Card. +2 Crypto. Aura +1.",
         "aura": 1,
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "draw",
             "target": {
@@ -3585,8 +3585,8 @@
         "cardClass": "Utility",
         "generated": false,
         "enabled": true,
-        "cost": 7,
-        "power": 0,
+        "cost": 6,
+        "power": 2,
         "art": "/assets/library/card_art/base cards/utility/crypto-alchemist.png",
         "effect": "Morph this into a random crypto-coin worth: 1, 2, 3, or 5",
         "onReveal": [
@@ -4192,7 +4192,7 @@
         "cardClass": "Utility",
         "generated": false,
         "enabled": true,
-        "cost": 6,
+        "cost": 4,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png",
         "effect": "Gain a random Quark, playable for +1VP, in your discard pile.",
@@ -4216,7 +4216,7 @@
       {
         "id": "card-33hus0p6",
         "definitionId": "card-33hus0p6",
-        "name": "Quark",
+        "name": "Gluon",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Runtime",
@@ -4224,7 +4224,7 @@
         "enabled": true,
         "cost": 0,
         "power": 0,
-        "art": "/assets/library/card_art/base cards/widgets/quark.png",
+        "art": "/assets/card_art/uploads/gluon.png",
         "effect": "+1 VP.",
         "onReveal": [
           {
@@ -4241,7 +4241,7 @@
       {
         "id": "card-9sqb8wxx",
         "definitionId": "card-9sqb8wxx",
-        "name": "Charm Quark",
+        "name": "Quark",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Runtime",
@@ -4249,7 +4249,7 @@
         "enabled": true,
         "cost": 0,
         "power": 0,
-        "art": "/assets/library/card_art/base cards/widgets/charm-quark.png",
+        "art": "/assets/card_art/uploads/quark.png",
         "effect": "+1 VP.",
         "onReveal": [
           {
@@ -4274,7 +4274,7 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/library/card_art/base cards/utility/the-heisenberg-hag.png",
-        "effect": "Gain a Schrödinger Box. +2 Actions.",
+        "effect": "Gain a Schrödinger Box. +2 Actions. +1 Crypto.",
         "onReveal": [
           {
             "action": "gainCard",
@@ -4295,6 +4295,14 @@
               "who": "self"
             },
             "amount": 2
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ]
       },
@@ -4382,7 +4390,7 @@
         "cost": 0,
         "power": 0,
         "art": "/assets/library/card_art/base cards/cats/cat-hack.png",
-        "effect": "Steal 1 Power from a revealed enemy card. Enemy must discard a card",
+        "effect": "Steal 2 Power from a revealed enemy card. Enemy must discard a card",
         "onReveal": [
           {
             "action": "changePower",
@@ -4391,7 +4399,7 @@
               "who": "opponent",
               "where": "board"
             },
-            "amount": -1,
+            "amount": -2,
             "pick": {
               "mode": "random"
             }
@@ -4527,7 +4535,7 @@
         "cost": 0,
         "power": 0,
         "art": "/assets/library/card_art/base cards/cats/schrodinger-box.png",
-        "effect": "Is the cat alive or dead? Go ahead, open it and find out.",
+        "effect": "What's in the box?  Go ahead, open it and find out.  Is the cat alive or dead? ",
         "onReveal": [
           {
             "action": "morph",
@@ -4574,7 +4582,7 @@
         "cost": 0,
         "power": 0,
         "art": "/assets/library/card_art/base cards/cats/dead-cat-02.png",
-        "effect": "I'm dead.",
+        "effect": "What did you do?",
         "onReveal": []
       },
       {
@@ -4589,8 +4597,17 @@
         "cost": 0,
         "power": 1,
         "art": "/assets/library/card_art/base cards/cats/dead-cat-03.png",
-        "effect": "Ack!",
-        "onReveal": []
+        "effect": "+2 Actions.   Ack!",
+        "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          }
+        ]
       },
       {
         "id": "card-jovdfv9n",
@@ -4705,7 +4722,7 @@
         "generated": false,
         "enabled": true,
         "cost": 8,
-        "power": 2,
+        "power": 3,
         "art": "/assets/library/card_art/base cards/utility/entropic-infantry.png",
         "effect": "+1 Card. After each play, cycle Alpha → Bravo → Charlie → Alpha.",
         "onReveal": [
@@ -4952,7 +4969,7 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/card_art/uploads/delete-detritus.png",
-        "effect": "+1 Action. You may destroy a card in your hand. If you do +3 Crypto.",
+        "effect": "+2 Actions. You may destroy a card in your hand. If you do +3 Crypto.",
         "onReveal": [
           {
             "action": "gainActions",
@@ -4960,7 +4977,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           },
           {
             "action": "destroyCard",
@@ -4997,7 +5014,7 @@
         "enabled": true,
         "cost": 0,
         "power": 4,
-        "art": "/assets/card_art/uploads/chingdai.png",
+        "art": "/assets/card_art/uploads/chin-dai-b.png",
         "effect": "The God of the East.\nDrain -150",
         "onReveal": [
           {
@@ -5014,16 +5031,16 @@
       {
         "id": "card-vls0e5lo",
         "definitionId": "card-vls0e5lo",
-        "name": "Doom Loop",
+        "name": "Atomic Mass",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Action",
         "generated": false,
         "enabled": true,
         "cost": 2,
-        "power": 1,
-        "art": "/assets/card_art/uploads/doom-loop.png",
-        "effect": "+2 Cards. Once each Cycle, you may move this card.",
+        "power": 2,
+        "art": "/assets/card_art/uploads/atomic-mass2.png",
+        "effect": "+2 Cards. You may move this once.",
         "onReveal": [
           {
             "action": "draw",
@@ -5039,7 +5056,7 @@
       {
         "id": "card-jxs8sfzd",
         "definitionId": "card-jxs8sfzd",
-        "name": "Doom Loop copy",
+        "name": "Doom Loop",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Action",
@@ -5048,8 +5065,16 @@
         "cost": 3,
         "power": 1,
         "art": "/assets/card_art/uploads/doom-loop.png",
-        "effect": "Trash a Crypto card in your discard pile, then +3 Crypto.",
+        "effect": "+2 Actions. Trash a Crypto card in your discard pile, then +3 Crypto.",
         "onReveal": [
+          {
+            "action": "gainActions",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          },
           {
             "action": "trashCard",
             "target": {
@@ -5097,7 +5122,7 @@
               "who": "opponent",
               "server": "auto"
             },
-            "amount": 75
+            "amount": 100
           },
           {
             "action": "gainActions",
@@ -5143,7 +5168,7 @@
         "cost": 3,
         "power": 3,
         "art": "/assets/card_art/uploads/hack-n1.png",
-        "effect": "Drain -75. +1 Crypto. +1 Card.",
+        "effect": "Drain -75. +1 Action. +1 Card. +1 Crypto.",
         "onReveal": [
           {
             "action": "damageServer",
@@ -5155,7 +5180,7 @@
             "amount": 75
           },
           {
-            "action": "gainCrypto",
+            "action": "gainActions",
             "target": {
               "type": "player",
               "who": "self"
@@ -5164,6 +5189,14 @@
           },
           {
             "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
+          {
+            "action": "gainCrypto",
             "target": {
               "type": "player",
               "who": "self"
@@ -5676,9 +5709,9 @@
       },
       {
         "id": "location-hak8535x",
-        "name": "The Might Meek",
-        "rule": "Ongoing: +1 Power to the weakest revealed card on each side.",
-        "reward": "Ongoing: +1 Power to the weakest revealed card on each side.",
+        "name": "Meek the Mighty",
+        "rule": "Ongoing: +1 Power to the weakest revealed card on each side here.",
+        "reward": "Ongoing: +1 Power to the weakest revealed card on each side here.",
         "effects": [],
         "enabled": true,
         "ongoing": [
@@ -5687,7 +5720,7 @@
             "target": {
               "type": "card",
               "who": "both",
-              "where": "board"
+              "where": "thisNode"
             },
             "amount": 1,
             "pick": {
@@ -5798,8 +5831,7 @@
             },
             "pick": {
               "mode": "random"
-            },
-            "modifier": "movableEachTurn"
+            }
           }
         ],
         "enabled": true
@@ -5841,8 +5873,8 @@
       {
         "id": "location-b2wbb5kt",
         "name": "Not a total loss",
-        "rule": "if you have -1 or less Power here, +2 Crypto..",
-        "reward": "if you have -1 or less Power here, +2 Crypto..",
+        "rule": "Once you have -1 or less Power here, +2 Crypto..",
+        "reward": "Once you have -1 or less Power here, +2 Crypto..",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -5894,8 +5926,8 @@
       {
         "id": "location-j4a26tga",
         "name": "Spice of Lyfe",
-        "rule": "While in play: if you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
-        "reward": "While in play: if you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
+        "rule": "Condition: Once you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
+        "reward": "Condition: Once you have an Action, a Horror, a Utility, and an Attack here, +4 Crypto..",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -5924,8 +5956,8 @@
       {
         "id": "location-tua216cd",
         "name": "A Good Mix",
-        "rule": "While in play: if you have an Attack and an Action here, +2 Crypto..",
-        "reward": "While in play: if you have an Attack and an Action here, +2 Crypto..",
+        "rule": "Condition: Once you have an Attack and an Action here, +2 Crypto..",
+        "reward": "Condition: Once you have an Attack and an Action here, +2 Crypto..",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -5952,8 +5984,8 @@
       {
         "id": "location-xdf1vqir",
         "name": "Fly Wheel",
-        "rule": "While in play: if you have 5 or more Power here, +2 Cards.",
-        "reward": "While in play: if you have 5 or more Power here, +2 Cards.",
+        "rule": "Condition: Once you have 5 or more Power here, +2 Cards.",
+        "reward": "Condition: Once you have 5 or more Power here, +2 Cards.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -5978,8 +6010,8 @@
       {
         "id": "location-ybl2xq1v",
         "name": "7th Heaven",
-        "rule": "While in play: if you have 7 or more Power here, +3 Crypto.",
-        "reward": "While in play: if you have 7 or more Power here, +3 Crypto.",
+        "rule": "Condition: Once you have 7 or more Power here, +3 Crypto.",
+        "reward": "Condition: Once you have 7 or more Power here, +3 Crypto.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6004,8 +6036,8 @@
       {
         "id": "location-26uysel6",
         "name": "Triple Lindy",
-        "rule": "While in play: if you have 3 or more cards here, +2 Cards..",
-        "reward": "While in play: if you have 3 or more cards here, +2 Cards..",
+        "rule": "Condition: Once you have 3 or more cards here, +2 Cards..",
+        "reward": "Condition: Once you have 3 or more cards here, +2 Cards..",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6030,8 +6062,8 @@
       {
         "id": "location-4idhqez4",
         "name": "3s Company",
-        "rule": "While in play: if you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
-        "reward": "While in play: if you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
+        "rule": "Condition: Once you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
+        "reward": "Condition: Once you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6071,9 +6103,9 @@
       },
       {
         "id": "location-asuc319p",
-        "name": "New location",
-        "rule": "While in play: if you have 2 or more Utility cards here, +1 Power to each.",
-        "reward": "While in play: if you have 2 or more Utility cards here, +1 Power to each.",
+        "name": "Utility Belt",
+        "rule": "Condition: Once you have 2 or more Utility cards here, +1 Power to each.",
+        "reward": "Condition: Once you have 2 or more Utility cards here, +1 Power to each.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6106,9 +6138,9 @@
       },
       {
         "id": "location-ps0lfyec",
-        "name": "3rd Wheel",
-        "rule": "While in play: if you have 3 or more cards here, -1 Power from all cards here.",
-        "reward": "While in play: if you have 3 or more cards here, -1 Power from all cards here.",
+        "name": "The 3rd Wheel",
+        "rule": "Condition: Once you have 3 or more cards here, -1 Power from all cards here.",
+        "reward": "Condition: Once you have 3 or more cards here, -1 Power from all cards here.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6138,8 +6170,8 @@
       {
         "id": "location-rroy4ez3",
         "name": "Mill My Man",
-        "rule": "While in play: if you have an Attack and a Horror here, Mill a card from the other player's deck.",
-        "reward": "While in play: if you have an Attack and a Horror here, Mill a card from the other player's deck.",
+        "rule": "Condition: Once you have an Attack and a Horror here, Mill a card from the other player's deck.",
+        "reward": "Condition: Once you have an Attack and a Horror here, Mill a card from the other player's deck.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6168,8 +6200,8 @@
       {
         "id": "location-0pzdundr",
         "name": "Crowed House",
-        "rule": "While in play: if you have 4 or more cards here, +3 Crypto.",
-        "reward": "While in play: if you have 4 or more cards here, +3 Crypto.",
+        "rule": "Condition: Once you have 4 or more cards here, +3 Crypto.",
+        "reward": "Condition: Once you have 4 or more cards here, +3 Crypto.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6253,6 +6285,428 @@
             "pick": {
               "mode": "choose"
             }
+          }
+        ]
+      },
+      {
+        "id": "sacrificial_altar",
+        "name": "Sacrificial Altar",
+        "rule": "On collapse: You may destroy your cards here. +2 Crypto for each.",
+        "reward": "On collapse: You may destroy your cards here. +2 Crypto for each.",
+        "effects": [
+          {
+            "action": "sacrificeCards",
+            "amount": 2,
+            "optional": true,
+            "target": {
+              "type": "card",
+              "who": "winner",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "choose",
+              "count": 4
+            }
+          }
+        ],
+        "enabled": true,
+        "events": []
+      },
+      {
+        "effects": [
+          {
+            "action": "sacrificeCards",
+            "amount": 2,
+            "optional": true,
+            "target": {
+              "type": "card",
+              "who": "winner",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "choose",
+              "count": 4
+            }
+          }
+        ],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-consume-pit",
+        "name": "Consume Pit",
+        "rule": "On collapse: You may destroy your cards here. +2 Crypto for each.",
+        "reward": "On collapse: You may destroy your cards here. +2 Crypto for each."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [
+          {
+            "id": "moop-buff",
+            "kind": "cardMovedHere",
+            "effects": [
+              {
+                "action": "changePower",
+                "amount": 1,
+                "target": {
+                  "type": "card",
+                  "who": "self",
+                  "where": "board",
+                  "relation": "self"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "id": "loc-moop-yard",
+        "name": "MOOP Yard",
+        "rule": "When: a card moves here, +1 Power to that card.",
+        "reward": "When: a card moves here, +1 Power to that card."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [
+          {
+            "id": "leave-crypto",
+            "kind": "cardLeft",
+            "effects": [
+              {
+                "action": "gainCrypto",
+                "amount": 1,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "id": "loc-departure-lounge",
+        "name": "Departure Lounge",
+        "rule": "When: a card leaves here, +1 Crypto.",
+        "reward": "When: a card leaves here, +1 Crypto."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [
+          {
+            "id": "vamp-drain",
+            "kind": "cardMovedHere",
+            "effects": [
+              {
+                "action": "damageServer",
+                "amount": 50,
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "id": "loc-vamping-grounds",
+        "name": "Vamping Grounds",
+        "rule": "When: a card moves here, Drain -50.",
+        "reward": "When: a card moves here, Drain -50."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [
+          {
+            "action": "moveCard",
+            "target": {
+              "type": "card",
+              "who": "played",
+              "where": "board",
+              "relation": "self"
+            }
+          }
+        ],
+        "events": [],
+        "enabled": true,
+        "id": "loc-move-station",
+        "name": "Move Station",
+        "rule": "On reveal: Move the card that was played to another open Node.",
+        "reward": "On reveal: Move the card that was played to another open Node."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-sanctuary",
+        "name": "Sanctuary",
+        "rule": "Ongoing: Cards here cannot be destroyed. Ongoing: Cards here ignore Power loss.",
+        "reward": "Ongoing: Cards here cannot be destroyed. Ongoing: Cards here ignore Power loss.",
+        "passives": {
+          "immuneDestroy": true,
+          "immunePowerDown": true
+        }
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-warded-gate",
+        "name": "Warded Gate",
+        "rule": "Ongoing: Cards cannot move onto this Node.",
+        "reward": "Ongoing: Cards cannot move onto this Node.",
+        "passives": {
+          "blockMovesOnto": true
+        }
+      },
+      {
+        "effects": [],
+        "ongoing": [
+          {
+            "action": "draw",
+            "amount": 1,
+            "target": {
+              "type": "player",
+              "who": "winner"
+            }
+          }
+        ],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-silent-field",
+        "name": "Silent Field",
+        "rule": "Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player.",
+        "reward": "Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player.",
+        "passives": {
+          "suppressOngoing": true
+        }
+      },
+      {
+        "effects": [],
+        "ongoing": [
+          {
+            "action": "draw",
+            "amount": 1,
+            "target": {
+              "type": "player",
+              "who": "winner"
+            }
+          }
+        ],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-echo-chamber",
+        "name": "Echo Chamber",
+        "rule": "Ongoing: Ongoing effects here are doubled. +1 Card to the winning player.",
+        "reward": "Ongoing: Ongoing effects here are doubled. +1 Card to the winning player.",
+        "passives": {
+          "doubleOngoing": true
+        }
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-solo-peak",
+        "name": "Solo Peak",
+        "rule": "While: only one card is here, +5 Power.",
+        "reward": "While: only one card is here, +5 Power.",
+        "whiles": [
+          {
+            "id": "while-solo-power",
+            "kind": "soloCard",
+            "powerBonus": 5
+          }
+        ]
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [
+          {
+            "id": "death-crypto",
+            "kind": "cardDestroyed",
+            "effects": [
+              {
+                "action": "gainCrypto",
+                "amount": 2,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "id": "loc-death-spire",
+        "name": "Death Spire",
+        "rule": "When: a card is destroyed here, +2 Crypto.",
+        "reward": "When: a card is destroyed here, +2 Crypto."
+      },
+      {
+        "effects": [
+          {
+            "action": "gainCard",
+            "amount": 1,
+            "maxCost": 3,
+            "filter": {
+              "cardClass": "Utility"
+            },
+            "target": {
+              "type": "zone",
+              "who": "winner",
+              "zone": "hand"
+            }
+          }
+        ],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-subtype-bazaar",
+        "name": "Utility Station",
+        "rule": "On collapse: Gain a random Utility card costing 3 or less in the winning player's hand.",
+        "reward": "On collapse: Gain a random Utility card costing 3 or less in the winning player's hand."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [
+          {
+            "action": "stealDeckCard",
+            "amount": 1,
+            "target": {
+              "type": "zone",
+              "who": "other",
+              "zone": "deck"
+            }
+          }
+        ],
+        "events": [],
+        "enabled": false,
+        "id": "loc-deck-raid",
+        "name": "Deck Raid",
+        "rule": "On reveal: Steal 1 card from the top of the other player's deck into your hand.",
+        "reward": "On reveal: Steal 1 card from the top of the other player's deck into your hand."
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": false,
+        "id": "loc-swap-floor",
+        "name": "Swap Floor",
+        "rule": "Start of turn 2: Swap the top 1 card of both decks.",
+        "reward": "Start of turn 2: Swap the top 1 card of both decks.",
+        "startTurn2": [
+          {
+            "action": "deckSwap",
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [
+          {
+            "action": "copyText",
+            "target": {
+              "type": "card",
+              "who": "played",
+              "where": "board",
+              "relation": "previous"
+            }
+          }
+        ],
+        "events": [],
+        "enabled": true,
+        "id": "loc-copy-archive",
+        "name": "Copy Archive",
+        "rule": "On reveal: Copy the On Reveal of your previously revealed card.",
+        "reward": "On reveal: Copy the On Reveal of your previously revealed card."
+      },
+      {
+        "effects": [
+          {
+            "action": "changePower",
+            "amount": 1,
+            "target": {
+              "type": "card",
+              "who": "winner",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "all"
+            }
+          }
+        ],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "enabled": true,
+        "id": "loc-neighbour-beacon",
+        "name": "Neighbour Beacon",
+        "rule": "On collapse: +1 Power to all cards on the winning side here.",
+        "reward": "On collapse: +1 Power to all cards on the winning side here."
+      },
+      {
+        "id": "loc-solo-draw",
+        "name": "Lone Outpost",
+        "enabled": true,
+        "effects": [],
+        "ongoing": [],
+        "onPlay": [],
+        "events": [],
+        "whiles": [
+          {
+            "id": "while-solo-draw",
+            "kind": "soloCard",
+            "effects": [
+              {
+                "action": "draw",
+                "amount": 1,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ],
+        "rule": "While: only one card is here, +1 Card.",
+        "reward": "While: only one card is here, +1 Card."
+      },
+      {
+        "id": "location-vwtph6e4",
+        "name": "Stand Alone",
+        "rule": "While: only one card is here, +5 Power.",
+        "reward": "While: only one card is here, +5 Power.",
+        "effects": [],
+        "enabled": true,
+        "whiles": [
+          {
+            "id": "while-rlb104y2",
+            "kind": "soloCard",
+            "powerBonus": 5,
+            "effects": []
           }
         ]
       }
@@ -7395,6 +7849,164 @@
             "amount": 2
           }
         ]
+      },
+      {
+        "id": "mod-consume",
+        "name": "Consume",
+        "enabled": true,
+        "onCollapse": [
+          {
+            "action": "sacrificeCards",
+            "amount": 2,
+            "optional": true,
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "choose",
+              "count": 4
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-move-it",
+        "name": "Move It",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "moveCard",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "board",
+              "relation": "self"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-vamping",
+        "name": "Vamping",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "changePower",
+            "amount": -2,
+            "transfer": true,
+            "target": {
+              "type": "card",
+              "who": "opponent",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "first"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-deck-thief",
+        "name": "Deck Thief",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "stealDeckCard",
+            "amount": 1,
+            "target": {
+              "type": "zone",
+              "who": "opponent",
+              "zone": "deck"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-deck-swap",
+        "name": "Deck Swap",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "deckSwap",
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "id": "mod-placer",
+        "name": "Placer",
+        "enabled": true,
+        "onCollapse": [
+          {
+            "action": "placeCard",
+            "optional": true,
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "hand"
+            },
+            "pick": {
+              "mode": "choose"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-copy-text",
+        "name": "Copy Text",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "copyText",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "board",
+              "relation": "previous"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-subtype-gain",
+        "name": "Subtype Gain",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "gainCard",
+            "amount": 1,
+            "maxCost": 2,
+            "filter": {
+              "cardClass": "Utility"
+            },
+            "target": {
+              "type": "zone",
+              "who": "self",
+              "zone": "hand"
+            }
+          }
+        ]
+      },
+      {
+        "id": "mod-moop",
+        "name": "MOOP",
+        "enabled": true,
+        "onReveal": [
+          {
+            "action": "trashCard",
+            "target": {
+              "type": "card",
+              "who": "opponent",
+              "where": "thisNode"
+            },
+            "pick": {
+              "mode": "first"
+            },
+            "optional": true
+          }
+        ]
       }
     ],
     "opponents": [
@@ -7554,7 +8166,7 @@
           "rezz-razor",
           "rezz-blade"
         ],
-        "formula": "Reveal Rezz Razor and Rezz Blade at the same Node during the same Cycle.",
+        "formula": "Reveal Rezz Razor and Rezz Blade at the same Node during the same Cycle. You gain Ching Dai; your opponent gains It's a Good Knife.",
         "effects": [
           {
             "action": "gainCard",
@@ -7563,6 +8175,16 @@
             "target": {
               "type": "zone",
               "who": "self",
+              "zone": "hand"
+            }
+          },
+          {
+            "action": "gainCard",
+            "amount": 1,
+            "cardId": "razor-blade-jade",
+            "target": {
+              "type": "zone",
+              "who": "opponent",
               "zone": "hand"
             }
           }

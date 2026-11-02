@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 22,
-    "plan": "v1.22 continues to focus on an early economy boost through Cycles 1-4, aiming for ~12 Crypto per hand. In Cycles 5-8, I will balance attacks, engine setup, Server Restore, and VP collection to improve my standing. From Cycle 9, I will aggressively target enemy Servers through Chaos and Drain strategies, prioritizing VP cards. I will adapt my play to exploit new Locations, particularly those that enhance economic advantages or disrupt the opponent's strategies, while also focusing on maintaining my Server health. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "v1.22 plays the designer's baseline with 7 adopted changes (min buy score 1.75, dilution 0.9; drain weight 2.9; disrupt weight 1.37; crypto weight 3.3; restore weight 2.49). In Cycles 1-4, prioritize strong draw/Action Base cards and Crypto worth 2+ (avoid Shyte-Coin), aiming for ~12 Crypto per hand. In Cycles 5-8, maintain a balanced midgame of attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for endgame pushes; buy VP cards from Cycle 9, with last Draft buys being solely VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -28,7 +28,7 @@
     },
     "cardBias": {}
   },
-  "plan": "v1.22 continues to focus on an early economy boost through Cycles 1-4, aiming for ~12 Crypto per hand. In Cycles 5-8, I will balance attacks, engine setup, Server Restore, and VP collection to improve my standing. From Cycle 9, I will aggressively target enemy Servers through Chaos and Drain strategies, prioritizing VP cards. I will adapt my play to exploit new Locations, particularly those that enhance economic advantages or disrupt the opponent's strategies, while also focusing on maintaining my Server health. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "v1.22 plays the designer's baseline with 7 adopted changes (min buy score 1.75, dilution 0.9; drain weight 2.9; disrupt weight 1.37; crypto weight 3.3; restore weight 2.49). In Cycles 1-4, prioritize strong draw/Action Base cards and Crypto worth 2+ (avoid Shyte-Coin), aiming for ~12 Crypto per hand. In Cycles 5-8, maintain a balanced midgame of attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for endgame pushes; buy VP cards from Cycle 9, with last Draft buys being solely VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -5454,7 +5454,7 @@
     {
       "id": "strategic-location-control",
       "text": "New Locations provide opportunities for shifting game dynamics; I should prioritize Locations that enhance my economic advantage.",
-      "status": "proposed",
+      "status": "retired",
       "confidence": 0.5,
       "support": 0,
       "against": 0,
@@ -5464,6 +5464,16 @@
     {
       "id": "early-economy-adjustment",
       "text": "Adjusting my early economy focus may help keep pace with human opponents who are consistently outpacing my Draft wallet.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 22,
+      "updatedBy": 22
+    },
+    {
+      "id": "evaluate-new-cards",
+      "text": "New cards may enhance deck efficiency and synergy.",
       "status": "proposed",
       "confidence": 0.5,
       "support": 0,
@@ -5473,741 +5483,6 @@
     }
   ],
   "notes": [
-    {
-      "version": 15,
-      "at": "2026-10-27T15:32:23.568Z",
-      "text": "Experiment x152-crypto inconclusive: league 33/48 for the experiment vs 33/48 for the current best against dv-8@v1.2, t-5@v1.3 (margin +0.6/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:32:23.568Z",
-      "text": "New experiment x153-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:37:07.291Z",
-      "text": "Experiment x153-disrupt inconclusive: league 34/48 for the experiment vs 35/48 for the current best against dv-8@v1.1, dv-8@v1.2 (margin +3.2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:37:07.291Z",
-      "text": "New experiment x154-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.09→2.49. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:41:35.049Z",
-      "text": "Experiment x154-restore inconclusive: league 24/48 for the experiment vs 22/48 for the current best against t-5@v1.4, dv-8@v1.1, vp-dog@v1.1 (margin +1.5/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:45:14.486Z",
-      "text": "New experiment x155-fallback-155-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.1→1.35. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:46:28.321Z",
-      "text": "Experiment x155-fallback-155-2 rejected: league 12/48 for the experiment vs 15/48 for the current best against t-5@v1.5, vp-dog@v1.1 (margin -5.5/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:53:10.073Z",
-      "text": "New experiment x156-fallback-156-4: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: drain weight 2.4→2.65. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:54:06.270Z",
-      "text": "Experiment x156-fallback-156-4 inconclusive: league 29/48 for the experiment vs 31/48 for the current best against t-5@v1.5, dv-8@v1.2 (margin +0.5/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:54:06.271Z",
-      "text": "New experiment x157-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 1.6→2. Prediction: More wins and more Locations won than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T15:57:40.348Z",
-      "text": "Experiment x157-draw rejected: league 11/48 for the experiment vs 13.5/48 for the current best against vp-dog@v1.1 (margin -2.4/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T16:01:27.352Z",
-      "text": "New experiment x158-fallback-158-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T16:02:33.667Z",
-      "text": "Experiment x158-fallback-158-0 inconclusive: league 25/48 for the experiment vs 22/48 for the current best against t-5@v1.5, vp-dog@v1.1 (margin +6.4/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 15,
-      "at": "2026-10-27T16:02:33.667Z",
-      "text": "New experiment x159-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.25→1.75, dilution 0.7→0.9. Prediction: More wins with a smaller deck than the current best."
-    },
-    {
-      "version": 16,
-      "at": "2026-10-27T16:06:04.314Z",
-      "text": "Now v1.16: adopted x159-leaner (min buy score 1.25→1.75, dilution 0.7→0.9)."
-    },
-    {
-      "version": 16,
-      "at": "2026-10-27T16:06:04.314Z",
-      "text": "Experiment x159-leaner adopted: league 15/48 for the experiment vs 10.5/48 for the current best against vp-dog@v1.1, vp-dog@v1.0 (margin +5.7/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 16,
-      "at": "2026-10-27T16:06:04.316Z",
-      "text": "New experiment x160-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.4→2.9. Prediction: Earlier Server kills and more wins than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:10:28.344Z",
-      "text": "Now v1.17: adopted x160-drain (drain weight 2.4→2.9)."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:10:28.344Z",
-      "text": "Experiment x160-drain adopted: league 38/48 for the experiment vs 34/48 for the current best against t-5@v1.5, t-5@v1.3, strat-g@v1.15 (margin +4.6/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:12:32.601Z",
-      "text": "New experiment x161-fallback-161-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.59→2.84. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:13:29.700Z",
-      "text": "Experiment x161-fallback-161-3 rejected: league 31.5/48 for the experiment vs 32/48 for the current best against t-5@v1.4, t-5@v1.3, strat-g@v1.16 (margin -1.6/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:13:29.700Z",
-      "text": "New experiment x162-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. Prediction: More wins and bigger mid-game Wallets than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:17:37.828Z",
-      "text": "Experiment x162-thinner rejected: league 24.5/48 for the experiment vs 25/48 for the current best against dv-8@v1.2, vp-dog@v1.0, t-5@v1.6 (margin -1.9/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:55:47.799Z",
-      "text": "New experiment x163-fallback-163-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 1.6→1.85. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:56:53.568Z",
-      "text": "Experiment x163-fallback-163-1 rejected: league 22/48 for the experiment vs 26/48 for the current best against t-5@v1.3, vp-dog@v1.1, vp-dog@v1.0 (margin -4.2/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T16:56:53.569Z",
-      "text": "New experiment x164-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T17:07:14.176Z",
-      "text": "Experiment x164-power rejected: league 30/48 for the experiment vs 32.5/48 for the current best against dv-8@v1.2, t-5@v1.6 (margin -4.5/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T17:07:14.176Z",
-      "text": "New experiment x165-crypto: Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: crypto weight 2.59→2.89. Prediction: Bigger mid-game Wallets and more wins than the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T17:10:19.103Z",
-      "text": "Experiment x165-crypto inconclusive: league 31/48 for the experiment vs 30/48 for the current best against dv-8@v1.3, t-5@v1.6 (margin -0.6/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 17,
-      "at": "2026-10-27T17:10:19.103Z",
-      "text": "New experiment x166-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.05→1.37. Prediction: More wins and a better margin than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:15:07.841Z",
-      "text": "Now v1.18: adopted x166-disrupt (disrupt weight 1.05→1.37)."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:15:07.841Z",
-      "text": "Experiment x166-disrupt adopted: league 29.5/48 for the experiment vs 25.5/48 for the current best against dv-8@v1.0, dv-8@v1.3, vp-dog@v1.1 (margin +5/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:15:07.847Z",
-      "text": "New experiment x167-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.09→2.49. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:18:30.130Z",
-      "text": "Experiment x167-restore inconclusive: league 40/48 for the experiment vs 39/48 for the current best against dv-8@v1.3, t-5@v1.4 (margin +1.3/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:21:52.178Z",
-      "text": "New experiment x168-fallback-168-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.1→1.35. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:04.033Z",
-      "text": "Experiment x168-fallback-168-2 inconclusive: league 24/48 for the experiment vs 24/48 for the current best against dv-8@v1.0, vp-dog@v1.1, strat-g@v1.16 (margin +3.7/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:39.803Z",
-      "text": "v1.18 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:48.042Z",
-      "text": "Observation: I lost most Locations in recent Cycles; Power dynamics need addressing."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:48.042Z",
-      "text": "Warning: my Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:48.042Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:48.042Z",
-      "text": "There's potential in the new Locations to shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:48.042Z",
-      "text": "Model experiment \"Increasing Power weight will help secure Locations.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:23:59.144Z",
-      "text": "v1.18 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.240Z",
-      "text": "Observation: The human's Draft wallet consistently outpaces mine."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.240Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.240Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.240Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.240Z",
-      "text": "Need to focus on improving my economy to compete effectively."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:05.241Z",
-      "text": "New experiment x169-restore-value: Higher Restore weight will improve my Server survivability. Change: restore weight 2.09→2.5. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:13.009Z",
-      "text": "v1.18 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:20.090Z",
-      "text": "Observation: The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:20.090Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:20.090Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:20.090Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:37.531Z",
-      "text": "v1.18 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:43.689Z",
-      "text": "Observation: The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:43.689Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:43.689Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:24:43.689Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:31:12.707Z",
-      "text": "Theory restore-value was contradicted from x169-restore-value (league 24/48 for the experiment vs 26/48 for the current best against dv-8@v1.4, strat-g@v1.16, vp-dog@v1.1 (margin -1/game) → rejected); now 0 for / 1 against."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:31:12.707Z",
-      "text": "Experiment x169-restore-value rejected: league 24/48 for the experiment vs 26/48 for the current best against dv-8@v1.4, strat-g@v1.16, vp-dog@v1.1 (margin -1/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:31:12.707Z",
-      "text": "New experiment x170-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 1.6→2. Prediction: More wins and more Locations won than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:35:55.772Z",
-      "text": "Experiment x170-draw rejected: league 33/48 for the experiment vs 35.5/48 for the current best against t-5@v1.5, dv-8@v1.2, t-5@v1.8 (margin -2.7/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:35:55.773Z",
-      "text": "New experiment x171-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.9→3. Prediction: Earlier Server kills and more wins than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:45.687Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:51.196Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:51.196Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:51.196Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:51.196Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:42:51.196Z",
-      "text": "Observation: I need to balance my draft strategy to include more economy-focused cards."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:05.111Z",
-      "text": "v1.18 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:11.533Z",
-      "text": "Observation: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:11.533Z",
-      "text": "Warning: I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:11.533Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:11.533Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:11.533Z",
-      "text": "I need to balance my draft strategy to include more economy-focused cards."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:44.006Z",
-      "text": "v1.18 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:49.052Z",
-      "text": "Observation: The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:49.052Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:49.052Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:49.052Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:49.052Z",
-      "text": "I need to balance my draft strategy to include more economy-focused cards."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:43:56.427Z",
-      "text": "v1.18 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:00.385Z",
-      "text": "Monitoring new Locations' impact on strategies is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:00.385Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to improve my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:00.385Z",
-      "text": "Critical warning: My Servers are low; defense with Restore is essential."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:00.385Z",
-      "text": "Lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:20.323Z",
-      "text": "v1.18 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:28.611Z",
-      "text": "Observation: The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:28.611Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:28.611Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:28.611Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T17:44:28.611Z",
-      "text": "I need to balance my draft strategy to include more economy-focused cards."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T18:56:56.148Z",
-      "text": "Experiment x171-drain inconclusive: league 32/48 for the experiment vs 30/48 for the current best against t-5@v1.8, vp-dog@v1.2, dv-8@v1.2 (margin +1.3/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T18:56:56.149Z",
-      "text": "New experiment x172-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.75→2.25, dilution 0.9→1.1. Prediction: More wins with a smaller deck than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:07:28.544Z",
-      "text": "Experiment x172-leaner rejected: league 25/48 for the experiment vs 29/48 for the current best against t-5@v1.4, vp-dog@v1.2, dv-8@v1.3 (margin -4.3/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:13:27.973Z",
-      "text": "New experiment x173-fallback-173-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:14:29.168Z",
-      "text": "Experiment x173-fallback-173-0 rejected: league 23/48 for the experiment vs 25/48 for the current best against vp-dog@v1.1, t-5@v1.9, dv-8@v1.6 (margin -2/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:19:44.675Z",
-      "text": "New experiment x174-fallback-174-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.59→2.84. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:20:54.452Z",
-      "text": "Experiment x174-fallback-174-3 rejected: league 19/48 for the experiment vs 24/48 for the current best against dv-8@v1.6, vp-dog@v1.2 (margin -1.9/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:20:54.453Z",
-      "text": "New experiment x175-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. Prediction: More wins and bigger mid-game Wallets than the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-27T19:26:29.613Z",
-      "text": "Experiment x175-thinner inconclusive: league 25.5/48 for the experiment vs 25/48 for the current best against dv-8@v1.6, t-5@v1.8, vp-dog@v1.2 (margin -0.7/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:46.357Z",
-      "text": "v1.18 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.646Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.646Z",
-      "text": "New Locations may shift strategies; monitoring their impact is crucial."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.646Z",
-      "text": "I need to balance my draft strategy to include more economy-focused cards."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.646Z",
-      "text": "Critical warning: My Servers are low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.646Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:27:52.647Z",
-      "text": "New experiment x176-more-economy-focused-draft: Drafting more economy-focused cards will improve my performance. Change: crypto weight 2.59→2.8. Prediction: I will win at least 50% of the next 5 games against the current best."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:28:00.353Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:28:05.793Z",
-      "text": "Adapt draft strategy to include more economy-focused cards as observed."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:28:05.793Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:28:05.793Z",
-      "text": "Critical warning: Servers are low; focus on defense with Restore."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:28:05.793Z",
-      "text": "Lost most Locations; board Power is too low; need to contest key Nodes."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:18.672Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:24.766Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:24.766Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:24.766Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:24.766Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:30:24.766Z",
-      "text": "Adapt draft strategy to include more economy-focused cards as observed."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T03:33:12.112Z",
-      "text": "Designer Q&A: Mel said — What is the worst part of the game and why?"
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:52.335Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:57.492Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:57.492Z",
-      "text": "Focus on improving my economy; the human's Draft wallet consistently outpaces mine."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:57.492Z",
-      "text": "Critical warning: My Servers are low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:57.492Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:15:57.492Z",
-      "text": "The human's Draft strategy has been very effective; I need to adapt."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:21.074Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:26.985Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:26.985Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:26.985Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:26.985Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:35.013Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:41.540Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:41.540Z",
-      "text": "Warning: My Servers are low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:41.540Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:41.540Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:16:41.540Z",
-      "text": "Experiment x176 is ongoing; results will inform future strategies."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:14.292Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:20.385Z",
-      "text": "The human's Draft wallet consistently outpaces mine; I need to focus on improving my economy."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:20.385Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:20.385Z",
-      "text": "I lost most Locations recently; my board Power is too low."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:20.385Z",
-      "text": "Monitor new Locations for their strategic impact."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:20.385Z",
-      "text": "Adapt draft strategy to include more economy-focused cards as observed."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:32.998Z",
-      "text": "v1.18 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:39.480Z",
-      "text": "Focus on improving economy; human's Draft wallet consistently outpaces mine."
-    },
-    {
-      "version": 18,
-      "at": "2026-10-28T05:19:39.480Z",
-      "text": "Warning: My Servers are critically low; defense with Restore is essential now."
-    },
     {
       "version": 18,
       "at": "2026-10-28T05:19:39.480Z",
@@ -6972,6 +6247,741 @@
       "version": 22,
       "at": "2026-10-30T02:58:29.652Z",
       "text": "My board Power is frequently low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-10-31T06:12:41.591Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-10-31T06:12:45.385Z",
+      "text": "Monitor new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-10-31T06:12:45.385Z",
+      "text": "Defense is critical as my Servers frequently drop low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-10-31T06:12:45.385Z",
+      "text": "My board Power can be low; explore cards enhancing Power to maintain Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-10-31T06:12:45.385Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:20.024Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: BumpEffecter. Removed cards: banishing-ritual."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:39.418Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:44.730Z",
+      "text": "Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:44.730Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:44.730Z",
+      "text": "Warning: defense matters as my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T09:19:44.730Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T17:34:33.674Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T17:34:39.519Z",
+      "text": "Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T17:34:39.519Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T17:34:39.519Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T17:34:39.519Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:17.880Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:22.025Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:22.025Z",
+      "text": "My Servers are often low; prioritize Restore effects to maintain defense."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:22.025Z",
+      "text": "My board Power is frequently low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:22.025Z",
+      "text": "Monitor new Locations for their strategic impact, especially those that affect Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:37.773Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:41.205Z",
+      "text": "Monitor the human's Draft wallet; they often outpace mine significantly."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:41.205Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:41.205Z",
+      "text": "Evaluate new cards and Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:41.205Z",
+      "text": "Explore opportunities to contest or concede Locations based on their rewards and impacts."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:50.438Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:53.690Z",
+      "text": "Monitor new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:53.690Z",
+      "text": "Warning: my Servers are frequently low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:53.690Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:22:53.690Z",
+      "text": "Evaluate new cards for their potential to impact deck efficiency and strategy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:09.119Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:12.906Z",
+      "text": "Defense is critical as my Servers frequently drop low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:12.906Z",
+      "text": "My board Power can be low; explore cards enhancing Power to maintain Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:12.906Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:12.906Z",
+      "text": "Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:25.080Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:28.822Z",
+      "text": "Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:28.822Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:28.822Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:28.822Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:28.822Z",
+      "text": "Evaluate new cards and Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:39.305Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:42.949Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:42.949Z",
+      "text": "My Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:42.949Z",
+      "text": "My board Power is frequently low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:42.949Z",
+      "text": "Monitor new Locations for their strategic impact, especially those that affect Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:23:56.909Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:24:00.331Z",
+      "text": "Monitor new Locations for their strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:24:00.331Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:24:00.331Z",
+      "text": "My board Power can be low; explore cards enhancing Power to maintain Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:24:00.331Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:24:00.331Z",
+      "text": "Evaluate new cards and Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:54.466Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:58.460Z",
+      "text": "Monitor the impact of new Locations on strategic decision-making."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:58.460Z",
+      "text": "Evaluate the effect of the human's consistent wallet advantage on my Draft strategy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:58.460Z",
+      "text": "Maintain a focus on defense; my Servers are often low, prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:58.460Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T20:26:58.460Z",
+      "text": "Assess the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:15.592Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0. New Locations: Sacrificial Altar."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:19.263Z",
+      "text": "Evaluate new cards for their potential to impact deck efficiency and strategy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:19.263Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:19.263Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:19.263Z",
+      "text": "My board Power can be low; explore cards enhancing Power to maintain Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:19.263Z",
+      "text": "Monitor new Locations for their strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:45.634Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:48.988Z",
+      "text": "Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:48.988Z",
+      "text": "Human consistently outpaces my Draft wallet; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:48.988Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:48.988Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:36:48.988Z",
+      "text": "Evaluate new cards and Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:36.420Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:40.413Z",
+      "text": "Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:40.413Z",
+      "text": "My Servers are frequently low; prioritize Restore effects for defense."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:40.413Z",
+      "text": "Monitor the human's Draft wallet; they consistently outpace mine, indicating a need for early economy adjustments."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:47.123Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:51.611Z",
+      "text": "Monitor new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:51.611Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:51.611Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:51.611Z",
+      "text": "Evaluate new cards and Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:38:51.611Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:49.101Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0. New Locations: Consume Pit, MOOP Yard, Departure Lounge, Vamping Grounds, Move Station, Sanctuary, Warded Gate, Silent Field, Echo Chamber, Solo Peak, Death Spire, Subtype Bazaar, Deck Raid, Swap Floor, Placement Pad, Copy Archive, Neighbour Beacon."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Evaluate new Locations for potential strategic impacts on gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Monitor the impact of the human's consistent wallet advantage on my Draft strategy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Assess the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Evaluate new Locations for strategic impact, particularly those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:44:56.286Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:35.695Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:39.712Z",
+      "text": "Evaluate new Locations for their potential to shift game dynamics, especially for economic advantages."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:39.712Z",
+      "text": "Human players consistently outpace my Draft wallet; consider further adjustments to early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:39.712Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:39.712Z",
+      "text": "Monitor new Locations for strategic impact, particularly those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T21:46:39.712Z",
+      "text": "Evaluate how new cards may enhance deck efficiency and synergy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:30.242Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:33.931Z",
+      "text": "Monitor the human's Draft wallet; they consistently outpace mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:33.931Z",
+      "text": "Warning: my Servers are frequently low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:33.931Z",
+      "text": "Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:33.931Z",
+      "text": "Consider adjustments to early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:25:33.931Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:10.426Z",
+      "text": "v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "My Servers are frequently low; prioritize Restore effects for defense."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "Monitor the human's Draft wallet; they consistently outpace mine, indicating a need for early economy adjustments."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:15.172Z",
+      "text": "Monitor new cards for potential strategic impacts on gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:17.667Z",
+      "text": "v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Evaluate new Locations for potential strategic impacts on my gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Monitor the human's Draft wallet; they consistently outpace mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Warning: my Servers are frequently low; prioritize Restore effects for defense."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:21.473Z",
+      "text": "Assess the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:27.868Z",
+      "text": "v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:31.675Z",
+      "text": "Evaluate new Locations for potential strategic impacts on gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:31.675Z",
+      "text": "Consider further adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:31.675Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:31.675Z",
+      "text": "Monitor new cards for potential enhancements to deck efficiency and synergy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:31.675Z",
+      "text": "Assess the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:39:58.847Z",
+      "text": "v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "Evaluate the potential of new cards to enhance deck efficiency and synergy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "The human's Draft wallet consistently outpaces mine; consider adjustments to early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "Assess the impact of Locations that affect card movement and Power."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:02.458Z",
+      "text": "Monitor new card performance in relation to my established strategies."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:07.752Z",
+      "text": "v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:11.191Z",
+      "text": "Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:11.191Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:11.191Z",
+      "text": "My Servers are frequently low; prioritize Restore effects for defense."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:11.191Z",
+      "text": "Monitor the human's Draft wallet; they consistently outpace mine, indicating a need for early economy adjustments."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:40:11.191Z",
+      "text": "Consider adjustments to early economy focus."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:45.490Z",
+      "text": "v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Monitor new Locations for potential strategic impacts on gameplay."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Prioritize defense strategies; my Servers frequently drop low, leading to losses."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Explore cards that enhance Power for maintaining Node control."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Evaluate the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:41:49.090Z",
+      "text": "Watch for potential synergies with new cards introduced."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:06.768Z",
+      "text": "v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0. New Locations: Lone Outpost."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "Evaluate new cards for potential enhancements to deck efficiency and synergy."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "Warning: my Servers are often low; prioritize Restore effects."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "Assess the value of new cards in relation to improving deck efficiency."
+    },
+    {
+      "version": 22,
+      "at": "2026-11-01T22:43:10.798Z",
+      "text": "My board Power is often low; explore cards that enhance Power for maintaining Node control."
     }
   ],
   "cardNotes": {
@@ -7118,7 +7128,26 @@
     "location-0pzdundr": "New Location: \"While in play: if you have 4 or more cards here, +3 Crypto.\" Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.",
     "location-5iszf48r": "New Location: \"On collapse: +1 Power to all cards here.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
     "location-785bvq7y": "New Location: \"Start of turn 3: +2 Power to the first revealed card on each side here.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
-    "location-e8tshr8e": "New Location: \"On reveal: Move the card that was played to another open Node.\" Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy."
+    "location-e8tshr8e": "New Location: \"On reveal: Move the card that was played to another open Node.\" Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy.",
+    "sacrificial_altar": "New Location: \"On collapse: You may destroy your cards here. +2 Crypto for each.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-consume-pit": "New Location: \"On collapse: You may destroy your cards here. +2 Crypto for each.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-moop-yard": "New Location: \"When: a card moves here, Trash it.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-departure-lounge": "New Location: \"When: a card leaves here, +1 Crypto.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-vamping-grounds": "New Location: \"When: a card moves here, Drain -50.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-move-station": "New Location: \"On reveal: Move the card that was played to another open Node.\" Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy.",
+    "loc-sanctuary": "New Location: \"Ongoing: Cards here cannot be destroyed. Ongoing: Cards here ignore Power loss.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-warded-gate": "New Location: \"Ongoing: Cards cannot move onto this Node.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-silent-field": "New Location: \"Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player.\" Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "loc-echo-chamber": "New Location: \"Ongoing: Ongoing effects here are doubled. Ongoing: +1 Card to the winning player.\" Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "loc-solo-peak": "New Location: \"Condition: Once you have only one card here, +3 Crypto.\" Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.",
+    "loc-death-spire": "New Location: \"When: a card is destroyed here, +2 Crypto.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-subtype-bazaar": "New Location: \"On collapse: Gain a Utility card costing 3 or less into your hand.\" Read: contest it: holding it is worth about 3.84 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "loc-deck-raid": "New Location: \"On reveal: Steal 1 card from the top of the other player's deck into your hand.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-swap-floor": "New Location: \"Start of turn 2: Swap the top 1 card of both decks.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-placement-pad": "New Location: \"On collapse: You may place a card from your hand onto this Node.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-copy-archive": "New Location: \"On reveal: Copy the On Reveal of your previously revealed card.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.",
+    "loc-neighbour-beacon": "New Location: \"On collapse: Push 1 Power to a nearby location.\" Read: contest it: holding it is worth about 1.52 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "loc-solo-draw": "New Location: \"While: only one card is here, +1 Card.\" Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy."
   },
   "knownCards": [
     "eval-signal-surveyor",
@@ -7146,7 +7175,6 @@
     "summon-the-acolytes",
     "temporal-rift",
     "ghost-key",
-    "banishing-ritual",
     "opulent-void",
     "sacrifical-sigil",
     "byte-heist",
@@ -7191,6 +7219,7 @@
     "trash-collector",
     "kim-dracula",
     "jinx-001",
+    "card-ot1vjma3",
     "apollo-ascii",
     "card-20fn3o2h",
     "card-93h8cciw",
@@ -7262,7 +7291,23 @@
     "location-0pzdundr",
     "location-5iszf48r",
     "location-785bvq7y",
-    "location-e8tshr8e"
+    "location-e8tshr8e",
+    "sacrificial_altar",
+    "loc-consume-pit",
+    "loc-moop-yard",
+    "loc-departure-lounge",
+    "loc-vamping-grounds",
+    "loc-move-station",
+    "loc-sanctuary",
+    "loc-warded-gate",
+    "loc-silent-field",
+    "loc-echo-chamber",
+    "loc-solo-peak",
+    "loc-death-spire",
+    "loc-subtype-bazaar",
+    "loc-copy-archive",
+    "loc-neighbour-beacon",
+    "loc-solo-draw"
   ],
   "cardStats": {
     "sudo-demiurge": {
@@ -8727,7 +8772,7 @@
     },
     {
       "label": "strat-g@v1.22",
-      "savedAt": "2026-10-30T02:58:29.652Z",
+      "savedAt": "2026-11-01T22:43:10.799Z",
       "profile": {
         "version": 22,
         "plan": "",

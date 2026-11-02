@@ -6,7 +6,7 @@
 import type { PlayerId } from "../game";
 
 export type Pair = [number, number];
-export type EffectSource = "card" | "location" | "circuit";
+export type EffectSource = "card" | "location" | "circuit" | "runtimeHack";
 export type TelemetryEvent = {
   kind: string; text: string; owner?: PlayerId; targetOwner?: PlayerId; cardId?: string; definitionId?: string;
   source?: EffectSource; sourceName?: string; amount?: number; before?: number; after?: number; target?: string;
@@ -44,7 +44,7 @@ const sourceStats = (name: string): SourceTelemetry => ({ name, drain: pair(), r
 export function emptyTelemetry(): GameTelemetry {
   return {
     events: 0, drainDealt: pair(), restoreDone: pair(),
-    drainBySource: { card: pair(), location: pair(), circuit: pair() }, restoreBySource: { card: pair(), location: pair(), circuit: pair() },
+    drainBySource: { card: pair(), location: pair(), circuit: pair(), runtimeHack: pair() }, restoreBySource: { card: pair(), location: pair(), circuit: pair(), runtimeHack: pair() },
     wastedRestores: pair(), restoreEvents: pair(), drainEvents: pair(),
     drawn: pair(), actionsGained: pair(), cryptoGained: pair(), vpGained: pair(),
     destructions: [], cards: {}, locations: {}, circuit: {}, perCycle: [],
@@ -111,7 +111,8 @@ export class TelemetryCollector {
   private sourceOf(event: TelemetryEvent): EffectSource {
     if (event.cardId?.startsWith("location:")) return "location";
     if (event.cardId?.startsWith("circuit:")) return "circuit";
-    return event.source === "location" || event.source === "circuit" ? event.source : "card";
+    if (event.source === "location" || event.source === "circuit" || event.source === "runtimeHack") return event.source;
+    return "card";
   }
 
   private sourceId(event: TelemetryEvent): string {

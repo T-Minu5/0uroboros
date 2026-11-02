@@ -586,6 +586,24 @@
       "height": 300,
       "focus": 0.5137
     },
+    "/assets/card_art/uploads/a-good-knife-2.png": {
+      "sha": "8fa2da42edd0b75f3765272aab707b59e7003c2d7e5f9d4c5f9826817af32d78",
+      "v": 2,
+      "color": "/assets/card_art/depth/8fa2da42edd0b75f3765-v2.color.webp",
+      "depth": "/assets/card_art/depth/8fa2da42edd0b75f3765-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5541
+    },
+    "/assets/card_art/uploads/a-good-knife.png": {
+      "sha": "c67234c435c129d7891989fc3a3579576bc05bed9aa700bc875006802e073123",
+      "v": 2,
+      "color": "/assets/card_art/depth/c67234c435c129d78919-v2.color.webp",
+      "depth": "/assets/card_art/depth/c67234c435c129d78919-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5049
+    },
     "/assets/card_art/uploads/agent-reaper.png": {
       "sha": "c13e9db8b16a42eabdb1103dc74c1673a653afa2118e6e2771a6d9d181ebe442",
       "v": 2,
@@ -612,6 +630,33 @@
       "width": 400,
       "height": 300,
       "focus": 0.5102
+    },
+    "/assets/card_art/uploads/atomic-mass2.png": {
+      "sha": "95a4df4bb67b69e1974821b64e187f5cf8e92b44c4197bf09e5debdf7755d1de",
+      "v": 2,
+      "color": "/assets/card_art/depth/95a4df4bb67b69e19748-v2.color.webp",
+      "depth": "/assets/card_art/depth/95a4df4bb67b69e19748-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3772
+    },
+    "/assets/card_art/uploads/atomic-number.png": {
+      "sha": "8d7af2d8a0129bad51c399cf70022de32df85b61c95079920871895cb7c6e446",
+      "v": 2,
+      "color": "/assets/card_art/depth/8d7af2d8a0129bad51c3-v2.color.webp",
+      "depth": "/assets/card_art/depth/8d7af2d8a0129bad51c3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4586
+    },
+    "/assets/card_art/uploads/chin-dai-b.png": {
+      "sha": "175a0ff732d7e1a98007d1c5080a8bd640c6f08b560daef166a14051a590c5be",
+      "v": 2,
+      "color": "/assets/card_art/depth/175a0ff732d7e1a98007-v2.color.webp",
+      "depth": "/assets/card_art/depth/175a0ff732d7e1a98007-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3812
     },
     "/assets/card_art/uploads/chingdai.png": {
       "sha": "199ccb11986ebcd216ad44e7286aa2c30884e83391255250d5f9bde6c4caaa12",
@@ -649,6 +694,15 @@
       "height": 300,
       "focus": 0.3021
     },
+    "/assets/card_art/uploads/dit-dot.png": {
+      "sha": "13c2544cd58654b1d7b6623e8c55460207a069785f7f79599bd5960e6141142f",
+      "v": 2,
+      "color": "/assets/card_art/depth/13c2544cd58654b1d7b6-v2.color.webp",
+      "depth": "/assets/card_art/depth/13c2544cd58654b1d7b6-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5181
+    },
     "/assets/card_art/uploads/dolly-dos.png": {
       "sha": "23981cfb8ba3ad10fd8f4ab47ae0eeecc2b9f9ca40cb25804df2a76c3ad9379f",
       "v": 2,
@@ -675,6 +729,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.3719
+    },
+    "/assets/card_art/uploads/gluon.png": {
+      "sha": "6fa3253309c14c446b6bba833c9e6a63eacc78302d9d8036fbe2fe552e51edff",
+      "v": 2,
+      "color": "/assets/card_art/depth/6fa3253309c14c446b6b-v2.color.webp",
+      "depth": "/assets/card_art/depth/6fa3253309c14c446b6b-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.579
     },
     "/assets/card_art/uploads/h3l3-ios.png": {
       "sha": "fea00c2987742a6541aeeb9d5df14cc11a3eec826a52bccb494fa829d961c0ad",
@@ -756,6 +819,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.5498
+    },
+    "/assets/card_art/uploads/quark.png": {
+      "sha": "f711a2bc47275d5a15352b60eb15d8f194b26b8df16dfcedd5b91f60ae65f56b",
+      "v": 2,
+      "color": "/assets/card_art/depth/f711a2bc47275d5a1535-v2.color.webp",
+      "depth": "/assets/card_art/depth/f711a2bc47275d5a1535-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.7132
     },
     "/assets/card_art/uploads/rezz-rizz.png": {
       "sha": "14048e9de2f2957555cac193cadb567366d66aa963b18373bf5706a94ff4ee40",

@@ -62,21 +62,21 @@ function place(game: RuntimeSession, owner: 0 | 1, entry: Card, revealed = true)
 }
 
 describe('location condition helpers', () => {
-  it('describes each formula under While in play', () => {
+  it('describes each formula under Condition: Once you have…', () => {
     const count = createLocationCondition('subtypeCount');
     count.count = 3;
     count.cardClass = 'Attack';
     count.effects = gainCrypto(1);
-    expect(describeCondition(count)).toMatch(/While in play:.*3 or more Attack cards here/i);
+    expect(describeCondition(count)).toMatch(/Condition: Once you have 3 or more Attack cards here/i);
     const pair = createLocationCondition('subtypePair');
     pair.effects = gainCrypto(1);
-    expect(describeCondition(pair)).toMatch(/While in play:.*an Attack and a Horror here/i);
+    expect(describeCondition(pair)).toMatch(/Condition: Once you have an Attack and a Horror here/i);
     const power = createLocationCondition('powerThreshold');
     power.amount = 5;
     power.comparison = 'orMore';
     power.effects = gainCrypto(1);
-    expect(describeCondition(power)).toMatch(/While in play:.*5 or more Power here/i);
-    expect(describeLocation({ conditions: [count] })).toContain('While in play:');
+    expect(describeCondition(power)).toMatch(/Condition: Once you have 5 or more Power here/i);
+    expect(describeLocation({ conditions: [count] })).toContain('Condition:');
   });
 
   it('ignores face-down cards when testing predicates', () => {
@@ -245,5 +245,60 @@ describe('location conditions runtime', () => {
     const game = quietSession([condition]);
     playOut(game, card('only', { power: 2 }), 0);
     expect(game.state.players[0].wallet).toBe(2);
+  });
+
+  it('awards drainFromNode only after enough Drain sourced from that Node', () => {
+    const condition: LocationCondition = {
+      id: 'drain-100',
+      kind: 'drainFromNode',
+      amount: 100,
+      comparison: 'orMore',
+      effects: gainCrypto(3),
+    };
+    expect(describeCondition(condition)).toMatch(/Condition: Once you have dealt 100 or more Drain from here/i);
+    const game = quietSession([condition]);
+    playOut(game, card('drip', {
+      power: 1,
+      onReveal: [{ action: 'damageServer', amount: 50, target: { type: 'server', who: 'opponent', server: 'auto' } }],
+    }));
+    expect(game.state.players[0].wallet).toBe(0);
+    playOut(game, card('burst', {
+      power: 1,
+      onReveal: [{ action: 'damageServer', amount: 50, target: { type: 'server', who: 'opponent', server: 'auto' } }],
+    }));
+    expect(game.state.players[0].wallet).toBe(3);
+  });
+
+  it('awards soloCard at exactly one revealed card', () => {
+    const condition: LocationCondition = {
+      id: 'solo',
+      kind: 'soloCard',
+      effects: gainCrypto(2),
+    };
+    expect(describeCondition(condition)).toMatch(/Condition: Once you have only one card here/i);
+    const empty = quietSession([condition]);
+    playOut(empty, card('lonely', { power: 2 }));
+    expect(empty.state.players[0].wallet).toBe(2);
+
+    const crowded = quietSession([condition]);
+    place(crowded, 0, card('a', { power: 2 }), true);
+    playOut(crowded, card('b', { power: 2 }));
+    expect(crowded.state.players[0].wallet).toBe(0);
+  });
+
+  it('awards cardPlayedHere when a matching card reveals here this Cycle', () => {
+    const condition: LocationCondition = {
+      id: 'played-attack',
+      kind: 'cardPlayedHere',
+      cardClass: 'Attack',
+      effects: gainCrypto(4),
+    };
+    expect(describeCondition(condition)).toMatch(/Condition: Once you have played an Attack here/i);
+    const miss = quietSession([condition]);
+    playOut(miss, card('util', { power: 1, cardClass: 'Utility' }));
+    expect(miss.state.players[0].wallet).toBe(0);
+    const hit = quietSession([condition]);
+    playOut(hit, card('atk', { power: 2, cardClass: 'Attack' }));
+    expect(hit.state.players[0].wallet).toBe(4);
   });
 });

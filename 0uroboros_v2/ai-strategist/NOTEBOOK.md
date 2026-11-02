@@ -18,7 +18,7 @@ League snapshots (newest first): strat-g@v1.22, strat-g@v1.21, strat-g@v1.20, st
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-v1.22 continues to focus on an early economy boost through Cycles 1-4, aiming for ~12 Crypto per hand. In Cycles 5-8, I will balance attacks, engine setup, Server Restore, and VP collection to improve my standing. From Cycle 9, I will aggressively target enemy Servers through Chaos and Drain strategies, prioritizing VP cards. I will adapt my play to exploit new Locations, particularly those that enhance economic advantages or disrupt the opponent's strategies, while also focusing on maintaining my Server health. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+v1.22 plays the designer's baseline with 7 adopted changes (min buy score 1.75, dilution 0.9; drain weight 2.9; disrupt weight 1.37; crypto weight 3.3; restore weight 2.49). In Cycles 1-4, prioritize strong draw/Action Base cards and Crypto worth 2+ (avoid Shyte-Coin), aiming for ~12 Crypto per hand. In Cycles 5-8, maintain a balanced midgame of attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for endgame pushes; buy VP cards from Cycle 9, with last Draft buys being solely VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
@@ -88,38 +88,18 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - none yet
 
 ### Under test
-- **strategic-location-control** (untested · v1.22): New Locations provide opportunities for shifting game dynamics; I should prioritize Locations that enhance my economic advantage.
-- **early-economy-adjustment** (untested · v1.22): Adjusting my early economy focus may help keep pace with human opponents who are consistently outpacing my Draft wallet.
+- **evaluate-new-cards** (untested · v1.22): New cards may enhance deck efficiency and synergy.
 
 ### Refuted
 - none yet
 
 ## Card and Location notes
 
-- **Renew**: Start of turn 3: Reset the Power of all cards here. Holding this Location can provide a significant advantage.
-- **Pay to Play?**: On collapse: Winner may pay 2 Crypto, and get +4 Power to a random card in their deck. Winning it can significantly boost a player's board strength.
-- **Peep my shit**: New Location: 'Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.' This can shift the game state significantly.
-- **Wreck my shit **: New Location: "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck." Read: winning it hands the other player about 1 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.
-- **Glitch-Witch**: utility; est. hand value -0.7 early / -0.7 late at cost 5. Untested.
-- **Crypto Alchemist**: utility; est. hand value 0 early / 0 late at cost 7. Untested.
-- **Jackpot**: New Location: "On collapse: +3 Crypto to the winning player." Read: contest it: holding it is worth about 12.64 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
-- **Get Some**: New Location: "On collapse: +2 Crypto to each player." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Amatera-5u**: 3 VP finisher, deck-cycling draw engine; est. hand value 7.3 early / 7.3 late at cost 6. Untested.
-- **Danda**: 1 VP finisher, economy; est. hand value 10 early / 6.5 late at cost 4. Untested.
-- **H3l3-iOS**: 4 VP finisher, Server defense; est. hand value 8.1 early / 6.3 late at cost 7. Untested.
-- **Kinich**: 2 VP finisher; est. hand value 4.9 early / 4.9 late at cost 8. Untested.
-- **Sun Scythe**: 1 VP finisher; est. hand value 0 early / 0 late at cost 3. Untested.
-- **Astra Wraith**: 1 VP finisher; est. hand value 2 early / 2 late at cost 5. Untested.
-- **Mary Mallon**: utility; est. hand value 1.3 early / 1.3 late at cost 8. Untested.
-- **Merchant of Chaos**: utility; est. hand value 5.7 early / 5.7 late at cost 11. Untested.
-- **The Heisenberg Hag**: Action engine; est. hand value 6.6 early / 6.6 late at cost 4. Untested.
-- **Entropic Infantry**: utility; est. hand value 2.5 early / 2.5 late at cost 8. Untested.
-- **Pihkal hound**: light Drain; est. hand value 4.5 early / 7.2 late at cost 5. Untested.
 - **Delete.Detritus.exe**: utility; est. hand value 5.5 early / 2 late at cost 4. Untested.
 - **Not a total loss**: New Location: "if you have 0 or less Power here, +2 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.11. Untested; watch who wins it and how it shifts the economy.
 - **Absolute Horror**: New Location: "If you have 3 or more Horror cards here, Drain -200 from the other player's server." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.16. Untested; watch who wins it and how it shifts the economy.
 - **Spice of Lyfe**: New Location: "While in play: if you have an Action and a Horror here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Doom Loop**: utility; est. hand value -0.3 early / -0.3 late at cost 3. Untested.
+- **Atomic Mass**: utility; est. hand value -0.3 early / -0.3 late at cost 3. Untested.
 - **Time Slide**: Utility; est. hand value 6.3 early / 6.3 late at cost 2. Untested.
 - **Koppy-Kat**: Utility; est. hand value 2.5 early / 2.5 late at cost 4. Untested.
 - **A Good Mix**: New Location: "While in play: if you have an Attack and an Action here, +2 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.97. Untested; watch who wins it and how it shifts the economy.
@@ -127,15 +107,34 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - **7th Heaven**: New Location: "While in play: if you have 7 or less Power here, +3 Crypto." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.
 - **Triple Lindy**: New Location: "While in play: if you have 3 or more cards here, +2 Cards.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 1.6. Untested; watch who wins it and how it shifts the economy.
 - **3s Company**: New Location: "While in play: if you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.84. Untested; watch who wins it and how it shifts the economy.
-- **New location**: New Location: "While in play: if you have 2 or more Utility cards here, +1 Power to each." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.38. Untested; watch who wins it and how it shifts the economy.
+- **Utility Belt**: New Location: "While in play: if you have 2 or more Utility cards here, +1 Power to each." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.38. Untested; watch who wins it and how it shifts the economy.
 - **Slash-ØN1**: light Drain; est. hand value 14.9 early / 9.5 late at cost 4. Untested.
 - **Hack-ØN1**: light Drain; est. hand value 10.5 early / 10 late at cost 3. Untested.
-- **3rd Wheel**: New Location: "While in play: if you have 3 or more cards here, -1 Power from all cards here." Read: about even for both sides; it matters through which cards sit there; each card you reveal here costs you about 0.38. Untested; watch who wins it and how it shifts the economy.
+- **The 3rd Wheel**: New Location: "While in play: if you have 3 or more cards here, -1 Power from all cards here." Read: about even for both sides; it matters through which cards sit there; each card you reveal here costs you about 0.38. Untested; watch who wins it and how it shifts the economy.
 - **Mill My Man**: New Location: "While in play: if you have an Attack and a Horror here, Mill a card from the other player's deck." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.69. Untested; watch who wins it and how it shifts the economy.
 - **Crowed House**: New Location: "While in play: if you have 4 or more cards here, +3 Crypto." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.
 - **The Giving Tree**: New Location: "On collapse: +1 Power to all cards here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **Oh, Good For You!**: New Location: "Start of turn 3: +2 Power to the first revealed card on each side here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **Repel Spell **: New Location: "On reveal: Move the card that was played to another open Node." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy.
+- **Sacrificial Altar**: New Location: "On collapse: You may destroy your cards here. +2 Crypto for each." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Consume Pit**: New Location: "On collapse: You may destroy your cards here. +2 Crypto for each." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **MOOP Yard**: New Location: "When: a card moves here, Trash it." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Departure Lounge**: New Location: "When: a card leaves here, +1 Crypto." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Vamping Grounds**: New Location: "When: a card moves here, Drain -50." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Move Station**: New Location: "On reveal: Move the card that was played to another open Node." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy.
+- **Sanctuary**: New Location: "Ongoing: Cards here cannot be destroyed. Ongoing: Cards here ignore Power loss." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Warded Gate**: New Location: "Ongoing: Cards cannot move onto this Node." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Silent Field**: New Location: "Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Echo Chamber**: New Location: "Ongoing: Ongoing effects here are doubled. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Solo Peak**: New Location: "Condition: Once you have only one card here, +3 Crypto." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.
+- **Death Spire**: New Location: "When: a card is destroyed here, +2 Crypto." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Utility Station**: New Location: "On collapse: Gain a Utility card costing 3 or less into your hand." Read: contest it: holding it is worth about 3.84 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **loc-deck-raid**: New Location: "On reveal: Steal 1 card from the top of the other player's deck into your hand." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **loc-swap-floor**: New Location: "Start of turn 2: Swap the top 1 card of both decks." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **loc-placement-pad**: New Location: "On collapse: You may place a card from your hand onto this Node." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Copy Archive**: New Location: "On reveal: Copy the On Reveal of your previously revealed card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Neighbour Beacon**: New Location: "On collapse: Push 1 Power to a nearby location." Read: contest it: holding it is worth about 1.52 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Lone Outpost**: New Location: "While: only one card is here, +1 Card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 
 ## Card results (complete games where a side bought it)
 
@@ -175,46 +174,46 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Recent notes
 
-- v1.22 · 2026-10-30 02:58 · My board Power is frequently low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-10-30 02:58 · Warning: defense matters as my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-10-30 02:58 · Human consistently outpaces my Draft wallet; consider adjusting my early economy focus.
-- v1.22 · 2026-10-30 02:58 · Monitor the impact of new Locations on game dynamics, especially those affecting Crypto and Power.
-- v1.22 · 2026-10-30 02:58 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-10-29 07:48 · Evaluate the effectiveness of card combinations that synergize well with new Locations and card abilities.
-- v1.22 · 2026-10-29 07:48 · Consider prioritizing defense strategies due to frequent Server vulnerabilities observed in recent games.
-- v1.22 · 2026-10-29 07:48 · Monitor the impact of new Locations on game dynamics, especially those affecting Crypto and Power dynamics.
-- v1.22 · 2026-10-29 07:48 · v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-10-29 07:39 · Monitor new Locations for their strategic impact, especially those that affect Crypto and Power dynamics.
-- v1.22 · 2026-10-29 07:39 · My board Power is frequently low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-10-29 07:39 · My Servers are often low; prioritize Restore effects to maintain defense.
-- v1.22 · 2026-10-29 07:39 · The human's Draft wallet consistently outpaces mine; consider adjusting my early economy focus.
-- v1.22 · 2026-10-29 07:39 · v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-10-29 07:39 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-10-29 07:39 · Warning: defense matters as my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-10-29 07:39 · Human consistently outpaces my Draft wallet; consider adjusting my early economy focus.
-- v1.22 · 2026-10-29 07:39 · Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact.
-- v1.22 · 2026-10-29 07:39 · v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0. New cards since last version: Slash-ØN1, Hack-ØN1. New Locations: 3rd Wheel, Mill My Man, Crowed House, The Giving Tree, Oh, Good For You!, Repel Spell .
-- v1.22 · 2026-10-29 03:06 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-10-29 03:06 · Warning: defense matters as my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-10-29 03:06 · Human consistently outpaces my Draft wallet; consider adjusting my early economy focus.
-- v1.22 · 2026-10-29 03:06 · Monitor new Locations: 'A Good Mix', 'Fly Wheel', and others for their strategic impact.
-- v1.22 · 2026-10-29 03:06 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0. New Locations: A Good Mix, Fly Wheel, 7th Heaven, Triple Lindy, 3's Company, New location.
-- v1.22 · 2026-10-28 15:19 · New experiment x196-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 1.6→2. Prediction: More wins and more Locations won than the current best.
-- v1.22 · 2026-10-28 15:19 · Experiment x195-fallback-195-2 inconclusive: league 32.5/48 for the experiment vs 32.5/48 for the current best against t-5@v1.6, dv-8@v1.3 (margin +2/game) → inconclusive. Kept the current best.
-- v1.22 · 2026-10-28 15:18 · New experiment x195-fallback-195-2: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.1→1.35. Prediction: More wins or a better margin than the current best.
-- v1.22 · 2026-10-28 15:14 · Experiment x194-fallback-194-1 rejected: league 24.5/48 for the experiment vs 29/48 for the current best against strat-g@v1.19, t-5@v1.10, dv-8@v1.5 (margin -3.4/game) → rejected. Kept the current best.
-- v1.22 · 2026-10-28 15:13 · New experiment x194-fallback-194-1: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 1.6→1.85. Prediction: More wins or a better margin than the current best.
-- v1.22 · 2026-10-28 15:09 · Experiment x193-disrupt inconclusive: league 23.5/48 for the experiment vs 23/48 for the current best against dv-8@v1.7, vp-dog@v1.2 (margin -2.4/game) → inconclusive. Kept the current best.
-- v1.22 · 2026-10-28 15:06 · New experiment x193-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. Prediction: More wins and a better margin than the current best.
-- v1.22 · 2026-10-28 15:06 · Experiment x192-power inconclusive: league 18/48 for the experiment vs 15/48 for the current best against t-5@v1.10, strat-g@v1.18, vp-dog@v1.6 (margin +2.1/game) → inconclusive. Kept the current best.
-- v1.22 · 2026-10-28 15:01 · New experiment x192-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. Prediction: More Locations won and more wins than the current best.
-- v1.22 · 2026-10-28 15:01 · Experiment x191-restore inconclusive: league 25/48 for the experiment vs 25/48 for the current best against dv-8@v1.6, t-5@v1.10, vp-dog@v1.5 (margin -1.5/game) → inconclusive. Kept the current best.
-- v1.22 · 2026-10-28 14:58 · New experiment x191-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.49→2.89. Prediction: Fewer losses by Server destruction than the current best.
-- v1.22 · 2026-10-28 14:58 · Experiment x190-fallback-190-3 adopted: league 36/48 for the experiment vs 29/48 for the current best against dv-8@v1.6, t-5@v1.6, strat-g@v1.19 (margin +5.9/game) → promising. Adopted into the current best.
-- v1.22 · 2026-10-28 14:58 · Now v1.22: adopted x190-fallback-190-3 (crypto weight 3.05→3.3).
-- v1.21 · 2026-10-28 14:57 · New experiment x190-fallback-190-3: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 3.05→3.3. Prediction: More wins or a better margin than the current best.
-- v1.21 · 2026-10-28 14:52 · Experiment x189-thinner rejected: league 20/48 for the experiment vs 21/48 for the current best against t-5@v1.10, vp-dog@v1.2, dv-8@v1.7 (margin -1.6/game) → rejected. Kept the current best.
-- v1.21 · 2026-10-28 14:41 · New experiment x189-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. Prediction: More wins and bigger mid-game Wallets than the current best.
+- v1.22 · 2026-11-01 22:43 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-01 22:43 · Assess the value of new cards in relation to improving deck efficiency.
+- v1.22 · 2026-11-01 22:43 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
+- v1.22 · 2026-11-01 22:43 · Warning: my Servers are often low; prioritize Restore effects.
+- v1.22 · 2026-11-01 22:43 · Evaluate new cards for potential enhancements to deck efficiency and synergy.
+- v1.22 · 2026-11-01 22:43 · Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics.
+- v1.22 · 2026-11-01 22:43 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0. New Locations: Lone Outpost.
+- v1.22 · 2026-11-01 22:41 · Watch for potential synergies with new cards introduced.
+- v1.22 · 2026-11-01 22:41 · Evaluate the value of new cards in relation to improving deck efficiency.
+- v1.22 · 2026-11-01 22:41 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
+- v1.22 · 2026-11-01 22:41 · Explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-01 22:41 · Prioritize defense strategies; my Servers frequently drop low, leading to losses.
+- v1.22 · 2026-11-01 22:41 · Monitor new Locations for potential strategic impacts on gameplay.
+- v1.22 · 2026-11-01 22:41 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-01 22:40 · Consider adjustments to early economy focus.
+- v1.22 · 2026-11-01 22:40 · Monitor the human's Draft wallet; they consistently outpace mine, indicating a need for early economy adjustments.
+- v1.22 · 2026-11-01 22:40 · My Servers are frequently low; prioritize Restore effects for defense.
+- v1.22 · 2026-11-01 22:40 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-01 22:40 · Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics.
+- v1.22 · 2026-11-01 22:40 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-01 22:40 · Monitor new card performance in relation to my established strategies.
+- v1.22 · 2026-11-01 22:40 · Assess the impact of Locations that affect card movement and Power.
+- v1.22 · 2026-11-01 22:40 · The human's Draft wallet consistently outpaces mine; consider adjustments to early economy focus.
+- v1.22 · 2026-11-01 22:40 · Warning: my Servers are often low; prioritize Restore effects.
+- v1.22 · 2026-11-01 22:40 · Evaluate the potential of new cards to enhance deck efficiency and synergy.
+- v1.22 · 2026-11-01 22:40 · Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics.
+- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-01 22:39 · Assess the value of new cards in relation to improving deck efficiency.
+- v1.22 · 2026-11-01 22:39 · Monitor new cards for potential enhancements to deck efficiency and synergy.
+- v1.22 · 2026-11-01 22:39 · Warning: my Servers are often low; prioritize Restore effects.
+- v1.22 · 2026-11-01 22:39 · Consider further adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
+- v1.22 · 2026-11-01 22:39 · Evaluate new Locations for potential strategic impacts on gameplay.
+- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-01 22:39 · Assess the value of new cards in relation to improving deck efficiency.
+- v1.22 · 2026-11-01 22:39 · Explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-01 22:39 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
+- v1.22 · 2026-11-01 22:39 · Warning: my Servers are frequently low; prioritize Restore effects for defense.
+- v1.22 · 2026-11-01 22:39 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-01 22:39 · Evaluate new Locations for potential strategic impacts on my gameplay.
+- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
 
 ## Version history
 

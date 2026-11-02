@@ -7,8 +7,8 @@ const coloured = (text: string) => splitLocationText(text).filter(part => part.c
 
 describe('Location text colours', () => {
   it('prints every trigger prefix in white', () => {
-    const parts = splitLocationText('On reveal: x. Ongoing: y. On collapse: z. Start of turn 2: w.').filter(part => part.trigger);
-    expect(parts.map(part => part.trigger)).toEqual(['onReveal', 'ongoing', 'onCollapse', 'startTurn']);
+    const parts = splitLocationText('On reveal: x. Ongoing: y. On collapse: z. Start of turn 2: w. Condition: Once you have…. When: a card is destroyed here.').filter(part => part.trigger);
+    expect(parts.map(part => part.trigger)).toEqual(['onReveal', 'ongoing', 'onCollapse', 'startTurn', 'whileInPlay', 'when']);
     expect(parts.every(part => part.color === LOCATION_TRIGGER_COLOR)).toBe(true);
   });
 

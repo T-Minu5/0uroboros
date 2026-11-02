@@ -24,6 +24,14 @@ import {
   CONDITION_COMPARISONS, CONDITION_KIND_LABELS, LOCATION_CONDITION_KINDS, createLocationCondition,
   type ConditionComparison, type LocationCondition, type LocationConditionKind,
 } from '@0uroboros/engine/locationConditions';
+import {
+  LOCATION_EVENT_KINDS, LOCATION_EVENT_KIND_LABELS, createLocationEvent,
+  type LocationEvent, type LocationEventKind,
+} from '@0uroboros/engine/locationEvents';
+import {
+  LOCATION_WHILE_KINDS, WHILE_KIND_LABELS, createLocationWhile,
+  type LocationWhile, type LocationWhileKind,
+} from '@0uroboros/engine/locationWhiles';
 import { getBundledDocument } from '../contentPack/contentStore';
 import { ModsContext, StepList } from './StepEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
@@ -366,6 +374,18 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
   const conditions = location.conditions ?? [];
   const setConditions = (next: LocationCondition[]) => syncHooks({ conditions: next.length ? next : undefined });
   const replaceCondition = (index: number, condition: LocationCondition) => setConditions(conditions.map((entry, at) => at === index ? condition : entry));
+  const events = location.events ?? [];
+  const setEvents = (next: LocationEvent[]) => syncHooks({ events: next });
+  const replaceEvent = (index: number, event: LocationEvent) => setEvents(events.map((entry, at) => at === index ? event : entry));
+  const whiles = location.whiles ?? [];
+  const setWhiles = (next: LocationWhile[]) => syncHooks({ whiles: next.length ? next : undefined });
+  const replaceWhile = (index: number, entry: LocationWhile) => setWhiles(whiles.map((item, at) => at === index ? entry : item));
+  const passives = location.passives ?? {};
+  const setPassive = (key: keyof NonNullable<AuthoredLocation['passives']>, checked: boolean) => {
+    const next = { ...passives, [key]: checked || undefined };
+    const cleaned = Object.values(next).some(Boolean) ? next : undefined;
+    syncHooks({ passives: cleaned });
+  };
   return <div className="au-properties au-standalone-properties"><section className="au-panel"><SectionTitle title="Location properties" /><div className="au-field-grid">
     <TextField field="name" label="Name" value={location.name} onChange={name => patch({ name })} />
   </div>
@@ -381,12 +401,35 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
       <SectionTitle eyebrow="Unique to this Location" title="Location effects" description="Select a step to edit it." />
       <StepList field="effects" title="On collapse" description="When this Node resolves during Wave Collapse. On a tie, Winner gives to each player and a random player makes any choice." scope="location" cards={asCards(cards)} steps={location.effects} onChange={effects => syncHooks({ effects })} />
       <StepList field="ongoing" title="Ongoing" description="After each Runtime reveal while this Location is open. Winner = current controller; Loser = the trailing player. Actions count for the turn that is starting." scope="location" cards={asCards(cards)} steps={location.ongoing ?? []} onChange={ongoing => syncHooks({ ongoing })} />
+      <div className="au-field-grid" style={{ marginBottom: '0.75rem' }}>
+        <div className="au-span-all"><Toggle field="passives.revealedCanMove" label="Revealed cards can move" checked={!!passives.revealedCanMove} onChange={checked => setPassive('revealedCanMove', checked)} hint="Ongoing: revealed cards here may self-move once per Runtime turn." /></div>
+        <div className="au-span-all"><Toggle field="passives.doublePowerChanges" label="Double Power changes" checked={!!passives.doublePowerChanges} onChange={checked => setPassive('doublePowerChanges', checked)} hint="Ongoing: changePower deltas applied to cards at this Node are doubled." /></div>
+        <div className="au-span-all"><Toggle field="passives.doubleOngoing" label="Double Ongoing effects" checked={!!passives.doubleOngoing} onChange={checked => setPassive('doubleOngoing', checked)} hint="Ongoing: amounts on this Location’s Ongoing steps are doubled." /></div>
+        <div className="au-span-all"><Toggle field="passives.suppressOngoing" label="Stop Ongoing here" checked={!!passives.suppressOngoing} onChange={checked => setPassive('suppressOngoing', checked)} hint="Ongoing: this Location’s Ongoing effects do not resolve." /></div>
+        <div className="au-span-all"><Toggle field="passives.blockMovesOnto" label="Node ward (block moves onto)" checked={!!passives.blockMovesOnto} onChange={checked => setPassive('blockMovesOnto', checked)} hint="Ongoing: cards cannot move onto this Node (deploy still allowed)." /></div>
+        <div className="au-span-all"><Toggle field="passives.immuneDestroy" label="Immune to destroy" checked={!!passives.immuneDestroy} onChange={checked => setPassive('immuneDestroy', checked)} hint="Ongoing: revealed cards here cannot be destroyed." /></div>
+        <div className="au-span-all"><Toggle field="passives.immunePowerDown" label="Immune to Power loss" checked={!!passives.immunePowerDown} onChange={checked => setPassive('immunePowerDown', checked)} hint="Ongoing: revealed cards here ignore negative Power changes." /></div>
+      </div>
       <StepList field="onPlay" title="On reveal" description="When a card is played (reveals) here. Targets are relative to that card’s owner; “this card” is the card that was played." scope="locationPlay" cards={asCards(cards)} steps={location.onPlay ?? []} onChange={onPlay => syncHooks({ onPlay })} />
       <StepList field="startTurn2" title="Start of turn 2" description="When Runtime turn 2 begins. A Location with these effects is only dealt as one of the first 3 revealed, so it is always open by then. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.startTurn2 ?? []} onChange={startTurn2 => syncHooks({ startTurn2: startTurn2.length ? startTurn2 : undefined })} />
       <StepList field="startTurn3" title="Start of turn 3" description="When Runtime turn 3 begins. A Location with these effects is only dealt as one of the first 4 revealed. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.startTurn3 ?? []} onChange={startTurn3 => syncHooks({ startTurn3: startTurn3.length ? startTurn3 : undefined })} />
     </section>
     <section className="au-panel au-effects-panel">
-      <SectionTitle eyebrow="While in play" title="Conditions" description="Each seat is checked on its own revealed cards here. The reward awards once per seat the first time that seat meets the formula." />
+      <SectionTitle eyebrow="While" title="While" description="Continuous: holds a live Power bonus and/or fires with Ongoing cadence for as long as the formula is true. Solo = exactly one revealed card on this Node (either seat)." />
+      {whiles.map((entry, index) => (
+        <LocationWhileEditor
+          key={entry.id}
+          index={index}
+          entry={entry}
+          cards={asCards(cards)}
+          onChange={next => replaceWhile(index, next)}
+          onRemove={() => setWhiles(whiles.filter((_, at) => at !== index))}
+        />
+      ))}
+      <button type="button" className="au-button au-button-subtle" onClick={() => setWhiles([...whiles, createLocationWhile()])}>+ Add while</button>
+    </section>
+    <section className="au-panel au-effects-panel">
+      <SectionTitle eyebrow="Condition" title="Conditions" description="Each seat is checked on its own revealed cards here. The reward awards once per seat the first time that seat meets the formula." />
       {conditions.map((condition, index) => (
         <LocationConditionEditor
           key={condition.id}
@@ -398,6 +441,20 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
         />
       ))}
       <button type="button" className="au-button au-button-subtle" onClick={() => setConditions([...conditions, createLocationCondition()])}>+ Add condition</button>
+    </section>
+    <section className="au-panel au-effects-panel">
+      <SectionTitle eyebrow="When" title="Events" description="Fire when something happens at this Node. Beneficiary is the seat that caused the event. Target → This card is the card that moved, played, left, or was destroyed." />
+      {events.map((event, index) => (
+        <LocationEventEditor
+          key={event.id}
+          index={index}
+          event={event}
+          cards={asCards(cards)}
+          onChange={next => replaceEvent(index, next)}
+          onRemove={() => setEvents(events.filter((_, at) => at !== index))}
+        />
+      ))}
+      <button type="button" className="au-button au-button-subtle" onClick={() => setEvents([...events, createLocationEvent()])}>+ Add event</button>
     </section>
     <details className="au-property-section"><summary>Identity</summary><IdentityFields id={location.id} /></details>
     <AdvancedJson key={location.id} item={location} onApply={item => applyAdvanced(item as AuthoredLocation)} onPendingChange={onPendingChange} />
@@ -456,15 +513,19 @@ function LocationConditionEditor({ index, condition, cards, onChange, onRemove }
           </button>
         )}
       </>}
-      {(condition.kind === 'powerThreshold' || condition.kind === 'cardCountThreshold') && <>
+      {(condition.kind === 'powerThreshold' || condition.kind === 'cardCountThreshold' || condition.kind === 'drainFromNode') && <>
         <NumberField
           field={`conditions.${index}.amount`}
-          label={condition.kind === 'powerThreshold' ? 'Power' : 'Cards'}
+          label={condition.kind === 'powerThreshold' ? 'Power' : condition.kind === 'drainFromNode' ? 'Drain' : 'Cards'}
           value={condition.amount}
           min={condition.kind === 'powerThreshold' ? -99 : 0}
           onChange={amount => onChange({ ...condition, amount: amount ?? 0 })}
         />
         <SelectField field={`conditions.${index}.comparison`} label="Comparison" value={condition.comparison ?? 'orMore'} options={CONDITION_COMPARISONS} labels={{ orMore: 'or more', orLess: 'or less' } satisfies Record<ConditionComparison, string>} onChange={comparison => onChange({ ...condition, comparison })} />
+      </>}
+      {condition.kind === 'cardPlayedHere' && <>
+        <SelectField field={`conditions.${index}.cardClass`} label="Subtype (optional)" value={condition.cardClass ?? ''} options={['', ...CARD_CLASSES]} labels={{ '': 'Any', ...Object.fromEntries(CARD_CLASSES.map(cls => [cls, cls])) }} onChange={cardClass => onChange({ ...condition, cardClass: cardClass ? cardClass as CardClass : undefined })} />
+        <TextField field={`conditions.${index}.definitionId`} label="Card id (optional)" value={condition.definitionId ?? ''} onChange={definitionId => onChange({ ...condition, definitionId: definitionId.trim() || undefined })} />
       </>}
       <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove condition {index + 1}</button>
     </div>
@@ -476,6 +537,74 @@ function LocationConditionEditor({ index, condition, cards, onChange, onRemove }
       cards={cards}
       steps={condition.effects}
       onChange={effects => onChange({ ...condition, effects })}
+    />
+  </div>;
+}
+
+function LocationEventEditor({ index, event, cards, onChange, onRemove }: {
+  index: number; event: LocationEvent; cards: readonly Card[];
+  onChange: (event: LocationEvent) => void; onRemove: () => void;
+}) {
+  const changeKind = (kind: LocationEventKind) => onChange({ ...createLocationEvent(kind), id: event.id, effects: event.effects });
+  return <div className="au-schedule" data-field={`events.${index}`}>
+    <div className="au-schedule-fields au-field-grid">
+      <SelectField field={`events.${index}.kind`} label={`Event ${index + 1}`} value={event.kind} options={LOCATION_EVENT_KINDS} labels={LOCATION_EVENT_KIND_LABELS} onChange={changeKind} />
+      {event.kind === 'cardPlayed' && <>
+        <SelectField field={`events.${index}.cardClass`} label="Subtype (optional)" value={event.cardClass ?? ''} options={['', ...CARD_CLASSES]} labels={{ '': 'Any', ...Object.fromEntries(CARD_CLASSES.map(cls => [cls, cls])) }} onChange={cardClass => onChange({ ...event, cardClass: cardClass ? cardClass as CardClass : undefined })} />
+        <TextField field={`events.${index}.definitionId`} label="Card id (optional)" value={event.definitionId ?? ''} onChange={definitionId => onChange({ ...event, definitionId: definitionId.trim() || undefined })} />
+      </>}
+      {event.kind === 'playsThisTurn' && (
+        <NumberField field={`events.${index}.count`} label="Plays needed" value={event.count ?? 2} min={1} onChange={count => onChange({ ...event, count: count ?? 2 })} />
+      )}
+      <div className="au-span-all">
+        <Toggle
+          field={`events.${index}.oncePerSeat`}
+          label="Once per seat"
+          checked={event.oncePerSeat ?? event.kind === 'playsThisTurn'}
+          onChange={oncePerSeat => onChange({ ...event, oncePerSeat })}
+          hint={event.kind === 'playsThisTurn' ? 'Default on: once per seat per turn.' : 'Default off: fires every matching event.'}
+        />
+      </div>
+      <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove event {index + 1}</button>
+    </div>
+    <StepList
+      field={`events.${index}`}
+      title={`Event ${index + 1} reward`}
+      description={'Awarded to the seat that triggered the event. Target → This card is that card (e.g. the one that moved here).'}
+      scope="locationEvent"
+      cards={cards}
+      steps={event.effects}
+      onChange={effects => onChange({ ...event, effects })}
+    />
+  </div>;
+}
+
+function LocationWhileEditor({ index, entry, cards, onChange, onRemove }: {
+  index: number; entry: LocationWhile; cards: readonly Card[];
+  onChange: (entry: LocationWhile) => void; onRemove: () => void;
+}) {
+  const changeKind = (kind: LocationWhileKind) => onChange({ ...createLocationWhile(kind), id: entry.id, effects: entry.effects, powerBonus: entry.powerBonus });
+  return <div className="au-schedule" data-field={`whiles.${index}`}>
+    <div className="au-schedule-fields au-field-grid">
+      <SelectField field={`whiles.${index}.kind`} label={`While ${index + 1}`} value={entry.kind} options={LOCATION_WHILE_KINDS} labels={WHILE_KIND_LABELS} onChange={changeKind} />
+      <NumberField
+        field={`whiles.${index}.powerBonus`}
+        label="Power bonus"
+        value={entry.powerBonus}
+        min={1}
+        onChange={powerBonus => onChange({ ...entry, powerBonus: powerBonus || undefined })}
+        hint="Live bonus on the solo card while the formula holds. Leave empty for none."
+      />
+      <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove while {index + 1}</button>
+    </div>
+    <StepList
+      field={`whiles.${index}`}
+      title={`While ${index + 1} effects`}
+      description="Fire with Ongoing cadence while the formula holds. Beneficiary is the solo card’s owner. Target → This card is that card."
+      scope="locationEvent"
+      cards={cards}
+      steps={entry.effects ?? []}
+      onChange={effects => onChange({ ...entry, effects: effects.length ? effects : undefined })}
     />
   </div>;
 }

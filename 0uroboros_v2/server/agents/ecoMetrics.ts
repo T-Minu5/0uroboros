@@ -126,7 +126,10 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const at = (cycle: number) => timeline.find(row => row.cycle === cycle);
   const winner = report.winner as Seat | null;
   const winnerMaxDeficit = winner === null ? 0 : Math.max(0, ...timeline.map(row => row.vp[1 - winner] - row.vp[winner]));
-  const circuitLead2At = pair(seat => timeline.find(row => row.circuitClaims[seat] - row.circuitClaims[1 - seat] >= 2)?.cycle ?? null);
+  const circuitLead2At: [number | null, number | null] = [
+    timeline.find(row => row.circuitClaims[0] - row.circuitClaims[1] >= 2)?.cycle ?? null,
+    timeline.find(row => row.circuitClaims[1] - row.circuitClaims[0] >= 2)?.cycle ?? null,
+  ];
   const marketVp = report.marketVp ?? pair(seat => sum(ownPurchases(seat).map(item => item.vp ?? 0)));
   const otherVp = pair(seat => report.finalVP[seat] - destructionVP[seat] - marketVp[seat]);
   const finalScore = report.finalScore
