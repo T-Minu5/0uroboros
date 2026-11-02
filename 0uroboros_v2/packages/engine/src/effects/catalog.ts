@@ -176,7 +176,7 @@ const CARD_TARGETS: readonly TargetChoice[] = [
 /** Attach / Remove mod: same card places as other card effects, plus the deck+Discard+hand pool. */
 const MOD_CARD_TARGETS: readonly TargetChoice[] = [
   ...CARD_TARGETS,
-  cardChoice('collection', 'Deck, Discard or hand'),
+  cardChoice('collection', 'Deck, Discard or hand', 'collection'),
 ];
 const SERVER_TARGETS: readonly TargetChoice[] = [
   { key: 'auto', label: 'Available', server: 'auto' }, { key: 'both', label: 'Both', server: 'both' }, { key: 'backup', label: 'Backup', server: 'backup' },

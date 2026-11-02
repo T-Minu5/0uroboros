@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
-import { starterCards, type Card } from '@0uroboros/engine/game';
+import { starterCards, type Card, type Deployment } from '@0uroboros/engine/game';
 import { describeLocation, describeWhileEntry } from '@0uroboros/engine/effects/catalog';
 import { createLocationWhile, meetsLocationWhile, revealedAtNode, whilePowerBonus } from '@0uroboros/engine/locationWhiles';
 import type { LocationWhile } from '@0uroboros/engine/locationWhiles';
@@ -92,12 +92,11 @@ describe('location while formulas', () => {
     const entry: LocationWhile = { id: 'w', kind: 'soloCard', powerBonus: 5 };
     const game = baseSession({ whiles: [entry] });
     const lone = place(game, 0, card('lone'));
-    game.recalculate?.();
-    // recalculate is private — poke via a no-op move path: call powers through a step
-    (game as unknown as { recalculate: () => void }).recalculate();
+    const recalc = () => (game as unknown as { recalculate: () => void }).recalculate();
+    recalc();
     expect(game.state.nodes[0].powers[0]).toBe(7); // 2 printed + 5 while
     place(game, 1, card('rival'));
-    (game as unknown as { recalculate: () => void }).recalculate();
+    recalc();
     expect(game.state.nodes[0].powers[0]).toBe(2);
     expect(whilePowerBonus([entry], revealedAtNode(game.state.nodes[0].cards.flat()), lone)).toBe(0);
   });
@@ -153,9 +152,8 @@ describe('location event This card', () => {
     game.state.nodes[0].cards[0] = [];
     const traveler = place(game, 0, card('traveler-2'), true, 1);
     const source = place(game, 0, mover, true, 1);
-    // Use session's move by deploying isn't easy; call move through choose path
     (game as unknown as {
-      movePlacement: (source: typeof source, destination: number, target: typeof traveler) => RuntimeEvent;
+      movePlacement: (from: Deployment, destination: number, target: Deployment) => RuntimeEvent;
     }).movePlacement(source, 0, traveler);
     finish(game);
     expect(traveler.card.powerDelta ?? 0).toBe(1);

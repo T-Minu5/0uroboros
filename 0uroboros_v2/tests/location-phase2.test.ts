@@ -313,7 +313,7 @@ describe('phase 2 authored pack', () => {
       events: [{ id: 'x', kind: 'cardLeft', effects: migrateEffects([{ kind: 'crypto', amount: 1 }], 'locationEvent') }],
     })).toMatch(/When: a card leaves here/i);
     expect(describeMod({
-      id: 'mod-consume', name: 'Consume',
+      id: 'mod-consume',
       onCollapse: [{
         action: 'sacrificeCards', amount: 2, optional: true,
         target: { type: 'card', who: 'self', where: 'thisNode' },

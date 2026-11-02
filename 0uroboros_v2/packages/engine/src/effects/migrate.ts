@@ -1,6 +1,7 @@
 import type { Card, LegacyEffect } from '../game';
 import { normalizeLocationCondition, type LocationCondition } from '../locationConditions';
 import type { LocationEvent } from '../locationEvents';
+import type { LocationWhile } from '../locationWhiles';
 import { ACTIONS } from './catalog';
 import { isStep, scopedWho, type AnyEffect, type ChoiceOption, type EffectStep, type PickMode, type Scope, type Target, type Who } from './types';
 
@@ -93,7 +94,7 @@ type LocationLike = {
 };
 type StepLocationCondition = Omit<LocationCondition, 'effects'> & { effects: EffectStep[] };
 type StepLocationEvent = Omit<LocationEvent, 'effects'> & { effects: EffectStep[] };
-type StepLocationWhile = Omit<LocationWhileLike, 'effects'> & { effects?: EffectStep[]; powerBonus?: number };
+type StepLocationWhile = Omit<LocationWhile, 'effects'> & { effects?: EffectStep[] };
 type StepLocation<T> = Omit<T, 'effects' | 'ongoing' | 'onPlay' | 'startTurn2' | 'startTurn3' | 'conditions' | 'events' | 'whiles'> & {
   effects: EffectStep[]; ongoing?: EffectStep[]; onPlay?: EffectStep[]; startTurn2?: EffectStep[]; startTurn3?: EffectStep[];
   conditions?: StepLocationCondition[];
