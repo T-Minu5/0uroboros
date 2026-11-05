@@ -12,6 +12,10 @@ export type GameSetup = {
   noTrailingRewards: boolean;
   /** Persistent Crypto card shelf in Draft. Defaults off. */
   draftCrypto: boolean;
+  /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
+  middleNodesOnly: boolean;
+  /** Characters deploy free; gainActions is suppressed and hidden. */
+  noActions: boolean;
 };
 
 const SETUP_KEY = 'ouroboros.gameSetup';
@@ -19,7 +23,7 @@ const clampInt = (value: unknown, min: number, max: number, fallback: number) =>
 
 export function sanitizeGameSetup(raw: unknown): GameSetup {
   const value = (raw && typeof raw === 'object' ? raw : {}) as {
-    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; noTrailingRewards?: unknown; draftCrypto?: unknown;
+    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; noTrailingRewards?: unknown; draftCrypto?: unknown; middleNodesOnly?: unknown; noActions?: unknown;
   };
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
@@ -27,6 +31,8 @@ export function sanitizeGameSetup(raw: unknown): GameSetup {
     noLocations: value.noLocations === true,
     noTrailingRewards: value.noTrailingRewards !== false,
     draftCrypto: value.draftCrypto === true,
+    middleNodesOnly: value.middleNodesOnly === true,
+    noActions: value.noActions === true,
   };
 }
 

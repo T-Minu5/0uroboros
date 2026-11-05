@@ -459,6 +459,18 @@
 .world-anchor .location-plate .location-trigger{margin-right:0;font-weight:700}
 .world-anchor .location-plate .location-effect,.location-inspect .location-effect{font-weight:600}
 .location-inspect .location-trigger{font-weight:700}
+.location-subtype-icon{
+  display:inline-block;
+  width:1em;
+  height:1em;
+  margin:0 .12em;
+  vertical-align:-0.15em;
+  background:var(--tone,#fff);
+  -webkit-mask:center / contain no-repeat;
+  mask:center / contain no-repeat;
+}
+.world-anchor .location-plate .location-subtype-icon{width:12px;height:12px;margin:0 2px;vertical-align:-1px}
+.location-inspect .location-subtype-icon{width:14px;height:14px}
 .world-anchor .location-plate>b{position:relative;top:2px}
 .world-anchor .location-plate>.location-reward,
 .world-anchor .location-plate>.location-rule{position:relative;top:4px}

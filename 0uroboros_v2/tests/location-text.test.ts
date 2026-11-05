@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { LOCATION_EFFECT_COLORS, LOCATION_TRIGGER_COLOR, splitLocationText } from '@0uroboros/engine/locationTriggers';
 import { describeStep } from '@0uroboros/engine/effects/catalog';
 import type { CardWhere, EffectStep, Scope, Who } from '@0uroboros/engine/effects/types';
+import { styleForCardClass } from '../src/cardPresentation';
+import { cardClassesInText } from '../src/LocationText';
 
 const coloured = (text: string) => splitLocationText(text).filter(part => part.color).map(part => [part.text, part.trigger ?? part.effect]);
 
@@ -52,5 +54,28 @@ describe('Location text colours', () => {
 
   it('leaves the Trash pile itself uncoloured', () => {
     expect(coloured('Recover a card from the shared Trash. Mill 2 cards into the Trash.')).toEqual([['Recover a card', 'recover'], ['Mill 2 cards', 'mill']]);
+  });
+
+  it('maps each CardClass to its frame style for subtype icons', () => {
+    expect(styleForCardClass('Horror')).toBe('horror');
+    expect(styleForCardClass('Attack')).toBe('attack');
+    expect(styleForCardClass('Volume')).toBe('vp');
+    expect(styleForCardClass('Solar-monk')).toBe('solar');
+    expect(styleForCardClass('Action')).toBe('action');
+  });
+
+  it('finds subtype names in location prose, including slash lists and Solar-monk', () => {
+    expect(cardClassesInText('Once you have an Attack and a Horror here')).toEqual(['Attack', 'Horror']);
+    expect(cardClassesInText('Gain a Attack/Hacker card')).toEqual(['Attack', 'Hacker']);
+    expect(cardClassesInText('a Solar-monk card here')).toEqual(['Solar-monk']);
+    expect(cardClassesInText('+1 Action to each player')).toEqual(['Action']);
+  });
+
+  it('keeps Action resource phrases inside effect parts so icons only replace plain subtype prose', () => {
+    const parts = splitLocationText('Condition: Once you have an Attack here. +1 Action.');
+    const plain = parts.filter(part => !part.trigger && !part.effect).map(part => part.text).join('');
+    const effects = parts.filter(part => part.effect).map(part => part.text).join('');
+    expect(cardClassesInText(plain)).toEqual(['Attack']);
+    expect(cardClassesInText(effects)).toEqual(['Action']);
   });
 });

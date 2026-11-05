@@ -231,15 +231,32 @@ function walkSteps(
         credit = BUDGET_WEIGHTS.hologramPower * Math.max(0, cardPower);
         label = `Hologram (~${cardPower} Power on mirror)`;
         break;
-      case 'discardCards':
-        if (step.then?.length) {
+      case 'discardCards': {
+        const who = step.target && 'who' in step.target ? step.target.who : 'self';
+        // Only self-hand discard is a Studio cost; foe discard is disruption (e.g. Invocation of the Sword).
+        if (who !== 'self' && who !== undefined) {
+          pushSoft(into, 'discardCards:foe', 'Forcing another seat to discard is situational disruption.');
+          break;
+        }
+        // Mandatory self-discard (Summon the Acolytes) and discard→then costs are hard negatives.
+        // Optional discard with no then stays soft (thinning without a locked payoff).
+        if (!step.optional || step.then?.length) {
           credit = -BUDGET_WEIGHTS.costDiscard * amount;
-          label = `Discard up to ${amount} (cost)`;
+          label = step.then?.length
+            ? `Discard up to ${amount} (cost)`
+            : `Discard ${amount} (mandatory)`;
         } else {
-          pushSoft(into, 'discardCards', 'Discard without a scored payoff is thinning/tempo, not a fixed credit.');
+          pushSoft(into, 'discardCards', 'Optional discard without a scored payoff is thinning/tempo, not a fixed credit.');
         }
         break;
-      case 'trashCards':
+      }
+      case 'trashCards': {
+        const who = step.target && 'who' in step.target ? step.target.who : 'self';
+        if (who !== 'self' && who !== undefined) {
+          pushSoft(into, 'trashCards:foe', 'Forcing another seat to trash is situational disruption.');
+          break;
+        }
+        // Bare trash (Night Scythe) stays soft; trash→then is a hard cost. Astra: bare trash soft unless payoff.
         if (step.then?.length) {
           credit = -BUDGET_WEIGHTS.costTrash * amount;
           label = `Trash up to ${amount} (cost)`;
@@ -247,6 +264,7 @@ function walkSteps(
           pushSoft(into, 'trashCards', 'Trash without a scored payoff is deck thinning — flagged, not scored.');
         }
         break;
+      }
       default:
         pushSoft(into, step.action, `No hard budget mapping for ${step.action}.`);
         break;
@@ -330,7 +348,7 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
     parts,
     soft,
     density,
-    formula: 'E = V / B(cost); B = α + β·c + γ·c^1.35; Drain/Restore ÷ Server integrity; soft effects flagged only.',
+    formula: 'E = V / B(cost); B = α + β·c + γ·c^1.35; Drain/Restore ÷ Server integrity; mandatory self-discard is a hard cost; soft effects flagged only.',
   };
 }
 

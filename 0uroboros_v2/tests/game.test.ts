@@ -16,13 +16,23 @@ describe("Runtime V1 rules", () => {
     expect(legalNodes(3,order)).toEqual(order);
   });
 
+  it("opens one, then two, then three middle Nodes under the middleThree schedule", () => {
+    const order = [3, 1, 2];
+    expect(legalNodes(1, order, "middleThree")).toEqual([3]);
+    expect(legalNodes(2, order, "middleThree")).toEqual([3, 1]);
+    expect(legalNodes(3, order, "middleThree")).toEqual(order);
+  });
+
   it("keeps Crypto out of deployment and preserves the four-card capacity", () => {
     const crypto = starterCards.find(card => card.type === "Crypto")!;
     const character = starterCards.find(card => card.type === "Character")!;
     expect(canDeploy(crypto, 2, 1, 0, 0)).toMatch(/Crypto/);
     expect(canDeploy(character, 2, 1, 0, 4)).toMatch(/full/);
     expect(canDeploy(character, 0, 1, 0, 0)).toMatch(/Actions/);
+    expect(canDeploy(character, 0, 1, 0, 0, undefined, { requireActions: false })).toBeNull();
     expect(canDeploy(character, 2, 1, 0, 0)).toBeNull();
+    expect(canDeploy(character, 2, 1, 0, 0, [1, 2, 3])).toMatch(/out of play/);
+    expect(canDeploy(character, 2, 1, 2, 0, [1, 2, 3])).toBeNull();
   });
 
   it("uses the canonical probability distribution and player-specific power", () => {

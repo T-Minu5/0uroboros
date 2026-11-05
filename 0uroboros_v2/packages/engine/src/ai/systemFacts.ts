@@ -56,6 +56,16 @@ export function configurableFacts(): ConfigurableFact[] {
       notes: "When on, every Node is No Man's Land for the whole game (no Location effects).",
     },
     {
+      id: "middleNodesOnly", surface: "configure", label: "Middle Nodes only",
+      default: false, cohortDefault: false,
+      notes: "When on, only Nodes 2–4 are in play: one opens each Runtime turn (random order). Nodes 1 and 5 stay closed — no deploys, moves, holograms, Power push/pull, Locations, or Collapse. Circuit weights concentrate on the three middle Nodes. Draft rotating offers shrink from 10 to 8 (drops the duplicate Action/Utility and Chaos slots).",
+    },
+    {
+      id: "noActions", surface: "configure", label: "No Actions",
+      default: false, cohortDefault: false,
+      notes: "When on, Characters deploy without spending Actions, gainActions never resolves, and +Actions text is hidden on card faces and the HUD.",
+    },
+    {
       id: "noTrailingRewards", surface: "configure", label: "No trailing Circuit Rewards",
       default: true, cohortDefault: true,
       notes: "Defaults on. Configure shows 'Include trailing rewards' unchecked by default; checking it turns this off so catch-up Circuit Rewards stay in the pool.",
@@ -148,7 +158,7 @@ export function systemFacts(document: ContentDocument): SystemFacts {
       format: "Two-player competitive deck-builder. Runtime Mode: three deployment turns per Cycle, then Wave Collapse, then Draft. Up to 16 Cycles.",
       cycleLoop: "Runtime (turns 1–3) → Wave Collapse (Nodes 1–5, then Effect Bank) → probabilistic Circuit selection → End of Cycle cleanup → Draft → End Draft → New Cycle (Wallet 0, new Locations, start-of-Cycle effects, draw 5).",
       cycles: 16, runtimeTurnsPerCycle: 3, handSize: 5, nodes: 5, maxCardsPerSidePerNode: 4,
-      opening: "Turn 1 opens Nodes 1–3 (+2 Actions). Turn 2 opens Node 4 (+1 Action) and each player draws 1. Turn 3 opens Node 5 (+1 Action) and each player draws 1. Open Nodes stay playable until Collapse.",
+      opening: "Default: a shuffled reveal order opens three Nodes on turn 1, four on turn 2, five on turn 3 (+2 Actions on turn 1; +1 and a draw on turns 2–3). Configure middleNodesOnly: only Nodes 2–4 are in play; one opens each Runtime turn; Nodes 1 and 5 stay closed. Open Nodes stay playable until Collapse.",
       actions: "2 Actions on turn 1; later turns carry unspent Actions over, +1 per turn, plus Action effects. Each Character costs 1 Action; VP cards cost none; Crypto cannot be deployed. Actions never carry between Cycles.",
       midCycleDraw: "Fixed rule: each player draws 1 card at the start of Runtime turns 2 and 3.",
       draftCrypto: "Setup option (default off): when on, a persistent Crypto shelf (Shyte-Coin, Byte-Coin, Kilo-Coin, Mega-Cache) sits beside the rotating Draft offer. When off, Crypto cards are not for sale — Wallet income comes from Character effects and any Crypto already held.",

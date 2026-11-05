@@ -150,16 +150,37 @@ export const market = [
 
 export const nodeNames = ["The Event Horizon", "Black-Sun Array", "Mirror of Mnemosyne", "The Root Temple", "CERN Serpent"];
 export const initialWeights = [30, 25, 20, 15, 10];
+/** Circuit weights for the three middle Nodes when Nodes 1 and 5 are out of play. */
+export const middleThreeWeights = [40, 35, 25] as const;
+/** Board indices for the middle-three opening schedule (player-facing Nodes 2–4). */
+export const MIDDLE_NODES = [1, 2, 3] as const;
+export type OpeningSchedule = "standard" | "middleThree";
 
-export function legalNodes(turn: number, order: readonly number[] = [0, 1, 2, 3, 4]) {
-  return turn >= 1 && turn <= 3 ? order.slice(0, turn + 2) : [];
+export function playableNodes(schedule: OpeningSchedule = "standard"): readonly number[] {
+  return schedule === "middleThree" ? MIDDLE_NODES : [0, 1, 2, 3, 4];
 }
 
-export function canDeploy(card: Card, actions: number, turn: number, node: number, occupancy: number, _openNodes: readonly number[] = legalNodes(turn)) {
+/** Nodes open for the given Runtime turn. Standard opens 3/4/5; middleThree opens 1/2/3 from `order`. */
+export function legalNodes(turn: number, order: readonly number[] = [0, 1, 2, 3, 4], schedule: OpeningSchedule = "standard") {
+  if (turn < 1 || turn > 3) return [];
+  const count = schedule === "middleThree" ? turn : turn + 2;
+  return order.slice(0, count);
+}
+
+export function canDeploy(
+  card: Card,
+  actions: number,
+  turn: number,
+  node: number,
+  occupancy: number,
+  playable: readonly number[] = playableNodes(),
+  opts?: { requireActions?: boolean },
+) {
   if (card.type === "Crypto") return "Crypto belongs in the Crypto Cache for Draft.";
   if (!Number.isInteger(node) || node < 0 || node >= 5 || turn < 1 || turn > 3) return "Unknown Node or Runtime turn.";
+  if (!playable.includes(node)) return "That Node is out of play.";
   if (occupancy >= 4) return "This deployment region is full.";
-  if (isCharacterCard(card) && actions < 1) return "Insufficient Actions.";
+  if (opts?.requireActions !== false && isCharacterCard(card) && actions < 1) return "Insufficient Actions.";
   return null;
 }
 

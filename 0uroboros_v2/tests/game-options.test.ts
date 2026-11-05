@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import authored from "../content/authored-content.json";
 import { compileForSelfPlay } from "@0uroboros/engine/ai/selfPlay";
 import { NO_MANS_LAND } from "@0uroboros/engine/content";
+import { starterCards } from "@0uroboros/engine/game";
 import { createSession, seededRandom, type RuntimeSession, type SessionConfig } from "@0uroboros/engine/runtime";
 import { publishedContent, PACK_REVISION } from "@0uroboros/content/document";
 import { Lobby } from "@0uroboros/server/lobby";
@@ -64,12 +65,14 @@ describe("No trailing rewards", () => {
 
 describe("online tables", () => {
   it("defaults no trailing rewards on and hands options to the room's session", () => {
-    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: true, midCycleDraw: true, draftCrypto: false });
+    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: true, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true });
-    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, draftCrypto: true });
+    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true });
+    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, draftCrypto: true, middleNodesOnly: true, noActions: true });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
-    expect(room.session!.state.nodes.map(node => node.location?.name)).toEqual(Array(5).fill("No Man's Land"));
+    expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
+    expect(room.session!.view().playableNodes).toEqual([1, 2, 3]);
+    expect(room.session!.view().noActions).toBe(true);
   });
 });
 
@@ -82,8 +85,8 @@ describe("setup and look defaults", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("keeps game options through a save, with no trailing rewards on unless include is chosen", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, noTrailingRewards: true, draftCrypto: false });
-    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: false, midCycleDraw: false, draftCrypto: true })).toMatchObject({ noLocations: true, noTrailingRewards: false, draftCrypto: true });
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, noTrailingRewards: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
+    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: false, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true })).toMatchObject({ noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true });
   });
 
   it("defaults the board to Neon once, then keeps a saved Classic", () => {
@@ -103,5 +106,35 @@ describe("setup and look defaults", () => {
     expect(loadColorTheme()).toEqual(["cyan", "purple"]);
     store.set("0uroboros.colorTheme", JSON.stringify(["gold", "purple"]));
     expect(loadColorTheme()).toEqual(["orange", "purple"]);
+  });
+});
+
+describe("No Actions", () => {
+  it("lets Characters deploy with zero Actions and never credits gainActions", () => {
+    const session = createSession({
+      content, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: "higher",
+      random: seededRandom(9), noActions: true, aiSeats: [],
+    });
+    expect(session.view().noActions).toBe(true);
+    expect(session.state.players[0].actions).toBe(0);
+    const dash = { ...starterCards[1], id: "no-actions-dash", effect: "+1 Card, +2 Actions." };
+    session.state.players[0].hand = [dash];
+    const node = session.view().openNodes[0];
+    session.deploy(dash.id, node);
+    expect(session.state.players[0].actions).toBe(0);
+    const shownBefore = session.view().nodes[node].cards[0][0]?.card;
+    expect(shownBefore && "effect" in shownBefore ? shownBefore.effect : "").not.toMatch(/Actions?/i);
+    session.endTurn();
+    const actionGains: number[] = [];
+    for (let guard = 0; guard < 500 && (session.pendingCount || session.state.choice); guard++) {
+      if (session.state.choice) session.choose(session.state.choice.options[0].id);
+      else {
+        const step = session.step()!;
+        if (step.event.kind === "actions") actionGains.push(step.event.amount ?? 0);
+      }
+    }
+    expect(actionGains.every(amount => amount === 0)).toBe(true);
+    expect(session.state.players[0].pendingActions).toBe(0);
+    expect(session.state.players[0].actions).toBe(0);
   });
 });

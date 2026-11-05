@@ -23,10 +23,11 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
  const local=view.players[0],opponent=view.players[1];
  const locked=busy||view.draftEnded||view.draftReady[0]||seconds===0;
  const privilege=view.circuitReward.definition;
- // Engine order: top 5 then bottom 5 — never re-sort by cost.
+ // Engine order: top row then bottom row (5+5 standard, 4+4 middle-Nodes) — never re-sort by cost.
  const offers=view.market.filter(pile=>pile.rotating);
- const topRow=offers.slice(0,5);
- const bottomRow=offers.slice(5,10);
+ const split=Math.ceil(offers.length/2);
+ const topRow=offers.slice(0,split);
+ const bottomRow=offers.slice(split);
  // Persistent Crypto shelf (setup option), kept in engine order for the 2×2 grid.
  const cryptoPiles=view.market.filter(pile=>!pile.rotating&&pile.category==='Crypto');
  const vpEarned=Math.max(0,local.totalVP-(cycleStart?.vp??0));

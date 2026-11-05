@@ -61,6 +61,10 @@ export const RoomSettingsSchema = z.object({
   midCycleDraw: z.boolean().default(true),
   /** Persistent Crypto card shelf in Draft. */
   draftCrypto: z.boolean().default(false),
+  /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
+  middleNodesOnly: z.boolean().default(false),
+  /** Characters deploy free; gainActions is suppressed and hidden. */
+  noActions: z.boolean().default(false),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

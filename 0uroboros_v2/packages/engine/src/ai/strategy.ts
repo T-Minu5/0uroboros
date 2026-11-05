@@ -134,6 +134,8 @@ export type StrategyContext = {
   owned: readonly Card[];
   ownServers: number; ownServersMax: number;
   enemyServers: number; enemyServersMax: number;
+  /** Configure: Action economy is off — do not value gainActions. */
+  noActions?: boolean;
 };
 
 export type Phase = 'economy' | 'build' | 'endgame';
@@ -354,7 +356,8 @@ export function planDraft(options: readonly DraftOption[], wallet: number, profi
 export function deployPriority(card: Card, profile: StrategyProfile, context: StrategyContext): number {
   const total = (action: EffectStep['action'], enemy = false) => effectTotal(card.onReveal, action, enemy);
   const attack = strategyPhase(profile, context.cycle) === 'endgame' ? 1 : midgameShare(profile, context.cycle);
-  return total('gainActions') * 3 + total('draw') * 2 + ((card.power ?? 0) + (card.powerDelta ?? 0)) * 0.5 + attack * total('damageServer', true) / 50 + (card.type === 'VP' ? 10 : 0);
+  const actions = context.noActions ? 0 : total('gainActions') * 3;
+  return actions + total('draw') * 2 + ((card.power ?? 0) + (card.powerDelta ?? 0)) * 0.5 + attack * total('damageServer', true) / 50 + (card.type === 'VP' ? 10 : 0);
 }
 
 /** A Location's effect lists, as content and the runtime carry them. */

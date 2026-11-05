@@ -1,10 +1,17 @@
-import { isSolarMonk, type Card } from '@0uroboros/engine/game';
+import { isSolarMonk, type Card, type CardClass } from '@0uroboros/engine/game';
 import { HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
 
 export type CardStyle = 'hacker' | 'action' | 'runtime' | 'attack' | 'utility' | 'crypto' | 'vp' | 'solar' | 'horror';
 export type CardWithPresentation = Card & {
   generated?: boolean;
 };
+
+/** Frame style for a printed CardClass (Volume → vp, Solar-monk → solar). */
+export function styleForCardClass(cardClass: CardClass): CardStyle {
+  if (cardClass === 'Volume') return 'vp';
+  if (cardClass === 'Solar-monk') return 'solar';
+  return cardClass.toLowerCase() as CardStyle;
+}
 
 export const CARD_STYLE_ICONS: Record<CardStyle, string> = {
   hacker: '/assets/Icons/icon-hacker.svg',

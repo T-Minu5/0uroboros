@@ -37,12 +37,12 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
   const choice = resolveOpponent(opponents, opponent);
   const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds, noLocations, noTrailingRewards, draftCrypto } = setup;
+  const { serverVP, turnSeconds, noLocations, noTrailingRewards, draftCrypto, middleNodesOnly, noActions } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
     `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
-    ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(!noTrailingRewards ? ['Trailing rewards'] : []),
+    ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(middleNodesOnly ? ['Middle Nodes'] : []), ...(noActions ? ['No Actions'] : []), ...(!noTrailingRewards ? ['Trailing rewards'] : []),
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
@@ -77,6 +77,14 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
       <label className='game-configure-row game-configure-check'>
         <span>No Locations <small>Every Node is No Man's Land for the whole game</small></span>
         <input aria-label='No Locations' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />
+      </label>
+      <label className='game-configure-row game-configure-check'>
+        <span>Middle Nodes only <small>Only Nodes 2–4; one opens each Runtime turn. Nodes 1 and 5 stay closed and out of play. Draft offers 8 cards</small></span>
+        <input aria-label='Middle Nodes only' type='checkbox' disabled={disabled} checked={middleNodesOnly} onChange={event => onChange({ ...setup, middleNodesOnly: event.target.checked })} />
+      </label>
+      <label className='game-configure-row game-configure-check'>
+        <span>No Actions <small>Cards deploy without Actions; +Actions effects are hidden and do not resolve</small></span>
+        <input aria-label='No Actions' type='checkbox' disabled={disabled} checked={noActions} onChange={event => onChange({ ...setup, noActions: event.target.checked })} />
       </label>
       <label className='game-configure-row game-configure-check'>
         <span>Include trailing rewards <small>Adds Circuit Rewards that go to the player with the least VP</small></span>

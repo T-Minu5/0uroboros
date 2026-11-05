@@ -39,6 +39,8 @@ export const GAME_VP_SUPPLY=4;
 
 /** Ten ordered rotating offers each Draft (top 5 + bottom 5). */
 export const DRAFT_OFFER_COUNT=10;
+/** Eight rotating offers when middle-Nodes-only is on (top 4 + bottom 4). */
+export const DRAFT_OFFER_COUNT_MIDDLE=8;
 export const DRAFT_SOLAR_MONK_COUNT=1;
 export const DRAFT_COPIES_PER_PLAYER=2;
 /** Cycles 1–4 only offer cards costing 1–7 Crypto. */
@@ -146,6 +148,9 @@ export const DRAFT_SLOTS:readonly DraftSlot[]=[
  {id:'vp',label:'VP',category:()=>'VP',matches:({card})=>card.type==='VP'&&!isSolarMonk(card)},
 ];
 
+/** Middle-Nodes draft: drop the duplicate Action/Utility and Chaos slots (8 offers). */
+export const DRAFT_SLOTS_MIDDLE:readonly DraftSlot[]=DRAFT_SLOTS.filter(slot=>slot.id!=='action-utility-2'&&slot.id!=='chaos-2');
+
 export const DRAFT_SLOT_SUMMARY=DRAFT_SLOTS.map(slot=>slot.label).join(' → ');
 /** @deprecated Phase weighting removed; kept for any leftover imports. */
 export type DraftPhase={from:number;to:number;favours:string;share:number;matches:(entry:PoolEntry)=>boolean};
@@ -183,15 +188,22 @@ function pickForSlot(
 }
 
 /**
- * One Draft round: 10 ordered rotating offers (2 copies per player). Slot order is top row then
+ * One Draft round: ordered rotating offers (2 copies per player). Slot order is top row then
  * bottom row. Last round's identities are avoided while the pool allows. `gameIds` is ignored
- * (fixed piles removed).
+ * (fixed piles removed). Pass `DRAFT_SLOTS_MIDDLE` for the 8-card middle-Nodes draft.
  */
-export function draftOffer(random:RandomSource,content?:MarketContent,_gameIds:ReadonlySet<string>=new Set(),previousIds:ReadonlySet<string>=new Set(),cycle?:number):MarketPile[]{
+export function draftOffer(
+ random:RandomSource,
+ content?:MarketContent,
+ _gameIds:ReadonlySet<string>=new Set(),
+ previousIds:ReadonlySet<string>=new Set(),
+ cycle?:number,
+ slots:readonly DraftSlot[]=DRAFT_SLOTS,
+):MarketPile[]{
  const pool=allPool(content);
  const taken=new Set<string>();
  const offered:{card:Card;category:MarketCategory}[]=[];
- for(const slot of DRAFT_SLOTS){
+ for(const slot of slots){
   const entry=pickForSlot(slot,pool,taken,previousIds,random,cycle);
   if(!entry)continue;
   taken.add(cardId(entry.card));

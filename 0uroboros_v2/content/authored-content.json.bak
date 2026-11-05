@@ -1,5 +1,5 @@
 {
-  "revision": 802,
+  "revision": 833,
   "document": {
     "version": 3,
     "cards": [
@@ -906,7 +906,7 @@
         "definitionId": "summon-the-acolytes",
         "name": "Summon the Acolytes",
         "type": "Character",
-        "cost": 2,
+        "cost": 3,
         "art": "/assets/card_art/base cards/utility/summon-the-acolytes.png",
         "effect": "+4 Cards, discard 3 cards from your hand. +1 Crypto.",
         "power": 2,
@@ -2529,7 +2529,7 @@
         "type": "VP",
         "cost": 6,
         "art": "/assets/card_art/volume/3vp.png",
-        "effect": "Repair +125, for the next 4 Cycles.",
+        "effect": "Repair +75 for the next 4 Cycles.",
         "power": 2,
         "vp": 4,
         "onReveal": [],
@@ -2545,7 +2545,7 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 125
+            "amount": 75
           }
         ]
       },
@@ -2556,7 +2556,7 @@
         "type": "VP",
         "cost": 5,
         "art": "/assets/card_art/volume/4vp.png",
-        "effect": "Repair +45, every turn.",
+        "effect": "Repair +15 every turn.",
         "power": 2,
         "vp": 3,
         "duration": 99,
@@ -2582,11 +2582,11 @@
         "definitionId": "esoteric-encryption",
         "name": "Esoteric Encryption",
         "type": "VP",
-        "cost": 7,
+        "cost": 9,
         "art": "/assets/card_art/volume/6vp-b.png",
-        "effect": "Repair +100, for the next 4 Cycles.",
+        "effect": "Repair +75, for the next 4 Cycles.",
         "power": 3,
-        "vp": 5,
+        "vp": 6,
         "onReveal": [],
         "pool": "VP",
         "enabled": true,
@@ -2600,7 +2600,7 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 100
+            "amount": 75
           }
         ]
       },
@@ -2611,16 +2611,16 @@
         "type": "VP",
         "cost": 9,
         "art": "/assets/card_art/volume/6vp.png",
-        "effect": "Repair +25, every turn.",
+        "effect": "Repair +15 every turn.",
         "power": 3,
-        "vp": 6,
+        "vp": 5,
         "duration": 99,
         "durationPeriod": "runtime",
         "onReveal": [],
         "recurring": [
           {
             "action": "repairServer",
-            "amount": 25,
+            "amount": 15,
             "target": {
               "type": "server",
               "who": "self",
@@ -2639,9 +2639,9 @@
         "type": "VP",
         "cost": 10,
         "art": "/assets/card_art/volume/10vp.png",
-        "effect": "Repair +250, for the next 3 Cycles.",
-        "power": 4,
-        "vp": 8,
+        "effect": "Repair +100, for the next 3 Cycles.",
+        "power": 3,
+        "vp": 7,
         "onReveal": [],
         "pool": "VP",
         "enabled": true,
@@ -2655,7 +2655,7 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 200
+            "amount": 100
           }
         ]
       },
@@ -2664,18 +2664,18 @@
         "definitionId": "zenith-wetware",
         "name": "Zenith Wetware",
         "type": "VP",
-        "cost": 11,
+        "cost": 12,
         "art": "/assets/card_art/volume/10vp-b.png",
-        "effect": "Repair +50, every turn.",
+        "effect": "Repair +25 every turn.",
         "power": 4,
-        "vp": 9,
+        "vp": 8,
         "duration": 99,
         "durationPeriod": "runtime",
         "onReveal": [],
         "recurring": [
           {
             "action": "repairServer",
-            "amount": 50,
+            "amount": 25,
             "target": {
               "type": "server",
               "who": "self",
@@ -2790,7 +2790,7 @@
           }
         ],
         "pool": "Base",
-        "enabled": true,
+        "enabled": false,
         "cardClass": "Utility"
       },
       {
@@ -5956,8 +5956,8 @@
       {
         "id": "location-tua216cd",
         "name": "A Good Mix",
-        "rule": "Condition: Once you have an Attack and an Action here, +2 Crypto..",
-        "reward": "Condition: Once you have an Attack and an Action here, +2 Crypto..",
+        "rule": "Condition: Once you have an Attack and an Action here, +2 Crypto.",
+        "reward": "Condition: Once you have an Attack and an Action here, +2 Crypto.",
         "effects": [],
         "enabled": true,
         "conditions": [
@@ -6061,7 +6061,7 @@
       },
       {
         "id": "location-4idhqez4",
-        "name": "3s Company",
+        "name": "3's Company",
         "rule": "Condition: Once you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
         "reward": "Condition: Once you have 3 or more cards here, +1 Action. +1 Card. +1 Crypto..",
         "effects": [],
@@ -6138,7 +6138,7 @@
       },
       {
         "id": "location-ps0lfyec",
-        "name": "The 3rd Wheel",
+        "name": "3's a Crowd",
         "rule": "Condition: Once you have 3 or more cards here, -1 Power from all cards here.",
         "reward": "Condition: Once you have 3 or more cards here, -1 Power from all cards here.",
         "effects": [],
@@ -6544,7 +6544,7 @@
             "effects": [
               {
                 "action": "gainCrypto",
-                "amount": 2,
+                "amount": 4,
                 "target": {
                   "type": "player",
                   "who": "self"
@@ -6555,9 +6555,9 @@
         ],
         "enabled": true,
         "id": "loc-death-spire",
-        "name": "Death Spire",
-        "rule": "When: a card is destroyed here, +2 Crypto.",
-        "reward": "When: a card is destroyed here, +2 Crypto."
+        "name": "Death Altar",
+        "rule": "When: a card is destroyed here, +4 Crypto.",
+        "reward": "When: a card is destroyed here, +4 Crypto."
       },
       {
         "effects": [
@@ -6637,7 +6637,7 @@
           }
         ],
         "events": [],
-        "enabled": true,
+        "enabled": false,
         "id": "loc-copy-archive",
         "name": "Copy Archive",
         "rule": "On reveal: Copy the On Reveal of your previously revealed card.",
@@ -6693,6 +6693,22 @@
         ],
         "rule": "While: only one card is here, +1 Card.",
         "reward": "While: only one card is here, +1 Card."
+      },
+      {
+        "id": "location-vwtph6e4",
+        "name": "Stand Alone",
+        "rule": "While: only one card is here, +5 Power.",
+        "reward": "While: only one card is here, +5 Power.",
+        "effects": [],
+        "enabled": true,
+        "whiles": [
+          {
+            "id": "while-rlb104y2",
+            "kind": "soloCard",
+            "powerBonus": 5,
+            "effects": []
+          }
+        ]
       }
     ],
     "circuitRewards": [

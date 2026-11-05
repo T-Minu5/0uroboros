@@ -54,7 +54,7 @@ describe("Location valuation", () => {
     expect(facts.rules.mods).toMatch(/Hologram/i);
     expect(facts.rules.vpSources).toMatch(/destruction/);
     expect(facts.configurable.map(item => item.id)).toEqual(expect.arrayContaining([
-      "serverVP.primary", "draftCrypto", "noLocations", "noTrailingRewards",
+      "serverVP.primary", "draftCrypto", "noLocations", "noTrailingRewards", "noActions",
       "cards", "locations", "circuitRewards", "mods", "serverIntegrity",
     ]));
     expect(facts.configurable.find(item => item.id === "draftCrypto")).toMatchObject({ default: false, surface: "configure" });

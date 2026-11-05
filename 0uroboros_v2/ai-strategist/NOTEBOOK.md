@@ -18,7 +18,7 @@ League snapshots (newest first): strat-g@v1.22, strat-g@v1.21, strat-g@v1.20, st
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-v1.22 plays the designer's baseline with 7 adopted changes (min buy score 1.75, dilution 0.9; drain weight 2.9; disrupt weight 1.37; crypto weight 3.3; restore weight 2.49). In Cycles 1-4, prioritize strong draw/Action Base cards and Crypto worth 2+ (avoid Shyte-Coin), aiming for ~12 Crypto per hand. In Cycles 5-8, maintain a balanced midgame of attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for endgame pushes; buy VP cards from Cycle 9, with last Draft buys being solely VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+v1.22 plays the designer's baseline with adopted changes (min buy score 1.75, dilution 0.9; drain weight 2.9; disrupt weight 1.37; crypto weight 3.3; restore weight 2.49). In Cycles 1-4, prioritize strong draw/Action Base cards and Crypto worth 2+ (avoid Shyte-Coin), aiming for ~12 Crypto per hand. In Cycles 5-8, maintain a balanced midgame of attacks, engine, Server Restore, and VP. From Cycle 9, focus on aggressive Chaos and Drain for endgame pushes; buy VP cards from Cycle 9, with last Draft buys being solely VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
@@ -58,29 +58,25 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Current experiment
 
-- **x196-draw** (lab, proposed by v1.22, heuristic): Valuing draw higher cycles back to the best cards faster than extra Crypto does.
-- Change: draw weight 1.6→2
-- Prediction: More wins and more Locations won than the current best.
-- Theory: none
-- League trial: pending
+- none running.
 
 ## Experiment log
 
+- **x207-evaluate-new-cards** inconclusive (v1.22): Testing new cards will reveal synergies that improve overall performance. Change: power weight 1.26→1.5, draw weight 1.6→1.8, crypto weight 3.3→3.5, restore weight 2.49→2.5, vp weight 2.6→3. league 32.5/48 for the experiment vs 35/48 for the current best against dv-8@v1.5, t-5@v1.10, dv-8@v1.8 (margin +0.1/game) → inconclusive. Kept the current best.
+- **x206-disrupt** inconclusive (v1.22): Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. league 15.5/48 for the experiment vs 15.5/48 for the current best against t-5@v1.10, vp-dog@v1.6 (margin -2.6/game) → inconclusive. Kept the current best.
+- **x205-power** rejected (v1.22): Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. league 24/48 for the experiment vs 30/48 for the current best against t-5@v1.8, vp-dog@v1.6, dv-8@v1.6 (margin -2.6/game) → rejected. Kept the current best.
+- **x204-restore** rejected (v1.22): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.49→2.89. league 21.5/48 for the experiment vs 22/48 for the current best against t-5@v1.10, t-5@v1.6, dv-8@v1.8 (margin -1.9/game) → rejected. Kept the current best.
+- **x203-fallback-203-5** rejected (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: restore weight 2.49→2.74. league 14/48 for the experiment vs 14.5/48 for the current best against t-5@v1.9, vp-dog@v1.6 (margin -0.2/game) → rejected. Kept the current best.
+- **x202-thinner** inconclusive (v1.22): Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. league 18/48 for the experiment vs 19.5/48 for the current best against vp-dog@v1.2, vp-dog@v1.3, dv-8@v1.6 (margin +1.9/game) → inconclusive. Kept the current best.
+- **x201-fallback-201-3** inconclusive (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 3.3→3.55. league 29.5/48 for the experiment vs 29/48 for the current best against t-5@v1.7, dv-8@v1.9, vp-dog@v1.2 (margin +1.7/game) → inconclusive. Kept the current best.
+- **x200-fallback-200-0** rejected (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. league 15/48 for the experiment vs 15.5/48 for the current best against t-5@v1.10, vp-dog@v1.6 (margin -1.3/game) → rejected. Kept the current best.
+- **x199-crypto** inconclusive (v1.22): Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: crypto weight 3.3→3.6. league 19/48 for the experiment vs 17.5/48 for the current best against vp-dog@v1.4, strat-g@v1.19, t-5@v1.10 (margin -1.7/game) → inconclusive. Kept the current best.
+- **x198-leaner** rejected (v1.22): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.75→2.25, dilution 0.9→1.1. league 27/48 for the experiment vs 29/48 for the current best against strat-g@v1.18, dv-8@v1.8, strat-g@v1.20 (margin -3.7/game) → rejected. Kept the current best.
+- **x197-drain** inconclusive (v1.22): Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.9→3. league 30.5/48 for the experiment vs 31/48 for the current best against dv-8@v1.8, dv-8@v1.4, t-5@v1.10 (margin +0.1/game) → inconclusive. Kept the current best.
+- **x196-draw** rejected (v1.22): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 1.6→2. league 22.5/48 for the experiment vs 30/48 for the current best against dv-8@v1.7, vp-dog@v1.6, t-5@v1.6 (margin -7.2/game) → rejected. Kept the current best.
 - **x195-fallback-195-2** inconclusive (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.1→1.35. league 32.5/48 for the experiment vs 32.5/48 for the current best against t-5@v1.6, dv-8@v1.3 (margin +2/game) → inconclusive. Kept the current best.
 - **x194-fallback-194-1** rejected (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 1.6→1.85. league 24.5/48 for the experiment vs 29/48 for the current best against strat-g@v1.19, t-5@v1.10, dv-8@v1.5 (margin -3.4/game) → rejected. Kept the current best.
 - **x193-disrupt** inconclusive (v1.22): Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. league 23.5/48 for the experiment vs 23/48 for the current best against dv-8@v1.7, vp-dog@v1.2 (margin -2.4/game) → inconclusive. Kept the current best.
-- **x192-power** inconclusive (v1.22): Valuing Power higher wins more Locations and their rewards. Change: power weight 1.26→1.56. league 18/48 for the experiment vs 15/48 for the current best against t-5@v1.10, strat-g@v1.18, vp-dog@v1.6 (margin +2.1/game) → inconclusive. Kept the current best.
-- **x191-restore** inconclusive (v1.22): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.49→2.89. league 25/48 for the experiment vs 25/48 for the current best against dv-8@v1.6, t-5@v1.10, vp-dog@v1.5 (margin -1.5/game) → inconclusive. Kept the current best.
-- **x190-fallback-190-3** adopted (v1.22): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 3.05→3.3. league 36/48 for the experiment vs 29/48 for the current best against dv-8@v1.6, t-5@v1.6, strat-g@v1.19 (margin +5.9/game) → promising. Adopted into the current best.
-- **x189-thinner** rejected (v1.21): Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. league 20/48 for the experiment vs 21/48 for the current best against t-5@v1.10, vp-dog@v1.2, dv-8@v1.7 (margin -1.6/game) → rejected. Kept the current best.
-- **x188-crypto** rejected (v1.21): Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: crypto weight 3.05→3.35. league 31/48 for the experiment vs 32/48 for the current best against strat-g@v1.19, dv-8@v1.3, dv-8@v1.7 (margin -1.4/game) → rejected. Kept the current best.
-- **x187-fallback-187-3** adopted (v1.21): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 2.8→3.05. league 30.5/48 for the experiment vs 22.5/48 for the current best against dv-8@v1.7, t-5@v1.10, strat-g@v1.18 (margin +7.6/game) → promising. Adopted into the current best.
-- **x186-fallback-186-0** rejected (v1.20): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.26→1.51. league 35/48 for the experiment vs 36/48 for the current best against dv-8@v1.7, t-5@v1.10 (margin -3.2/game) → rejected. Kept the current best.
-- **x185-leaner** rejected (v1.20): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.75→2.25, dilution 0.9→1.1. league 20/48 for the experiment vs 24.5/48 for the current best against dv-8@v1.7, vp-dog@v1.4, vp-dog@v1.3 (margin -0.3/game) → rejected. Kept the current best.
-- **x184-drain** rejected (v1.20): Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.9→3. league 21/48 for the experiment vs 23/48 for the current best against vp-dog@v1.4, dv-8@v1.3 (margin -1/game) → rejected. Kept the current best.
-- **x183-draw** rejected (v1.20): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 1.6→2. league 23/48 for the experiment vs 29/48 for the current best against t-5@v1.10, t-5@v1.6, strat-g@v1.17 (margin -8/game) → rejected. Kept the current best.
-- **x182-fallback-182-2** inconclusive (v1.20): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: actions weight 1.1→1.35. league 22.5/48 for the experiment vs 22.5/48 for the current best against vp-dog@v1.1, t-5@v1.10, dv-8@v1.3 (margin -2.8/game) → inconclusive. Kept the current best.
-- **x181-fallback-181-1** rejected (v1.20): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 1.6→1.85. league 29.5/48 for the experiment vs 34/48 for the current best against dv-8@v1.7, dv-8@v1.5 (margin -5.5/game) → rejected. Kept the current best.
 
 ## Theories
 
@@ -89,13 +85,13 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ### Under test
 - **evaluate-new-cards** (untested · v1.22): New cards may enhance deck efficiency and synergy.
+- **adjust-early-economy-focus** (untested · v1.22): Focusing on early economy may help balance the Draft wallet disparity.
 
 ### Refuted
 - none yet
 
 ## Card and Location notes
 
-- **Delete.Detritus.exe**: utility; est. hand value 5.5 early / 2 late at cost 4. Untested.
 - **Not a total loss**: New Location: "if you have 0 or less Power here, +2 Crypto.." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.11. Untested; watch who wins it and how it shifts the economy.
 - **Absolute Horror**: New Location: "If you have 3 or more Horror cards here, Drain -200 from the other player's server." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 2.16. Untested; watch who wins it and how it shifts the economy.
 - **Spice of Lyfe**: New Location: "While in play: if you have an Action and a Horror here." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
@@ -135,6 +131,7 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 - **Copy Archive**: New Location: "On reveal: Copy the On Reveal of your previously revealed card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **Neighbour Beacon**: New Location: "On collapse: Push 1 Power to a nearby location." Read: contest it: holding it is worth about 1.52 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
 - **Lone Outpost**: New Location: "While: only one card is here, +1 Card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
+- **Stand Alone**: New Location: "While: only one card is here, +5 Power." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 
 ## Card results (complete games where a side bought it)
 
@@ -174,46 +171,46 @@ Baseline weights: power 1, draw 1.6, actions 1.1, crypto 1, drain 2.4, restore 1
 
 ## Recent notes
 
-- v1.22 · 2026-11-01 22:43 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-11-01 22:43 · Assess the value of new cards in relation to improving deck efficiency.
-- v1.22 · 2026-11-01 22:43 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
-- v1.22 · 2026-11-01 22:43 · Warning: my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-11-01 22:43 · Evaluate new cards for potential enhancements to deck efficiency and synergy.
-- v1.22 · 2026-11-01 22:43 · Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics.
-- v1.22 · 2026-11-01 22:43 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0. New Locations: Lone Outpost.
-- v1.22 · 2026-11-01 22:41 · Watch for potential synergies with new cards introduced.
-- v1.22 · 2026-11-01 22:41 · Evaluate the value of new cards in relation to improving deck efficiency.
-- v1.22 · 2026-11-01 22:41 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
-- v1.22 · 2026-11-01 22:41 · Explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-11-01 22:41 · Prioritize defense strategies; my Servers frequently drop low, leading to losses.
-- v1.22 · 2026-11-01 22:41 · Monitor new Locations for potential strategic impacts on gameplay.
-- v1.22 · 2026-11-01 22:41 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-11-01 22:40 · Consider adjustments to early economy focus.
-- v1.22 · 2026-11-01 22:40 · Monitor the human's Draft wallet; they consistently outpace mine, indicating a need for early economy adjustments.
-- v1.22 · 2026-11-01 22:40 · My Servers are frequently low; prioritize Restore effects for defense.
-- v1.22 · 2026-11-01 22:40 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-11-01 22:40 · Evaluate new Locations for strategic impact, especially those affecting Crypto and Power dynamics.
-- v1.22 · 2026-11-01 22:40 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-11-01 22:40 · Monitor new card performance in relation to my established strategies.
-- v1.22 · 2026-11-01 22:40 · Assess the impact of Locations that affect card movement and Power.
-- v1.22 · 2026-11-01 22:40 · The human's Draft wallet consistently outpaces mine; consider adjustments to early economy focus.
-- v1.22 · 2026-11-01 22:40 · Warning: my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-11-01 22:40 · Evaluate the potential of new cards to enhance deck efficiency and synergy.
-- v1.22 · 2026-11-01 22:40 · Monitor the impact of new Locations on strategies, especially those affecting Crypto and Power dynamics.
-- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-11-01 22:39 · Assess the value of new cards in relation to improving deck efficiency.
-- v1.22 · 2026-11-01 22:39 · Monitor new cards for potential enhancements to deck efficiency and synergy.
-- v1.22 · 2026-11-01 22:39 · Warning: my Servers are often low; prioritize Restore effects.
-- v1.22 · 2026-11-01 22:39 · Consider further adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
-- v1.22 · 2026-11-01 22:39 · Evaluate new Locations for potential strategic impacts on gameplay.
-- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.22 · 2026-11-01 22:39 · Assess the value of new cards in relation to improving deck efficiency.
-- v1.22 · 2026-11-01 22:39 · Explore cards that enhance Power for maintaining Node control.
-- v1.22 · 2026-11-01 22:39 · Consider adjustments to early economy focus, as the human's Draft wallet consistently outpaces mine.
-- v1.22 · 2026-11-01 22:39 · Warning: my Servers are frequently low; prioritize Restore effects for defense.
-- v1.22 · 2026-11-01 22:39 · Monitor the human's Draft wallet; they consistently outpace mine.
-- v1.22 · 2026-11-01 22:39 · Evaluate new Locations for potential strategic impacts on my gameplay.
-- v1.22 · 2026-11-01 22:39 · v1.22 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-04 07:36 · Experiment x207-evaluate-new-cards inconclusive: league 32.5/48 for the experiment vs 35/48 for the current best against dv-8@v1.5, t-5@v1.10, dv-8@v1.8 (margin +0.1/game) → inconclusive. Kept the current best.
+- v1.22 · 2026-11-04 07:27 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-04 07:27 · Evaluate new card synergies and effects as they may enhance deck efficiency.
+- v1.22 · 2026-11-04 07:27 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-04 07:27 · Warning: my Servers are often low; prioritize Restore effects for defense.
+- v1.22 · 2026-11-04 07:27 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-04 07:27 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-04 07:19 · Consider adjustments to early economy focus as new cards and Locations may impact strategies.
+- v1.22 · 2026-11-04 07:19 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-04 07:19 · Evaluate new card synergies and effects as they may enhance deck efficiency.
+- v1.22 · 2026-11-04 07:19 · My board Power is often low; explore cards that enhance Power.
+- v1.22 · 2026-11-04 07:19 · Defense is crucial; prioritize Restore effects to keep my Servers alive.
+- v1.22 · 2026-11-04 07:19 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-04 07:19 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-04 07:17 · New experiment x207-evaluate-new-cards: Testing new cards will reveal synergies that improve overall performance. Change: power weight 1.26→1.5, draw weight 1.6→1.8, crypto weight 3.3→3.5, restore weight 2.49→2.5, vp weight 2.6→3. Prediction: If new cards consistently improve hand quality, I will win more games or achieve a higher VP margin compared to the current best.
+- v1.22 · 2026-11-04 07:17 · Consider adjustments to early economy focus as new cards and Locations may impact strategies.
+- v1.22 · 2026-11-04 07:17 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-04 07:17 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-04 07:17 · Evaluate new card synergies and effects as they may enhance deck efficiency.
+- v1.22 · 2026-11-04 07:17 · Warning: my Servers are often low; prioritize Restore effects for defense.
+- v1.22 · 2026-11-04 07:17 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-04 07:17 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0. Removed cards: eval-relocation-relay.
+- v1.22 · 2026-11-04 07:15 · Experiment x206-disrupt inconclusive: league 15.5/48 for the experiment vs 15.5/48 for the current best against t-5@v1.10, vp-dog@v1.6 (margin -2.6/game) → inconclusive. Kept the current best.
+- v1.22 · 2026-11-04 07:05 · New experiment x206-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. Prediction: More wins and a better margin than the current best.
+- v1.22 · 2026-11-04 07:05 · Experiment x205-power rejected: league 24/48 for the experiment vs 30/48 for the current best against t-5@v1.8, vp-dog@v1.6, dv-8@v1.6 (margin -2.6/game) → rejected. Kept the current best.
+- v1.22 · 2026-11-03 03:42 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-03 03:42 · Evaluate new card synergies and effects as they may enhance deck efficiency.
+- v1.22 · 2026-11-03 03:42 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-03 03:42 · Defense is crucial; prioritize Restore effects to keep my Servers alive.
+- v1.22 · 2026-11-03 03:42 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-03 03:42 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-03 03:12 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-03 03:12 · Evaluate new card synergies and effects as they may enhance deck efficiency.
+- v1.22 · 2026-11-03 03:12 · My board Power is often low; explore cards that enhance Power for maintaining Node control.
+- v1.22 · 2026-11-03 03:12 · Warning: my Servers are often low; prioritize Restore effects for defense.
+- v1.22 · 2026-11-03 03:12 · Monitor the human's Draft wallet; they consistently outpace mine.
+- v1.22 · 2026-11-03 03:12 · v1.22 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-10-0.
+- v1.22 · 2026-11-03 03:11 · My board Power is often low; explore cards that enhance Power.
+- v1.22 · 2026-11-03 03:11 · Watch for new Locations to assess their strategic impacts.
+- v1.22 · 2026-11-03 03:11 · Defense is crucial; prioritize Restore effects to keep my Servers alive.
 
 ## Version history
 
