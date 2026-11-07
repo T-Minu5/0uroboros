@@ -55,7 +55,7 @@ describe('optional unmet pile effects', () => {
       carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(9), aiSeats: [],
     });
     session.state.nodeOrder = [0, 1, 2, 3, 4];
-    session.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.actions = 4; });
+    session.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
     const source = {
       ...starterCards[0], id: 'slash', name: 'Slash-ØN1',
       onReveal: migrateEffects([{

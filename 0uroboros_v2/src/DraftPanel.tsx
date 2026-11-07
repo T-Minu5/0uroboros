@@ -23,7 +23,7 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
  const local=view.players[0],opponent=view.players[1];
  const locked=busy||view.draftEnded||view.draftReady[0]||seconds===0;
  const privilege=view.circuitReward.definition;
- // Engine order: top row then bottom row (5+5 standard, 4+4 middle-Nodes) — never re-sort by cost.
+ // Engine order: top row then bottom row (4+4 default, 5+5 with tenCardDraft) — never re-sort by cost.
  const offers=view.market.filter(pile=>pile.rotating);
  const split=Math.ceil(offers.length/2);
  const topRow=offers.slice(0,split);

@@ -9,7 +9,7 @@ import type { ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import { splitTabs } from "../src/miniMarkdown";
 import { cohortMetrics } from "../server/agents/ecoMetrics";
 import { emptyJournal, renderJournal, retractCardVerdicts, topRecommendations, type Journal, type Recommendation } from "../server/agents/ecoJournal";
-import { createEcoStrat, JOURNAL_RESETS } from "../server/agents/ecoStrat";
+import { createEcoStrat, DESIGNER_NOTICES, JOURNAL_RESETS } from "../server/agents/ecoStrat";
 import { sealEvidence, type GameEvidence } from "../server/agents/evidence";
 
 const content = compileForSelfPlay((authored as unknown as { document: ContentDocument }).document);
@@ -149,7 +149,8 @@ describe("Eco-Strat and the starting deck", () => {
       const eco = ecoFor(root);
       await eco.load();
       expect(eco.journal().recommendations[0].status).toBe("withdrawn");
-      expect(eco.journal().resets).toEqual(JOURNAL_RESETS.map(reset => reset.id));
+      expect(eco.journal().resets).toEqual([...JOURNAL_RESETS.map(reset => reset.id), ...DESIGNER_NOTICES.map(notice => notice.id)]);
+      expect(eco.journal().designerGuidance?.some(item => /trailing Circuit Rewards/i.test(item.text))).toBe(true);
       const saved = JSON.parse(await readFile(join(folder, "journal.json"), "utf8")) as Journal;
       saved.recommendations.push(rec("r2", "rep-2", "Rezz Blade per play is high", "Rezz Blade: -100 to -90 Drain."));
       await writeFile(join(folder, "journal.json"), JSON.stringify(saved));

@@ -88,13 +88,12 @@ function playCycle(room: Room, conns: [FakeConnection, FakeConnection], schedule
 describe("game server rooms", () => {
   it("keeps a seat's planning from the other seat until both commit, and forgets planning that was undone", () => {
     const { room, a, b, tokens } = table();
-    const boHand = b.view!.players[1].hand.length, boActions = b.view!.players[1].actions;
+    const boHand = b.view!.players[1].hand.length;
     expect(placeOne(room, 0, a)).toBe(true);
-    // Bo: no event, no card, Ada's hand and Actions unchanged.
+    // Bo: no event, no card, Ada's hand unchanged.
     expect(b.events().some(e => e.kind === "deploy")).toBe(false);
     expect(b.view!.nodes.flatMap(node => node.cards[1])).toEqual([]);
     expect(b.view!.players[1].hand.length).toBe(boHand);
-    expect(b.view!.players[1].actions).toBe(boActions);
 
     // Ada takes it back: Bo never hears of the placement or the undo.
     command(room, 0, { type: "undoPlanning" });

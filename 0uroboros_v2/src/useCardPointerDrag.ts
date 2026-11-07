@@ -1,5 +1,5 @@
 import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react';
-import type { Card } from '@0uroboros/engine/game';
+import { isPlayableCrypto, type Card } from '@0uroboros/engine/game';
 import { depthRenderer, type DepthArtHandle } from './depthArt/DepthArtRenderer';
 import { depthEntry } from './depthArt/depthManifest';
 import { SIDE_GAIN, VERTICAL_GAIN, leanFraction, restingTilt, sampleVelocity, stepTilt, tiltEye, type DragTilt } from './depthArt/dragTilt';
@@ -202,7 +202,8 @@ export function useCardPointerDrag(callbacks:Callbacks){
  },[]);
 
  return (event:ReactPointerEvent<HTMLButtonElement>,card:Card)=>{
-  if(!latest.current.enabled||card.type==='Crypto'||!event.isPrimary||event.button!==0||gesture.current)return;
+  // Wallet-only Crypto stays undraggable; generated Crypto with Power (e.g. Crypto-Shyte) deploys like a Character.
+  if(!latest.current.enabled||(card.type==='Crypto'&&!isPlayableCrypto(card))||!event.isPrimary||event.button!==0||gesture.current)return;
   const element=event.currentTarget;
   // A quick retry can grab the card before its previous return animation ends.
   for(const item of returning.current){

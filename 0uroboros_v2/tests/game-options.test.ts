@@ -64,15 +64,14 @@ describe("No trailing rewards", () => {
 });
 
 describe("online tables", () => {
-  it("defaults no trailing rewards on and hands options to the room's session", () => {
-    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: true, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
+  it("defaults trailing rewards in the pool and hands options to the room's session", () => {
+    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6 });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true });
-    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, draftCrypto: true, middleNodesOnly: true, noActions: true });
+    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
+    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
     expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
     expect(room.session!.view().playableNodes).toEqual([1, 2, 3]);
-    expect(room.session!.view().noActions).toBe(true);
   });
 });
 
@@ -84,9 +83,10 @@ describe("setup and look defaults", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("keeps game options through a save, with no trailing rewards on unless include is chosen", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, noTrailingRewards: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
-    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: false, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true })).toMatchObject({ noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true });
+  it("keeps game options through a save; trailing rewards are not a Configure field", () => {
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6 });
+    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0 })).toMatchObject({ noLocations: true, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 0 });
+    expect(sanitizeGameSetup(null)).not.toHaveProperty("noTrailingRewards");
   });
 
   it("defaults the board to Neon once, then keeps a saved Classic", () => {
@@ -109,21 +109,16 @@ describe("setup and look defaults", () => {
   });
 });
 
-describe("No Actions", () => {
-  it("lets Characters deploy with zero Actions and never credits gainActions", () => {
+describe("deployment without Actions economy", () => {
+  it("lets Characters deploy freely and ignores legacy gainActions steps", () => {
     const session = createSession({
       content, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: "higher",
-      random: seededRandom(9), noActions: true, aiSeats: [],
+      random: seededRandom(9), aiSeats: [],
     });
-    expect(session.view().noActions).toBe(true);
-    expect(session.state.players[0].actions).toBe(0);
-    const dash = { ...starterCards[1], id: "no-actions-dash", effect: "+1 Card, +2 Actions." };
+    const dash = { ...starterCards[1], id: "free-deploy-dash", onReveal: [{ action: "gainActions", amount: 2, target: { who: "self" } }] };
     session.state.players[0].hand = [dash];
     const node = session.view().openNodes[0];
     session.deploy(dash.id, node);
-    expect(session.state.players[0].actions).toBe(0);
-    const shownBefore = session.view().nodes[node].cards[0][0]?.card;
-    expect(shownBefore && "effect" in shownBefore ? shownBefore.effect : "").not.toMatch(/Actions?/i);
     session.endTurn();
     const actionGains: number[] = [];
     for (let guard = 0; guard < 500 && (session.pendingCount || session.state.choice); guard++) {
@@ -133,8 +128,6 @@ describe("No Actions", () => {
         if (step.event.kind === "actions") actionGains.push(step.event.amount ?? 0);
       }
     }
-    expect(actionGains.every(amount => amount === 0)).toBe(true);
-    expect(session.state.players[0].pendingActions).toBe(0);
-    expect(session.state.players[0].actions).toBe(0);
+    expect(actionGains).toHaveLength(0);
   });
 });

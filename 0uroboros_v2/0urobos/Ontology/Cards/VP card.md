@@ -12,9 +12,9 @@ tags: [ontology/cards]
 A [[Card type]] that scores [[Victory Points]] while held in an active player-owned [[Zone]] (not [[Trash]] or [[Destroyed]]). Its `vp` value is separate from its [[Card Power]] (new VP cards use the VP value as Power).
 
 ## Classes
-| Class | Deploy cost | Typical effect |
+| Class | Deploy | Typical effect |
 | --- | --- | --- |
-| **Volume** | 0 Actions | Repair your Server ("Repair +100"), often over a [[Duration]] |
-| **Solar-monk** | 1 [[Action]] | Also a [[Character]]: counts for Character targets |
+| **Volume** | Free | Repair your Server ("Repair +100"), often over a [[Duration]] |
+| **Solar-monk** | Free | Also a [[Character]]: counts for Character targets |
 
 VP may be negative or state-dependent when card text says so.

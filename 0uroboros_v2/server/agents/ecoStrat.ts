@@ -45,6 +45,17 @@ const HYPOTHESIS_LIMIT = 40;
 export const JOURNAL_RESETS = [
   { id: 'starting-deck-rezz-blade', card: 'Rezz Blade', reason: 'Rezz Blade starts in every deck, including the human player\'s, so it leads play, Drain and Actions in every game. Those totals are not evidence that it is overpowered; it is judged per play against market cards from now on.' },
 ];
+/** One-time Mel rule notices written into designer guidance on load. */
+export const DESIGNER_NOTICES = [
+  {
+    id: 'trailing-rewards-always-on',
+    text: 'Rule change: trailing Circuit Rewards (awardTrailing catch-up rewards) are always in the pool. Configure no longer has an Include trailing rewards toggle. Evaluate snowball and comeback with those catch-up rewards present every game; facts.rules.circuit is authoritative.',
+  },
+  {
+    id: 'crypto-cards-playable',
+    text: 'Rule change: Crypto cards deploy free during Runtime (same as Characters/VP). Undeployed copies still auto-resolve cryptoValue at Draft. Currency cards reprint their payout on reveal when played. facts.rules.deploy is authoritative.',
+  },
+];
 /** Cards both players start with are played in every game; Eco-Strat must not read that exposure as power. */
 export function startingDeckNote(names: string[]) {
   return names.length ? `Starting deck: ${names.join(', ')} start in both players' decks (the human's too), so they are played in every game from Cycle 1. Their play counts, effect totals, "top Drain card" status and win rates come from that exposure, not from power: never call a card marked inStartingDeck overpowered or dominant from its totals. Judge a starting card only by its per-play effect against market cards of similar cost, and leave starting cards out of purchase comparisons.` : '';
@@ -129,6 +140,12 @@ const FOUNDING: { id: string; topic: string; statement: string; test: FoundingTe
     test: m => { if (m.winner === null) return null; const [w, l] = [m.circuitClaims[m.winner], m.circuitClaims[1 - m.winner]]; return w === l ? { direction: 'neutral', note: `claims equal (${w})` } : { direction: w > l ? 'for' : 'against', note: `Circuit claims winner ${w}, loser ${l}` }; } },
   { id: 'location-control-wins', topic: 'Locations', statement: 'Winning more Locations across a game predicts winning the game.',
     test: m => { if (m.winner === null) return null; const [w, l] = [m.locationsWon[m.winner], m.locationsWon[1 - m.winner]]; return w === l ? null : { direction: w > l ? 'for' : 'against', note: `Locations won: winner ${w}, loser ${l}` }; } },
+  { id: 'nodes-vs-circuits-diverge', topic: 'End-game board awards', statement: 'Most-Nodes and most-Circuits leaders often disagree in the same game, so a separate Nodes end-game VP award would reward a distinct skill from mostCircuitsBonusVP.',
+    test: m => m.mostCircuitsVsMostNodes === 'differ'
+      ? { direction: 'for', note: `Circuits leader seat ${m.mostCircuitsLeader} (${m.circuitWins[0]}–${m.circuitWins[1]} wins) ≠ Nodes leader seat ${m.mostNodesLeader} (${m.locationsWon[0]}–${m.locationsWon[1]} Nodes)` }
+      : m.mostCircuitsVsMostNodes === 'same'
+        ? { direction: 'against', note: `same seat led Circuits (${m.circuitWins[0]}–${m.circuitWins[1]}) and Nodes (${m.locationsWon[0]}–${m.locationsWon[1]})` }
+        : { direction: 'neutral', note: `Circuits or Nodes tied (Circuit wins ${m.circuitWins[0]}–${m.circuitWins[1]}, Nodes ${m.locationsWon[0]}–${m.locationsWon[1]})` } },
   { id: 'early-lead-holds', topic: 'Snowballing and comebacks', statement: 'The VP leader at Cycle 8 usually wins; comebacks are rare.',
     test: m => { if (m.winner === null) return null; if (m.winnerMaxDeficit >= 5) return { direction: 'against', note: `winner came back from ${m.winnerMaxDeficit} VP down` }; const leader = m.vpLeaderAt['8']; return leader === null ? null : { direction: leader === m.winner ? 'for' : 'against', note: `Cycle 8 VP leader ${leader === m.winner ? 'won' : 'lost'}` }; } },
   { id: 'crypto-overflow', topic: 'Economy', statement: 'Wallets often end the Draft holding Crypto nothing worthwhile can absorb (weak sinks).',
@@ -239,6 +256,11 @@ export function createEcoStrat(options: EcoStratOptions) {
         const taken = retractCardVerdicts(journal, reset.card, reset.reason, now());
         journal.resets = [...(journal.resets ?? []), reset.id];
         log(`correction ${reset.id}: withdrew ${taken.recommendations} recommendations, retired ${taken.hypotheses} hypotheses, answered ${taken.questions} questions, revised ${taken.principles} principles.`);
+      }
+      for (const notice of DESIGNER_NOTICES.filter(item => !journal.resets?.includes(item.id))) {
+        appendDesignerGuidance(journal, [notice.text], now());
+        journal.resets = [...(journal.resets ?? []), notice.id];
+        log(`designer notice ${notice.id} recorded in journal guidance.`);
       }
       await save();
     })().catch(error => { loaded = null; throw error; });
@@ -508,6 +530,8 @@ export function createEcoStrat(options: EcoStratOptions) {
     if (m.decisions.aiRandomPicks > 0) observeFact('random-ai-choices', 'Strat-G', `The AI resolved ${m.decisions.aiRandomPicks} choices at random because it has no strategic rule for them (an AI limitation, not game randomness).`, gameId);
     if ((m.economy.walletLeftAtDraftEnd[0] + m.economy.walletLeftAtDraftEnd[1]) / 2 >= 3) observeFact('unspent-wallet', 'Economy', 'Seats ended Drafts with 3+ Crypto unspent on average.', gameId);
     if (Math.max(...m.economy.finalDeckSize) >= 30) observeFact('deck-bloat', 'Economy', `A deck reached ${Math.max(...m.economy.finalDeckSize)} cards.`, gameId);
+    if (m.mostCircuitsVsMostNodes === 'differ') observeFact('nodes-vs-circuits-differ', 'End-game board awards', `Most-Circuits seat ${m.mostCircuitsLeader} (${m.circuitWins[0]}–${m.circuitWins[1]} Circuit wins) differed from most-Nodes seat ${m.mostNodesLeader} (${m.locationsWon[0]}–${m.locationsWon[1]} Nodes).`, gameId);
+    else if (m.mostCircuitsVsMostNodes === 'same') observeFact('nodes-vs-circuits-same', 'End-game board awards', `Same seat led both Circuits (${m.circuitWins[0]}–${m.circuitWins[1]}) and Nodes (${m.locationsWon[0]}–${m.locationsWon[1]}).`, gameId);
   }
 
   function addEvidence(id: string, direction: Direction, note: string, kind: 'measured' | 'interpreted', gameId?: string, cohortId?: string) {
@@ -539,7 +563,7 @@ export function createEcoStrat(options: EcoStratOptions) {
         for (const founding of FOUNDING) { const outcome = founding.test(m); if (outcome) addEvidence(founding.id, outcome.direction, outcome.note, 'measured', evidence.id, evidence.cohortId); }
         measuredObservations(m, evidence.id);
         const starters = await startingDeck();
-        const interpretation = await askModel(`${ROLE}\n\nTask: privately update your hypotheses from one finished game. Use the measured METRICS; the aiPlayer fields show what the AI player (the agent named there) decided and believed, which is evidence about play quality, not truth about the game. In league games and human games, seatArchetypes names the deck archetype in seat 0 and seat 1 (Human is the designer playing); judge each AI against its design goal. ${startingDeckNote(starters)} Reply as {"observations": [{"topic": string, "text": string}] (<=4, specific, cite numbers), "hypothesisUpdates": [{"id": existing hypothesis id, "direction": "for"|"against"|"neutral", "note": string}] (only where this game is real evidence), "newHypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars stating a general, testable rule; no numbers from this one game)}] (<=2), "questions": string[] (<=2)}.`,
+        const interpretation = await askModel(`${ROLE}\n\nTask: privately update your hypotheses from one finished game. Use the measured METRICS; the aiPlayer fields show what the AI player (the agent named there) decided and believed, which is evidence about play quality, not truth about the game. In league games and human games, seatArchetypes names the deck archetype in seat 0 and seat 1 (Human is the designer playing); judge each AI against its design goal. When metrics.mostCircuitsVsMostNodes is "differ" or "same", that is evidence for the open nodes-vs-circuits-diverge hypothesis (observational weigh of a second Nodes award — not an implemented rule); cite circuitWins vs locationsWon. ${startingDeckNote(starters)} Reply as {"observations": [{"topic": string, "text": string}] (<=4, specific, cite numbers), "hypothesisUpdates": [{"id": existing hypothesis id, "direction": "for"|"against"|"neutral", "note": string}] (only where this game is real evidence), "newHypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars stating a general, testable rule; no numbers from this one game)}] (<=2), "questions": string[] (<=2)}.`,
           { game: { id: evidence.id, source: evidence.source, ...(evidence.seats ? { seatArchetypes: evidence.seats.map(agent => ARCHETYPES[agent] ?? agent) } : {}), metrics: compactGame(m, starters) }, aiPlayer: stratGSummary(evidence), hypotheses: hypothesesForModel() }, 'low', 120_000);
         if (interpretation) {
           for (const item of Array.isArray(interpretation.data.observations) ? interpretation.data.observations.slice(0, 4) as { topic?: unknown; text?: unknown }[] : []) {
@@ -646,7 +670,7 @@ Write plainly: short sentences, everyday words, game terms as the game uses them
 Reply as one JSON object:
 {"headline": string (<=350 chars: the state of the economy and the single most important balance issue),
  "recommendations": [{"title": string (<=80, imperative), "change": string (<=250: the concrete change, naming cards and numbers), "why": string[] (2-4 reasons, each <=200 chars and citing a measured number), "cause": string (<=200: what you think produces the problem), "hypothesis": string (<=350: if this were implemented, how the game would change: which measured numbers move which way and roughly how far, and how play would feel), "watchFor": string (<=200: risks and side effects), "confidence": "strong"|"moderate"|"weak"|"insufficient", "test": string (<=200: how to confirm it with a seeded A/B run)}] (at most ${MAX_RECOMMENDATIONS}, ranked by expected impact on balance, only where evidence supports a change; each is a proposal for human design review and is never applied automatically),
- "findings": {"goals": [{"goal": string, "verdict": string (<=220: is the game meeting it today, citing numbers)}] (one per design goal, in order), "working": string[] (<=4, each <=180 chars), "problems": string[] (<=5, each <=200 chars, most important for balance first), "areas": {"finalScores": string, "economy": string, "damageVsHealing": string, "circuitRewards": string, "locations": string, "cardValue": string, "strategicDiversity": string, "snowballing": string, "playerExperience": string} (a one-sentence verdict each, <=200 chars), "neglected": [{"card": string, "verdict": "game dynamic"|"the card"|"AI player"|"unclear", "note": string (<=200)}] (<=8), "stratG": {"agree": string[], "disagree": string[], "insufficient": string[]} (<=3 each, <=180 chars), "uncertainties": string[] (<=4, <=180 chars: what you could not determine and why)},
+ "findings": {"goals": [{"goal": string, "verdict": string (<=220: is the game meeting it today, citing numbers)}] (one per design goal, in order), "working": string[] (<=4, each <=180 chars), "problems": string[] (<=5, each <=200 chars, most important for balance first), "areas": {"finalScores": string, "economy": string, "damageVsHealing": string, "circuitRewards": string, "locations": string, "boardAwards": string, "cardValue": string, "strategicDiversity": string, "snowballing": string, "playerExperience": string} (a one-sentence verdict each, <=200 chars; boardAwards = whether most-Nodes vs most-Circuits diverge enough for a second award — observational only), "neglected": [{"card": string, "verdict": "game dynamic"|"the card"|"AI player"|"unclear", "note": string (<=200)}] (<=8), "stratG": {"agree": string[], "disagree": string[], "insufficient": string[]} (<=3 each, <=180 chars), "uncertainties": string[] (<=4, <=180 chars: what you could not determine and why)},
  "pointOfView": {"summary": string (<=600: how you believe a deck-building game's economy should work), "principles": [{"principle": string (<=110), "why": string (<=260: your reasoning, naming the concept, article or game-theory idea it comes from), "here": string (<=260: how 0uroboros measures up today, citing numbers)}] (5-7), "changed": string (<=220: what you changed from previousPointOfView and why; empty if this is your first version)},
  "plainHypotheses": [{"id": string, "plain": string (<=140 chars, one plain sentence)}] (one for every hypothesis marked needsPlain),
  "hypothesisUpdates": [{"id": string, "direction": "for"|"against"|"neutral", "note": string}],
@@ -654,6 +678,8 @@ Reply as one JSON object:
  "questions": string[] (<=3)}
 
 Final scores: metrics.vp.margins splits games into close (margin under ${CLOSE_MARGIN} VP), mid (${CLOSE_MARGIN}–${BLOWOUT_MARGIN} VP inclusive) and blowouts (over ${BLOWOUT_MARGIN} VP), overall and by how the game ended; metrics.vp.winnerLead says how much of the winner's lead came from destroying Servers versus every other VP source, and bothDestroyed counts games where each player destroyed at least one enemy Server (target more than ${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%). Destruction endings should land in ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}% (Cycle 16 at most ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}%). metrics.vp.winnerKill reports how often the winner destroyed both enemy Servers versus winning without a full kill (one Server + other VP, or no Servers). metrics.vpSources splits final VP into destructionVp, marketVp (printed VP on bought VP cards) and otherVp; use it when separating Server-kill scoring from market VP. metrics.timeline rows carry per-cycle locationsWon, cumulative circuitClaims and circuitDifferential (seat0−seat1). metrics.snowball.circuitLead2Plus tests whether a 2+ Circuit-claim lead snowballs (kept lead, later Circuits/Locations, game win). Use these to explain why margins are wide or narrow and what would close them without pushing destruction endings outside the band. metrics.cycles.destructionEnd says in which Cycle destruction endings came.
+
+Board awards (observation only — Mel already ships Configure mostCircuitsBonusVP; do NOT invent or recommend shipping a most-Nodes award unless metrics.boardAwards.mostCircuitsVsMostNodes shows the leaders differ often enough that a second award would reward a distinct skill): metrics.circuit.winsPerGame and metrics.circuit.winnerWonMoreCircuits use Circuit wins (Cycles with a strict Location lead — same definition as mostCircuitsBonusVP), distinct from circuitClaims. metrics.boardAwards.mostCircuitsVsMostNodes reports how often most-Circuits and most-Nodes (total Locations/Nodes won) leaders are the same seat, differ, or tied; differAmongDecided is the share among games where both leaders were decided. Weigh in findings.areas.boardAwards whether a second Nodes end-game VP award is warranted from these rates alone; prefer "not yet / too correlated" when differShare is low or the sample is small. Never treat this as an implemented Configure knob.
 
 Archetypes: ${archetypes ? `archetypes holds ${archetypes.games} league games by the deck archetype in each seat (Balanced, Pure aggression, Engine, Pure economy; each is an AI agent held to that style): win rates, head-to-head records, how often and by which Cycle each destroyed both enemy Servers (the pure aggression goal), how many games each dealt ${integrity} total Server damage (both Servers' full integrity on this build; the designer may change it, so judge aggression by destruction and treat the number only as the current size of the job) and bought ${T.vpBought} VP from the market, and how often it destroyed both Servers yet lost on VP. Judge the archetype goals from these numbers, and when one archetype misses its timing, look for the economy or timing cause (prices, Drain per cost, VP pile values, Restore) rather than blaming the agent. A missed target can also be an AI limitation: say which you think it is.` : 'there are no league games on this build, so the archetype goals cannot be measured yet: say so in their verdicts.'}
 
@@ -752,7 +778,11 @@ Point of view: your own considered view of how a deck-building economy should wo
         : 'no seat reached a 2+ Circuit-claim lead in this sample'],
       ['VP sources', `per seat avg destruction ${m.vpSources.avgDestructionVp} VP, market (bought VP cards) ${m.vpSources.avgMarketVp} VP, other ${m.vpSources.avgOtherVp} VP; market is ${pct(m.vpSources.marketShare)} of all VP, destruction ${pct(m.vpSources.destructionShare)}`],
       ['Locations', `the player who won more Locations won the game ${pct(m.locations.winnerWonMoreLocations.rate)} of the time`],
-      ['Circuit Rewards', `${m.circuit.claimsPerGame} claims per game; the player who claimed more won ${pct(m.circuit.winnerClaimedMore.rate)}`],
+      ['Circuit Rewards', `${m.circuit.claimsPerGame} claims per game; the player who claimed more won ${pct(m.circuit.winnerClaimedMore.rate)}; Circuit wins (Location-lead Cycles) ${m.circuit.winsPerGame} per game, that leader won ${pct(m.circuit.winnerWonMoreCircuits.rate)}`],
+      ['Most Circuits vs most Nodes', (() => {
+        const cmp = m.boardAwards.mostCircuitsVsMostNodes;
+        return `observational only (weighing a second Nodes award): same leader ${cmp.same}, differ ${cmp.differ}, tied ${cmp.tied} of ${cmp.games} (${pct(cmp.differShare)} differ; ${pct(cmp.differAmongDecided)} of decided); most-Circuits leader won ${pct(m.boardAwards.mostCircuitsLeaderWonGame.rate)}, most-Nodes leader won ${pct(m.boardAwards.mostNodesLeaderWonGame.rate)}`;
+      })()],
       ['Variety', `${m.diversity.distinctCardsBought} different cards bought; the top three were ${pct(m.diversity.topThreeShare)} of purchases`],
       ['Neglected cards', d.gamesWithMarketData ? `${d.neglected.length} cards were often affordable but almost never bought` : 'not measured yet (these games predate market tracking)'],
     ];
@@ -792,7 +822,7 @@ Point of view: your own considered view of how a deck-building economy should wo
         : 'No league games in this report yet; run the league with Eco-Strat watching.',
         arch ? arch.agents.map(agent => `${agent.archetype}: ${record(agent)} over ${agent.games} games, ${agent.avgFinalVP} final VP and ${agent.avgDrainDealt} Server damage dealt on average.`) : []],
     ];
-    const areaLines = ([['Final scores', 'finalScores'], ['Economy', 'economy'], ['Damage vs healing', 'damageVsHealing'], ['Circuit Rewards', 'circuitRewards'], ['Locations', 'locations'], ['Card value', 'cardValue'], ['Strategic diversity', 'strategicDiversity'], ['Snowballing and comebacks', 'snowballing'], ['Player experience', 'playerExperience']] as const)
+    const areaLines = ([['Final scores', 'finalScores'], ['Economy', 'economy'], ['Damage vs healing', 'damageVsHealing'], ['Circuit Rewards', 'circuitRewards'], ['Locations', 'locations'], ['Board awards (Nodes vs Circuits)', 'boardAwards'], ['Card value', 'cardValue'], ['Strategic diversity', 'strategicDiversity'], ['Snowballing and comebacks', 'snowballing'], ['Player experience', 'playerExperience']] as const)
       .map(([label, key]) => [label, str(areas[key], 260)] as const).filter(([, text]) => text).map(([label, text]) => `- **${label}:** ${text}`);
     return [
       `# Eco-Strat report · ${input.id.slice(0, 10)} (${input.kind})`,

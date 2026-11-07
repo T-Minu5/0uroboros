@@ -14,7 +14,7 @@ export function logGameEvent(gameId: string | null, session: RuntimeSession | nu
       cards: node.cards.map(side => side.map(placement => `${placement.card.name}${placement.revealed ? '' : ' (hidden)'}`)),
     })),
     players: state.players.map(player => ({
-      actions: player.actions, wallet: player.wallet, hand: names(player.hand), bank: player.bank.map(entry => entry.card.name),
+      wallet: player.wallet, hand: names(player.hand), bank: player.bank.map(entry => entry.card.name),
       discard: player.discard.length, draw: player.draw.length,
     })),
   };

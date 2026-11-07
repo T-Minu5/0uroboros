@@ -22,7 +22,7 @@ describe("Location valuation", () => {
   it("prices from the winner's seat: loser-paying Locations are negative, draw/Drain/VP ones positive, symmetric ones even", () => {
     for (const name of ["Login the Calvary", "Loser's Luck", "Code Cull"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeLessThan(0);
     for (const name of ["Signal tower", "Data Breach", "Sludge core", "Wind fall"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeGreaterThan(0);
-    for (const name of ["Trash compactor", "Sacrificial LLM", "No Man's Land"]) expect(Math.abs(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake)).toBeLessThan(0.5);
+    for (const name of ["Trash compactor", "Sacrificial Altar", "No Man's Land"]) expect(Math.abs(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake)).toBeLessThan(0.5);
   });
 
   it("stakes are the mirror image for the two players", () => {
@@ -54,9 +54,10 @@ describe("Location valuation", () => {
     expect(facts.rules.mods).toMatch(/Hologram/i);
     expect(facts.rules.vpSources).toMatch(/destruction/);
     expect(facts.configurable.map(item => item.id)).toEqual(expect.arrayContaining([
-      "serverVP.primary", "draftCrypto", "noLocations", "noTrailingRewards", "noActions",
+      "serverVP.primary", "draftCrypto", "noLocations", "mostCircuitsBonusVP",
       "cards", "locations", "circuitRewards", "mods", "serverIntegrity",
     ]));
+    expect(facts.configurable.find(item => item.id === "mostCircuitsBonusVP")).toMatchObject({ default: 6, surface: "configure" });
     expect(facts.configurable.find(item => item.id === "draftCrypto")).toMatchObject({ default: false, surface: "configure" });
     expect(facts.configurable.find(item => item.id === "serverIntegrity")?.surface).toBe("code-constant");
     expect(facts.mods.some(mod => mod.kind === "builtin")).toBe(true);

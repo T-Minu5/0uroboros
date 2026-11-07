@@ -15,14 +15,13 @@ describe("log summary", () => {
       ev({ kind: "reveal", owner: 0, node: 3, cardId: "0:rezz", text: "Rezz Blade reveals." }),
       ev({ kind: "drain", owner: 0, node: 3, cardId: "0:rezz", source: "card", sourceName: "Rezz Blade", target: "primary", targetOwner: 1, amount: 100, text: "Rezz Blade: Drain 100 at primary Server." }),
       ev({ kind: "draw", owner: 0, node: 3, cardId: "0:rezz", source: "card", target: "hand", targetOwner: 0, amount: 1, text: "Rezz Blade: draw 1." }),
-      ev({ kind: "actions", owner: 0, node: 3, cardId: "0:rezz", source: "card", target: "actions", targetOwner: 0, amount: 2, text: "Rezz Blade: +2 Actions next Runtime turn." }),
       ev({ kind: "reveal", owner: 1, node: 0, cardId: "1:scythe", text: "Nyte Scythe reveals." }),
       ev({ kind: "trash", owner: 1, node: 0, cardId: "1:scythe", source: "card", amount: 0, text: "Nyte Scythe: No target." }),
       ev({ kind: "choice", owner: 1, node: 0, cardId: "1:scythe", text: "Bo chooses: nothing." }),
     ];
     expect(summarizeEvents(events, names)).toEqual([
-      { owner: 0, lines: ["Plays Rezz Blade at N4, Draining 100 from Bo's Server. Gaining 1 card and 2 actions."] },
-      { owner: 1, lines: ["Plays Nyte Scythe at N1, Trashing 0 cards."] },
+      { owner: 0, lines: ["Plays Rezz Blade at N4, Draining 100 from Bo's Server. Gaining 1 card."] },
+      { owner: 1, lines: ["Plays Nyte Scythe at N1."] },
     ]);
   });
 

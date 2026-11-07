@@ -85,7 +85,7 @@ describe('legacy effect migration', () => {
   });
 
   it('writes Location and On Play effects in winner/loser and played/other terms', () => {
-    expect(migrateEffects([{ kind: 'actions', amount: 1, opponent: true }], 'location')[0].target).toEqual({ type: 'player', who: 'loser' });
+    expect(migrateEffects([{ kind: 'actions', amount: 1, opponent: true }], 'location')).toEqual([]);
     expect(migrateEffects([{ kind: 'drain', amount: 25 }], 'locationPlay')[0].target).toEqual({ type: 'server', who: 'other', server: 'auto' });
     expect(migrateEffects([{ kind: 'modifyPower', amount: -1, boardSide: 'loser', cardPick: 'random' }], 'location')[0])
       .toMatchObject({ action: 'changePower', target: { type: 'card', who: 'loser', where: 'thisNode' }, pick: { mode: 'random' } });

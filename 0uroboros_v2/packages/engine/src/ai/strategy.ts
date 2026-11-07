@@ -1,4 +1,4 @@
-import type { Card } from '../game';
+import { type Card } from '../game';
 import { migrateEffects } from '../effects/migrate';
 import type { AnyEffect, ChoiceOption, EffectStep, Who } from '../effects/types';
 
@@ -20,7 +20,6 @@ export type StrategyWeights = {
   power: number;
   /** Per card drawn: drawing is how the deck cycles back to its best cards. */
   draw: number;
-  actions: number;
   /** Per Crypto earned by a Character during Runtime. */
   crypto: number;
   /** Per 100 Drain. */
@@ -81,7 +80,7 @@ export const DEFAULT_STRATEGY: StrategyProfile = {
   minCryptoValue: 2,
   minBuyScore: 0.75,
   dilution: 0.5,
-  weights: { power: 1, draw: 1.6, actions: 1.1, crypto: 1, drain: 2, restore: 1, vp: 2.2, duration: 0.8, thin: 1.2, disrupt: 0.8, chaos: 1.5 },
+  weights: { power: 1, draw: 1.6, crypto: 1, drain: 2, restore: 1, vp: 2.2, duration: 0.8, thin: 1.2, disrupt: 0.8, chaos: 1.5 },
   cardBias: {},
 };
 
@@ -134,8 +133,6 @@ export type StrategyContext = {
   owned: readonly Card[];
   ownServers: number; ownServersMax: number;
   enemyServers: number; enemyServersMax: number;
-  /** Configure: Action economy is off — do not value gainActions. */
-  noActions?: boolean;
 };
 
 export type Phase = 'economy' | 'build' | 'endgame';
@@ -181,7 +178,6 @@ function effectValue(step: EffectStep, w: StrategyWeights, m: Multipliers): numb
   let value: number;
   switch (step.action) {
     case 'draw': value = sign * w.draw * amount; break;
-    case 'gainActions': value = sign * w.actions * amount; break;
     case 'gainCrypto': value = sign * w.crypto * amount * m.econ; break;
     case 'payCrypto': value = -sign * w.crypto * amount * m.econ; break;
     case 'gainCard': value = sign * (step.cardId && JUNK_CARDS.has(step.cardId) ? -w.thin : w.draw * 1.2) * amount; break;
@@ -252,6 +248,7 @@ export function optionValue(steps: readonly EffectStep[], profile: StrategyProfi
 export function cryptoPerHand(owned: readonly Card[]): number {
   if (!owned.length) return 0;
   const total = owned.reduce((sum, card) => {
+    // Undeployed Crypto still auto-resolves cryptoValue at Draft; Character/VP Crypto comes from effects.
     if (card.type === 'Crypto') return sum + (card.cryptoValue ?? 0);
     return sum + 0.7 * effectTotal(card.onReveal, 'gainCrypto');
   }, 0);
@@ -261,7 +258,14 @@ export function cryptoPerHand(owned: readonly Card[]): number {
 /** Worth of a card each time it is drawn and played, excluding the VP it scores just by being owned. */
 export function handValue(card: Card, profile: StrategyProfile, context: StrategyContext): number {
   const w = profile.weights, m = multipliers(profile, context);
-  if (card.type === 'Crypto') return w.crypto * (card.cryptoValue ?? 0) * Math.max(m.econ, 0.3);
+  if (card.type === 'Crypto') {
+    // Wallet-first currency: Draft cryptoValue. Printed Power / board hooks add play worth (Crypto-Shyte).
+    const wallet = w.crypto * (card.cryptoValue ?? 0) * Math.max(m.econ, 0.3);
+    const power = card.powerSource ? 2 : (card.power ?? 0) + (card.powerDelta ?? 0);
+    if (!power && !card.onCollapse?.length && !card.recurring?.length && !(card.schedule?.length)) return wallet;
+    return wallet + w.power * power + sumEffects(card.onReveal, w, m) + sumEffects(card.onCollapse, w, m)
+      + sumEffects(card.recurring, w, m) + (card.schedule ?? []).reduce((sum, entry) => sum + sumEffects(entry.effects, w, m), 0);
+  }
   const lasting = card.duration ? Math.min(card.duration, 3) : 1;
   const power = card.powerSource ? 2 : (card.power ?? 0) + (card.powerDelta ?? 0);
   return w.power * power
@@ -352,12 +356,11 @@ export function planDraft(options: readonly DraftOption[], wallet: number, profi
   return taken[budget].map(index => items[index]).sort((a, b) => b.cost - a.cost || b.value - a.value).map(item => item.id);
 }
 
-/** Higher plays first: Action and draw engines fuel later turns, Drain matters most in the endgame. */
+/** Higher plays first: draw engines fuel later turns; Drain matters most in the endgame. */
 export function deployPriority(card: Card, profile: StrategyProfile, context: StrategyContext): number {
   const total = (action: EffectStep['action'], enemy = false) => effectTotal(card.onReveal, action, enemy);
   const attack = strategyPhase(profile, context.cycle) === 'endgame' ? 1 : midgameShare(profile, context.cycle);
-  const actions = context.noActions ? 0 : total('gainActions') * 3;
-  return actions + total('draw') * 2 + ((card.power ?? 0) + (card.powerDelta ?? 0)) * 0.5 + attack * total('damageServer', true) / 50 + (card.type === 'VP' ? 10 : 0);
+  return total('draw') * 2 + ((card.power ?? 0) + (card.powerDelta ?? 0)) * 0.5 + attack * total('damageServer', true) / 50 + (card.type === 'VP' ? 10 : 0);
 }
 
 /** A Location's effect lists, as content and the runtime carry them. */

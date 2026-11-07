@@ -115,7 +115,6 @@ describe('location while formulas', () => {
     });
     // Simpler: call enqueue via end of reveal by playing a card on another node then checking
     game.state.players[0].hand = [card('spark')];
-    game.state.players[0].actions = 2;
     game.deploy(game.state.players[0].hand[0]!.id, 1);
     game.endTurn(0);
     game.endTurn(1);

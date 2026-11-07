@@ -3,7 +3,7 @@ import { compileContent, createDefaultContent } from '@0uroboros/engine/authorin
 import { describeStep, validateSteps, type ValidationCards } from '@0uroboros/engine/effects/catalog';
 import type { CardWhere, EffectStep, PickMode, Who } from '@0uroboros/engine/effects/types';
 import { starterCards, type Card } from '@0uroboros/engine/game';
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
+import { createSession, firstLegalSelection, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 
 const card = (id: string, extra: Partial<Card> = {}): Card => ({ ...starterCards[0], id, name: id, type: 'Character', power: 2, onReveal: [], ...extra });
 const coin = (id: string): Card => ({ ...starterCards[0], id, name: id, type: 'Crypto', cryptoValue: 1, power: undefined, onReveal: [] });
@@ -11,21 +11,21 @@ const step = (action: EffectStep['action'], where: CardWhere, who: Who = 'oppone
   ({ action, target: { type: 'card', who, where }, pick: { mode }, ...extra });
 const validation: ValidationCards = { enabledIds: new Set(), types: new Map() };
 
-function session() {
+function session(aiSeats: (0 | 1)[] = [1]) {
   const game = createSession({
     carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
-    random: seededRandom(5), content: compileContent(createDefaultContent()), midCycleDraw: false,
+    random: seededRandom(5), content: compileContent(createDefaultContent()), midCycleDraw: false, aiSeats,
   });
   game.state.nodeOrder = [0, 1, 2, 3, 4];
   game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
-  game.state.players[1].actions = 0;
   return game;
 }
 
 function finish(game: RuntimeSession) {
   const events: RuntimeEvent[] = [];
-  while (game.pendingCount) {
-    events.push(game.step()!.event);
+  while (game.pendingCount || game.state.choice) {
+    if (game.state.choice) events.push(game.choose(firstLegalSelection(game.state.choice)));
+    else events.push(game.step()!.event);
     if (events.length > 400) throw new Error('stalled');
   }
   return events;
@@ -35,9 +35,13 @@ function play(game: RuntimeSession, effect: EffectStep) {
   const source = card('source', { onReveal: [effect] });
   game.state.players[0].hand.unshift(source);
   game.deploy(source.id, 0);
-  game.endTurn();
+  game.endTurn(0);
+  try { game.endTurn(1); } catch { /* AI seat, or already committed */ }
   return finish(game);
 }
+
+/** Crypto stays in hand through AI deploy (Characters now deploy free). */
+const handFoe = (id: string) => coin(id);
 
 describe('card targets off the board', () => {
   it('validates and prints every place for either side', () => {
@@ -59,7 +63,7 @@ describe('card targets off the board', () => {
 
   it('trashes a random card from the enemy hand', () => {
     const game = session();
-    game.state.players[1].hand = [card('foe-a'), card('foe-b')];
+    game.state.players[1].hand = [handFoe('foe-a'), handFoe('foe-b')];
     play(game, step('trashCard', 'hand'));
     expect(game.state.players[1].hand).toHaveLength(1);
     expect(game.state.trash.map(entry => entry.id)).toEqual(expect.arrayContaining([expect.stringMatching(/^foe-/)]));
@@ -78,7 +82,7 @@ describe('card targets off the board', () => {
   });
 
   it('trashes a Crypto card from the enemy wallet and leaves other hand cards alone', () => {
-    const game = session();
+    const game = session([]);
     game.state.players[1].hand = [card('keeper'), coin('coin')];
     play(game, step('trashCard', 'wallet'));
     expect(game.state.players[1].hand.map(entry => entry.id)).toEqual(['keeper']);
@@ -102,22 +106,28 @@ describe('card targets off the board', () => {
   });
 
   it('lets the opponent choose which of their hand cards is trashed', () => {
-    const game = session();
+    const game = session([]);
     game.state.players[0].hand = [card('mine')];
     game.state.players[1].hand = [card('weak', { power: 1 }), card('strong', { power: 9 })];
-    const events = play(game, step('trashCard', 'hand', 'opponent', 'choose', { pick: { mode: 'choose', chooser: 'opponent' } }));
-    expect(events.some(event => event.text.startsWith('Opponent chooses'))).toBe(true);
+    const source = card('source', { onReveal: [step('trashCard', 'hand', 'opponent', 'choose', { pick: { mode: 'choose', chooser: 'opponent' } })] });
+    game.state.players[0].hand.unshift(source);
+    game.deploy(source.id, 0);
+    game.endTurn(0); game.endTurn(1);
+    while (game.pendingCount && !game.state.choice) game.step();
+    expect(game.state.choice?.owner).toBe(1);
+    game.choose('card-weak', 1);
+    finish(game);
     expect(game.state.trash.map(entry => entry.id)).toContain('weak');
     expect(game.state.players[1].hand.map(entry => entry.id)).toEqual(['strong']);
   });
 
   it('asks you to choose from the enemy hand, showing the cards', () => {
-    const game = session();
+    const game = session([]);
     game.state.players[1].hand = [card('foe-a'), card('foe-b')];
     const source = card('source', { onReveal: [step('destroyCard', 'hand', 'opponent', 'choose')] });
     game.state.players[0].hand.unshift(source);
     game.deploy(source.id, 0);
-    game.endTurn();
+    game.endTurn(0); game.endTurn(1);
     while (game.pendingCount && !game.state.choice) game.step();
     expect(game.state.choice?.owner).toBe(0);
     expect(game.state.choice?.prompt).toMatch(/in the opponent's hand to destroy/);
@@ -163,12 +173,12 @@ describe('card targets off the board', () => {
     expect(destroyGame.state.players[0].discard).toHaveLength(0);
     expect(destroyGame.state.players[0].destroyed.map(entry => entry.id)).toEqual(['scrap']);
 
-    const pick = session();
+    const pick = session([]);
     pick.state.players[0].discard = [card('pick-me'), card('other')];
     const source = card('picker', { onReveal: [step('trashCard', 'discard', 'self', 'choose')] });
     pick.state.players[0].hand.unshift(source);
     pick.deploy(source.id, 0);
-    pick.endTurn();
+    pick.endTurn(0); pick.endTurn(1);
     while (pick.pendingCount && !pick.state.choice) pick.step();
     expect(pick.state.choice?.zone).toBe('discard');
     expect(pick.state.choice?.zoneOwner).toBe(0);
@@ -176,14 +186,14 @@ describe('card targets off the board', () => {
   });
 
   it('recovers a card from Discard into hand via the discard drawer choice', () => {
-    const game = session();
+    const game = session([]);
     game.state.players[0].discard = [card('saved'), card('left')];
     const source = card('rescuer', {
       onReveal: [{ action: 'recover', amount: 1, target: { type: 'card', who: 'self', where: 'discard' }, pick: { mode: 'choose' }, destination: 'hand' }],
     });
     game.state.players[0].hand.unshift(source);
     game.deploy(source.id, 0);
-    game.endTurn();
+    game.endTurn(0); game.endTurn(1);
     while (game.pendingCount && !game.state.choice) game.step();
     expect(game.state.choice?.zone).toBe('discard');
     expect(game.state.choice?.zoneOwner).toBe(0);

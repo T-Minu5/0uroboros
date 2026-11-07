@@ -127,7 +127,6 @@ describe('phase 2 passives', () => {
         { action: 'changePower', amount: -2, transfer: false, target: { type: 'card', who: 'self', where: 'thisNode' }, pick: { mode: 'first' } },
       ],
     })];
-    game.state.players[0].actions = 2;
     game.deploy('hit', 0);
     game.endTurn(0); game.endTurn(1);
     finish(game);
@@ -179,7 +178,6 @@ describe('phase 2 events and actions', () => {
         target: { type: 'zone', who: 'opponent', zone: 'deck' },
       }],
     })];
-    game.state.players[0].actions = 2;
     game.deploy('thief', 0);
     game.endTurn(0); game.endTurn(1);
     finish(game);
@@ -195,7 +193,6 @@ describe('phase 2 events and actions', () => {
       power: 1,
       onReveal: [{ action: 'deckSwap', amount: 1 }],
     })];
-    game.state.players[0].actions = 2;
     game.deploy('swapper', 0);
     game.endTurn(0); game.endTurn(1);
     finish(game);
@@ -217,7 +214,6 @@ describe('phase 2 events and actions', () => {
       }),
       spare,
     ];
-    game.state.players[0].actions = 2;
     game.deploy('placer', 0);
     game.endTurn(0); game.endTurn(1);
     while (game.pendingCount || game.state.choice) {
@@ -245,7 +241,6 @@ describe('phase 2 events and actions', () => {
         target: { type: 'card', who: 'self', where: 'board', relation: 'previous' },
       }],
     })];
-    game.state.players[0].actions = 2;
     game.deploy('copier', 0);
     game.endTurn(0); game.endTurn(1);
     finish(game);
@@ -273,7 +268,6 @@ describe('phase 2 events and actions', () => {
         target: { type: 'zone', who: 'self', zone: 'hand' },
       }],
     })];
-    game.state.players[0].actions = 2;
     game.state.players[0].draw = [card('pad')];
     game.deploy('buyer', 0);
     game.endTurn(0); game.endTurn(1);

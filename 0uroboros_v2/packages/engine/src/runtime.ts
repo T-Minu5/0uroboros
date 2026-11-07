@@ -1,4 +1,4 @@
-import { EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, DRAFT_SLOTS_MIDDLE, type MarketPile } from "./evaluationMarket";
+import { EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, DRAFT_SLOTS_TEN, type MarketPile } from "./evaluationMarket";
 import {
   describeConditionPredicate, meetsLocationCondition, revealedHere, type LocationCondition,
 } from "./locationConditions";
@@ -16,11 +16,11 @@ import {
   type Card, type CardClass, type CardModifier, type PlayerId, type RandomSource, type Deployment, type Servers,
   type OpeningSchedule,
   applyServerEffect, serverMaximums, defaultServerVP, drawCards,
-  initialWeights, middleThreeWeights, MIDDLE_NODES, legalNodes, playableNodes, mirroredOpening, nodeWinner, trailingPlayer,
-  revealOrder, runtimeActions, starterEffects, canDeploy,
+  initialWeights, MIDDLE_NODES, legalNodes, playableNodes, mirroredOpening, nodeWinner, trailingPlayer,
+  selectCircuitNode, revealOrder, starterEffects, canDeploy,
   shuffleCards, effectiveCardPower, cardPowerFloor, expandDeck, DEFAULT_STARTING_DECK, setPowerDelta, isCharacterCard,
 } from "./game";
-import { ACTIONS, describeCard, describeStep, modBadge, optionText } from "./effects/catalog";
+import { ACTIONS, describeStep, modBadge, optionText } from "./effects/catalog";
 import { migrateEffects } from "./effects/migrate";
 import { builtinMod } from "./builtinMods";
 import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type ModDefinition, type ModHook, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
@@ -86,7 +86,7 @@ export type SessionConfig = {
   seatNames?: [string, string];
   /** Every Node is No Man's Land for the whole session. */
   noLocations?: boolean;
-  /** Circuit Rewards that go to the trailing player are never drawn. Defaults on. */
+  /** Legacy opt-out: when true, Circuit Rewards that go to the trailing player are never drawn. Defaults off (trailing rewards stay in the pool). */
   noTrailingRewards?: boolean;
   /** Each player draws 1 at the start of Runtime turns 2 and 3. Fixed rule (defaults on; tests may opt out). */
   midCycleDraw?: boolean;
@@ -94,11 +94,13 @@ export type SessionConfig = {
   draftCrypto?: boolean;
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly?: boolean;
+  /** When true, Draft uses the optional 10-slot offer; default is the 8-slot offer. */
+  tenCardDraft?: boolean;
   /**
-   * No Action economy: Characters deploy free, `gainActions` never resolves, and Action text is stripped from
-   * shown cards. Defaults off.
+   * End-game bonus VP for the seat that won more Circuits across completed Cycles (a Circuit win =
+   * strictly more Locations that Cycle). 0 or unset awards nothing; Configure defaults to Eco-Strat's 6.
    */
-  noActions?: boolean;
+  mostCircuitsBonusVP?: number;
   /** The clock Draft deadlines read; defaults to Date.now. Inject for tests and servers. */
   now?: () => number;
 };
@@ -174,7 +176,7 @@ type ChoiceRequest = {
 export type PlayerState = {
   bank: BankEntry[];
   draw: Card[]; hand: Card[]; discard: Card[]; destroyed: Card[];
-  actions: number; pendingActions: number; wallet: number;
+  wallet: number;
   servers: Servers; destructionVP: number; rewardVP: number; totalVP: number;
   /** Cards this player has moved this game, by relocating or with their cards' effects. */
   moved: number;
@@ -242,8 +244,6 @@ export type SessionView = Omit<SessionState, "players" | "nodes" | "nodeOrder"> 
   openNodes: number[];
   /** Nodes that may receive deploys this session (sorted). Does not reveal opening order. */
   playableNodes: number[];
-  /** Configure: Action costs and gainActions are off for this session. */
-  noActions: boolean;
   canUndoPlanning: boolean;
   planningCardIds: string[];
   movableCardIds: string[];
@@ -271,15 +271,13 @@ type EffectContext = {
   winner?: PlayerId | null;
   /** Owner of the card whose reveal triggered an On Play effect. */
   played?: PlayerId;
-  /** Actions gained count for the current Runtime turn rather than the next. */
-  immediateActions?: boolean;
   /** Event source for Location, Circuit and Runtime Hack effects. */
   label?: { source: "location" | "circuit" | "runtimeHack"; sourceName: string; node?: number };
 };
 /** Outcomes that break a chain: nothing to act on, an optional step skipped, a cost declined or unpaid. */
 const FAILED_OUTCOME = /: No target\.$|: No Power to shift\.$| skipped\.$|payment declined\.$|chained effects cancelled\.$|: cannot pay \d+ Crypto\.$|: Not enough cards[^.]*\.$|: (?:Shared Trash|Discard|Destroyed pile) is empty\.$/;
-const STEP_EVENT: Record<ActionId, RuntimeEvent["kind"]> = {
-  draw: "draw", gainActions: "actions", gainCrypto: "crypto", payCrypto: "crypto", gainVP: "vp", gainCard: "draw",
+const STEP_EVENT: Partial<Record<ActionId, RuntimeEvent["kind"]>> = {
+  draw: "draw", gainCrypto: "crypto", payCrypto: "crypto", gainVP: "vp", gainCard: "draw",
   damageServer: "drain", repairServer: "restore", destroyServer: "drain",
   discardCards: "trash", trashCards: "trash", mill: "trash", scry: "choice", recover: "trash", stealCrypto: "crypto", bump: "trash",
   moveCard: "move", changePower: "power", healCard: "power", restoreCard: "power", destroyCard: "trash", trashCard: "trash", attachModifier: "power", removeModifier: "power", transferPower: "power", morph: "morph",
@@ -308,16 +306,6 @@ const matchesFilter = (card: Card, filter?: CardFilter) => {
 export function seededRandom(seed: number): RandomSource {
   let value = seed >>> 0;
   return () => { value = (Math.imul(value, 1664525) + 1013904223) >>> 0; return value / 4294967296; };
-}
-
-/** Strip "+N Action(s)" clauses from a static effect string when Configure noActions is on. */
-function stripActionEffectText(effect: string): string {
-  return effect
-    .replace(/(?:,\s*)?\+\d+\s+Actions?(?:\s+(?:to|for)\s+[^,.]+)?/gi, "")
-    .replace(/\.\s*\./g, ".")
-    .replace(/^\s*,\s*|\s*,\s*$/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
 }
 
 export function createSession(config: SessionConfig): RuntimeSession { return new RuntimeSession(config); }
@@ -389,7 +377,7 @@ const LOCATION_SCORE_CAP = 45;
 // takes the acting seat, and `view(seat)` / `redactEvent` decide what each seat may see.
 /** A seat's planning state at its first placement or move of the turn, restored by Undo all actions. */
 type PlanningSnapshot = {
-  hand: Card[]; actions: number; nodes: Deployment[][]; order: number;
+  hand: Card[]; nodes: Deployment[][]; order: number;
   relocatedThisTurn: string[]; relocatedThisCycle: string[]; moved: number; movedTotal: number;
 };
 
@@ -452,7 +440,7 @@ export class RuntimeSession {
     this.config = { ...config, content: config.content ? structuredClone(config.content) : undefined };
     const deck = this.config.content?.startingDeck ?? expandDeck(DEFAULT_STARTING_DECK, EVALUATION_ALL_CARDS);
     const opening = mirroredOpening(config.random, deck);
-    const player = (owner: PlayerId): PlayerState => ({ ...opening[owner], destroyed: [], bank: [], actions: config.noActions ? 0 : 2, pendingActions: 0, wallet: 0, servers: { ...serverMaximums }, destructionVP: 0, rewardVP: 0, totalVP: 0, moved: 0 });
+    const player = (owner: PlayerId): PlayerState => ({ ...opening[owner], destroyed: [], bank: [], wallet: 0, servers: { ...serverMaximums }, destructionVP: 0, rewardVP: 0, totalVP: 0, moved: 0 });
     this.state = {
       phase: "runtime", turn: 1, cycle: 1, priority: config.random() < 0.5 ? 0 : 1,
       players: [player(0), player(1)],
@@ -527,16 +515,14 @@ export class RuntimeSession {
       }
       return values;
     };
-    if (this.config.middleNodesOnly) {
-      this.state.nodeOrder = shuffled([...MIDDLE_NODES]);
-      const mid = shuffled([...middleThreeWeights]);
-      const weights = [0, 0, 0, 0, 0];
-      this.state.nodeOrder.forEach((node, i) => { weights[node] = mid[i]; });
-      this.state.weights = weights;
-      return;
-    }
-    this.state.nodeOrder = shuffled([0, 1, 2, 3, 4]);
-    this.state.weights = shuffled([...initialWeights]);
+    // Weights follow open order: first three Nodes to open get 30/25/20, then 15 and 10.
+    // Middle-Nodes tables only use the first three buckets (30/25/20) on Nodes 2–4.
+    this.state.nodeOrder = this.config.middleNodesOnly
+      ? shuffled([...MIDDLE_NODES])
+      : shuffled([0, 1, 2, 3, 4]);
+    const weights = [0, 0, 0, 0, 0];
+    this.state.nodeOrder.forEach((node, i) => { weights[node] = initialWeights[i]; });
+    this.state.weights = weights;
   }
 
   private setupEvaluationLocations() {
@@ -597,18 +583,17 @@ export class RuntimeSession {
         !this.relocateBlocker(placement) && this.moveDestinations(placement).length > 0).map(placement => placement.card.id)
       : [];
     // Built seat-0-indexed with `me` redaction; a seat-1 reader gets the mirror below.
-    const view = {...snapshot, seat: 0 as PlayerId, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: this.openNodes(), playableNodes: [...this.playableNodeList()], noActions: !!this.config.noActions, canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !this.state.turnReady[me] && !!planning, planningCardIds: planning ? this.state.nodes.flatMap(node => node.cards[me]).filter(card => card.order > planning.order).map(card => card.card.id) : [], movableCardIds} as unknown as SessionView;
+    const view = {...snapshot, seat: 0 as PlayerId, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: this.openNodes(), playableNodes: [...this.playableNodeList()], canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !this.state.turnReady[me] && !!planning, planningCardIds: planning ? this.state.nodes.flatMap(node => node.cards[me]).filter(card => card.order > planning.order).map(card => card.card.id) : [], movableCardIds} as unknown as SessionView;
     if (!this.state.circuitEligible.includes(me)) view.circuitReward.definition = null;
     view.players.forEach((player,owner)=>player.bank.forEach((entry,index)=>{const timer=this.runtimeTimers.get(entry.card.id);if(timer&&Number.isFinite(this.timerUntil(timer)))entry.remainingTurns=Math.max(0,this.timerUntil(timer)-timer.age);entry.effectsLeft=this.bankEffectsLeft(this.state.players[owner].bank[index]);}));
     const hidden = (_card: Card, index: number) => ({ id: `hidden-${index}`, hidden: true as const });
     // The other seat's uncommitted planning is its secret: until every seat has ended the turn, this view shows that
-    // side as it stood when its planning began (hand size, Actions, where its cards sit), so neither where nor when
+    // side as it stood when its planning began (hand size, where its cards sit), so neither where nor when
     // it places or moves cards is visible. Once the reveal starts the snapshot is gone and the placements show face down.
     const theirPlanning = this.state.phase === "runtime" ? this.planningSnapshot[them] : null;
     view.players[0].draw = this.state.players[0].draw.map(hidden);
     view.players[1].draw = this.state.players[1].draw.map(hidden);
     (view.players[them] as { hand: VisibleCard[] }).hand = (theirPlanning?.hand ?? this.state.players[them].hand).map(hidden);
-    if (theirPlanning) view.players[them].actions = theirPlanning.actions;
     (view.players[me] as { hand: VisibleCard[] }).hand = this.state.players[me].hand.map(card => this.shownCard(card));
     view.players.forEach((player, owner) => {
       const state = this.state.players[owner];
@@ -708,52 +693,11 @@ export class RuntimeSession {
   private shownCard(card: Card, live = this.livePower(card)): Card {
     const copy = structuredClone(card);
     const withPower = (() => {
-      if (card.type === "Crypto" || (card.power === undefined && !card.powerDelta && !card.powerSource)) return copy;
+      if (card.power === undefined && !card.powerDelta && !card.powerSource) return copy;
       const printed = card.power ?? 0;
       return { ...copy, power: live, ...(live !== printed ? { basePower: printed } : {}) };
     })();
-    return this.config.noActions ? this.hideActionEffects(withPower) : withPower;
-  }
-
-  /** Drop gainActions from shown steps and regenerate or strip Action clauses from printed effect text. */
-  private hideActionEffects(card: Card): Card {
-    const filter = (steps: readonly EffectStep[] | undefined): EffectStep[] | undefined => {
-      if (!steps?.length) return steps as EffectStep[] | undefined;
-      return steps.flatMap(step => {
-        if (step.action === "gainActions") return filter(step.then) ?? [];
-        return [{
-          ...step,
-          ...(step.then ? { then: filter(step.then) } : {}),
-          ...(step.options ? {
-            options: step.options.map(option => ({
-              ...option,
-              ...(option.cost ? { cost: filter(option.cost as EffectStep[]) } : {}),
-              effects: filter(option.effects) ?? [],
-            })),
-          } : {}),
-        }];
-      });
-    };
-    const onReveal = filter(card.onReveal);
-    const onCollapse = filter(card.onCollapse);
-    const recurring = filter(card.recurring);
-    const schedule = card.schedule?.map(entry => ({ ...entry, effects: filter(entry.effects) ?? [] }));
-    const next: Card = {
-      ...card,
-      ...(onReveal !== undefined ? { onReveal } : {}),
-      ...(onCollapse !== undefined ? { onCollapse } : {}),
-      ...(recurring !== undefined ? { recurring } : {}),
-      ...(schedule !== undefined ? { schedule } : {}),
-    };
-    const hasSteps = !!(onReveal?.length || onCollapse?.length || recurring?.length || schedule?.some(entry => entry.effects.length)
-      || card.onReveal || card.onCollapse || card.recurring || card.schedule);
-    if (hasSteps) {
-      const text = describeCard(next, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods);
-      next.effect = text || undefined;
-    } else if (card.effect) {
-      next.effect = stripActionEffectText(card.effect) || undefined;
-    }
-    return next;
+    return withPower;
   }
 
   private cardPower(placement: Deployment, withAura = true): number {
@@ -929,7 +873,7 @@ export class RuntimeSession {
   private takePlanningSnapshot(owner: PlayerId): PlanningSnapshot {
     const player = this.state.players[owner];
     return {
-      hand: [...player.hand], actions: player.actions,
+      hand: [...player.hand],
       nodes: this.state.nodes.map(node => [...node.cards[owner]]), order: this.order,
       relocatedThisTurn: [...this.relocatedThisTurn], relocatedThisCycle: [...this.relocatedThisCycle],
       moved: player.moved, movedTotal: this.state.movedTotal,
@@ -941,7 +885,6 @@ export class RuntimeSession {
     if (this.state.phase !== "runtime" || this.queue.length || this.state.choice || !snapshot || this.state.turnReady[owner]) throw new Error("No reversible planning actions are available.");
     const player = this.state.players[owner];
     player.hand = [...snapshot.hand];
-    player.actions = snapshot.actions;
     this.state.nodes.forEach((node, index) => {
       node.cards[owner] = [...snapshot.nodes[index]];
       node.cards[owner].forEach(placement => { placement.node = index; });
@@ -954,7 +897,7 @@ export class RuntimeSession {
     this.state.movedTotal = snapshot.movedTotal;
     this.planningSnapshot[owner] = null;
     this.recalculate();
-    return this.event("turn", "All planning actions undone. Moved cards return, and hand order and Actions are restored.", {owner});
+    return this.event("turn", "All planning actions undone. Moved cards return, and hand order is restored.", {owner});
   }
 
   /** Why a board card cannot relocate itself now, or null when it can. The movable mod allows once per Runtime turn;
@@ -999,12 +942,9 @@ export class RuntimeSession {
     const card = player.hand.find(item => item.id === cardId);
     if (!card) throw new Error("Card is not in this player's hand.");
     if (!this.state.nodes[node]) throw new Error("Unknown Node.");
-    const reason = canDeploy(card, player.actions, this.state.turn, node, this.occupancy(node, owner), this.playableNodeList(), {
-      requireActions: !this.config.noActions,
-    });
+    const reason = canDeploy(card, this.state.turn, node, this.occupancy(node, owner), this.playableNodeList());
     if (reason) throw new Error(reason);
     player.hand = player.hand.filter(item => item.id !== cardId);
-    if (!this.config.noActions && isCharacterCard(card)) player.actions--;
     this.state.nodes[node].cards[owner].push({ card, owner, node, order: ++this.order, revealed: false });
     this.rewardAuraFarming(node, card.id);
     this.recalculate();
@@ -1027,7 +967,6 @@ export class RuntimeSession {
       owned: [...own.draw, ...own.hand, ...own.discard, ...own.bank.map(entry => entry.card)],
       ownServers: own.servers.primary + own.servers.backup, ownServersMax: max,
       enemyServers: enemy.servers.primary + enemy.servers.backup, enemyServersMax: max,
-      ...(this.config.noActions ? { noActions: true } : {}),
     };
   }
 
@@ -1039,8 +978,9 @@ export class RuntimeSession {
     const hand = [...player.hand].sort((a, b) => priority.get(b.id)! - priority.get(a.id)!);
     const stakes = new Map(this.state.nodes.map((state, node) => [node, state.location ? locationStakes(state.location, profile, context, this.state.turn) : null]));
     for (const card of hand) {
-      if (card.type === "Crypto") continue;
-      const candidates = this.openNodes().filter(node => !canDeploy(card, player.actions, this.state.turn, node, this.occupancy(node, owner), this.playableNodeList(), { requireActions: !this.config.noActions }));
+      // Currency without Power stays in hand for Draft auto-resolve; Power Crypto (e.g. Crypto-Shyte) may deploy.
+      if (card.type === "Crypto" && !(card.power ?? 0) && !card.powerDelta && !card.powerSource) continue;
+      const candidates = this.openNodes().filter(node => !canDeploy(card, this.state.turn, node, this.occupancy(node, owner), this.playableNodeList()));
       const locationScore = (node: number, swing: number) => {
         const read = stakes.get(node);
         return read ? Math.max(-LOCATION_SCORE_CAP, Math.min(LOCATION_SCORE_CAP, LOCATION_POINT * (swing * read.stake + read.reveal))) : 0;
@@ -1096,11 +1036,6 @@ export class RuntimeSession {
         for (const key of [...this.awardedLocationEvents]) {
           if (key.endsWith(":turn")) this.awardedLocationEvents.delete(key);
         }
-        this.state.players.forEach(player => {
-          if (this.config.noActions) { player.actions = 0; player.pendingActions = 0; return; }
-          player.actions = runtimeActions(this.state.turn, player.actions, player.pendingActions, this.config.carryover);
-          player.pendingActions = 0;
-        });
         // Turns 2 and 3: each player draws 1 before planning (fixed rule; tests may opt out with midCycleDraw: false).
         // Draw inside the event callback so the UI sees a before/after hand diff and can animate arrivals.
         if (this.config.midCycleDraw !== false) {
@@ -1606,15 +1541,15 @@ export class RuntimeSession {
     return this.config.content?.mods ?? [];
   }
 
-  private cardContext(source: Deployment, immediateActions = false): EffectContext {
-    return { scope: "card", source, ...(immediateActions ? { immediateActions } : {}) };
+  private cardContext(source: Deployment): EffectContext {
+    return { scope: "card", source };
   }
 
   /** A Location's effects act for the Node's winner; on a tie the stand-in owner is only a placeholder (see `chooserFor`). */
-  private locationContext(node: number, immediateActions = false): EffectContext {
+  private locationContext(node: number): EffectContext {
     const location = this.state.nodes[node].location!;
     const winner = this.state.nodes[node].winner;
-    return { scope: "location", node, winner, immediateActions, source: this.locationSyntheticPlacement(node, winner ?? 0), label: { source: "location", sourceName: location.name, node } };
+    return { scope: "location", node, winner, source: this.locationSyntheticPlacement(node, winner ?? 0), label: { source: "location", sourceName: location.name, node } };
   }
 
   /** On Play effects resolve as the card that revealed here. */
@@ -1645,7 +1580,7 @@ export class RuntimeSession {
   }
 
   private noTarget(ctx: EffectContext, step: EffectStep, detail: Omit<RuntimeEvent, "id" | "kind" | "text"> = {}, reason = "No target."): RuntimeEvent {
-    return this.event(STEP_EVENT[step.action], `${ctx.source.card.name}: ${reason}`, { ...this.base(ctx), amount: 0, ...detail });
+    return this.event(STEP_EVENT[step.action] ?? "turn", `${ctx.source.card.name}: ${reason}`, { ...this.base(ctx), amount: 0, ...detail });
   }
 
   /** Skip an optional step that cannot be paid or targeted, without opening a choice. */
@@ -1735,10 +1670,6 @@ export class RuntimeSession {
 
   /** Resolves one catalog step. Location and Circuit events carry their source. */
   private resolveStep(ctx: EffectContext, step: EffectStep): RuntimeEvent {
-    // Configure noActions: drop the whole gainActions package (including nested then).
-    if (this.config.noActions && step.action === "gainActions") {
-      return this.labelled(ctx, this.event("turn", `${ctx.source.card.name}: Actions are off.`, this.base(ctx)));
-    }
     return this.labelled(ctx, this.dispatchStep(ctx, step));
   }
 
@@ -1761,7 +1692,7 @@ export class RuntimeSession {
     // Optional pay/gain for several players: each is asked on their own, and `then` runs only for whoever accepts.
     const who = step.target && "who" in step.target ? step.target.who : "self";
     const multiOptional = !!(step.optional && step.then?.length && !OPTIONAL_INSIDE.has(step.action)
-      && (step.action === "payCrypto" || step.action === "draw" || step.action === "gainActions" || step.action === "gainCrypto" || step.action === "gainVP")
+      && (step.action === "payCrypto" || step.action === "draw" || step.action === "gainCrypto" || step.action === "gainVP")
       && (who === "both" || who === "any" || (who === "winner" && ctx.winner === null) || (who === "leastVP" && this.whoPlayers(ctx, "leastVP", false).length > 1)));
     if (multiOptional) {
       return this.forEachRecipient(ctx, step, false, (acting, recipient) => {
@@ -1792,7 +1723,7 @@ export class RuntimeSession {
       ]);
     }
     switch (step.action) {
-      case "draw": case "gainActions": case "gainCrypto": case "payCrypto": case "gainVP":
+      case "draw": case "gainCrypto": case "payCrypto": case "gainVP":
         return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.playerStep(acting, step, recipient));
       case "damageServer": case "repairServer": case "destroyServer": {
         const target = step.target?.type === "server" ? step.target : { who: "opponent" as Who, server: "auto" as ServerSlot };
@@ -1839,20 +1770,6 @@ export class RuntimeSession {
         const before = credited.hand.length;
         Object.assign(credited, drawCards(credited, amount, this.config.random));
         return this.event("draw", `${card.name}: draw ${credited.hand.length - before}.`, { ...base, amount: credited.hand.length - before, before, after: credited.hand.length, target: "hand" });
-      }
-      case "gainActions": {
-        if (this.config.noActions) {
-          const before = ctx.immediateActions ? credited.actions : credited.pendingActions;
-          return this.event("actions", `${card.name}: Actions are off.`, { ...base, amount: 0, target: "actions", before, after: before });
-        }
-        if (ctx.immediateActions) {
-          const before = credited.actions;
-          credited.actions += amount;
-          return this.event("actions", `${card.name}: +${amount} Actions this Runtime turn.`, { ...base, target: "actions", before, after: credited.actions });
-        }
-        const before = credited.pendingActions;
-        credited.pendingActions += amount;
-        return this.event("actions", `${card.name}: +${amount} Action${amount === 1 ? "" : "s"} next Runtime turn.`, { ...base, before, after: credited.pendingActions, target: "actions" });
       }
       case "gainCrypto": {
         const before = credited.wallet;
@@ -2834,7 +2751,7 @@ export class RuntimeSession {
     for (const node of this.openNodes(turn - 1)) {
       const location = this.state.nodes[node].location;
       if (!location?.[hook]?.length) continue;
-      const ctx = this.locationContext(node, true);
+      const ctx = this.locationContext(node);
       for (const step of this.locationSteps(location, hook)) callbacks.push(() => this.resolveStep(ctx, step));
     }
     this.queue.unshift(...callbacks);
@@ -2849,7 +2766,7 @@ export class RuntimeSession {
       const location = this.state.nodes[node].location;
       if (!location) continue;
       if (location.passives?.suppressOngoing) continue;
-      const ctx = this.locationContext(node, true);
+      const ctx = this.locationContext(node);
       const steps = this.locationSteps(location, "ongoing").map(step =>
         location.passives?.doubleOngoing ? this.scaleStepAmounts(step, 2) : step);
       for (const step of steps) callbacks.push(() => this.resolveStep(ctx, step));
@@ -2864,7 +2781,6 @@ export class RuntimeSession {
           winner: this.state.nodes[node].winner,
           source: host,
           label: { source: "location", sourceName: location.name, node },
-          immediateActions: true,
         };
         const whileSteps = this.steps(entry.effects, "locationEvent").map(step =>
           location.passives?.doubleOngoing ? this.scaleStepAmounts(step, 2) : step);
@@ -3206,7 +3122,7 @@ export class RuntimeSession {
     const active = this.state.players[placement.owner].bank.some(entry => entry.card.id === placement.card.id) || this.state.nodes.some(node => node.cards[placement.owner].some(item => item.card.id === placement.card.id));
     if (!active) return this.event("bank", `${placement.card.name}: scheduled effect source is no longer active.`, { owner: placement.owner, cardId: placement.card.id, source: "card", sourceName: placement.card.name });
     if (step.action === "morph") return this.resolveMorph(placement, step, true);
-    return this.resolveStep(this.cardContext(placement, timing === "start"), step);
+    return this.resolveStep(this.cardContext(placement), step);
   }
 
   private resolveCircuitEffect(owner: PlayerId, name: string, step: EffectStep): RuntimeEvent {
@@ -3417,10 +3333,15 @@ export class RuntimeSession {
       return this.event("collapse", "Effect Bank resolves after Node 5, oldest first.");
     });
     this.queue.push(() => {
-      this.state.selectedNode = null;
+      // Weight lottery still picks a "particle" Node for ControlledWeight visualization; Circuit
+      // eligibility stays Location-lead based (or trailing, when that reward is drawn).
+      const liveWeights = this.state.weights.map((weight, node) => this.playableNodeList().includes(node) ? weight : 0);
+      this.state.selectedNode = liveWeights.some(weight => weight > 0)
+        ? selectCircuitNode(liveWeights, this.config.random)
+        : null;
       const wins = this.locationWins();
       const pool=this.config.content?.circuitRewards??EVALUATION_CIRCUIT_REWARDS;
-      const leaders=this.config.noTrailingRewards !== false ? pool.filter(reward => !reward.awardTrailing) : pool;
+      const leaders=this.config.noTrailingRewards === true ? pool.filter(reward => !reward.awardTrailing) : pool;
       const rewards=leaders.length ? leaders : pool;
       const definition = this.config.evaluationContent ? structuredClone(rewards[Math.floor(this.config.random() * rewards.length)]) : null;
       this.refreshScores();
@@ -3429,9 +3350,10 @@ export class RuntimeSession {
       this.state.circuitEligible = winner === null ? [0, 1] : [winner];
       this.state.circuitReward = { definition, claimed: [] };
       if (this.telemetry) { this.telemetry.circuitId = definition?.id ?? null; this.telemetry.circuitName = definition?.name ?? null; }
+      const particle = this.state.selectedNode !== null ? ` Particle on N${this.state.selectedNode + 1}.` : "";
       const visibleName = this.circuitNamePublic() ? definition?.name : undefined;
       const basis = definition?.awardTrailing ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}` : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
-      return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}`, { source: "circuit", sourceName: visibleName });
+      return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}${particle}`, { source: "circuit", sourceName: visibleName, ...(this.state.selectedNode !== null ? { node: this.state.selectedNode } : {}) });
     });
     this.queue.push(() => {
       this.nextRevealTriggers = [];
@@ -3453,7 +3375,6 @@ export class RuntimeSession {
         const expired = player.bank.filter(entry => entry.expiresCycle !== undefined && entry.expiresCycle <= this.state.cycle);
         player.discard.push(...expired.map(entry => entry.card));
         player.bank = player.bank.filter(entry => !expired.includes(entry));
-        player.pendingActions = 0;
       });
       this.expiredOnBoard.clear();
       // Build this queue now, after all Location draws and cleanup. Capturing the
@@ -3516,7 +3437,7 @@ export class RuntimeSession {
           new Set(persistent.map(identity)),
           previousOffer,
           this.state.cycle,
-          this.config.middleNodesOnly ? DRAFT_SLOTS_MIDDLE : undefined,
+          this.config.tenCardDraft ? DRAFT_SLOTS_TEN : undefined,
         ),
         ...persistent,
       ];
@@ -3680,8 +3601,6 @@ export class RuntimeSession {
     this.planningSnapshot = [null, null];
     this.state.players.forEach(player => {
       player.wallet = 0;
-      player.actions = this.config.noActions ? 0 : 2;
-      player.pendingActions = 0;
       Object.assign(player, drawCards(player, 5, this.config.random));
     });
     this.state.nodes.forEach(node => { node.cards = [[], []]; node.holograms = []; node.powerModifiers = [0, 0]; node.powers = [0, 0]; node.winner = null; });
@@ -3702,9 +3621,10 @@ export class RuntimeSession {
   /** `owner` gives up the game in any phase: the other seat wins whatever the score. Concessions and forfeits use this. */
   resign(owner: PlayerId, reason = `${this.subject(owner)} ${this.config.seatNames || owner !== 0 ? "concedes" : "concede"}.`): RuntimeEvent {
     if (this.state.phase === "gameover") throw new Error("The session has already ended.");
+    const bonusNote = this.awardMostCircuitsBonus();
     this.refreshScores();
     this.state.phase = "gameover"; this.state.winner = (1 - owner) as PlayerId;
-    this.state.endedReason = reason;
+    this.state.endedReason = bonusNote ? `${reason} ${bonusNote}` : reason;
     this.queue = []; this.state.choice = null; this.choiceResolver = null;
     return this.event("gameover", this.state.endedReason, { owner });
   }
@@ -3715,12 +3635,36 @@ export class RuntimeSession {
     return this.gameOver("Session ended early for evaluation.");
   }
 
+  /**
+   * Tallies Circuit wins from completed Cycle records (strict Location lead that Cycle) and, when
+   * `mostCircuitsBonusVP` > 0, credits that VP to the sole leader as circuit reward VP.
+   */
+  private awardMostCircuitsBonus(): string | null {
+    const bonus = this.config.mostCircuitsBonusVP ?? 0;
+    if (bonus <= 0 || this.config.noLocations) return null;
+    const wins: [number, number] = [0, 0];
+    let ties = 0;
+    for (const record of this.cycleRecords) {
+      const [a, b] = record.locationsWon;
+      if (a > b) wins[0]++;
+      else if (b > a) wins[1]++;
+      else ties++;
+    }
+    if (wins[0] === wins[1]) return null;
+    const leader = (wins[0] > wins[1] ? 0 : 1) as PlayerId;
+    this.state.players[leader].rewardVP += bonus;
+    this.rewardSources[leader].circuit += bonus;
+    const tally = `${wins[leader]}–${wins[1 - leader]}${ties ? ` with ${ties} tie${ties === 1 ? "" : "s"}` : ""}`;
+    return `${this.say(leader, "You earn", "earns")} +${bonus} VP for most Circuits won (${tally}).`;
+  }
+
   private gameOver(reason: string): RuntimeEvent {
+    const bonusNote = this.awardMostCircuitsBonus();
     this.refreshScores();
     this.state.phase = "gameover";
     const [local, opponent] = this.state.players.map(player => player.totalVP);
     this.state.winner = nodeWinner([local, opponent]);
-    this.state.endedReason = `${reason} ${local === opponent ? "Tie" : this.say(local > opponent ? 0 : 1, "You win", "wins")}, ${local} to ${opponent} VP.`;
+    this.state.endedReason = `${reason}${bonusNote ? ` ${bonusNote}` : ""} ${local === opponent ? "Tie" : this.say(local > opponent ? 0 : 1, "You win", "wins")}, ${local} to ${opponent} VP.`;
     this.queue = []; this.state.choice = null; this.choiceResolver = null;
     return this.event("gameover", this.state.endedReason);
   }

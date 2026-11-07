@@ -7,7 +7,7 @@ export type PlayerSummary = { owner: PlayerId; lines: string[] };
 
 type Play = {
   owner: PlayerId; card: string; node?: number; kind: 'play' | 'trigger' | 'location' | 'circuit';
-  drained: Map<PlayerId, number>; restored: number; cards: number; actions: number; crypto: number; vp: number;
+  drained: Map<PlayerId, number>; restored: number; cards: number; crypto: number; vp: number;
   trashedNames: string[]; destroyedNames: string[]; notes: string[];
 };
 
@@ -18,7 +18,7 @@ const detail = (event: RuntimeEvent) => event.text.replace(/^[^:]*:\s*/, '').tri
 const cardName = (event: RuntimeEvent) => event.text.replace(/ reveals\.$/, '');
 
 function newPlay(owner: PlayerId, card: string, kind: Play['kind'], node?: number): Play {
-  return { owner, card, node, kind, drained: new Map(), restored: 0, cards: 0, actions: 0, crypto: 0, vp: 0, trashedNames: [], destroyedNames: [], notes: [] };
+  return { owner, card, node, kind, drained: new Map(), restored: 0, cards: 0, crypto: 0, vp: 0, trashedNames: [], destroyedNames: [], notes: [] };
 }
 
 /** Pull the affected card name from engine trash/destroy event text. */
@@ -43,7 +43,7 @@ function absorb(play: Play, event: RuntimeEvent, names: SeatNames) {
       return;
     case 'restore': if (amount > 0) { if (mine) play.restored += amount; else note(`Restoring ${amount} to ${possessive(names[to])} Server`); } return;
     case 'draw': if (amount > 0 && event.target === 'hand') { if (mine) play.cards += amount; else note(`${names[to]} draws ${amount}`); } return;
-    case 'actions': if (amount > 0) { if (mine) play.actions += amount; else note(`Giving ${names[to]} ${plural(amount, 'action')}`); } return;
+    case 'actions': return;
     case 'crypto': if (amount) { if (mine) play.crypto += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${Math.abs(amount)} Crypto`); } return;
     case 'vp': if (amount) { if (mine) play.vp += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${plural(Math.abs(amount), 'VP').replace(/VPs$/, 'VP')}`); } return;
     case 'trash': {
@@ -77,7 +77,7 @@ function sentence(play: Play, names: SeatNames): string | null {
     ...play.notes,
   ];
   const gains = [
-    ...(play.cards ? [plural(play.cards, 'card')] : []), ...(play.actions ? [plural(play.actions, 'action')] : []),
+    ...(play.cards ? [plural(play.cards, 'card')] : []),
     ...(play.crypto > 0 ? [`${play.crypto} Crypto`] : []), ...(play.vp > 0 ? [`${play.vp} VP`] : []),
   ];
   const losses = [...(play.crypto < 0 ? [`${-play.crypto} Crypto`] : []), ...(play.vp < 0 ? [`${-play.vp} VP`] : [])];

@@ -65,7 +65,6 @@ const server = (roles: readonly Role[], servers: readonly ServerSlot[] = ['auto'
 
 export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   draw: { id: 'draw', label: 'Draw cards', family: 'Resources', help: 'Draw from the deck into hand, shuffling Discard in when the deck runs out.', targets: [player()], amount: { label: 'Cards', min: 0, max: 100, default: 1 } },
-  gainActions: { id: 'gainActions', label: 'Gain Actions', family: 'Resources', help: 'Actions for the next Runtime turn.', targets: [player()], amount: { label: 'Actions', min: 0, max: 20, default: 1 }, scopes: ['card', 'location', 'locationPlay', 'locationCondition', 'locationEvent'] },
   gainCrypto: { id: 'gainCrypto', label: 'Gain Crypto', family: 'Resources', help: 'Crypto for the coming Draft.', targets: [player()], amount: { label: 'Crypto', min: 0, max: 100, default: 2 } },
   payCrypto: { id: 'payCrypto', label: 'Pay Crypto', family: 'Resources', help: 'Spend Crypto gained this Cycle. Optional with follow-ups: each targeted player may accept or decline. As a Choice option cost, the option is unavailable without enough Crypto.', targets: [player(['ally', 'both'])], amount: { label: 'Crypto', min: 1, max: 100, default: 1 }, optional: true },
   gainVP: { id: 'gainVP', label: 'Gain Victory Points', family: 'Resources', help: 'Negative amounts take Victory Points away.', targets: [player()], amount: { label: 'Victory Points', min: -100, max: 100, default: 1 } },
@@ -190,7 +189,6 @@ const flowOf = (step: EffectStep) => step.flow ?? 'either';
 
 export const EDITOR_ENTRIES: readonly EditorEntry[] = [
   { key: 'draw', label: 'Draw cards', group: 'Resources', action: 'draw' },
-  { key: 'gainActions', label: 'Gain actions', group: 'Resources', action: 'gainActions' },
   { key: 'gainVP', label: 'Gain victory points', group: 'Resources', action: 'gainVP' },
   { key: 'gainCard', label: 'Gain a card', group: 'Resources', action: 'gainCard' },
   { key: 'gainCrypto', label: 'Gain crypto', group: 'Resources', action: 'gainCrypto' },
@@ -330,7 +328,7 @@ export const MOD_HOOK_LABELS: Record<ModHook, string> = { onReveal: 'When reveal
 const MOD_HOOK_GLYPHS: Record<ModHook, string> = { onReveal: '◉', onCollapse: '▼', recurring: '↻' };
 const signed = (amount: number) => `${amount < 0 ? '-' : '+'}${formatAmount(Math.abs(amount))}`;
 const BADGE_TOKENS: Partial<Record<ActionId, (amount: number) => string>> = {
-  draw: amount => `${signed(amount)}C`, gainActions: amount => `${signed(amount)}A`, gainCrypto: amount => `${signed(amount)}₵`, gainVP: amount => `${signed(amount)}VP`,
+  draw: amount => `${signed(amount)}C`, gainCrypto: amount => `${signed(amount)}₵`, gainVP: amount => `${signed(amount)}VP`,
   changePower: amount => `${signed(amount)}P`, healCard: amount => `+${amount}HP`, damageServer: amount => `-${amount}`, repairServer: amount => `+${amount}♥`,
 };
 /** A short tag for the card art, generated from what the mod does: trigger glyphs, then its first effect. */
@@ -640,7 +638,6 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
   const who = step.target && 'who' in step.target ? step.target.who : 'self';
   switch (step.action) {
     case 'draw': return `+${plural(amount, 'Card')}${recipient(who, scope, false, 'enemy hand')}`;
-    case 'gainActions': return `+${plural(amount, 'Action')}${recipient(who, scope)}`;
     case 'gainCrypto': return `+${formatAmount(amount)} Crypto${recipient(who, scope)}`;
     case 'payCrypto': return `Pay ${formatAmount(amount)} Crypto`;
     case 'gainVP': return `${amount < 0 ? '-' : '+'}${formatAmount(Math.abs(amount))} VP${recipient(who, scope, amount < 0)}`;

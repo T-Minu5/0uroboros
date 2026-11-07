@@ -1,17 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeGameSetup, TURN_TIMER_CHOICES } from '../src/gameSetup';
+import { sanitizeGameSetup } from '../src/gameSetup';
 
-describe('game setup', () => {
-  it('offers turn timers from 35 to 90 seconds in steps of 5', () => {
-    expect(TURN_TIMER_CHOICES).toEqual([35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90]);
+describe('sanitizeGameSetup', () => {
+  it('defaults to 12 VP for a Primary Server, 16 for a Backup, Eco-Strat most-Circuits bonus 6, trailing rewards always on (no setup field), and no turn timer', () => {
+    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 16 }, turnSeconds: null, noLocations: false, draftCrypto: false, middleNodesOnly: false, tenCardDraft: false, mostCircuitsBonusVP: 6 });
   });
 
-  it('defaults to 12 VP for a Primary Server, 16 for a Backup, no trailing rewards, and no turn timer', () => {
-    expect(sanitizeGameSetup(null)).toEqual({ serverVP: { primary: 12, backup: 16 }, turnSeconds: null, noLocations: false, noTrailingRewards: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
-  });
-
-  it('drops saved values the setup can no longer choose', () => {
-    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 }, midCycleDraw: false })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null, noLocations: false, noTrailingRewards: true, draftCrypto: false, middleNodesOnly: false, noActions: false });
-    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true })).toEqual({ serverVP: { primary: 10, backup: 16 }, turnSeconds: 45, noLocations: false, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, noActions: true });
+  it('clamps Server VP and drops unknown legacy flags', () => {
+    expect(sanitizeGameSetup({ serverVP: { primary: 6.4, backup: -3 }, turnSeconds: 2, cryptoSwap: { enabled: true, cycle: 40 }, midCycleDraw: false })).toEqual({ serverVP: { primary: 6, backup: 0 }, turnSeconds: null, noLocations: false, draftCrypto: false, middleNodesOnly: false, tenCardDraft: false, mostCircuitsBonusVP: 6 });
+    expect(sanitizeGameSetup({ serverVP: { primary: 10 }, turnSeconds: 45, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, tenCardDraft: true, noActions: true, mostCircuitsBonusVP: 99 })).toEqual({ serverVP: { primary: 10, backup: 16 }, turnSeconds: 45, noLocations: false, draftCrypto: true, middleNodesOnly: true, tenCardDraft: true, mostCircuitsBonusVP: 50 });
   });
 });

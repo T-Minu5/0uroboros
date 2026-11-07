@@ -55,16 +55,18 @@ export const RoomSettingsSchema = z.object({
   opponent: z.string().trim().min(1).max(80).optional(),
   /** Every Node is No Man's Land for the whole game. */
   noLocations: z.boolean().default(false),
-  /** Circuit Rewards that go to the trailing player are never drawn. Defaults on. */
-  noTrailingRewards: z.boolean().default(true),
+  /** Legacy opt-out: when true, Circuit Rewards that go to the trailing player are never drawn. Defaults off — trailing rewards are always in the pool; Configure no longer exposes this. */
+  noTrailingRewards: z.boolean().default(false),
   /** Fixed rule: each player draws 1 at the start of Runtime turns 2 and 3. Kept for replay compat; always treated as on. */
   midCycleDraw: z.boolean().default(true),
   /** Persistent Crypto card shelf in Draft. */
   draftCrypto: z.boolean().default(false),
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly: z.boolean().default(false),
-  /** Characters deploy free; gainActions is suppressed and hidden. */
-  noActions: z.boolean().default(false),
+  /** When true, Draft offers 10 rotating cards; default is the 8-card offer. */
+  tenCardDraft: z.boolean().default(false),
+  /** End-game bonus VP for most Circuit wins; 0 disables. Eco-Strat initial default is 6. */
+  mostCircuitsBonusVP: z.number().int().min(0).max(50).default(6),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

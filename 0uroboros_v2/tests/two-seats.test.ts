@@ -112,10 +112,9 @@ describe("what each seat may see", () => {
     expect(ids(mine.players[0].hand)).toEqual(ids(session.state.players[0].hand));
     expect(mine.players[1].hand.every(card => card.hidden)).toBe(true);
     expect(mine.nodes.flatMap(node => node.cards[0]).map(placement => placement.card.id)).toEqual([placed0]);
-    // The other seat's uncommitted planning is invisible: no placement, and its hand and Actions as the turn began.
+    // The other seat's uncommitted planning is invisible: no placement, and its hand as the turn began.
     expect(mine.nodes.flatMap(node => node.cards[1])).toEqual([]);
     expect(mine.players[1].hand.length).toBe(hand1.length);
-    expect(mine.players[1].actions).toBe(session.view(1).players[0].actions + 1);
     expect(mentionsNone(mine, [...hand1, placed1])).toBe(true);
     expect(mine.planningCardIds).toEqual([placed0]);
 

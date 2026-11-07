@@ -80,7 +80,7 @@ describe('choice options', () => {
 
   it('plays the saved Forked Signal menu from authored content', () => {
     const saved = (authored as unknown as { document: ContentDocument }).document;
-    const forked = saved.cards.find(entry => entry.name === 'Forked Signal')!;
+    const forked = saved.cards.find(entry => entry.definitionId === 'eval-forked-signal' || entry.name === 'Forked Signal')!;
     const gained = (forked.onReveal![0] as EffectStep).options!.find(entry => entry.id === 'crypto')!.effects[0].amount;
     for (const [pick, check] of [['crypto', (g: RuntimeSession) => g.state.players[0].wallet === gained], ['draw', (g: RuntimeSession) => g.state.players[0].hand.length === 1]] as const) {
       const game = session();

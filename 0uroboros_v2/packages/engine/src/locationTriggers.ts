@@ -21,7 +21,6 @@ export const locationTriggerPrefix = (trigger: LocationTrigger, turn?: number) =
 /** Effect phrases called out in colour on Location copy. */
 export const LOCATION_EFFECT_COLORS = {
  draw: '#4185ff',
- actions: '#27e2ff',
  drain: '#fa0048',
  heal: '#ff8a1f',
  crypto: '#1fffb1',
@@ -47,7 +46,6 @@ const EFFECT_PATTERNS: Record<LocationEffect, string> = {
  /* Before `heal`: older copy still words Server repair as "Restore server +N". */
  repair: String.raw`\bRepair \+${NUMBER}|\bRepair\b(?=[^.]*\+${NUMBER})|(?<=\bRepair\b[^.]*)\+${NUMBER}\b|\bRestore ${NUMBER}\b|\bRestore (?:both )?(?:your )?(?:primary |backup )?servers? \+${NUMBER}`,
  heal: String.raw`\bRestore \+${NUMBER}|\bRestore\b(?=[^.]*\+${NUMBER})|(?<=\bRestore\b[^.]*)\+${NUMBER}\b(?! (?:Power|Cards?|Actions?|Crypto|VP)\b)|\bHeal \+?${NUMBER}`,
- actions: String.raw`\+${NUMBER} Actions?\b`,
  drain: String.raw`\bDrain -?${NUMBER}`,
  crypto: String.raw`[+-]${NUMBER} Crypto\b|\bPay ${NUMBER} Crypto\b|\bSteal (?:an?|${NUMBER}) (?:random )?Crypto cards?\b`,
  destroy: String.raw`(?<!the )\bDestroy\b`,

@@ -20,7 +20,7 @@ flowchart LR
 
 **Cycle start:** [[Wallet]] resets to 0 → [[Location|Locations]] are shuffled onto the [[Node|Nodes]] → start-of-Cycle effects → each player draws 5.
 
-**End of Cycle:** cards left in [[Hand]] go to [[Discard]]. [[Action|Actions]] do not carry into the next Cycle.
+**End of Cycle:** cards left in [[Hand]] go to [[Discard]].
 
 ## Parts
 1. [[Runtime]] — three [[Runtime turn|Runtime turns]] of deploying and revealing

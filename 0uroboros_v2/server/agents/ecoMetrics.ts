@@ -59,6 +59,21 @@ export type GameMetrics = {
   circuit: { cycle: number; rewardId: string; name: string; eligible: number[]; claimed: number[] }[];
   circuitClaims: Pair;
   /**
+   * Cycles where this seat alone won more Locations (a Circuit win). Matches Configure's
+   * mostCircuitsBonusVP definition; distinct from `circuitClaims` (rewards claimed).
+   */
+  circuitWins: Pair;
+  /** Seat with more Circuit wins, or null on a tie. */
+  mostCircuitsLeader: Seat | null;
+  /** Seat with more total Nodes/Locations won across the game, or null on a tie. */
+  mostNodesLeader: Seat | null;
+  /**
+   * Whether most-Circuits and most-Nodes leaders agree. Observational only — used to weigh a
+   * possible second Configure award for most Nodes; not a game rule.
+   * `same` = same sole leader; `differ` = both decided and disagree; `tied` = either metric tied.
+   */
+  mostCircuitsVsMostNodes: 'same' | 'differ' | 'tied';
+  /**
    * Per-cycle board state for snowball analysis. `circuitClaims` is cumulative through this Cycle;
    * `circuitDifferential` is seat0 − seat1 cumulative Circuit claims; `locationsWon` is that Cycle only.
    */
@@ -158,6 +173,13 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const firstCycle = (seat: Seat, category: string) => ownPurchases(seat).filter(item => item.category === category).map(item => item.cycle).sort((a, b) => a - b)[0] ?? null;
   const drainTaken = (seat: Seat) => t?.drainDealt[1 - seat] ?? 0;
   const restore = t?.restoreDone ?? [0, 0];
+  const locationsWon = pair(seat => sum(report.cycles.map(cycle => cycle.locationsWon[seat])));
+  const circuitWins = pair(seat => report.cycles.filter(cycle => cycle.locationsWon[seat] > cycle.locationsWon[1 - seat]).length);
+  const mostCircuitsLeader = leader(circuitWins);
+  const mostNodesLeader = leader(locationsWon);
+  const mostCircuitsVsMostNodes: GameMetrics['mostCircuitsVsMostNodes'] =
+    mostCircuitsLeader === null || mostNodesLeader === null ? 'tied'
+      : mostCircuitsLeader === mostNodesLeader ? 'same' : 'differ';
   return {
     winner, endedBy: endedBy(report), cycles: report.cycle, finalVP: report.finalVP, servers: report.servers,
     vpMargin: Math.abs(report.finalVP[0] - report.finalVP[1]), destructionVP,
@@ -175,10 +197,11 @@ export function gameMetrics(report: MatchReport): GameMetrics {
       firstChaosCycle: [firstCycle(0, 'Chaos'), firstCycle(1, 'Chaos')], firstVpCycle: [firstCycle(0, 'VP'), firstCycle(1, 'VP')],
     },
     archetype: [archetypeOf(ownPurchases(0)), archetypeOf(ownPurchases(1))],
-    locationsWon: pair(seat => sum(report.cycles.map(cycle => cycle.locationsWon[seat]))),
+    locationsWon,
     locations: report.cycles.flatMap(cycle => cycle.locations.map(location => ({ id: location.id, name: location.name, winner: location.winner as Seat | null }))),
     circuit: report.cycles.filter(cycle => cycle.circuit).map(cycle => ({ cycle: cycle.cycle, rewardId: cycle.circuit!.rewardId, name: cycle.circuit!.name, eligible: [...cycle.circuit!.eligible], claimed: [...cycle.circuit!.claimed] })),
     circuitClaims: pair(seat => report.cycles.filter(cycle => cycle.circuit?.claimed.includes(seat)).length),
+    circuitWins, mostCircuitsLeader, mostNodesLeader, mostCircuitsVsMostNodes,
     timeline, marketVp, otherVp, finalScore, circuitLead2At,
     vpLeadChanges,
     vpLeaderAt: { '4': at(4) ? leader(at(4)!.vp) : null, '8': at(8) ? leader(at(8)!.vp) : null, '12': at(12) ? leader(at(12)!.vp) : null },
@@ -327,8 +350,27 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
       destructionsPerGame: avg(m => m.destructions.length), avgFirstDestructionCycle: round(mean(rows.map(row => row.m.firstDestructionCycle).filter((value): value is number => value !== null))),
       winnerDrainedMore: winnerVs((m, seat) => m.drain[seat]), winnerRestoredMore: winnerVs((m, seat) => m.restore[seat]),
     },
-    circuit: { claimsPerGame: avg(m => sum(m.circuitClaims)), winnerClaimedMore: winnerVs((m, seat) => m.circuitClaims[seat]), rewards: circuit, effectsTotal: circuitEffects },
+    circuit: { claimsPerGame: avg(m => sum(m.circuitClaims)), winsPerGame: avg(m => sum(m.circuitWins)), winnerClaimedMore: winnerVs((m, seat) => m.circuitClaims[seat]), winnerWonMoreCircuits: winnerVs((m, seat) => m.circuitWins[seat]), rewards: circuit, effectsTotal: circuitEffects },
     locations: { winnerWonMoreLocations: winnerVs((m, seat) => m.locationsWon[seat]), list: locations },
+    /**
+     * Observational: Mel already ships mostCircuitsBonusVP; weigh whether most-Nodes leaders diverge
+     * often enough to justify a second Configure award. Not a game rule.
+     */
+    boardAwards: (() => {
+      const same = rows.filter(row => row.m.mostCircuitsVsMostNodes === 'same').length;
+      const differ = rows.filter(row => row.m.mostCircuitsVsMostNodes === 'differ').length;
+      const tied = rows.filter(row => row.m.mostCircuitsVsMostNodes === 'tied').length;
+      const decided = same + differ;
+      return {
+        mostCircuitsVsMostNodes: {
+          games: n, same, differ, tied,
+          differShare: rate(differ, n),
+          differAmongDecided: rate(differ, decided),
+        },
+        mostCircuitsLeaderWonGame: winnerVs((m, seat) => m.circuitWins[seat]),
+        mostNodesLeaderWonGame: winnerVs((m, seat) => m.locationsWon[seat]),
+      };
+    })(),
     vpSources: {
       avgDestructionVp: perSeatAvg((m, seat) => m.destructionVP[seat]),
       avgMarketVp: perSeatAvg((m, seat) => m.marketVp[seat]),

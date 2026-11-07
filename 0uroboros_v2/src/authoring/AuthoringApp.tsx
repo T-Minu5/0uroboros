@@ -276,7 +276,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
     : { ...next, effect: printedText(next, cards, mods) };
   const changeType = (type: AuthoredCard['type']) => {
     const cardClass = type === 'Character' ? 'Utility' as CardClass : type === 'VP' ? 'Volume' as CardClass : undefined;
-    patch({ type, pool: poolForClass(type, cardClass), cardClass, ...(type === 'Crypto' ? { cryptoValue: card.cryptoValue ?? 1, power: undefined } : { power: card.power ?? 0 }), ...(type === 'VP' ? { vp: card.vp ?? 1 } : {}), ...(type !== 'Character' ? { powerSource: undefined, aura: undefined, selfMove: undefined } : {}) });
+    patch({ type, pool: poolForClass(type, cardClass), cardClass, ...(type === 'Crypto' ? { cryptoValue: card.cryptoValue ?? 1, power: card.power } : { power: card.power ?? 0 }), ...(type === 'VP' ? { vp: card.vp ?? 1 } : {}), ...(type !== 'Character' ? { powerSource: undefined, aura: undefined, selfMove: undefined } : {}) });
   };
   const changeClass = (cardClass: CardClass) => patch({ cardClass, pool: poolForClass(card.type, cardClass) });
   const schedule = card.schedule ?? [];
@@ -288,14 +288,14 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
         <TextField field="name" label="Name" value={card.name} onChange={name => patch({ name })} />
         <SelectField field="type" label="Card type" value={card.type} options={['Character', 'VP', 'Crypto']} onChange={changeType} />
         <NumberField field="cost" label="Cost" value={card.cost} min={0} onChange={cost => patch({ cost: cost ?? 0 })} />
-        {card.type !== 'Crypto' && <NumberField field="power" label="Power" value={card.power} onChange={power => patch({ power: power ?? 0 })} />}
+        <NumberField field="power" label="Power" value={card.power} onChange={power => patch({ power: power ?? 0 })} hint={card.type === 'Crypto' ? 'Optional. Currency often leaves this empty (0 on the board); Crypto-Shyte-style tokens set 1+.' : undefined} />
         {card.type === 'Character' && <SelectField field="powerSource" label="Power bonus" value={card.powerSource ?? 'none'} options={POWER_SOURCE_OPTIONS} labels={POWER_SOURCE_LABELS} hint="Live bonus added to printed Power while the card is in play." onChange={source => update(syncPrinted({ ...card, powerSource: source === 'none' ? undefined : source }))} />}
         {card.type === 'Character' && <NumberField field="aura" label="Power aura" value={card.aura} min={1} onChange={aura => update(syncPrinted({ ...card, aura: aura || undefined }))} hint="This card’s own effect: +N Power to its other revealed allies at its Location. No mod badge. Leave empty for none." />}
         {card.type === 'Character' && <SelectField field="selfMove" label="Moves itself" value={card.selfMove ?? 'none'} options={['none', 'turn', 'cycle'] as const} labels={SELF_MOVE_LABELS} hint="While revealed, its owner may drag it to another open Node for free. Undo all actions puts it back." onChange={selfMove => update(syncPrinted({ ...card, selfMove: selfMove === 'none' ? undefined : selfMove }))} />}
         {card.type === 'VP' && <NumberField field="vp" label="Victory points" value={card.vp} onChange={vp => patch({ vp: vp ?? 0 })} />}
         {card.type === 'Crypto' && <NumberField field="cryptoValue" label="Crypto value" value={card.cryptoValue} min={0} onChange={cryptoValue => patch({ cryptoValue: cryptoValue ?? 0 })} />}
         {card.type === 'Character' && <SelectField field="cardClass" label="Card class" value={cardClassOf(card)} options={cardClasses} onChange={changeClass} />}
-        {card.type === 'VP' && <SelectField field="cardClass" label="VP subtype" value={cardClassOf(card)} options={vpClasses} onChange={changeClass} hint={isSolarMonk(card) ? 'Also a Character: costs 1 Action to play and counts for effects that target Characters.' : 'Plays for 0 Actions.'} />}
+        {card.type === 'VP' && <SelectField field="cardClass" label="VP subtype" value={cardClassOf(card)} options={vpClasses} onChange={changeClass} hint={isSolarMonk(card) ? 'Also a Character: deploys free and counts for effects that target Characters.' : 'Deploys free.'} />}
       </div>
       <div className="au-toggle-row"><Toggle field="generated" label="Generated" checked={isGeneratedCard(card)} onChange={generated => patch({ generated: generated || undefined })} hint="Created only by card effects. Never offered in Draft." /></div>
       <div className="au-printed-field">
@@ -311,7 +311,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
       <SectionTitle
         eyebrow="Authoring"
         title="Balance"
-        description="Efficiency E = printed value V ÷ baseline B(cost). Anchors Mel named as balanced set E≈1. Hard numbers only (Power, Crypto, draw, Actions, Drain, Restore, VP). Soft effects are flagged, not scored. Drain/Restore scale with full Server integrity."
+        description="Efficiency E = V ÷ B(cost), plus a Mel crypto-floor penalty when free +2/+3/+5 Crypto sits under draft cost 3/6/9. Anchors (Chrome Mitchell, ∆-Wave, Dash-Dot, …) set E≈1. Duration hooks discount positive credits ×0.75. Soft effects are flagged, not scored."
       />
       <div className="au-balance-hero">
         <div className="au-balance-score">
@@ -319,7 +319,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
           <span className="au-balance-delta" data-band={budget.band}>{budget.deltaPct >= 0 ? '+' : ''}{budget.deltaPct.toFixed(0)}%</span>
           <span className="au-balance-band" data-band={budget.band}>{budget.band === 'near' ? 'Near baseline' : budget.band === 'over' ? 'Over budget' : 'Under budget'}</span>
         </div>
-        <p className="au-balance-meta">V {budget.value} · B {budget.baseline}{budget.density !== null ? ` · Density ${budget.density} Power/slot` : ''}</p>
+        <p className="au-balance-meta">V {budget.value} · B {budget.baseline}{budget.density !== null ? ` · Density ${budget.density} Power/slot` : ''}{budget.cryptoFloor > 0 ? ` · Crypto floor ${budget.cryptoFloor}` : ''}</p>
       </div>
       {budget.parts.length > 0 && (
         <ul className="au-balance-parts">
@@ -339,7 +339,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
     </section>
     <section className="au-panel au-effects-panel">
       <SectionTitle eyebrow="Unique to this card" title="Card effects" description="Select a step to edit it. The preview updates as you go." />
-      {card.type === 'Crypto' && <p className="au-recipe-help">Crypto value is paid from the wallet in Draft. Play triggers run when a deployable form is played.</p>}
+      {card.type === 'Crypto' && <p className="au-recipe-help">Crypto deploys free. cryptoValue auto-resolves from hand at Draft; On reveal / On collapse fire when the card is played (currency usually reprints its payout on reveal).</p>}
       <StepList field="onReveal" title="On reveal" description="When this card turns face up." steps={card.onReveal ?? []} scope="card" cards={asCards(cards)} onChange={onReveal => update(syncPrinted({ ...card, onReveal }))} />
       <StepList field="onCollapse" title="On collapse" description="When its Location resolves." steps={card.onCollapse ?? []} scope="card" cards={asCards(cards)} onChange={onCollapse => update(syncPrinted({ ...card, onCollapse }))} />
       <div className="au-duration-fields au-field-grid"><NumberField field="duration" label="Duration" value={card.duration} min={1} onChange={duration => update(syncPrinted({ ...card, duration }))} hint="Leave empty for no duration; 99 is permanent." /><SelectField field="durationPeriod" label="Duration period" value={card.durationPeriod ?? 'cycle'} options={['cycle', 'runtime']} labels={DURATION_LABELS} onChange={durationPeriod => update(syncPrinted({ ...card, durationPeriod }))} hint="The time scale for the whole card: the duration, every-turn steps and schedule all count Runtime turns or Cycles." /></div>
@@ -400,7 +400,7 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
     <section className="au-panel au-effects-panel">
       <SectionTitle eyebrow="Unique to this Location" title="Location effects" description="Select a step to edit it." />
       <StepList field="effects" title="On collapse" description="When this Node resolves during Wave Collapse. On a tie, Winner gives to each player and a random player makes any choice." scope="location" cards={asCards(cards)} steps={location.effects} onChange={effects => syncHooks({ effects })} />
-      <StepList field="ongoing" title="Ongoing" description="After each Runtime reveal while this Location is open. Winner = current controller; Loser = the trailing player. Actions count for the turn that is starting." scope="location" cards={asCards(cards)} steps={location.ongoing ?? []} onChange={ongoing => syncHooks({ ongoing })} />
+      <StepList field="ongoing" title="Ongoing" description="After each Runtime reveal while this Location is open. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.ongoing ?? []} onChange={ongoing => syncHooks({ ongoing })} />
       <div className="au-field-grid" style={{ marginBottom: '0.75rem' }}>
         <div className="au-span-all"><Toggle field="passives.revealedCanMove" label="Revealed cards can move" checked={!!passives.revealedCanMove} onChange={checked => setPassive('revealedCanMove', checked)} hint="Ongoing: revealed cards here may self-move once per Runtime turn." /></div>
         <div className="au-span-all"><Toggle field="passives.doublePowerChanges" label="Double Power changes" checked={!!passives.doublePowerChanges} onChange={checked => setPassive('doublePowerChanges', checked)} hint="Ongoing: changePower deltas applied to cards at this Node are doubled." /></div>

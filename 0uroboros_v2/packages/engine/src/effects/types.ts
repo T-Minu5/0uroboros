@@ -41,7 +41,7 @@ export type PickMode = 'choose' | 'random' | 'all' | 'weakest' | 'strongest' | '
 export type Pick = { mode: PickMode; count?: number; chooser?: 'self' | 'opponent' };
 
 export type ActionId =
-  | 'draw' | 'gainActions' | 'gainCrypto' | 'payCrypto' | 'gainVP' | 'gainCard'
+  | 'draw' | 'gainCrypto' | 'payCrypto' | 'gainVP' | 'gainCard'
   | 'damageServer' | 'repairServer' | 'destroyServer'
   | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'recover' | 'stealCrypto' | 'bump'
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'

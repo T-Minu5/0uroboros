@@ -10,7 +10,7 @@ const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card>
   ({ ...starterCards[0], id, power: 2, onReveal: effects, ...extra });
 
 function session() {
-  const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(19) });
+  const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, midCycleDraw: false, random: seededRandom(19) });
   game.state.nodeOrder = [0, 1, 2, 3, 4];
   game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
   return game;

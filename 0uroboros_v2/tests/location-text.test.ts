@@ -16,7 +16,7 @@ describe('Location text colours', () => {
 
   it('calls out each effect phrase in its colour', () => {
     expect(coloured('+2 Cards to the winning player. +1 Action to each player. Drain -100 from the losing player\'s server. Heal 2 on a random revealed card.')).toEqual([
-      ['+2 Cards', 'draw'], ['+1 Action', 'actions'], ['Drain -100', 'drain'], ['Heal 2', 'heal'],
+      ['+2 Cards', 'draw'], ['Drain -100', 'drain'], ['Heal 2', 'heal'],
     ]);
     expect(coloured('+3 Crypto. Pay 1 Crypto. Destroy the weakest revealed card, then trash a card. +2 Power to every revealed card. -1 Power from it.')).toEqual([
       ['+3 Crypto', 'crypto'], ['Pay 1 Crypto', 'crypto'], ['Destroy', 'destroy'], ['trash', 'trash'], ['+2 Power', 'powerUp'], ['-1 Power', 'powerDown'],
@@ -71,11 +71,10 @@ describe('Location text colours', () => {
     expect(cardClassesInText('+1 Action to each player')).toEqual(['Action']);
   });
 
-  it('keeps Action resource phrases inside effect parts so icons only replace plain subtype prose', () => {
+  it('does not colour legacy +N Action resource phrases on Location copy', () => {
     const parts = splitLocationText('Condition: Once you have an Attack here. +1 Action.');
+    expect(parts.some(part => part.effect === 'actions')).toBe(false);
     const plain = parts.filter(part => !part.trigger && !part.effect).map(part => part.text).join('');
-    const effects = parts.filter(part => part.effect).map(part => part.text).join('');
-    expect(cardClassesInText(plain)).toEqual(['Attack']);
-    expect(cardClassesInText(effects)).toEqual(['Action']);
+    expect(cardClassesInText(plain)).toEqual(['Attack', 'Action']);
   });
 });

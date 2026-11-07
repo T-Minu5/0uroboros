@@ -25,12 +25,12 @@ function finish(game: RuntimeSession) {
 }
 
 describe('Solar-monks', () => {
-  it('are Characters as well as VP cards, so they need an Action to deploy', () => {
+  it('are Characters as well as VP cards; either may deploy when a Node is legal', () => {
     const volume: Card = { ...monk(), cardClass: 'Volume' };
     expect(isCharacterCard(monk())).toBe(true);
     expect(isCharacterCard(volume)).toBe(false);
-    expect(canDeploy(monk(), 0, 1, 0, 0)).toBe('Insufficient Actions.');
-    expect(canDeploy(volume, 0, 1, 0, 0)).toBeNull();
+    expect(canDeploy(monk(), 1, 0, 0)).toBeNull();
+    expect(canDeploy(volume, 1, 0, 0)).toBeNull();
   });
 
   it('print with the solar frame and list as Solar-monk · VP', () => {
@@ -60,26 +60,26 @@ describe('Solar-monks', () => {
       const offer = draftOffer(seededRandom(seed), withMonks, new Set(), new Set(), 8);
       const monks = offer.filter(pile => pile.card.cardClass === 'Solar-monk');
       expect(monks).toEqual([expect.objectContaining({ category: 'VP', rotating: true, supply: 4, remaining: [2, 2] })]);
-      expect(offer[4]?.card.cardClass).toBe('Solar-monk');
+      expect(offer[6]?.card.cardClass).toBe('Solar-monk');
       const next = draftOffer(seededRandom(seed + 50), withMonks, new Set(), new Set(offer.map(pile => pile.card.definitionId ?? pile.card.id)), 8);
       expect(next.find(pile => pile.card.cardClass === 'Solar-monk')!.id).not.toBe(monks[0].id);
     }
     expect(draftOffer(seededRandom(1), plain, new Set(), new Set(), 8).some(pile => pile.card.cardClass === 'Solar-monk')).toBe(false);
   });
 
-  it('spend an Action when played, and Apollo Ascii resets Power on both sides here', () => {
+  it('deploys free and Apollo Ascii resets Power on both sides here', () => {
     const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(5), content: compileContent(createDefaultContent()) });
     game.state.nodeOrder = [0, 1, 2, 3, 4];
     game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
-    game.state.players[1].actions = 0;
     const ally: Card = { ...starterCards[0], id: 'ally', name: 'ally', type: 'Character', power: 2, powerDelta: 3, onReveal: [] };
     const enemy: Card = { ...starterCards[0], id: 'enemy', name: 'enemy', type: 'Character', power: 2, powerDelta: -1, onReveal: [] };
     game.state.nodes[0].cards[0].push({ card: ally, owner: 0, node: 0, order: 1, revealed: true });
     game.state.nodes[0].cards[1].push({ card: enemy, owner: 1, node: 0, order: 2, revealed: true });
-    game.state.players[0].hand = [monk()];
-    const actions = game.state.players[0].actions;
+    game.state.players[0].hand = [monk(), { ...monk(), id: 'apollo-2' }];
     game.deploy('apollo', 0);
-    expect(game.state.players[0].actions).toBe(actions - 1);
+    game.deploy('apollo-2', 1);
+    expect(game.state.nodes[0].cards[0]).toHaveLength(2);
+    expect(game.state.nodes[1].cards[0]).toHaveLength(1);
     game.endTurn();
     finish(game);
     expect(ally.powerDelta ?? 0).toBe(0);

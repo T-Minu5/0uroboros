@@ -188,7 +188,7 @@ describe("Evaluation information and repeat-play boundaries", () => {
     for (let cycle = 1; cycle <= 3; cycle++) {
       for (let turn = 1; turn <= 3; turn++) {
         for (const card of [...session.state.players[0].hand]) {
-          if (card.type === "Crypto" || (card.type === "Character" && !session.state.players[0].actions)) continue;
+          if (card.type === "Crypto") continue;
           const node = session.state.nodes.findIndex((state, index) => session.view().openNodes.includes(index) && state.cards[0].length < 4);
           if (node !== -1) session.deploy(card.id, node);
         }

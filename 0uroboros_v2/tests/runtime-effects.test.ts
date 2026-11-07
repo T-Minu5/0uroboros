@@ -3,8 +3,13 @@ import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from
 import {EVALUATION_ALL_CARDS} from '@0uroboros/engine/evaluationMarket';
 import {starterCards,type Card,type EvaluationEffect} from '@0uroboros/engine/game';
 import {transferText} from '@0uroboros/engine/transferText';
-const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
-const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>({...starterCards[0],id,onReveal:effects,...extra});
+const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,midCycleDraw:false,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
+const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>{
+ const next:Card={...starterCards[0],id,onReveal:effects,...extra};
+ // Starter Character power must not leak onto wallet Crypto stand-ins.
+ if(next.type==='Crypto'&&!('power' in extra))delete (next as {power?:number}).power;
+ return next;
+};
 function drain(session:RuntimeSession){const events=[];while(session.pendingCount){events.push(session.step()!.event);if(events.length>200)throw new Error('stalled');}return events;}
 function play(session:RuntimeSession,source:Card){session.state.players[0].hand.unshift(source);session.deploy(source.id,0);session.endTurn();return drain(session);}
 
@@ -56,18 +61,18 @@ it('scry asks keep, discard, or trash for every inspected card and applies them 
 
 it('scoped attacking-owner choice can choose an opposing card without exposing the rest of the hand view',()=>{
  const s=make();
- // No opponent Actions means these cards remain in hand until the scoped attack.
- s.state.players[1].actions=0;s.state.players[1].hand=[card('enemy-a'),card('enemy-b')];
+ // Wallet Crypto without Power stays in hand for Draft; leave coins there as steal targets.
+ s.state.players[1].hand=[card('enemy-a',[],{type:'Crypto',cryptoValue:1}),card('enemy-b',[],{type:'Crypto',cryptoValue:1})];
  play(s,card('attack',[{kind:'handDiscard',amount:1,opponent:true,chooser:'owner'}]));
  expect(s.state.choice?.options.map(o=>o.id)).toEqual(['enemy-a','enemy-b']);
  expect(s.view().players[1].hand.every(c=>'hidden' in c)).toBe(true);
  s.choose('enemy-b');drain(s);expect(s.state.players[1].discard.map(c=>c.id)).toEqual(['enemy-b']);
 });
 
-it('Runtime schedules cross Cycle refill, give Actions in the scheduled turn, then expire',()=>{
- const s=make();s.state.players[0].hand=[card('timed',[],{duration:4,durationPeriod:'runtime',schedule:[{at:2,effects:[{kind:'actions',amount:2}]},{at:4,effects:[{kind:'draw',amount:1}]}]})];
+it('Runtime schedules cross Cycle refill, resolve scheduled draw, then expire',()=>{
+ const s=make();s.state.players[0].hand=[card('timed',[],{duration:4,durationPeriod:'runtime',schedule:[{at:2,effects:[{kind:'crypto',amount:2}]},{at:4,effects:[{kind:'draw',amount:1}]}]})];
  s.deploy('timed',0);s.endTurn();drain(s);
- expect(s.state.players[0].actions).toBe(4);expect(s.state.players[0].pendingActions).toBe(0);
+ expect(s.state.players[0].wallet).toBe(2);
  s.endTurn();drain(s);s.endTurn();drain(s);
  expect(s.view().players[0].bank[0]).toMatchObject({remainingTurns:1});
  s.state.players[0].draw=Array.from({length:6},(_,i)=>card(`refill-${i}`));
@@ -79,12 +84,11 @@ it('Runtime schedules cross Cycle refill, give Actions in the scheduled turn, th
 it('banked cards count the effect steps they still have to resolve, down to zero',()=>{
  const s=make();
  s.state.players[0].hand=[
-  card('scheduled',[],{duration:4,durationPeriod:'runtime',schedule:[{at:2,effects:[{kind:'actions',amount:2}]},{at:4,effects:[{kind:'draw',amount:1}]}]}),
+  card('scheduled',[],{duration:4,durationPeriod:'runtime',schedule:[{at:2,effects:[{kind:'crypto',amount:2}]},{at:4,effects:[{kind:'draw',amount:1}]}]}),
   card('recurring',[],{duration:5,durationPeriod:'runtime',recurring:[{kind:'crypto',amount:1}]}),
   card('collapse',[],{duration:2,onCollapse:[{kind:'crypto',amount:1}]}),
   card('endless',[],{duration:99,durationPeriod:'runtime',recurring:[{kind:'crypto',amount:1}]}),
  ];
- s.state.players[0].actions=4;
  for(const id of ['scheduled','recurring','collapse','endless'])s.deploy(id,0);
  s.endTurn();drain(s);s.endTurn();drain(s);s.endTurn();drain(s);
  expect(s.state.phase).toBe('draft');
@@ -151,7 +155,7 @@ it.each(EVALUATION_ALL_CARDS.map(definition=>[definition.name,definition] as con
   expect(cards.length).toBe(initial+generated.size);
   expect(new Set(cards.map(c=>c.id)).size).toBe(cards.length);
   expect(cards.filter(c=>c.id===added.cardId)).toHaveLength(1);
-  s.state.players.forEach(p=>{for(const value of [p.actions,p.pendingActions,p.wallet,p.servers.primary,p.servers.backup,p.totalVP]){expect(Number.isFinite(value)).toBe(true);expect(value).toBeGreaterThanOrEqual(0);}expect(p.bank.length).toBeLessThanOrEqual(4);});
+  s.state.players.forEach(p=>{for(const value of [p.wallet,p.servers.primary,p.servers.backup,p.totalVP]){expect(Number.isFinite(value)).toBe(true);expect(value).toBeGreaterThanOrEqual(0);}expect(p.bank.length).toBeLessThanOrEqual(4);});
  };
  const pump=()=>{let steps=0;while(s.pendingCount||s.state.choice){const event=s.state.choice?s.choose(firstLegalSelection(s.state.choice)):s.step()!.event;if(event.cardId?.includes(':generated-'))generated.add(event.cardId);check();if(++steps>500)throw new Error(`Choice/schedule loop for ${definition.name}`);}};
  if(definition.type!=='Crypto')s.deploy(added.cardId!,0);

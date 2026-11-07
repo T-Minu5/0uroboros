@@ -32,7 +32,6 @@ function finish(game: RuntimeSession) {
 
 function play(game: RuntimeSession, source: Card, node = 0) {
   game.state.players[0].hand.unshift(source);
-  game.state.players[0].actions = Math.max(game.state.players[0].actions, 1);
   game.deploy(source.id, node);
   game.endTurn();
   return finish(game);
@@ -95,7 +94,6 @@ describe('Aura Farming and Lefty', () => {
     game.state.nodes[1].cards[0].push({ card: host, owner: 0, node: 1, order: 1, revealed: true });
     const arriver = card('arriver', { power: 1 });
     game.state.players[0].hand = [arriver];
-    game.state.players[0].actions = 2;
     game.deploy(arriver.id, 1);
     expect(host.powerDelta).toBe(1);
   });
@@ -132,7 +130,6 @@ describe('mod award host choice', () => {
     const c = card('gamma', { definitionId: 'gamma' });
     game.state.players[0].draw = [a, b, c];
     game.state.players[0].hand.unshift(card('reward', { onReveal: [step] }));
-    game.state.players[0].actions = 2;
     game.deploy(game.state.players[0].hand[0].id, 0);
     game.endTurn();
     while (game.pendingCount) game.step();
@@ -184,8 +181,6 @@ describe('Superpositioning holograms', () => {
     play(game, card('super', { power: 2, onReveal: [{ action: 'createHologram' }] }), 0);
     expect(game.state.nodes[4].holograms).toHaveLength(1);
     // Drive collapse through end of cycle: fill turns and collapse
-    game.state.players[0].actions = 0;
-    game.state.players[1].actions = 0;
     // Force collapse queue for node 4 close by stepping a synthetic clear like runtime does
     const node = 4;
     const cleared = game.state.nodes[node].holograms.length;

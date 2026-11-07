@@ -56,8 +56,12 @@ export function migrateEffects(effects: readonly AnyEffect[] | undefined, scope:
   const output: EffectStep[] = [];
   for (let index = 0; index < effects.length; index++) {
     const effect = effects[index];
+    // Legacy Actions resource — dropped from the game; skip without migrating.
+    if (!isStep(effect) && effect.kind === 'actions') continue;
+    if (isStep(effect) && (effect as EffectStep).action === 'gainActions') continue;
     if (!isStep(effect) && effect.chain && index < effects.length - 1) {
       const { chain: _chain, ...head } = effect;
+      if (!isStep(head) && head.kind === 'actions') break;
       const step = migrateEffect(head, scope);
       output.push(lockConditionPlayerTargets({ ...step, then: [...(step.then ?? []), ...migrateEffects(effects.slice(index + 1), scope)] }, scope));
       break;
@@ -186,7 +190,7 @@ function migrateLegacy(effect: LegacyEffect, scope: Scope): EffectStep {
   };
   switch (effect.kind) {
     case 'draw': return { action: 'draw', amount: effect.amount ?? 0, target: player(effect.opponent), ...common };
-    case 'actions': return { action: 'gainActions', amount: effect.amount ?? 0, target: player(effect.opponent), ...common };
+    case 'actions': return { action: 'draw', amount: 0, target: player(effect.opponent), ...common }; // unreachable: filtered in migrateEffects
     case 'crypto': return { action: 'gainCrypto', amount: effect.amount ?? 0, target: player(effect.opponent), ...common };
     case 'vp': return { action: 'gainVP', amount: effect.amount ?? 0, target: player(effect.opponent), ...common };
     // The engine always aimed Drain at the opponent and Restore at its owner, whatever `opponent` said.

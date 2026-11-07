@@ -191,7 +191,6 @@ describe('location hooks and in-location targeting', () => {
     finish(game);
     expect(game.state.turn).toBe(2);
     expect(game.state.players[0].wallet).toBe(2);
-    game.state.players[1].actions = 0;
     game.endTurn();
     finish(game);
     expect(game.state.players[0].wallet).toBe(2);

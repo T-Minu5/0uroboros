@@ -82,7 +82,6 @@ describe('authored card mods', () => {
     expect(host.modifiers).toEqual([expect.objectContaining({ kind: 'authored', modId: 'overclock', name: 'Overclock', badge: '[◉+2₵]', onReveal: [crypto(2)], sourceName: 'rigger' })]);
 
     const next = session();
-    next.state.players[0].actions = 5;
     host.modifiers = [...host.modifiers!, carried('m2', { onReveal: [crypto(2)] })];
     play(next, host);
     expect(next.state.players[0].wallet).toBe(4);

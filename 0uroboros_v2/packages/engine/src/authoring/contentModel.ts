@@ -285,6 +285,7 @@ export function validateContent(value: unknown): string[] {
     if(item.powerSource!==undefined&&(item.type!=='Character'||!(POWER_SOURCES as readonly unknown[]).includes(item.powerSource)))errors.push(`${p}.powerSource: expected ${POWER_SOURCES.join(', ')} on a Character`);
     if(item.aura!==undefined&&(item.type!=='Character'||!integer(item.aura,1,20)))errors.push(`${p}.aura: expected integer from 1 to 20 on a Character`);
     if(item.selfMove!==undefined&&(item.type!=='Character'||!['turn','cycle'].includes(String(item.selfMove))))errors.push(`${p}.selfMove: expected turn or cycle on a Character`);
+    if(item.type==='Crypto'&&item.power!==undefined&&item.generated!==true)errors.push(`${p}.power: only generated Crypto may have Power (playable Crypto tokens)`);
     if((item.cardClass==='Hacker'||item.cardClass==='Attack'||item.cardClass==='Horror')&&(item.type!=='Character'||item.pool!=='Chaos'))errors.push(`${p}.cardClass: ${item.cardClass} cards must be Chaos Characters`);
     if((item.cardClass==='Action'||item.cardClass==='Utility'||item.cardClass==='Runtime')&&item.type==='Character'&&item.pool==='Chaos')errors.push(`${p}.cardClass: ${item.cardClass} cards must be Base Characters`);
     if (!integer(item.cost, 0, 1000)) errors.push(`${p}.cost: expected integer from 0 to 1000`);

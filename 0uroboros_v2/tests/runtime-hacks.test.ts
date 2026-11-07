@@ -59,7 +59,6 @@ function quietSession(document: ContentDocument) {
     player.draw = [];
     player.discard = [];
     player.wallet = 0;
-    player.actions = 4;
   });
   session.state.nodes.forEach(node => { node.cards = [[], []]; node.location = null; });
   session.state.turn = 1;
@@ -235,7 +234,6 @@ describe('Runtime Hack awards', () => {
     session.state.phase = 'runtime';
     session.state.turn = 1;
     session.state.turnReady = [false, false];
-    session.state.players[0].actions = 4;
     session.state.nodes.forEach(node => { node.cards = [[], []]; });
     const againA = placeInHand(session, 0, card('slash-dot-2', { definitionId: 'slash-dot' }));
     const againB = placeInHand(session, 0, card('dash-dot-2', { definitionId: 'dash-dot' }));

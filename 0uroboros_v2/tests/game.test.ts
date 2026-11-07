@@ -23,16 +23,14 @@ describe("Runtime V1 rules", () => {
     expect(legalNodes(3, order, "middleThree")).toEqual(order);
   });
 
-  it("keeps Crypto out of deployment and preserves the four-card capacity", () => {
+  it("lets Crypto deploy free and preserves the four-card capacity", () => {
     const crypto = starterCards.find(card => card.type === "Crypto")!;
     const character = starterCards.find(card => card.type === "Character")!;
-    expect(canDeploy(crypto, 2, 1, 0, 0)).toMatch(/Crypto/);
-    expect(canDeploy(character, 2, 1, 0, 4)).toMatch(/full/);
-    expect(canDeploy(character, 0, 1, 0, 0)).toMatch(/Actions/);
-    expect(canDeploy(character, 0, 1, 0, 0, undefined, { requireActions: false })).toBeNull();
-    expect(canDeploy(character, 2, 1, 0, 0)).toBeNull();
-    expect(canDeploy(character, 2, 1, 0, 0, [1, 2, 3])).toMatch(/out of play/);
-    expect(canDeploy(character, 2, 1, 2, 0, [1, 2, 3])).toBeNull();
+    expect(canDeploy(crypto, 1, 0, 0)).toBeNull();
+    expect(canDeploy(character, 1, 0, 4)).toMatch(/full/);
+    expect(canDeploy(character, 1, 0, 0)).toBeNull();
+    expect(canDeploy(character, 1, 0, 0, [1, 2, 3])).toMatch(/out of play/);
+    expect(canDeploy(character, 1, 2, 0, [1, 2, 3])).toBeNull();
   });
 
   it("uses the canonical probability distribution and player-specific power", () => {
@@ -41,7 +39,7 @@ describe("Runtime V1 rules", () => {
   });
 });
 
-import { applyServerEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, runtimeActions, selectCircuitNode, transferProbability, type Deployment } from "@0uroboros/engine/game";
+import { applyServerEffect, controlledWeights, drawCards, mirroredOpening, nodeWinner, revealOrder, selectCircuitNode, transferProbability, type Deployment } from "@0uroboros/engine/game";
 
 describe("Canonical engine primitives", () => {
   it("mirrors the five-card opening and remaining deck while keeping distinct owned instances", () => {
@@ -134,10 +132,4 @@ describe("Canonical engine primitives", () => {
     expect(applyServerEffect({ primary: 0, backup: 0 }, "restore", 100).target).toBeNull();
   });
 
-  it("requires explicit carryover configuration, delays reveal Actions, and resets each Cycle", () => {
-    expect(runtimeActions(2, 2, 3, true)).toBe(6);
-    expect(runtimeActions(2, 2, 3, false)).toBe(4);
-    expect(runtimeActions(1, 20, 20, true)).toBe(2);
-    expect(canDeploy(starterCards[8], 0, 1, 0, 0)).toBeNull();
-  });
 });

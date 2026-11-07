@@ -71,6 +71,8 @@ export const VP_CLASSES: readonly CardClass[] = ['Volume', 'Solar-monk'];
 /** Solar-monks are VP cards that are also Characters: they cost an Action and count wherever an effect says Character. */
 export const isSolarMonk = (card: Pick<Card, 'type' | 'cardClass'>) => card.type === 'VP' && card.cardClass === 'Solar-monk';
 export const isCharacterCard = (card: Pick<Card, 'type' | 'cardClass'>) => card.type === 'Character' || isSolarMonk(card);
+/** Crypto cards deploy free during Runtime. Undeployed copies still auto-resolve `cryptoValue` at Draft. */
+export const isPlayableCrypto = (card: Pick<Card, 'type'>) => card.type === 'Crypto';
 export const POWER_SOURCES = ['trash', 'destroyed', 'moved', 'movedByOwner'] as const;
 export type PowerSource = typeof POWER_SOURCES[number];
 export type Card = {
@@ -109,10 +111,10 @@ export type Card = {
 
 export const starterCards: Card[] = [
   { id: "slash", name: "Slash-Dot", type: "Character", power: 3, cost: 4, art: "/assets/card_art/base cards/slash-dot.png", effect: "+3 Cards." },
-  { id: "dash-dot", name: "Dash-Dot", type: "Character", power: 2, cost: 3, art: "/assets/card_art/base cards/action/dash-dot.png", effect: "+1 Card. +2 Actions." },
-  { id: "dotkrawler", name: "Dotkrawler", type: "Character", power: 1, cost: 4, art: "/assets/card_art/base cards/action/dotkrawler.png", effect: "+1 Card. Push or pull 1 power. +2 Actions." },
-  { id: "razor", name: "Rezz-Razor", type: "Character", power: 4, cost: 3, art: "/assets/card_art/chaos cards/rezz-razor.png", effect: "Drain 75. +1 Card. +1 Action." },
-  { id: "blade", name: "Rezz-Blade", type: "Character", power: 3, cost: 4, art: "/assets/card_art/chaos cards/rezz-blade.png", effect: "Drain 100. +1 Card. +2 Actions." },
+  { id: "dash-dot", name: "Dash-Dot", type: "Character", power: 2, cost: 3, art: "/assets/card_art/base cards/action/dash-dot.png", effect: "+1 Card." },
+  { id: "dotkrawler", name: "Dotkrawler", type: "Character", power: 1, cost: 4, art: "/assets/card_art/base cards/action/dotkrawler.png", effect: "+1 Card. Push or pull 1 power." },
+  { id: "razor", name: "Rezz-Razor", type: "Character", power: 4, cost: 3, art: "/assets/card_art/chaos cards/rezz-razor.png", effect: "Drain 75. +1 Card." },
+  { id: "blade", name: "Rezz-Blade", type: "Character", power: 3, cost: 4, art: "/assets/card_art/chaos cards/rezz-blade.png", effect: "Drain 100. +1 Card." },
   { id: "byte-1", name: "Byte-Coin", type: "Crypto", cost: 3, art: "/assets/card_art/crypto/byte-coin.png", effect: "+2 Crypto." },
   { id: "byte-2", name: "Byte-Coin", type: "Crypto", cost: 3, art: "/assets/card_art/crypto/byte-coin.png", effect: "+2 Crypto." },
   { id: "kilo", name: "Kilo-Coin", type: "Crypto", cost: 6, art: "/assets/card_art/crypto/kilo-coin.png", effect: "+3 Crypto." },
@@ -169,18 +171,14 @@ export function legalNodes(turn: number, order: readonly number[] = [0, 1, 2, 3,
 
 export function canDeploy(
   card: Card,
-  actions: number,
   turn: number,
   node: number,
   occupancy: number,
   playable: readonly number[] = playableNodes(),
-  opts?: { requireActions?: boolean },
 ) {
-  if (card.type === "Crypto") return "Crypto belongs in the Crypto Cache for Draft.";
   if (!Number.isInteger(node) || node < 0 || node >= 5 || turn < 1 || turn > 3) return "Unknown Node or Runtime turn.";
   if (!playable.includes(node)) return "That Node is out of play.";
   if (occupancy >= 4) return "This deployment region is full.";
-  if (opts?.requireActions !== false && isCharacterCard(card) && actions < 1) return "Insufficient Actions.";
   return null;
 }
 
@@ -209,6 +207,8 @@ export function setPowerDelta(card: Card, delta: number) {
 export const serverMaximums: Servers = { primary: 2000, backup: 1500 };
 /** VP the destroyer scores for taking each enemy Server to zero. */
 export const defaultServerVP: Servers = { primary: 12, backup: 16 };
+/** End-game bonus VP for the seat with the most Circuit wins (Eco-Strat initial). 0 disables. */
+export const defaultMostCircuitsBonusVP = 6;
 
 /**
  * A player's VP plus, for each enemy Server still standing, the share of its destruction VP matching the share of its
@@ -341,23 +341,16 @@ export function applyServerEffect(servers: Servers, kind: "drain" | "restore", a
   return { servers: { ...servers, [target]: after }, target, amount: Math.abs(after - before), destructionVP: after === 0 ? serverVP[target] : 0 };
 }
 
-// The caller must supply the unresolved turn carryover policy; there is no V1 default.
-export function runtimeActions(turn: number, remaining: number, pendingOnReveal: number, carryover: boolean): number {
-  if (![1, 2, 3].includes(turn)) throw new Error("Runtime contains exactly three turns.");
-  return turn === 1 ? 2 : (carryover ? remaining : 0) + 1 + pendingOnReveal;
-}
-
 const you = { type: "player", who: "self" } as const;
 const draw = (amount: number): EffectStep => ({ action: "draw", amount, target: you });
-const gainActions = (amount: number): EffectStep => ({ action: "gainActions", amount, target: you });
 const drain = (amount: number): EffectStep => ({ action: "damageServer", amount, target: { type: "server", who: "opponent", server: "auto" } });
 const crypto = (amount: number): EffectStep => ({ action: "gainCrypto", amount, target: you });
 export const starterEffects: Readonly<Record<string, readonly EffectStep[]>> = {
   "Slash-Dot": [draw(3)],
-  "Dash-Dot": [draw(1), gainActions(2)],
-  "Dotkrawler": [draw(1), { action: "transferPower", amount: 1, target: { type: "node", which: "neighbours" } }, gainActions(2)],
-  "Rezz-Razor": [drain(75), draw(1), gainActions(1)],
-  "Rezz-Blade": [drain(100), draw(1), gainActions(2)],
+  "Dash-Dot": [draw(1)],
+  "Dotkrawler": [draw(1), { action: "transferPower", amount: 1, target: { type: "node", which: "neighbours" } }],
+  "Rezz-Razor": [drain(75), draw(1)],
+  "Rezz-Blade": [drain(100), draw(1)],
   "Byte-Coin": [crypto(2)],
   "Kilo-Coin": [crypto(3)],
   "Vault Encryption": [{ action: "repairServer", amount: 100, target: { type: "server", who: "self", server: "auto" } }],

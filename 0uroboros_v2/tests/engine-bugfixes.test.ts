@@ -119,8 +119,8 @@ describe('engine fixes', () => {
     expect([...deciders].sort()).toEqual([0, 1]);
   });
 
-  it('adds Ongoing Actions to the Runtime turn that is starting', () => {
-    const actionsAfterTurn = (ongoing: AnyEffect[]) => {
+  it('applies Ongoing Crypto at the start of the next Runtime turn', () => {
+    const walletAfterTurn = (ongoing: AnyEffect[]) => {
       const game = session();
       setLocation(game, 0, { ongoing });
       game.state.nodes[0].cards[0].push({ card: card('lead', { power: 4 }), owner: 0, node: 0, order: 1, revealed: true });
@@ -128,12 +128,9 @@ describe('engine fixes', () => {
       game.state.phase = 'runtime';
       game.endTurn();
       finish(game);
-      return { actions: game.state.players[0].actions, pending: game.state.players[0].pendingActions };
+      return game.state.players[0].wallet;
     };
-    const plain = actionsAfterTurn([]);
-    const boosted = actionsAfterTurn([{ kind: 'actions', amount: 1 }]);
-    expect(boosted.actions).toBe(plain.actions + 1);
-    expect(boosted.pending).toBe(plain.pending);
+    expect(walletAfterTurn([{ kind: 'crypto', amount: 2 }])).toBe(walletAfterTurn([]) + 2);
   });
 
   it('gives Circuit rewards with board card targets No target rather than acting on a card', () => {

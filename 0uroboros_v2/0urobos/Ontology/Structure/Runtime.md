@@ -13,11 +13,11 @@ tags: [ontology/structure]
 The deployment phase of a [[Cycle]]: three [[Runtime turn|Runtime turns]] on the [[Circuit]]. Followed by [[Wave Collapse]].
 
 ## Node opening
-| Turn | Opens | Actions gained |
-| --- | --- | --- |
-| 1 | 3 random Nodes | +2 |
-| 2 | 1 more Node | +1 |
-| 3 | the last Node | +1 |
+| Turn | Opens |
+| --- | --- |
+| 1 | 3 random Nodes |
+| 2 | 1 more Node |
+| 3 | the last Node |
 
 Opening order is random each Cycle and hidden from players. A closed Node's [[Location]] stays hidden until it opens.
 
@@ -25,4 +25,4 @@ Opening order is random each Cycle and hidden from players. A closed Node's [[Lo
 - Cards deploy face down; open Nodes stay playable until Collapse.
 - Cards may be placed at unopened Nodes; they stay face down until that Node opens.
 - Max 4 cards per player per Node.
-- Unused [[Action|Actions]] carry between Runtime turns within the Cycle.
+- [[Character|Characters]] and [[VP card|VP cards]] deploy free; there is no Action resource.

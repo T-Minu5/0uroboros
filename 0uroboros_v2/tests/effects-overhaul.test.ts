@@ -50,8 +50,8 @@ describe('authoring effects overhaul', () => {
     expect(steps([{ kind: 'restorePrimary', amount: 400 }], 'circuit')).toEqual([{ action: 'repairServer', amount: 400, target: { type: 'server', who: 'self', server: 'primary' } }]);
     expect(describeSteps(steps([{ kind: 'crypto', amount: 2 }, { kind: 'draw', amount: 1 }], 'location'), 'location', catalog))
       .toBe('+2 Crypto to the winning player. +1 Card to the winning player.');
-    expect(describeLocation({ effects: steps([{ kind: 'crypto', amount: 2 }], 'location'), ongoing: steps([{ kind: 'draw', amount: 1 }], 'location'), onPlay: steps([{ kind: 'vp', amount: 1 }], 'locationPlay'), startTurn2: steps([{ kind: 'actions', amount: 1 }], 'location'), startTurn3: steps([{ kind: 'vp', amount: 1 }], 'location') }, catalog))
-      .toBe('On collapse: +2 Crypto to the winning player. Ongoing: +1 Card to the winning player. On reveal: +1 VP to the player who played here. Start of turn 2: +1 Action to the winning player. Start of turn 3: +1 VP to the winning player.');
+    expect(describeLocation({ effects: steps([{ kind: 'crypto', amount: 2 }], 'location'), ongoing: steps([{ kind: 'draw', amount: 1 }], 'location'), onPlay: steps([{ kind: 'vp', amount: 1 }], 'locationPlay'), startTurn2: steps([{ kind: 'draw', amount: 1 }], 'location'), startTurn3: steps([{ kind: 'vp', amount: 1 }], 'location') }, catalog))
+      .toBe('On collapse: +2 Crypto to the winning player. Ongoing: +1 Card to the winning player. On reveal: +1 VP to the player who played here. Start of turn 2: +1 Card to the winning player. Start of turn 3: +1 VP to the winning player.');
     const modifier = createStep('attachModifier', 'circuit', catalog);
     expect(modifier).toMatchObject({ action: 'attachModifier', modifier: 'doublePrintedEffects', target: { type: 'card', where: 'collection' } });
     expect(describeStep({ ...modifier, cardId: 'alpha-definition' }, 'circuit', catalog)).toBe('Attach “printed effects happen twice” to Alpha Relay');
@@ -218,7 +218,6 @@ describe('authoring effects overhaul', () => {
     drainGame.state.nodes[0].cards[0].push({ card: card('first', [], { power: 4, name: 'First' }), owner: 0, node: 0, order: 1, revealed: true });
     const linker = card('drain-next', [{ kind: 'modifyPower', amount: -2, cardRelation: 'next' }], { power: 1, name: 'Drain Next' });
     drainGame.state.players[0].hand = [linker, card('second', [], { power: 4, name: 'Second' })];
-    drainGame.state.players[0].actions = 5;
     drainGame.deploy('drain-next', 2);
     drainGame.deploy('second', 1);
     drainGame.endTurn();

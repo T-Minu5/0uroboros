@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import source from '../assets/card_art/cards.json';
 import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_SLOTS, cardGainsCrypto, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_CRYPTO_OFFER_MIN, DRAFT_SLOTS, cardGainsCryptoAtLeast, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
@@ -38,26 +38,21 @@ describe('Historic catalog activation',()=>{
   expect(EVALUATION_BASE_CARDS.some(card=>card.id==='owl-king')).toBe(true);
   expect(EVALUATION_CHAOS_CARDS.some(card=>card.id==='sudo-demiurge')).toBe(true);
  });
- it('starts with no fixed piles and deals a 10-slot rotating Draft offer (2 copies each)',()=>{
+ it('starts with no fixed piles and deals an 8-slot rotating Draft offer (2 copies each)',()=>{
   expect(createStrategicMarket(()=>0.31)).toEqual([]);
   const offer=draftOffer(()=>.71,bundledContent,new Set(),new Set(),1);
   expect(offer).toHaveLength(DRAFT_SLOTS.length);
   expect(offer.every(p=>p.rotating&&p.remaining?.join()==='2,2'&&p.supply===4)).toBe(true);
   expect(['Action','Utility']).toContain(offer[0].card.cardClass);
   expect(['Action','Utility']).toContain(offer[1].card.cardClass);
-  expect(offer[2].category).toBe('Chaos');
-  expect(offer[3].category).toBe('Chaos');
-  expect(isSolarMonk(offer[4].card)).toBe(true);
-  expect(cardGainsCrypto(offer[5].card)).toBe(true);
-  expect(offer[5].card.cost).toBeGreaterThanOrEqual(2);
-  expect(offer[5].card.cost).toBeLessThanOrEqual(5);
-  expect(['Base','Chaos']).toContain(offer[5].category);
-  expect(cardGainsCrypto(offer[6].card)).toBe(true);
-  expect(['Base','Chaos']).toContain(offer[6].category);
-  expect(offer[7].card.cardClass).toBe('Attack');
-  expect(offer[8].card.cardClass).toBe('Horror');
-  expect(offer[9].card.type).toBe('VP');
-  expect(isSolarMonk(offer[9].card)).toBe(false);
+  expect(['Hacker','Utility']).toContain(offer[2].card.cardClass);
+  expect(['Hacker','Utility']).toContain(offer[3].card.cardClass);
+  expect(offer[4].card.cardClass).toBe('Attack');
+  expect(offer[5].card.cardClass).toBe('Horror');
+  expect(isSolarMonk(offer[6].card)).toBe(true);
+  expect(offer[7].card.type).toBe('VP');
+  expect(isSolarMonk(offer[7].card)).toBe(false);
+  expect(offer.filter(p=>cardGainsCryptoAtLeast(p.card)).length).toBeGreaterThanOrEqual(DRAFT_CRYPTO_OFFER_MIN);
   const ids=offer.map(p=>p.card.definitionId??p.card.id);
   expect(new Set(ids).size).toBe(ids.length);
   const next=draftOffer(()=>.71,bundledContent,new Set(),new Set(ids),1);
@@ -94,8 +89,9 @@ describe('Historic catalog activation',()=>{
   for(const card of HISTORIC_CARDS.filter(card=>card.type==='Crypto')){expect(card.power).toBeUndefined();expect(card.cryptoValue).toBeGreaterThan(0);}
  });
  it('uses description authority for contradictions and explicit future-only schedules where source says next',()=>{
-  expect(byId('cowl-obscyra').onReveal).toEqual([{action:'gainActions',amount:2,target:you},{action:'draw',amount:1,target:you}]);
-  for(const [id,last] of [['atomic-unit',5],['atomic-mass',3],['recursive-seance',6],['bloodlet-drone',8]] as const){const card=byId(id);expect(card.onReveal!.length).toBeGreaterThan(0);expect(card.schedule?.at(-1)?.at).toBe(last);}
+  expect(byId('cowl-obscyra').onReveal).toEqual([{action:'draw',amount:1,target:you}]);
+  expect(byId('atomic-unit')).toMatchObject({duration:5,durationPeriod:'runtime'});
+  for(const [id,last] of [['atomic-mass',3],['recursive-seance',6],['bloodlet-drone',8]] as const){const card=byId(id);expect(card.onReveal!.length).toBeGreaterThan(0);expect(card.schedule?.at(-1)?.at).toBe(last);}
   for(const [id,last] of [['byte-drone',4],['the-tesseract-magi',7],['dit-bot',5]] as const){const card=byId(id);expect(card.onReveal).toEqual([]);expect(card.schedule?.[0].at).toBe(2);expect(card.schedule?.at(-1)?.at).toBe(last);}
   expect(byId('temporal-rift').schedule?.[0]).toMatchObject({at:4,timing:'start'});
   expect(byId('kilo-cycle').schedule?.[0]).toMatchObject({at:3,timing:'end'});
@@ -107,7 +103,8 @@ describe('Historic catalog activation',()=>{
   for(const card of EVALUATION_ALL_CARDS){
    const effects=flatten([...(card.onReveal??[]),...(card.onCollapse??[]),...(card.recurring??[]),...(card.schedule??[]).flatMap(tick=>tick.effects)]);
    // The two retained starter identities use the canonical name-keyed resolver.
-   if(card.type==='Character'&&!['dash','dot'].includes(card.definitionId??''))expect(effects.length,card.name).toBeGreaterThan(0);
+   // atomic-unit kept its duration after Action grants were removed; it has no executable clauses left.
+   if(card.type==='Character'&&!['dash','dot','atomic-unit'].includes(card.definitionId??''))expect(effects.length,card.name).toBeGreaterThan(0);
    for(const effect of effects){if(effect.action==='gainCard')expect(ids.has(effect.cardId),card.name).toBe(true);if(effect.amount!==undefined)expect(Number.isFinite(effect.amount),card.name).toBe(true);}
    for(const tick of card.schedule??[]){expect(tick.at,card.name).toBeGreaterThanOrEqual(1);expect(tick.at,card.name).toBeLessThanOrEqual(card.duration!);expect(tick.effects.length,card.name).toBeGreaterThan(0);}
    if(card.schedule?.length||card.recurring?.length)expect(card.durationPeriod,card.name).toBe('runtime');

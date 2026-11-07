@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 import { starterCards, type Card, type EvaluationEffect, type PlayerId } from '@0uroboros/engine/game';
+import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 
 const card = (id: string, effects: EvaluationEffect[] = [], extra: Partial<Card> = {}): Card =>
   ({ ...starterCards[0], id, onReveal: effects, ...extra });
 
 function session() {
-  const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, random: seededRandom(19) });
+  const game = createSession({ carryover: true, priorityPreference: 'higher', strategicMarket: true, midCycleDraw: false, random: seededRandom(19) });
   game.state.nodeOrder = [0, 1, 2, 3, 4];
   game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
   return game;
@@ -53,7 +54,6 @@ describe('effect recipe quantities and recipients', () => {
   it('gains three VP cards into the opposing hand and updates the recipient score', () => {
     const game = session();
     game.state.players[1].hand = [card('already-held', [], { type: 'Crypto' })];
-    game.state.players[1].actions = 0;
     const events = play(game, card('source', [{ kind: 'gain', cardId: 'basic-encryption', amount: 3, destination: 'hand', opponent: true }]));
     const gained = game.state.players[1].hand.slice(1);
     expect(gained).toHaveLength(3);
@@ -106,54 +106,42 @@ describe('effect recipe quantities and recipients', () => {
     })]));
   });
 
-  it('credits ordinary Crypto and pending Actions to either player while preserving the source owner', () => {
+  it('credits ordinary Crypto to either player while preserving the source owner', () => {
     const game = session();
     const events = play(game, card('source', [
-      { kind: 'crypto', amount: 2 }, { kind: 'actions', amount: 1 },
-      { kind: 'crypto', amount: 3, opponent: true }, { kind: 'actions', amount: 2, opponent: true },
+      { kind: 'crypto', amount: 2 },
+      { kind: 'crypto', amount: 3, opponent: true },
     ]));
     expect([game.state.players[0].wallet, game.state.players[1].wallet]).toEqual([2, 3]);
-    expect([game.state.players[0].actions, game.state.players[1].actions]).toEqual([3, 5]);
-    expect(game.state.players.map(player => player.pendingActions)).toEqual([0, 0]);
-    expect(events.filter(event => event.cardId === 'source' && ['crypto', 'actions'].includes(event.kind))).toEqual([
+    expect(events.filter(event => event.cardId === 'source' && event.kind === 'crypto')).toEqual([
       expect.objectContaining({ kind: 'crypto', owner: 0, targetOwner: 0, target: 'wallet', amount: 2, before: 0, after: 2 }),
-      expect.objectContaining({ kind: 'actions', owner: 0, targetOwner: 0, target: 'actions', amount: 1, before: 0, after: 1 }),
       expect.objectContaining({ kind: 'crypto', owner: 0, targetOwner: 1, target: 'wallet', amount: 3, before: 0, after: 3 }),
-      expect.objectContaining({ kind: 'actions', owner: 0, targetOwner: 1, target: 'actions', amount: 2, before: 0, after: 2 }),
     ]);
   });
 
-  it('routes an opponent-owned draw, Crypto, and pending Actions back to the local player', () => {
+  it('routes an opponent-owned draw and Crypto back to the local player', () => {
     const game = session();
     game.state.players[0].draw = [card('local-draw')];
     const events = play(game, card('enemy-source', [
       { kind: 'draw', amount: 1, opponent: true },
       { kind: 'crypto', amount: 4, opponent: true },
-      { kind: 'actions', amount: 1, opponent: true },
     ]), 1);
     expect(game.state.players[0].hand.map(item => item.id)).toEqual(['local-draw']);
     expect(game.state.players[1].hand).toHaveLength(0);
     expect([game.state.players[0].wallet, game.state.players[1].wallet]).toEqual([4, 0]);
-    expect([game.state.players[0].actions, game.state.players[1].actions]).toEqual([4, 3]);
-    expect(events.filter(event => event.cardId === 'enemy-source' && ['draw', 'crypto', 'actions'].includes(event.kind))).toEqual([
+    expect(events.filter(event => event.cardId === 'enemy-source' && ['draw', 'crypto'].includes(event.kind))).toEqual([
       expect.objectContaining({ kind: 'draw', owner: 1, targetOwner: 0, target: 'hand', amount: 1 }),
       expect.objectContaining({ kind: 'crypto', owner: 1, targetOwner: 0, target: 'wallet', amount: 4 }),
-      expect.objectContaining({ kind: 'actions', owner: 1, targetOwner: 0, target: 'actions', amount: 1 }),
     ]);
   });
 
-  it('credits scheduled start Actions to the opposing current turn', () => {
-    const game = session();
-    const events = play(game, card('timed', [], {
-      duration: 2, durationPeriod: 'runtime',
-      schedule: [{ at: 2, timing: 'start', effects: [{ kind: 'actions', amount: 3, opponent: true }] }],
-    }));
-    expect(game.state.players[0].actions).toBe(2);
-    expect(game.state.players[1].actions).toBe(6);
-    expect(game.state.players.map(player => player.pendingActions)).toEqual([0, 0]);
-    expect(events).toEqual(expect.arrayContaining([expect.objectContaining({
-      kind: 'actions', owner: 0, cardId: 'timed', targetOwner: 1, target: 'actions', amount: 3, before: 3, after: 6,
-    })]));
+  it('drops legacy Actions when migrating schedule effects', () => {
+    expect(migrateEffects([
+      { kind: 'actions', amount: 3, opponent: true },
+      { kind: 'crypto', amount: 1 },
+    ], 'card')).toEqual([
+      { action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } },
+    ]);
   });
 
   it('retains existing Server targets even when opponent is specified on drain and restore', () => {

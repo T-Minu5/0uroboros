@@ -739,6 +739,15 @@
       "height": 300,
       "focus": 0.579
     },
+    "/assets/card_art/uploads/greenbug.png": {
+      "sha": "7ea15c87892eebea04df44d0906c24d3f6cde1a08b72033764747c7dcab2e64f",
+      "v": 2,
+      "color": "/assets/card_art/depth/7ea15c87892eebea04df-v2.color.webp",
+      "depth": "/assets/card_art/depth/7ea15c87892eebea04df-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.3924
+    },
     "/assets/card_art/uploads/h3l3-ios.png": {
       "sha": "fea00c2987742a6541aeeb9d5df14cc11a3eec826a52bccb494fa829d961c0ad",
       "v": 2,
@@ -846,6 +855,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.2959
+    },
+    "/assets/card_art/uploads/slash-dot2.png": {
+      "sha": "4525553ef2901d98aee377ba33e16e09d6b10075a01e1ecbe3812f64e77dd729",
+      "v": 2,
+      "color": "/assets/card_art/depth/4525553ef2901d98aee3-v2.color.webp",
+      "depth": "/assets/card_art/depth/4525553ef2901d98aee3-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.7374
     },
     "/assets/card_art/uploads/slash-n1.png": {
       "sha": "873a4b7386a9c807a74735d7c34fdd9da9bb86a6eb7cf5f299e46613f501bdbc",

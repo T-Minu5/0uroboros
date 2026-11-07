@@ -3,8 +3,8 @@ import { AGENT_FLAG_KEYS, opponentName, resolveOpponent, type OpponentId } from 
 import type { AuthoredOpponent } from '@0uroboros/engine/ai/opponents';
 import { STUDIO_TOOLS } from './studioTools';
 import type { DeckOption } from './contentPack/loadGameContent';
-import { defaultServerVP, type Servers } from '@0uroboros/engine/game';
-import { SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
+import { defaultMostCircuitsBonusVP, defaultServerVP, type Servers } from '@0uroboros/engine/game';
+import { MOST_CIRCUITS_BONUS_VP_MAX, SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
 import { StartingDeckPicker } from './StartingDeckPicker';
 
 type Props = {
@@ -37,12 +37,14 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
   const choice = resolveOpponent(opponents, opponent);
   const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds, noLocations, noTrailingRewards, draftCrypto, middleNodesOnly, noActions } = setup;
+  const { serverVP, turnSeconds, noLocations, draftCrypto, middleNodesOnly, tenCardDraft, mostCircuitsBonusVP } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
     `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
-    ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(middleNodesOnly ? ['Middle Nodes'] : []), ...(noActions ? ['No Actions'] : []), ...(!noTrailingRewards ? ['Trailing rewards'] : []),
+    mostCircuitsBonusVP > 0 ? `Most Circuits +${mostCircuitsBonusVP} VP` : 'No Circuits bonus',
+    tenCardDraft ? '10-card Draft' : '8-card Draft',
+    ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(middleNodesOnly ? ['Middle Nodes'] : []),
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
@@ -70,6 +72,17 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
           <button type='button' title={`Back to ${defaultServerVP.primary} / ${defaultServerVP.backup}`} disabled={disabled || (serverVP.primary === defaultServerVP.primary && serverVP.backup === defaultServerVP.backup)} onClick={() => onChange({ ...setup, serverVP: { ...defaultServerVP } })}>Reset</button>
         </div>
       </div>
+      <label className='game-configure-row'>
+        <span>Most Circuits bonus VP <small>End of game; player with more Circuit wins (more Locations in a Cycle). 0 off</small></span>
+        <div className='game-configure-vp'>
+          <input aria-label='Most Circuits bonus VP' type='number' min={0} max={MOST_CIRCUITS_BONUS_VP_MAX} disabled={disabled || noLocations} value={mostCircuitsBonusVP} onChange={event => onChange({ ...setup, mostCircuitsBonusVP: Math.min(MOST_CIRCUITS_BONUS_VP_MAX, Math.max(0, Math.round(Number(event.target.value) || 0))) })} />
+          <button type='button' title={`Back to ${defaultMostCircuitsBonusVP}`} disabled={disabled || noLocations || mostCircuitsBonusVP === defaultMostCircuitsBonusVP} onClick={() => onChange({ ...setup, mostCircuitsBonusVP: defaultMostCircuitsBonusVP })}>Reset</button>
+        </div>
+      </label>
+      <label className='game-configure-row game-configure-check'>
+        <span>10-card Draft <small>Default is 8 (Action/Utility ×2, Hacker/Utility ×2, Attack, Horror, Solar Monk, VP). On adds two Chaos fills</small></span>
+        <input aria-label='10-card Draft' type='checkbox' disabled={disabled} checked={tenCardDraft} onChange={event => onChange({ ...setup, tenCardDraft: event.target.checked })} />
+      </label>
       <label className='game-configure-row game-configure-check'>
         <span>Draft Crypto <small>Shyte-Coin, Byte-Coin, Kilo-Coin and Mega-Cache stay available beside the offer</small></span>
         <input aria-label='Draft Crypto' type='checkbox' disabled={disabled} checked={draftCrypto} onChange={event => onChange({ ...setup, draftCrypto: event.target.checked })} />
@@ -79,16 +92,8 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
         <input aria-label='No Locations' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />
       </label>
       <label className='game-configure-row game-configure-check'>
-        <span>Middle Nodes only <small>Only Nodes 2–4; one opens each Runtime turn. Nodes 1 and 5 stay closed and out of play. Draft offers 8 cards</small></span>
+        <span>Middle Nodes only <small>Only Nodes 2–4; one opens each Runtime turn. Nodes 1 and 5 stay closed and out of play</small></span>
         <input aria-label='Middle Nodes only' type='checkbox' disabled={disabled} checked={middleNodesOnly} onChange={event => onChange({ ...setup, middleNodesOnly: event.target.checked })} />
-      </label>
-      <label className='game-configure-row game-configure-check'>
-        <span>No Actions <small>Cards deploy without Actions; +Actions effects are hidden and do not resolve</small></span>
-        <input aria-label='No Actions' type='checkbox' disabled={disabled} checked={noActions} onChange={event => onChange({ ...setup, noActions: event.target.checked })} />
-      </label>
-      <label className='game-configure-row game-configure-check'>
-        <span>Include trailing rewards <small>Adds Circuit Rewards that go to the player with the least VP</small></span>
-        <input aria-label='Include trailing rewards' type='checkbox' disabled={disabled} checked={!noTrailingRewards} onChange={event => onChange({ ...setup, noTrailingRewards: !event.target.checked })} />
       </label>
       <StartingDeckPicker decks={decks} value={deckId} onChange={onDeck} disabled={disabled} />
     </div>}

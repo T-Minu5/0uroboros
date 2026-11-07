@@ -84,7 +84,6 @@ function playOut(game: RuntimeSession, entry: Card, node = 0) {
   game.state.phase = 'runtime';
   game.state.turnReady = [false, false];
   game.state.players[0].hand = [entry];
-  game.state.players[0].actions = Math.max(2, game.state.players[0].actions);
   game.deploy(entry.id, node);
   game.endTurn(0);
   game.endTurn(1);
@@ -166,7 +165,6 @@ describe('location events runtime', () => {
     };
     const game = baseSession({ events: [event] });
     game.state.players[0].hand = [card('one', { power: 1 }), card('two', { power: 1 })];
-    game.state.players[0].actions = 4;
     game.deploy('one', 0);
     game.deploy('two', 0);
     game.endTurn(0);
@@ -232,7 +230,6 @@ describe('sacrificeCards / Sacrificial Altar', () => {
       power: 1,
       onReveal: [sacrifice],
     })];
-    skipGame.state.players[0].actions = 2;
     skipGame.deploy('sk', 0);
     skipGame.endTurn(0);
     skipGame.endTurn(1);
@@ -250,7 +247,6 @@ describe('sacrificeCards / Sacrificial Altar', () => {
     place(takeGame, 0, a, true);
     place(takeGame, 0, b, true);
     takeGame.state.players[0].hand = [card('tk', { power: 1, onReveal: [sacrifice] })];
-    takeGame.state.players[0].actions = 2;
     takeGame.deploy('tk', 0);
     takeGame.endTurn(0);
     takeGame.endTurn(1);

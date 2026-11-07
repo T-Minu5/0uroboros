@@ -117,7 +117,7 @@ function playMatch(session: RuntimeSession, localDraft: (session: RuntimeSession
     drain();
     for (let turn = 1; turn <= 3 && session.state.phase === "runtime"; turn++) {
       for (const item of [...session.state.players[0].hand]) {
-        const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.players[0].actions, session.state.turn, node, session.state.nodes[node].cards[0].length));
+        const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.turn, node, session.state.nodes[node].cards[0].length));
         if (target !== undefined) session.deploy(item.id, target);
       }
       session.endTurn(); drain();

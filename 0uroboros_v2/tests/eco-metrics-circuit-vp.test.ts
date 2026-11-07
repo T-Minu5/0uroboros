@@ -44,6 +44,49 @@ describe('Eco metrics Circuit differential and market VP', () => {
     expect(m.timeline.map(row => row.circuitDifferential)).toEqual([1, 2, 1]);
     expect(m.circuitLead2At).toEqual([2, null]);
     expect(m.circuitClaims).toEqual([2, 1]);
+    expect(m.circuitWins).toEqual([2, 1]);
+    expect(m.locationsWon).toEqual([9, 6]);
+    expect(m.mostCircuitsLeader).toBe(0);
+    expect(m.mostNodesLeader).toBe(0);
+    expect(m.mostCircuitsVsMostNodes).toBe('same');
+  });
+
+  it('flags when most-Circuits and most-Nodes leaders disagree (observational)', () => {
+    const sameLeaders = gameMetrics(report({
+      finalVP: [10, 5], purchases: [],
+      cycles: [
+        { cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+        { cycle: 2, vp: [4, 2], servers: [3500, 3500], wallet: [0, 0], locationsWon: [4, 1], deckSize: [10, 10], locations: [], circuit: null },
+      ],
+    }));
+    expect(sameLeaders.circuitWins).toEqual([2, 0]);
+    expect(sameLeaders.locationsWon).toEqual([7, 3]);
+    expect(sameLeaders.mostCircuitsVsMostNodes).toBe('same');
+
+    // Seat 0 wins more Cycles narrowly; seat 1 piles Nodes in one blowout Cycle.
+    const splitCycles = [
+      { cycle: 1, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 2, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 3, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 4, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [0, 5], deckSize: [10, 10], locations: [], circuit: null },
+    ];
+    const split = gameMetrics(report({ finalVP: [8, 8], winner: null, purchases: [], cycles: splitCycles }));
+    expect(split.circuitWins).toEqual([3, 1]);
+    expect(split.locationsWon).toEqual([9, 11]);
+    expect(split.mostCircuitsLeader).toBe(0);
+    expect(split.mostNodesLeader).toBe(1);
+    expect(split.mostCircuitsVsMostNodes).toBe('differ');
+
+    const sameCycles = [
+      { cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 2, vp: [4, 2], servers: [3500, 3500], wallet: [0, 0], locationsWon: [4, 1], deckSize: [10, 10], locations: [], circuit: null },
+    ];
+    const cohort = cohortMetrics([
+      { id: 'same-a', report: report({ finalVP: [10, 5], purchases: [], cycles: sameCycles }) },
+      { id: 'differ-b', report: report({ finalVP: [8, 8], winner: null, purchases: [], cycles: splitCycles }) },
+    ]);
+    expect(cohort.boardAwards.mostCircuitsVsMostNodes).toMatchObject({ games: 2, same: 1, differ: 1, tied: 0, differShare: 0.5, differAmongDecided: 0.5 });
+    expect(cohort.circuit.winsPerGame).toBeGreaterThan(0);
   });
 
   it('exposes market VP per seat separately from destruction VP', () => {

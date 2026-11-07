@@ -20,7 +20,7 @@ describe('authored content', () => {
     expect(compiled.circuitRewards).toHaveLength(3);
     expect(compiled.baseCards.find(card => card.definitionId === 'eval-relocation-relay')?.onReveal).toEqual(steps([{ kind: 'moveCard' }]));
     expect(compiled.chaosCards.find(card => card.definitionId === 'eval-power-siphon')?.onReveal).toEqual([{ action: 'changePower', amount: -2, target: { type: 'card', who: 'opponent', where: 'board' }, pick: { mode: 'choose' } }]);
-    expect(compiled.baseCards.find(card => card.definitionId === 'dash')?.onReveal).toEqual([{ action: 'draw', amount: 1, target: you }, { action: 'gainActions', amount: 1, target: you }]);
+    expect(compiled.baseCards.find(card => card.definitionId === 'dash')?.onReveal).toEqual([{ action: 'draw', amount: 1, target: you }]);
     for (const reward of compiled.circuitRewards) expect(reward.effect).toEqual(reward.effects![0]);
   });
 
@@ -33,9 +33,8 @@ describe('authored content', () => {
     document.cards.filter(card => card.pool === 'Chaos' || card.pool === 'Base').forEach(card => { card.enabled = false; });
     const errors = validateContent(document);
     expect(errors).toEqual(expect.arrayContaining([
-      expect.stringContaining('cards: at least 7 enabled non-Generated Base or Chaos cards'),
-      expect.stringContaining('cards: at least 2 enabled non-Generated Base cards that are not Runtime'),
-      expect.stringContaining('cards: at least 1 enabled non-Generated Attack or Hacker Chaos card'),
+      expect.stringContaining('cards: at least 10 enabled non-Generated Base or Chaos cards'),
+      expect.stringContaining('cards: at least 1 enabled non-Generated Attack Chaos card'),
       expect.stringContaining('cards: at least 1 enabled non-Generated Horror Chaos card'),
       expect.stringMatching(/^startingDecks\[0\]\.cards\[\d+\]\.cardId: unknown card rezz-blade$/),
       expect.stringMatching(/onCollapse\[0\]\.action: unknown effect \(legacy draw must be migrated\)$/),
@@ -48,9 +47,9 @@ describe('authored content', () => {
 
   it('rejects disabled starting deck cards', () => {
     const document = createDefaultContent();
-    document.cards.find(card => card.definitionId === 'byte-coin')!.enabled = false;
+    document.cards.find(card => card.definitionId === 'slash-dot')!.enabled = false;
     expect(validateContent(document)).toEqual(expect.arrayContaining([
-      'startingDecks[0].cards[0].cardId: unknown card byte-coin',
+      expect.stringMatching(/^startingDecks\[0\]\.cards\[\d+\]\.cardId: unknown card slash-dot$/),
     ]));
     expect(validateContent(document).some(error => /Draft currency/.test(error))).toBe(false);
   });
@@ -77,13 +76,13 @@ describe('authored content', () => {
 
   it('loads whichever named deck is active, including Generated cards', () => {
     const document = createDefaultContent();
-    document.cards.find(card => card.definitionId === 'shyte-coin')!.generated = true;
-    document.startingDecks!.push({ id: 'deck-rush', name: 'Rush', cards: [{ cardId: 'rezz-blade', count: 4 }, { cardId: 'shyte-coin', count: 2 }] });
+    document.cards.find(card => card.definitionId === 'rezz-blade')!.generated = true;
+    document.startingDecks!.push({ id: 'deck-rush', name: 'Rush', cards: [{ cardId: 'rezz-blade', count: 4 }, { cardId: 'slash-dot', count: 2 }] });
     document.activeStartingDeckId = 'deck-rush';
     expect(validateContent(document)).toEqual([]);
     const compiled = compileContent(document);
-    expect(compiled.startingDeck.map(card => card.id)).toEqual(['rezz-blade-1', 'rezz-blade-2', 'rezz-blade-3', 'rezz-blade-4', 'shyte-coin-1', 'shyte-coin-2']);
-    expect(compiled.startingDeck.find(card => card.definitionId === 'shyte-coin')).toMatchObject({ generated: true, cryptoValue: 1 });
+    expect(compiled.startingDeck.map(card => card.id)).toEqual(['rezz-blade-1', 'rezz-blade-2', 'rezz-blade-3', 'rezz-blade-4', 'slash-dot-1', 'slash-dot-2']);
+    expect(compiled.startingDeck.find(card => card.definitionId === 'rezz-blade')).toMatchObject({ generated: true });
   });
 
   it('validates deck names, copies, duplicates, opening size and the active selection', () => {
@@ -134,7 +133,6 @@ describe('authored content', () => {
     const authored: EffectStep[] = [
       { action: 'gainCard', cardId: 'byte-coin', amount: 3, target: { type: 'zone', who: 'opponent', zone: 'hand' } },
       { action: 'draw', amount: 2, target: them },
-      { action: 'gainActions', amount: 1, target: them },
       { action: 'gainCrypto', amount: 4, target: them },
       { action: 'choice', choose: { count: 1, chooser: 'opponent' }, options: [
         { id: 'pay', label: 'Pay 2 for 1 VP', cost: [{ action: 'payCrypto', amount: 2, target: you }], effects: [{ action: 'gainVP', amount: 1, target: you }] },

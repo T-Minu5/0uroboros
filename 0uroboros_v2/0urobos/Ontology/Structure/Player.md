@@ -3,7 +3,7 @@ kind: concept
 category: structure
 aliases: [You, Opponent, Enemy]
 part_of: "[[0uroboros]]"
-related: ["[[Server]]", "[[Zone]]", "[[Action]]", "[[Crypto]]", "[[Victory Points]]", "[[Who]]"]
+related: ["[[Server]]", "[[Zone]]", "[[Crypto]]", "[[Victory Points]]", "[[Who]]"]
 code: src/runtime.ts (PlayerState)
 tags: [ontology/structure]
 ---
@@ -19,7 +19,6 @@ One of the two sides. Effects name players relative to whoever controls the effe
 ## Tracks
 | State | Notes |
 | --- | --- |
-| [[Action|Actions]] | Spent to deploy [[Character|Characters]]; earned Actions wait for the next [[Runtime turn]] |
 | [[Wallet]] | Crypto amount for this Cycle's [[Draft]] |
 | [[Victory Points]] | Destruction VP + reward VP + VP cards held |
 | Server integrity | Primary 2000, Backup 1500 at start |

@@ -152,7 +152,6 @@ function playOut(game: RuntimeSession, entry: Card, node = 0) {
   game.state.phase = 'runtime';
   game.state.turnReady = [false, false];
   game.state.players[0].hand = [entry];
-  game.state.players[0].actions = Math.max(2, game.state.players[0].actions);
   game.deploy(entry.id, node);
   game.endTurn(0);
   game.endTurn(1);

@@ -1,10 +1,14 @@
 /**
- * Deterministic card-efficiency budget for Content Studio.
+ * Deterministic card-efficiency budget for Content Studio (post-Actions economy).
  *
- * Efficiency E = printed value V / baseline B(cost). Anchors Mel named as balanced
- * are calibrated so mean E ≈ 1. Soft (unquantifiable) effects are flagged, not scored.
+ * Efficiency E = V / B(cost) + cryptoFloorPenalty.
+ * Anchors Mel named as balanced (Chrome Mitchell, ∆-Wave, Dash-Dot, …) calibrate mean E ≈ 1.
+ * Soft (unquantifiable) effects are flagged; duration hooks discount positive credits.
  *
  * Drain/Restore scale against full Server integrity (Primary + Backup).
+ *
+ * Astra (2026-11): flat durationFactor 0.75; crypto floors softFlagPlusPenalty (2→3, 3→6, 5→9);
+ * novel aura/bump/scry stay soft; curve retuned so Mel’s exemplars land near band.
  */
 import { serverMaximums, type Card } from '../game';
 import { migrateEffects } from '../effects/migrate';
@@ -24,37 +28,50 @@ export type CardBudgetScore = {
   soft: SoftFlag[];
   /** Power ÷ board slots (hologram counts as a second slot). Display only. */
   density: number | null;
+  /** Draft-cost floor implied by free Crypto income; 0 when none / waived. */
+  cryptoFloor: number;
   formula: string;
 };
 
-/** Mel's "completely balanced" exemplars (definitionId / id). */
+/**
+ * Mel’s balanced exemplars (definitionId / id).
+ * Chrome Mitchell + ∆-Wave + Dash-Dot are the post-Actions calibration core.
+ */
 export const ANCHOR_CARD_IDS = [
-  'card-vls0e5lo', // Doom Loop
-  'night-scythe',
+  'chrome-mitchell',
+  'delta-wave',
   'dash-dot',
   'slash-dot',
-  'dotkrawler',
   'rezz-blade',
   'rezz-razor',
   'cowl-obscyra',
-  'quantum-telementry', // pack spelling
-  'byte-coin',
+  'quantum-telementry',
 ] as const;
 
 /** Near band: within ±15% of baseline. */
 export const BAND_THRESHOLDS = { under: 0.85, over: 1.15 } as const;
 
 /**
- * Effect credits. Tuned so anchor cards average efficiency ≈ 1.
- * Retune here when Mel redefines "balanced."
+ * Free Crypto income → minimum draft cost (Mel). Waived when that Crypto sits behind
+ * a linked self discard / trash / payCrypto cost.
+ */
+export const CRYPTO_COST_FLOORS: readonly { minGain: number; minCost: number }[] = [
+  { minGain: 5, minCost: 9 },
+  { minGain: 3, minCost: 6 },
+  { minGain: 2, minCost: 3 },
+];
+
+/**
+ * Effect credits. Tuned so Mel’s anchors average efficiency ≈ 1.
+ * Astra preserved most effect weights; drain bumped so mid/high Attack packages
+ * (Chrome / ∆-Wave) sit with Dash-Dot on the character curve.
  */
 export const BUDGET_WEIGHTS = {
   power: 1.0,
   crypto: 1.15,
   draw: 1.28,
-  actions: 1.42,
   /** Multiplier on (damage / serverIntegrity). */
-  drain: 36,
+  drain: 48,
   restore: 30,
   vp: 2.2,
   hologramPower: 0.85,
@@ -67,16 +84,23 @@ export const BUDGET_WEIGHTS = {
   costDiscard: 0.55,
   costTrash: 0.7,
   costPayCrypto: 1.0,
+  /** Positive credits on recurring / schedule ticks (Mel / Astra flat 0.75). */
+  durationFactor: 0.75,
+  /**
+   * Added to E per draft-cost point below the Mel crypto floor for free Crypto income.
+   * Pushes underpriced free Crypto packages into the OVER band.
+   */
+  cryptoFloorPenalty: 1.0,
 } as const;
 
 /**
  * B(c) = α + β·c + γ·c^1.35.
- * Relatively high α (slot/tempo overhead) + mild γ so dense mid-cost packages
- * and lean high-cost bodies can both sit near E≈1 for Mel’s anchors.
+ * Calibrated so Dash-Dot (3), Chrome Mitchell (7), and ∆-Wave (9) land near E≈1
+ * with the post-Actions weight table.
  */
 export const BASELINE_CURVES = {
-  character: { alpha: 2.2, beta: 1.2, gamma: 0.08 },
-  crypto: { alpha: 0.15, beta: 0.65, gamma: 0.1 },
+  character: { alpha: 3.35, beta: 0.68, gamma: 0.015 },
+  crypto: { alpha: 0.2, beta: 0.7, gamma: 0.08 },
   vp: { alpha: 0.4, beta: 0.9, gamma: 0.28 },
 } as const;
 
@@ -102,6 +126,7 @@ const SOFT_ACTIONS: Partial<Record<ActionId, string>> = {
 };
 
 type Curve = { alpha: number; beta: number; gamma: number };
+type Timing = 'instant' | 'duration';
 
 export type BudgetCard = Omit<Card, 'art' | 'effect' | 'powerSource'> & {
   art?: string;
@@ -150,9 +175,59 @@ function pushSoft(into: WalkResult, id: string, reason: string) {
   into.soft.push({ id, reason });
 }
 
+function isSelfTarget(step: EffectStep): boolean {
+  const who = step.target && 'who' in step.target ? step.target.who : 'self';
+  return who === 'self' || who === undefined;
+}
+
+function isSelfCostGate(step: EffectStep): boolean {
+  if (!isSelfTarget(step)) return false;
+  return step.action === 'payCrypto'
+    || step.action === 'discardCards'
+    || step.action === 'trashCards';
+}
+
+/**
+ * Largest Crypto gain that is not behind a linked self discard / trash / payCrypto gate.
+ * Used for Mel’s draft-cost floors.
+ */
+export function freeCryptoGain(card: BudgetCard): number {
+  let max = 0;
+  const visit = (steps: readonly EffectStep[] | undefined, gated: boolean) => {
+    if (!steps?.length) return;
+    for (const step of migrateEffects(steps, 'card')) {
+      if (step.action === 'gainCrypto' && !gated) max = Math.max(max, step.amount ?? 0);
+      const childGated = gated || isSelfCostGate(step);
+      if (step.then?.length) visit(step.then, childGated);
+      if (step.options?.length) {
+        for (const option of step.options) {
+          // Option costs gate that option’s effects.
+          const optionGated = childGated || !!(option.cost?.length);
+          if (option.cost?.length) visit(option.cost as EffectStep[], true);
+          if (option.effects?.length) visit(option.effects, optionGated);
+        }
+      }
+    }
+  };
+  if (card.type === 'Crypto') max = Math.max(max, card.cryptoValue ?? 0);
+  else visit(card.onReveal, false);
+  visit(card.onCollapse, false);
+  visit(card.recurring, false);
+  for (const entry of card.schedule ?? []) visit(entry.effects, false);
+  return max;
+}
+
+/** Mel floor cost for a free Crypto gain amount; 0 if below +2. */
+export function cryptoFloorForGain(gain: number): number {
+  for (const row of CRYPTO_COST_FLOORS) {
+    if (gain >= row.minGain) return row.minCost;
+  }
+  return 0;
+}
+
 /**
  * Walk effect steps. `factor` already includes parent optional/then discounts.
- * An optional step of its own multiplies positive credits (and its `then`) by optionalFactor.
+ * Duration timing multiplies positive credits only (Astra: discount benefits, not payments).
  */
 function walkSteps(
   steps: readonly EffectStep[] | undefined,
@@ -160,6 +235,7 @@ function walkSteps(
   into: WalkResult,
   serverIntegrity: number,
   cardPower: number,
+  timing: Timing,
 ): void {
   if (!steps?.length) return;
   for (const step of migrateEffects(steps, 'card')) {
@@ -172,11 +248,11 @@ function walkSteps(
       if (step.options?.length) {
         pushSoft(into, `${step.action}:options`, 'Choice/random option payoffs are not averaged into the hard score.');
         for (const option of step.options) {
-          if (option.cost?.length) walkSteps(option.cost as EffectStep[], childFactor, into, serverIntegrity, cardPower);
-          if (option.effects?.length) walkSteps(option.effects, childFactor, into, serverIntegrity, cardPower);
+          if (option.cost?.length) walkSteps(option.cost as EffectStep[], childFactor, into, serverIntegrity, cardPower, timing);
+          if (option.effects?.length) walkSteps(option.effects, childFactor, into, serverIntegrity, cardPower, timing);
         }
       }
-      if (step.then?.length) walkSteps(step.then, childFactor, into, serverIntegrity, cardPower);
+      if (step.then?.length) walkSteps(step.then, childFactor, into, serverIntegrity, cardPower, timing);
       continue;
     }
 
@@ -188,10 +264,6 @@ function walkSteps(
       case 'draw':
         credit = BUDGET_WEIGHTS.draw * amount;
         label = `Draw ${amount}`;
-        break;
-      case 'gainActions':
-        credit = BUDGET_WEIGHTS.actions * amount;
-        label = `+${amount} Action${amount === 1 ? '' : 's'}`;
         break;
       case 'gainCrypto':
         credit = BUDGET_WEIGHTS.crypto * amount;
@@ -232,14 +304,10 @@ function walkSteps(
         label = `Hologram (~${cardPower} Power on mirror)`;
         break;
       case 'discardCards': {
-        const who = step.target && 'who' in step.target ? step.target.who : 'self';
-        // Only self-hand discard is a Studio cost; foe discard is disruption (e.g. Invocation of the Sword).
-        if (who !== 'self' && who !== undefined) {
+        if (!isSelfTarget(step)) {
           pushSoft(into, 'discardCards:foe', 'Forcing another seat to discard is situational disruption.');
           break;
         }
-        // Mandatory self-discard (Summon the Acolytes) and discard→then costs are hard negatives.
-        // Optional discard with no then stays soft (thinning without a locked payoff).
         if (!step.optional || step.then?.length) {
           credit = -BUDGET_WEIGHTS.costDiscard * amount;
           label = step.then?.length
@@ -251,12 +319,10 @@ function walkSteps(
         break;
       }
       case 'trashCards': {
-        const who = step.target && 'who' in step.target ? step.target.who : 'self';
-        if (who !== 'self' && who !== undefined) {
+        if (!isSelfTarget(step)) {
           pushSoft(into, 'trashCards:foe', 'Forcing another seat to trash is situational disruption.');
           break;
         }
-        // Bare trash (Night Scythe) stays soft; trash→then is a hard cost. Astra: bare trash soft unless payoff.
         if (step.then?.length) {
           credit = -BUDGET_WEIGHTS.costTrash * amount;
           label = `Trash up to ${amount} (cost)`;
@@ -271,16 +337,18 @@ function walkSteps(
     }
 
     if (credit !== 0) {
-      const delta = credit * childFactor;
+      let delta = credit * childFactor;
+      if (timing === 'duration' && credit > 0) delta *= BUDGET_WEIGHTS.durationFactor;
+      const durationNote = timing === 'duration' && credit > 0 ? ' · duration' : '';
       into.parts.push({
         id: `${step.action}:${into.parts.length}`,
-        label: step.optional ? `${label} (optional)` : label,
+        label: `${step.optional ? `${label} (optional)` : label}${durationNote}`,
         credit: round2(delta),
       });
       into.credit += delta;
     }
 
-    if (step.then?.length) walkSteps(step.then, childFactor, into, serverIntegrity, cardPower);
+    if (step.then?.length) walkSteps(step.then, childFactor, into, serverIntegrity, cardPower, timing);
   }
 }
 
@@ -312,6 +380,7 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
     parts.push({ id: 'vp', label: `Printed VP ${card.vp}`, credit: round2(credit) });
     value += credit;
   }
+  // Astra: aura stays soft (board-dependent); residual flag only.
   if (card.aura) soft.push({ id: 'aura', reason: 'Power aura depends on other allies at the Location.' });
   if (card.powerSource) {
     soft.push({ id: 'powerSource', reason: 'Live Power bonus depends on game state.' });
@@ -319,13 +388,12 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
   if (card.selfMove) soft.push({ id: 'selfMove', reason: 'Self-move is mobility utility, not a fixed resource credit.' });
 
   const walk: WalkResult = { credit: 0, parts: [], soft: [] };
-  // Skip On Reveal crypto gains on Crypto cards — already counted via cryptoValue.
   if (card.type !== 'Crypto') {
-    walkSteps(card.onReveal, 1, walk, serverIntegrity, power);
+    walkSteps(card.onReveal, 1, walk, serverIntegrity, power, 'instant');
   }
-  walkSteps(card.onCollapse, 1, walk, serverIntegrity, power);
-  walkSteps(card.recurring, 1, walk, serverIntegrity, power);
-  for (const entry of card.schedule ?? []) walkSteps(entry.effects, 1, walk, serverIntegrity, power);
+  walkSteps(card.onCollapse, 1, walk, serverIntegrity, power, 'instant');
+  walkSteps(card.recurring, 1, walk, serverIntegrity, power, 'duration');
+  for (const entry of card.schedule ?? []) walkSteps(entry.effects, 1, walk, serverIntegrity, power, 'duration');
 
   for (const flag of walk.soft) {
     if (!soft.some(existing => existing.id === flag.id)) soft.push(flag);
@@ -333,8 +401,20 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
   parts.push(...walk.parts);
   value += walk.credit;
 
-  const baseline = Math.max(0.01, baselineForCost(card.cost ?? 0, curveFor(card)));
-  const efficiency = value / baseline;
+  const freeCrypto = freeCryptoGain(card);
+  const cryptoFloor = cryptoFloorForGain(freeCrypto);
+  const cost = card.cost ?? 0;
+  let floorPenalty = 0;
+  if (cryptoFloor > 0 && cost < cryptoFloor) {
+    floorPenalty = BUDGET_WEIGHTS.cryptoFloorPenalty * (cryptoFloor - cost);
+    soft.push({
+      id: 'cryptoFloor',
+      reason: `Free +${freeCrypto} Crypto usually wants draft cost ≥ ${cryptoFloor} (Mel). E += ${BUDGET_WEIGHTS.cryptoFloorPenalty} per missing cost point → OVER.`,
+    });
+  }
+
+  const baseline = Math.max(0.01, baselineForCost(cost, curveFor(card)));
+  const efficiency = value / baseline + floorPenalty;
   const hasHologram = [...(card.onReveal ?? []), ...(card.onCollapse ?? []), ...(card.recurring ?? [])]
     .some(step => step.action === 'createHologram');
   const density = card.type === 'Character' ? round2(power / (hasHologram ? 2 : 1)) : null;
@@ -348,7 +428,8 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
     parts,
     soft,
     density,
-    formula: 'E = V / B(cost); B = α + β·c + γ·c^1.35; Drain/Restore ÷ Server integrity; mandatory self-discard is a hard cost; soft effects flagged only.',
+    cryptoFloor,
+    formula: 'E = V / B(cost) + cryptoFloorPenalty; B = α + β·c + γ·c^1.35; duration ×0.75 on positive recurring/schedule credits; free +2/+3/+5 Crypto floors cost 3/6/9 unless paid for; soft effects flagged only.',
   };
 }
 
@@ -361,7 +442,11 @@ export function meanAnchorEfficiency(
     .map(id => cards.find(card => (card.definitionId ?? card.id) === id))
     .filter((card): card is BudgetCard => !!card)
     .map(card => ({ card, score: scoreCard(card, opts) }))
-    .filter(({ score }) => !opts?.hardOnly || score.soft.length === 0 || (score.soft.length === 1 && score.soft[0]?.id === 'selfMove'));
+    .filter(({ score }) => {
+      if (!opts?.hardOnly) return true;
+      const soft = score.soft.filter(flag => flag.id !== 'selfMove' && flag.id !== 'cryptoFloor');
+      return soft.length === 0;
+    });
   if (!anchors.length) return 0;
   const sum = anchors.reduce((total, { score }) => total + score.efficiency, 0);
   return round2(sum / anchors.length);

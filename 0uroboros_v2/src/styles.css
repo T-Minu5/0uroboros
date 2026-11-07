@@ -511,3 +511,33 @@
   pointer-events:none;
   z-index:3;
 }
+
+/* Far-left ControlledWeight tug-of-war — outside the 3D board canvas. */
+.weight-tug{
+  position:absolute;left:10px;top:18%;bottom:28%;z-index:26;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  width:36px;pointer-events:none;
+}
+.weight-tug-end{font:700 8px Orbitron,sans-serif;letter-spacing:.6px;opacity:.85}
+.weight-tug-track{position:relative;flex:1;width:100%;min-height:120px}
+.weight-tug-line{
+  position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;
+  background:linear-gradient(#ffffff22,#e8e0f055 50%,#ffffff22);border-radius:1px;
+}
+.weight-tug-dot{
+  position:absolute;left:50%;width:12px;height:12px;margin:-6px 0 0 -6px;
+  border-radius:50%;border:1px solid #fff8;transition:top .45s ease,background .3s,box-shadow .3s;
+}
+.weight-tug-particle{
+  position:absolute;left:50%;font:700 11px Orbitron,sans-serif;color:#ffe39c;
+  text-shadow:0 0 8px #ffcc1266;letter-spacing:.5px;white-space:nowrap;
+  animation:weight-particle-in .35s ease-out both;
+}
+.weight-tug-particle.far{top:8%;transform:translate(-50%,0);margin-left:14px}
+.weight-tug-particle.near{bottom:8%;transform:translate(-50%,0);margin-left:14px}
+.weight-tug-particle.tie{top:50%;transform:translate(-50%,-50%);margin-left:14px}
+@keyframes weight-particle-in{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
+@media(prefers-reduced-motion:reduce){
+  .weight-tug-dot{transition:none}
+  .weight-tug-particle{animation:none}
+}

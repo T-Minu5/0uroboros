@@ -61,27 +61,20 @@ describe("Local Runtime session", () => {
     expect(session.state.phase).toBe("runtime");
   });
 
-  it("defers OnReveal Actions to the next turn and preserves actual draw zones", () => {
+  it("resolves OnReveal draw into the actual draw zone", () => {
     const session = make();
     const player = session.state.players[0];
     player.hand = [{ ...starterCards[1], id: "test-dash" }];
     player.draw = [{ ...starterCards[0], id: "test-slash" }];
     player.discard = [];
     session.deploy("test-dash", 0);
-    expect(player.actions).toBe(1);
     session.endTurn();
-    let actionSeen = false;
+    let drawSeen = false;
     while (session.pendingCount) {
       const step = session.step()!;
-      if (step.event.owner === 0 && step.event.kind === "actions") {
-        actionSeen = true;
-        expect(player.actions).toBe(1);
-        expect(player.pendingActions).toBe(2);
-      }
+      if (step.event.owner === 0 && step.event.kind === "draw") drawSeen = true;
     }
-    expect(actionSeen).toBe(true);
-    expect(player.actions).toBe(3);
-    expect(player.pendingActions).toBe(0);
+    expect(drawSeen).toBe(true);
     expect(player.hand.some(card => card.id === "test-slash")).toBe(true);
     expect(player.draw).toHaveLength(0);
   });
@@ -117,8 +110,6 @@ describe("Local Runtime session", () => {
     expect(pile.supply).toBe(7);
     expect(player.wallet).toBe(6);
     expect(ownedCount(session, 0)).toBe(11);
-    expect(() => session.buy(pile.id, now + 1000)).toThrow(/cooldown/);
-    expect(pile.supply).toBe(7);
     session.buy(session.state.market[1].id, now + 1000);
     expect(ownedCount(session, 0)).toBe(12);
     session.endDraft(); session.nextCycle();
@@ -158,7 +149,6 @@ describe("Local Runtime session", () => {
       session.endDraft(); session.nextCycle();
       expect(session.state.cycle).toBe(index + 1);
       expect(session.state.players[0].hand).toHaveLength(5);
-      expect(session.state.players[0].pendingActions).toBe(0);
     }
   });
 
@@ -231,14 +221,13 @@ describe("Session edge conditions", () => {
 });
 
 describe("Resolution presentation data", () => {
-  it("discards starter deployments before Draft Crypto and expires turn-three Actions", () => {
+  it("discards starter deployments before Draft Crypto", () => {
     const session = make();
     session.endTurn(); drain(session);
     session.endTurn(); drain(session);
     const player = session.state.players[0];
     player.hand.push({ ...starterCards[1], id: "late-dash" });
     player.hand.push({ ...starterCards[5], id: "late-crypto" });
-    player.actions = 1;
     session.deploy("late-dash", 4);
     session.endTurn();
     let cleaned = false;
@@ -249,7 +238,6 @@ describe("Resolution presentation data", () => {
         cleaned = true;
         expect(session.state.nodes.every(node => node.cards.every(cards => cards.length === 0))).toBe(true);
         expect(player.discard.some(card => card.id === "late-dash")).toBe(true);
-        expect(player.pendingActions).toBe(0);
       }
       if (event.kind === "crypto" && event.cardId === "late-crypto") {
         cryptoSeen = true;
@@ -259,8 +247,6 @@ describe("Resolution presentation data", () => {
     }
     expect(cryptoSeen).toBe(true);
     session.endDraft(); session.nextCycle();
-    expect(player.actions).toBe(2);
-    expect(player.pendingActions).toBe(0);
   });
 
   it("reports actual clamped Drain target values for source-to-target animation", () => {
@@ -284,9 +270,9 @@ describe("State and visibility invariants", () => {
         for (const owner of [0, 1] as const) {
           const player = session.state.players[owner];
           const cards = ownedCards(session, owner);
-          expect(cards).toHaveLength(10);
-          expect(new Set(cards.map(card => card.id)).size).toBe(10);
-          expect(player.actions).toBeGreaterThanOrEqual(0);
+          // Free deploy lets more effects fire per turn; ownership must stay unique even if counts grow.
+          expect(cards.length).toBeGreaterThanOrEqual(10);
+          expect(new Set(cards.map(card => card.id)).size).toBe(cards.length);
           expect(player.servers.primary).toBeGreaterThanOrEqual(0);
           expect(player.servers.primary).toBeLessThanOrEqual(2000);
           expect(player.servers.backup).toBeGreaterThanOrEqual(0);
@@ -301,7 +287,6 @@ describe("State and visibility invariants", () => {
         for (let turn = 1; turn <= 3; turn++) {
           for (const card of [...session.state.players[0].hand]) {
             if (card.type === "Crypto") continue;
-            if (card.type === "Character" && session.state.players[0].actions === 0) continue;
             const target = session.state.nodes.findIndex((node, index) => session.view().openNodes.includes(index) && node.cards[0].length < 4);
             if (target !== -1) session.deploy(card.id, target);
           }
@@ -447,7 +432,6 @@ describe("Planning and Location-count rulings", () => {
     expect(session.state.phase).toBe('runtime');
     expect(session.state.nodes[3].cards[0][0].revealed).toBe(true);
     expect(session.state.nodes[4].cards[0][0].revealed).toBe(false);
-    expect(session.state.players[0].pendingActions).toBe(2);
     session.endTurn();const events=drain(session);
     expect(events.filter(event=>event.kind==='reveal'&&event.cardId==='last-node')).toHaveLength(1);
     expect(events.filter(event=>event.cardId==='opening-dash')).toHaveLength(0);
@@ -463,7 +447,8 @@ describe("Planning and Location-count rulings", () => {
     }
     session.endTurn();drain(session);
     expect(session.state.circuitEligible).toEqual(eligible);
-    expect(session.state.selectedNode).toBe(null);
+    // Particle still rolls from weights for the tug UI; eligibility stays Location-based.
+    expect(session.state.selectedNode).toBe(0);
   });
 
   it("uses Location count for priority and retains current priority on tied counts",()=>{

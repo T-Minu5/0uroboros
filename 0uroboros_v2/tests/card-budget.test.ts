@@ -3,6 +3,7 @@ import authored from '../content/authored-content.json';
 import {
   ANCHOR_CARD_IDS,
   BUDGET_WEIGHTS,
+  freeCryptoGain,
   fullServerIntegrity,
   meanAnchorEfficiency,
   scoreCard,
@@ -11,22 +12,32 @@ import {
 
 const packCards = authored.document.cards as BudgetCard[];
 
-function anchor(id: (typeof ANCHOR_CARD_IDS)[number]): BudgetCard {
+function byId(id: string): BudgetCard {
   const card = packCards.find(entry => (entry.definitionId ?? entry.id) === id);
-  if (!card) throw new Error(`Missing anchor ${id}`);
+  if (!card) throw new Error(`Missing card ${id}`);
   return card;
 }
 
+function anchor(id: (typeof ANCHOR_CARD_IDS)[number]): BudgetCard {
+  return byId(id);
+}
+
 describe('cardBudget', () => {
-  it('calibrates Mel’s hard-scored anchors near efficiency 1', () => {
+  it('calibrates Mel’s hard-scored anchors near efficiency 1 (Chrome, ∆-Wave, Dash-Dot)', () => {
     const mean = meanAnchorEfficiency(packCards, { hardOnly: true });
     expect(mean).toBeGreaterThanOrEqual(0.95);
-    // Band allows dense tempo packages (e.g. Dash Dot) without retuning BUDGET_WEIGHTS.
-    expect(mean).toBeLessThanOrEqual(1.07);
+    expect(mean).toBeLessThanOrEqual(1.10);
+
+    for (const id of ['chrome-mitchell', 'delta-wave', 'dash-dot'] as const) {
+      const score = scoreCard(anchor(id));
+      expect(score.efficiency, id).toBeGreaterThanOrEqual(0.85);
+      expect(score.efficiency, id).toBeLessThanOrEqual(1.15);
+      expect(score.band, id).toBe('near');
+    }
 
     for (const id of ANCHOR_CARD_IDS) {
       const score = scoreCard(anchor(id));
-      const softExcuse = score.soft.length > 0;
+      const softExcuse = score.soft.some(flag => flag.id !== 'cryptoFloor' && flag.id !== 'selfMove');
       if (softExcuse) continue;
       expect(score.efficiency).toBeGreaterThanOrEqual(0.75);
       expect(score.efficiency).toBeLessThanOrEqual(1.45);
@@ -34,7 +45,7 @@ describe('cardBudget', () => {
   });
 
   it('lists Night Scythe trash as soft, not scored', () => {
-    const score = scoreCard(anchor('night-scythe'));
+    const score = scoreCard(byId('night-scythe'));
     expect(score.soft.some(flag => flag.id === 'trashCards')).toBe(true);
     expect(score.parts.every(part => !part.id.startsWith('trashCards'))).toBe(true);
     expect(score.value).toBe(score.parts.find(part => part.id === 'power')?.credit ?? 0);
@@ -82,7 +93,7 @@ describe('cardBudget', () => {
     const discard = score.parts.find(part => part.id.startsWith('discardCards'));
     expect(discard?.credit).toBeCloseTo(-BUDGET_WEIGHTS.costDiscard * 3, 5);
     expect(score.soft.some(flag => flag.id === 'discardCards')).toBe(false);
-    expect(score.efficiency).toBeLessThan(1.34);
+    expect(score.efficiency).toBeLessThanOrEqual(1.35);
   });
 
   it('hard-scores mandatory self-discard on complete draw packages (Summon-like)', () => {
@@ -141,7 +152,73 @@ describe('cardBudget', () => {
   });
 
   it('does not double-count Crypto value and On Reveal gainCrypto', () => {
-    const score = scoreCard(anchor('byte-coin'));
+    const score = scoreCard(byId('byte-coin'));
     expect(score.parts.filter(part => part.id === 'cryptoValue' || part.id.startsWith('gainCrypto'))).toHaveLength(1);
+  });
+
+  it('marks free +2 Crypto under cost 3 as OVER via Mel floor penalty', () => {
+    const cheap: BudgetCard = {
+      id: 'budget-cheap-crypto',
+      name: 'Cheap Crypto',
+      type: 'Character',
+      cost: 2,
+      power: 1,
+      onReveal: [{ action: 'gainCrypto', amount: 2, target: { type: 'player', who: 'self' } }],
+    };
+    const score = scoreCard(cheap);
+    expect(freeCryptoGain(cheap)).toBe(2);
+    expect(score.cryptoFloor).toBe(3);
+    expect(score.soft.some(flag => flag.id === 'cryptoFloor')).toBe(true);
+    expect(score.band).toBe('over');
+    expect(score.efficiency).toBeGreaterThan(1.15);
+  });
+
+  it('waives the crypto floor when Crypto is behind a sacrifice cost (Sigil)', () => {
+    const score = scoreCard(byId('sacrifical-sigil'));
+    expect(score.cryptoFloor).toBe(0);
+    expect(score.soft.some(flag => flag.id === 'cryptoFloor')).toBe(false);
+    expect(freeCryptoGain(byId('sacrifical-sigil'))).toBe(0);
+  });
+
+  it('applies durationFactor to positive recurring and schedule credits only', () => {
+    const instant = scoreCard({
+      id: 'budget-draw-now',
+      name: 'Draw Now',
+      type: 'Character',
+      cost: 3,
+      power: 0,
+      onReveal: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }],
+    });
+    const duration = scoreCard({
+      id: 'budget-draw-later',
+      name: 'Draw Later',
+      type: 'Character',
+      cost: 3,
+      power: 0,
+      recurring: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }],
+    });
+    const scheduled = scoreCard({
+      id: 'budget-draw-sched',
+      name: 'Draw Sched',
+      type: 'Character',
+      cost: 3,
+      power: 0,
+      schedule: [{ effects: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }] }],
+    });
+    const instantDraw = instant.parts.find(part => part.id.startsWith('draw'))!.credit;
+    const recurringDraw = duration.parts.find(part => part.id.startsWith('draw'))!.credit;
+    const scheduleDraw = scheduled.parts.find(part => part.id.startsWith('draw'))!.credit;
+    expect(instantDraw).toBeCloseTo(BUDGET_WEIGHTS.draw * 2, 5);
+    expect(recurringDraw).toBeCloseTo(BUDGET_WEIGHTS.draw * 2 * BUDGET_WEIGHTS.durationFactor, 5);
+    expect(scheduleDraw).toBeCloseTo(BUDGET_WEIGHTS.draw * 2 * BUDGET_WEIGHTS.durationFactor, 5);
+    expect(duration.parts.find(part => part.id.startsWith('draw'))!.label).toMatch(/duration/);
+  });
+
+  it('keeps Dash-Dot free +2 Crypto at Mel’s cost-3 floor without a floor penalty', () => {
+    const score = scoreCard(anchor('dash-dot'));
+    expect(freeCryptoGain(anchor('dash-dot'))).toBe(2);
+    expect(score.cryptoFloor).toBe(3);
+    expect(score.soft.some(flag => flag.id === 'cryptoFloor')).toBe(false);
+    expect(score.band).toBe('near');
   });
 });

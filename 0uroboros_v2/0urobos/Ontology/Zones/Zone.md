@@ -14,7 +14,7 @@ A place a [[Card]] can be. Every copy is in exactly one zone.
 flowchart LR
   Deck -->|draw| Hand
   Hand -->|deploy| Lane[Node lane]
-  Hand -->|Crypto| Wallet
+  Hand -->|undeployed Crypto| Wallet
   Wallet -->|Draft| Discard
   Lane -->|collapse| Discard
   Lane -->|Duration| Bank[Effect Bank]
