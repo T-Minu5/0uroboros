@@ -154,7 +154,7 @@ describe('random gainCard draft eligibility', () => {
   it('Glitch-Witch still seeds a Generated Glitch into the enemy Discard', () => {
     const { pack, game } = gainSession();
     const witch = pack.cards.find(card => card.name === 'Glitch-Witch' || (card.definitionId ?? card.id) === 'card-q6u1qrf2');
-    expect(witch?.onReveal?.some(step => step.action === 'gainCard')).toBe(true);
+    expect(witch?.onReveal?.some(step => 'action' in step && step.action === 'gainCard')).toBe(true);
     game.state.players[0].hand = [{ ...structuredClone(witch!), id: 'witch-1' }];
     game.state.players[1].discard = [];
     game.deploy('witch-1', 0);

@@ -1,5 +1,5 @@
 {
-  "packRevision": 1008,
+  "packRevision": 1014,
   "files": [
     "assets/HUDs/Elipse_test.svg",
     "assets/HUDs/circles.svg",
@@ -417,6 +417,7 @@
     "assets/library/card_art/glitches/glitch-03.png",
     "assets/library/card_art/glitches/glitch-04.png",
     "assets/library/card_art/glitches/glitch-05.png",
+    "assets/library/strike.png",
     "assets/materials/field-engraving.png",
     "assets/materials/titanium-surface.png",
     "assets/models/ouroboros-board-v4.glb",
