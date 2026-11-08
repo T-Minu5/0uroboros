@@ -901,6 +901,15 @@
       "height": 300,
       "focus": 0.3136
     },
+    "/assets/card_art/uploads/trash-collector.png": {
+      "sha": "db158eb42c7017fc82f1d0d8b6fb83120b3128d58cbe23498c8dd7dd54b05bc8",
+      "v": 2,
+      "color": "/assets/card_art/depth/db158eb42c7017fc82f1-v2.color.webp",
+      "depth": "/assets/card_art/depth/db158eb42c7017fc82f1-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.616
+    },
     "/assets/card_art/volume/10vp-b.png": {
       "sha": "4402fe11289c1fec569f6a409d3184d6214c0844af37e17f816875e167865d27",
       "v": 2,

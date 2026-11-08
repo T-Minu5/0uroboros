@@ -89,6 +89,24 @@ describe('Eco metrics Circuit differential and market VP', () => {
     expect(cohort.circuit.winsPerGame).toBeGreaterThan(0);
   });
 
+  it('counts Collapse particle Node control vs ties for Eco', () => {
+    const m = gameMetrics(report({
+      finalVP: [10, 8], purchases: [],
+      cycles: [
+        { cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null, particleNode: 2, particleWinner: 0 },
+        { cycle: 2, vp: [4, 2], servers: [3500, 3500], wallet: [0, 0], locationsWon: [2, 3], deckSize: [10, 10], locations: [], circuit: null, particleNode: 0, particleWinner: null },
+        { cycle: 3, vp: [6, 4], servers: [3500, 3500], wallet: [0, 0], locationsWon: [4, 1], deckSize: [10, 10], locations: [], circuit: null, particleNode: 4, particleWinner: 1 },
+        // Older cycle without particle fields — ignored for particle stats
+        { cycle: 4, vp: [8, 5], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+      ],
+    }));
+    expect(m.mostNodesLeader).toBe(0);
+    expect(m.locationsWon).toEqual([12, 8]);
+    expect(m.particleControlled).toBe(2);
+    expect(m.particleTied).toBe(1);
+    expect(m.particleWins).toEqual([1, 1]);
+  });
+
   it('exposes market VP per seat separately from destruction VP', () => {
     const m = gameMetrics(report({
       finalVP: [18, 12],

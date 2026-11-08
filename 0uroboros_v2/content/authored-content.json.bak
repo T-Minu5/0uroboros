@@ -1,5 +1,5 @@
 {
-  "revision": 939,
+  "revision": 1007,
   "document": {
     "version": 3,
     "cards": [
@@ -494,8 +494,8 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/base cards/action/cowl-obscyra.png",
-        "effect": "+2 Cards. +1 Crypto.",
-        "power": 3,
+        "effect": "+2 Cards. +2 Crypto.",
+        "power": 2,
         "onReveal": [
           {
             "action": "draw",
@@ -599,7 +599,7 @@
         "type": "Character",
         "cost": 7,
         "art": "/assets/card_art/base cards/action/root-rune.png",
-        "effect": "+3 Cards. +3 Crypto.",
+        "effect": "+3 Cards. +2 Crypto.",
         "power": 3,
         "onReveal": [
           {
@@ -653,7 +653,7 @@
           },
           {
             "action": "gainCrypto",
-            "amount": 4,
+            "amount": 3,
             "target": {
               "type": "player",
               "who": "self"
@@ -702,8 +702,8 @@
         "type": "Character",
         "cost": 2,
         "art": "/assets/card_art/base cards/utility/night-scythe.png",
-        "effect": "Trash 1 card from your hand.",
-        "power": 1,
+        "effect": "+1 Crypto. You may trash 1 card from your hand. ",
+        "power": 3,
         "onReveal": [
           {
             "action": "trashCards",
@@ -717,6 +717,14 @@
               "mode": "choose"
             },
             "optional": true
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Base",
@@ -731,7 +739,7 @@
         "type": "Character",
         "cost": 2,
         "art": "/assets/card_art/base cards/utility/superpositioning.png",
-        "effect": "You may discard up to 3 cards from your hand. If you do, +3 Cards.",
+        "effect": "You may discard 3 cards from your hand. If you do +5 Cards.",
         "power": 1,
         "onReveal": [
           {
@@ -749,7 +757,7 @@
             "then": [
               {
                 "action": "draw",
-                "amount": 3,
+                "amount": 5,
                 "target": {
                   "type": "player",
                   "who": "self"
@@ -767,7 +775,7 @@
         "definitionId": "koppy-kat",
         "name": "Koppy-Kat",
         "type": "Character",
-        "cost": 5,
+        "cost": 6,
         "art": "/assets/card_art/chaos cards/hackers/kim-dracula.png",
         "effect": "Copy the text of your last revealed card.",
         "power": 2,
@@ -786,7 +794,7 @@
         "definitionId": "superpositioning",
         "name": "Superpositioning",
         "type": "Character",
-        "cost": 3,
+        "cost": 5,
         "art": "/assets/card_art/uploads/hell-hound-form.png",
         "effect": "Create hologram at mirrored Node. +2 Crypto.",
         "power": 2,
@@ -960,7 +968,7 @@
         "cost": 4,
         "art": "/assets/card_art/base cards/utility/opulent-void.png",
         "effect": "Trash 1,2, or 3 cards from your hand. +2 Crypto.",
-        "power": 2,
+        "power": 3,
         "onReveal": [
           {
             "action": "trashCards",
@@ -1039,11 +1047,11 @@
         "id": "byte-heist",
         "definitionId": "byte-heist",
         "name": "Byte Heist",
-        "type": "Character",
-        "cost": 5,
+        "type": "Crypto",
+        "cost": 3,
         "art": "/assets/card_art/base cards/utility/byte-heist.png",
-        "effect": "+1 Card. Gain a Byte-Coin on top of your deck.",
-        "power": 3,
+        "effect": "+1 Card. +2 Crypto.",
+        "power": 0,
         "onReveal": [
           {
             "action": "draw",
@@ -1054,22 +1062,18 @@
             }
           },
           {
-            "action": "gainCard",
+            "action": "gainCrypto",
             "target": {
-              "type": "zone",
-              "who": "self",
-              "zone": "deck"
+              "type": "player",
+              "who": "self"
             },
-            "amount": 1,
-            "cardIds": [
-              "byte-coin"
-            ]
+            "amount": 2
           }
         ],
-        "pool": "Base",
+        "pool": "Crypto",
         "enabled": true,
-        "cardClass": "Utility",
-        "storyText": "Pocket a Byte-coin and yield both tactical advantage and lasting prosperity."
+        "storyText": "Pocket a Byte-coin and yield both tactical advantage and lasting prosperity.",
+        "cryptoValue": 1
       },
       {
         "id": "code-sniper",
@@ -1078,8 +1082,8 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/base cards/utility/code-sniper.png",
-        "effect": "Choose one: +2 Cards or +2 Crypto.",
-        "power": 2,
+        "effect": "Choose one: +3 Cards or +3 Crypto.",
+        "power": 1,
         "onReveal": [
           {
             "action": "choice",
@@ -1087,11 +1091,11 @@
             "options": [
               {
                 "id": "draw",
-                "label": "+2 Cards",
+                "label": "+3 Cards",
                 "effects": [
                   {
                     "action": "draw",
-                    "amount": 2,
+                    "amount": 3,
                     "target": {
                       "type": "player",
                       "who": "self"
@@ -1101,11 +1105,11 @@
               },
               {
                 "id": "crypto",
-                "label": "+2 Crypto",
+                "label": "+3 Crypto",
                 "effects": [
                   {
                     "action": "gainCrypto",
-                    "amount": 2,
+                    "amount": 3,
                     "target": {
                       "type": "player",
                       "who": "self"
@@ -1124,35 +1128,11 @@
         "id": "kilo-cycle",
         "definitionId": "kilo-cycle",
         "name": "Kilo Cycle",
-        "type": "Character",
+        "type": "Crypto",
         "cost": 6,
         "art": "/assets/card_art/base cards/utility/kilo-cycle.png",
-        "effect": "+3 Crypto.",
-        "power": 1,
-        "onReveal": [
-          {
-            "action": "gainCrypto",
-            "target": {
-              "type": "player",
-              "who": "self"
-            },
-            "amount": 3
-          }
-        ],
-        "durationPeriod": "cycle",
-        "pool": "Base",
-        "enabled": true,
-        "cardClass": "Utility"
-      },
-      {
-        "id": "chronos-cache",
-        "definitionId": "chronos-cache",
-        "name": "Chronos Cache",
-        "type": "Character",
-        "cost": 9,
-        "art": "/assets/card_art/base cards/utility/chronos-cache.png",
-        "effect": "+1 Card. +5 Crypto.",
-        "power": 3,
+        "effect": "+1 Card. +3 Crypto.",
+        "power": 0,
         "onReveal": [
           {
             "action": "draw",
@@ -1168,13 +1148,45 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 5
+            "amount": 3
           }
         ],
         "durationPeriod": "cycle",
-        "pool": "Base",
+        "pool": "Crypto",
         "enabled": true,
-        "cardClass": "Utility"
+        "cryptoValue": 1
+      },
+      {
+        "id": "chronos-cache",
+        "definitionId": "chronos-cache",
+        "name": "Chronos Cache",
+        "type": "Crypto",
+        "cost": 9,
+        "art": "/assets/card_art/base cards/utility/chronos-cache.png",
+        "effect": "+1 Card. +6 Crypto.",
+        "power": 0,
+        "onReveal": [
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 6
+          }
+        ],
+        "durationPeriod": "cycle",
+        "pool": "Crypto",
+        "enabled": true,
+        "cryptoValue": 1
       },
       {
         "id": "dit-bot",
@@ -1396,7 +1408,7 @@
         "type": "Character",
         "cost": 4,
         "art": "/assets/card_art/chaos cards/attack/invocation-of-the-sword.png",
-        "effect": "Discard up to 2 cards from opponent hand.Drain -100.",
+        "effect": "Discard 2 cards from enemy hand (enemy chooses). Drain -75.",
         "power": 2,
         "onReveal": [
           {
@@ -1546,7 +1558,7 @@
         "type": "Character",
         "cost": 6,
         "art": "/assets/card_art/chaos cards/attack/h3x1-d3x1.PNG",
-        "effect": "Drain -250. +2 Crypto.",
+        "effect": "Drain -250. +1 Crypto.",
         "power": 2,
         "onReveal": [
           {
@@ -1557,6 +1569,14 @@
               "who": "opponent",
               "server": "auto"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Chaos",
@@ -1582,6 +1602,14 @@
               "who": "opponent",
               "server": "backup"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
           }
         ],
         "pool": "Chaos",
@@ -1596,7 +1624,7 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/chaos cards/attack/qubit-kid.png",
-        "effect": "Choose a card from the enemy's hand to discard.",
+        "effect": "Choose a card from the enemy's hand to discard.+1 Card. +1 Crypto.",
         "power": 3,
         "durationPeriod": "runtime",
         "onReveal": [
@@ -1612,6 +1640,22 @@
               "mode": "choose"
             },
             "optional": true
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
           }
         ],
         "pool": "Chaos",
@@ -1978,7 +2022,7 @@
         "type": "Character",
         "cost": 8,
         "art": "/assets/card_art/chaos cards/horrors/the-azimuthal-kill.png",
-        "effect": "Drain -125 when played. Then Drain -25 for the next 4 Cylces. Finally drain  -350 from backup server on the 5th Cycle.",
+        "effect": "Drain -125 when played. Then Drain -25 for the next 4 Cylces. Finally drain  -450 from backup server on the 5th Cycle.",
         "power": 3,
         "onReveal": [
           {
@@ -2053,7 +2097,7 @@
               },
               {
                 "action": "damageServer",
-                "amount": 350,
+                "amount": 450,
                 "target": {
                   "type": "server",
                   "who": "opponent",
@@ -2112,12 +2156,12 @@
         "type": "Character",
         "cost": 12,
         "art": "/assets/card_art/chaos cards/horrors/veil-of-cthulhu.png",
-        "effect": "Drain -500. Repair +100. Mill 2 cards from enemy deck.",
+        "effect": "Drain -600. Repair +100. Mill 2 cards from enemy deck.",
         "power": 4,
         "onReveal": [
           {
             "action": "damageServer",
-            "amount": 500,
+            "amount": 600,
             "target": {
               "type": "server",
               "who": "opponent",
@@ -2194,13 +2238,13 @@
         "type": "VP",
         "cost": 3,
         "art": "/assets/card_art/volume/1vp.png",
-        "effect": "Repair +50.",
+        "effect": "Repair +35.",
         "power": 1,
         "vp": 1,
         "onReveal": [
           {
             "action": "repairServer",
-            "amount": 50,
+            "amount": 35,
             "target": {
               "type": "server",
               "who": "self",
@@ -2350,7 +2394,7 @@
         "type": "VP",
         "cost": 10,
         "art": "/assets/card_art/volume/10vp.png",
-        "effect": "Repair +200, for the next 3 Cycles.",
+        "effect": "Repair +125, for the next 3 Cycles.",
         "power": 1,
         "vp": 5,
         "pool": "VP",
@@ -2365,7 +2409,7 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 200
+            "amount": 125
           }
         ]
       },
@@ -2407,7 +2451,17 @@
         "cryptoValue": 1,
         "pool": "Crypto",
         "enabled": true,
-        "storyText": "Basic crypto unit used for data acquisition."
+        "storyText": "Basic crypto unit used for data acquisition.",
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "amount": 1,
+            "target": {
+              "type": "player",
+              "who": "self"
+            }
+          }
+        ]
       },
       {
         "id": "byte-coin",
@@ -2429,7 +2483,7 @@
           }
         ],
         "pool": "Crypto",
-        "enabled": true,
+        "enabled": false,
         "storyText": "Enhanced crypto unit with double processing power."
       },
       {
@@ -2452,7 +2506,7 @@
           }
         ],
         "pool": "Crypto",
-        "enabled": true,
+        "enabled": false,
         "storyText": "Advanced crypto with triple processing capacity."
       },
       {
@@ -2465,8 +2519,18 @@
         "effect": "+5 Crypto",
         "cryptoValue": 5,
         "pool": "Crypto",
-        "enabled": true,
-        "storyText": "Premium crypto with exceptional computational power."
+        "enabled": false,
+        "storyText": "Premium crypto with exceptional computational power.",
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "amount": 5,
+            "target": {
+              "type": "player",
+              "who": "self"
+            }
+          }
+        ]
       },
       {
         "id": "eval-relocation-relay",
@@ -2662,7 +2726,7 @@
       },
       {
         "type": "Character",
-        "art": "/assets/card_art/base cards/utility/trash-collector.png",
+        "art": "/assets/card_art/uploads/trash-collector.png",
         "enabled": true,
         "onReveal": [
           {
@@ -2742,7 +2806,7 @@
         "generated": false,
         "enabled": true,
         "cost": 5,
-        "power": 2,
+        "power": 1,
         "art": "/assets/card_art/uploads/ghetto-blaster.png",
         "effect": "Destroy your next revealed card, then +2 Cards. +3 Crypto.",
         "onReveal": [
@@ -2765,7 +2829,7 @@
               },
               {
                 "action": "gainCrypto",
-                "amount": 4,
+                "amount": 3,
                 "target": {
                   "type": "player",
                   "who": "self"
@@ -3092,7 +3156,7 @@
         "power": 3,
         "vp": 1,
         "art": "/assets/card_art/uploads/i0n.png",
-        "effect": "For the next 2 Cycles. +1 Card. Restore a revealed card of yours +1.",
+        "effect": "For the next 3 Cycles. +1 Card. Restore a revealed card of yours +1.",
         "duration": 3,
         "recurring": [
           {
@@ -3221,13 +3285,12 @@
         "id": "card-ncwu37n8",
         "definitionId": "card-ncwu37n8",
         "name": "Crypto Alchemist",
-        "pool": "Base",
-        "type": "Character",
-        "cardClass": "Utility",
+        "pool": "Crypto",
+        "type": "Crypto",
         "generated": false,
         "enabled": true,
-        "cost": 6,
-        "power": 2,
+        "cost": 7,
+        "power": 0,
         "art": "/assets/library/card_art/base cards/utility/crypto-alchemist.png",
         "effect": "Morph this into a random crypto-coin worth: 1, 2, 3, or 5",
         "onReveal": [
@@ -3242,7 +3305,8 @@
             "selection": "random",
             "resetAfterCycle": true
           }
-        ]
+        ],
+        "cryptoValue": 1
       },
       {
         "id": "card-t2g3tg0s",
@@ -3412,7 +3476,7 @@
         "enabled": true,
         "cost": 6,
         "power": 2,
-        "vp": 1,
+        "vp": 2,
         "art": "/assets/card_art/uploads/amatera-5u.png",
         "effect": "+2 Cards. +1 Crypto. Repair +50.",
         "onReveal": [
@@ -3626,7 +3690,7 @@
         "enabled": true,
         "cost": 5,
         "power": 0,
-        "vp": 1,
+        "vp": 2,
         "art": "/assets/card_art/uploads/astra-wraith.png",
         "effect": "Steal 1 Power from the strongest revealed enemy card. Enemy must discard a card from their hand. Repair +50.",
         "onReveal": [
@@ -3814,8 +3878,16 @@
         "cost": 4,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png",
-        "effect": "Gain a random Quark, playable for +1VP, in your discard pile.",
+        "effect": "+1 Crypto. Gain a random Quark, playable for +1VP, in your discard pile.",
         "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          },
           {
             "action": "gainCard",
             "target": {
@@ -4653,7 +4725,7 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/card_art/uploads/slash-n1.png",
-        "effect": "Drain -75. You may destroy a card in your discard pile. If you do +3 Crypto.",
+        "effect": "Drain -75. You may destroy a card in your hand. If you do +2 Crypto.",
         "onReveal": [
           {
             "action": "damageServer",
@@ -4669,7 +4741,7 @@
             "target": {
               "type": "card",
               "who": "self",
-              "where": "discard"
+              "where": "hand"
             },
             "pick": {
               "mode": "choose"
@@ -4681,7 +4753,7 @@
                   "type": "player",
                   "who": "self"
                 },
-                "amount": 3
+                "amount": 2
               }
             ],
             "optional": true
@@ -4697,7 +4769,7 @@
         "cardClass": "Horror",
         "generated": false,
         "enabled": true,
-        "cost": 3,
+        "cost": 4,
         "power": 3,
         "art": "/assets/card_art/uploads/hack-n1.png",
         "effect": "Drain -75. +1 Card. +1 Crypto.",
@@ -4736,7 +4808,7 @@
         "name": "Login the Calvary",
         "rule": "Ongoing: +2 Cards.",
         "reward": "Ongoing: +2 Cards.",
-        "enabled": true,
+        "enabled": false,
         "ongoing": [
           {
             "action": "draw",
@@ -4811,9 +4883,9 @@
       },
       {
         "id": "loser-s-luck",
-        "name": "Loser's Luck",
-        "rule": "Ongoing: The losing player gets.",
-        "reward": "Ongoing: The losing player gets.",
+        "name": "Catch me up",
+        "rule": "Ongoing: +1 Card to the losing player.",
+        "reward": "Ongoing: +1 Card to the losing player.",
         "enabled": true,
         "ongoing": [
           {
@@ -4924,7 +4996,7 @@
       },
       {
         "id": "data-breach",
-        "name": "Data Breach",
+        "name": "Make 'em bleed",
         "rule": "On collapse: Drain -100 from the losing player's server.",
         "reward": "On collapse: Deal 100 damage to the losing player's server.",
         "effects": [
@@ -4963,7 +5035,7 @@
       },
       {
         "id": "backup-failure",
-        "name": "Backup Plan Fails",
+        "name": "Failed to recover",
         "rule": "Ongoing: +1 Card to the losing player. On collapse: Drain -50 form their backup server.",
         "reward": "Ongoing: +1 Card to the losing player. On collapse: Drain -50 form their backup server.",
         "effects": [
@@ -4992,18 +5064,20 @@
       {
         "id": "penny-for-the-poor",
         "name": "Penny for the poor",
-        "rule": "On collapse: Gain a Shyte-Coin in the losing player's hand.",
-        "reward": "On collapse: Gain a Shyte-Coin in the losing player's hand.",
+        "rule": "On collapse: Gain +1 Crypto-Shyte in the losing player's hand.",
+        "reward": "On collapse: Gain +1 Crypto-Shyte in the losing player's hand.",
         "effects": [
           {
             "action": "gainCard",
             "amount": 1,
-            "cardId": "shyte-coin",
             "target": {
               "type": "zone",
               "who": "loser",
               "zone": "hand"
-            }
+            },
+            "cardIds": [
+              "crypto-shyte"
+            ]
           }
         ],
         "enabled": true
@@ -5295,7 +5369,7 @@
         "name": "Peep my shit",
         "rule": "Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.",
         "reward": "Start of turn 3: Winner inspects 3 cards from their deck, then keep, discard or trash each.",
-        "enabled": true,
+        "enabled": false,
         "startTurn3": [
           {
             "action": "scry",
@@ -5754,8 +5828,8 @@
       {
         "id": "location-e8tshr8e",
         "name": "Repel Spell ",
-        "rule": "On reveal: Move the card that was played to another open Node.",
-        "reward": "On reveal: Move the card that was played to another open Node.",
+        "rule": "On reveal: Move the card that was played to a random other open Node.",
+        "reward": "On reveal: Move the card that was played to a random other open Node.",
         "enabled": true,
         "onPlay": [
           {
@@ -5767,7 +5841,7 @@
               "relation": "self"
             },
             "pick": {
-              "mode": "choose"
+              "mode": "random"
             }
           }
         ],
@@ -5842,7 +5916,7 @@
         ],
         "enabled": true,
         "id": "loc-moop-yard",
-        "name": "MOOP Yard",
+        "name": "Couch Surf",
         "rule": "When: a card moves here, +1 Power to that card.",
         "reward": "When: a card moves here, +1 Power to that card.",
         "effects": []
@@ -5913,7 +5987,7 @@
         "events": [],
         "enabled": true,
         "id": "loc-warded-gate",
-        "name": "Warded Gate",
+        "name": "Not Welcome",
         "rule": "Ongoing: Cards cannot move onto this Node.",
         "reward": "Ongoing: Cards cannot move onto this Node.",
         "passives": {
@@ -6074,7 +6148,7 @@
             "amount": 1,
             "target": {
               "type": "card",
-              "who": "winner",
+              "who": "loser",
               "where": "thisNode"
             },
             "pick": {
@@ -6085,9 +6159,9 @@
         "events": [],
         "enabled": true,
         "id": "loc-neighbour-beacon",
-        "name": "Neighbour Beacon",
-        "rule": "On collapse: +1 Power to all cards on the winning side here.",
-        "reward": "On collapse: +1 Power to all cards on the winning side here."
+        "name": "Lucky Loser",
+        "rule": "On collapse: +1 Power to all cards on the losing side here.",
+        "reward": "On collapse: +1 Power to all cards on the losing side here."
       },
       {
         "id": "loc-solo-draw",
@@ -6434,14 +6508,12 @@
                 "label": "+2 Crypto",
                 "effects": [
                   {
-                    "action": "gainCard",
+                    "action": "gainCrypto",
                     "target": {
-                      "type": "zone",
-                      "who": "self",
-                      "zone": "deck"
+                      "type": "player",
+                      "who": "self"
                     },
-                    "amount": 1,
-                    "cardId": "byte-coin"
+                    "amount": 2
                   }
                 ]
               },
@@ -6885,59 +6957,6 @@
     ],
     "startingDecks": [
       {
-        "id": "deck-standard",
-        "name": "Standard-old",
-        "cards": [
-          {
-            "cardId": "byte-coin",
-            "count": 2
-          },
-          {
-            "cardId": "shyte-coin",
-            "count": 2
-          },
-          {
-            "cardId": "dotkrawler",
-            "count": 1
-          },
-          {
-            "cardId": "slash-dot",
-            "count": 1
-          },
-          {
-            "cardId": "rezz-blade",
-            "count": 1
-          },
-          {
-            "cardId": "basic-encryption",
-            "count": 2
-          },
-          {
-            "cardId": "night-scythe",
-            "count": 1
-          }
-        ]
-      },
-      {
-        "id": "deck-h89qtofj",
-        "name": "New deck",
-        "cards": []
-      },
-      {
-        "id": "deck-rjwj1cpi",
-        "name": "Extended Runtime",
-        "cards": [
-          {
-            "cardId": "basic-encryption",
-            "count": 3
-          },
-          {
-            "cardId": "shyte-coin",
-            "count": 7
-          }
-        ]
-      },
-      {
         "id": "deck-vlk4aczm",
         "name": "Standard deck - cypto",
         "cards": [
@@ -7020,6 +7039,24 @@
           {
             "cardId": "crypto-shyte",
             "count": 7
+          }
+        ]
+      },
+      {
+        "id": "deck-1bk6n58u",
+        "name": "Short Circuit",
+        "cards": [
+          {
+            "cardId": "rezz-razor",
+            "count": 1
+          },
+          {
+            "cardId": "basic-encryption",
+            "count": 1
+          },
+          {
+            "cardId": "crypto-shyte",
+            "count": 5
           }
         ]
       }
@@ -7574,6 +7611,37 @@
             "chaos": 0.3
           },
           "cardBias": {}
+        }
+      },
+      {
+        "id": "last-2go",
+        "name": "Last2Go",
+        "style": "Reactive majority",
+        "profile": {
+          "version": 0,
+          "plan": "Most VP wins; destroying Servers awards VP and can end the game early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free from hand; there is no Draft Crypto shelf (Hacker/Crypto slots only). Shared early economy through Cycle 4, then mirror the opponent's Draft buys with a mild Drain/Chaos/disrupt bias. Never play Runtime turn 1 — hold the hand, then contest Nodes on turns 2 and 3 for at least one more Location win than the enemy — ties are fine tools for that majority.",
+          "economyUntilCycle": 4,
+          "chaosFromCycle": 6,
+          "vpFromCycle": 10,
+          "handCryptoTarget": 8,
+          "minCryptoValue": 2,
+          "minBuyScore": 0.6,
+          "dilution": 0.4,
+          "weights": {
+            "power": 1.3,
+            "draw": 1.4,
+            "crypto": 1,
+            "drain": 2.8,
+            "restore": 0.9,
+            "vp": 2,
+            "duration": 0.7,
+            "thin": 1,
+            "disrupt": 1.4,
+            "chaos": 2.2
+          },
+          "cardBias": {},
+          "holdUntilTurn": 2,
+          "mirrorBuys": true
         }
       }
     ],

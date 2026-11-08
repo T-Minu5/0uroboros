@@ -8,7 +8,8 @@ export type AgentSettings = {
   t5: { enabled: boolean };
   dv8: { enabled: boolean };
   vpDog: { enabled: boolean };
-  /** AI-vs-AI league between Strat-G, T-5, DV-8 and VP-Dog. */
+  last2go: { enabled: boolean };
+  /** AI-vs-AI league between Strat-G, T-5, DV-8, VP-Dog and Last2Go. */
   league: { rounds: number; seedsPerBlock: number; ecoObserves: boolean };
   ecoStrat: { enabled: boolean; observeHumanGames: boolean; continuous: boolean; reportEvery: number; baselineGames: number };
 };
@@ -19,24 +20,26 @@ export const DEFAULT_AGENT_SETTINGS: AgentSettings = {
   t5: { enabled: true },
   dv8: { enabled: true },
   vpDog: { enabled: true },
+  last2go: { enabled: true },
   league: { rounds: 3, seedsPerBlock: 4, ecoObserves: true },
   ecoStrat: { enabled: true, observeHumanGames: true, continuous: true, reportEvery: 10, baselineGames: 10 },
 };
 
 const bool = (value: unknown, fallback: boolean) => typeof value === 'boolean' ? value : fallback;
 const int = (value: unknown, fallback: number, min: number, max: number) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback;
-const SECTIONS = ['stratG', 't5', 'dv8', 'vpDog', 'league', 'ecoStrat'] as const;
+const SECTIONS = ['stratG', 't5', 'dv8', 'vpDog', 'last2go', 'league', 'ecoStrat'] as const;
 const section = (value: unknown): Record<string, unknown> => value && typeof value === 'object' ? value as Record<string, unknown> : {};
 
 export function sanitizeSettings(value: unknown, base: AgentSettings = DEFAULT_AGENT_SETTINGS): AgentSettings {
   const input = section(value);
-  const [stratG, t5, dv8, vpDog, league, eco] = SECTIONS.map(key => section(input[key]));
+  const [stratG, t5, dv8, vpDog, last2go, league, eco] = SECTIONS.map(key => section(input[key]));
   return {
     agentsEnabled: bool(input.agentsEnabled, base.agentsEnabled),
     stratG: { enabled: bool(stratG.enabled, base.stratG.enabled), recordDecisions: bool(stratG.recordDecisions, base.stratG.recordDecisions) },
     t5: { enabled: bool(t5.enabled, base.t5.enabled) },
     dv8: { enabled: bool(dv8.enabled, base.dv8.enabled) },
     vpDog: { enabled: bool(vpDog.enabled, base.vpDog.enabled) },
+    last2go: { enabled: bool(last2go.enabled, base.last2go.enabled) },
     league: {
       rounds: int(league.rounds, base.league.rounds, 1, 5), seedsPerBlock: int(league.seedsPerBlock, base.league.seedsPerBlock, 2, 8),
       ecoObserves: bool(league.ecoObserves, base.league.ecoObserves),
@@ -54,6 +57,7 @@ export const stratGActive = (settings: AgentSettings) => settings.agentsEnabled 
 export const t5Active = (settings: AgentSettings) => settings.agentsEnabled && settings.t5.enabled;
 export const dv8Active = (settings: AgentSettings) => settings.agentsEnabled && settings.dv8.enabled;
 export const vpDogActive = (settings: AgentSettings) => settings.agentsEnabled && settings.vpDog.enabled;
+export const last2goActive = (settings: AgentSettings) => settings.agentsEnabled && settings.last2go.enabled;
 export const ecoStratActive = (settings: AgentSettings) => settings.agentsEnabled && settings.ecoStrat.enabled;
 
 export function createSettingsStore(file: string) {

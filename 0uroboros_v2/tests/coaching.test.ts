@@ -54,12 +54,13 @@ describe("Location valuation", () => {
     expect(facts.rules.mods).toMatch(/Hologram/i);
     expect(facts.rules.vpSources).toMatch(/destruction/);
     expect(facts.configurable.map(item => item.id)).toEqual(expect.arrayContaining([
-      "serverVP.primary", "draftCrypto", "noLocations", "mostCircuitsBonusVP",
+      "serverVP.primary", "noLocations", "mostCircuitsBonusVP",
       "cards", "locations", "circuitRewards", "mods", "serverIntegrity",
     ]));
     expect(facts.configurable.find(item => item.id === "mostCircuitsBonusVP")).toMatchObject({ default: 6, surface: "configure" });
-    expect(facts.configurable.find(item => item.id === "draftCrypto")).toMatchObject({ default: false, surface: "configure" });
+    expect(facts.configurable.find(item => item.id === "draftCrypto")).toBeUndefined();
     expect(facts.configurable.find(item => item.id === "serverIntegrity")?.surface).toBe("code-constant");
+    expect(facts.market.currency).toMatch(/no persistent Crypto shelf/i);
     expect(facts.mods.some(mod => mod.kind === "builtin")).toBe(true);
   });
 });

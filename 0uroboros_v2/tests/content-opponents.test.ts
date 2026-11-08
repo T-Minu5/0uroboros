@@ -7,9 +7,9 @@ import { LEAGUE_ROSTER } from '../server/agents/roster';
 import { publishOpponent } from '../src/agentsApi';
 
 describe('opponents in the content pack', () => {
-  it('ships the four league baselines by default, each already sanitized', () => {
+  it('ships the five opponent baselines by default, each already sanitized', () => {
     const doc = createDefaultContent();
-    expect(doc.opponents!.map(opponent => opponent.id)).toEqual(['strat-g', 't-5', 'dv-8', 'vp-dog']);
+    expect(doc.opponents!.map(opponent => opponent.id)).toEqual(['strat-g', 't-5', 'dv-8', 'vp-dog', 'last-2go']);
     for (const opponent of doc.opponents!) expect(isCanonicalProfile(opponent.profile)).toBe(true);
     expect(validateContent(doc)).toEqual([]);
   });
@@ -20,7 +20,7 @@ describe('opponents in the content pack', () => {
     expect(upgraded.opponents).toEqual(defaultOpponents());
     expect(validateContent(upgraded)).toEqual([]);
     const compiled = compileContent(older as ContentDocument);
-    expect(compiled.opponents.map(opponent => opponent.name)).toEqual(['Strat-G', 'T-5', 'DV-8', 'VP-Dog']);
+    expect(compiled.opponents.map(opponent => opponent.name)).toEqual(['Strat-G', 'T-5', 'DV-8', 'VP-Dog', 'Last2Go']);
     expect(compiled.opponents[0].profile).toEqual(opponentBaseline('strat-g'));
   });
 
@@ -85,7 +85,7 @@ describe('publishing an agent to the pack', () => {
     expect(entry).toMatchObject({ name: 'T-5', style: 'Pure aggression' });
     expect(entry.profile.version).toBe(12);
     expect(entry.profile.cardBias).toEqual({ [keptId]: 2 });
-    expect(saved!.document.opponents!.map(opponent => opponent.id)).toEqual(['strat-g', 't-5', 'dv-8', 'vp-dog']);
+    expect(saved!.document.opponents!.map(opponent => opponent.id)).toEqual(['strat-g', 't-5', 'dv-8', 'vp-dog', 'last-2go']);
     expect(validateContent(saved!.document)).toEqual([]);
     expect(result).toEqual({ label: 'v12', revision: 42, hash: packHash(saved!.document) });
   });

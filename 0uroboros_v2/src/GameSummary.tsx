@@ -38,18 +38,37 @@ function useCountUp(target: number, delay: number){
 
 const cardVP = (card: Card) => card.vp ?? (card.name === 'Vault Encryption' ? 2 : 0);
 
-function PlayerTally({ owner, score, color, leading, showEffects, showDestruction, inspect }:{
- owner: PlayerId; score: ScoreBreakdown; color: PlayerColor; leading: boolean;
+/** Every physical card a seat still owns at gameover (zones + board), including VP cards. */
+function ownedDeck(view: SessionView, owner: PlayerId, vpCards: readonly Card[] = []): Card[] {
+  const player = view.players[owner];
+  const board = view.nodes.flatMap(node => [
+    ...node.cards[owner].map(placement => placement.card),
+    ...node.holograms.filter(holo => holo.owner === owner).map(holo => holo.card),
+  ]);
+  const deck = [...player.draw, ...player.hand, ...player.discard, ...player.bank.map(entry => entry.card), ...board];
+  const seen = new Set(deck.map(card => card.id));
+  for (const card of vpCards) {
+    if (!seen.has(card.id)) {
+      deck.push(card);
+      seen.add(card.id);
+    }
+  }
+  return deck;
+}
+
+function PlayerTally({ owner, score, deck, color, leading, showEffects, showDestruction, inspect }:{
+ owner: PlayerId; score: ScoreBreakdown; deck: Card[]; color: PlayerColor; leading: boolean;
  showEffects: boolean; showDestruction: boolean; inspect: (card: Card) => void;
 }){
- const [open, setOpen] = useState(false);
+ const [vpOpen, setVpOpen] = useState(false);
+ const [deckOpen, setDeckOpen] = useState(false);
  const rows: { key: string; label: string; value: number }[] = [
   { key: 'locations', label: 'Locations', value: score.locationVP },
   { key: 'circuit', label: 'Circuit rewards', value: score.circuitVP },
   ...(showEffects ? [{ key: 'effects', label: 'Card effects', value: score.effectVP }] : []),
   ...(showDestruction ? [{ key: 'destruction', label: 'Server destruction', value: score.destructionVP }] : []),
  ];
- const totalDelay = (rows.length + 2) * ROW_STAGGER_MS;
+ const totalDelay = (rows.length + 3) * ROW_STAGGER_MS;
  const total = useCountUp(score.total, totalDelay);
  return <article className={`summary-player ${leading ? 'leading' : ''}`} data-owner={owner} style={{ '--tally-accent': color.accent } as CSSProperties}>
   <header>
@@ -58,18 +77,33 @@ function PlayerTally({ owner, score, color, leading, showEffects, showDestructio
   </header>
   <ul className='summary-rows'>
    <li style={{ '--row-index': 0 } as CSSProperties}>
-    <button className='summary-cards-toggle' aria-expanded={open} disabled={!score.vpCards.length} onClick={() => setOpen(value => !value)}>
-     <span className='summary-row-label'><i aria-hidden='true'>{open ? '−' : '+'}</i>VP cards<em>{score.vpCards.length} {score.vpCards.length === 1 ? 'card' : 'cards'}</em></span>
+    <button className='summary-cards-toggle' aria-expanded={deckOpen} disabled={!deck.length} onClick={() => setDeckOpen(value => !value)}>
+     <span className='summary-row-label'><i aria-hidden='true'>{deckOpen ? '−' : '+'}</i>Deck<em>{deck.length} {deck.length === 1 ? 'card' : 'cards'}</em></span>
+     <b>{deck.length}</b>
+    </button>
+    {deckOpen && <div className='summary-cards summary-cards-grid' role='list'>
+     {deck.map((card, index) => {
+      const vp = cardVP(card);
+      return <button key={`${card.id}-${index}`} role='listitem' className='summary-card' style={{ '--card-index': index } as CSSProperties} aria-label={vp ? `Inspect ${card.name}, ${vp} VP` : `Inspect ${card.name}`} onClick={() => inspect(card)}>
+       <CardFace card={card}/>
+       {vp !== 0 && <span className={`summary-card-vp ${vp < 0 ? 'negative' : ''}`}>{vp < 0 ? `−${-vp}` : `+${vp}`}</span>}
+      </button>;
+     })}
+    </div>}
+   </li>
+   <li style={{ '--row-index': 1 } as CSSProperties}>
+    <button className='summary-cards-toggle' aria-expanded={vpOpen} disabled={!score.vpCards.length} onClick={() => setVpOpen(value => !value)}>
+     <span className='summary-row-label'><i aria-hidden='true'>{vpOpen ? '−' : '+'}</i>VP cards<em>{score.vpCards.length} {score.vpCards.length === 1 ? 'card' : 'cards'}</em></span>
      <b>{score.cardVP}</b>
     </button>
-    {open && <div className='summary-cards' role='list'>
+    {vpOpen && <div className='summary-cards summary-cards-grid' role='list'>
      {score.vpCards.map((card, index) => <button key={card.id} role='listitem' className='summary-card' style={{ '--card-index': index } as CSSProperties} aria-label={`Inspect ${card.name}, ${cardVP(card)} VP`} onClick={() => inspect(card)}>
       <CardFace card={card}/>
       <span className={`summary-card-vp ${cardVP(card) < 0 ? 'negative' : ''}`}>{cardVP(card) < 0 ? `−${-cardVP(card)}` : `+${cardVP(card)}`}</span>
      </button>)}
     </div>}
    </li>
-   {rows.map((row, index) => <li key={row.key} style={{ '--row-index': index + 1 } as CSSProperties}>
+   {rows.map((row, index) => <li key={row.key} style={{ '--row-index': index + 2 } as CSSProperties}>
     <span className='summary-row-label'>{row.label}</span><b>{row.value}</b>
    </li>)}
   </ul>
@@ -81,7 +115,7 @@ export function GameSummary({ view, colors, inspect, restart, onTallied }: Props
  const scores = view.finalScore;
  const showEffects = !!scores?.some(score => score.effectVP !== 0);
  const showDestruction = !!scores?.some(score => score.destructionVP !== 0);
- const rowCount = 2 + Number(showEffects) + Number(showDestruction);
+ const rowCount = 3 + Number(showEffects) + Number(showDestruction);
  useEffect(() => {
   if(!scores || !onTallied) return;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -103,7 +137,7 @@ export function GameSummary({ view, colors, inspect, restart, onTallied }: Props
    <button className='primary-button' onClick={restart}>New evaluation session <span>↗</span></button>
   </header>
   <div className='summary-players'>
-   {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}
+   {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} deck={ownedDeck(view, owner, scores[owner].vpCards)} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}
   </div>
  </section>
  <button type='button' className={`summary-expand ${collapsed ? 'shown' : ''}`} aria-label='Expand session summary' aria-controls='session-summary' aria-expanded={!collapsed} inert={!collapsed} onClick={() => setCollapsed(false)}>

@@ -16,8 +16,8 @@ import { createLeague, type LeagueMember } from './league';
 import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 import { coach, coachingTips, combineTips, createCoachingStore, withoutCoaching, type CoachingStore } from './coaching';
 import { baselineTips, createMentoringStore, handOff, TIPS_PER_MENTOR, type MentoringStore } from './mentoring';
-import { DV_8, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from './roster';
-import { createSettingsStore, dv8Active, ecoStratActive, stratGActive, t5Active, vpDogActive } from './settings';
+import { DV_8, LAST_2GO, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from './roster';
+import { createSettingsStore, dv8Active, ecoStratActive, last2goActive, stratGActive, t5Active, vpDogActive } from './settings';
 import { chatWithStrat, isChatAudience, type ChatAudience, type ChatHistoryTurn, type ChatLearnerId, type LearnerChatBundle } from './chat';
 
 /**
@@ -25,10 +25,11 @@ import { chatWithStrat, isChatAudience, type ChatAudience, type ChatHistoryTurn,
  * evidence bus; Eco-Strat subscribes. Nothing flows the other way: Eco-Strat is created without any handle
  * to the agents, and the routes here only read their status.
  *
- * Strat-G is the default opponent; the human can pick T-5, DV-8 or VP-Dog instead (`/api/ai/*?agent=`).
- * The league referee runs AI-vs-AI games between the agents and hands each one its own results only.
- * Mentoring and coaching are the designer-run channels between agents: VP-Dog's and DV-8's tips go into the
- * baselines of T-5 and Strat-G, and coaching moves Strat-G's baseline a set share toward its competitors' play.
+ * Strat-G is the default opponent; the human can pick T-5, DV-8 (Novice, not league-rated), VP-Dog or Last2Go
+ * instead (`/api/ai/*?agent=`). The league referee runs AI-vs-AI games between Strat-G, T-5, VP-Dog and Last2Go
+ * and hands each one its own results only. Mentoring and coaching are the designer-run channels between agents:
+ * VP-Dog's and DV-8's tips go into the baselines of T-5 and Strat-G, and coaching moves Strat-G's baseline a set
+ * share toward its competitors' play.
  */
 export type AgentSystemOptions = {
   cwd: string;
@@ -74,13 +75,15 @@ export function createAgentSystem(options: AgentSystemOptions) {
     enabled: () => stratGActive(settings.read()),
     loadSelfPlay, recordDecisions, onGameRecorded: publishHumanGame('strat-g'),
   });
-  const t5Root = resolve(cwd, 'ai-agents/t-5'), dv8Root = resolve(cwd, 'ai-agents/dv-8'), vpDogRoot = resolve(cwd, 'ai-agents/vp-dog');
+  const t5Root = resolve(cwd, 'ai-agents/t-5'), dv8Root = resolve(cwd, 'ai-agents/dv-8'), vpDogRoot = resolve(cwd, 'ai-agents/vp-dog'), last2goRoot = resolve(cwd, 'ai-agents/last-2go');
   const t5 = createStrategist({ root: t5Root, contentFile, identity: T_5, league: true, mentorTips: async () => baselineTips(await mentoringStore.read(), 't-5'), apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => t5Active(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('t-5'), log: message => log(`T-5 ${message}`) });
-  const dv8 = createStrategist({ root: dv8Root, contentFile, identity: DV_8, league: true, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => dv8Active(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('dv-8'), log: message => log(`DV-8 ${message}`) });
+  // Novice human opponent only: still publishes games and receives content/rules updates, but does not rate in Elo trials.
+  const dv8 = createStrategist({ root: dv8Root, contentFile, identity: DV_8, league: false, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => dv8Active(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('dv-8'), log: message => log(`DV-8 ${message}`) });
   const vpDog = createStrategist({ root: vpDogRoot, contentFile, identity: VP_DOG, league: true, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => vpDogActive(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('vp-dog'), log: message => log(`VP-Dog ${message}`) });
+  const last2go = createStrategist({ root: last2goRoot, contentFile, identity: LAST_2GO, league: true, apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL, enabled: () => last2goActive(settings.read()), recordDecisions, onGameRecorded: publishHumanGame('last-2go'), log: message => log(`Last2Go ${message}`) });
 
   const learners: Record<string, { agent: typeof strategist; root: string }> = {
-    'strat-g': { agent: strategist, root: stratGRoot }, 't-5': { agent: t5, root: t5Root }, 'dv-8': { agent: dv8, root: dv8Root }, 'vp-dog': { agent: vpDog, root: vpDogRoot },
+    'strat-g': { agent: strategist, root: stratGRoot }, 't-5': { agent: t5, root: t5Root }, 'dv-8': { agent: dv8, root: dv8Root }, 'vp-dog': { agent: vpDog, root: vpDogRoot }, 'last-2go': { agent: last2go, root: last2goRoot },
   };
   /** The agent's current best profile (never a running experiment's arm), sanitized for the content pack. */
   async function publishable(id: string) {
@@ -103,8 +106,8 @@ export function createAgentSystem(options: AgentSystemOptions) {
     members: [
       member('strat-g', 'Strat-G', strategist, () => stratGActive(settings.read())),
       member('t-5', 'T-5', t5, () => t5Active(settings.read())),
-      member('dv-8', 'DV-8', dv8, () => dv8Active(settings.read())),
       member('vp-dog', 'VP-Dog', vpDog, () => vpDogActive(settings.read())),
+      member('last-2go', 'Last2Go', last2go, () => last2goActive(settings.read())),
     ],
     harness: loadSelfPlay,
     document: readDocument,
@@ -255,6 +258,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
     if (t5Active(current)) void t5.start();
     if (dv8Active(current)) void dv8.start();
     if (vpDogActive(current)) void vpDog.start();
+    if (last2goActive(current)) void last2go.start();
     if (ecoStratActive(current)) void eco.load().catch(error => log(`Eco-Strat failed to load its journal (gameplay unaffected): ${error instanceof Error ? error.message : String(error)}`));
     if (ecoStratActive(current)) online?.start();
   }
@@ -264,12 +268,13 @@ export function createAgentSystem(options: AgentSystemOptions) {
     const rel = (path: string) => relative(cwd, path);
     return {
       settings: current,
-      effective: { stratG: stratGActive(current), t5: t5Active(current), dv8: dv8Active(current), vpDog: vpDogActive(current), ecoStrat: ecoStratActive(current) },
+      effective: { stratG: stratGActive(current), t5: t5Active(current), dv8: dv8Active(current), vpDog: vpDogActive(current), last2go: last2goActive(current), ecoStrat: ecoStratActive(current) },
       settingsFile: rel(settings.file),
       stratG: { ...strategist.status(), paths: { notebook: rel(resolve(stratGRoot, 'NOTEBOOK.md')), memory: rel(resolve(stratGRoot, 'memory.json')), games: rel(resolve(stratGRoot, 'games')) } },
       t5: { ...t5.status(), paths: { notebook: rel(resolve(t5Root, 'NOTEBOOK.md')), memory: rel(resolve(t5Root, 'memory.json')) } },
       dv8: { ...dv8.status(), paths: { notebook: rel(resolve(dv8Root, 'NOTEBOOK.md')), memory: rel(resolve(dv8Root, 'memory.json')) } },
       vpDog: { ...vpDog.status(), paths: { notebook: rel(resolve(vpDogRoot, 'NOTEBOOK.md')), memory: rel(resolve(vpDogRoot, 'memory.json')) } },
+      last2go: { ...last2go.status(), paths: { notebook: rel(resolve(last2goRoot, 'NOTEBOOK.md')), memory: rel(resolve(last2goRoot, 'memory.json')) } },
       league: league.status(),
       mentoring: { running: mentoring.running, error: mentoring.error, store: mentoring.store, file: rel(mentoringStore.file) },
       coaching: { running: coaching.running, error: coaching.error, store: coaching.store, file: rel(coachingStore.file), phases: STRAT_G_PHASES },
@@ -292,6 +297,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
       { id: 't-5-notebook', agent: 't-5', title: 'Notebook', file: resolve(t5Root, 'NOTEBOOK.md') },
       { id: 'dv-8-notebook', agent: 'dv-8', title: 'Notebook', file: resolve(dv8Root, 'NOTEBOOK.md') },
       { id: 'vp-dog-notebook', agent: 'vp-dog', title: 'Notebook', file: resolve(vpDogRoot, 'NOTEBOOK.md') },
+      { id: 'last-2go-notebook', agent: 'last-2go', title: 'Notebook', file: resolve(last2goRoot, 'NOTEBOOK.md') },
       { id: 'eco-strat-journal', agent: 'eco-strat', title: 'Journal', file: resolve(ecoRoot, 'JOURNAL.md') },
       ...reports.map(name => ({ id: `eco-strat-report-${name.slice(0, -3)}`, agent: 'eco-strat', title: `Report ${name.slice(0, -3)}`, file: resolve(ecoRoot, 'reports', name) })),
     ];
@@ -327,7 +333,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
       }
       if (path === '/api/agents/publishable' && request.method === 'GET') {
         const best = await publishable(new URLSearchParams((request.url ?? '').split('?')[1] ?? '').get('agent') ?? '');
-        if (!best) { reply(response, 404, { error: 'Only Strat-G, T-5, DV-8 and VP-Dog can be published as opponents.' }); return; }
+        if (!best) { reply(response, 404, { error: 'Only Strat-G, T-5, DV-8, VP-Dog and Last2Go can be published as opponents.' }); return; }
         reply(response, 200, best); return;
       }
       if (path === '/api/agents/settings' && request.method === 'PUT') {
@@ -356,12 +362,13 @@ export function createAgentSystem(options: AgentSystemOptions) {
         const message = typeof payload.message === 'string' ? payload.message : '';
         const history = Array.isArray(payload.history) ? payload.history as ChatHistoryTurn[] : [];
         if (!message.trim()) { reply(response, 400, { error: 'Message is required.' }); return; }
-        if (!isChatAudience(audience)) { reply(response, 400, { error: 'audience must be strat-g, eco-strat, t-5, dv-8, vp-dog, both, or all.' }); return; }
+        if (!isChatAudience(audience)) { reply(response, 400, { error: 'audience must be strat-g, eco-strat, t-5, dv-8, vp-dog, last-2go, both, or all.' }); return; }
         await Promise.all([
           strategist.start().catch(() => undefined),
           t5.start().catch(() => undefined),
           dv8.start().catch(() => undefined),
           vpDog.start().catch(() => undefined),
+          last2go.start().catch(() => undefined),
           eco.load().catch(() => undefined),
         ]);
         const readNotebook = async (root: string) => {
@@ -381,6 +388,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
           learner('t-5', t5, t5Root, 'T-5'),
           learner('dv-8', dv8, dv8Root, 'DV-8'),
           learner('vp-dog', vpDog, vpDogRoot, 'VP-Dog'),
+          learner('last-2go', last2go, last2goRoot, 'Last2Go'),
         ])) as Partial<Record<ChatLearnerId, LearnerChatBundle>>;
         let lastReportMarkdown: string | null = null;
         const last = eco.journal().reports.at(-1);
@@ -456,5 +464,5 @@ export function createAgentSystem(options: AgentSystemOptions) {
     }
   };
 
-  return { start, status, middlewares: [strategist.middleware, t5.middleware, dv8.middleware, vpDog.middleware, middleware], strategist, t5, dv8, vpDog, league, eco, settings, runEvaluationCohort, runMentoring, runCoaching, coachingState: () => ({ ...coaching }), mentoringState: () => ({ ...mentoring }), cohortState: () => ({ ...cohort }) };
+  return { start, status, middlewares: [strategist.middleware, t5.middleware, dv8.middleware, vpDog.middleware, last2go.middleware, middleware], strategist, t5, dv8, vpDog, last2go, league, eco, settings, runEvaluationCohort, runMentoring, runCoaching, coachingState: () => ({ ...coaching }), mentoringState: () => ({ ...mentoring }), cohortState: () => ({ ...cohort }) };
 }

@@ -1,5 +1,5 @@
 import { expandDeck, starterEffects, CARD_CLASSES, POWER_SOURCES, DEFAULT_STARTING_DECK, MIN_STARTING_DECK_SIZE, VP_CLASSES, type Card, type CardClass, type DeckEntry, type LegacyEffect } from '../game';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, CURRENCY_PILES, DRAFT_OFFER_COUNT, cardGainsCrypto } from '../evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_VP_CARDS, EVALUATION_CRYPTO_CARDS, DRAFT_OFFER_COUNT, cardGainsCrypto } from '../evaluationMarket';
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, type EvaluationLocation, type CircuitRewardDefinition } from '../content';
 import { CARD_ART_PLACEHOLDER } from '../cardArtwork';
 import { HISTORIC_SOURCE_METADATA } from '../historicCatalog';
@@ -285,7 +285,6 @@ export function validateContent(value: unknown): string[] {
     if(item.powerSource!==undefined&&(item.type!=='Character'||!(POWER_SOURCES as readonly unknown[]).includes(item.powerSource)))errors.push(`${p}.powerSource: expected ${POWER_SOURCES.join(', ')} on a Character`);
     if(item.aura!==undefined&&(item.type!=='Character'||!integer(item.aura,1,20)))errors.push(`${p}.aura: expected integer from 1 to 20 on a Character`);
     if(item.selfMove!==undefined&&(item.type!=='Character'||!['turn','cycle'].includes(String(item.selfMove))))errors.push(`${p}.selfMove: expected turn or cycle on a Character`);
-    if(item.type==='Crypto'&&item.power!==undefined&&item.generated!==true)errors.push(`${p}.power: only generated Crypto may have Power (playable Crypto tokens)`);
     if((item.cardClass==='Hacker'||item.cardClass==='Attack'||item.cardClass==='Horror')&&(item.type!=='Character'||item.pool!=='Chaos'))errors.push(`${p}.cardClass: ${item.cardClass} cards must be Chaos Characters`);
     if((item.cardClass==='Action'||item.cardClass==='Utility'||item.cardClass==='Runtime')&&item.type==='Character'&&item.pool==='Chaos')errors.push(`${p}.cardClass: ${item.cardClass} cards must be Base Characters`);
     if (!integer(item.cost, 0, 1000)) errors.push(`${p}.cost: expected integer from 0 to 1000`);
@@ -424,9 +423,8 @@ export function validateContent(value: unknown): string[] {
   if (!draftable.some(card => gainsCrypto(card) && (card.pool === 'Base' || card.pool === 'Chaos'))) {
     errors.push('cards: at least 1 enabled Base/Chaos card that gains Crypto required for Draft');
   }
-  for (const { cardId } of CURRENCY_PILES) {
-    const card = cards.find(item => record(item) && (item.definitionId ?? item.id) === cardId);
-    if (!record(card) || card.enabled !== true || card.generated === true || card.type !== 'Crypto') errors.push(`cards: ${cardId} is a Draft currency and must remain enabled as a non-Generated Crypto card`);
+  if (draftable.filter(card => card.type === 'Crypto' || (card.pool === 'Chaos' && card.cardClass === 'Hacker')).length < 2) {
+    errors.push('cards: at least 2 enabled non-Generated Hacker or Crypto cards required for Hacker/Crypto Draft slots');
   }
   validateStartingDecks(value, cardIds, errors);
   validateOpponents(value.opponents, cardIds, errors);

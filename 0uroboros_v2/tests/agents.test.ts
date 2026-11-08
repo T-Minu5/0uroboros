@@ -465,12 +465,13 @@ describe("agent settings", () => {
       const action = response();
       await system.middlewares.at(-1)!(request("POST", "/api/agents/eco-strat/baseline"), action.res, () => undefined);
       expect(action.result.status).toBe(409);
-    } finally { await rm(root, { recursive: true, force: true }); }
+      system.settings.write({ agentsEnabled: false });
+    } finally { await rm(root, { recursive: true, force: true, maxRetries: 8, retryDelay: 50 }); }
   });
 
   it("keeps test-game settings in range and guards the test-game routes", async () => {
     expect(sanitizeSettings({ league: { rounds: 50, seedsPerBlock: 0, ecoObserves: "no" } }).league).toEqual({ rounds: 5, seedsPerBlock: 2, ecoObserves: true });
-    expect(sanitizeSettings({})).toMatchObject({ t5: { enabled: true }, dv8: { enabled: true }, vpDog: { enabled: true }, league: { rounds: 3, seedsPerBlock: 4, ecoObserves: true } });
+    expect(sanitizeSettings({})).toMatchObject({ t5: { enabled: true }, dv8: { enabled: true }, vpDog: { enabled: true }, last2go: { enabled: true }, league: { rounds: 3, seedsPerBlock: 4, ecoObserves: true } });
     const root = await project();
     try {
       const system = createAgentSystem({ cwd: root, env: {}, loadModule: async path => import(/* @vite-ignore */ resolve(`.${path}`)), log: () => undefined });
@@ -478,7 +479,7 @@ describe("agent settings", () => {
       const evaluate = await post("/api/agents/eco-strat/evaluate");
       expect(evaluate.status).toBe(409);
       expect(JSON.parse(evaluate.body).error).toMatch(/baseline/);
-      system.settings.write({ t5: { enabled: false }, dv8: { enabled: false }, vpDog: { enabled: false } });
+      system.settings.write({ t5: { enabled: false }, dv8: { enabled: false }, vpDog: { enabled: false }, last2go: { enabled: false } });
       const lonely = await post("/api/agents/league/run");
       expect(lonely.status).toBe(409);
       expect(JSON.parse(lonely.body).error).toMatch(/at least two/);
@@ -486,6 +487,7 @@ describe("agent settings", () => {
       expect(system.status().league).toMatchObject({ running: false, window: 5, latestRatio: 0.5 });
       expect(await readdir(join(root, "ai-agents"))).not.toContain("t-5");
       expect(await readdir(join(root, "ai-agents"))).not.toContain("vp-dog");
+      expect(await readdir(join(root, "ai-agents"))).not.toContain("last-2go");
     } finally { await rm(root, { recursive: true, force: true }); }
   });
 

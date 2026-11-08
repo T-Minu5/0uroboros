@@ -68,11 +68,18 @@ export type StrategyProfile = {
   weights: StrategyWeights;
   /** Learned per-card adjustments keyed by definition id, in points. */
   cardBias: Record<string, number>;
+  /**
+   * When set, the AI holds its hand until this Runtime turn (e.g. 3) so it can react to
+   * where the opponent has already played. Other seats leave this unset.
+   */
+  holdUntilTurn?: number;
+  /** Prefer Draft cards the opponent already bought this Draft (or earlier this Cycle). */
+  mirrorBuys?: boolean;
 };
 
 export const DEFAULT_STRATEGY: StrategyProfile = {
   version: 0,
-  plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption, then Shyte after a better Crypto source), then pivot into Chaos for the Drain race, finishing on VP cards.',
+  plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source), then pivot into Chaos for the Drain race, finishing on VP cards.',
   economyUntilCycle: 4,
   chaosFromCycle: 5,
   vpFromCycle: 12,
@@ -109,6 +116,9 @@ export function sanitizeProfile(value: unknown, fallback: StrategyProfile = DEFA
   const economyUntilCycle = Math.round(clamp(finite(source.economyUntilCycle, fallback.economyUntilCycle), PROFILE_BOUNDS.economyUntilCycle));
   const chaosFromCycle = Math.round(clamp(Math.max(finite(source.chaosFromCycle, fallback.chaosFromCycle), economyUntilCycle + 1), PROFILE_BOUNDS.chaosFromCycle));
   const midgameMix = clamp(finite(source.midgameMix, fallback.midgameMix ?? 0), PROFILE_BOUNDS.midgameMix);
+  const holdRaw = finite(source.holdUntilTurn, fallback.holdUntilTurn ?? 0);
+  const holdUntilTurn = holdRaw >= 2 && holdRaw <= 3 ? Math.round(holdRaw) : undefined;
+  const mirrorBuys = source.mirrorBuys === true || (source.mirrorBuys === undefined && fallback.mirrorBuys === true);
   return {
     version: Math.max(0, Math.round(finite(source.version, fallback.version))),
     plan: typeof source.plan === 'string' && source.plan.trim() ? source.plan.trim().slice(0, 600) : fallback.plan,
@@ -122,6 +132,8 @@ export function sanitizeProfile(value: unknown, fallback: StrategyProfile = DEFA
     dilution: clamp(finite(source.dilution, fallback.dilution), PROFILE_BOUNDS.dilution),
     weights,
     cardBias,
+    ...(holdUntilTurn ? { holdUntilTurn } : {}),
+    ...(mirrorBuys ? { mirrorBuys: true } : {}),
   };
 }
 
@@ -133,6 +145,8 @@ export type StrategyContext = {
   owned: readonly Card[];
   ownServers: number; ownServersMax: number;
   enemyServers: number; enemyServersMax: number;
+  /** Definition ids the other seat bought this Cycle's Draft (for mirrorBuys). */
+  opponentBoughtIds?: readonly string[];
 };
 
 export type Phase = 'economy' | 'build' | 'endgame';
@@ -290,24 +304,25 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
   const bias = profile.cardBias[definition(card)] ?? 0;
   const id = definition(card);
   const opening = earlyEconomy(context.cycle);
+  const mirrorBonus = profile.mirrorBuys && context.opponentBoughtIds?.includes(id) ? 4.5 : 0;
 
   if (card.type === 'Crypto') {
     if ((card.cryptoValue ?? 0) < profile.minCryptoValue) return -Infinity;
     if (opening) {
-      // Shared opener when Crypto shelf cards are offered: Kilo first, then Mega-Cache; Byte only as the Cycle-1 fallback when Kilo is out of reach. Without the shelf, Character Crypto income is scored via handValue below.
-      if (id === 'mega-cache') return 24 - plannedCopies * 2 + bias;
-      if (id === 'kilo-coin') return (ownsUpgrade(owned) ? 12 : 30) - plannedCopies * 2 + bias;
-      if (id === 'byte-coin') return ownsUpgrade(owned) ? 2 + bias : 8 - plannedCopies * 3 + bias;
+      // Shared opener when Crypto cards appear in Hacker/Crypto slots: Kilo first, then Mega-Cache; Byte as the cheaper fallback.
+      if (id === 'mega-cache') return 24 - plannedCopies * 2 + bias + mirrorBonus;
+      if (id === 'kilo-coin') return (ownsUpgrade(owned) ? 12 : 30) - plannedCopies * 2 + bias + mirrorBonus;
+      if (id === 'byte-coin') return (ownsUpgrade(owned) ? 2 + bias : 8 - plannedCopies * 3 + bias) + mirrorBonus;
     }
     const need = Math.min(1, Math.max(0.15, (profile.handCryptoTarget - cryptoPerHand(owned)) / profile.handCryptoTarget));
     const decay = 1 / (1 + 0.25 * plannedCopies);
-    return (profile.weights.crypto * (card.cryptoValue ?? 0) * (0.4 + need) * m.econ) * decay - dilution + bias;
+    return (profile.weights.crypto * (card.cryptoValue ?? 0) * (0.4 + need) * m.econ) * decay - dilution + bias + mirrorBonus;
   }
   if (card.type === 'VP') {
     if (opening && EARLY_JUNK_VP.has(id)) return -Infinity;
     if (opening) return -Infinity;
     const points = profile.weights.vp * (card.vp ?? 0) * m.vp;
-    return points + handValue(card, profile, context) * uses * 0.5 - dilution + bias;
+    return points + handValue(card, profile, context) * uses * 0.5 - dilution + bias + mirrorBonus;
   }
   if (opening && isChaos(card)) return -Infinity;
   const chaos = isChaos(card)
@@ -315,7 +330,7 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
     : 0;
   // Early opener still values draw, Actions and trash enablers (Night Scythe) once Crypto buys are scored above them.
   const value = (handValue(card, profile, context) + chaos) * uses;
-  return value / (1 + 0.5 * copies) - dilution + bias;
+  return value / (1 + 0.5 * copies) - dilution + bias + mirrorBonus;
 }
 
 /** Compiled cards drop their pool, but only Chaos Characters carry these classes. */

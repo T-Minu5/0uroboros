@@ -29,6 +29,13 @@
 .setup-agents-body{display:block;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 14px}
 .setup-agents-body.games .test-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
 .setup-agents-body.games .test-games>:not(.test-games-card){grid-column:1/-1}
+.setup-agents-body.ab .test-games{display:block;max-width:560px}
+.ab-howto{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border:1px solid #ffffff14;border-radius:7px;background:#ffffff06}
+.ab-howto h3{margin:2px 0 0;font:600 9px Inter,sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:#9fe8ff}
+.ab-howto h3:first-child{margin-top:0}
+.ab-howto ol,.ab-howto ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.ab-howto li,.ab-howto p{margin:0;font:500 10px/1.45 Inter,sans-serif;color:#9ea6ba}
+.ab-howto b{font-weight:600;color:#eaf0f6}
 .mentoring-recipients{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px 14px;align-items:start}
 .report-control{display:flex;flex-direction:column;gap:4px}
 .agents-panel .report-control>button{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center}

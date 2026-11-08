@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_CRYPTO_OFFER_MIN, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, DRAFT_SLOTS_TEN, cardGainsCryptoAtLeast, chaosClassOf, createCryptoPiles, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_COPIES_PER_PLAYER, DRAFT_CRYPTO_OFFER_MIN, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, DRAFT_SLOTS_TEN, cardGainsCryptoAtLeast, chaosClassOf, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
 import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
 import { bundledContent } from "../src/contentPack/contentStore";
@@ -37,8 +37,8 @@ describe("Strategic evaluation Draft", () => {
   it("has no fixed piles and deals an 8-slot rotating Draft with 2 copies per player", () => {
     expect(EVALUATION_BASE_CARDS.length).toBeGreaterThan(12); expect(EVALUATION_VP_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CRYPTO_CARDS.length).toBeGreaterThanOrEqual(3); expect(EVALUATION_CHAOS_CARDS.length).toBeGreaterThanOrEqual(5);
     expect(createStrategicMarket(seededRandom(41))).toEqual([]);
-    expect(CURRENCY_PILES.map(pile => pile.cardId)).toEqual(["shyte-coin", "byte-coin", "kilo-coin", "mega-cache"]);
-    expect(createCryptoPiles(bundledContent).map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
+    expect(createStrategicMarket(seededRandom(41), bundledContent, { draftCrypto: true })).toEqual([]);
+    expect(CURRENCY_CARD_IDS).toEqual(["shyte-coin", "byte-coin", "kilo-coin", "mega-cache"]);
     const session = make(); draft(session);
     const offer = session.state.market.filter(pile => pile.rotating);
     expect(session.state.market.filter(pile => !pile.rotating)).toEqual([]);
@@ -48,8 +48,8 @@ describe("Strategic evaluation Draft", () => {
     expect(built).toHaveLength(DRAFT_SLOTS.length);
     expect(["Action", "Utility"]).toContain(built[0].card.cardClass);
     expect(["Action", "Utility"]).toContain(built[1].card.cardClass);
-    expect(["Hacker", "Utility"]).toContain(built[2].card.cardClass);
-    expect(["Hacker", "Utility"]).toContain(built[3].card.cardClass);
+    expect(built[2].card.cardClass === "Hacker" || built[2].card.type === "Crypto").toBe(true);
+    expect(built[3].card.cardClass === "Hacker" || built[3].card.type === "Crypto").toBe(true);
     expect(chaosClassOf(built[4].card)).toBe("Attack");
     expect(chaosClassOf(built[5].card)).toBe("Horror");
     expect(isSolarMonk(built[6].card)).toBe(true);
@@ -58,25 +58,12 @@ describe("Strategic evaluation Draft", () => {
     expect(built.filter(pile => cardGainsCryptoAtLeast(pile.card)).length).toBeGreaterThanOrEqual(DRAFT_CRYPTO_OFFER_MIN);
   });
 
-  it("adds a persistent Crypto shelf when the Draft Crypto setting is on", () => {
-    expect(createStrategicMarket(seededRandom(41), bundledContent, { draftCrypto: true }).map(pile => pile.id)).toEqual([
-      "Crypto:shyte-coin", "Crypto:byte-coin", "Crypto:kilo-coin", "Crypto:mega-cache",
-    ]);
+  it("never creates a persistent Crypto shelf, even if draftCrypto is requested", () => {
     const session = createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(41), content: bundledContent, draftCrypto: true });
     draft(session);
-    const crypto = session.state.market.filter(pile => pile.category === "Crypto");
-    expect(crypto).toHaveLength(4);
-    expect(crypto.every(pile => !pile.rotating && pile.remaining === undefined)).toBe(true);
-    expect(crypto.map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
+    expect(session.state.market.filter(pile => !pile.rotating)).toEqual([]);
+    expect(session.state.market.filter(pile => pile.id.startsWith("Crypto:"))).toEqual([]);
     expect(session.state.market.filter(pile => pile.rotating)).toHaveLength(DRAFT_SLOTS.length);
-    session.state.players[0].wallet = 20;
-    const before = crypto[1].supply;
-    session.buy("Crypto:byte-coin");
-    expect(crypto[1].supply).toBe(before - 1);
-    expect(session.state.players[0].discard.some(card => card.name === "Byte-Coin")).toBe(true);
-    session.endDraft(0); session.endDraft(1); session.nextCycle(); cycle(session);
-    expect(session.state.market.filter(pile => pile.category === "Crypto").map(pile => pile.card.name)).toEqual(["Shyte-Coin", "Byte-Coin", "Kilo-Coin", "Mega-Cache"]);
-    expect(session.state.market.find(pile => pile.id === "Crypto:byte-coin")!.supply).toBe(before - 1);
   });
 
   it("tracks per-player Draft stock with no purchase cooldown", () => {
@@ -127,8 +114,8 @@ describe("Strategic evaluation Draft", () => {
       }
       expect(["Action", "Utility"]).toContain(offer[0].card.cardClass);
       expect(["Action", "Utility"]).toContain(offer[1].card.cardClass);
-      expect(["Hacker", "Utility"]).toContain(offer[2].card.cardClass);
-      expect(["Hacker", "Utility"]).toContain(offer[3].card.cardClass);
+      expect(offer[2].card.cardClass === "Hacker" || offer[2].card.type === "Crypto").toBe(true);
+      expect(offer[3].card.cardClass === "Hacker" || offer[3].card.type === "Crypto").toBe(true);
       if (slots === DRAFT_SLOTS_TEN) {
         expect(offer[4].category).toBe("Chaos");
         expect(offer[5].category).toBe("Chaos");

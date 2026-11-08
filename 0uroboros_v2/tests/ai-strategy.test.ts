@@ -411,3 +411,55 @@ describe("strategy over effect steps", () => {
     expect(selfDrain).toBeLessThan(0);
   });
 });
+
+describe("Last2Go brain hooks", () => {
+  const last2go = sanitizeProfile({
+    ...DEFAULT_STRATEGY,
+    holdUntilTurn: 2,
+    mirrorBuys: true,
+    weights: { ...DEFAULT_STRATEGY.weights, drain: 2.8, chaos: 2.2, disrupt: 1.4, power: 1.3, vp: 2 },
+  });
+
+  it("sanitizes holdUntilTurn and mirrorBuys, leaving other agents unchanged", () => {
+    expect(sanitizeProfile(DEFAULT_STRATEGY).holdUntilTurn).toBeUndefined();
+    expect(sanitizeProfile(DEFAULT_STRATEGY).mirrorBuys).toBeUndefined();
+    expect(last2go.holdUntilTurn).toBe(2);
+    expect(last2go.mirrorBuys).toBe(true);
+    expect(sanitizeProfile({ holdUntilTurn: 1 }).holdUntilTurn).toBeUndefined();
+    expect(sanitizeProfile({ holdUntilTurn: 99 }).holdUntilTurn).toBeUndefined();
+  });
+
+  it("boosts draftScore for cards the opponent already bought when mirrorBuys is on", () => {
+    const base = context(6);
+    const mirrored = context(6, starter, { opponentBoughtIds: ["slash-dot"] });
+    expect(draftScore(byId("slash-dot"), last2go, mirrored)).toBeGreaterThan(draftScore(byId("slash-dot"), last2go, base));
+    expect(draftScore(byId("slash-dot"), DEFAULT_STRATEGY, mirrored)).toBe(draftScore(byId("slash-dot"), DEFAULT_STRATEGY, base));
+  });
+
+  it("skips Runtime turn 1, then deploys on turns 2 and 3", () => {
+    const session = createSession({
+      carryover: true, priorityPreference: "higher", strategicMarket: true, evaluationContent: true,
+      random: seededRandom(17), aiSeats: [1], seatStrategies: { 1: last2go }, recordDecisions: true,
+    });
+    const boardCards = () => session.state.nodes.reduce((sum, node) => sum + node.cards[1].length, 0);
+    const playable = () => session.state.players[1].hand.filter(card => card.type !== "Crypto" || (card.power ?? 0) || card.powerDelta || card.powerSource).length;
+
+    expect(session.state.turn).toBe(1);
+    expect(playable()).toBeGreaterThan(0);
+    session.endTurn(0);
+    expect(boardCards()).toBe(0);
+    expect(session.matchReport().decisions.filter(item => item.kind === "deploy" && item.owner === 1)).toEqual([]);
+
+    for (let guard = 0; session.pendingCount || session.state.choice; guard++) {
+      if (guard > 4000) throw new Error("Resolution stalled.");
+      if (session.state.choice) session.choose(firstLegalSelection(session.state.choice), session.state.choice.owner);
+      else session.step();
+    }
+    expect(session.state.turn).toBe(2);
+    const before = playable();
+    expect(before).toBeGreaterThan(0);
+    session.endTurn(0);
+    expect(boardCards()).toBeGreaterThan(0);
+    expect(session.matchReport().decisions.some(item => item.kind === "deploy" && item.owner === 1 && item.turn === 2)).toBe(true);
+  });
+});

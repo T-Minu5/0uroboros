@@ -7,7 +7,7 @@ import type { LeagueArms, LeagueOutcome, Snapshot } from '../aiStrategist';
 import type { GameEvidence } from './evidence';
 
 /**
- * The AI league: a neutral referee for adversarial self-play between Strat-G, T-5, DV-8 and VP-Dog, following the
+ * The AI league: a neutral referee for adversarial self-play between Strat-G, T-5, VP-Dog and Last2Go, following the
  * self-play practice of ML-Agents / the Hugging Face Deep RL course:
  * - one agent learns at a time while the others are frozen snapshots ("team change");
  * - opponents come from a pool of each agent's last `WINDOW` snapshots; with probability `LATEST_RATIO` the

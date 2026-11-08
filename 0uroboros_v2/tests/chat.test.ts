@@ -76,7 +76,7 @@ describe('Chat audiences and reply formatting', () => {
     expect(isChatAudience('all')).toBe(true);
     expect(isChatAudience('mentor')).toBe(false);
     expect(speakersForAudience('both')).toEqual(['strat-g', 'eco-strat']);
-    expect(speakersForAudience('all')).toEqual(['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog']);
+    expect(speakersForAudience('all')).toEqual(['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog', 'last-2go']);
     expect(speakersForAudience('vp-dog')).toEqual(['vp-dog']);
   });
 

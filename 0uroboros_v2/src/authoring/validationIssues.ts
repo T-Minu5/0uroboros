@@ -107,11 +107,10 @@ export function describeIssues(document: ContentDocument, errors: readonly strin
       const { field, label } = locate(section, segments(itemMatch[3]));
       return { section, itemId: item?.id ?? null, itemName: item?.name || `Untitled ${SECTION_NOUN[section]}`, field, label, message: humanize(itemMatch[4]) };
     }
-    const requiredCard = /^cards: (\S+) is (used by the default starting deck|a Draft currency) and must remain enabled/.exec(error);
+    const requiredCard = /^cards: (\S+) is used by the default starting deck and must remain enabled/.exec(error);
     if (requiredCard) {
       const card = document.cards.find(candidate => (candidate.definitionId ?? candidate.id) === requiredCard[1]);
-      const currency = requiredCard[2] === 'a Draft currency';
-      return { section: 'cards', itemId: card?.id ?? null, itemName: card?.name ?? requiredCard[1], field: card ? 'enabled' : null, label: currency ? 'Draft currency' : 'Starting deck', message: currency ? 'must stay an enabled, non-Generated Crypto card because every Draft sells it' : 'must stay enabled because the starting deck uses it' };
+      return { section: 'cards', itemId: card?.id ?? null, itemName: card?.name ?? requiredCard[1], field: card ? 'enabled' : null, label: 'Starting deck', message: 'must stay enabled because the starting deck uses it' };
     }
     const builtin = /^builtinMods\.([A-Za-z]+)\.(name|badge|text): (.*)$/.exec(error);
     if (builtin) return { section: 'mods', itemId: builtin[1], itemName: builtinMod(builtin[1] as ModifierKind).name, field: `builtinMods.${builtin[1]}.${builtin[2]}`, label: BUILTIN_FIELD_LABELS[builtin[2]], message: humanize(builtin[3]) };

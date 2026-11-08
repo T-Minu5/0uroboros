@@ -175,6 +175,65 @@ describe('location hooks and in-location targeting', () => {
     expect(game.state.players[1].hand).toHaveLength(0);
   });
 
+  it('Pay to Play still pays and draws per seat when one side already leads on Power', () => {
+    const document = createDefaultContent();
+    const payToPlay: EffectStep = {
+      action: 'payCrypto',
+      optional: true,
+      amount: 1,
+      target: { type: 'player', who: 'both' },
+      then: [{ action: 'draw', amount: 3, target: { type: 'player', who: 'both' } }],
+    };
+    document.locations.forEach(location => {
+      location.enabled = true;
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
+      location.startTurn2 = undefined;
+      location.startTurn3 = undefined;
+    });
+    document.locations[0].startTurn3 = [payToPlay];
+    const content = compileContent(document);
+    const game = createSession({
+      carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
+      random: seededRandom(13), content, aiSeats: [], midCycleDraw: false,
+    });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach((player, owner) => {
+      player.hand = [];
+      player.draw = [card(`${owner}a`), card(`${owner}b`), card(`${owner}c`), card(`${owner}d`)];
+      player.discard = [];
+      player.wallet = 2;
+    });
+    game.state.nodes.forEach((node, index) => {
+      node.location = {
+        ...structuredClone(content.locations[0]),
+        id: `loc-${index}`,
+        effects: [{ kind: 'crypto', amount: 0 }],
+        startTurn3: index === 0 ? [payToPlay] : undefined,
+      };
+      node.winner = null;
+      node.cards = [[], []];
+    });
+    // Unequal revealed Power makes recalculate() set a provisional winner before start-of-turn.
+    game.state.nodes[0].cards[0].push({ card: card('lead', { power: 5 }), owner: 0, node: 0, order: 1, revealed: true });
+    game.state.nodes[0].cards[1].push({ card: card('trail', { power: 1 }), owner: 1, node: 0, order: 2, revealed: true });
+    game.state.turn = 2;
+    game.state.phase = 'runtime';
+    game.endTurn(0);
+    game.endTurn(1);
+    finish(game);
+    expect(game.state.nodes[0].winner).toBe(0);
+    expect(game.state.choice?.owner).toBe(0);
+    game.choose('resolve', 0);
+    finish(game);
+    expect(game.state.players[0].wallet).toBe(1);
+    expect(game.state.players[0].hand).toHaveLength(3);
+    expect(game.state.choice?.owner).toBe(1);
+    game.choose('resolve', 1);
+    finish(game);
+    expect(game.state.players[1].wallet).toBe(1);
+    expect(game.state.players[1].hand).toHaveLength(3);
+  });
+
   it('fires start-of-turn-2 effects when turn 2 begins, not on other turns', () => {
     const document = createDefaultContent();
     document.locations.forEach(location => { location.enabled = true; location.effects = steps([{ kind: 'crypto', amount: 0 }]); });
@@ -242,6 +301,50 @@ describe('location hooks and in-location targeting', () => {
         expect(slot, `seed ${seed}: ${location.id}`).toBeLessThanOrEqual(latestRevealSlot(location));
       });
     }
+  });
+
+  it('on-play auto-moves the played card to a random open Node without asking', () => {
+    const document = createDefaultContent();
+    const repel: EffectStep = {
+      action: 'moveCard',
+      target: { type: 'card', who: 'played', where: 'board', relation: 'self' },
+      pick: { mode: 'choose' }, // even choose is ignored for location on-play destinations
+    };
+    document.locations.forEach(location => {
+      location.enabled = true;
+      location.effects = steps([{ kind: 'crypto', amount: 0 }]);
+      location.onPlay = undefined;
+    });
+    document.locations[0].onPlay = [repel];
+    const content = compileContent(document);
+    const game = createSession({
+      carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
+      random: seededRandom(21), content, aiSeats: [], midCycleDraw: false,
+    });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
+    game.state.nodes.forEach((node, index) => {
+      node.location = {
+        ...structuredClone(content.locations[0]),
+        id: `loc-${index}`,
+        onPlay: index === 0 ? [repel] : undefined,
+        effects: [{ kind: 'crypto', amount: 0 }],
+      };
+      node.cards = [[], []];
+    });
+    game.state.players[0].hand = [card('played', { power: 2, name: 'Played' })];
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.deploy('played', 0);
+    game.endTurn(0);
+    game.endTurn(1);
+    const events = finish(game);
+    expect(game.state.choice).toBeNull();
+    const moved = events.find(event => event.kind === 'move' && event.targetCardId === 'played');
+    expect(moved).toMatchObject({ sourceNode: 0 });
+    expect(moved?.targetNode).not.toBe(0);
+    expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'played')).toBe(false);
+    expect(game.state.nodes.some((node, index) => index !== 0 && node.cards[0].some(entry => entry.card.id === 'played'))).toBe(true);
   });
 
   it('on-play rewards the player who played the card, not the Location winner', () => {

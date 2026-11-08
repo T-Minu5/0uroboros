@@ -200,7 +200,7 @@ describe("league agents", () => {
         expect(prompt).toContain(VP_DOG.persona);
         expect(prompt).toMatch(/16 Cycles/);
         expect(prompt).toMatch(/most VP still wins/);
-        expect(prompt).toMatch(/draftCrypto/);
+        expect(prompt).toMatch(/Hacker\/Crypto|no persistent Crypto shelf|Crypto cards are offered/);
         expect(prompt).toMatch(/weaker than older builds/);
         expect(prompt).toMatch(/1 rotating Solar-monk|Solar-monk/);
         for (const foreign of [T_5.persona, DV_8.persona, "T-5", "DV-8", "Strat-G"]) expect(prompt).not.toContain(foreign);

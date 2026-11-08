@@ -19,7 +19,7 @@ export const resolveOpponent = (opponents: readonly AuthoredOpponent[], id: stri
 export const opponentName = (opponents: readonly AuthoredOpponent[], id: OpponentId) => resolveOpponent(opponents, id)?.name ?? id;
 
 /** The agents status field that carries each league agent's on/off switch (studio build only). */
-export const AGENT_FLAG_KEYS: Record<string, string> = { 'strat-g': 'stratG', 't-5': 't5', 'dv-8': 'dv8', 'vp-dog': 'vpDog' };
+export const AGENT_FLAG_KEYS: Record<string, string> = { 'strat-g': 'stratG', 't-5': 't5', 'dv-8': 'dv8', 'vp-dog': 'vpDog', 'last-2go': 'last2go' };
 
 const route = (path: string, agent: OpponentId) => `${path}?agent=${encodeURIComponent(agent)}`;
 

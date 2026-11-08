@@ -77,12 +77,14 @@ export type EffectStep = {
   /**
    * Gain a card: optional pool of definition IDs. When set (and longer than one), each copy is
    * picked from this list (`selection`, default `random`). A single `cardId` still means exactly that card.
-   * When neither `cardId` nor `cardIds` is set, `filter` (+ optional `maxCost`) picks from the catalog.
+   * When neither `cardId` nor `cardIds` is set, `filter` (+ optional `maxCost`) picks from the
+   * draft-eligible catalog (Generated cards are excluded; use an explicit `cardId` for those).
+   * Random multi-id pools also skip Generated; sequential named lists keep them for special grants.
    */
   cardIds?: readonly string[];
   /** Gain-by-filter / copyText: match cards by type, class, and/or definitionId. */
   filter?: CardFilter;
-  /** Gain-by-filter: highest printed cost allowed (inclusive). */
+  /** Gain-by-filter: highest printed cost allowed (inclusive). Draft-eligible catalog only. */
   maxCost?: number;
   /** Attach: the mod to attach. Remove: the mod to strip; absent strips every mod. */
   modifier?: ModifierRef;

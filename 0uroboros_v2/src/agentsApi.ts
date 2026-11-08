@@ -11,10 +11,11 @@ export type AgentSettings = {
   t5: { enabled: boolean };
   dv8: { enabled: boolean };
   vpDog: { enabled: boolean };
+  last2go: { enabled: boolean };
   league: { rounds: number; seedsPerBlock: number; ecoObserves: boolean };
   ecoStrat: { enabled: boolean; observeHumanGames: boolean; continuous: boolean; reportEvery: number; baselineGames: number };
 };
-/** Strat-G, T-5, DV-8 and VP-Dog share one learning loop and report the same status. */
+/** Strat-G, T-5, DV-8, VP-Dog and Last2Go share one learning loop and report the same status. */
 export type LearnerStatus = {
   state: string; version: number; mode: string | null; record: { games: number; aiWins: number; humanWins: number; ties: number }; modelConfigured: boolean; model: string; activeTheories: number; error: string | null; paths: { notebook: string };
   experiment?: { id: string; hypothesis: string; change: string; stage: string; lab: string | null; field: string } | null; adoptedChanges?: number; experimentsConcluded?: number; ignoredGames?: number;
@@ -47,11 +48,12 @@ export type CoachingStatus = {
   store: { appliedAt: string; share: number; competitors: { id: string; name: string; version: string }[]; change: ProfileChange; lines: string[] } | null;
 };
 export type AgentsStatus = {
-  settings: AgentSettings; effective: { stratG: boolean; t5: boolean; dv8: boolean; vpDog: boolean; ecoStrat: boolean }; settingsFile: string;
+  settings: AgentSettings; effective: { stratG: boolean; t5: boolean; dv8: boolean; vpDog: boolean; last2go: boolean; ecoStrat: boolean }; settingsFile: string;
   stratG: LearnerStatus;
   t5: LearnerStatus;
   dv8: LearnerStatus;
   vpDog: LearnerStatus;
+  last2go: LearnerStatus;
   league: LeagueStatus;
   mentoring: MentoringStatus;
   coaching: CoachingStatus;
@@ -79,6 +81,7 @@ export const cohortPhaseLabel = (phase: AgentsStatus['cohort']['phase']) =>
   phase === 'studying' ? 'studying the new build first' : phase === 'researching' ? 'reading research first' : phase === 'playing' ? 'playing (Eco-Strat reads each game)' : 'starting';
 export type AgentsPatch = {
   agentsEnabled?: boolean; stratG?: Partial<AgentSettings['stratG']>; t5?: Partial<AgentSettings['t5']>; dv8?: Partial<AgentSettings['dv8']>; vpDog?: Partial<AgentSettings['vpDog']>;
+  last2go?: Partial<AgentSettings['last2go']>;
   league?: Partial<AgentSettings['league']>; ecoStrat?: Partial<AgentSettings['ecoStrat']>;
 };
 export type AgentsApi = ReturnType<typeof useAgents>;
@@ -151,9 +154,9 @@ export function useAgents(active = true) {
   return { status, error, docs, update, act, runContentAb, chat: chatWithStrat };
 }
 
-export type ChatAudience = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'both' | 'all';
+export type ChatAudience = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go' | 'both' | 'all';
 export type ChatReply = {
-  speaker: 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog';
+  speaker: 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go';
   answer: string;
   questionsForMel: string[];
   complaints: string[];

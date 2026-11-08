@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-export type AgentId = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog';
+export type AgentId = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go';
 
 /** Eco-Strat: a monocled piggy-bank robot in a top hat, counting everyone else's coins. */
 function EcoStratFace() {
@@ -94,8 +94,24 @@ function VPDogFace() {
   </>;
 }
 
-export const AGENT_NAMES: Record<AgentId, string> = { 'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog' };
-const FACES: Record<AgentId, () => ReactElement> = { 'strat-g': StratGFace, 'eco-strat': EcoStratFace, 't-5': T5Face, 'dv-8': DV8Face, 'vp-dog': VPDogFace };
+/** Last2Go: a late-arriving runner who skips turn 1, then contests Locations on turns 2–3. */
+function Last2GoFace() {
+  return <>
+    <ellipse cx='24' cy='40' rx='14' ry='3.2' fill='#1a2430' opacity='.35'/>
+    <path d='M10 34 Q14 22 20 18 L22 28 Q16 30 12 36 Z' fill='#3a5168' stroke='#9fe8ff' strokeWidth='1.1' strokeLinejoin='round'/>
+    <path d='M38 34 Q34 22 28 18 L26 28 Q32 30 36 36 Z' fill='#3a5168' stroke='#9fe8ff' strokeWidth='1.1' strokeLinejoin='round'/>
+    <circle cx='24' cy='22' r='12' fill='#243447' stroke='#9fe8ff' strokeWidth='1.4'/>
+    <path d='M16 20 H32' stroke='#ffd36b' strokeWidth='1.6' strokeLinecap='round' strokeDasharray='3 2.5'/>
+    <circle cx='18.5' cy='19' r='2.4' fill='#1a2430'/><circle cx='29.5' cy='19' r='2.4' fill='#1a2430'/>
+    <circle cx='19.2' cy='18.3' r='.7' fill='#9fe8ff'/><circle cx='30.2' cy='18.3' r='.7' fill='#9fe8ff'/>
+    <path d='M19 27 Q24 30.5 29 27' fill='none' stroke='#9fe8ff' strokeWidth='1.2' strokeLinecap='round'/>
+    <text x='24' y='14' textAnchor='middle' fontSize='5' fontWeight='800' fontFamily='sans-serif' fill='#ffd36b'>3</text>
+    <path d='M33 10 L38 6 L36 12 Z' fill='#ff6b3d'/>
+  </>;
+}
+
+export const AGENT_NAMES: Record<AgentId, string> = { 'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog', 'last-2go': 'Last2Go' };
+const FACES: Record<AgentId, () => ReactElement> = { 'strat-g': StratGFace, 'eco-strat': EcoStratFace, 't-5': T5Face, 'dv-8': DV8Face, 'vp-dog': VPDogFace, 'last-2go': Last2GoFace };
 
 export function AgentAvatar({ agent, size = 28 }: { agent: AgentId; size?: number }) {
   const Face = FACES[agent] ?? StratGFace;

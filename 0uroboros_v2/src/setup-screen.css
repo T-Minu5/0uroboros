@@ -22,8 +22,29 @@
 .game-configure-vp input{width:58px}
 .game-configure-vp button{padding:5px 9px;font-size:11px}
 .game-configure-check{cursor:pointer}
-.game-configure-row.game-configure-check input{width:18px;height:18px;padding:0;accent-color:#27e2ff;cursor:pointer}
+.game-configure-row.game-configure-check input{width:18px;height:18px;padding:0;accent-color:var(--green,#1fffb1);cursor:pointer}
+.game-mode-toggle{display:inline-flex;padding:2px;border:1px solid #1fffb144;border-radius:7px;background:#04150f88;gap:2px}
+.game-mode-toggle>button{padding:7px 11px;border:0;border-radius:5px;background:transparent;color:#9ff5d6;font:600 11px Inter,sans-serif;white-space:nowrap}
+.game-mode-toggle>button:hover:not(:disabled):not(.selected){background:#1fffb114}
+.game-mode-toggle>button.selected,.game-mode-toggle>button[aria-checked='true']{background:var(--green,#1fffb1);color:#04150f}
+.game-mode-toggle>button:disabled{opacity:.45}
 .game-configure .deck-picker{margin-bottom:12px}
+.setup-actions{
+  display:flex;align-items:stretch;gap:10px;margin:0 0 14px;width:100%;
+}
+.setup-actions>.primary-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  margin:0;min-height:44px;padding:12px 14px;white-space:nowrap;
+}
+.setup-actions>.setup-gallery-button{flex:0 0 30%;width:30%;max-width:30%}
+.setup-actions>.primary-button:not(.setup-gallery-button){flex:1 1 auto;min-width:0}
+.setup-card .setup-gallery-button,
+.setup-card .setup-gallery-button:hover:not(:disabled){
+  background:transparent;border-color:var(--green,#1fffb1);color:var(--green,#1fffb1);
+}
+.setup-gallery-button .icon{
+  width:16px;height:16px;background:currentColor;
+}
 
 .deck-picker{margin:0 0 16px;padding:0;border:0;min-width:0}
 .deck-picker legend{display:flex;align-items:baseline;justify-content:space-between;width:100%;padding:0;margin-bottom:8px;font-size:12px;color:#c4bfd2}

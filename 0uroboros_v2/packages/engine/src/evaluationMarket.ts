@@ -52,26 +52,16 @@ export const DRAFT_EARLY_CYCLES=4;
 export const DRAFT_CRYPTO_GAIN_MIN=2;
 export const DRAFT_CRYPTO_OFFER_MIN=2;
 
-/**
- * Persistent Crypto shelf when the `draftCrypto` setup option is on. Shared supply (not per-seat).
- * Order is the 2×2 Draft grid: Shyte / Byte on top, Kilo / Mega below.
- */
-export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=[
- {cardId:'shyte-coin',supply:16},
- {cardId:'byte-coin',supply:16},
- {cardId:'kilo-coin',supply:16},
- {cardId:'mega-cache',supply:8},
-];
+/** Classic Crypto definition ids that often fill Hacker/Crypto Draft slots (not a persistent shelf). */
+export const CURRENCY_CARD_IDS:readonly string[]=['shyte-coin','byte-coin','kilo-coin','mega-cache'];
+/** @deprecated Shelf removed; alias kept for older imports. */
+export const CURRENCY_PILES:readonly {cardId:string;supply:number}[]=CURRENCY_CARD_IDS.map(cardId=>({cardId,supply:0}));
 
 function cardId(card:Card){return card.definitionId??card.id;}
 
-/** The four Crypto card piles for Draft when the setting is enabled. */
-export function createCryptoPiles(content?:MarketContent):MarketPile[]{
- const crypto=content?.cryptoCards??EVALUATION_CRYPTO_CARDS;
- return CURRENCY_PILES.flatMap(({cardId:id,supply})=>{
-  const card=crypto.find(entry=>cardId(entry)===id);
-  return card?[{id:`Crypto:${id}`,card:structuredClone(card),category:'Crypto' as const,supply}]:[];
- });
+/** @deprecated Crypto shelf removed; always empty. Crypto enters Draft via Hacker/Crypto rotating slots. */
+export function createCryptoPiles(_content?:MarketContent):MarketPile[]{
+ return [];
 }
 
 function pick<T>(items:readonly T[],count:number,random:RandomSource):T[]{
@@ -126,10 +116,9 @@ export function cardGainsCrypto(card:Card):boolean{
  return cryptoGainAmounts(card).some(amount=>amount>0);
 }
 
-/** Persistent market piles at session start. Rotating offers are filled at each Draft.
- *  When draftCrypto is on, the four Crypto cards sit as a fixed shelf beside the offer. */
-export function createStrategicMarket(_random:RandomSource,content?:MarketContent,opts?:{draftCrypto?:boolean}):MarketPile[]{
- return opts?.draftCrypto?createCryptoPiles(content):[];
+/** Persistent market piles at session start. Always empty — Crypto is offered only in rotating Hacker/Crypto slots. */
+export function createStrategicMarket(_random:RandomSource,_content?:MarketContent,_opts?:{draftCrypto?:boolean}):MarketPile[]{
+ return [];
 }
 
 /** Slot rules for rotating Draft offers, in UI order (top row then bottom row). */
@@ -142,12 +131,12 @@ export type DraftSlot={
  soft?:boolean;
 };
 
-/** Default 8-card Draft: Action/Utility ×2, Hacker/Utility ×2, Attack, Horror, Solar Monk, VP. */
+/** Default 8-card Draft: Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP. */
 export const DRAFT_SLOTS:readonly DraftSlot[]=[
  {id:'action-utility-1',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility',soft:true},
  {id:'action-utility-2',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility',soft:true},
- {id:'hacker-utility-1',label:'Hacker or Utility',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.cardClass==='Utility',soft:true},
- {id:'hacker-utility-2',label:'Hacker or Utility',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.cardClass==='Utility',soft:true},
+ {id:'hacker-crypto-1',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto',soft:true},
+ {id:'hacker-crypto-2',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto',soft:true},
  {id:'attack',label:'Attack',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Attack'},
  {id:'horror',label:'Horror',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Horror'},
  {id:'solar-monk',label:'Solar Monk',category:()=>'VP',matches:({card})=>isSolarMonk(card)},
@@ -173,15 +162,18 @@ export const DRAFT_PHASES:readonly DraftPhase[]=[];
 export const draftPhase=(_cycle:number):DraftPhase=>({from:1,to:16,favours:'slot rules',share:1,matches:()=>true});
 export const DRAFT_PHASE_SUMMARY=`Default ${DRAFT_OFFER_COUNT} slots: ${DRAFT_SLOT_SUMMARY}. Optional ${DRAFT_OFFER_COUNT_TEN}: ${DRAFT_SLOT_SUMMARY_TEN}. At least ${DRAFT_CRYPTO_OFFER_MIN} cards with +${DRAFT_CRYPTO_GAIN_MIN} Crypto. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost.`;
 
-/** True when the card prints at least one Crypto-gain amount ≥ DRAFT_CRYPTO_GAIN_MIN. */
+/** True when the card prints at least one Crypto-gain amount ≥ DRAFT_CRYPTO_GAIN_MIN (Crypto cards also count via cryptoValue). */
 export function cardGainsCryptoAtLeast(card:Card,min=DRAFT_CRYPTO_GAIN_MIN):boolean{
+ if(card.type==='Crypto'&&(card.cryptoValue??0)>=min)return true;
  return cryptoGainAmounts(card).some(amount=>amount>=min);
 }
 
 function allPool(content?:MarketContent):PoolEntry[]{
  const characters=characterPool(content);
  const vp=(content?.vpCards??EVALUATION_VP_CARDS).map(card=>({card,category:'VP' as const}));
- return [...characters,...vp];
+ // Non-generated Crypto only (compileContent already omits generated from cryptoCards).
+ const crypto=(content?.cryptoCards??EVALUATION_CRYPTO_CARDS).map(card=>({card,category:'Crypto' as const}));
+ return [...characters,...vp,...crypto];
 }
 
 function inEarlyCost(card:Card,cycle?:number){

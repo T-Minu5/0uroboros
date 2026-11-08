@@ -8,7 +8,9 @@
 
 .transfer-stage{width:480px;margin:6px auto 0;display:flex;flex-direction:column;align-items:center;gap:2px}
 .transfer-row{width:480px;display:grid;grid-template-columns:repeat(3,160px);justify-items:center;align-items:center}
-.transfer-push-row,.transfer-pull-row{min-height:26px}
+.transfer-push-row,.transfer-pull-row{min-height:28px}
+.transfer-push-cluster{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;min-height:28px}
+.transfer-pull-slot{display:flex;justify-content:center;align-items:center;min-height:28px}
 .transfer-diamonds{position:relative;height:62px}
 .transfer-arcs{position:absolute;inset:0;display:block;overflow:visible;pointer-events:none}
 .transfer-arcs path{fill:none;stroke:#52eaff66;stroke-width:2;stroke-linecap:round;transition:stroke .15s,stroke-width .15s}
@@ -16,8 +18,10 @@
 .transfer-arcs path.is-active{stroke:#52eaff;stroke-width:3}
 .transfer-arcs .transfer-pull-arc{stroke-dasharray:6 5}
 .transfer-arcs .transfer-pull-arc.is-active{stroke-dasharray:none}
-.choice-dialog .transfer-action{min-width:84px;min-height:24px;padding:3px 12px;border:1px solid #27e2ff88;border-radius:5px;background:#0f2a36;color:#dff9ff;font:600 10px Orbitron,Inter,sans-serif;letter-spacing:.5px}
+.choice-dialog .transfer-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:52px;min-height:28px;padding:3px 10px;border:1px solid #27e2ff88;border-radius:5px;background:#0f2a36;color:#dff9ff;font:600 10px Orbitron,Inter,sans-serif;letter-spacing:.5px}
 .choice-dialog .transfer-action:hover:not(:disabled),.choice-dialog .transfer-action:focus-visible{border-color:#52eaff;background:#17485a;color:#fff}
+.choice-dialog .transfer-action .transfer-arrow{font-size:16px;line-height:1;font-weight:700}
+.choice-dialog .transfer-action .transfer-arrow-amount{font-size:10px}
 .choice-dialog .transfer-pull{border-style:dashed}
 .transfer-node{position:relative;display:grid;place-items:center;width:160px;height:62px}
 .transfer-node.is-empty{visibility:hidden}

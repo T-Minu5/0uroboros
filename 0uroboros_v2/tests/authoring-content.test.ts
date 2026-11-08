@@ -54,6 +54,13 @@ describe('authored content', () => {
     expect(validateContent(document).some(error => /Draft currency/.test(error))).toBe(false);
   });
 
+  it('no longer treats classic Crypto coins as mandatory Draft currency', () => {
+    const document = createDefaultContent();
+    document.cards.find(card => card.definitionId === 'mega-cache')!.enabled = false;
+    const errors = validateContent(document);
+    expect(errors.some(error => /Draft currency|must remain enabled as a non-Generated Crypto/.test(error))).toBe(false);
+  });
+
   it('seeds the Standard starting deck and resolves the active deck into one card per copy', () => {
     const document = createDefaultContent();
     expect(document.activeStartingDeckId).toBe(DEFAULT_DECK_ID);
@@ -196,5 +203,13 @@ describe('authored content', () => {
       expect.stringContaining('Crypto cards require an explicit payout'),
       expect.stringContaining('VP cards require explicit scoring points'),
     ]));
+  });
+
+  it('allows any Power on draft Crypto cards', () => {
+    const document = createDefaultContent();
+    findCard(document, 'byte-coin').power = 4;
+    findCard(document, 'mega-cache').power = -1;
+    expect(validateContent(document)).toEqual([]);
+    expect(compileContent(document).cards.find(card => card.definitionId === 'byte-coin')).toMatchObject({ power: 4, cryptoValue: 2 });
   });
 });

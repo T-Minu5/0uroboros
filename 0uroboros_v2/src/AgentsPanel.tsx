@@ -12,6 +12,7 @@ const ADVERSARIES = {
   't-5': { key: 't5', about: 'Pure aggression: almost no economy, Chaos and Drain from Cycle 3, aiming to destroy both enemy Servers by Cycles 10-13.' },
   'dv-8': { key: 'dv8', about: 'An engine and control deviant: a long, thin, draw-heavy economy, Restore for defense, then late heavy VP.' },
   'vp-dog': { key: 'vpDog', about: 'Pure economy: big Crypto and draw first, then VP every Draft from the midgame, aiming to buy 25+ VP by Cycles 11-14.' },
+  'last-2go': { key: 'last2go', about: 'Reactive Location control: mirrors opponent Draft buys with a mild destruction bias, skips Runtime turn 1, then contests on turns 2–3 for Location majority (ties OK).' },
 } as const;
 const isAdversary = (tab: AgentId): tab is keyof typeof ADVERSARIES => tab in ADVERSARIES;
 
@@ -66,12 +67,13 @@ const CHAT_AUDIENCES: { id: ChatAudience; label: string }[] = [
   { id: 't-5', label: 'T-5' },
   { id: 'dv-8', label: 'DV-8' },
   { id: 'vp-dog', label: 'VP-Dog' },
+  { id: 'last-2go', label: 'Last2Go' },
   { id: 'both', label: 'Strat+Eco' },
   { id: 'all', label: 'All' },
 ];
 
 const SPEAKER_LABEL: Record<ChatReply['speaker'], string> = {
-  'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog',
+  'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog', 'last-2go': 'Last2Go',
 };
 
 type ChatLogEntry =
@@ -172,7 +174,7 @@ function PublishControl({ agent }: { agent: AgentId }) {
 }
 
 /**
- * Switches and status for Eco-Strat, Strat-G and the league adversaries T-5, DV-8 and VP-Dog, one agent per tab, with a reader for
+ * Switches and status for Eco-Strat, Strat-G and the league adversaries T-5, DV-8, VP-Dog and Last2Go, one agent per tab, with a reader for
  * each agent's notebook, journal and reports. Chat with Strat is always shown. `settingsOnly` (Agents page) keeps Status / baseline
  * actions / Files folded away; a full mount adds those. Pass `agents` to share one status poll with a sibling panel.
  */
@@ -194,6 +196,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
     { id: 'eco-strat', state: ecoState }, { id: 'strat-g', state: learnerState(status.effective.stratG, stratG) },
     { id: 't-5', state: learnerState(status.effective.t5, status.t5) }, { id: 'dv-8', state: learnerState(status.effective.dv8, status.dv8) },
     { id: 'vp-dog', state: learnerState(status.effective.vpDog, status.vpDog) },
+    { id: 'last-2go', state: learnerState(status.effective.last2go, status.last2go) },
   ];
   const details = !settingsOnly;
   const reader = (agent: AgentId) => {
@@ -217,7 +220,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
       {toggle('Decision log', settings.stratG.recordDecisions, () => update({ stratG: { recordDecisions: !settings.stratG.recordDecisions } }), !master)}
       {reader('strat-g')}
       <PublishControl agent='strat-g'/>
-      <Fold title='About Strat-G'><p>Balanced: plays you from the designer's baseline, and plays T-5, DV-8 and VP-Dog in the league. It changes its play only through measured experiments, and never sees the adversaries' strategies.</p></Fold>
+      <Fold title='About Strat-G'><p>Balanced: plays you from the designer's baseline, and plays T-5, DV-8, VP-Dog and Last2Go in the league. It changes its play only through measured experiments, and never sees the adversaries' strategies.</p></Fold>
       {details&&<Fold title='Status'><dl>
         <dt>Record</dt><dd>{stratG.record.aiWins}–{stratG.record.humanWins}–{stratG.record.ties} over {stratG.record.games}</dd>
         <dt>League</dt><dd>{leagueLine(status, 'strat-g')}</dd>
@@ -268,7 +271,7 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
         <ReportControl status={status} act={post} onRead={setReading}/>
       </>}
       {reader('eco-strat')}
-      <Fold title='About Eco-Strat'><p>Evaluates the economy from finished games. Read-only: it never plays or advises Strat-G. Content A/B (try one card change on paired seeds) lives under Agent games → Content A/B.</p></Fold>
+      <Fold title='About Eco-Strat'><p>Evaluates the economy from finished games. Read-only: it never plays or advises Strat-G. Content A/B (try one card change on paired seeds) has its own tab.</p></Fold>
       {details&&<>
         <Fold title='Status'><dl>
           <dt>Build</dt><dd>{ecoStrat.build?.label ?? '—'}</dd>

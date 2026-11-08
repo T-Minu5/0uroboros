@@ -9,31 +9,24 @@ tags: [ontology/resources]
 ---
 # Market
 
-What players can buy in the [[Draft]]. Built from piles, each with a shared supply.
-
-## Game piles (dealt once, last all game)
-| Piles | From | Supply each |
-| --- | --- | --- |
-| 2 Base | Base pool, not Runtime | 8 |
-| 2 Chaos | Chaos pool | 8 |
-| 3 Volume | VP pool | 8 |
-| 1 Solar-monk | VP pool | 8 |
-| Byte-Coin, Kilo-Coin, Mega-Cache | Crypto | 16 / 16 / 8 |
+What players can buy in the [[Draft]]. There are **no fixed game piles** and **no persistent Crypto shelf** — only a rotating offer each Draft.
 
 ## Draft offer (changes every Draft)
-3 Base or Chaos cards (Runtime included) that aren't game piles, each limited to **2 copies per player**. Last Draft's offer is avoided when possible.
+Default **8** rotating piles (Configure can expand to 10), each limited to **2 copies per player**. Last Draft's identities are avoided when the pool allows. Soft floor: at least two cards that gain +2 [[Crypto]].
 
-Each of the 3 slots leans to the Cycle's phase: it comes from the favoured cards with the given chance, otherwise from the rest of the pool (`DRAFT_PHASES`).
+| Slot | Matches |
+| --- | --- |
+| 1–2 | Action or Utility |
+| 3–4 | Hacker or [[Crypto card\|Crypto]] |
+| 5 | Attack |
+| 6 | Horror |
+| 7 | Solar Monk |
+| 8 | VP (non–Solar Monk) |
 
-| Cycles | Favoured | Chance per slot |
-| --- | --- | --- |
-| 1–4 | [[Card class\|Action]] and Utility | 75% |
-| 5–8 | Runtime, Attack and Hacker | 60% |
-| 9–12 | [[Card pool\|Chaos]] (Attack, Hacker, Horror) | 75% |
-| 13–16 | Horror | 75% |
+Optional 10-card mode inserts two soft Chaos fills between slots 4 and 5.
+
+Cycles 1–4 only offer cards costing 1–7 Crypto; later Cycles any cost.
 
 ## Not in the market
 - [[Generated card|Generated cards]]
 - The [[Circuit Reward]], a separate privileged offer for eligible players
-
-> V3.1 described 9 Base / 3 VP / 3 Crypto piles + 3 Chaos offers; the current build uses the structure above.

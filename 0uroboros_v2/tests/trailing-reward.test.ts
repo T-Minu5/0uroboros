@@ -72,6 +72,27 @@ describe("Circuit Rewards awarded to the trailing player", () => {
     expect(session.state.circuitEligible).toEqual([0, 1]);
   });
 
+  it("on a Locations tie draws a normal reward for both seats, not trailing catch-up", () => {
+    const mixed = compileForSelfPlay({
+      ...document,
+      circuitRewards: document.circuitRewards.map((reward, index) => index === 0 ? withTrailing(reward, true) : withTrailing(reward, false)),
+    });
+    const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: mixed, noTrailingRewards: false });
+    session.state.players.forEach(player => { player.draw = []; player.hand = []; player.discard = []; player.destroyed = []; player.rewardVP = 0; });
+    session.state.turn = 3;
+    session.state.nodes.forEach(node => { node.location = null; node.cards = [[], []]; });
+    session.state.nodes[0].cards[0].push({ card: { ...starterCards[0], id: "p0-n0", vp: undefined, onReveal: [] }, owner: 0, node: 0, order: 1, revealed: true });
+    session.state.nodes[1].cards[1].push({ card: { ...starterCards[0], id: "p1-n1", vp: undefined, onReveal: [] }, owner: 1, node: 1, order: 2, revealed: true });
+    // Seat 1 trails on VP — catch-up must not fire while Locations are tied.
+    session.state.players[1].rewardVP = 5;
+    session.state.players[1].servers = { primary: 500, backup: 1500 };
+    session.endTurn(); drain(session);
+    expect(session.state.nodes.filter(node => node.winner === 0)).toHaveLength(1);
+    expect(session.state.nodes.filter(node => node.winner === 1)).toHaveLength(1);
+    expect(session.state.circuitReward.definition?.awardTrailing).toBeFalsy();
+    expect(session.state.circuitEligible).toEqual([0, 1]);
+  });
+
   it("is stored as an optional boolean on the reward", () => {
     const flagged = { ...document, circuitRewards: document.circuitRewards.map((reward, index) => index === 0 ? withTrailing(reward, true) : reward) };
     expect(validateContent(flagged)).toEqual([]);

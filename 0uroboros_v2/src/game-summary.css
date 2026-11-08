@@ -42,9 +42,10 @@
 .summary-head p{margin:0;font-size:11px;color:#b6b9cd}
 .game-summary .summary-head .primary-button{width:auto;flex:0 0 auto;margin:0}
 
-.summary-players{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.summary-players{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 .summary-player{
  --tally-accent:#cfb8ed;
+ min-width:0;max-width:100%;overflow:hidden;
  padding:14px 16px;border-radius:10px;
  border:1px solid color-mix(in srgb,var(--tally-accent) 30%,transparent);
  background:linear-gradient(160deg,color-mix(in srgb,var(--tally-accent) 10%,#11121f),#0b0c16);
@@ -55,9 +56,10 @@
 .summary-total{font:700 30px Orbitron;color:#fff;font-variant-numeric:tabular-nums}
 .summary-total span{margin-left:5px;font-size:10px;letter-spacing:1px;color:var(--muted)}
 
-.summary-rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.summary-rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;min-width:0;max-width:100%}
 .summary-rows>li{
  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+ min-width:0;max-width:100%;width:100%;
  padding:8px 0;border-top:1px solid #ffffff12;font-size:12px;
  animation:summary-row 360ms ease-out both;
  animation-delay:calc(260ms + var(--row-index) * 110ms);
@@ -79,7 +81,28 @@
 }
 .summary-cards-toggle:disabled{opacity:.6}
 
-.summary-cards{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px}
+.summary-cards{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px;min-width:0;max-width:100%;box-sizing:border-box}
+.summary-cards-scroll{
+  flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  max-width:100%;padding-bottom:8px;scrollbar-width:thin;
+}
+.summary-cards-scroll .summary-card{flex:0 0 72px;width:72px}
+.summary-cards-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-content:start;
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  width:100%;min-width:0;max-height:220px;max-width:100%;box-sizing:border-box;
+  margin:0;padding:10px 16px 8px;scrollbar-width:thin;
+}
+/* Size the cell first; CardFace fills it. Self-cqw on .cf-card can runaway inside % grid tracks. */
+.summary-cards-grid .summary-card{
+  position:relative;width:100%;max-width:100%;min-width:0;aspect-ratio:170/236;
+  padding:0;border:0;background:none;overflow:hidden;box-sizing:border-box;
+  container-type:inline-size;
+}
+.summary-cards-grid .summary-card>.cf-card{
+  width:100%;height:100%;max-width:100%;aspect-ratio:auto;
+  container-type:normal;--cf-u:calc(100cqw / 170);
+}
 .summary-card{
  position:relative;width:64px;padding:0;border:0;background:none;
  animation:summary-card 280ms ease-out both;

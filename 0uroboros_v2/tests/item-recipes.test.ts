@@ -124,7 +124,7 @@ describe('multi-step Circuit reward recipes', () => {
 });
 
 describe('generated cards and card class metadata', () => {
-  it('seeds Horror from historic power metadata, rejects invalid Hacker cards and Generated currencies, and allows Generated starters', () => {
+  it('seeds Horror from historic power metadata, rejects invalid Hacker cards, and allows Generated starters', () => {
     const document=createDefaultContent();
     const horror=document.cards.find(card=>HISTORIC_SOURCE_METADATA[card.definitionId??card.id]?.types.includes('power'))!;
     expect(horror.cardClass).toBe('Horror');
@@ -136,9 +136,11 @@ describe('generated cards and card class metadata', () => {
     const starter=document.cards.find(card=>card.definitionId==='slash-dot')!;
     starter.generated=true;
     expect(validateContent(document)).toEqual([]);
-    document.cards.find(card=>card.definitionId==='kilo-coin')!.generated=true;
+    for (const id of ['shyte-coin', 'byte-coin', 'kilo-coin', 'mega-cache']) {
+      document.cards.find(card => card.definitionId === id)!.generated = true;
+    }
     expect(validateContent(document)).toEqual(expect.arrayContaining([
-      expect.stringContaining('kilo-coin is a Draft currency and must remain enabled as a non-Generated Crypto card'),
+      expect.stringContaining('at least 2 enabled non-Generated Hacker or Crypto cards required for Hacker/Crypto Draft slots'),
     ]));
   });
 

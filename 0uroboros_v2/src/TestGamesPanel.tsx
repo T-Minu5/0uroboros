@@ -17,8 +17,8 @@ const LEAGUE_SEEDS = [2, 4, 8] as const;
 const MEMBERS = [
   { id: 'strat-g', key: 'stratG', style: 'Balanced' },
   { id: 't-5', key: 't5', style: 'Pure aggression' },
-  { id: 'dv-8', key: 'dv8', style: 'Engine' },
   { id: 'vp-dog', key: 'vpDog', style: 'Pure economy' },
+  { id: 'last-2go', key: 'last2go', style: 'Reactive majority' },
 ] as const;
 const nameOf = (id: string) => AGENT_NAMES[id as AgentId] ?? id;
 const FIELD_TEXT: Record<string, string> = { economyUntilCycle: 'economy through Cycle', chaosFromCycle: 'Chaos from Cycle', vpFromCycle: 'VP from Cycle', handCryptoTarget: 'Crypto target', minBuyScore: 'min buy score', dilution: 'dilution' };
@@ -44,47 +44,26 @@ function Progress({ label, value, total }: { label: string; value: number; total
   return <div className='agents-progress' aria-label={label}><span>{label}</span><i style={{ width: `${Math.min(100, (value / Math.max(1, total)) * 100)}%` }}/></div>;
 }
 
-/**
- * AI-vs-AI test games for the agents to learn from. Eco-Strat studies seeded cohorts in which both seats play Strat-G's
- * current best, frozen for the run; Strat-G, T-5, DV-8 and VP-Dog learn by playing each other in the league.
- */
 type AbCardOption = { id: string; name: string; cost: number; power?: number; cryptoValue?: number; type: string };
 
+/**
+ * AI-vs-AI test games for the agents to learn from. Eco-Strat studies seeded cohorts in which both seats play Strat-G's
+ * current best, frozen for the run; Strat-G, T-5, VP-Dog and Last2Go learn by playing each other in the league (DV-8 is Novice-only, not Elo-rated).
+ * Content A/B lives on its own tab (`ContentAbPanel`).
+ */
 export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
-  const { status, error, docs, update, act, runContentAb } = agents;
+  const { status, error, docs, update, act } = agents;
   const [deck, setDeck] = useState<string | null>(null);
   const [reading, setReading] = useState<string | null>(null);
-  const [abCards, setAbCards] = useState<AbCardOption[]>([]);
-  const [abCardId, setAbCardId] = useState('');
-  const [abField, setAbField] = useState<(typeof AB_FIELDS)[number]['id']>('cost');
-  const [abValue, setAbValue] = useState(4);
-  const [abSeeds, setAbSeeds] = useState<(typeof AB_SEEDS)[number]>(10);
+  const [confirmResetElo, setConfirmResetElo] = useState(false);
   useEffect(() => {
     let live = true;
     loadGameSource().then(source => {
       const saved = source.decks.find(entry => entry.id === source.defaultDeckId);
       if (live && saved) setDeck(`${saved.name} (${saved.size} cards)`);
     }).catch(() => undefined);
-    fetch('/api/content', { cache: 'no-store' })
-      .then(response => response.json())
-      .then((payload: { document?: { cards?: { definitionId?: string; id: string; name: string; cost: number; power?: number; cryptoValue?: number; type: string; enabled?: boolean; generated?: boolean }[] } }) => {
-        if (!live) return;
-        const cards = (payload.document?.cards ?? [])
-          .filter(card => card.enabled !== false && !card.generated)
-          .map(card => ({ id: card.definitionId ?? card.id, name: card.name, cost: card.cost, power: card.power, cryptoValue: card.cryptoValue, type: card.type }))
-          .sort((a, b) => a.name.localeCompare(b.name));
-        setAbCards(cards);
-        if (cards[0] && !abCardId) {
-          setAbCardId(cards[0].id);
-          setAbValue(cards[0].cost);
-          setAbField('cost');
-        }
-      })
-      .catch(() => undefined);
     return () => { live = false; };
   }, []);
-
-  const selectedAb = abCards.find(card => card.id === abCardId);
 
   if (!status) return <section className='test-games agents-panel'><p className='agents-note'>{error || 'Loading agents…'}</p></section>;
   const contentAb = status.contentAb ?? { running: false, experimentId: null, cardId: null, seedIndex: 0, seedCount: 0, error: null, last: null };
@@ -100,14 +79,10 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
   const leagueGames = rounds * (players * (players - 1) / 2 * seedsPerBlock * 2 + trials * league.blocksPerTrial * seedsPerBlock * 4);
   const adopted = league.lastRun?.trials.filter(trial => /→ promising/.test(trial.result)).length ?? 0;
   const waitLeague = leagueBusy ? 'Wait for the league run to finish' : undefined;
-  const waitEco = ecoBusy ? 'Wait for the Eco-Strat run to finish' : undefined;
   const journal = docs.find(doc => doc.id === 'eco-strat-journal');
-  const abReportDoc = contentAb.last?.reportId
-    ? docs.find(doc => doc.id === `eco-strat-report-${contentAb.last!.reportId}`)
-    : docs.find(doc => /ab-/i.test(doc.id));
 
   return <section className='test-games agents-panel' aria-label='Agent games'>
-    <p className='test-games-meta'>AI vs AI on {deck ? <>the saved deck <b>{deck}</b></> : 'the saved deck'}</p>
+    <p className='test-games-meta'>AI vs AI on {deck ? <>the saved deck <b>{deck}</b></> : 'the saved deck'}. Card tuning lives under <b>Content A/B</b>.</p>
 
     <article className='test-games-card' aria-label='Eco-Strat study'>
       <header><AgentAvatar agent='eco-strat' size={24}/><span><strong>Eco-Strat study</strong><small>{ecoOn ? `${ecoStrat.build?.label ?? 'this build'} · both seats play Strat-G's best` : 'switched off'}</small></span></header>
@@ -116,11 +91,11 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
         ? <Progress label={`${cohort.kind === 'evaluation' ? 'More games' : 'Baseline'} ${cohort.valid}/${cohort.target}${cohort.invalid ? ` · ${cohort.invalid} invalid` : ''} · ${cohortPhaseLabel(cohort.phase)} · seeds ${cohort.seedBase ?? 1001}+`} value={cohort.valid} total={cohort.target}/>
         : <Progress label={`Baseline ${ecoStrat.baseline.valid}/${ecoStrat.baseline.target}${baselineDone ? ' · complete' : ecoStrat.baseline.status === 'not-started' ? ' · not run' : ` · ${ecoStrat.baseline.status}`} · ${ecoStrat.gamesObserved.currentBuild} games this build`} value={ecoStrat.baseline.valid} total={ecoStrat.baseline.target}/>}
       <div className='agents-actions'>
-        {ecoBusy
+        {cohort.running
           ? <button type='button' onClick={() => void act('eco-strat', 'stop')}>Stop</button>
           : <>
-            <button type='button' className={baselineDone ? '' : 'primary'} disabled={!ecoOn || leagueBusy} title={waitLeague} onClick={() => void act('eco-strat', 'baseline')}>{baselineDone ? 'Re-run baseline' : 'Run baseline'}</button>
-            <button type='button' className={baselineDone ? 'primary' : ''} disabled={!ecoOn || !baselineDone || leagueBusy} title={waitLeague ?? (baselineDone ? undefined : 'Run the baseline for this build first')} onClick={() => void act('eco-strat', 'evaluate')}>Play {games} more</button>
+            <button type='button' className={baselineDone ? '' : 'primary'} disabled={!ecoOn || leagueBusy || contentAb.running} title={waitLeague ?? (contentAb.running ? 'Wait for Content A/B to finish' : undefined)} onClick={() => void act('eco-strat', 'baseline')}>{baselineDone ? 'Re-run baseline' : 'Run baseline'}</button>
+            <button type='button' className={baselineDone ? 'primary' : ''} disabled={!ecoOn || !baselineDone || leagueBusy || contentAb.running} title={waitLeague ?? (contentAb.running ? 'Wait for Content A/B to finish' : baselineDone ? undefined : 'Run the baseline for this build first')} onClick={() => void act('eco-strat', 'evaluate')}>Play {games} more</button>
           </>}
         <button type='button' disabled={!journal} onClick={() => journal && setReading(journal.id)}>Journal</button>
       </div>
@@ -128,55 +103,6 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
       <Fold title='How Eco-Strat test games work'>
         <p>The baseline replays seeds 1001 onward, so every build is measured on the same games. “More” games use fresh seeds and add evidence for the next report. Strat-G's strategy is frozen for the whole run and Strat-G does not learn from these games.</p>
         <p>The journal opens on a summary: Eco-Strat's top 3 recommendations, the best and worst market purchases, and how games end, split into close, mid and blowout finishes. Mutual Server kills (each player destroys ≥1 of the other's) should land above 40%.</p>
-      </Fold>
-    </article>
-
-    <article className='test-games-card' aria-label='Content A/B'>
-      <header><AgentAvatar agent='eco-strat' size={24}/><span><strong>Content A/B</strong><small>Try one card change · same seeds · frozen Strat-G</small></span></header>
-      <label className='test-games-field'>
-        <small>Card</small>
-        <select value={abCardId} disabled={!ecoOn || ecoBusy || !abCards.length} onChange={event => {
-          const id = event.target.value;
-          setAbCardId(id);
-          const card = abCards.find(entry => entry.id === id);
-          if (!card) return;
-          if (abField === 'power') setAbValue(card.power ?? 0);
-          else if (abField === 'cryptoValue') setAbValue(card.cryptoValue ?? 0);
-          else setAbValue(card.cost);
-        }}>
-          {abCards.map(card => <option key={card.id} value={card.id}>{card.name} · c{card.cost}{card.power !== undefined ? ` · p${card.power}` : ''}{card.cryptoValue !== undefined ? ` · ₵${card.cryptoValue}` : ''}</option>)}
-        </select>
-      </label>
-      <div className='agents-cadence' role='radiogroup' aria-label='Field to change'>
-        <small>Change</small>
-        {AB_FIELDS.map(field => <button key={field.id} type='button' role='radio' aria-checked={abField === field.id} disabled={!ecoOn || ecoBusy} onClick={() => {
-          setAbField(field.id);
-          if (!selectedAb) return;
-          if (field.id === 'power') setAbValue(selectedAb.power ?? 0);
-          else if (field.id === 'cryptoValue') setAbValue(selectedAb.cryptoValue ?? 0);
-          else setAbValue(selectedAb.cost);
-        }}>{field.label}</button>)}
-      </div>
-      <label className='test-games-field'>
-        <small>New value</small>
-        <input type='number' value={abValue} disabled={!ecoOn || ecoBusy} onChange={event => setAbValue(Number(event.target.value))}/>
-      </label>
-      <Choice label='Paired seeds' values={AB_SEEDS} value={abSeeds} unit={count => `${count}`} disabled={!ecoOn || ecoBusy} onChange={setAbSeeds}/>
-      {contentAb.running
-        ? <Progress label={`A/B ${contentAb.cardId ?? '…'} · seed ${contentAb.seedIndex}/${contentAb.seedCount} (×2 games)`} value={contentAb.seedIndex} total={Math.max(1, contentAb.seedCount)}/>
-        : contentAb.last
-          ? <p className='test-games-result'>Last: <b>{contentAb.last.cardId}</b> · patch win rate {contentAb.last.patchWinRate == null ? 'n/a' : `${Math.round(contentAb.last.patchWinRate * 100)}%`}{contentAb.last.reportId ? <> · report <code>{contentAb.last.reportId}</code></> : null}</p>
-          : <p className='agents-note'>Picks a card, changes one number, plays the pack twice per seed (before vs after).</p>}
-      {contentAb.error && <p className='agents-error'>{contentAb.error}</p>}
-      <div className='agents-actions'>
-        {contentAb.running
-          ? <button type='button' onClick={() => void act('eco-strat', 'stop')}>Stop A/B</button>
-          : <button type='button' className='primary' disabled={!ecoOn || !abCardId || leagueBusy || ecoBusy} title={waitLeague ?? waitEco} onClick={() => void runContentAb({ definitionId: abCardId, changes: { [abField]: abValue }, seedCount: abSeeds })}>Run A/B ({abSeeds}×2 games)</button>}
-        <button type='button' disabled={!abReportDoc} onClick={() => abReportDoc && setReading(abReportDoc.id)}>Read A/B report</button>
-      </div>
-      <Fold title='How Content A/B works'>
-        <p>Control = today's pack. Patch = same pack with only your one change. Both seats play Strat-G's frozen profile. Same seeds on both arms. The report compares wins, buys, and the card's budget score E.</p>
-        <p>If the patch wins more often, the change is stronger. If pick rate drops, the AI (or the price) does not want it. Soft flags mean the formula cannot see the full card.</p>
       </Fold>
     </article>
 
@@ -211,17 +137,137 @@ export function TestGamesPanel({ agents }: { agents: AgentsApi }) {
       <div className='agents-actions'>
         {leagueBusy
           ? <button type='button' disabled={league.stopping} onClick={() => void act('league', 'stop')}>Stop league</button>
-          : <button type='button' className='primary' disabled={!settings.agentsEnabled || players < 2 || cohort.running || mentoring.running || coaching.running} title={cohort.running ? 'Wait for the Eco-Strat run to finish' : mentoring.running || coaching.running ? 'Wait for the mentoring or coaching hand-off to finish' : players < 2 ? 'Switch on at least two agents' : undefined} onClick={() => void act('league', 'run')}>Run league · ~{leagueGames} games</button>}
+          : <button type='button' className='primary' disabled={!settings.agentsEnabled || players < 2 || cohort.running || contentAb.running || mentoring.running || coaching.running} title={cohort.running || contentAb.running ? 'Wait for the Eco-Strat run to finish' : mentoring.running || coaching.running ? 'Wait for the mentoring or coaching hand-off to finish' : players < 2 ? 'Switch on at least two agents' : undefined} onClick={() => void act('league', 'run')}>Run league · ~{leagueGames} games</button>}
         <button type='button' aria-pressed={ecoObserves} disabled={leagueBusy} onClick={() => void update({ league: { ecoObserves: !ecoObserves } })}>Eco-Strat watches: {ecoObserves ? 'On' : 'Off'}</button>
+        {confirmResetElo
+          ? <>
+            <button type='button' disabled={leagueBusy} onClick={() => { setConfirmResetElo(false); void act('league', 'reset'); }}>Clear all Elo</button>
+            <button type='button' onClick={() => setConfirmResetElo(false)}>Cancel</button>
+          </>
+          : <button type='button' disabled={leagueBusy} title={leagueBusy ? 'Stop the league run first' : 'Clear Elo, W–L–T and head-to-head. Snapshots and run history stay.'} onClick={() => setConfirmResetElo(true)}>Reset Elo…</button>}
       </div>
       <Fold title='How the league works'>
         <p>Each round opens with rating games: every pair of agents plays the same seeds from both seats, and the results move their Elo (everyone starts at 1200; K is 32 for a snapshot's first 30 games, then 16).</p>
         <p>Then each agent takes a turn learning while the others stay frozen. Its experiment and its current best play the same opponents on the same seeds, so only the change differs. Opponents come from the last {league.window} snapshots of every agent, including its own older selves; {Math.round(league.latestRatio * 100)}% of the time it is another agent's latest. Each opponent stays for a block of seeds before swapping. A change that clearly beats the current best is adopted and saved as a new snapshot.</p>
         <p>Strat-G plays balanced, T-5 is pure aggression, DV-8 builds an engine and VP-Dog is pure economy; each is held to its style. They get only their own results back and never see each other's strategies. Eco-Strat watches one rating game per pairing each round.</p>
         <p>Catch-up learning: an agent {league.catchUpGap ?? 150}+ Elo below the leader takes a second trial each round{league.catchUp?.length ? ` (now ${league.catchUp.map(nameOf).join(', ')})` : ''}.</p>
+        <p>Reset Elo clears ratings and head-to-head only. Agent snapshots, notebooks and past run logs stay; the next rating games start everyone at 1200 again.</p>
       </Fold>
     </article>
     {(error || cohort.error) && <p className='agents-error'>{error || cohort.error}</p>}
+    {reading && <AgentReader docs={docs} initial={reading} onClose={() => setReading(null)}/>}
+  </section>;
+}
+
+/** One card change on paired seeds: control pack vs patched pack, frozen Strat-G on both seats. */
+export function ContentAbPanel({ agents }: { agents: AgentsApi }) {
+  const { status, error, docs, act, runContentAb } = agents;
+  const [reading, setReading] = useState<string | null>(null);
+  const [abCards, setAbCards] = useState<AbCardOption[]>([]);
+  const [abCardId, setAbCardId] = useState('');
+  const [abField, setAbField] = useState<(typeof AB_FIELDS)[number]['id']>('cost');
+  const [abValue, setAbValue] = useState(4);
+  const [abSeeds, setAbSeeds] = useState<(typeof AB_SEEDS)[number]>(10);
+  useEffect(() => {
+    let live = true;
+    fetch('/api/content', { cache: 'no-store' })
+      .then(response => response.json())
+      .then((payload: { document?: { cards?: { definitionId?: string; id: string; name: string; cost: number; power?: number; cryptoValue?: number; type: string; enabled?: boolean; generated?: boolean }[] } }) => {
+        if (!live) return;
+        const cards = (payload.document?.cards ?? [])
+          .filter(card => card.enabled !== false && !card.generated)
+          .map(card => ({ id: card.definitionId ?? card.id, name: card.name, cost: card.cost, power: card.power, cryptoValue: card.cryptoValue, type: card.type }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setAbCards(cards);
+        if (cards[0] && !abCardId) {
+          setAbCardId(cards[0].id);
+          setAbValue(cards[0].cost);
+          setAbField('cost');
+        }
+      })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, []);
+
+  if (!status) return <section className='test-games agents-panel'><p className='agents-note'>{error || 'Loading agents…'}</p></section>;
+  const contentAb = status.contentAb ?? { running: false, experimentId: null, cardId: null, seedIndex: 0, seedCount: 0, error: null, last: null };
+  const { cohort, league } = status;
+  const ecoOn = status.effective.ecoStrat;
+  const leagueBusy = league.running;
+  const ecoBusy = cohort.running || contentAb.running;
+  const waitLeague = leagueBusy ? 'Wait for the league run to finish' : undefined;
+  const waitEco = ecoBusy ? 'Wait for the Eco-Strat run to finish' : undefined;
+  const selectedAb = abCards.find(card => card.id === abCardId);
+  const abReportDoc = contentAb.last?.reportId
+    ? docs.find(doc => doc.id === `eco-strat-report-${contentAb.last!.reportId}`)
+    : docs.find(doc => /ab-/i.test(doc.id));
+
+  return <section className='test-games content-ab agents-panel' aria-label='Content A/B'>
+    <article className='test-games-card' aria-label='Content A/B'>
+      <header><AgentAvatar agent='eco-strat' size={24}/><span><strong>Content A/B</strong><small>One card change · same seeds · frozen Strat-G</small></span></header>
+
+      <div className='ab-howto'>
+        <h3>How to run</h3>
+        <ol>
+          <li>Turn Eco-Strat on (Agents tab). League and Eco study must be idle.</li>
+          <li>Pick a card, which number to change (Cost / Power / Crypto value), and the new value.</li>
+          <li>Choose paired seeds — more seeds = clearer answer, slower run. Each seed plays twice (before and after).</li>
+          <li>Press <b>Run A/B</b>. When it finishes, press <b>Read A/B report</b>.</li>
+        </ol>
+        <h3>How to read the result</h3>
+        <ul>
+          <li><b>Patch win rate</b> — share of paired seeds where the changed pack beat the unchanged one. Above ~55% leans “stronger”; below ~45% leans “weaker.” Near 50% is noise.</li>
+          <li><b>Mean margin Δ</b> — average VP gap (patch − control). Positive = patch wins by more; negative = loses by more.</li>
+          <li><b>Pick rate</b> — how often Strat-G buys the card. If it falls, the AI (or the new price) does not want it.</li>
+          <li><b>Buyer win / Win Δ</b> — when someone buys it, do they win more afterward?</li>
+          <li><b>Soft flags</b> — the budget formula cannot see the full card; treat efficiency (E) carefully.</li>
+        </ul>
+        <p>Control = today’s pack. Patch = same pack with only your one change. Neither arm teaches Strat-G.</p>
+      </div>
+
+      <label className='test-games-field'>
+        <small>Card</small>
+        <select value={abCardId} disabled={!ecoOn || ecoBusy || !abCards.length} onChange={event => {
+          const id = event.target.value;
+          setAbCardId(id);
+          const card = abCards.find(entry => entry.id === id);
+          if (!card) return;
+          if (abField === 'power') setAbValue(card.power ?? 0);
+          else if (abField === 'cryptoValue') setAbValue(card.cryptoValue ?? 0);
+          else setAbValue(card.cost);
+        }}>
+          {abCards.map(card => <option key={card.id} value={card.id}>{card.name} · c{card.cost}{card.power !== undefined ? ` · p${card.power}` : ''}{card.cryptoValue !== undefined ? ` · ₵${card.cryptoValue}` : ''}</option>)}
+        </select>
+      </label>
+      <div className='agents-cadence' role='radiogroup' aria-label='Field to change'>
+        <small>Change</small>
+        {AB_FIELDS.map(field => <button key={field.id} type='button' role='radio' aria-checked={abField === field.id} disabled={!ecoOn || ecoBusy} onClick={() => {
+          setAbField(field.id);
+          if (!selectedAb) return;
+          if (field.id === 'power') setAbValue(selectedAb.power ?? 0);
+          else if (field.id === 'cryptoValue') setAbValue(selectedAb.cryptoValue ?? 0);
+          else setAbValue(selectedAb.cost);
+        }}>{field.label}</button>)}
+      </div>
+      <label className='test-games-field'>
+        <small>New value</small>
+        <input type='number' value={abValue} disabled={!ecoOn || ecoBusy} onChange={event => setAbValue(Number(event.target.value))}/>
+      </label>
+      <Choice label='Paired seeds' values={AB_SEEDS} value={abSeeds} unit={count => `${count}`} disabled={!ecoOn || ecoBusy} onChange={setAbSeeds}/>
+      {contentAb.running
+        ? <Progress label={`A/B ${contentAb.cardId ?? '…'} · seed ${contentAb.seedIndex}/${contentAb.seedCount} (×2 games)`} value={contentAb.seedIndex} total={Math.max(1, contentAb.seedCount)}/>
+        : contentAb.last
+          ? <p className='test-games-result'>Last: <b>{contentAb.last.cardId}</b> · patch win rate {contentAb.last.patchWinRate == null ? 'n/a' : `${Math.round(contentAb.last.patchWinRate * 100)}%`}{contentAb.last.reportId ? <> · report <code>{contentAb.last.reportId}</code></> : null}</p>
+          : null}
+      {contentAb.error && <p className='agents-error'>{contentAb.error}</p>}
+      <div className='agents-actions'>
+        {contentAb.running
+          ? <button type='button' onClick={() => void act('eco-strat', 'stop')}>Stop A/B</button>
+          : <button type='button' className='primary' disabled={!ecoOn || !abCardId || leagueBusy || ecoBusy} title={waitLeague ?? waitEco} onClick={() => void runContentAb({ definitionId: abCardId, changes: { [abField]: abValue }, seedCount: abSeeds })}>Run A/B ({abSeeds}×2 games)</button>}
+        <button type='button' disabled={!abReportDoc} onClick={() => abReportDoc && setReading(abReportDoc.id)}>Read A/B report</button>
+      </div>
+    </article>
+    {error && <p className='agents-error'>{error}</p>}
     {reading && <AgentReader docs={docs} initial={reading} onClose={() => setReading(null)}/>}
   </section>;
 }

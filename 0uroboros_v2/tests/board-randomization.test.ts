@@ -112,16 +112,22 @@ it('middleNodesOnly opens one middle Node per turn and keeps ends out of play', 
 it('default Draft offers eight rotating cards; tenCardDraft expands to ten', () => {
   expect(DRAFT_SLOTS_MIDDLE).toHaveLength(DRAFT_OFFER_COUNT_MIDDLE);
   expect(DRAFT_SLOTS_MIDDLE.map(slot => slot.id)).toEqual([
-    'action-utility-1', 'action-utility-2', 'hacker-utility-1', 'hacker-utility-2', 'attack', 'horror', 'solar-monk', 'vp',
+    'action-utility-1', 'action-utility-2', 'hacker-crypto-1', 'hacker-crypto-2', 'attack', 'horror', 'solar-monk', 'vp',
   ]);
   expect(draftOffer(seededRandom(11), content, new Set(), new Set(), 8, DRAFT_SLOTS_MIDDLE)).toHaveLength(DRAFT_OFFER_COUNT_MIDDLE);
+  const drain = (session: ReturnType<typeof createSession>) => {
+    for (let guard = 0; guard < 5_000 && (session.pendingCount || session.state.choice); guard++) {
+      if (session.state.choice) session.choose(session.state.choice.options[0].id);
+      else session.step();
+    }
+  };
   const eight = createSession({
     content, carryover: true, priorityPreference: 'higher', evaluationContent: true, strategicMarket: true,
     middleNodesOnly: true, random: seededRandom(11),
   });
   for (let turn = 0; turn < 3; turn++) {
     eight.endTurn();
-    while (eight.pendingCount) eight.step();
+    drain(eight);
   }
   expect(eight.state.phase).toBe('draft');
   expect(eight.state.market.filter(pile => pile.rotating)).toHaveLength(DRAFT_OFFER_COUNT_MIDDLE);
@@ -132,7 +138,7 @@ it('default Draft offers eight rotating cards; tenCardDraft expands to ten', () 
   });
   for (let turn = 0; turn < 3; turn++) {
     ten.endTurn();
-    while (ten.pendingCount) ten.step();
+    drain(ten);
   }
   expect(ten.state.phase).toBe('draft');
   expect(ten.state.market.filter(pile => pile.rotating)).toHaveLength(10);

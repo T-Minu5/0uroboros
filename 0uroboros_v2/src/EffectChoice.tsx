@@ -12,12 +12,22 @@ type Choice=NonNullable<SessionView['choice']>;
  * Fixed 480px stage so arrowheads never stretch: three 160px columns, centres at 80/240/400. The 44px diamonds' side points
  * sit 31px either side of a centre on the diamond row's midline (y 31); push arcs skim just above it, pull arcs just below.
  */
+/*
+ * Push arcs leave the played Node (center → side). Pull arcs enter it (side → center).
+ * Arrowheads sit on the destination end so Push points away and Pull points in.
+ */
 const TRANSFER_ARCS={
  push:{left:'M207 28 C194 23 126 23 113 28',right:'M273 28 C286 23 354 23 367 28'},
  pull:{left:'M113 34 C126 39 194 39 207 34',right:'M367 34 C354 39 286 39 273 34'},
 };
-const TRANSFER_SIDES=['left','both','right'] as const;
 const DIAGRAM_KEY='ouroboros.transferDiagram';
+
+/** Arrow badge copy: Push leaves the played Node; Pull arrives into it. */
+function transferArrow(mode:'push'|'pull',side:'left'|'right'|'both'){
+ if(side==='both')return mode==='push'?'↔':'↔';
+ if(mode==='push')return side==='left'?'←':'→';
+ return side==='left'?'→':'←';
+}
 
 function TransferChoice({choice,choose,view,hover}:{choice:Choice;choose:(id:string)=>void;view:TransferView;hover:(id:string|null)=>void}){
  const transfer=choice.transfer!;
@@ -34,14 +44,26 @@ function TransferChoice({choice,choose,view,hover}:{choice:Choice;choose:(id:str
  const arcShown=(mode:'push'|'pull',side:'left'|'right')=>has(`${mode}-${side}`)||has(`${mode}-both`)&&!!slots[side==='left'?0:2];
  const arcActive=(mode:'push'|'pull',side:'left'|'right')=>view.option===`${mode}-${side}`||view.option===`${mode}-both`&&!!slots[side==='left'?0:2];
  const state=(node:number)=>view.over===node?'is-over':view.from===node?'is-origin':dragging?(view.targets.includes(node)?'is-target':''):view.sources.includes(node)?'is-source':'';
- const button=(id:string,mode:'push'|'pull')=>has(id)&&<button type='button' className={`transfer-action transfer-${mode}`} data-choice-option={id} aria-label={label(id)} title={label(id)}
+ const button=(id:string,mode:'push'|'pull',side:'left'|'right'|'both')=>has(id)&&<button type='button' className={`transfer-action transfer-${mode}`} data-choice-option={id} aria-label={label(id)} title={label(id)}
   onMouseEnter={()=>hover(id)} onMouseLeave={()=>hover(null)} onFocus={event=>{if(event.currentTarget.matches(':focus-visible'))hover(id);}} onBlur={()=>hover(null)} onClick={()=>choose(id)}>
-  {mode==='push'?'Push':'Pull'} {total(id)}
+  <span className='transfer-arrow' aria-hidden='true'>{transferArrow(mode,side)}</span>
+  <span className='transfer-arrow-amount'>{total(id)}</span>
  </button>;
  const modes=(['push','pull'] as const).filter(mode=>choice.options.some(option=>option.id.startsWith(`${mode}-`)));
- // Push buttons sit on the diamonds' top points and pull buttons on their bottom points.
- const actionRow=(mode:'push'|'pull')=><div className={`transfer-row transfer-${mode}-row`}>
-  {TRANSFER_SIDES.map(side=><div key={side}>{button(`${mode}-${side}`,mode)}</div>)}
+ // Push badges sit on the played Node (center). Pull badges sit on the neighbouring Nodes.
+ const pushRow=<div className='transfer-row transfer-push-row'>
+  <div aria-hidden='true'/>
+  <div className='transfer-push-cluster'>
+   {button('push-left','push','left')}
+   {button('push-both','push','both')}
+   {button('push-right','push','right')}
+  </div>
+  <div aria-hidden='true'/>
+ </div>;
+ const pullRow=<div className='transfer-row transfer-pull-row'>
+  <div className='transfer-pull-slot'>{button('pull-left','pull','left')}</div>
+  <div className='transfer-pull-slot transfer-pull-both'>{button('pull-both','pull','both')}</div>
+  <div className='transfer-pull-slot'>{button('pull-right','pull','right')}</div>
  </div>;
  return <>
   <div className='transfer-head'>
@@ -51,10 +73,10 @@ function TransferChoice({choice,choose,view,hover}:{choice:Choice;choose:(id:str
   <h2>{choice.icon&&<Icon name={choice.icon}/>}{dragging?'Drop on a glowing location':'Drag power between glowing locations'}</h2>
   <p className='transfer-summary'>{choice.prompt}{dragging&&' Esc cancels.'}</p>
   {shown&&<div id='transfer-diagram' className={`transfer-stage ${dragging?'is-dragging':''}`}>
-   {modes.includes('push')&&actionRow('push')}
+   {modes.includes('push')&&pushRow}
    <div className='transfer-row transfer-diamonds'>
     <svg className='transfer-arcs' width='480' height='62' viewBox='0 0 480 62' aria-hidden='true'>
-     <defs>{modes.map(mode=><marker key={mode} id={`transfer-head-${mode}`} viewBox='0 0 10 10' refX='7' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0 L10 5 L0 10 z'/></marker>)}</defs>
+     <defs>{modes.map(mode=><marker key={mode} id={`transfer-head-${mode}`} viewBox='0 0 10 10' refX='8' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0 0 L10 5 L0 10 z'/></marker>)}</defs>
      {modes.flatMap(mode=>(['left','right'] as const).filter(side=>arcShown(mode,side)).map(side=><path key={`${mode}-${side}`} className={`transfer-${mode}-arc ${arcActive(mode,side)?'is-active':''}`} d={TRANSFER_ARCS[mode][side]} markerEnd={`url(#transfer-head-${mode})`}/>))}
     </svg>
     {slots.map((slot,index)=>slot?<div key={slot.node} className={`transfer-node ${index===1?'is-center':''} ${state(slot.node)}`}>
@@ -63,7 +85,7 @@ function TransferChoice({choice,choose,view,hover}:{choice:Choice;choose:(id:str
      {delta(slot.node)!==0&&<em className='transfer-delta'>{delta(slot.node)>0?'+':'−'}{formatAmount(Math.abs(delta(slot.node)))}</em>}
     </div>:<div key={`empty-${index}`} className='transfer-node is-empty' aria-hidden='true'/>)}
    </div>
-   {modes.includes('pull')&&actionRow('pull')}
+   {modes.includes('pull')&&pullRow}
    <div className='transfer-row transfer-names'>{slots.map((slot,index)=><div key={index} className={slot?'':'is-empty'}>
     {slot&&<small>{slot.name}</small>}
     {slot&&index===1&&<i>This location</i>}

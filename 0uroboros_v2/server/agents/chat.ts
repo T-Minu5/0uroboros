@@ -7,7 +7,7 @@ import type { StrategistMemory } from '../aiStrategist';
 import type { Journal } from './ecoJournal';
 import { BLOWOUT_MARGIN, CLOSE_MARGIN, TARGET_BOTH_DESTROYED_RATE, TARGET_CYCLE16_MAX_RATE, TARGET_DESTRUCTION_END_RATE_MAX, TARGET_DESTRUCTION_END_RATE_MIN } from './ecoMetrics';
 
-export type ChatLearnerId = 'strat-g' | 't-5' | 'dv-8' | 'vp-dog';
+export type ChatLearnerId = 'strat-g' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go';
 export type ChatSpeaker = ChatLearnerId | 'eco-strat';
 export type ChatAudience = ChatSpeaker | 'both' | 'all';
 export type ChatHistoryTurn = { role: 'user' | 'assistant'; content: string; speaker?: string };
@@ -31,14 +31,15 @@ export const CHAT_KICKOFF_MESSAGE = [
   'Be concrete and cite CONTEXT numbers when you have them; say "not recorded" when you do not.',
 ].join(' ');
 
-export const CHAT_AUDIENCES: ChatAudience[] = ['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog', 'both', 'all'];
-export const CHAT_SPEAKERS: ChatSpeaker[] = ['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog'];
+export const CHAT_AUDIENCES: ChatAudience[] = ['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog', 'last-2go', 'both', 'all'];
+export const CHAT_SPEAKERS: ChatSpeaker[] = ['strat-g', 'eco-strat', 't-5', 'dv-8', 'vp-dog', 'last-2go'];
 
 const LEARNER_LABEL: Record<ChatLearnerId, string> = {
   'strat-g': 'Strat-G',
   't-5': 'T-5',
   'dv-8': 'DV-8',
   'vp-dog': 'VP-Dog',
+  'last-2go': 'Last2Go',
 };
 
 const REPLY_SCHEMA = `Reply with one JSON object: {"answer": string (<=700: conversational reply to the designer), "questionsForMel": string[] (<=2 short mechanics/design questions; empty if none), "complaints": string[] (<=3 design complaints; required when Mel opened the session / asked for complaints, otherwise only when relevant or empty), "learned": string[] (<=3 short takeaways from Mel's latest message that you will remember; empty on kickoff if Mel taught nothing yet), "confidence": "strong"|"moderate"|"weak"|"insufficient"|"unknown", "sources": [{"id": string, "at"?: string}] (<=8 CONTEXT ids you used)}. Cite only numbers/facts present in CONTEXT; say "not recorded" when missing. Never invent statistics. Never change strategy profiles or experiments yourself — Mel's guidance will be saved as notes.`;
@@ -320,7 +321,7 @@ export async function chatWithStrat(options: ChatWithStratOptions): Promise<Chat
   const message = options.message.trim().slice(0, 2000);
   if (!message) return { replies: [], model: null, error: 'Message is required.' };
   if (!isChatAudience(options.audience)) {
-    return { replies: [], model: null, error: 'audience must be strat-g, eco-strat, t-5, dv-8, vp-dog, both, or all.' };
+    return { replies: [], model: null, error: 'audience must be strat-g, eco-strat, t-5, dv-8, vp-dog, last-2go, both, or all.' };
   }
   if (!options.apiKey) return { replies: [], model: null, error: 'No OpenAI API key configured for agents.' };
   const fetchImpl = options.fetchImpl ?? fetch;

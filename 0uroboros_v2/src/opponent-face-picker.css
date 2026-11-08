@@ -1,0 +1,47 @@
+/* Landing AI faces: square tiles with a 45° cut on TL/BR and 2px rounds on TR/BL. */
+.opponent-faces{
+  display:flex;flex-wrap:nowrap;justify-content:center;gap:4px;
+  margin:0 0 18px;padding:4px 0 2px;width:100%;
+}
+.opponent-face{
+  position:relative;display:flex;flex:1 1 0;flex-direction:column;align-items:center;gap:5px;
+  min-width:0;max-width:76px;padding:2px;border:0;background:transparent;cursor:pointer;
+  color:#c4bfd2;text-align:center;isolation:isolate;
+}
+.opponent-face::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  border:1px solid transparent;border-radius:4px;background:transparent;
+  transition:border-color .18s ease, background-color .18s ease;
+}
+.opponent-face>*{position:relative;z-index:1}
+.opponent-face:disabled{opacity:.45;cursor:not-allowed}
+.opponent-face-frame{
+  position:relative;display:block;width:58px;height:58px;overflow:hidden;
+  /* Square with 45° shaved TL + BR; soft 2px on TR + BL via rounded mask corners. */
+  clip-path:polygon(11px 0, calc(100% - 2px) 0, 100% 2px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 2px 100%, 0 calc(100% - 2px), 0 11px);
+  background:#0a1218;box-shadow:0 0 0 1px #ffffff22;
+}
+.opponent-face-frame>img{
+  display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%;
+  transform:scale(1.35);transform-origin:center top;
+}
+.opponent-face:hover:not(:disabled)::before,
+.opponent-face.selected::before{
+  border-color:var(--green,#1fffb1);
+  background:color-mix(in srgb, var(--green,#1fffb1) 25%, transparent);
+}
+.opponent-face b{
+  max-width:100%;margin:0;padding:0 1px;
+  font:600 9px/1.15 Inter,sans-serif;color:#e8ecf4;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.opponent-face small{
+  font:600 8px/1 Inter,sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#8b93a7;
+}
+.opponent-face.selected b{color:#e8fff6}
+.opponent-face.selected small{color:#9ff5d6}
+.opponent-face:focus-visible{outline:none}
+.opponent-face:focus-visible::before{
+  border-color:#ffcc12;
+  background:color-mix(in srgb, #ffcc12 18%, transparent);
+}

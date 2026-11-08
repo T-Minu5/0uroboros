@@ -9,8 +9,6 @@ export type GameSetup = {
   serverVP: Servers;
   turnSeconds: number | null;
   noLocations: boolean;
-  /** Persistent Crypto card shelf in Draft. Defaults off. */
-  draftCrypto: boolean;
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly: boolean;
   /** When true, Draft offers 10 rotating cards; default is 8. */
@@ -27,13 +25,12 @@ const clampInt = (value: unknown, min: number, max: number, fallback: number) =>
 
 export function sanitizeGameSetup(raw: unknown): GameSetup {
   const value = (raw && typeof raw === 'object' ? raw : {}) as {
-    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; draftCrypto?: unknown; middleNodesOnly?: unknown; tenCardDraft?: unknown; mostCircuitsBonusVP?: unknown;
+    serverVP?: Partial<Servers>; turnSeconds?: unknown; noLocations?: unknown; middleNodesOnly?: unknown; tenCardDraft?: unknown; mostCircuitsBonusVP?: unknown;
   };
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
     turnSeconds: typeof value.turnSeconds === 'number' && TURN_TIMER_CHOICES.includes(value.turnSeconds) ? value.turnSeconds : null,
     noLocations: value.noLocations === true,
-    draftCrypto: value.draftCrypto === true,
     middleNodesOnly: value.middleNodesOnly === true,
     tenCardDraft: value.tenCardDraft === true,
     mostCircuitsBonusVP: clampInt(value.mostCircuitsBonusVP, 0, MOST_CIRCUITS_BONUS_VP_MAX, defaultMostCircuitsBonusVP),

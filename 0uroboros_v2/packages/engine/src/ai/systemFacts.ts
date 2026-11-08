@@ -3,7 +3,7 @@
  * the runtime actually uses. Evaluators read this instead of importing the engine.
  */
 import type { ContentDocument } from "../authoring/contentModel";
-import { CURRENCY_PILES, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_OFFER_COUNT, DRAFT_PHASE_SUMMARY, DRAFT_SLOT_SUMMARY, DRAFT_SOLAR_MONK_COUNT } from "../evaluationMarket";
+import { DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_OFFER_COUNT, DRAFT_PHASE_SUMMARY, DRAFT_SLOT_SUMMARY, DRAFT_SOLAR_MONK_COUNT } from "../evaluationMarket";
 import { DEFAULT_BUILTIN_MODS } from "../builtinMods";
 import { defaultMostCircuitsBonusVP, defaultServerVP, initialWeights, serverMaximums, type Card } from "../game";
 import { compileForSelfPlay } from "./selfPlay";
@@ -46,24 +46,19 @@ export function configurableFacts(): ConfigurableFact[] {
       notes: "VP awarded when you destroy the enemy Backup. Configure UI; not Server integrity.",
     },
     {
-      id: "draftCrypto", surface: "configure", label: "Draft Crypto shelf",
+      id: "noLocations", surface: "configure", label: "No location text",
       default: false, cohortDefault: false,
-      notes: "When on, Shyte-Coin / Byte-Coin / Kilo-Coin / Mega-Cache sit beside the rotating Draft offer. Off by default: Crypto comes from Character effects and held Crypto cards.",
+      notes: "When on, every Node is No Man's Land for the whole game (no Location effects). Configure label: No location text.",
     },
     {
-      id: "noLocations", surface: "configure", label: "No Locations",
+      id: "middleNodesOnly", surface: "configure", label: "Short Circuit (3 Locations)",
       default: false, cohortDefault: false,
-      notes: "When on, every Node is No Man's Land for the whole game (no Location effects).",
-    },
-    {
-      id: "middleNodesOnly", surface: "configure", label: "Middle Nodes only",
-      default: false, cohortDefault: false,
-      notes: "When on, only Nodes 2–4 are in play: one opens each Runtime turn (random order). Nodes 1 and 5 stay closed — no deploys, moves, holograms, Power push/pull, Locations, or Collapse. Open-order weights use the first three buckets (30/25/20) on those Nodes.",
+      notes: "Game mode Short Circuit: only Nodes 2–4 are in play; one opens each Runtime turn (random order). Nodes 1 and 5 stay closed — no deploys, moves, holograms, Power push/pull, Locations, or Collapse. Extended runtime (default) uses all five Nodes. Open-order weights use the first three buckets (30/25/20) on Short Circuit Nodes.",
     },
     {
       id: "tenCardDraft", surface: "configure", label: "10-card Draft",
       default: false, cohortDefault: false,
-      notes: "Default Draft is 8 rotating offers (Action/Utility ×2, Hacker/Utility ×2, Attack, Horror, Solar Monk, VP) with a soft floor of two +2 Crypto cards. When on, adds two Chaos fills for a 10-card offer.",
+      notes: "Default Draft is 8 rotating offers (Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP) with a soft floor of two +2 Crypto cards. When on, adds two Chaos fills for a 10-card offer.",
     },
     {
       id: "mostCircuitsBonusVP", surface: "configure", label: "Most Circuits end-game bonus VP",
@@ -126,9 +121,9 @@ export function configurableFacts(): ConfigurableFact[] {
       notes: "Buckets 30/25/20/15/10 assign by open order (first Node to open gets 30, … last gets 10). Middle-Nodes tables use only 30/25/20. Probability transfer can still move weight during Runtime. ControlledWeight drives reveal priority; a Collapse particle Node is rolled from final weights for UI.",
     },
     {
-      id: "actionCarryover", surface: "session-fixed", label: "Runtime Action carryover",
+      id: "actionCarryover", surface: "session-fixed", label: "Legacy session carryover flag",
       default: true, cohortDefault: true,
-      notes: "Unspent Actions carry between Runtime turns inside a Cycle. Never between Cycles. User-facing and cohort sessions use carryover: true.",
+      notes: "There is no Action resource anymore. Sessions still require the carryover boolean for API compatibility; it does not change play. User-facing and cohort sessions pass carryover: true.",
     },
     {
       id: "priorityPreference", surface: "session-fixed", label: "Next-reveal priority from ControlledWeight",
@@ -158,10 +153,10 @@ export function systemFacts(document: ContentDocument): SystemFacts {
       format: "Two-player competitive deck-builder. Runtime Mode: three deployment turns per Cycle, then Wave Collapse, then Draft. Up to 16 Cycles.",
       cycleLoop: "Runtime (turns 1–3) → Wave Collapse (Nodes 1–5, then Effect Bank) → probabilistic Circuit selection → End of Cycle cleanup → Draft → End Draft → New Cycle (Wallet 0, new Locations, start-of-Cycle effects, draw 5).",
       cycles: 16, runtimeTurnsPerCycle: 3, handSize: 5, nodes: 5, maxCardsPerSidePerNode: 4,
-      opening: "Default: a shuffled reveal order opens three Nodes on turn 1, four on turn 2, five on turn 3 (turns 2–3 also grant a draw at start). Configure middleNodesOnly: only Nodes 2–4 are in play; one opens each Runtime turn; Nodes 1 and 5 stay closed. Open Nodes stay playable until Collapse.",
+      opening: "Extended runtime (default): a shuffled reveal order opens three Nodes on turn 1, four on turn 2, five on turn 3 (turns 2–3 also grant a draw at start). Short Circuit (middleNodesOnly): only Nodes 2–4 are in play; one opens each Runtime turn; Nodes 1 and 5 stay closed. Open Nodes stay playable until Collapse.",
       actions: "There is no Action resource. Characters and VP cards deploy free during Runtime; wallet Crypto settles at Draft, but generated Crypto with printed Power (e.g. Crypto-Shyte) can deploy. Legacy gainActions steps on cards are ignored.",
       midCycleDraw: "Fixed rule: each player draws 1 card at the start of Runtime turns 2 and 3.",
-      draftCrypto: "Setup option (default off): when on, a persistent Crypto shelf (Shyte-Coin, Byte-Coin, Kilo-Coin, Mega-Cache) sits beside the rotating Draft offer. When off, Crypto cards are not for sale — Wallet income comes from Character effects and any Crypto already held.",
+      draftCrypto: "Removed. There is no persistent Crypto shelf. Crypto-type cards appear in the rotating Hacker/Crypto Draft slots; Wallet also comes from Character Crypto effects and held Crypto that auto-resolves at Draft.",
       startingDeck: "Both seats use the active starting deck from content. Current Standard is weaker than older builds (mostly Shyte-Coin plus a thin Character/VP core), so early hands are softer and the Draft shapes the economy more.",
       deploy: "Cards deploy face down. Max 4 cards+holograms per seat per Node. Characters, VP and Crypto all deploy free. Crypto left in hand still auto-resolves cryptoValue at Draft; Crypto played fires onReveal/onCollapse (currency cards typically reprint their payout on reveal). Reveal alternates priority seat then other, chronological within a seat; each reveal fully resolves its onReveal before the next.",
       power: "Higher numeric Power controls a Node (negatives allowed; empty side is 0 so 0 beats negative). Equal totals tie and split ControlledWeight. ControlledWeight = sum of weights of Nodes you win + half the weights of ties; higher ControlledWeight gets next reveal priority (ties keep current).",
@@ -171,19 +166,19 @@ export function systemFacts(document: ContentDocument): SystemFacts {
       nodeWeights: initialWeights.join(", ") + " assigned by open order",
       collapse: "Resolve Nodes 1→5. At each Node: Location onCollapse → card onCollapse → recalculate Power → winner/tie → Location Reward. Then Effect Bank onCollapse (oldest first). Then a weight lottery picks a particle Node for the ControlledWeight UI; Circuit eligibility stays Location-lead based.",
       locations: "Each Cycle deals one Location onto each of the 5 Nodes (unless noLocations). Whoever has more Power at a Node when it collapses wins that Location and its collapse effects fire once with the winner as the actor. 'Ongoing' effects fire at the start of turns 2 and 3 for whoever leads the Node then; 'when a card is played here' effects fire for that card's owner. Text says who benefits: you (the winner), your opponent (the loser), both players, the player with the least VP. A Location that rewards the loser, or hands out Glitch/Shyte-Coin junk, is worth conceding; one that draws, Drains or pays VP is worth contesting. Locations won also count toward the Circuit Reward. 'read' is the default AI's valuation at Cycle 8.",
-      circuit: "Whoever won more Locations in the Cycle is eligible for one random Circuit Reward; a tie makes both eligible. A reward with awardTrailing goes instead to the trailing player: lower VP once each enemy Server still standing adds the share of its destruction VP matching the share of its health already lost (both eligible when level). Catch-up (awardTrailing) rewards stay in the pool every game — Configure no longer toggles them.",
+      circuit: "Whoever won more Locations in the Cycle is eligible for one random Circuit Reward; a Locations-won tie makes both eligible for a normal (non-trailing) Circuit Reward — awardTrailing catch-up rewards are excluded from that draw. When Location counts differ, a reward with awardTrailing goes instead to the trailing player: lower VP once each enemy Server still standing adds the share of its destruction VP matching the share of its health already lost (both eligible when level). Catch-up (awardTrailing) rewards stay in the pool every game — Configure no longer toggles them — but they only apply when Location counts differ.",
       runtimeHacks: "Secret authored reveal combos. After a card's reveal effects (and Location on-play / opening schedule queued with that reveal) finish, if that seat has revealed every required card inside the hack's window (game, Cycle, Runtime turn, same Node across the game, or same Node within one Cycle), both seats see the award modal; only the unlocking seat gets the reward (usually a card into hand). Each hack fires at most once per seat per game. Face-down deploys do not count.",
-      draft: "Spendable Crypto comes from Character effects (many Base and Chaos cards print Crypto) and any held Crypto cards that resolve at Draft. Default Draft is 8 fixed slots (Action/Utility ×2, Hacker/Utility ×2, Attack, Horror, Solar Monk, VP) with a soft floor of two cards that gain +2 Crypto; Configure tenCardDraft expands to 10 with two Chaos fills. Crypto/Wallet resets each Cycle; unspent Crypto is lost. Bought cards go to the Discard. Draft lasts up to 90 seconds. Optional setup (draftCrypto, default off): a persistent Crypto shelf sits beside the offer.",
+      draft: "Spendable Crypto comes from Character effects, Crypto cards bought from the rotating Hacker/Crypto slots, and any held Crypto that auto-resolves at Draft. Default Draft is 8 fixed slots (Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP) with a soft floor of two cards that gain +2 Crypto (Crypto-type cards count via cryptoValue); Configure tenCardDraft expands to 10 with two Chaos fills. There is no persistent Crypto shelf. Crypto/Wallet resets each Cycle; unspent Crypto is lost. Bought cards go to the Discard. Draft lasts up to 90 seconds.",
       zones: "Draw, Hand, Discard, Nodes (board), Effect Bank (duration cards), Trash (shared, recoverable when text allows), Destroyed (permanent). End-of-Cycle: remaining hand to Discard; new Cycle draws 5.",
       mods: "Mods attach to host cards (Circuit/collection awards often choose between two hosts, prefer unmodded). Built-ins include double printed effects, Power aura to allies at the Location, and movable-each-turn. Authored mods (Aura Farming, Lefty, etc.) add hooks such as onReveal / recurring. Holograms: a card can create a hologram at the mirrored Node (1↔5, 2↔4; center does nothing); holograms occupy a slot, add Power, cannot be targeted, and clear after that Node's Collapse.",
       vpSources: "Final VP = destruction VP (Server kills) + printed VP on owned cards in active zones (Draw/Hand/Discard/Nodes; Destroyed excluded) + Location/Circuit/effect VP tracked as reward VP. When mostCircuitsBonusVP > 0, the seat with more Circuit wins across completed Cycles (strict Location lead per Cycle) also gets that bonus once at game end, counted as circuit VP; ties award nothing. Market VP is the printed VP on bought VP-category cards.",
       victory: "Most VP after the Cycle 16 Draft, or when a player loses both Servers (finish current Collapse Node, skip remaining Nodes/Draft). Equal VP is a tie.",
-      setup: "Configurable per game — see facts.configurable. Read those flags before assuming Crypto piles, mid-cycle draws, or Locations are in play. Trailing Circuit Rewards are always in the pool. Cohorts use Configure defaults unless noted in configurable.cohortDefault.",
+      setup: "Configurable per game — see facts.configurable. Read those flags before assuming mid-cycle draws or Locations are in play. Crypto is drafted from Hacker/Crypto slots (no shelf). Trailing Circuit Rewards are always in the pool. Cohorts use Configure defaults unless noted in configurable.cohortDefault.",
     },
     configurable: configurableFacts(),
     market: {
       gameCharacterPiles: 0, gameVpPiles: 0,
-      currency: "optional Crypto shelf when draftCrypto is on: " + (CURRENCY_PILES.length ? CURRENCY_PILES.map(pile => `${pile.cardId} x${pile.supply}`).join(", ") : "none") + "; otherwise Crypto comes from Character effects",
+      currency: "none — no persistent Crypto shelf; Crypto-type cards rotate through Hacker/Crypto Draft slots (2 copies per player when offered)",
       rotatingOffersPerDraft: DRAFT_OFFER_COUNT, rotatingSolarMonksPerDraft: `${DRAFT_SOLAR_MONK_COUNT} Solar-monk slot when any is enabled (VP Character: 1 Action to play)`, rotatingCopiesPerPlayer: DRAFT_COPIES_PER_PLAYER,
       rotatingOfferSlots: DRAFT_SLOT_SUMMARY,
       rotatingOfferRules: DRAFT_PHASE_SUMMARY,

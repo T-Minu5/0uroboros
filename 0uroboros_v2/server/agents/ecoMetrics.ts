@@ -74,6 +74,15 @@ export type GameMetrics = {
    */
   mostCircuitsVsMostNodes: 'same' | 'differ' | 'tied';
   /**
+   * Cycles where the Collapse weight-lottery particle Node had a seat winner.
+   * Older reports without `particleNode` contribute 0.
+   */
+  particleControlled: number;
+  /** Cycles where a particle Node existed and that Node tied. */
+  particleTied: number;
+  /** How often each seat controlled the particle Node. */
+  particleWins: Pair;
+  /**
    * Per-cycle board state for snowball analysis. `circuitClaims` is cumulative through this Cycle;
    * `circuitDifferential` is seat0 − seat1 cumulative Circuit claims; `locationsWon` is that Cycle only.
    */
@@ -180,6 +189,10 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const mostCircuitsVsMostNodes: GameMetrics['mostCircuitsVsMostNodes'] =
     mostCircuitsLeader === null || mostNodesLeader === null ? 'tied'
       : mostCircuitsLeader === mostNodesLeader ? 'same' : 'differ';
+  const particleCycles = report.cycles.filter(cycle => typeof cycle.particleNode === 'number');
+  const particleControlled = particleCycles.filter(cycle => cycle.particleWinner === 0 || cycle.particleWinner === 1).length;
+  const particleTied = particleCycles.filter(cycle => cycle.particleWinner == null).length;
+  const particleWins = pair(seat => particleCycles.filter(cycle => cycle.particleWinner === seat).length);
   return {
     winner, endedBy: endedBy(report), cycles: report.cycle, finalVP: report.finalVP, servers: report.servers,
     vpMargin: Math.abs(report.finalVP[0] - report.finalVP[1]), destructionVP,
@@ -202,6 +215,7 @@ export function gameMetrics(report: MatchReport): GameMetrics {
     circuit: report.cycles.filter(cycle => cycle.circuit).map(cycle => ({ cycle: cycle.cycle, rewardId: cycle.circuit!.rewardId, name: cycle.circuit!.name, eligible: [...cycle.circuit!.eligible], claimed: [...cycle.circuit!.claimed] })),
     circuitClaims: pair(seat => report.cycles.filter(cycle => cycle.circuit?.claimed.includes(seat)).length),
     circuitWins, mostCircuitsLeader, mostNodesLeader, mostCircuitsVsMostNodes,
+    particleControlled, particleTied, particleWins,
     timeline, marketVp, otherVp, finalScore, circuitLead2At,
     vpLeadChanges,
     vpLeaderAt: { '4': at(4) ? leader(at(4)!.vp) : null, '8': at(8) ? leader(at(8)!.vp) : null, '12': at(12) ? leader(at(12)!.vp) : null },
@@ -369,6 +383,12 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
         },
         mostCircuitsLeaderWonGame: winnerVs((m, seat) => m.circuitWins[seat]),
         mostNodesLeaderWonGame: winnerVs((m, seat) => m.locationsWon[seat]),
+        /** Collapse weight-lottery particle Node: controlled vs tied across games (UI particle, not Circuit eligibility). */
+        particle: {
+          controlledPerGame: avg(m => m.particleControlled),
+          tiedPerGame: avg(m => m.particleTied),
+          winsPerSeat: [avg(m => m.particleWins[0]), avg(m => m.particleWins[1])] as Pair,
+        },
       };
     })(),
     vpSources: {

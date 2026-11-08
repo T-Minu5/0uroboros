@@ -28,7 +28,7 @@ export function DraftPanel({view,busy,now,seconds,acquired,cycleStart,inspect,ac
  const split=Math.ceil(offers.length/2);
  const topRow=offers.slice(0,split);
  const bottomRow=offers.slice(split);
- // Persistent Crypto shelf (setup option), kept in engine order for the 2×2 grid.
+ // Legacy non-rotating Crypto shelf (removed); kept so old snapshots with shelf piles still render.
  const cryptoPiles=view.market.filter(pile=>!pile.rotating&&pile.category==='Crypto');
  const vpEarned=Math.max(0,local.totalVP-(cycleStart?.vp??0));
  const integrityDelta=local.servers.primary+local.servers.backup-(cycleStart?.integrity??0);

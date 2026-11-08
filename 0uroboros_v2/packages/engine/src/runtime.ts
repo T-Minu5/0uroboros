@@ -90,7 +90,7 @@ export type SessionConfig = {
   noTrailingRewards?: boolean;
   /** Each player draws 1 at the start of Runtime turns 2 and 3. Fixed rule (defaults on; tests may opt out). */
   midCycleDraw?: boolean;
-  /** Persistent Crypto card shelf in Draft (Shyte / Byte / Kilo / Mega). Defaults off. */
+  /** @deprecated Crypto shelf removed; ignored. Crypto is offered in rotating Hacker/Crypto slots. */
   draftCrypto?: boolean;
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly?: boolean;
@@ -113,6 +113,13 @@ export type CycleRecord = {
   cycle: number; vp: [number, number]; servers: [number, number]; wallet: [number, number]; locationsWon: [number, number];
   locations: { id: string; name: string; winner: PlayerId | null }[];
   circuit: { rewardId: string; name: string; eligible: PlayerId[]; claimed: PlayerId[] } | null;
+  /**
+   * Weight-lottery Node highlighted for the ControlledWeight UI after Collapse (`selectCircuitNode`).
+   * Independent of Circuit Reward eligibility. Absent on older reports.
+   */
+  particleNode?: number | null;
+  /** Winner of `particleNode` after Collapse (`null` = tie); absent on older reports. */
+  particleWinner?: PlayerId | null;
   /** Cards owned outside the board at the end of the Cycle, before Draft purchases. */
   deckSize: [number, number];
   /** The Draft's market as it opened; `stock` is what each seat could still buy. */
@@ -454,7 +461,7 @@ export class RuntimeSession {
     this.randomizeBoard();
     this.setupEvaluationLocations();
     // After board/location shuffle so seeded location layouts stay stable.
-    if (config.strategicMarket) this.state.market = createStrategicMarket(this.config.random, this.config.content, { draftCrypto: !!config.draftCrypto });
+    if (config.strategicMarket) this.state.market = createStrategicMarket(this.config.random, this.config.content);
     this.refreshScores();
     this.telemetry = new TelemetryCollector(() => ({ cycle: this.state.cycle, turn: this.state.turn }), cardId => {
       const card = this.findCard(cardId);
@@ -962,21 +969,39 @@ export class RuntimeSession {
   private strategyContext(owner: PlayerId = 1): StrategyContext {
     const own = this.state.players[owner], enemy = this.state.players[1 - owner];
     const max = serverMaximums.primary + serverMaximums.backup;
+    const enemySeat = (1 - owner) as PlayerId;
+    const opponentBoughtIds = this.purchases
+      .filter(purchase => purchase.cycle === this.state.cycle && purchase.owner === enemySeat)
+      .map(purchase => purchase.definitionId);
     return {
       cycle: this.state.cycle, finalCycle: 16,
       owned: [...own.draw, ...own.hand, ...own.discard, ...own.bank.map(entry => entry.card)],
       ownServers: own.servers.primary + own.servers.backup, ownServersMax: max,
       enemyServers: enemy.servers.primary + enemy.servers.backup, enemyServersMax: max,
+      opponentBoughtIds,
     };
+  }
+
+  /** Visible enemy Power at a Node: revealed Power plus occupancy of face-down enemy cards (unknown strength). */
+  private visibleEnemyPower(node: number, enemy: PlayerId): number {
+    const state = this.state.nodes[node];
+    const revealed = state.powers[enemy];
+    const faceDown = state.cards[enemy].filter(placement => !placement.revealed).length;
+    return revealed + faceDown;
   }
 
   /** Plans one AI seat's deployments from public state and its own hand; it never inspects the other hand. */
   private aiDeploy(owner: PlayerId) {
     const player = this.state.players[owner], enemy = (1 - owner) as PlayerId;
     const profile = this.strategyOf(owner), context = this.strategyContext(owner);
+    // Last2Go-style agents hold the hand until holdUntilTurn so they can react to opponent placements.
+    if (profile.holdUntilTurn && this.state.turn < profile.holdUntilTurn) return;
     const priority = new Map(player.hand.map(card => [card.id, deployPriority(card, profile, context)]));
     const hand = [...player.hand].sort((a, b) => priority.get(b.id)! - priority.get(a.id)!);
     const stakes = new Map(this.state.nodes.map((state, node) => [node, state.location ? locationStakes(state.location, profile, context, this.state.turn) : null]));
+    const majorityBias = Boolean(profile.holdUntilTurn);
+    const winsBefore = this.locationWins();
+    const ownWins = winsBefore[owner], enemyWins = winsBefore[enemy];
     for (const card of hand) {
       // Currency without Power stays in hand for Draft auto-resolve; Power Crypto (e.g. Crypto-Shyte) may deploy.
       if (card.type === "Crypto" && !(card.power ?? 0) && !card.powerDelta && !card.powerSource) continue;
@@ -989,13 +1014,26 @@ export class RuntimeSession {
         const state = this.state.nodes[node];
         // Only the seat's own identities and the other seat's publicly revealed Power are used.
         const own = state.cards[owner].reduce((sum, placement) => sum + this.cardPower(placement, false), 0);
-        const visibleEnemy = state.powers[enemy];
+        const visibleEnemy = majorityBias ? this.visibleEnemyPower(node, enemy) : state.powers[enemy];
         const after = own + this.printedPower(card);
         const flips = own <= visibleEnemy && after > visibleEnemy, ties = own <= visibleEnemy && after === visibleEnemy;
         const outcome = flips ? 3 : ties ? 1.5 : own < visibleEnemy ? .7 : .25;
         // How much this card moves the chance of holding the Node when its Location fires.
         const swing = flips ? 1 : ties ? .5 : own < visibleEnemy ? .15 : .05;
-        return 20 * outcome - state.cards[owner].length * 3 + locationScore(node, swing);
+        let score = 20 * outcome - state.cards[owner].length * 3 + locationScore(node, swing);
+        if (majorityBias) {
+          // Prefer flips that create or extend a Location-count lead; ties that do not hurt majority are acceptable.
+          const leadBefore = ownWins - enemyWins;
+          if (flips) {
+            const leadAfter = (ownWins + 1) - Math.max(0, enemyWins - (state.winner === enemy ? 1 : 0));
+            score += leadAfter > leadBefore ? 28 : leadAfter > 0 ? 18 : 10;
+          } else if (ties) {
+            score += leadBefore > 0 ? 8 : 4;
+          } else if (own < visibleEnemy) {
+            score -= 6;
+          }
+        }
+        return score;
       };
       candidates.sort((a, b) => this.config.strategicMarket ? tacticalScore(b) - tacticalScore(a) || a - b : this.state.nodes[a].cards[owner].length - this.state.nodes[b].cards[owner].length || a - b);
       if (!candidates.length) continue;
@@ -1641,8 +1679,13 @@ export class RuntimeSession {
     const who = step.target && "who" in step.target ? step.target.who : "self";
     const recipients = this.whoPlayers(ctx, who, false);
     if (!recipients.length) return this.noTarget(ctx, step);
-    // The trailing player makes the choices in their own award.
-    const actor = (recipient: PlayerId) => who === "leastVP" && !hostile ? recipient : this.actorFor(ctx, recipient, hostile);
+    // Shared beneficial targets (both / any / leastVP): each seat acts for itself.
+    // Otherwise a provisional Location "winner" from recalculate() would steal pay/draw
+    // (e.g. Pay to Play on turn 3 when one side already leads on Power).
+    const actor = (recipient: PlayerId) =>
+      !hostile && (who === "leastVP" || who === "both" || who === "any")
+        ? recipient
+        : this.actorFor(ctx, recipient, hostile);
     return this.runSteps(recipients.map(recipient => () => this.labelled(ctx, run(this.actingAs(ctx, actor(recipient)), recipient))));
   }
 
@@ -1845,20 +1888,29 @@ export class RuntimeSession {
     if (!Number.isInteger(amount) || amount < 0 || amount > 100) throw new Error("Gain count must be an integer from 0 to 100.");
     const catalog = this.config.content?.cards ?? EVALUATION_ALL_CARDS;
     const byId = (id: string) => catalog.find(card => (card.definitionId ?? card.id) === id || card.id === id);
+    /** Same eligibility as draft piles: Generated cards are only for named/specific grants. */
+    const draftEligible = (card: Card) => card.generated !== true;
     const poolIds = step.cardIds?.length ? [...step.cardIds] : step.cardId ? [step.cardId] : [];
-    const pool = poolIds.length
+    const named = poolIds.length
       ? poolIds.map(id => {
         const definition = byId(id);
         if (!definition) throw new Error(`Gain definition unavailable: ${id}`);
         return definition;
       })
+      : [];
+    // Named single card or sequential list: keep Generated for condition-specific grants.
+    // Random multi-id pools and filter/maxCost catalog picks: draft-eligible only.
+    const randomNamed = named.length > 1 && step.selection !== "sequential";
+    const pool = named.length
+      ? (randomNamed ? named.filter(draftEligible) : named)
       : catalog.filter(card => {
+        if (!draftEligible(card)) return false;
         if (!matchesFilter(card, step.filter)) return false;
         if (step.maxCost !== undefined && (card.cost ?? 0) > step.maxCost) return false;
         return true;
       });
     if (!pool.length) {
-      if (!poolIds.length && (step.filter || step.maxCost !== undefined)) {
+      if ((!poolIds.length && (step.filter || step.maxCost !== undefined)) || randomNamed) {
         return this.noTarget(ctx, step, { targetOwner }, "No matching card to gain.");
       }
       throw new Error("Gain requires a card or a pool of cards.");
@@ -2182,8 +2234,14 @@ export class RuntimeSession {
       if (step.action === "trashCard") return this.trashSelf(ctx);
       const self = this.state.nodes[ctx.source.node]?.cards[ctx.source.owner].includes(ctx.source) ? ctx.source : null;
       if (step.action === "moveCard") {
-        const targets = self ? this.moveDestinations(self) : [];
-        return this.requestChoice(ctx.source, `Move ${card.name} to another open Node.`, targets.map(node => ({ id: `node-${node}`, label: `Node ${node + 1}`, node, resolve: () => this.movePlacement(ctx.source, node, ctx.source) })));
+        if (!self) return this.noTarget(ctx, step);
+        // Location on-play / auto-moves never pause for a destination pick; card effects still may.
+        const mode = step.pick?.mode ?? "choose";
+        const locationAuto = ctx.scope === "location" || ctx.scope === "locationPlay" || ctx.scope === "locationEvent" || ctx.scope === "locationCondition";
+        if (mode === "random" || locationAuto) {
+          return this.movePlacementRandom(self, self, ctx.scope === "card" || ctx.scope === "circuit" ? "card" : "location");
+        }
+        return this.chooseMoveDestination(ctx.source, self);
       }
       return self && this.isCardTargetLegal(step, self) ? this.applyCardStep(ctx, step, self, true) : this.noTarget(ctx, step);
     }
@@ -3333,26 +3391,41 @@ export class RuntimeSession {
       return this.event("collapse", "Effect Bank resolves after Node 5, oldest first.");
     });
     this.queue.push(() => {
-      // Weight lottery still picks a "particle" Node for ControlledWeight visualization; Circuit
-      // eligibility stays Location-lead based (or trailing, when that reward is drawn).
+      // Weight lottery still picks a "particle" Node for ControlledWeight visualization.
+      // Locations tied → both seats share a normal Circuit Reward (trailing catch-up is excluded
+      // from the draw). Location counts differ → leader eligibility, or awardTrailing → VP trailer.
       const liveWeights = this.state.weights.map((weight, node) => this.playableNodeList().includes(node) ? weight : 0);
       this.state.selectedNode = liveWeights.some(weight => weight > 0)
         ? selectCircuitNode(liveWeights, this.config.random)
         : null;
       const wins = this.locationWins();
+      const locationsTied = wins[0] === wins[1];
       const pool=this.config.content?.circuitRewards??EVALUATION_CIRCUIT_REWARDS;
       const leaders=this.config.noTrailingRewards === true ? pool.filter(reward => !reward.awardTrailing) : pool;
-      const rewards=leaders.length ? leaders : pool;
+      const shared=leaders.filter(reward => !reward.awardTrailing);
+      // On a Locations tie, only share normal rewards. Fall back to the full pool only if every
+      // remaining reward is trailing (still share both seats — never apply catch-up on a tie).
+      const rewards = locationsTied
+        ? (shared.length ? shared : leaders.length ? leaders : pool)
+        : (leaders.length ? leaders : pool);
       const definition = this.config.evaluationContent ? structuredClone(rewards[Math.floor(this.config.random() * rewards.length)]) : null;
       this.refreshScores();
       const [me, them] = this.state.players;
-      const winner = definition?.awardTrailing ? trailingPlayer([{ vp: me.totalVP, servers: me.servers }, { vp: them.totalVP, servers: them.servers }], this.config.serverVP ?? defaultServerVP) : nodeWinner(wins);
+      const winner = locationsTied
+        ? null
+        : definition?.awardTrailing
+          ? trailingPlayer([{ vp: me.totalVP, servers: me.servers }, { vp: them.totalVP, servers: them.servers }], this.config.serverVP ?? defaultServerVP)
+          : nodeWinner(wins);
       this.state.circuitEligible = winner === null ? [0, 1] : [winner];
       this.state.circuitReward = { definition, claimed: [] };
       if (this.telemetry) { this.telemetry.circuitId = definition?.id ?? null; this.telemetry.circuitName = definition?.name ?? null; }
       const particle = this.state.selectedNode !== null ? ` Particle on N${this.state.selectedNode + 1}.` : "";
       const visibleName = this.circuitNamePublic() ? definition?.name : undefined;
-      const basis = definition?.awardTrailing ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}` : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
+      const basis = locationsTied
+        ? `Locations won ${wins[0]}–${wins[1]} (tied). Both players are eligible`
+        : definition?.awardTrailing
+          ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}`
+          : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
       return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}${particle}`, { source: "circuit", sourceName: visibleName, ...(this.state.selectedNode !== null ? { node: this.state.selectedNode } : {}) });
     });
     this.queue.push(() => {
@@ -3412,6 +3485,7 @@ export class RuntimeSession {
     this.state.phase = "draft";
     this.refreshScores();
     const [local, opponent] = this.state.players;
+    const particleNode = this.state.selectedNode;
     this.cycleRecords.push({
       cycle: this.state.cycle,
       vp: [local.totalVP, opponent.totalVP],
@@ -3420,6 +3494,8 @@ export class RuntimeSession {
       locationsWon: this.locationWins(),
       locations: this.state.nodes.filter(node => node.location).map(node => ({ id: node.location!.id, name: node.location!.name, winner: node.winner })),
       circuit: this.state.circuitReward.definition ? { rewardId: this.state.circuitReward.definition.id, name: this.state.circuitReward.definition.name, eligible: [...this.state.circuitEligible], claimed: [] } : null,
+      particleNode,
+      particleWinner: particleNode !== null ? this.state.nodes[particleNode].winner : null,
       deckSize: [local, opponent].map(player => player.draw.length + player.hand.length + player.discard.length + player.bank.length) as [number, number],
     });
     this.state.draftEndsAt = this.now() + 90_000;

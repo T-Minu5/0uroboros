@@ -272,7 +272,10 @@ describe('phase 2 events and actions', () => {
     game.deploy('buyer', 0);
     game.endTurn(0); game.endTurn(1);
     finish(game);
-    expect(game.state.players[0].hand.some(entry => entry.cardClass === 'Utility')).toBe(true);
+    const gained = game.state.players[0].hand.find(entry => entry.cardClass === 'Utility');
+    expect(gained).toBeTruthy();
+    expect(gained!.generated).not.toBe(true);
+    expect(document.cards.find(entry => (entry.definitionId ?? entry.id) === (gained!.definitionId ?? gained!.id))?.generated).not.toBe(true);
   });
 });
 

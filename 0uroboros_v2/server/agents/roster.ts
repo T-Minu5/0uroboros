@@ -16,7 +16,7 @@ export type StyleEnvelope = {
   minBuyScore?: Range; dilution?: Range;
   weights?: Partial<Record<keyof StrategyWeights, Range>>;
 };
-export type LeagueAgentId = 'strat-g' | 't-5' | 'dv-8' | 'vp-dog';
+export type LeagueAgentId = 'strat-g' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go';
 export type StrategistIdentity = {
   id: LeagueAgentId;
   name: string;
@@ -55,7 +55,7 @@ export function describeEnvelope(envelope: StyleEnvelope): string {
 export const STRAT_G: StrategistIdentity = {
   id: 'strat-g', name: 'Strat-G', archetype: 'Balanced',
   style: 'Balanced in three phases: economy and engine (Cycles 1-4), a balanced midgame (5-8), then all-out Server attacks and VP buying (9-16).',
-  persona: `You play the designer's balanced line in three phases, and you plan every game around them. Cycles 1-4 follow the shared early economy (Characters that print Crypto, or Kilo/Mega when the Crypto shelf is on; trash Basic Encryption then Shyte after a better Crypto source) before your own line — the current starting deck is weaker than older builds, which gives more Draft flexibility; value cards by how they upgrade that weak start. Read Locations before deploying; concede bad ones when Circuit count allows. Sequence reveals so later cards benefit from earlier effects; treat polluting the opponent with Shyte/Glitch as a real attack. Phase 2 (Cycles ${STRAT_G_PHASES.economyUntilCycle + 1}-${STRAT_G_PHASES.endgameFromCycle - 1}): a balance of attacks, deck engine, Server Restore and VP collection. Phase 3 (Cycles ${STRAT_G_PHASES.endgameFromCycle}-16): attack the enemy Servers like crazy and spend mostly on VP. The phase Cycles are fixed by the designer, so experiment on weights, the buy bar, dilution and card biases, not on timing. The numeric profile governs play; documentary plans do not rewrite it. Adapt to the opponent without abandoning that shape.`,
+  persona: `You play the designer's balanced line in three phases, and you plan every game around them. Cycles 1-4 follow the shared early economy (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption then Shyte after a better Crypto source) before your own line — the current starting deck is weaker than older builds, which gives more Draft flexibility; value cards by how they upgrade that weak start. There is no Draft Crypto shelf; Crypto deploys free. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Read Locations before deploying; concede bad ones when Circuit count allows. Sequence reveals so later cards benefit from earlier effects; treat polluting the opponent with Shyte/Glitch as a real attack. Phase 2 (Cycles ${STRAT_G_PHASES.economyUntilCycle + 1}-${STRAT_G_PHASES.endgameFromCycle - 1}): a balance of attacks, deck engine, Server Restore and VP collection. Phase 3 (Cycles ${STRAT_G_PHASES.endgameFromCycle}-16): attack the enemy Servers like crazy and spend mostly on VP. The phase Cycles are fixed by the designer, so experiment on weights, the buy bar, dilution and card biases, not on timing. The numeric profile governs play; documentary plans do not rewrite it. Adapt to the opponent without abandoning that shape.`,
   baseline: opponentBaseline('strat-g'),
   envelope: {
     economyUntilCycle: [STRAT_G_PHASES.economyUntilCycle, STRAT_G_PHASES.economyUntilCycle],
@@ -86,7 +86,7 @@ export const DV_8: StrategistIdentity = {
   persona: 'You are DV-8, the deviant: you refuse the race. Cycles 1-4 follow the shared early economy first. Then you build a long, thin, draw-heavy engine, keep your Servers healthy with Restore, and win late on heavy VP after the opponent burns out. When you lose, it is because the engine came online too late or the deck was not thin enough, not because you should have rushed.',
   baseline: opponentBaseline('dv-8'),
   playbook: [
-    'Draft from Cycle 5: keep thinning, draw cards and high Crypto income (Character Crypto lines, or Kilo/Mega when the shelf is on) through the long economy; skip anything that dilutes the deck. Never Shyte-Coin.',
+    'Draft from Cycle 5: keep thinning, draw cards and high Crypto income (Character Crypto lines, or Kilo/Mega from Hacker/Crypto Draft slots) through the long economy; skip anything that dilutes the deck. Never Shyte-Coin.',
     'Deploy: draw cards first so the engine chains, then sequence other reveals; read Locations and concede ones that hurt the engine; Restore whenever the Servers take real damage.',
     'Choices from Cycle 5: trash my own junk aggressively (remaining Shyte, Glitch, weak Crypto) to keep the deck thin; pollution on the opponent is welcome when the effect offers it.',
     'Arc: after the shared early economy, survive pressure, let the engine take over, Chaos only as a late finisher, then heavy VP buying from Cycle 13.',
@@ -101,7 +101,7 @@ export const VP_DOG: StrategistIdentity = {
   persona: 'You are VP-Dog, the pure economy deck: you hound the VP piles. Your aim is to buy about 25 or more VP from the market by Cycles 11-14 and win on points. Cycles 1-4 follow the shared early economy first; then keep buying draw, start buying VP cards in the midgame and keep buying them every Draft, keep your Servers alive with Restore long enough for the points to count, and almost never spend on Chaos or Drain. The most VP wins, whether the game reaches the Cycle 16 Draft or ends early because a player loses both Servers, so be ahead on VP whenever the opponent could finish your Servers. When you lose, it is because the VP came too slowly or your Servers fell before the points added up, not because you should have attacked.',
   baseline: opponentBaseline('vp-dog'),
   playbook: [
-    'Draft from Cycle 5: finish Crypto income upgrades (Character Crypto lines, or Kilo/Mega when the shelf is on) plus draw cards; from Cycle 6 spend most of every Wallet on VP piles, most VP per Crypto first. Never Shyte-Coin; skip Chaos.',
+    'Draft from Cycle 5: finish Crypto income upgrades (Character Crypto lines, or Kilo/Mega from Hacker/Crypto Draft slots) plus draw cards; from Cycle 6 spend most of every Wallet on VP piles, most VP per Crypto first. Never Shyte-Coin; skip Chaos.',
     'Deploy: draw cards first, then VP cards whenever they are drawn (they deploy free); read Locations — concede attack-only Nodes when defending Servers matters more; Restore as soon as the Servers take real damage.',
     'Choices from Cycle 5: trash any remaining junk (Shyte-Coin, Glitch) so the strong Crypto income comes up more often; protect my Servers before hurting the opponent.',
     'Arc: shared early economy through Cycle 4, then VP every Draft from the midgame, 25+ VP bought by Cycles 11-14, staying ahead on VP whenever my Servers are in danger.',
@@ -110,4 +110,25 @@ export const VP_DOG: StrategistIdentity = {
   foundingNotes: ['Founding style: pure economy. Big Crypto and draw early, VP from the midgame, Restore for defense, almost no Chaos or Drain; the target is 25+ VP bought from the market by Cycles 11-14. Learning may sharpen the economy; it may not turn it into a rush.'],
 };
 
-export const LEAGUE_ROSTER: readonly StrategistIdentity[] = [STRAT_G, T_5, DV_8, VP_DOG];
+export const LAST_2GO: StrategistIdentity = {
+  id: 'last-2go', name: 'Last2Go', archetype: 'Reactive majority',
+  style: 'Reactive Location control: mirror Draft buys with a mild destruction bias; skip Runtime turn 1, then take Location majority on turns 2–3 (ties OK).',
+  persona: 'You are Last2Go. You know the win condition is most VP — Server destruction awards VP and can end the game early — and that Location majority drives Circuit eligibility. Trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf (buy Crypto from Hacker/Crypto slots). Cycles 1-4 follow the shared early economy. In Draft, mirror what the opponent buys, nudged toward Drain, Chaos and disruption. Your main tactic: never play Runtime turn 1 — hold the hand, then contest Nodes on turns 2 and 3 so you win at least one more Location than the enemy; ties are acceptable tools for that majority. When you lose, it is because you mistimed the late-cycle flip or mirrored the wrong buys, not because you should have dumped your hand on turn 1.',
+  baseline: opponentBaseline('last-2go'),
+  playbook: [
+    'Draft: after the shared early economy, prefer cards whose definition the opponent already bought this Draft; when several mirrors compete, lean Drain/Chaos/disrupt. Never Shyte-Coin.',
+    'Deploy: never play Runtime turn 1 — hold the entire hand. On turns 2 and 3, contest Nodes you can flip for a Location-count lead; accept ties on lanes that do not hurt majority; skip hopeless Nodes.',
+    'Choices: trash junk that dilutes the deck; pollute or disrupt when it slows the opponent without giving up Location majority.',
+    'Arc: shared early economy, mirror Draft, skip turn 1, then Location majority on turns 2–3 → Circuit eligibility → VP or destruction finish.',
+  ],
+  envelope: {
+    economyUntilCycle: [3, 5], chaosFromCycle: [5, 9], vpFromCycle: [8, 14], handCryptoTarget: [6, 11],
+    weights: { drain: [2, 4], chaos: [1.5, 3.5], disrupt: [1, 2.5], power: [1, 2], vp: [1.4, 3] },
+  },
+  foundingNotes: ['Founding style: reactive majority. Mirror opponent Draft buys with a mild destruction bias; never play Runtime turn 1, then contest for Location majority on turns 2–3 (ties OK). Learning may sharpen the late-cycle flip and mirror weights; it may not turn into dumping the hand on turn 1 or ignoring Locations.'],
+};
+
+/** Every playable learner (human opponents + mentors). Includes DV-8, which no longer rates in the league. */
+export const LEAGUE_ROSTER: readonly StrategistIdentity[] = [STRAT_G, T_5, DV_8, VP_DOG, LAST_2GO];
+/** AI-vs-AI Elo competitors only. DV-8 stays playable as Novice but is not rated. */
+export const LEAGUE_COMPETITORS: readonly StrategistIdentity[] = [STRAT_G, T_5, VP_DOG, LAST_2GO];

@@ -82,6 +82,76 @@ describe('Crypto-Shyte', () => {
   });
 });
 
+describe('random gainCard draft eligibility', () => {
+  function gainSession() {
+    const pack = compileContent(document);
+    const game = createSession({
+      content: pack, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: 'higher',
+      random: seededRandom(17), midCycleDraw: false, recordDecisions: false,
+    });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
+    return { pack, game };
+  }
+
+  it('filter/maxCost awards never pick Generated cards', () => {
+    const { pack, game } = gainSession();
+    const generatedIds = new Set(
+      pack.cards.filter(card => card.generated).map(card => card.definitionId ?? card.id),
+    );
+    expect(generatedIds.has('crypto-shyte')).toBe(true);
+    expect(generatedIds.has('wave-card')).toBe(true);
+
+    game.state.players[0].hand = [{
+      id: 'buyer', name: 'Buyer', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Gain.',
+      onReveal: [
+        { action: 'gainCard', amount: 8, filter: { cardType: 'Crypto' }, target: { type: 'zone', who: 'self', zone: 'hand' } },
+        { action: 'gainCard', amount: 8, filter: { cardClass: 'Action' }, target: { type: 'zone', who: 'self', zone: 'discard' } },
+      ],
+    }];
+    game.deploy('buyer', 0);
+    game.endTurn();
+    finish(game);
+
+    const gained = [...game.state.players[0].hand, ...game.state.players[0].discard];
+    expect(gained.length).toBe(16);
+    expect(gained.every(card => !generatedIds.has(card.definitionId ?? card.id))).toBe(true);
+    expect(gained.every(card => card.generated !== true)).toBe(true);
+    expect(gained.some(card => (card.definitionId ?? card.id) === 'crypto-shyte')).toBe(false);
+    expect(gained.some(card => (card.definitionId ?? card.id) === 'wave-card')).toBe(false);
+  });
+
+  it('explicit cardId still grants Generated Crypto-Shyte', () => {
+    const { game } = gainSession();
+    game.state.players[0].hand = [{
+      id: 'giver', name: 'Giver', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Shyte.',
+      onReveal: [{ action: 'gainCard', amount: 1, cardId: 'crypto-shyte', target: { type: 'zone', who: 'self', zone: 'hand' } }],
+    }];
+    game.deploy('giver', 0);
+    game.endTurn();
+    finish(game);
+    expect(game.state.players[0].hand.some(card => card.definitionId === 'crypto-shyte')).toBe(true);
+  });
+
+  it('random cardIds pools skip Generated entries', () => {
+    const { game } = gainSession();
+    game.state.players[0].hand = [{
+      id: 'picker', name: 'Picker', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Random.',
+      onReveal: [{
+        action: 'gainCard', amount: 12, selection: 'random',
+        cardIds: ['crypto-shyte', 'byte-coin'],
+        target: { type: 'zone', who: 'self', zone: 'hand' },
+      }],
+    }];
+    game.deploy('picker', 0);
+    game.endTurn();
+    finish(game);
+    const gained = game.state.players[0].hand;
+    expect(gained).toHaveLength(12);
+    expect(gained.every(card => card.definitionId === 'byte-coin')).toBe(true);
+  });
+});
+
 describe('Currency Crypto playable', () => {
   it('deploys Byte-Coin free and pays cryptoValue on reveal', () => {
     const pack = compileContent(document);

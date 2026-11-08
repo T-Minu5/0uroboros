@@ -1,61 +1,47 @@
-import { useEffect, useState } from 'react';
-import { AGENT_FLAG_KEYS, opponentName, resolveOpponent, type OpponentId } from './ai/strategistClient';
-import type { AuthoredOpponent } from '@0uroboros/engine/ai/opponents';
-import { STUDIO_TOOLS } from './studioTools';
-import type { DeckOption } from './contentPack/loadGameContent';
+import { useState } from 'react';
 import { defaultMostCircuitsBonusVP, defaultServerVP, type Servers } from '@0uroboros/engine/game';
+import type { DeckOption } from './contentPack/loadGameContent';
 import { MOST_CIRCUITS_BONUS_VP_MAX, SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
+import { faceNameFor } from './OpponentFacePicker';
 import { StartingDeckPicker } from './StartingDeckPicker';
 
 type Props = {
   setup: GameSetup; onChange: (setup: GameSetup) => void;
   decks: DeckOption[] | null; deckId: string | undefined; onDeck: (id: string) => void;
-  opponents: readonly AuthoredOpponent[]; opponent: OpponentId; onOpponent: (id: OpponentId) => void; disabled?: boolean;
+  /** Opponent id for the summary line only; selection lives on the landing face picker. */
+  opponent: string;
+  disabled?: boolean;
 };
 
-type AgentFlags = Partial<Record<string, boolean>>;
-
-/** Which agents are switched on, from the local dev server (studio build only); null otherwise, so every choice stays open. */
-function useAgentFlags(active: boolean) {
-  const [flags, setFlags] = useState<AgentFlags | null>(null);
-  useEffect(() => {
-    if (!active || !STUDIO_TOOLS) return;
-    let live = true;
-    fetch('/api/agents/status', { cache: 'no-store' })
-      .then(response => response.ok ? response.json() as Promise<{ effective?: AgentFlags }> : null)
-      .then(status => { if (live) setFlags(status?.effective ?? null); })
-      .catch(() => undefined);
-    return () => { live = false; };
-  }, [active]);
-  return flags;
-}
-
-/** Setup-screen Configure button: one summary line that opens the game options. */
-export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponents, opponent, onOpponent, disabled }: Props) {
+/** Setup-screen Configure button: game options without the opponent select. */
+export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent, disabled }: Props) {
   const [open, setOpen] = useState(false);
-  const flags = useAgentFlags(open);
-  const choice = resolveOpponent(opponents, opponent);
-  const off = (id: string) => flags?.[AGENT_FLAG_KEYS[id]] === false;
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds, noLocations, draftCrypto, middleNodesOnly, tenCardDraft, mostCircuitsBonusVP } = setup;
+  const { serverVP, turnSeconds, noLocations, middleNodesOnly, tenCardDraft, mostCircuitsBonusVP } = setup;
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
-    `vs ${opponentName(opponents, opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
+    `vs ${faceNameFor(opponent)}`, deck?.name || 'Default deck', turnSeconds ? `${turnSeconds}s turns` : 'No turn timer', `Server VP ${serverVP.primary} / ${serverVP.backup}`,
     mostCircuitsBonusVP > 0 ? `Most Circuits +${mostCircuitsBonusVP} VP` : 'No Circuits bonus',
     tenCardDraft ? '10-card Draft' : '8-card Draft',
-    ...(draftCrypto ? ['Draft Crypto'] : []), ...(noLocations ? ['No Locations'] : []), ...(middleNodesOnly ? ['Middle Nodes'] : []),
+    middleNodesOnly ? 'Short Circuit' : 'Extended runtime',
+    ...(noLocations ? ['No location text'] : []),
   ].join(' · ');
   return <div className='game-configure'>
     <button type='button' className='game-configure-toggle' aria-expanded={open} aria-controls='game-configure-panel' onClick={() => setOpen(value => !value)}>
       <b>Configure</b><small>{summary}</small><span aria-hidden>{open ? '▴' : '▾'}</span>
     </button>
     {open && <div id='game-configure-panel' className='game-configure-panel'>
-      <label className='game-configure-row'>
-        <span>Opponent <small>{choice ? `${choice.style}.${off(choice.id) ? ' Switched off: plays its published profile.' : ''}${flags?.ecoStrat ? ' Eco-Strat watches.' : ''}` : ''}</small></span>
-        <select aria-label='Opponent' value={choice?.id ?? ''} disabled={disabled || !opponents.length} onChange={event => onOpponent(event.target.value)}>
-          {opponents.map(entry => <option key={entry.id} value={entry.id} disabled={off(entry.id) && entry.id !== choice?.id}>{entry.name} · {entry.style}{off(entry.id) ? ' (off)' : ''}</option>)}
-        </select>
+      <div className='game-configure-row' role='group' aria-labelledby='game-mode-label'>
+        <span id='game-mode-label'>Game mode <small>How many Locations open each Cycle</small></span>
+        <div className='game-mode-toggle' role='radiogroup' aria-label='Game mode'>
+          <button type='button' role='radio' aria-checked={!middleNodesOnly} disabled={disabled} className={!middleNodesOnly ? 'selected' : undefined} onClick={() => onChange({ ...setup, middleNodesOnly: false })}>Extended runtime</button>
+          <button type='button' role='radio' aria-checked={middleNodesOnly} disabled={disabled} className={middleNodesOnly ? 'selected' : undefined} onClick={() => onChange({ ...setup, middleNodesOnly: true })}>Short Circuit</button>
+        </div>
+      </div>
+      <label className='game-configure-row game-configure-check'>
+        <span>No location text <small>Every Node is No Man&apos;s Land for the whole game</small></span>
+        <input aria-label='No location text' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />
       </label>
       <label className='game-configure-row'>
         <span>Turn timer <small>Each Runtime turn</small></span>
@@ -80,20 +66,8 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
         </div>
       </label>
       <label className='game-configure-row game-configure-check'>
-        <span>10-card Draft <small>Default is 8 (Action/Utility ×2, Hacker/Utility ×2, Attack, Horror, Solar Monk, VP). On adds two Chaos fills</small></span>
+        <span>10-card Draft <small>Default is 8 (Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP). On adds two Chaos fills</small></span>
         <input aria-label='10-card Draft' type='checkbox' disabled={disabled} checked={tenCardDraft} onChange={event => onChange({ ...setup, tenCardDraft: event.target.checked })} />
-      </label>
-      <label className='game-configure-row game-configure-check'>
-        <span>Draft Crypto <small>Shyte-Coin, Byte-Coin, Kilo-Coin and Mega-Cache stay available beside the offer</small></span>
-        <input aria-label='Draft Crypto' type='checkbox' disabled={disabled} checked={draftCrypto} onChange={event => onChange({ ...setup, draftCrypto: event.target.checked })} />
-      </label>
-      <label className='game-configure-row game-configure-check'>
-        <span>No Locations <small>Every Node is No Man's Land for the whole game</small></span>
-        <input aria-label='No Locations' type='checkbox' disabled={disabled} checked={noLocations} onChange={event => onChange({ ...setup, noLocations: event.target.checked })} />
-      </label>
-      <label className='game-configure-row game-configure-check'>
-        <span>Middle Nodes only <small>Only Nodes 2–4; one opens each Runtime turn. Nodes 1 and 5 stay closed and out of play</small></span>
-        <input aria-label='Middle Nodes only' type='checkbox' disabled={disabled} checked={middleNodesOnly} onChange={event => onChange({ ...setup, middleNodesOnly: event.target.checked })} />
       </label>
       <StartingDeckPicker decks={decks} value={deckId} onChange={onDeck} disabled={disabled} />
     </div>}

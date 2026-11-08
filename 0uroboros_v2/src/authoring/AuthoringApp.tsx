@@ -255,7 +255,7 @@ function CardPreview({ card, onBrowseArt }: { card: AuthoredCard; onBrowseArt: (
     <div className="au-card-face-wrap"><CardFace card={card} context="runtime"/></div>
     <button type="button" className="au-button au-button-subtle au-preview-art-button" onClick={onBrowseArt}>Change artwork…</button>
     <DepthStatus art={cardArtworkPath(card)} />
-    <div className="au-preview-meta" data-tone={cardTone(card)} style={{ '--tone': CARD_STYLE_COLORS[subtypeStyle(card)] } as CSSProperties}><b>{cardCategoryLabel(card)}</b><p className="au-preview-effect">{card.effect || 'Add effects below to generate printed text.'}</p><div className="au-card-metrics">{card.vp !== undefined && <span>VP <b>{card.vp}</b></span>}{card.cryptoValue !== undefined && <span>Crypto <b>{card.cryptoValue}</b></span>}</div><p>{isGeneratedCard(card) ? 'Created by card effects. Kept out of Draft.' : card.enabled ? 'Enabled for playtesting.' : 'Disabled in new games.'}</p></div>
+    <div className="au-preview-meta" data-tone={cardTone(card)} style={{ '--tone': CARD_STYLE_COLORS[subtypeStyle(card)] } as CSSProperties}><b>{cardCategoryLabel(card)}</b><p className="au-preview-effect">{card.effect || 'Add effects below to generate printed text.'}</p><div className="au-card-metrics">{card.power !== undefined && <span>Power <b>{card.power}</b></span>}{card.vp !== undefined && <span>VP <b>{card.vp}</b></span>}{card.cryptoValue !== undefined && <span>Crypto <b>{card.cryptoValue}</b></span>}</div><p>{isGeneratedCard(card) ? 'Created by card effects. Kept out of Draft.' : card.enabled ? 'Enabled for playtesting.' : 'Disabled in new games.'}</p></div>
   </aside>;
 }
 
@@ -288,7 +288,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
         <TextField field="name" label="Name" value={card.name} onChange={name => patch({ name })} />
         <SelectField field="type" label="Card type" value={card.type} options={['Character', 'VP', 'Crypto']} onChange={changeType} />
         <NumberField field="cost" label="Cost" value={card.cost} min={0} onChange={cost => patch({ cost: cost ?? 0 })} />
-        <NumberField field="power" label="Power" value={card.power} onChange={power => patch({ power: power ?? 0 })} hint={card.type === 'Crypto' ? 'Optional. Currency often leaves this empty (0 on the board); Crypto-Shyte-style tokens set 1+.' : undefined} />
+        <NumberField field="power" label="Power" value={card.power} onChange={power => patch(card.type === 'Crypto' ? { power: power === undefined ? undefined : power } : { power: power ?? 0 })} hint={card.type === 'Crypto' ? 'Optional board Power. Leave empty for wallet-only currency; any integer is allowed.' : undefined} />
         {card.type === 'Character' && <SelectField field="powerSource" label="Power bonus" value={card.powerSource ?? 'none'} options={POWER_SOURCE_OPTIONS} labels={POWER_SOURCE_LABELS} hint="Live bonus added to printed Power while the card is in play." onChange={source => update(syncPrinted({ ...card, powerSource: source === 'none' ? undefined : source }))} />}
         {card.type === 'Character' && <NumberField field="aura" label="Power aura" value={card.aura} min={1} onChange={aura => update(syncPrinted({ ...card, aura: aura || undefined }))} hint="This card’s own effect: +N Power to its other revealed allies at its Location. No mod badge. Leave empty for none." />}
         {card.type === 'Character' && <SelectField field="selfMove" label="Moves itself" value={card.selfMove ?? 'none'} options={['none', 'turn', 'cycle'] as const} labels={SELF_MOVE_LABELS} hint="While revealed, its owner may drag it to another open Node for free. Undo all actions puts it back." onChange={selfMove => update(syncPrinted({ ...card, selfMove: selfMove === 'none' ? undefined : selfMove }))} />}
@@ -609,7 +609,7 @@ function LocationWhileEditor({ index, entry, cards, onChange, onRemove }: {
   </div>;
 }
 
-const TRAILING_HINT = 'Goes to the player who is behind instead of whoever won more Locations. Behind means fewer VP after counting Server damage: each enemy Server still standing adds that share of its destruction VP (75% of its health gone counts as 75% of its VP). If neither player is behind, both can claim it.';
+const TRAILING_HINT = 'Only when Location counts differ: goes to the player who is behind instead of whoever won more Locations. Behind means fewer VP after counting Server damage: each enemy Server still standing adds that share of its destruction VP (75% of its health gone counts as 75% of its VP). On a Locations-won tie this catch-up is not drawn — both seats share a normal Circuit Reward instead. If neither player is behind when it does draw, both can claim it.';
 
 function CircuitEditor({ item: reward, cards, update, applyAdvanced, onPendingChange }: EditorProps<AuthoredCircuitReward>) {
   const mods = useContext(ModsContext);

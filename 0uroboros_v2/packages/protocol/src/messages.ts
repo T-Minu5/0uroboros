@@ -59,7 +59,7 @@ export const RoomSettingsSchema = z.object({
   noTrailingRewards: z.boolean().default(false),
   /** Fixed rule: each player draws 1 at the start of Runtime turns 2 and 3. Kept for replay compat; always treated as on. */
   midCycleDraw: z.boolean().default(true),
-  /** Persistent Crypto card shelf in Draft. */
+  /** @deprecated Crypto shelf removed; ignored if present on old clients/replays. */
   draftCrypto: z.boolean().default(false),
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly: z.boolean().default(false),
