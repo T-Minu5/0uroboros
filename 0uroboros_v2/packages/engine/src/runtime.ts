@@ -237,6 +237,8 @@ export type ScoreBreakdown = {
   total: number;
   /** Every owned card in an active zone that changes the score (VP cards, then negative ones like Glitch), both players revealed. */
   vpCards: Card[];
+  /** Full revealed deck at gameover (zones + board + holograms), for the end-screen accordion. */
+  ownedDeck: Card[];
   cardVP: number; locationVP: number; circuitVP: number; effectVP: number; destructionVP: number;
 };
 /**
@@ -650,9 +652,12 @@ export class RuntimeSession {
 
   private scoreBreakdown(owner: PlayerId): ScoreBreakdown {
     const player = this.state.players[owner], sources = this.rewardSources[owner];
-    const vpCards = structuredClone(this.activeCards(owner).filter(card => cardVP(card) !== 0).sort((a, b) => Number(cardVP(a) < 0) - Number(cardVP(b) < 0)));
+    const active = this.activeCards(owner);
+    const holograms = this.state.nodes.flatMap(node => node.holograms.filter(holo => holo.owner === owner).map(holo => holo.card));
+    const ownedDeck = structuredClone([...active, ...holograms].map(card => this.shownCard(card)));
+    const vpCards = structuredClone(active.filter(card => cardVP(card) !== 0).sort((a, b) => Number(cardVP(a) < 0) - Number(cardVP(b) < 0)));
     return {
-      total: player.totalVP, vpCards,
+      total: player.totalVP, vpCards, ownedDeck,
       cardVP: vpCards.reduce((sum, card) => sum + cardVP(card), 0),
       locationVP: sources.location, circuitVP: sources.circuit,
       effectVP: player.rewardVP - sources.location - sources.circuit,

@@ -116,7 +116,11 @@ describe("deployment without Actions economy", () => {
       content, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: "higher",
       random: seededRandom(9), aiSeats: [],
     });
-    const dash = { ...starterCards[1], id: "free-deploy-dash", onReveal: [{ action: "gainActions", amount: 2, target: { who: "self" } }] };
+    const dash = {
+      ...starterCards[1],
+      id: "free-deploy-dash",
+      onReveal: [{ action: "gainActions", amount: 2, target: { who: "self" } }] as unknown as typeof starterCards[1]["onReveal"],
+    };
     session.state.players[0].hand = [dash];
     const node = session.view().openNodes[0];
     session.deploy(dash.id, node);

@@ -73,7 +73,7 @@ describe('Location text colours', () => {
 
   it('does not colour legacy +N Action resource phrases on Location copy', () => {
     const parts = splitLocationText('Condition: Once you have an Attack here. +1 Action.');
-    expect(parts.some(part => part.effect === 'actions')).toBe(false);
+    expect(parts.some(part => (part.effect as string | undefined) === 'actions')).toBe(false);
     const plain = parts.filter(part => !part.trigger && !part.effect).map(part => part.text).join('');
     expect(cardClassesInText(plain)).toEqual(['Attack', 'Action']);
   });

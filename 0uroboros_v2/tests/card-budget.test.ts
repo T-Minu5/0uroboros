@@ -203,7 +203,7 @@ describe('cardBudget', () => {
       type: 'Character',
       cost: 3,
       power: 0,
-      schedule: [{ effects: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }] }],
+      schedule: [{ at: 1, effects: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }] }] as never,
     });
     const instantDraw = instant.parts.find(part => part.id.startsWith('draw'))!.credit;
     const recurringDraw = duration.parts.find(part => part.id.startsWith('draw'))!.credit;

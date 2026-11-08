@@ -58,7 +58,7 @@ export function migrateEffects(effects: readonly AnyEffect[] | undefined, scope:
     const effect = effects[index];
     // Legacy Actions resource — dropped from the game; skip without migrating.
     if (!isStep(effect) && effect.kind === 'actions') continue;
-    if (isStep(effect) && (effect as EffectStep).action === 'gainActions') continue;
+    if (isStep(effect) && (effect as { action?: string }).action === 'gainActions') continue;
     if (!isStep(effect) && effect.chain && index < effects.length - 1) {
       const { chain: _chain, ...head } = effect;
       if (!isStep(head) && head.kind === 'actions') break;

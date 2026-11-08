@@ -38,28 +38,11 @@ function useCountUp(target: number, delay: number){
 
 const cardVP = (card: Card) => card.vp ?? (card.name === 'Vault Encryption' ? 2 : 0);
 
-/** Every physical card a seat still owns at gameover (zones + board), including VP cards. */
-function ownedDeck(view: SessionView, owner: PlayerId, vpCards: readonly Card[] = []): Card[] {
-  const player = view.players[owner];
-  const board = view.nodes.flatMap(node => [
-    ...node.cards[owner].map(placement => placement.card),
-    ...node.holograms.filter(holo => holo.owner === owner).map(holo => holo.card),
-  ]);
-  const deck = [...player.draw, ...player.hand, ...player.discard, ...player.bank.map(entry => entry.card), ...board];
-  const seen = new Set(deck.map(card => card.id));
-  for (const card of vpCards) {
-    if (!seen.has(card.id)) {
-      deck.push(card);
-      seen.add(card.id);
-    }
-  }
-  return deck;
-}
-
-function PlayerTally({ owner, score, deck, color, leading, showEffects, showDestruction, inspect }:{
- owner: PlayerId; score: ScoreBreakdown; deck: Card[]; color: PlayerColor; leading: boolean;
+function PlayerTally({ owner, score, color, leading, showEffects, showDestruction, inspect }:{
+ owner: PlayerId; score: ScoreBreakdown; color: PlayerColor; leading: boolean;
  showEffects: boolean; showDestruction: boolean; inspect: (card: Card) => void;
 }){
+ const deck = score.ownedDeck;
  const [vpOpen, setVpOpen] = useState(false);
  const [deckOpen, setDeckOpen] = useState(false);
  const rows: { key: string; label: string; value: number }[] = [
@@ -137,7 +120,7 @@ export function GameSummary({ view, colors, inspect, restart, onTallied }: Props
    <button className='primary-button' onClick={restart}>New evaluation session <span>↗</span></button>
   </header>
   <div className='summary-players'>
-   {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} deck={ownedDeck(view, owner, scores[owner].vpCards)} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}
+   {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}
   </div>
  </section>
  <button type='button' className={`summary-expand ${collapsed ? 'shown' : ''}`} aria-label='Expand session summary' aria-controls='session-summary' aria-expanded={!collapsed} inert={!collapsed} onClick={() => setCollapsed(false)}>

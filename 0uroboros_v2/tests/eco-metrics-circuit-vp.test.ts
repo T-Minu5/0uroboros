@@ -65,10 +65,10 @@ describe('Eco metrics Circuit differential and market VP', () => {
 
     // Seat 0 wins more Cycles narrowly; seat 1 piles Nodes in one blowout Cycle.
     const splitCycles = [
-      { cycle: 1, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
-      { cycle: 2, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
-      { cycle: 3, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
-      { cycle: 4, vp: [0, 0], servers: [3500, 3500], wallet: [0, 0], locationsWon: [0, 5], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 1, vp: [0, 0] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [3, 2] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
+      { cycle: 2, vp: [0, 0] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [3, 2] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
+      { cycle: 3, vp: [0, 0] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [3, 2] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
+      { cycle: 4, vp: [0, 0] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [0, 5] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
     ];
     const split = gameMetrics(report({ finalVP: [8, 8], winner: null, purchases: [], cycles: splitCycles }));
     expect(split.circuitWins).toEqual([3, 1]);
@@ -78,8 +78,8 @@ describe('Eco metrics Circuit differential and market VP', () => {
     expect(split.mostCircuitsVsMostNodes).toBe('differ');
 
     const sameCycles = [
-      { cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
-      { cycle: 2, vp: [4, 2], servers: [3500, 3500], wallet: [0, 0], locationsWon: [4, 1], deckSize: [10, 10], locations: [], circuit: null },
+      { cycle: 1, vp: [2, 1] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [3, 2] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
+      { cycle: 2, vp: [4, 2] as [number, number], servers: [3500, 3500] as [number, number], wallet: [0, 0] as [number, number], locationsWon: [4, 1] as [number, number], deckSize: [10, 10] as [number, number], locations: [], circuit: null },
     ];
     const cohort = cohortMetrics([
       { id: 'same-a', report: report({ finalVP: [10, 5], purchases: [], cycles: sameCycles }) },
@@ -112,8 +112,8 @@ describe('Eco metrics Circuit differential and market VP', () => {
       finalVP: [18, 12],
       marketVp: [6, 2],
       finalScore: [
-        { total: 18, vpCards: [], cardVP: 8, locationVP: 0, circuitVP: 0, effectVP: 2, destructionVP: 8 },
-        { total: 12, vpCards: [], cardVP: 2, locationVP: 0, circuitVP: 0, effectVP: 2, destructionVP: 8 },
+        { total: 18, vpCards: [], ownedDeck: [], cardVP: 8, locationVP: 0, circuitVP: 0, effectVP: 2, destructionVP: 8 },
+        { total: 12, vpCards: [], ownedDeck: [], cardVP: 2, locationVP: 0, circuitVP: 0, effectVP: 2, destructionVP: 8 },
       ],
       purchases: [
         { cycle: 4, owner: 0, definitionId: 'basic-encryption', name: 'Basic Encryption', category: 'VP', cost: 3, vp: 2 },
