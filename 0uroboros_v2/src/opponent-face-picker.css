@@ -1,35 +1,77 @@
-/* Landing AI faces: square tiles with a 45° cut on TL/BR and 2px rounds on TR/BL. */
+/* Landing AI faces: portrait clip + full-tile chrome in that same shape. */
 .opponent-faces{
   display:flex;flex-wrap:nowrap;justify-content:center;gap:4px;
   margin:0 0 18px;padding:4px 0 2px;width:100%;
 }
 .opponent-face{
-  position:relative;display:flex;flex:1 1 0;flex-direction:column;align-items:center;gap:5px;
-  min-width:0;max-width:76px;padding:2px;border:0;background:transparent;cursor:pointer;
+  /* 4px padding = gap between chrome stroke and (level / pic / name) */
+  position:relative;display:flex;flex:1 1 0;flex-direction:column;align-items:center;gap:4px;
+  min-width:0;max-width:92px;padding:4px 8px;border:0;background:transparent;cursor:pointer;
   color:#c4bfd2;text-align:center;isolation:isolate;
+  /* Kill global button chrome (white/gray rect hover from styles.css). */
+  box-shadow:none;transform:none;
 }
-.opponent-face::before{
-  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  border:1px solid transparent;border-radius:4px;background:transparent;
-  transition:border-color .18s ease, background-color .18s ease;
+.opponent-face:hover:not(:disabled),
+.opponent-face.selected,
+.opponent-face:focus-visible{
+  border:0;background:transparent;box-shadow:none;transform:none;
 }
 .opponent-face>*{position:relative;z-index:1}
 .opponent-face:disabled{opacity:.45;cursor:not-allowed}
+.opponent-face:focus-visible{outline:none}
+
+/* Full-tile avatar-shaped chrome — replaces the old white opacity hover rect. */
+.opponent-face-chrome{
+  position:absolute;inset:0;z-index:0;width:100%;height:100%;
+  overflow:visible;pointer-events:none;opacity:0;
+  transition:opacity .18s ease;
+}
+.opponent-face-chrome path{
+  fill:color-mix(in srgb, var(--green,#1fffb1) 25%, transparent);
+  stroke:var(--green,#1fffb1);
+  stroke-width:2;
+  stroke-linejoin:miter;
+  vector-effect:non-scaling-stroke;
+  transition:stroke .18s ease;
+}
+.opponent-face:hover:not(:disabled) .opponent-face-chrome,
+.opponent-face.selected .opponent-face-chrome,
+.opponent-face:focus-visible .opponent-face-chrome{opacity:1}
+/* Active: outer chrome stroke off; portrait gets a solid 2px green stroke. */
+.opponent-face.selected .opponent-face-chrome path{
+  stroke:transparent;stroke-opacity:0;
+}
+.opponent-face:focus-visible:not(.selected) .opponent-face-chrome path{
+  stroke:#ffcc12;
+  fill:color-mix(in srgb, #ffcc12 18%, transparent);
+}
+
+.opponent-face-pic{
+  position:relative;display:block;width:58px;height:58px;flex:0 0 auto;
+}
 .opponent-face-frame{
-  position:relative;display:block;width:58px;height:58px;overflow:hidden;
-  /* Square with 45° shaved TL + BR; soft 2px on TR + BL via rounded mask corners. */
+  position:relative;display:block;width:100%;height:100%;overflow:hidden;
   clip-path:polygon(11px 0, calc(100% - 2px) 0, 100% 2px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 2px 100%, 0 calc(100% - 2px), 0 11px);
-  background:#0a1218;box-shadow:0 0 0 1px #ffffff22;
+  background:#0a1218;
 }
 .opponent-face-frame>img{
   display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%;
-  transform:scale(1.35);transform-origin:center top;
+  transform-origin:center top;
 }
-.opponent-face:hover:not(:disabled)::before,
-.opponent-face.selected::before{
-  border-color:var(--green,#1fffb1);
-  background:color-mix(in srgb, var(--green,#1fffb1) 25%, transparent);
+/* Sits outside the clipped img so the 2px active stroke is not cut off. */
+.opponent-face-ring{
+  position:absolute;inset:0;width:100%;height:100%;
+  overflow:visible;pointer-events:none;opacity:0;z-index:2;
 }
+.opponent-face-ring path{
+  fill:none;
+  stroke:var(--green,#1fffb1);
+  stroke-width:2;
+  stroke-linejoin:miter;
+  vector-effect:non-scaling-stroke;
+}
+.opponent-face.selected .opponent-face-ring{opacity:1}
+
 .opponent-face b{
   max-width:100%;margin:0;padding:0 1px;
   font:600 9px/1.15 Inter,sans-serif;color:#e8ecf4;
@@ -40,8 +82,3 @@
 }
 .opponent-face.selected b{color:#e8fff6}
 .opponent-face.selected small{color:#9ff5d6}
-.opponent-face:focus-visible{outline:none}
-.opponent-face:focus-visible::before{
-  border-color:#ffcc12;
-  background:color-mix(in srgb, #ffcc12 18%, transparent);
-}

@@ -479,9 +479,11 @@ export class RuntimeSession {
   // Log narration. Unnamed, texts speak to seat 0 as the solo client always has; named, they use the names.
   /** The seat as a sentence subject: "You", "Opponent" or its name. */
   private subject(owner: PlayerId): string { return this.config.seatNames?.[owner] ?? (owner === 0 ? "You" : "Opponent"); }
-  /** `firstPerson` for an unnamed seat 0 ("You acquire"); otherwise the subject with `thirdPerson` ("Ada acquires"). */
+  /** `firstPerson` for seat 0 when it is still "You" ("You acquire"); otherwise the subject with `thirdPerson` ("Ada acquires"). */
   private say(owner: PlayerId, firstPerson: string, thirdPerson: string): string {
-    return !this.config.seatNames && owner === 0 ? firstPerson : `${this.subject(owner)} ${thirdPerson}`;
+    const subject = this.subject(owner);
+    if (subject === 'You') return firstPerson;
+    return `${subject} ${thirdPerson}`;
   }
   /** Possessive for `owner` as read by `reader`: "your", the seat's name with 's, or `other` for an unnamed opponent. */
   private whose(owner: PlayerId, reader: PlayerId = 0, other = "the opponent's"): string {
@@ -1893,7 +1895,7 @@ export class RuntimeSession {
     if (!Number.isInteger(amount) || amount < 0 || amount > 100) throw new Error("Gain count must be an integer from 0 to 100.");
     const catalog = this.config.content?.cards ?? EVALUATION_ALL_CARDS;
     const byId = (id: string) => catalog.find(card => (card.definitionId ?? card.id) === id || card.id === id);
-    /** Same eligibility as draft piles: Generated cards are only for named/specific grants. */
+    /** Same eligibility as draft piles: Generated cards only arrive through an explicit card id / cardIds list. */
     const draftEligible = (card: Card) => card.generated !== true;
     const poolIds = step.cardIds?.length ? [...step.cardIds] : step.cardId ? [step.cardId] : [];
     const named = poolIds.length
@@ -1903,11 +1905,10 @@ export class RuntimeSession {
         return definition;
       })
       : [];
-    // Named single card or sequential list: keep Generated for condition-specific grants.
-    // Random multi-id pools and filter/maxCost catalog picks: draft-eligible only.
-    const randomNamed = named.length > 1 && step.selection !== "sequential";
+    // Explicit cardId / cardIds always honor Generated (Glitch Witch's random Glitch art pool, Crypto-Shyte gifts).
+    // Open filter / maxCost catalog picks stay draft-eligible only.
     const pool = named.length
-      ? (randomNamed ? named.filter(draftEligible) : named)
+      ? named
       : catalog.filter(card => {
         if (!draftEligible(card)) return false;
         if (!matchesFilter(card, step.filter)) return false;
@@ -1915,7 +1916,7 @@ export class RuntimeSession {
         return true;
       });
     if (!pool.length) {
-      if ((!poolIds.length && (step.filter || step.maxCost !== undefined)) || randomNamed) {
+      if (!poolIds.length && (step.filter || step.maxCost !== undefined)) {
         return this.noTarget(ctx, step, { targetOwner }, "No matching card to gain.");
       }
       throw new Error("Gain requires a card or a pool of cards.");

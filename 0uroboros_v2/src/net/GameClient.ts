@@ -69,10 +69,13 @@ export function attempt<T>(fn: () => Maybe<T>, onValue: (value: T) => void, onEr
 
 export class LocalClient implements GameClient {
   readonly mode = 'local' as const;
-  readonly seatNames = null;
+  readonly seatNames: [string, string] | null;
   readonly session: RuntimeSession;
   private listeners = new Set<(change: ClientChange) => void>();
-  constructor(session: RuntimeSession) { this.session = session; }
+  constructor(session: RuntimeSession, seatNames: [string, string] | null = null) {
+    this.session = session;
+    this.seatNames = seatNames;
+  }
   view() { return this.session.view(); }
   get pendingCount() { return this.session.pendingCount; }
   step() { return this.session.step(); }

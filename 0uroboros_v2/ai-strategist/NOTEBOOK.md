@@ -18,7 +18,7 @@ League snapshots (newest first): strat-g@v1.25, strat-g@v1.24, strat-g@v1.23, st
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-In this game, I followed the designer's baseline with adjustments for draw and drain. I aimed for strong draw and Crypto worth 2+, targeting ~12 Crypto per hand through Cycle 4. In Cycles 5-8, I balanced attacks, engine development, Server Restore, and VP collection. However, I struggled against the human's aggressive strategy, which led to the early destruction of my Servers by Cycle 9. My VP collection was insufficient, resulting in a loss of 37 to 1 VP. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+I will follow the designer's baseline while incorporating strategies for early aggression and server defense. My focus will be on raising Wallet income through Cycles 1-4 by drafting Characters that print Crypto and trashing weak cards. In Cycles 5-8, I will balance attacks, engine development, Server Restore, and VP collection, while adapting to the power dynamics of Locations. From Cycle 9 onward, I will ramp up aggression against the opponent's Servers while prioritizing VP cards. My strategy will evolve based on the opponent's moves, maintaining a schedule of economy through Cycle 4, balan (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
@@ -84,7 +84,8 @@ Baseline weights: power 1, draw 1.6, crypto 1, drain 2.4, restore 1, vp 2.6, dur
 - none yet
 
 ### Under test
-- none
+- **early-agg-adoption** (untested · v1.25): Incorporating early aggression will apply consistent pressure on the opponent.
+  - hyp: Higher early aggression will lead to a higher VP margin in games. · test: Measure VP margins in games where early aggression strategies are applied compared to standard strategies.
 
 ### Refuted
 - none yet
@@ -170,6 +171,21 @@ Baseline weights: power 1, draw 1.6, crypto 1, drain 2.4, restore 1, vp 2.6, dur
 
 ## Recent notes
 
+- v1.25 · 2026-11-08 06:31 · Monitor new Locations for their impact on strategies.
+- v1.25 · 2026-11-08 06:31 · Consider cards that boost Power early to contest Locations effectively.
+- v1.25 · 2026-11-08 06:31 · Defense (Restore) has become critical in late Cycles; adapt to maintain server integrity.
+- v1.25 · 2026-11-08 06:31 · Focus on improving early game economy to keep pace with opponent's Draft wallet.
+- v1.25 · 2026-11-08 06:31 · v1.25 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0.
+- v1.25 · 2026-11-08 04:08 · Monitor new Locations for their impact on strategies.
+- v1.25 · 2026-11-08 04:08 · Consider cards that boost Power early to contest Locations effectively.
+- v1.25 · 2026-11-08 04:08 · Defense (Restore) has become critical in late Cycles; adapt to maintain server integrity.
+- v1.25 · 2026-11-08 04:08 · Focus on improving early game economy to keep pace with opponent's Draft wallet.
+- v1.25 · 2026-11-08 04:08 · v1.25 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0.
+- v1.25 · 2026-11-08 02:12 · Focus on improving early game economy to keep pace with opponent's Draft wallet.
+- v1.25 · 2026-11-08 02:12 · Evaluate the impact of new Locations and their strategies.
+- v1.25 · 2026-11-08 02:12 · Consider cards that boost Power early to contest Locations effectively.
+- v1.25 · 2026-11-08 02:12 · Defense (Restore) has become critical in late Cycles; must adapt to maintain server integrity.
+- v1.25 · 2026-11-08 02:11 · v1.25 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0.
 - v1.25 · 2026-11-08 01:55 · New experiment x252-incorporating-more-early-agg: Incorporating more early aggression will allow me to apply consistent pressure on the opponent. Change: chaos weight 1.5→1.95. Prediction: I will achieve more wins or a better VP margin than the current best by integrating additional early-game Chaos cards.
 - v1.25 · 2026-11-08 01:55 · The human's choice of high-impact cards like Root Rune and Chrome Mitchell greatly enhanced their position.
 - v1.25 · 2026-11-08 01:55 · My VP collection was minimal; I only acquired low-value cards while the human amassed significant VP.
@@ -195,21 +211,6 @@ Baseline weights: power 1, draw 1.6, crypto 1, drain 2.4, restore 1, vp 2.6, dur
 - v1.25 · 2026-11-07 23:38 · Defense (Restore) has become critical in late Cycles; adapt to maintain server integrity.
 - v1.25 · 2026-11-07 23:38 · Focus on improving early game economy to keep pace with opponent's Draft wallet.
 - v1.25 · 2026-11-07 23:38 · Monitor the effectiveness of new cards, especially those enhancing deck synergy.
-- v1.25 · 2026-11-07 23:38 · Evaluate the impact of new Locations and their strategies.
-- v1.25 · 2026-11-07 23:38 · v1.25 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.25 · 2026-11-07 23:37 · Consider cards that boost Power early to contest Locations effectively.
-- v1.25 · 2026-11-07 23:37 · Defense (Restore) has become critical in late Cycles; must adapt to maintain server integrity.
-- v1.25 · 2026-11-07 23:37 · Focus on improving early game economy to keep pace with opponent's Draft wallet.
-- v1.25 · 2026-11-07 23:37 · Monitor the effectiveness of new Locations and their impact on strategies.
-- v1.25 · 2026-11-07 23:37 · Evaluate the performance of new cards, especially those enhancing deck synergy.
-- v1.25 · 2026-11-07 23:37 · v1.25 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-10-0.
-- v1.25 · 2026-11-07 22:57 · New experiment x245-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. Prediction: More wins and a better margin than the current best.
-- v1.25 · 2026-11-07 22:57 · Experiment x244-fallback-244-0 rejected: league 29/48 for the experiment vs 30/48 for the current best against last-2go@v1.2, vp-dog@v1.6, dv-8@v1.12 (margin -2.2/game) → rejected. Kept the current best.
-- v1.25 · 2026-11-07 22:55 · New experiment x244-fallback-244-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1→1.25. Prediction: More wins or a better margin than the current best.
-- v1.25 · 2026-11-07 22:40 · Experiment x243-power inconclusive: league 25.5/48 for the experiment vs 24/48 for the current best against vp-dog@v1.6, t-5@v1.13, last-2go@v1.1 (margin +0.8/game) → inconclusive. Kept the current best.
-- v1.25 · 2026-11-07 22:20 · New experiment x243-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1→1.3. Prediction: More Locations won and more wins than the current best.
-- v1.25 · 2026-11-07 22:20 · Experiment x242-thinner inconclusive: league 20/48 for the experiment vs 19/48 for the current best against vp-dog@v1.4, t-5@v1.15, dv-8@v1.9 (margin +1.9/game) → inconclusive. Kept the current best.
-- v1.25 · 2026-11-07 22:09 · New experiment x242-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.2→1.56. Prediction: More wins and bigger mid-game Wallets than the current best.
 
 ## Version history
 

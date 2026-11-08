@@ -267,48 +267,11 @@ describe("game server rooms", () => {
     expect(a.ofType("gameOver")[0].result).toMatchObject({ outcome: "concession", winner: 0 });
   });
 
-  it("seats the pack opponent the host picked at an ai table, and records it with the result", () => {
+  it("refuses to open server AI tables", () => {
     const scheduler = new ManualScheduler(), store = new MemoryStore();
     const lobby = new Lobby({ content, contentRevision: PACK_REVISION, scheduler, store });
-    const picked = lobby.createRoom("ai", { seed: 5, opponent: "vp-dog" });
-    expect(picked.settings.opponent).toBe("vp-dog");
-    const fallback = lobby.createRoom("ai", { seed: 5, opponent: "nobody" });
-    expect(fallback.settings.opponent).toBe(content.opponents[0].id);
-    const unset = lobby.createRoom("ai", { seed: 5 });
-    expect(unset.settings.opponent).toBe(content.opponents[0].id);
+    expect(() => lobby.createRoom("ai", { seed: 5 })).toThrow(/Server AI tables are no longer available/);
     expect(lobby.createRoom("pvp", { seed: 5, opponent: "vp-dog" }).settings.opponent).toBeUndefined();
-    const a = new FakeConnection();
-    picked.join("Ada", a);
-    expect(picked.session!.matchReport().strategyVersion).toBe(content.opponents.find(o => o.id === "vp-dog")!.profile.version);
-    command(picked, 0, { type: "concede" });
-    expect(store.results.at(-1)).toMatchObject({ code: picked.code, mode: "ai", opponent: "vp-dog" });
-    const replay = store.replays.get(picked.code)!;
-    expect(replay.settings.opponent).toBe("vp-dog");
-    expect(replayGame(replay, content).events.map(e => e.text)).toEqual(picked.events.map(e => e.text));
-  });
-
-  it("plays against the AI seat, which drafts on the server's clock", () => {
-    const { room, a, scheduler } = table({ mode: "ai", seed: 3 });
-    expect(room.status).toBe("playing");
-    expect(a.ofType("lobby").at(-1)!.seats[1]).toMatchObject({ ai: true, name: "AI" });
-    let guard = 0;
-    while (room.session!.state.phase === "runtime" && guard++ < 10) {
-      placeOne(room, 0, a);
-      command(room, 0, { type: "endTurn" });
-      expect(lastAck(a).ok).toBe(true);
-      while (room.session!.state.choice) {
-        command(room, 0, { type: "choose", selection: firstLegalSelection(room.session!.state.choice) });
-      }
-    }
-    expect(room.session!.state.phase).toBe("draft");
-    command(room, 0, { type: "endDraft" });
-    expect(room.session!.state.draftEnded).toBe(false);
-    scheduler.advance(95_000);
-    expect(room.session!.state.cycle).toBe(2);
-    const aiDrafted = room.commands.filter(c => c.command.type === "system" && c.command.action === "aiDraftStep");
-    expect(aiDrafted.length).toBeGreaterThan(0);
-    const rebuilt = replayGame(room.replay(), content);
-    expect(rebuilt.events.map(e => e.text)).toEqual(room.events.map(e => e.text));
   });
 
   it("hosts 50 tables at once through a Cycle each", () => {

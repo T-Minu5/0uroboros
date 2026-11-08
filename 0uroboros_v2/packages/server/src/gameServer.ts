@@ -358,6 +358,7 @@ export class GameServer {
       case "createRoom": {
         if (client.room) { send({ type: "error", code: "room", message: "Leave your current room first." }); return; }
         if (this.queue.has(client)) this.queue.leave(client);
+        if (message.mode === "ai") { send({ type: "error", code: "room", message: "Server AI tables are no longer available." }); return; }
         if (!this.mayCreateRoom(client)) { send({ type: "error", code: "rate", message: "You are opening tables too quickly; wait a few minutes." }); return; }
         const room = this.lobby.createRoom(message.mode, message.settings ?? {});
         const seated = room.join(this.seatName(client, message.name), connection, client.account?.id ?? null)!;

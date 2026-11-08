@@ -5,4 +5,3 @@
 .topline nav .bg-picker{display:inline-flex;align-items:center;gap:4px;margin-left:2px}
 .topline nav .bg-picker-btn{min-width:28px;padding:6px 8px;font-size:14px;line-height:1;border-color:#65517866;background:#151029;color:#d4c4ea}
 .topline nav .bg-picker-label{min-width:4.5em;text-align:center;font:600 9px Inter,system-ui,sans-serif;letter-spacing:.4px;color:#9b8bb8}
-.setup-authoring-link{display:block;color:#aeadcc;margin-top:14px;text-align:center;font-size:12px}

@@ -77,14 +77,15 @@ export type EffectStep = {
   /**
    * Gain a card: optional pool of definition IDs. When set (and longer than one), each copy is
    * picked from this list (`selection`, default `random`). A single `cardId` still means exactly that card.
-   * When neither `cardId` nor `cardIds` is set, `filter` (+ optional `maxCost`) picks from the
-   * draft-eligible catalog (Generated cards are excluded; use an explicit `cardId` for those).
-   * Random multi-id pools also skip Generated; sequential named lists keep them for special grants.
+   * Explicit `cardId` / `cardIds` always grant those definitions, including Generated tokens
+   * (Glitch Witch, Merchant of Chaos, Heisenberg Hag, Crypto-Shyte gifts).
+   * When neither is set, `filter` (+ optional `maxCost`) picks from the open catalog and
+   * excludes Generated — that is the “gain a random / any matching card” path.
    */
   cardIds?: readonly string[];
   /** Gain-by-filter / copyText: match cards by type, class, and/or definitionId. */
   filter?: CardFilter;
-  /** Gain-by-filter: highest printed cost allowed (inclusive). Draft-eligible catalog only. */
+  /** Gain-by-filter: highest printed cost allowed (inclusive). Open catalog; Generated excluded. */
   maxCost?: number;
   /** Attach: the mod to attach. Remove: the mod to strip; absent strips every mod. */
   modifier?: ModifierRef;

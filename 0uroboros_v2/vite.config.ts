@@ -98,6 +98,8 @@ export default defineConfig({
     cpSync(resolve(file), resolve(OUT_DIR, file));
    }
    if (!CLIENT) for (const folder of ['card_art', 'Icons', 'materials', 'board', 'HUDs']) cpSync(resolve('assets', folder), resolve(OUT_DIR, 'assets', folder), { recursive: true });
+   const strike = resolve('assets/library/strike.png');
+   if (existsSync(strike)) { mkdirSync(resolve(OUT_DIR, 'assets/library'), { recursive: true }); cpSync(strike, resolve(OUT_DIR, 'assets/library/strike.png')); }
    const songs = musicFiles();
    mkdirSync(resolve(OUT_DIR, 'assets/music'), { recursive: true });
    for (const song of songs) cpSync(resolve(MUSIC_DIR, song), resolve(OUT_DIR, 'assets/music', song));

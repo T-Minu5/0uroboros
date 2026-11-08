@@ -24,7 +24,7 @@ describe("presence", () => {
     expect(presenceText({ status: "idle", mode: null })).toBe("In the menu");
     expect(presenceText({ status: "waiting", mode: "pvp" })).toBe("Waiting for a friend to join");
     expect(presenceText({ status: "playing", mode: "pvp" }, 3)).toBe("In an online match · Cycle 3");
-    expect(presenceText({ status: "playing", mode: "ai" })).toBe("Playing the AI");
+    expect(presenceText({ status: "playing", mode: "ai" })).toBe("In an online match");
     expect(presenceText({ status: "finished", mode: "pvp" })).toBe("Reviewing a finished match");
   });
 });

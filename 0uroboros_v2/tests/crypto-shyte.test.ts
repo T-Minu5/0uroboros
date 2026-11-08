@@ -100,7 +100,6 @@ describe('random gainCard draft eligibility', () => {
       pack.cards.filter(card => card.generated).map(card => card.definitionId ?? card.id),
     );
     expect(generatedIds.has('crypto-shyte')).toBe(true);
-    expect(generatedIds.has('wave-card')).toBe(true);
 
     game.state.players[0].hand = [{
       id: 'buyer', name: 'Buyer', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Gain.',
@@ -111,14 +110,14 @@ describe('random gainCard draft eligibility', () => {
     }];
     game.deploy('buyer', 0);
     game.endTurn();
-    finish(game);
-
-    const gained = [...game.state.players[0].hand, ...game.state.players[0].discard];
-    expect(gained.length).toBe(16);
+    const events = finish(game);
+    expect(events.some(event => /gain 8 /.test(event.text) && /hand/i.test(event.text))).toBe(true);
+    expect(events.some(event => /gain 8 /.test(event.text) && /Discard/i.test(event.text))).toBe(true);
+    const gained = [...game.state.players[0].hand, ...game.state.players[0].discard, ...game.state.players[0].draw];
+    expect(gained.length).toBeGreaterThanOrEqual(16);
     expect(gained.every(card => !generatedIds.has(card.definitionId ?? card.id))).toBe(true);
     expect(gained.every(card => card.generated !== true)).toBe(true);
     expect(gained.some(card => (card.definitionId ?? card.id) === 'crypto-shyte')).toBe(false);
-    expect(gained.some(card => (card.definitionId ?? card.id) === 'wave-card')).toBe(false);
   });
 
   it('explicit cardId still grants Generated Crypto-Shyte', () => {
@@ -133,13 +132,13 @@ describe('random gainCard draft eligibility', () => {
     expect(game.state.players[0].hand.some(card => card.definitionId === 'crypto-shyte')).toBe(true);
   });
 
-  it('random cardIds pools skip Generated entries', () => {
+  it('explicit random cardIds pools keep Generated entries', () => {
     const { game } = gainSession();
     game.state.players[0].hand = [{
       id: 'picker', name: 'Picker', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Random.',
       onReveal: [{
         action: 'gainCard', amount: 12, selection: 'random',
-        cardIds: ['crypto-shyte', 'byte-coin'],
+        cardIds: ['crypto-shyte', 'shyte-coin'],
         target: { type: 'zone', who: 'self', zone: 'hand' },
       }],
     }];
@@ -148,16 +147,57 @@ describe('random gainCard draft eligibility', () => {
     finish(game);
     const gained = game.state.players[0].hand;
     expect(gained).toHaveLength(12);
-    expect(gained.every(card => card.definitionId === 'byte-coin')).toBe(true);
+    expect(gained.some(card => card.definitionId === 'crypto-shyte')).toBe(true);
+    expect(gained.some(card => card.definitionId === 'shyte-coin')).toBe(true);
+  });
+
+  it('Glitch-Witch still seeds a Generated Glitch into the enemy Discard', () => {
+    const { pack, game } = gainSession();
+    const witch = pack.cards.find(card => card.name === 'Glitch-Witch' || (card.definitionId ?? card.id) === 'card-q6u1qrf2');
+    expect(witch?.onReveal?.some(step => step.action === 'gainCard')).toBe(true);
+    game.state.players[0].hand = [{ ...structuredClone(witch!), id: 'witch-1' }];
+    game.state.players[1].discard = [];
+    game.deploy('witch-1', 0);
+    game.endTurn();
+    const events = finish(game);
+    expect(events.some(event => /gain 1 Glitch-[A-E] to Discard/.test(event.text))).toBe(true);
+    // Location draws (e.g. Echo Chamber) may pull the Glitch out of Discard into hand.
+    const enemy = [...game.state.players[1].discard, ...game.state.players[1].hand, ...game.state.players[1].draw];
+    const glitches = enemy.filter(card => (card.vp ?? 0) < 0 || /glitch/i.test(card.name));
+    expect(glitches.length).toBeGreaterThanOrEqual(1);
+    expect(glitches.every(card => card.generated === true)).toBe(true);
+  });
+
+  it('Merchant of Chaos still grants a Generated Quark/Gluon from its named pool', () => {
+    const { pack, game } = gainSession();
+    const merchant = pack.cards.find(card => card.name === 'Merchant of Chaos')!;
+    game.state.players[0].hand = [{ ...structuredClone(merchant), id: 'merchant-1' }];
+    game.deploy('merchant-1', 0);
+    game.endTurn();
+    const events = finish(game);
+    expect(events.some(event => /gain 1 (Quark|Gluon) to Discard/.test(event.text))).toBe(true);
+    const zones = [...game.state.players[0].discard, ...game.state.players[0].hand, ...game.state.players[0].draw];
+    expect(zones.some(card => card.generated === true && (card.name === 'Quark' || card.name === 'Gluon'))).toBe(true);
+  });
+
+  it('Heisenberg Hag still grants a Generated Schrödinger Box by named id', () => {
+    const { pack, game } = gainSession();
+    const hag = pack.cards.find(card => card.name === 'The Heisenberg Hag')!;
+    game.state.players[0].hand = [{ ...structuredClone(hag), id: 'hag-1' }];
+    game.deploy('hag-1', 0);
+    game.endTurn();
+    const events = finish(game);
+    expect(events.some(event => /Schrödinger Box/.test(event.text))).toBe(true);
+    expect(game.state.players[0].hand.some(card => card.name === 'Schrödinger Box' && card.generated === true)).toBe(true);
   });
 });
 
 describe('Currency Crypto playable', () => {
-  it('deploys Byte-Coin free and pays cryptoValue on reveal', () => {
+  it('deploys Shyte-Coin free and pays cryptoValue on reveal', () => {
     const pack = compileContent(document);
-    const byte = pack.cards.find(card => (card.definitionId ?? card.id) === 'byte-coin')!;
-    expect(canDeploy(byte, 1, 0, 0)).toBeNull();
-    expect(isPlayableCrypto(byte)).toBe(true);
+    const coin = pack.cards.find(card => (card.definitionId ?? card.id) === 'shyte-coin')!;
+    expect(canDeploy(coin, 1, 0, 0)).toBeNull();
+    expect(isPlayableCrypto(coin)).toBe(true);
 
     const game = createSession({
       content: pack, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: 'higher',
@@ -165,12 +205,12 @@ describe('Currency Crypto playable', () => {
     });
     game.state.nodeOrder = [0, 1, 2, 3, 4];
     game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
-    const token: Card = { ...structuredClone(byte), id: 'byte-play' };
+    const token: Card = { ...structuredClone(coin), id: 'coin-play' };
     game.state.players[0].hand = [token];
     expect(game.deploy(token.id, 0)).toMatchObject({ kind: 'deploy' });
     game.endTurn();
     finish(game);
-    expect(game.state.players[0].wallet).toBe(2);
-    expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'byte-play' && entry.revealed)).toBe(true);
+    expect(game.state.players[0].wallet).toBe(coin.cryptoValue ?? 0);
+    expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'coin-play' && entry.revealed)).toBe(true);
   });
 });

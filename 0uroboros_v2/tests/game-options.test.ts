@@ -67,9 +67,10 @@ describe("online tables", () => {
   it("defaults trailing rewards in the pool and hands options to the room's session", () => {
     expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6 });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("ai", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
+    const room = lobby.createRoom("pvp", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
     expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
+    room.join("Bo", { send: () => undefined, close: () => undefined } as never);
     expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
     expect(room.session!.view().playableNodes).toEqual([1, 2, 3]);
   });

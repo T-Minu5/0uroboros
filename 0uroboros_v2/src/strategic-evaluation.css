@@ -194,8 +194,15 @@
 .choice-backdrop.node-choice .choice-dialog{pointer-events:auto;border-color:#ffd36b88}
 /* Circuit announcements: the choice dialog's look, passive and under the Draft overlay so a Draft opening covers it. */
 .choice-backdrop.event-message{z-index:46;pointer-events:none;background:linear-gradient(to top,#050614cc 0,#05061400 190px)}
-.choice-backdrop.event-message.server-kill-banner{align-items:center;padding-bottom:0;background:#05061466;z-index:120}
-.choice-backdrop.event-message.server-kill-banner .event-dialog{max-height:none;text-align:center}
+.choice-backdrop.event-message.server-kill-banner{align-items:center;justify-content:center;padding-bottom:0;background:#05061466;z-index:120}
+.choice-backdrop.event-message.server-kill-banner .event-dialog{
+  max-height:none;text-align:center;display:flex;flex-direction:column;align-items:center;
+}
+.choice-backdrop.event-message.server-kill-banner .event-dialog>small,
+.choice-backdrop.event-message.server-kill-banner .event-dialog>p{text-align:center;width:100%}
+.choice-backdrop.event-message.server-kill-banner .event-dialog>h2{
+  justify-content:center;text-align:center;width:100%;margin-left:auto;margin-right:auto;
+}
 .event-dialog footer{margin-top:8px}
 .event-dialog.circuit-event{border-color:#c2a95f}
 .event-dialog.circuit-event>small{color:#ffcc12}

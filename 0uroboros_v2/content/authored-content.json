@@ -1,5 +1,5 @@
 {
-  "revision": 1008,
+  "revision": 1014,
   "document": {
     "version": 3,
     "cards": [
@@ -1669,7 +1669,7 @@
         "type": "Character",
         "cost": 7,
         "art": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
-        "effect": "-225 Both enemy servers. If you pay 3 Crypto you get +5 in return.",
+        "effect": "-225 Both enemy servers. If you pay -3 Crypto you get +7 in return.",
         "power": 4,
         "onReveal": [
           {
@@ -1696,7 +1696,7 @@
                   "type": "player",
                   "who": "self"
                 },
-                "amount": 5
+                "amount": 6
               }
             ]
           }
@@ -3252,16 +3252,8 @@
         "cost": 5,
         "power": 2,
         "art": "/assets/library/card_art/chaos cards/attack/glitch-witch.png",
-        "effect": "+2 card. +2 Crypto. Put a random -1VP Glitch into the enemy discard pile.",
+        "effect": "Put a -1VP Glitch into the enemy discard pile. +2 cards.",
         "onReveal": [
-          {
-            "action": "draw",
-            "target": {
-              "type": "player",
-              "who": "self"
-            },
-            "amount": 1
-          },
           {
             "action": "gainCard",
             "target": {
@@ -3278,6 +3270,14 @@
               "card-83befkos"
             ],
             "selection": "random"
+          },
+          {
+            "action": "draw",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
           }
         ]
       },

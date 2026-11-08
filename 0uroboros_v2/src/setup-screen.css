@@ -1,8 +1,8 @@
 /* Setup screen: the intro card, then the AI agents panel beside it. Both scroll inside the backdrop when the window is short. */
-.setup-backdrop{gap:40px;align-items:flex-start;overflow:auto}
-.setup-backdrop>.setup-card{margin:auto 0}
+.setup-backdrop{gap:0}
+.setup-backdrop>.setup-card{margin:0}
 .setup-card h1{margin:14px 0 16px}
-.setup-note{margin:20px 0 14px}
+.setup-note{margin:0}
 
 /* Configure: a summary button that opens the turn timer, Server VP and starting deck. */
 .game-configure{margin:0 0 16px}
@@ -30,19 +30,39 @@
 .game-mode-toggle>button:disabled{opacity:.45}
 .game-configure .deck-picker{margin-bottom:12px}
 .setup-actions{
-  display:flex;align-items:stretch;gap:10px;margin:0 0 14px;width:100%;
+  display:flex;align-items:stretch;gap:16px;margin:0 0 14px;width:100%;
 }
 .setup-actions>.primary-button{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  margin:0;min-height:44px;padding:12px 14px;white-space:nowrap;
-}
-.setup-actions>.setup-gallery-button{flex:0 0 30%;width:30%;max-width:30%}
-.setup-actions>.primary-button:not(.setup-gallery-button){flex:1 1 auto;min-width:0}
-.setup-card .setup-gallery-button,
-.setup-card .setup-gallery-button:hover:not(:disabled){
-  background:transparent;border-color:var(--green,#1fffb1);color:var(--green,#1fffb1);
+  flex:1 1 auto;width:100%;min-width:0;margin:0;height:32px;min-height:32px;padding:0 16px;white-space:nowrap;
+  font-size:14px;font-weight:400;
 }
 .setup-gallery-button .icon{
+  width:14px;height:14px;background:currentColor;
+}
+.setup-card>.setup-gallery-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:auto;align-self:flex-start;margin:0;height:32px;min-height:32px;padding:0 16px;
+  font-size:14px;font-weight:400;background:transparent;
+}
+/*
+ * Dual-layer chamfer stroke (same as other setup secondaries): ::before = green shell,
+ * ::after = inset face. Face uses the frosted-card tint so default reads unfilled, not a dark slab.
+ */
+.setup-card>.setup-gallery-button::before{
+  content:'';display:block;position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:var(--green,#1fffb1);border-radius:0 5px 0 5px;padding:0;
+  clip-path:polygon(var(--btn-cut) 0,100% 0,100% calc(100% - var(--btn-cut)),calc(100% - var(--btn-cut)) 100%,0 100%,0 var(--btn-cut));
+  -webkit-mask:none;mask:none;box-shadow:none;
+}
+.setup-card>.setup-gallery-button::after{
+  content:'';display:block;position:absolute;inset:2px;z-index:-1;pointer-events:none;
+  background:#050614c6;border-radius:0 4px 0 4px;
+  clip-path:polygon(calc(var(--btn-cut) - 2px) 0,100% 0,100% calc(100% - (var(--btn-cut) - 2px)),calc(100% - (var(--btn-cut) - 2px)) 100%,0 100%,0 calc(var(--btn-cut) - 2px));
+}
+.setup-card>.setup-gallery-button:hover:not(:disabled)::before{background:var(--green,#1fffb1)}
+.setup-card>.setup-gallery-button:hover:not(:disabled)::after{background:color-mix(in srgb,var(--green,#1fffb1) 14%,#050614c6)}
+.setup-actions>.primary-button .icon{
   width:16px;height:16px;background:currentColor;
 }
 
@@ -61,33 +81,73 @@
 .deck-picker-cards i{margin-right:3px;font-style:normal;color:#7f899e}
 .deck-picker-note{margin:0;font-size:11px;color:#7f899e}
 
-@media(max-width:1100px){.setup-backdrop{flex-wrap:wrap}.setup-backdrop>.setup-card{margin:0}}
+@media(max-width:1100px){.setup-backdrop{flex-wrap:nowrap}}
 
-/* Online: create a table for a friend, join one by code, or play the server's AI. Sits under the solo entry button. */
-.online-lobby{display:flex;flex-direction:column;gap:10px;margin:18px 0 14px;padding:14px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff06}
+/* Online: create a table for a friend, join one by code, or quick-match. */
+.online-lobby{display:flex;flex-direction:column;gap:10px;margin:18px 0 12px;padding:14px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff06}
+.online-identity{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:end;margin-bottom:14px}
+.online-identity-fields{display:flex;flex-direction:column;gap:8px;min-width:0}
+.online-identity-fields>.primary-button{width:100%;height:32px;min-height:32px;margin:0;font-size:14px;font-weight:400;--btn-fill:var(--green,#1fffb1);--btn-border:var(--green,#1fffb1);--btn-face:var(--green,#1fffb1);color:#04150f}
+.online-identity-fields>.primary-button:hover:not(:disabled)::before{background:var(--green,#1fffb1)}
+.online-identity-fields>.primary-button:hover:not(:disabled)::after{background:#8dffd8}
+.online-identity-fields>.primary-button .icon{background:currentColor}
+/* Same chamfer language as AI faces (58px), nudged a touch larger — 2px green stroke via outer clip fill. */
+.player-avatar-picker{position:relative;align-self:end;display:flex}
+.player-avatar-trigger{
+  --avatar-cut:11px;
+  display:block;width:66px;height:66px;padding:2px;border:0;border-radius:0;
+  background:var(--green,#1fffb1);overflow:hidden;box-shadow:none;
+  clip-path:polygon(var(--avatar-cut) 0,calc(100% - 2px) 0,100% 2px,100% calc(100% - var(--avatar-cut)),calc(100% - var(--avatar-cut)) 100%,2px 100%,0 calc(100% - 2px),0 var(--avatar-cut));
+}
+.player-avatar-trigger:hover:not(:disabled),.player-avatar-trigger:focus-visible{border:0;background:var(--green,#1fffb1);box-shadow:none;transform:none}
+.player-avatar-trigger:focus-visible{outline:2px solid #ffcc12;outline-offset:3px}
+.player-avatar-frame{
+  --avatar-cut:11px;
+  display:block;width:100%;height:100%;overflow:hidden;background:#0a1218;
+  clip-path:polygon(var(--avatar-cut) 0,calc(100% - 2px) 0,100% 2px,100% calc(100% - var(--avatar-cut)),calc(100% - var(--avatar-cut)) 100%,2px 100%,0 calc(100% - 2px),0 var(--avatar-cut));
+}
+.player-avatar-trigger>.player-avatar-frame{
+  --avatar-cut:9px; /* inset so the 2px green padding reads as a stroke */
+}
+.player-avatar-frame>img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;transform:scale(1.35);transform-origin:center top}
+.player-avatar-menu{position:absolute;left:0;bottom:calc(100% + 8px);z-index:5;display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:6px;width:min(280px,70vw);padding:10px;border:1px solid #ffffff24;border-radius:8px;background:#0b0f18f2;box-shadow:0 16px 40px #000c;backdrop-filter:blur(10px)}
+.player-avatar-menu>button{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid #ffffff1a;border-radius:6px;background:#ffffff08;color:#d7deea;font:600 11px Inter,sans-serif;text-align:left}
+.player-avatar-menu>button .player-avatar-frame{flex:none;width:40px;height:40px}
+.player-avatar-menu>button .player-avatar-frame>img{transform:scale(1.25)}
+.player-avatar-menu>button:hover:not(:disabled),.player-avatar-menu>button.selected{border-color:var(--green,#1fffb1);background:#1fffb114;color:#e8fff6}
+
 .online-lobby>small{font-size:10px;letter-spacing:1.6px;color:#8b93a7}
 .online-lobby p{margin:0;font-size:12px;line-height:1.5;color:#c4bfd2}
 .online-field{display:flex;flex-direction:column;gap:4px;font-size:10px;color:#7f899e}
 .online-lobby input{padding:7px 9px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit;font-size:12px}
 .online-lobby input::placeholder{color:#5f6b80}
-.online-actions{display:flex;flex-wrap:wrap;gap:8px}
-.online-actions>button,.online-join button,.online-lobby .online-resume,.online-lobby>button{padding:8px 12px;border:1px solid #ffffff24;border-radius:7px;background:#ffffff08;color:#e8ecf4;font:600 12px Inter,sans-serif}
-.online-actions>button:hover:not(:disabled),.online-join button:hover:not(:disabled),.online-resume:hover{border-color:var(--green,#1fffb1);background:#1fffb114}
-.online-actions>button:disabled,.online-join button:disabled{opacity:.45}
-.online-join{display:flex;gap:6px;flex:1 1 180px}
+.online-actions{display:flex;flex-direction:column;gap:10px}
+.online-table-row{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;width:100%}
+.online-actions>button:not(.primary-button),.online-table-row>button,.online-join button,.online-lobby .online-resume,.online-lobby>button:not(.primary-button){padding:8px 12px;border:1px solid #ffffff24;border-radius:7px;background:#ffffff08;color:#e8ecf4;font:600 12px Inter,sans-serif}
+.online-actions>button:not(.primary-button):hover:not(:disabled),.online-table-row>button:hover:not(:disabled),.online-join button:hover:not(:disabled),.online-resume:hover{border-color:var(--green,#1fffb1);background:#1fffb114}
+.online-actions>button:disabled,.online-table-row>button:disabled,.online-join button:disabled{opacity:.45}
+.online-actions>.primary-button{
+  width:100%;height:32px;min-height:32px;margin:0;font-size:14px;font-weight:400;
+  --btn-fill:var(--green,#1fffb1);--btn-border:var(--green,#1fffb1);--btn-face:var(--green,#1fffb1);color:#04150f;
+}
+.online-actions>.primary-button:hover:not(:disabled)::before{background:var(--green,#1fffb1)}
+.online-actions>.primary-button:hover:not(:disabled)::after{background:#8dffd8}
+.online-actions>.primary-button .icon{background:currentColor}
+.online-join{display:flex;gap:6px;flex:1 1 180px;min-width:0}
 .online-join input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:2px}
 .online-code{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #1fffb166;border-radius:7px;background:#1fffb10f}
 .online-code span{font-size:11px;color:#9ff5d6}
 .online-code b{font:700 22px Orbitron,Inter,sans-serif;letter-spacing:5px;color:#e8fff6}
 .online-status{color:#8b93a7}
 .online-error{color:#ff9d9d}
-.online-signin{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:8px;border-top:1px solid #ffffff12}
-.online-signin input{flex:1 1 180px;min-width:0}
-.online-signin button{padding:7px 10px;border:1px solid #ffffff24;border-radius:7px;background:#ffffff08;color:#e8ecf4;font:600 11px Inter,sans-serif}
-.online-signin button:hover:not(:disabled){border-color:var(--green,#1fffb1);background:#1fffb114}
-.online-signin button:disabled{opacity:.45}
-.online-signin span{flex-basis:100%;font-size:10px;color:#7f899e}
-.online-signin .online-native{flex-basis:100%;border-color:#1fffb166;background:#1fffb110}
 .online-account{padding-top:8px;border-top:1px solid #ffffff12;color:#c4bfd2}
 .online-account b{color:#e8fff6}
 .online-link{padding:0;border:0;background:none;color:#9ff5d6;font:inherit;text-decoration:underline;cursor:pointer}
+
+.landing-auth{display:inline-flex;align-items:center;gap:10px}
+.landing-auth-name{font:600 11px Inter,sans-serif;color:#c4bfd2;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.landing-auth-popover{min-width:240px}
+.landing-auth-form{display:flex;flex-direction:column;gap:8px}
+.landing-auth-form .online-field{margin:0}
+.landing-auth-form input{padding:7px 9px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit;font-size:12px}
+.landing-auth-form button{width:100%}

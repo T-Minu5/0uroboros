@@ -1,9 +1,10 @@
 import { useMemo, useState, type CSSProperties } from 'react';
+import { Icon } from './BoardScene';
 import { CardFace } from './CardFace';
 import type { Card, CardClass, PlayerId } from '@0uroboros/engine/game';
 import { EVALUATION_ALL_CARDS } from '@0uroboros/engine/evaluationMarket';
 import type { CompiledContent } from '@0uroboros/engine/authoring/contentModel';
-import { CARD_STYLE_COLORS, CARD_STYLE_ICONS, cardPresentation, type CardStyle } from './cardPresentation';
+import { CARD_STYLE_COLORS, CARD_STYLE_ICONS, type CardStyle } from './cardPresentation';
 import './card-catalog.css';
 
 type Props = {
@@ -108,14 +109,18 @@ export function CardCatalog({ content, canTest, inspect, add, close }: Props) {
       {canTest && <p className='catalog-hint'>Add a card directly to a test hand before placing cards this turn. This evaluation tool is separate from market purchases.</p>}
       {!canTest && <p className='catalog-hint'>Browse every card the Draft can offer. Start a Runtime turn with no placements to add test cards from Settings.</p>}
       <div className='catalog-grid'>{cards.map(card => {
-        const presentation = cardPresentation(card);
+        const cost = card.cost ?? 0;
         return <article key={identity(card)} data-catalog-id={identity(card)}>
           <button className='catalog-art' aria-label={`Inspect ${card.name}`} onClick={() => inspect(card)}>
             <CardFace card={card} context='preview' />
           </button>
           <div className='catalog-copy'>
-            <h2>{card.name}</h2>
-            <b className='catalog-cost' style={{ color: CARD_STYLE_COLORS[presentation.style] }}>{card.cost ?? 0}</b>
+            <p className='catalog-cost' aria-label={`Cost ${cost} Crypto`}>
+              <span>Cost</span>
+              <Icon name='crypto'/>
+              <b>{cost}</b>
+              <span>Crypto</span>
+            </p>
             <p>{card.effect}</p>
           </div>
           {canTest && <button className='catalog-add' onClick={() => {

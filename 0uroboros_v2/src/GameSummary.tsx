@@ -117,7 +117,7 @@ export function GameSummary({ view, colors, inspect, restart, onTallied }: Props
     <h2>{headline}</h2>
     {view.endedReason && <p>{view.endedReason}</p>}
    </div>
-   <button className='primary-button' onClick={restart}>New evaluation session <span>↗</span></button>
+   <button className='primary-button' onClick={restart}><span>New evaluation session</span><span>↗</span></button>
   </header>
   <div className='summary-players'>
    {([0, 1] as const).map(owner => <PlayerTally key={owner} owner={owner} score={scores[owner]} color={colors[owner]} leading={view.winner === owner} showEffects={showEffects} showDestruction={showDestruction} inspect={inspect}/>)}

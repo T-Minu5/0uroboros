@@ -36,8 +36,8 @@ export function awardAchievements(platform: Platform, result: GameResult, seat: 
 /** One line for the friends list: what the player is doing right now. */
 export function presenceText(lobby: Pick<LobbyState, 'status' | 'mode'>, cycle?: number): string {
   switch (lobby.status) {
-    case 'waiting': return lobby.mode === 'ai' ? 'Starting a game against the AI' : 'Waiting for a friend to join';
-    case 'playing': return `${lobby.mode === 'ai' ? 'Playing the AI' : 'In an online match'}${cycle ? ` · Cycle ${cycle}` : ''}`;
+    case 'waiting': return 'Waiting for a friend to join';
+    case 'playing': return `In an online match${cycle ? ` · Cycle ${cycle}` : ''}`;
     case 'finished': return 'Reviewing a finished match';
     default: return 'In the menu';
   }

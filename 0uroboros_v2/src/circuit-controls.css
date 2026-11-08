@@ -110,6 +110,40 @@
 .world-anchor :is(.local-console,.opponent-console)>.reveal-priority>i { width:5px; height:5px; border-radius:50%; background:#343b48; transition:background-color .2s,box-shadow .2s; }
 .world-anchor :is(.local-console,.opponent-console)>.reveal-priority.active { color:var(--console-accent,#1fffb1); }
 .world-anchor :is(.local-console,.opponent-console)>.reveal-priority.active>i { background:var(--console-accent,#1fffb1); box-shadow:0 0 6px color-mix(in srgb,var(--console-accent,#1fffb1) 67%,transparent); }
+/* Portrait between Crypto and VP. Same cut as landing faces; 2px stroke in the seat colour.
+   Top stays on the stats row; the face grows down so its bottom meets the plate floor. */
+.world-anchor .resources .stat-avatar {
+  position:relative;display:block;min-width:0;flex:0 0 auto;align-self:flex-start;
+  width:44px;height:18px;overflow:visible;pointer-events:none;
+}
+.world-anchor .resources .stat-avatar-shell {
+  position:absolute;top:0;left:50%;translate:-50% 0;
+  display:block;box-sizing:border-box;width:44px;height:44px;padding:2px;
+  background:var(--console-accent,#1fffb1);
+  clip-path:polygon(19% 0, calc(100% - 3.45%) 0, 100% 3.45%, 100% calc(100% - 19%), calc(100% - 19%) 100%, 3.45% 100%, 0 calc(100% - 3.45%), 0 19%);
+}
+.world-anchor .resources .stat-avatar-frame {
+  display:block;width:100%;height:100%;overflow:hidden;background:#0a1218;
+  clip-path:polygon(19% 0, calc(100% - 3.45%) 0, 100% 3.45%, 100% calc(100% - 19%), calc(100% - 19%) 100%, 3.45% 100%, 0 calc(100% - 3.45%), 0 19%);
+}
+.world-anchor .resources .stat-avatar-frame>img {
+  display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%;
+  transform-origin:center top;
+}
+/* Neon plate is 88px tall with 13px top pad; grow from the resources row to the plate floor. */
+.board-canvas[data-board-style=neon] .world-anchor :is(.local-console,.opponent-console),
+.board-canvas[data-board-style=neon] .world-anchor .resources {
+  overflow:visible;
+}
+.board-canvas[data-board-style=neon] .world-anchor .resources .stat-avatar {
+  /* static so the shell positions against the relative console, centered on the plate */
+  position:static;width:40px;height:18px;
+}
+.board-canvas[data-board-style=neon] .world-anchor .resources .stat-avatar-shell {
+  /* 13 pad + ~10 priority + 5 resources margin ≈ row top; bottom of plate = 88. */
+  top:28px;left:50%;width:58px;height:58px;
+  filter:drop-shadow(0 2px 2px #000d);
+}
 /* Neon: the local stats panel takes a footed, chamfered plate. Its stats sit centred on the near neon line, which
    threads through it level with the Server tubes, entering and leaving by 3D end caps at either side (NeonServerBases). */
 .board-canvas[data-board-style=neon] .world-anchor .local-console {
