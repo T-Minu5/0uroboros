@@ -47,6 +47,17 @@ export type Recommendation = {
 export type PurchaseLine = { name: string; cost: number; copies: number; buyerGames: number; buyerWinRate: number };
 /** Best and worst market purchases by how often their buyers won, as of the latest report; starting-deck cards are left out. */
 export type PurchaseSummary = { at: string; reportId: string; buildId: string; games: number; minBuyerGames: number; startingDeck: string[]; top: PurchaseLine[]; bottom: PurchaseLine[] };
+/** End-game achievement VP slate from the latest report (all tracked ideas + which are top 3). */
+export type AchievementSummaryLine = {
+  id: string; award: string; shipped: boolean; top3: boolean;
+  decided: number; tied: number;
+  destructionLoserHitRate: number | null; destructionWinnerHitRate: number | null;
+  leaderWonGameRate: number | null; meanMarginIfAwarded6: number | null;
+};
+export type AchievementSummary = {
+  at: string; reportId: string; buildId: string; games: number; vp: number;
+  slate: AchievementSummaryLine[];
+};
 /** Eco-Strat's own view of how a deck-building economy should work; revised, not rewritten, after each report. */
 export type PointOfView = {
   at: string; buildId: string; reportId: string; model: string | null;
@@ -96,6 +107,8 @@ export type Journal = {
   games: GameEntry[]; cohorts: Cohort[]; reports: ReportEntry[]; errors: ErrorEntry[];
   gamesSinceReport: number;
   purchases?: PurchaseSummary | null;
+  /** Latest report's achievement VP slate stats for the Summary tab. */
+  achievements?: AchievementSummary | null;
   /** One-time corrections already applied, by id. */
   resets?: string[];
 };
@@ -288,6 +301,8 @@ function summarySections(journal: Journal): string[] {
   const other = games.filter(game => game.endedBy !== 'destruction' && game.endedBy !== 'cycle16');
   const top = topRecommendations(journal, 3);
   const buys = journal.purchases?.buildId === journal.currentBuild ? journal.purchases : null;
+  const achievements = journal.achievements?.buildId === journal.currentBuild ? journal.achievements : null;
+  const pct = (value: number | null) => value === null ? 'n/a' : `${Math.round(value * 100)}%`;
   const table = (lines: PurchaseLine[]) => ['| Card | Cost | Copies bought | Games bought in | Buyers won |', '| --- | --- | --- | --- | --- |', ...lines.map(line => `| ${line.name} | ${line.cost} | ${line.copies} | ${line.buyerGames} | ${Math.round(line.buyerWinRate * 100)}% |`)];
   return [
     `## Summary`,
@@ -295,6 +310,20 @@ function summarySections(journal: Journal): string[] {
     `### Top 3 recommendations`,
     ``,
     ...(top.length ? top.flatMap((item, index) => [`${index + 1}. **${item.title}** ${item.adjustment} *(${item.confidence} · report ${item.reportId})*`]) : ['_None yet: recommendations come with the next model-backed report._']),
+    ``,
+    `### Achievement VP slate`,
+    ``,
+    ...(achievements?.slate.length ? [
+      `_All ${achievements.slate.length} tracked end-game achievement ideas from report ${achievements.reportId} over ${achievements.games} games (hypothetical +${achievements.vp} VP). Ranked primarily by how often the award would go to the **game loser** when the game ended by Server destruction. Top 3 non-shipped candidates are marked._`,
+      '',
+      '| Idea | Award | Decided / tied | Dest. loser hit | Dest. winner hit | Leader won game | Mean margin if +VP |',
+      '| --- | --- | --- | --- | --- | --- | --- |',
+      ...achievements.slate.map(line => {
+        const mark = line.top3 ? ' ★' : '';
+        const shipped = line.shipped ? ' (shipped)' : '';
+        return `| ${line.id}${mark}${shipped} | ${line.award} | ${line.decided} / ${line.tied} | ${pct(line.destructionLoserHitRate)} | ${pct(line.destructionWinnerHitRate)} | ${pct(line.leaderWonGameRate)} | ${line.meanMarginIfAwarded6 ?? 'n/a'} |`;
+      }),
+    ] : ['_Measured with the next report on this build._']),
     ``,
     `### Best purchases`,
     ``,

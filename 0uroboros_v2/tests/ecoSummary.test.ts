@@ -82,6 +82,18 @@ describe("the journal's tabs and summary", () => {
       item.games.push({ ...entry("g6", "destruction", [99, 0]), buildId: "old" });
       item.purchases = { at: AT, reportId: "rep-2", buildId: "b1", games: 5, minBuyerGames: 3, startingDeck: ["Rezz Blade"],
         top: [{ name: "Kilo-Coin", cost: 5, copies: 9, buyerGames: 6, buyerWinRate: 0.83 }], bottom: [{ name: "Dud", cost: 2, copies: 4, buyerGames: 4, buyerWinRate: 0.25 }] };
+      item.achievements = {
+        at: AT, reportId: "rep-2", buildId: "b1", games: 5, vp: 6,
+        slate: [
+          { id: "most-circuits", award: "Most Circuits won", shipped: true, top3: false, decided: 4, tied: 1, destructionLoserHitRate: 0.25, destructionWinnerHitRate: 0.75, leaderWonGameRate: 0.8, meanMarginIfAwarded6: 18 },
+          { id: "most-trashed", award: "Most cards trashed", shipped: false, top3: true, decided: 5, tied: 0, destructionLoserHitRate: 0.67, destructionWinnerHitRate: 0.33, leaderWonGameRate: 0.4, meanMarginIfAwarded6: 12 },
+          { id: "most-destroyed", award: "Most cards destroyed", shipped: false, top3: true, decided: 4, tied: 1, destructionLoserHitRate: 0.5, destructionWinnerHitRate: 0.5, leaderWonGameRate: 0.5, meanMarginIfAwarded6: 14 },
+          { id: "most-power-added", award: "Most lasting Power added", shipped: false, top3: true, decided: 5, tied: 0, destructionLoserHitRate: 0.4, destructionWinnerHitRate: 0.6, leaderWonGameRate: 0.6, meanMarginIfAwarded6: 15 },
+          { id: "most-card-power-drained", award: "Most Power drained", shipped: false, top3: false, decided: 3, tied: 2, destructionLoserHitRate: 0.3, destructionWinnerHitRate: 0.7, leaderWonGameRate: 0.7, meanMarginIfAwarded6: 16 },
+          { id: "most-card-power-restored", award: "Most Power restored", shipped: false, top3: false, decided: 2, tied: 3, destructionLoserHitRate: 0.2, destructionWinnerHitRate: 0.8, leaderWonGameRate: 0.75, meanMarginIfAwarded6: 17 },
+          { id: "most-server-repaired", award: "Most Server repaired", shipped: false, top3: false, decided: 4, tied: 1, destructionLoserHitRate: 0.1, destructionWinnerHitRate: 0.9, leaderWonGameRate: 0.9, meanMarginIfAwarded6: 19 },
+        ],
+      };
     });
     expect(topRecommendations(journal, 3).map(item => item.title)).toEqual(["First idea", "Second idea", "Old idea"]);
     const { preamble, tabs } = splitTabs(renderJournal(journal));
@@ -90,6 +102,7 @@ describe("the journal's tabs and summary", () => {
     const summary = tabs[0].text;
     expect(summary).toMatch(/1\. \*\*First idea\*\* Cut A\.[\s\S]*2\. \*\*Second idea\*\*[\s\S]*3\. \*\*Old idea\*\*/);
     expect(summary).not.toMatch(/Withdrawn idea/);
+    expect(summary).toMatch(/### Achievement VP slate[\s\S]*most-circuits \(shipped\)[\s\S]*most-trashed ★/);
     expect(summary).toMatch(/### Best purchases[\s\S]*\| Kilo-Coin \| 5 \| 9 \| 6 \| 83% \|/);
     expect(summary).toMatch(/### Worst purchases[\s\S]*\| Dud \| 2 \| 4 \| 4 \| 25% \|/);
     expect(summary).toMatch(/Starting-deck cards are left out \(Rezz Blade\)/);

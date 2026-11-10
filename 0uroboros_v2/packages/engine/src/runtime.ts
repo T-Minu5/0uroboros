@@ -7,7 +7,7 @@ import {
   type LocationEvent, type LocationEventKind, type LocationPassives,
 } from "./locationEvents";
 import {
-  meetsLocationWhile, revealedAtNode, whilePowerBonus, type LocationWhile,
+  meetsLocationWhile, revealedAtNode, revealedForOwner, whilePowerBonus, type LocationWhile,
 } from "./locationWhiles";
 import { unlockedRuntimeHacks, type RevealRecord, type RuntimeHackDefinition } from "./runtimeHacks";
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS, NO_MANS_LAND, type LocationRewardEffect, type CircuitRewardDefinition } from "./content";
@@ -218,7 +218,7 @@ export type RuntimeEvent = {
   publicText?: string;
   sourceNode?: number; targetNode?: number;
   source?: "card" | "location" | "circuit" | "runtimeHack"; sourceName?: string;
-  target?: "primary" | "backup" | "hand" | "actions" | "wallet" | "vp" | "trash" | "discard";
+  target?: "primary" | "backup" | "hand" | "actions" | "wallet" | "vp" | "trash" | "discard" | "destroyed";
   amount?: number; before?: number; after?: number; targetOwner?: PlayerId;
   stage?: "node-start" | "node-award" | "node-close";
   /** Where in the session the event happened; stamped by the engine for the Log. */
@@ -1789,7 +1789,8 @@ export class RuntimeSession {
       case "recover": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.recoverStep(acting, step, recipient));
       case "moveCard": case "changePower": case "healCard": case "restoreCard": case "destroyCard": case "trashCard": case "attachModifier": case "removeModifier":
         return this.resolveCardStep(ctx, step);
-      case "sacrificeCards": return this.resolveSacrificeCards(ctx, step);
+      // Each targeted seat chooses among its own cards here and keeps the Crypto (Consume Pit / Sacrificial Altar use who:both).
+      case "sacrificeCards": return this.forEachRecipient(ctx, step, false, acting => this.resolveSacrificeCards(acting, step));
       case "stealDeckCard": return this.forEachRecipient(ctx, step, true, (acting, recipient) => this.stealDeckCard(acting, step, recipient));
       case "deckSwap": return this.deckSwap(ctx, step);
       case "placeCard": return this.resolvePlaceCard(ctx, step);
@@ -2383,7 +2384,7 @@ export class RuntimeSession {
         this.recalculate();
         this.refreshScores();
         const whose = owner === source.owner ? "its owner's" : this.whose(owner);
-        return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${card.name} from ${whose} ${from}.` : `${source.card.name}: ${card.name} is removed from the game.`, { ...detail, ...(kept && zone === "trash" ? { target: "trash" as const } : {}), amount: 1 });
+        return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${card.name} from ${whose} ${from}.` : `${source.card.name}: ${card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
       }
       case "attachModifier": return this.attachModifier(ctx, step, card);
       case "removeModifier": return this.removeModifiers(ctx, step, card);
@@ -2501,7 +2502,7 @@ export class RuntimeSession {
     const name = location?.name ?? ctx.source.card.name;
     const destroy = step.action === "destroyCard";
     const zone = destroy ? "destroyed" as const : "trash" as const;
-    const detail = { node, source: "location" as const, sourceName: name, ...(destroy ? {} : { target: "trash" as const }) };
+    const detail = { node, source: "location" as const, sourceName: name, target: zone };
     const mode = (step.pick?.mode ?? "weakest") as "all" | "weakest" | "strongest" | "first";
     const hit: string[] = [], removed: string[] = [];
     for (const group of groups) {
@@ -2540,7 +2541,15 @@ export class RuntimeSession {
     for (const target of targets) setPowerDelta(target.card, (target.card.powerDelta ?? 0) + amount);
     this.recalculate();
     this.queueLocationConditionCheck(node);
-    return this.event("power", `${name}: ${amount < 0 ? "" : "+"}${amount} Power to ${targets.length} revealed card${targets.length === 1 ? "" : "s"} here.`, { ...base, amount, after: targets.length });
+    // One event per seat so Eco telemetry can credit lasting Power increases to the right cards.
+    const seats = ([0, 1] as PlayerId[]).filter(seat => targets.some(target => target.owner === seat));
+    return this.runSteps(seats.map(seat => () => {
+      const count = targets.filter(target => target.owner === seat).length;
+      const total = amount * count;
+      return this.event("power", `${name}: ${amount < 0 ? "" : "+"}${amount} Power to ${count} revealed card${count === 1 ? "" : "s"} here.`, {
+        ...base, amount: total, targetOwner: seat, after: count,
+      });
+    }));
   }
 
   /** Double changePower deltas when the target Node has the doublePowerChanges passive; zero out immune Power-down. */
@@ -2836,19 +2845,22 @@ export class RuntimeSession {
       for (const step of steps) callbacks.push(() => this.resolveStep(ctx, step));
       const revealed = revealedAtNode(this.state.nodes[node].cards.flat());
       for (const entry of location.whiles ?? []) {
-        if (!meetsLocationWhile(entry, revealed) || !entry.effects?.length) continue;
-        const host = entry.kind === 'soloCard' ? revealed[0] : undefined;
-        if (!host) continue;
-        const whileCtx: EffectContext = {
-          scope: "locationEvent",
-          node,
-          winner: this.state.nodes[node].winner,
-          source: host,
-          label: { source: "location", sourceName: location.name, node },
-        };
-        const whileSteps = this.steps(entry.effects, "locationEvent").map(step =>
-          location.passives?.doubleOngoing ? this.scaleStepAmounts(step, 2) : step);
-        for (const step of whileSteps) callbacks.push(() => this.resolveStep(whileCtx, step));
+        if (!entry.effects?.length) continue;
+        for (const seat of [0, 1] as const) {
+          if (!meetsLocationWhile(entry, revealed, seat)) continue;
+          const host = entry.kind === 'soloCard' ? revealedForOwner(revealed, seat)[0] : undefined;
+          if (!host) continue;
+          const whileCtx: EffectContext = {
+            scope: "locationEvent",
+            node,
+            winner: this.state.nodes[node].winner,
+            source: host,
+            label: { source: "location", sourceName: location.name, node },
+          };
+          const whileSteps = this.steps(entry.effects, "locationEvent").map(step =>
+            location.passives?.doubleOngoing ? this.scaleStepAmounts(step, 2) : step);
+          for (const step of whileSteps) callbacks.push(() => this.resolveStep(whileCtx, step));
+        }
       }
     }
     this.queue.unshift(...callbacks);
@@ -3299,7 +3311,7 @@ export class RuntimeSession {
     this.refreshScores();
     if (wasRevealed) this.queueLocationConditionCheck(atNode);
     if (wasRevealed && zone === "destroyed") this.queueLocationEvent("cardDestroyed", atNode, victim, victimCard);
-    return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${target.card.name}.` : `${source.card.name}: ${target.card.name} is removed from the game.`, { ...detail, ...(kept && zone === "trash" ? { target: "trash" as const } : {}), amount: 1 });
+    return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${target.card.name}.` : `${source.card.name}: ${target.card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
   }
 
   /** Heal raises a weakened card toward printed Power and never above it; with no amount

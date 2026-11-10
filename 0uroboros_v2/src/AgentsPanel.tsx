@@ -224,12 +224,17 @@ export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: b
       {details&&<Fold title='Status'><dl>
         <dt>Record</dt><dd>{stratG.record.aiWins}–{stratG.record.humanWins}–{stratG.record.ties} over {stratG.record.games}</dd>
         <dt>League</dt><dd>{leagueLine(status, 'strat-g')}</dd>
+        <dt>Human tempo</dt><dd>{status.humanTempo
+          ? `Watching you vs VP-Dog · ${status.humanTempo.games} game${status.humanTempo.games === 1 ? '' : 's'}${status.humanTempo.applied ? ' · soft coaching on' : status.humanTempo.games < status.humanTempo.minGames ? ` · needs ${status.humanTempo.minGames}` : ''}`
+          : '—'}</dd>
         <dt>Theories</dt><dd>{stratG.activeTheories} active</dd>
         <dt>Experiment</dt><dd>{stratG.experiment ? `${stratG.experiment.id} (${stratG.experiment.stage}): ${stratG.experiment.change}` : 'none running'}</dd>
         <dt>Learned</dt><dd>{stratG.adoptedChanges ?? 0} adopted of {stratG.experimentsConcluded ?? 0} tested{stratG.ignoredGames ? ` · ${stratG.ignoredGames} non-games ignored` : ''}</dd>
         <dt>Model</dt><dd>{stratG.modelConfigured ? stratG.model : 'not configured'}</dd>
         <dt>Notebook</dt><dd><code>{stratG.paths.notebook}</code></dd>
       </dl></Fold>}
+      {status.humanTempo?.planBlurb && <p className='agents-note'>{status.humanTempo.planBlurb}</p>}
+      {status.humanTempo?.error && <p className='agents-error'>{status.humanTempo.error}</p>}
       {stratG.error&&<p className='agents-error'>{stratG.error}</p>}
     </section>
     : isAdversary(tab) ? (() => {

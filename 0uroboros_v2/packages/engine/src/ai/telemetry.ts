@@ -27,6 +27,22 @@ export type GameTelemetry = {
   /** Restores that found no damaged Server, or healed nothing. */
   wastedRestores: Pair; restoreEvents: Pair; drainEvents: Pair;
   drawn: Pair; actionsGained: Pair; cryptoGained: Pair; vpGained: Pair;
+  /**
+   * Positive lasting Power added to a seat's cards (changePower / location boosts / steals).
+   * Heal/restore toward printed, Node push/pull, holograms, and mod attach/remove are excluded.
+   */
+  powerIncreased: Pair;
+  /**
+   * Power this seat removed from the opponent's cards (negative lasting changePower / location
+   * Power-downs targeting the enemy). Self-hits and heal/restore are excluded.
+   */
+  cardPowerDrained: Pair;
+  /** Card Power restored toward printed (healCard / restoreCard). */
+  cardPowerRestored: Pair;
+  /** Cards this seat trashed into the shared Trash (effect actor). */
+  cardsTrashed: Pair;
+  /** Cards this seat destroyed into a destroyed pile (effect actor; not Server kills). */
+  cardsDestroyed: Pair;
   destructions: Destruction[];
   cards: Record<string, CardTelemetry>;
   locations: Record<string, SourceTelemetry>;
@@ -47,6 +63,8 @@ export function emptyTelemetry(): GameTelemetry {
     drainBySource: { card: pair(), location: pair(), circuit: pair(), runtimeHack: pair() }, restoreBySource: { card: pair(), location: pair(), circuit: pair(), runtimeHack: pair() },
     wastedRestores: pair(), restoreEvents: pair(), drainEvents: pair(),
     drawn: pair(), actionsGained: pair(), cryptoGained: pair(), vpGained: pair(),
+    powerIncreased: pair(), cardPowerDrained: pair(), cardPowerRestored: pair(),
+    cardsTrashed: pair(), cardsDestroyed: pair(),
     destructions: [], cards: {}, locations: {}, circuit: {}, perCycle: [],
     failedOutcomes: pair(), randomResults: 0, choices: pair(),
   };
@@ -105,6 +123,31 @@ export class TelemetryCollector {
       case "actions": data.actionsGained[beneficiary] += amount; this.attribute(event, "actions", beneficiary, amount); return;
       case "crypto": data.cryptoGained[beneficiary] += amount; this.attribute(event, "crypto", beneficiary, amount); return;
       case "vp": data.vpGained[beneficiary] += amount; this.attribute(event, "vp", beneficiary, amount); return;
+      case "power": {
+        // Event amounts are signed (after − before); `amount` above is clamped nonnegative.
+        const signed = event.amount ?? 0;
+        const magnitude = Math.abs(signed);
+        // Card heal / restore toward printed — separate from lasting buffs.
+        if (/: heal |: restore /.test(event.text)) {
+          if (magnitude > 0) data.cardPowerRestored[(event.targetOwner ?? owner) as PlayerId] += magnitude;
+          return;
+        }
+        if (/push |pull |hologram|attach |remove /.test(event.text)) return;
+        if (signed > 0 && event.targetOwner !== undefined) data.powerIncreased[event.targetOwner as PlayerId] += signed;
+        // Power removed from the opponent's cards credits the effect actor.
+        if (signed < 0 && event.targetOwner !== undefined && event.targetOwner !== owner) {
+          data.cardPowerDrained[owner] += magnitude;
+        }
+        const stolen = /steals (\d+)/.exec(event.text);
+        if (stolen) data.powerIncreased[owner] += Number(stolen[1]);
+        return;
+      }
+      case "trash": {
+        if (!amount) return;
+        if (event.target === "destroyed" || /\bdestroys?\b/.test(event.text)) data.cardsDestroyed[owner] += amount;
+        else if (event.target === "trash" || /\btrashes?\b|shared Trash|mill /.test(event.text)) data.cardsTrashed[owner] += amount;
+        return;
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_COPIES_PER_PLAYER, DRAFT_CRYPTO_OFFER_MIN, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_SLOTS, DRAFT_SLOTS_TEN, cardGainsCryptoAtLeast, chaosClassOf, createStrategicMarket, draftOffer, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_COPIES_PER_PLAYER, DRAFT_CRYPTO_OFFER_MIN, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_LATE_COST_BIAS_FROM, DRAFT_LATE_COST_BIAS_HEAVY_FROM, DRAFT_LATE_COST_THRESHOLD, DRAFT_LATE_COST_WEIGHT, DRAFT_LATE_COST_WEIGHT_HEAVY, DRAFT_SLOTS, DRAFT_SLOTS_TEN, cardGainsCryptoAtLeast, chaosClassOf, createStrategicMarket, draftOffer, draftSlotPickWeight, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
 import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
 import { bundledContent } from "../src/contentPack/contentStore";
@@ -91,6 +91,47 @@ describe("Strategic evaluation Draft", () => {
     }
     expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Veil of Cthulhu")!)).toBe("Horror");
     expect(chaosClassOf(EVALUATION_CHAOS_CARDS.find(card => card.name === "Nyx Luna")!)).toBe("Attack");
+  });
+
+  it("weights high-cost Attack and Horror picks from Cycle 8 (+40%, +60% from Cycle 12)", () => {
+    const attack = { id: "attack", label: "Attack" };
+    const horror = { id: "horror", label: "Horror" };
+    const cheap = { cost: DRAFT_LATE_COST_THRESHOLD } as Card;
+    const pricey = { cost: DRAFT_LATE_COST_THRESHOLD + 1 } as Card;
+    expect(draftSlotPickWeight(attack, pricey, 7)).toBe(1);
+    expect(draftSlotPickWeight(attack, cheap, 8)).toBe(1);
+    expect(draftSlotPickWeight(attack, pricey, 8)).toBe(DRAFT_LATE_COST_WEIGHT);
+    expect(draftSlotPickWeight(horror, pricey, 11)).toBe(DRAFT_LATE_COST_WEIGHT);
+    expect(draftSlotPickWeight(horror, pricey, DRAFT_LATE_COST_BIAS_HEAVY_FROM)).toBe(DRAFT_LATE_COST_WEIGHT_HEAVY);
+    expect(draftSlotPickWeight(horror, pricey, 16)).toBe(DRAFT_LATE_COST_WEIGHT_HEAVY);
+    expect(draftSlotPickWeight({ id: "chaos-1", label: "Chaos" }, pricey, 14)).toBe(1);
+
+    const attackPool = EVALUATION_CHAOS_CARDS.filter(card => chaosClassOf(card) === "Attack");
+    const horrorPool = EVALUATION_CHAOS_CARDS.filter(card => chaosClassOf(card) === "Horror");
+    expect(attackPool.some(card => card.cost > DRAFT_LATE_COST_THRESHOLD)).toBe(true);
+    expect(horrorPool.some(card => card.cost > DRAFT_LATE_COST_THRESHOLD)).toBe(true);
+
+    const rate = (cycle: number, which: "Attack" | "Horror") => {
+      let high = 0, total = 0;
+      for (let seed = 1; seed <= 240; seed++) {
+        const offer = draftOffer(seededRandom(seed * 97 + cycle), bundledContent, new Set(), new Set(), cycle);
+        const pile = which === "Attack" ? offer[4] : offer[5];
+        total++;
+        if (pile.card.cost > DRAFT_LATE_COST_THRESHOLD) high++;
+      }
+      return high / total;
+    };
+    const earlyAttack = rate(5, "Attack");
+    const midAttack = rate(DRAFT_LATE_COST_BIAS_FROM, "Attack");
+    const lateAttack = rate(14, "Attack");
+    const earlyHorror = rate(5, "Horror");
+    const midHorror = rate(DRAFT_LATE_COST_BIAS_FROM, "Horror");
+    const lateHorror = rate(14, "Horror");
+    // Uniform midgame (Cycle 5) vs weighted late: high-cost share should rise once the bias starts.
+    expect(midAttack).toBeGreaterThan(earlyAttack);
+    expect(lateAttack).toBeGreaterThan(earlyAttack);
+    expect(midHorror).toBeGreaterThan(earlyHorror);
+    expect(lateHorror).toBeGreaterThan(earlyHorror);
   });
 
   it("enforces every Draft slot rule round-by-round across early and late Cycles", () => {

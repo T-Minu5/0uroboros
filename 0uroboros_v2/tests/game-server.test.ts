@@ -256,9 +256,10 @@ describe("game server rooms", () => {
     answerChoices(room, [a, b]);
     expect(room.session!.state.turn).toBe(2);
     expect(room.commands.some(c => c.command.type === "system" && c.command.action === "autoEndTurn")).toBe(true);
-    // Bo's second silent turn counts 1.25x faster, from the moment the first one expired.
+    // Bo's second silent turn counts 1.25x faster (30s / 1.25 = 24s from when it armed).
     const timers = b.ofType("timers").at(-1)!.timers;
-    expect(timers.turnEndsAt! - firstEndsAt).toBe(24_000);
+    expect(timers.turnEndsAt! - scheduler.now()).toBe(24_000);
+    expect(timers.turnEndsAt! - firstEndsAt).toBeGreaterThanOrEqual(24_000);
     placeOne(room, 0, a);
     command(room, 0, { type: "endTurn" });
     scheduler.advance(24_100);
@@ -432,8 +433,10 @@ describe("game server over WebSocket", () => {
     }));
     expect(server.lobby.rooms.size).toBe(50);
     await Promise.all(pairs.map(async ({ a, b }, i) => {
-      const card = a.view!.players[0].hand.find(c => c.type !== "Crypto")!;
-      a.send({ type: "command", requestId: `d${i}`, command: { type: "deploy", cardId: card.id, node: a.view!.openNodes[0] } });
+      const hand = a.view!.players[0].hand;
+      const card = hand.find(c => c.type !== "Crypto") ?? hand[0];
+      expect(card, `room ${i} opening hand`).toBeTruthy();
+      a.send({ type: "command", requestId: `d${i}`, command: { type: "deploy", cardId: card!.id, node: a.view!.openNodes[0] } });
       const ack = await a.until<Extract<ServerMessage, { type: "ack" }>>(m => m.type === "ack");
       expect(ack.ok).toBe(true);
       // B sees the placement once both have committed and the reveal begins.

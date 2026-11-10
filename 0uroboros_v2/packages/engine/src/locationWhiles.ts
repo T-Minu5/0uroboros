@@ -1,4 +1,4 @@
-import type { Deployment } from './game';
+import type { Deployment, PlayerId } from './game';
 import type { EffectStep } from './effects/types';
 
 /** Continuous Location rules that hold while a board formula is true. */
@@ -10,12 +10,12 @@ export type LocationWhile = {
   kind: LocationWhileKind;
   /**
    * Live Power added to the qualifying card(s) while the while holds.
-   * soloCard: the single revealed card at this Node.
+   * soloCard: each seat's lone revealed card at this Node (per seat, not Node-total).
    */
   powerBonus?: number;
   /**
    * Effects that resolve with Location Ongoing cadence while the while holds.
-   * Beneficiary = owner of the qualifying card (soloCard).
+   * Beneficiary = that seat (soloCard: owner of their lone card).
    */
   effects?: EffectStep[];
 };
@@ -23,7 +23,7 @@ export type LocationWhile = {
 export const LOCATION_WHILE_KINDS: readonly LocationWhileKind[] = ['soloCard'];
 
 export const WHILE_KIND_LABELS: Record<LocationWhileKind, string> = {
-  soloCard: 'Only one card here',
+  soloCard: 'You have only 1 card here',
 };
 
 /** Revealed placements currently on the Node (both seats). */
@@ -31,15 +31,20 @@ export function revealedAtNode(placements: readonly Deployment[]): Deployment[] 
   return placements.filter(placement => placement.revealed);
 }
 
-/** Does this while currently hold for the Node's revealed cards? */
-export function meetsLocationWhile(entry: LocationWhile, revealed: readonly Deployment[]): boolean {
+/** Revealed cards at the Node belonging to one seat. */
+export function revealedForOwner(revealed: readonly Deployment[], owner: PlayerId): Deployment[] {
+  return revealed.filter(placement => placement.owner === owner);
+}
+
+/** Does this while currently hold for one seat's revealed cards at the Node? */
+export function meetsLocationWhile(entry: LocationWhile, revealed: readonly Deployment[], owner: PlayerId): boolean {
   switch (entry.kind) {
     case 'soloCard':
-      return revealed.length === 1;
+      return revealedForOwner(revealed, owner).length === 1;
   }
 }
 
-/** Live Power bonus for a placement from matching whiles on this Node. */
+/** Live Power bonus for a placement from matching whiles on this Node (per-seat solo). */
 export function whilePowerBonus(
   whiles: readonly LocationWhile[] | undefined,
   revealed: readonly Deployment[],
@@ -48,9 +53,10 @@ export function whilePowerBonus(
   if (!whiles?.length || !placement.revealed) return 0;
   let bonus = 0;
   for (const entry of whiles) {
-    if (!entry.powerBonus || !meetsLocationWhile(entry, revealed)) continue;
-    if (entry.kind === 'soloCard' && revealed.length === 1 && revealed[0]!.card.id === placement.card.id) {
-      bonus += entry.powerBonus;
+    if (!entry.powerBonus || !meetsLocationWhile(entry, revealed, placement.owner)) continue;
+    if (entry.kind === 'soloCard') {
+      const mine = revealedForOwner(revealed, placement.owner);
+      if (mine.length === 1 && mine[0]!.card.id === placement.card.id) bonus += entry.powerBonus;
     }
   }
   return bonus;
@@ -60,7 +66,7 @@ export function whilePowerBonus(
 export function describeWhilePredicate(entry: LocationWhile): string {
   switch (entry.kind) {
     case 'soloCard':
-      return 'only one card is here';
+      return 'While you have only 1 card here';
   }
 }
 

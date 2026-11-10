@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from '@0uroboros/engine/runtime';
 import { starterCards, type Card, type Deployment } from '@0uroboros/engine/game';
-import { describeLocation, describeWhileEntry } from '@0uroboros/engine/effects/catalog';
+import { describeLocation, describeStep, describeWhileEntry, validateSteps, type ValidationCards } from '@0uroboros/engine/effects/catalog';
 import { createLocationWhile, meetsLocationWhile, revealedAtNode, whilePowerBonus } from '@0uroboros/engine/locationWhiles';
 import type { LocationWhile } from '@0uroboros/engine/locationWhiles';
 import type { LocationEvent } from '@0uroboros/engine/locationEvents';
@@ -75,54 +75,98 @@ function place(game: RuntimeSession, owner: 0 | 1, entry: Card, revealed = true,
 }
 
 describe('location while formulas', () => {
-  it('prints While: lines for solo Power and draw', () => {
+  it('prints Ongoing: While lines for per-seat solo Power and draw', () => {
     const power = createLocationWhile('soloCard');
     power.powerBonus = 5;
     delete power.effects;
-    expect(describeWhileEntry(power)).toBe('While: only one card is here, +5 Power.');
+    expect(describeWhileEntry(power)).toBe('Ongoing: While you have only 1 card here, +5 Power.');
     const draw: LocationWhile = {
       id: 'w', kind: 'soloCard',
       effects: [{ action: 'draw', amount: 1, target: { type: 'player', who: 'self' } }],
     };
-    expect(describeWhileEntry(draw)).toMatch(/While: only one card is here, \+1 Card/i);
-    expect(describeLocation({ effects: [], whiles: [power] })).toContain('While: only one card is here, +5 Power');
+    expect(describeWhileEntry(draw)).toMatch(/Ongoing: While you have only 1 card here, \+1 Card/i);
+    expect(describeLocation({ effects: [], whiles: [power] })).toContain('Ongoing: While you have only 1 card here, +5 Power');
   });
 
-  it('awards live Power only while exactly one revealed card is on the Node', () => {
+  it('awards live Power per seat with exactly one revealed card (1–1 both qualify)', () => {
     const entry: LocationWhile = { id: 'w', kind: 'soloCard', powerBonus: 5 };
     const game = baseSession({ whiles: [entry] });
     const lone = place(game, 0, card('lone'));
     const recalc = () => (game as unknown as { recalculate: () => void }).recalculate();
     recalc();
     expect(game.state.nodes[0].powers[0]).toBe(7); // 2 printed + 5 while
-    place(game, 1, card('rival'));
+    expect(whilePowerBonus([entry], revealedAtNode(game.state.nodes[0].cards.flat()), lone)).toBe(5);
+
+    const rival = place(game, 1, card('rival'));
     recalc();
-    expect(game.state.nodes[0].powers[0]).toBe(2);
+    // 1–1: both seats still qualify independently
+    expect(game.state.nodes[0].powers[0]).toBe(7);
+    expect(game.state.nodes[0].powers[1]).toBe(7);
+    expect(whilePowerBonus([entry], revealedAtNode(game.state.nodes[0].cards.flat()), lone)).toBe(5);
+    expect(whilePowerBonus([entry], revealedAtNode(game.state.nodes[0].cards.flat()), rival)).toBe(5);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 0)).toBe(true);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 1)).toBe(true);
+
+    place(game, 0, card('second'));
+    recalc();
+    // Seat 0 now has 2; only seat 1 keeps the bonus
+    expect(game.state.nodes[0].powers[0]).toBe(4); // 2+2 printed, no while
+    expect(game.state.nodes[0].powers[1]).toBe(7);
     expect(whilePowerBonus([entry], revealedAtNode(game.state.nodes[0].cards.flat()), lone)).toBe(0);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 0)).toBe(false);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 1)).toBe(true);
   });
 
-  it('fires While effects with Ongoing cadence for the solo card’s owner', () => {
+  it('fires While effects once per qualifying seat with Ongoing cadence', () => {
     const entry: LocationWhile = {
       id: 'w', kind: 'soloCard',
-      effects: [{ action: 'draw', amount: 1, target: { type: 'player', who: 'self' } }],
+      effects: [{ action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } }],
     };
     const game = baseSession({ whiles: [entry] });
-    place(game, 0, card('solo'));
-    const before = game.state.players[0].hand.length + game.state.players[0].draw.length;
-    // Ongoing is queued after reveals; inject by finishing a deploy cycle
-    const mover = card('mover', {
-      onReveal: [{ action: 'moveCard', target: { type: 'card', who: 'self', where: 'board', relation: 'self' }, optional: true }],
-    });
-    // Simpler: call enqueue via end of reveal by playing a card on another node then checking
+    place(game, 0, card('solo-a'));
+    place(game, 1, card('solo-b'));
     game.state.players[0].hand = [card('spark')];
     game.deploy(game.state.players[0].hand[0]!.id, 1);
     game.endTurn(0);
     game.endTurn(1);
     finishAll(game);
-    const after = game.state.players[0].hand.length + game.state.players[0].draw.length;
-    // Solo still on node 0; ongoing should have drawn for seat 0
-    expect(after).toBeGreaterThanOrEqual(before);
-    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()))).toBe(true);
+    expect(game.state.players[0].wallet).toBeGreaterThanOrEqual(1);
+    expect(game.state.players[1].wallet).toBeGreaterThanOrEqual(1);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 0)).toBe(true);
+    expect(meetsLocationWhile(entry, revealedAtNode(game.state.nodes[0].cards.flat()), 1)).toBe(true);
+  });
+});
+
+describe('gainCard filter describe/validate', () => {
+  it('describes random Utility filter gains and validates filter + maxCost', () => {
+    const step: EffectStep = {
+      action: 'gainCard',
+      amount: 1,
+      filter: { cardClass: 'Utility' },
+      maxCost: 3,
+      selection: 'random',
+      target: { type: 'zone', who: 'winner', zone: 'hand' },
+    };
+    expect(describeStep(step, 'location')).toMatch(/Gain a random Utility card costing 3 or less in the winning player's hand/i);
+
+    const validation: ValidationCards = { enabledIds: new Set(['alpha']), types: new Map([['alpha', 'Character']]) };
+    const errors: string[] = [];
+    validateSteps([step], 'steps', 'location', validation, errors);
+    expect(errors).toEqual([]);
+
+    const namedCleared: EffectStep = {
+      action: 'gainCard',
+      amount: 1,
+      filter: { cardClass: 'Utility' },
+      maxCost: 3,
+      selection: 'random',
+      cardId: undefined,
+      cardIds: undefined,
+      target: { type: 'zone', who: 'winner', zone: 'hand' },
+    };
+    const more: string[] = [];
+    validateSteps([namedCleared], 'steps', 'location', validation, more);
+    expect(more).toEqual([]);
   });
 });
 
@@ -140,14 +184,12 @@ describe('location event This card', () => {
     const game = baseSession({ events });
     const host = place(game, 0, card('traveler'));
     place(game, 0, card('anchor'), true, 1);
-    // Force a move via runtime private through moveCard effect
     const mover = card('pusher', {
       onReveal: [{
         action: 'moveCard',
         target: { type: 'card', who: 'self', where: 'board', relation: 'previous' },
       }],
     });
-    // Place traveler on node 1, then move to node 0 via direct placement move
     game.state.nodes[0].cards[0] = [];
     const traveler = place(game, 0, card('traveler-2'), true, 1);
     const source = place(game, 0, mover, true, 1);

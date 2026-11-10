@@ -133,12 +133,15 @@ describe('random gainCard draft eligibility', () => {
   });
 
   it('explicit random cardIds pools keep Generated entries', () => {
-    const { game } = gainSession();
+    const { pack, game } = gainSession();
+    const quark = pack.cards.find(card => card.name === 'Quark' && card.generated);
+    expect(quark).toBeTruthy();
+    const quarkId = quark!.definitionId ?? quark!.id;
     game.state.players[0].hand = [{
       id: 'picker', name: 'Picker', type: 'Character', power: 1, cost: 0, art: '/x.png', effect: 'Random.',
       onReveal: [{
         action: 'gainCard', amount: 12, selection: 'random',
-        cardIds: ['crypto-shyte', 'shyte-coin'],
+        cardIds: ['crypto-shyte', quarkId],
         target: { type: 'zone', who: 'self', zone: 'hand' },
       }],
     }];
@@ -148,7 +151,7 @@ describe('random gainCard draft eligibility', () => {
     const gained = game.state.players[0].hand;
     expect(gained).toHaveLength(12);
     expect(gained.some(card => card.definitionId === 'crypto-shyte')).toBe(true);
-    expect(gained.some(card => card.definitionId === 'shyte-coin')).toBe(true);
+    expect(gained.some(card => (card.definitionId ?? card.id) === quarkId)).toBe(true);
   });
 
   it('Glitch-Witch still seeds a Generated Glitch into the enemy Discard', () => {
@@ -193,9 +196,9 @@ describe('random gainCard draft eligibility', () => {
 });
 
 describe('Currency Crypto playable', () => {
-  it('deploys Shyte-Coin free and pays cryptoValue on reveal', () => {
+  it('deploys Crypto-Shyte free and pays crypto on reveal', () => {
     const pack = compileContent(document);
-    const coin = pack.cards.find(card => (card.definitionId ?? card.id) === 'shyte-coin')!;
+    const coin = pack.cards.find(card => (card.definitionId ?? card.id) === 'crypto-shyte')!;
     expect(canDeploy(coin, 1, 0, 0)).toBeNull();
     expect(isPlayableCrypto(coin)).toBe(true);
 
@@ -210,7 +213,7 @@ describe('Currency Crypto playable', () => {
     expect(game.deploy(token.id, 0)).toMatchObject({ kind: 'deploy' });
     game.endTurn();
     finish(game);
-    expect(game.state.players[0].wallet).toBe(coin.cryptoValue ?? 0);
+    expect(game.state.players[0].wallet).toBe(1);
     expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'coin-play' && entry.revealed)).toBe(true);
   });
 });

@@ -299,19 +299,11 @@ from). For the full setup it's `wss://api.yourdomain.com`.
 - **Health check:** `/healthz` answers with the protocol version and how many tables and players are connected.
 - **Logs:** one line of JSON per event. Under systemd: `journalctl -u 0uroboros`.
 
-### Does it matter that this is a VPS rather than Cloudflare or Fly?
+### Hosting model
 
-No. The earlier plan named Fly.io for the server and Cloudflare Pages for the website; one VPS with nginx does both
-jobs. What's different:
-
-- `site/_headers` (caching rules) is only read by Cloudflare and Netlify. The nginx config in Part 5 contains the same
-  rules.
-- `deploy/fly.toml`, `deploy/Dockerfile`, and the GitHub workflows `deploy-server.yml` and `deploy-site.yml` are for
-  Fly and Cloudflare. Without their secrets they deploy nothing (their runs just fail on GitHub). Delete or adapt them
-  later.
-- There's no CDN (a worldwide network of copies that makes downloads faster far away). Players download art and video
-  straight from the VPS, which is fine for playtests. You can put Cloudflare's free service in front of the domain
-  later without changing the game.
+One Hostinger VPS with nginx serves the website and proxies (or exposes) the game server. Players download art and
+video straight from the VPS. `deploy/hostinger-up.sh` is the one-shot upload for the quick playtest path; Part 6 is
+the repeatable release checklist.
 
 ---
 

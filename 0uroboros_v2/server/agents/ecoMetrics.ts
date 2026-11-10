@@ -41,6 +41,96 @@ export const enemyServersDestroyed = (m: Pick<GameMetrics, 'destructions'>, seat
 const UNRECORDED_DESTRUCTION_VP = { primary: 4, backup: 8 };
 export type Archetype = 'economy' | 'aggression' | 'vp' | 'board' | 'balanced' | 'idle';
 
+/** Hypothetical end-game achievement VP (matches Configure mostCircuitsBonusVP default). */
+export const ACHIEVEMENT_VP = 6;
+/** Cap on achievement recommendations Eco may emit in a report (full slate still gets stats). */
+export const MAX_ACHIEVEMENT_RECOMMENDATIONS = 3;
+
+export type AchievementId =
+  | 'most-circuits'
+  | 'most-trashed'
+  | 'most-destroyed'
+  | 'most-power-added'
+  | 'most-card-power-drained'
+  | 'most-card-power-restored'
+  | 'most-server-repaired';
+
+export type AchievementDef = {
+  id: AchievementId;
+  award: string;
+  shipped: boolean;
+  metricOf: (m: AchievementMetricSource) => Pair;
+};
+
+/** Fields the slate reads; a full GameMetrics or a draft without `achievements` both work. */
+export type AchievementMetricSource = {
+  circuitWins: Pair;
+  cardsTrashed: Pair;
+  cardsDestroyed: Pair;
+  powerIncreased: Pair;
+  cardPowerDrained: Pair;
+  cardPowerRestored: Pair;
+  restore: Pair;
+  winner: Seat | null;
+  endedBy: EndedBy;
+  finalVP: Pair;
+  vpMargin: number;
+};
+
+/** Strict leader: ties (including 0–0) award nobody. */
+export function achievementLeader(values: Pair): Seat | null {
+  return values[0] === values[1] ? null : values[0] > values[1] ? 0 : 1;
+}
+
+export type GameAchievementHit = {
+  id: AchievementId;
+  award: string;
+  shipped: boolean;
+  values: Pair;
+  leader: Seat | null;
+  gap: number;
+  /** Only set on destruction endings with a game winner and a metric leader. */
+  helpsDestructionLoser: boolean | null;
+  helpsDestructionWinner: boolean | null;
+  /** VP margin after hypothetically giving ACHIEVEMENT_VP to the leader (null if no leader). */
+  marginIfAwarded: number | null;
+  marginDeltaIfAwarded: number | null;
+};
+
+export const ACHIEVEMENT_SLATE: AchievementDef[] = [
+  { id: 'most-circuits', award: 'Most Circuits won', shipped: true, metricOf: m => m.circuitWins },
+  { id: 'most-trashed', award: 'Most cards trashed', shipped: false, metricOf: m => m.cardsTrashed },
+  { id: 'most-destroyed', award: 'Most cards destroyed', shipped: false, metricOf: m => m.cardsDestroyed },
+  { id: 'most-power-added', award: 'Most lasting Power added to own cards', shipped: false, metricOf: m => m.powerIncreased },
+  { id: 'most-card-power-drained', award: 'Most Power removed from enemy cards', shipped: false, metricOf: m => m.cardPowerDrained },
+  { id: 'most-card-power-restored', award: 'Most card Power restored/healed', shipped: false, metricOf: m => m.cardPowerRestored },
+  { id: 'most-server-repaired', award: 'Most Server repaired', shipped: false, metricOf: m => m.restore },
+];
+
+export function gameAchievementHits(m: AchievementMetricSource): GameAchievementHit[] {
+  const destructionLoser = m.endedBy === 'destruction' && m.winner !== null ? (1 - m.winner) as Seat : null;
+  const destructionWinner = m.endedBy === 'destruction' && m.winner !== null ? m.winner : null;
+  return ACHIEVEMENT_SLATE.map(def => {
+    const values = def.metricOf(m);
+    const leader = achievementLeader(values);
+    const gap = Math.abs(values[0] - values[1]);
+    let marginIfAwarded: number | null = null;
+    let marginDeltaIfAwarded: number | null = null;
+    if (leader !== null) {
+      const awarded: Pair = [m.finalVP[0], m.finalVP[1]];
+      awarded[leader] += ACHIEVEMENT_VP;
+      marginIfAwarded = Math.abs(awarded[0] - awarded[1]);
+      marginDeltaIfAwarded = marginIfAwarded - m.vpMargin;
+    }
+    return {
+      id: def.id, award: def.award, shipped: def.shipped, values, leader, gap,
+      helpsDestructionLoser: destructionLoser === null || leader === null ? null : leader === destructionLoser,
+      helpsDestructionWinner: destructionWinner === null || leader === null ? null : leader === destructionWinner,
+      marginIfAwarded, marginDeltaIfAwarded,
+    };
+  });
+}
+
 export type GameMetrics = {
   winner: Seat | null; endedBy: EndedBy; cycles: number; finalVP: Pair; servers: Pair; vpMargin: number;
   destructionVP: Pair; firstDestructionCycle: number | null;
@@ -82,6 +172,31 @@ export type GameMetrics = {
   particleTied: number;
   /** How often each seat controlled the particle Node. */
   particleWins: Pair;
+  /**
+   * Particle Node vs that Cycle's Circuit winner (strict Location lead).
+   * `byCircuitWinner` / `byCircuitLoser` only count Cycles with a decisive Circuit;
+   * `controlledWhileCircuitTied` is a controlled particle while Locations were tied.
+   */
+  particleByCircuitWinner: number;
+  particleByCircuitLoser: number;
+  particleControlledWhileCircuitTied: number;
+  /** Positive lasting Power added to each seat's cards (from telemetry; 0 on older reports). */
+  powerIncreased: Pair;
+  /** Power this seat removed from the opponent's cards (0 on older reports). */
+  cardPowerDrained: Pair;
+  /** Card Power restored toward printed via heal/restore (0 on older reports). */
+  cardPowerRestored: Pair;
+  /** Reveal plays per seat (sum of card.plays). */
+  cardsPlayed: Pair;
+  /** Cards each seat trashed as the effect actor. */
+  cardsTrashed: Pair;
+  /** Cards each seat destroyed as the effect actor (not Server kills). */
+  cardsDestroyed: Pair;
+  /**
+   * End-game achievement VP slate for this game: strict leaders (ties / 0–0 → nobody).
+   * Observational only — Eco ranks candidates; Configure already ships most-Circuits.
+   */
+  achievements: GameAchievementHit[];
   /**
    * Per-cycle board state for snowball analysis. `circuitClaims` is cumulative through this Cycle;
    * `circuitDifferential` is seat0 − seat1 cumulative Circuit claims; `locationsWon` is that Cycle only.
@@ -193,7 +308,24 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const particleControlled = particleCycles.filter(cycle => cycle.particleWinner === 0 || cycle.particleWinner === 1).length;
   const particleTied = particleCycles.filter(cycle => cycle.particleWinner == null).length;
   const particleWins = pair(seat => particleCycles.filter(cycle => cycle.particleWinner === seat).length);
-  return {
+  const circuitWinnerOf = (cycle: (typeof report.cycles)[number]): Seat | null =>
+    cycle.locationsWon[0] === cycle.locationsWon[1] ? null : cycle.locationsWon[0] > cycle.locationsWon[1] ? 0 : 1;
+  let particleByCircuitWinner = 0, particleByCircuitLoser = 0, particleControlledWhileCircuitTied = 0;
+  for (const cycle of particleCycles) {
+    const circuitWinner = circuitWinnerOf(cycle);
+    const particleWinner = cycle.particleWinner === 0 || cycle.particleWinner === 1 ? cycle.particleWinner as Seat : null;
+    if (particleWinner === null) continue; // tied Node counted in particleTied
+    if (circuitWinner === null) particleControlledWhileCircuitTied++;
+    else if (particleWinner === circuitWinner) particleByCircuitWinner++;
+    else particleByCircuitLoser++;
+  }
+  const powerIncreased = t?.powerIncreased ?? [0, 0] as Pair;
+  const cardPowerDrained = t?.cardPowerDrained ?? [0, 0] as Pair;
+  const cardPowerRestored = t?.cardPowerRestored ?? [0, 0] as Pair;
+  const cardsPlayed = pair(seat => sum(cards.map(card => card.plays[seat])));
+  const cardsTrashed = t?.cardsTrashed ?? [0, 0] as Pair;
+  const cardsDestroyed = t?.cardsDestroyed ?? [0, 0] as Pair;
+  const draft: Omit<GameMetrics, 'achievements'> = {
     winner, endedBy: endedBy(report), cycles: report.cycle, finalVP: report.finalVP, servers: report.servers,
     vpMargin: Math.abs(report.finalVP[0] - report.finalVP[1]), destructionVP,
     firstDestructionCycle: destructions.length ? Math.min(...destructions.map(item => item.cycle)) : null, destructions,
@@ -216,6 +348,8 @@ export function gameMetrics(report: MatchReport): GameMetrics {
     circuitClaims: pair(seat => report.cycles.filter(cycle => cycle.circuit?.claimed.includes(seat)).length),
     circuitWins, mostCircuitsLeader, mostNodesLeader, mostCircuitsVsMostNodes,
     particleControlled, particleTied, particleWins,
+    particleByCircuitWinner, particleByCircuitLoser, particleControlledWhileCircuitTied,
+    powerIncreased, cardPowerDrained, cardPowerRestored, cardsPlayed, cardsTrashed, cardsDestroyed,
     timeline, marketVp, otherVp, finalScore, circuitLead2At,
     vpLeadChanges,
     vpLeaderAt: { '4': at(4) ? leader(at(4)!.vp) : null, '8': at(8) ? leader(at(8)!.vp) : null, '12': at(12) ? leader(at(12)!.vp) : null },
@@ -235,6 +369,7 @@ export function gameMetrics(report: MatchReport): GameMetrics {
       avgDeployOptions: round(mean(deploys.map(item => item.options))),
     },
   };
+  return { ...draft, achievements: gameAchievementHits(draft) };
 }
 
 export type CohortMetrics = ReturnType<typeof cohortMetrics>;
@@ -383,12 +518,88 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
         },
         mostCircuitsLeaderWonGame: winnerVs((m, seat) => m.circuitWins[seat]),
         mostNodesLeaderWonGame: winnerVs((m, seat) => m.locationsWon[seat]),
-        /** Collapse weight-lottery particle Node: controlled vs tied across games (UI particle, not Circuit eligibility). */
+        /** Collapse weight-lottery particle Node: controlled vs tied, and vs that Cycle's Circuit winner. */
         particle: {
           controlledPerGame: avg(m => m.particleControlled),
           tiedPerGame: avg(m => m.particleTied),
           winsPerSeat: [avg(m => m.particleWins[0]), avg(m => m.particleWins[1])] as Pair,
+          /** Particle Node owned by that Cycle's Circuit winner / loser / tied Node / controlled while Circuit tied. */
+          vsCircuit: {
+            byWinnerPerGame: avg(m => m.particleByCircuitWinner),
+            byLoserPerGame: avg(m => m.particleByCircuitLoser),
+            tiedNodePerGame: avg(m => m.particleTied),
+            controlledWhileCircuitTiedPerGame: avg(m => m.particleControlledWhileCircuitTied),
+          },
         },
+      };
+    })(),
+    /**
+     * Winner vs loser on lasting Power buffs, Crypto generated, cards played, and trash/destroy volume.
+     * Rates are among decisive games where the two seats differ on that metric.
+     */
+    winnerProfile: {
+      avgPowerIncreased: perSeatAvg((m, seat) => m.powerIncreased[seat]),
+      avgCryptoGained: perSeatAvg((m, seat) => m.economy.cryptoGained[seat]),
+      avgCardsPlayed: perSeatAvg((m, seat) => m.cardsPlayed[seat]),
+      avgCardsTrashed: perSeatAvg((m, seat) => m.cardsTrashed[seat]),
+      avgCardsDestroyed: perSeatAvg((m, seat) => m.cardsDestroyed[seat]),
+      winnerPowerIncreasedMore: winnerVs((m, seat) => m.powerIncreased[seat]),
+      winnerCryptoGainedMore: winnerVs((m, seat) => m.economy.cryptoGained[seat]),
+      winnerPlayedMoreCards: winnerVs((m, seat) => m.cardsPlayed[seat]),
+      winnerTrashedMore: winnerVs((m, seat) => m.cardsTrashed[seat]),
+      winnerDestroyedMoreCards: winnerVs((m, seat) => m.cardsDestroyed[seat]),
+    },
+    /**
+     * End-game achievement VP slate (~7 Mel-seeded candidates). Rank primarily by how often the
+     * award would go to the game loser when the game ended by Server destruction. Observational —
+     * Eco proposes; Configure already ships mostCircuitsBonusVP (`most-circuits`).
+     */
+    achievements: (() => {
+      const slate = ACHIEVEMENT_SLATE.map(def => {
+        const hits = rows.map(row => row.m.achievements.find(item => item.id === def.id)!);
+        const decided = hits.filter(hit => hit.leader !== null);
+        const tied = hits.length - decided.length;
+        const destruction = hits.filter(hit => hit.helpsDestructionLoser !== null);
+        const destructionLoserHits = destruction.filter(hit => hit.helpsDestructionLoser === true).length;
+        const destructionWinnerHits = destruction.filter(hit => hit.helpsDestructionWinner === true).length;
+        const leaderWonGames = rows.filter(row => {
+          const hit = row.m.achievements.find(item => item.id === def.id)!;
+          return hit.leader !== null && row.m.winner !== null && hit.leader === row.m.winner;
+        }).length;
+        const leaderDecidedGames = rows.filter(row => {
+          const hit = row.m.achievements.find(item => item.id === def.id)!;
+          return hit.leader !== null && row.m.winner !== null;
+        }).length;
+        const margins = destruction.map(hit => hit.marginIfAwarded).filter((value): value is number => value !== null);
+        const deltas = destruction.map(hit => hit.marginDeltaIfAwarded).filter((value): value is number => value !== null);
+        return {
+          id: def.id,
+          award: def.award,
+          shipped: def.shipped,
+          games: hits.length,
+          decided: decided.length,
+          tied,
+          meanMetricGap: round(mean(hits.map(hit => hit.gap))),
+          destructionGamesWithLeader: destruction.length,
+          destructionLoserHits,
+          destructionWinnerHits,
+          destructionLoserHitRate: rate(destructionLoserHits, destruction.length),
+          destructionWinnerHitRate: rate(destructionWinnerHits, destruction.length),
+          leaderWonGameRate: rate(leaderWonGames, leaderDecidedGames),
+          meanMarginIfAwarded6: margins.length ? round(mean(margins)) : null,
+          meanMarginDeltaIfAwarded6: deltas.length ? round(mean(deltas)) : null,
+        };
+      });
+      const ranked = [...slate]
+        .filter(item => !item.shipped)
+        .sort((a, b) => (b.destructionLoserHitRate ?? -1) - (a.destructionLoserHitRate ?? -1)
+          || (a.destructionWinnerHitRate ?? 1) - (b.destructionWinnerHitRate ?? 1)
+          || b.decided - a.decided);
+      return {
+        vp: ACHIEVEMENT_VP,
+        slate,
+        /** Non-shipped ids ordered by destruction-loser hit rate (for Eco top-3 recommendations). */
+        topByDestructionLoserHit: ranked.slice(0, MAX_ACHIEVEMENT_RECOMMENDATIONS).map(item => item.id),
       };
     })(),
     vpSources: {

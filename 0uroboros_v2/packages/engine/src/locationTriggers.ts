@@ -8,7 +8,7 @@ export const LOCATION_TRIGGERS = {
  ongoing: {label: 'Ongoing'},
  startTurn: {label: 'Start of turn'},
  whileInPlay: {label: 'Condition'},
- whileActive: {label: 'While'},
+ whileActive: {label: 'Ongoing'},
  when: {label: 'When'},
 } as const satisfies Record<string, {label: string}>;
 export type LocationTrigger = keyof typeof LOCATION_TRIGGERS;

@@ -1,5 +1,5 @@
 {
-  "revision": 1013,
+  "revision": 1016,
   "document": {
     "version": 3,
     "cards": [
@@ -5859,7 +5859,7 @@
             "optional": true,
             "target": {
               "type": "card",
-              "who": "winner",
+              "who": "both",
               "where": "thisNode"
             },
             "pick": {
@@ -5879,7 +5879,7 @@
             "optional": true,
             "target": {
               "type": "card",
-              "who": "winner",
+              "who": "both",
               "where": "thisNode"
             },
             "pick": {
@@ -6076,7 +6076,8 @@
               "type": "zone",
               "who": "winner",
               "zone": "hand"
-            }
+            },
+            "selection": "random"
           }
         ],
         "events": [],
@@ -6184,15 +6185,15 @@
             ]
           }
         ],
-        "rule": "While: only one card is here, +1 Card.",
-        "reward": "While: only one card is here, +1 Card.",
+        "rule": "Ongoing: While you have only 1 card here, +1 Card.",
+        "reward": "Ongoing: While you have only 1 card here, +1 Card.",
         "effects": []
       },
       {
         "id": "location-vwtph6e4",
         "name": "Stand Alone",
-        "rule": "While: only one card is here, +5 Power.",
-        "reward": "While: only one card is here, +5 Power.",
+        "rule": "Ongoing: While you have only 1 card here, +5 Power.",
+        "reward": "Ongoing: While you have only 1 card here, +5 Power.",
         "enabled": false,
         "whiles": [
           {
@@ -7061,7 +7062,7 @@
         ]
       }
     ],
-    "activeStartingDeckId": "deck-nz9sfb0h",
+    "activeStartingDeckId": "deck-rd3wruoy",
     "mods": [
       {
         "id": "mod-r3emmf8z",

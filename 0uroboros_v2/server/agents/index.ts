@@ -15,6 +15,10 @@ import { createOnlineEvidence } from './onlineEvidence';
 import { createLeague, type LeagueMember } from './league';
 import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 import { coach, coachingTips, combineTips, createCoachingStore, withoutCoaching, type CoachingStore } from './coaching';
+import {
+  appendWatchedGame, buildHumanTempoStore, createHumanTempoStore, humanTempoNotebookSection, humanTempoStatus, humanTempoTips,
+  isWatchedHumanVsVpDog, withoutHumanTempo, type HumanTempoStore,
+} from './humanTempo';
 import { baselineTips, createMentoringStore, handOff, TIPS_PER_MENTOR, type MentoringStore } from './mentoring';
 import { DV_8, LAST_2GO, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from './roster';
 import { createSettingsStore, dv8Active, ecoStratActive, last2goActive, stratGActive, t5Active, vpDogActive } from './settings';
@@ -57,6 +61,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
   const loadSelfPlay = () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as never;
   const mentoringStore = createMentoringStore(resolve(cwd, 'ai-agents/league/mentoring.json'));
   const coachingStore = createCoachingStore(resolve(cwd, 'ai-agents/league/coaching.json'));
+  const humanTempoStore = createHumanTempoStore(resolve(cwd, 'ai-agents/league/human-tempo.json'));
   const recordDecisions = () => settings.read().stratG.recordDecisions;
   /** Every agent can play the human; each finished game goes out to Eco-Strat tagged with the agent that played it. */
   const publishHumanGame = (agent: string) => (record: StratGGameRecord) => {
@@ -68,9 +73,16 @@ export function createAgentSystem(options: AgentSystemOptions) {
       report: record.report as MatchReport, stratG: record.stratG,
     });
   };
+  /** Mentoring → coaching → human tempo last so watched Draft tempo wins contested fields. */
+  const stratGMentorTips = async () => combineTips(
+    baselineTips(await mentoringStore.read(), 'strat-g'),
+    coachingTips(await coachingStore.read()),
+    humanTempoTips(await humanTempoStore.read()),
+  );
   const strategist = createStrategist({
     root: stratGRoot, contentFile, identity: STRAT_G, league: true,
-    mentorTips: async () => combineTips(baselineTips(await mentoringStore.read(), 'strat-g'), coachingTips(await coachingStore.read())),
+    mentorTips: stratGMentorTips,
+    notebookExtra: async () => humanTempoNotebookSection(await humanTempoStore.read()),
     apiKey: strategistKey, model: env.AI_STRATEGIST_MODEL,
     enabled: () => stratGActive(settings.read()),
     loadSelfPlay, recordDecisions, onGameRecorded: publishHumanGame('strat-g'),
@@ -128,6 +140,37 @@ export function createAgentSystem(options: AgentSystemOptions) {
     settings: () => { const s = settings.read(); return { active: ecoStratActive(s), observeHumanGames: s.ecoStrat.observeHumanGames, continuous: s.ecoStrat.continuous, reportEvery: s.ecoStrat.reportEvery, baselineGames: s.ecoStrat.baselineGames }; },
   });
   bus.subscribe(evidence => eco.observe(evidence));
+
+  let humanTempo: { store: HumanTempoStore | null; error: string | null; applying: boolean } = { store: null, error: null, applying: false };
+  void humanTempoStore.read().then(store => { humanTempo.store = store; }).catch(() => undefined);
+
+  const tipFingerprint = (store: HumanTempoStore | null) => JSON.stringify(store ? { change: store.change, lines: store.lines, games: store.summary.games } : null);
+
+  /** Soft-coaches Strat-G from complete human-vs-VP-Dog Draft tempo; mentoring → coaching → human tempo. */
+  async function observeHumanTempo(evidence: Parameters<Parameters<typeof bus.subscribe>[0]>[0]) {
+    if (!isWatchedHumanVsVpDog(evidence)) return;
+    if (humanTempo.applying) return;
+    humanTempo = { ...humanTempo, applying: true, error: null };
+    try {
+      const previous = await humanTempoStore.read();
+      const games = appendWatchedGame(previous, evidence);
+      await strategist.start();
+      const start = withoutHumanTempo(strategist.memory().profile, previous);
+      const store = buildHumanTempoStore(games, start);
+      await humanTempoStore.write(store);
+      humanTempo.store = store;
+      // Tips-only refresh: a full reboot would askModel + schedule lab trials and stall the app after every game.
+      if (tipFingerprint(previous) !== tipFingerprint(store)) await strategist.refreshTips();
+      log(`human tempo: ${store.planBlurb}`);
+    } catch (error) {
+      humanTempo.error = error instanceof Error ? error.message : String(error);
+      log(`human tempo failed (gameplay unaffected): ${humanTempo.error}`);
+    } finally {
+      humanTempo = { ...humanTempo, applying: false };
+    }
+  }
+  bus.subscribe(evidence => { void observeHumanTempo(evidence); });
+
   // Hosted games reach Eco-Strat too, when the studio knows where the server is and holds its admin token.
   const online = env.OUROBOROS_EVIDENCE_URL && env.OUROBOROS_ADMIN_TOKEN
     ? createOnlineEvidence({ url: env.OUROBOROS_EVIDENCE_URL, adminToken: env.OUROBOROS_ADMIN_TOKEN, cursorFile: resolve(cwd, 'ai-agents/online-evidence.json'), publish: evidence => bus.publish(evidence), log: message => log(`online evidence ${message}`) })
@@ -241,7 +284,9 @@ export function createAgentSystem(options: AgentSystemOptions) {
     try {
       await Promise.all([strategist.start(), t5.start(), dv8.start(), vpDog.start()]);
       const competitors = ([[T_5, t5], [DV_8, dv8], [VP_DOG, vpDog]] as const).map(([identity, agent]) => ({ id: identity.id, name: identity.name, version: versionLabel(agent.memory().version), profile: agent.memory().profile }));
-      const store = coach(withoutCoaching(strategist.memory().profile, await coachingStore.read()), competitors, STRAT_G.envelope);
+      // Undo soft layers first so coaching never compounds with itself or human-tempo tips.
+      const start = withoutHumanTempo(withoutCoaching(strategist.memory().profile, await coachingStore.read()), await humanTempoStore.read());
+      const store = coach(start, competitors, STRAT_G.envelope);
       await coachingStore.write(store);
       coaching.store = store;
       await strategist.reboot();
@@ -278,6 +323,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
       league: league.status(),
       mentoring: { running: mentoring.running, error: mentoring.error, store: mentoring.store, file: rel(mentoringStore.file) },
       coaching: { running: coaching.running, error: coaching.error, store: coaching.store, file: rel(coachingStore.file), phases: STRAT_G_PHASES },
+      humanTempo: { ...humanTempoStatus(humanTempo.store), error: humanTempo.error, applying: humanTempo.applying, file: rel(humanTempoStore.file) },
       ecoStrat: eco.status(),
       cohort: { running: cohort.running, kind: cohort.kind, phase: cohort.phase, seedBase: cohort.seedBase, cohortId: cohort.cohortId, valid: cohort.valid, invalid: cohort.invalid, target: cohort.target, error: cohort.error },
       contentAb: {

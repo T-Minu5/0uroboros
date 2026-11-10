@@ -415,7 +415,7 @@ function LocationEditor({ item: location, cards, update, applyAdvanced, onPendin
       <StepList field="startTurn3" title="Start of turn 3" description="When Runtime turn 3 begins. A Location with these effects is only dealt as one of the first 4 revealed. Winner = current controller; Loser = the trailing player." scope="location" cards={asCards(cards)} steps={location.startTurn3 ?? []} onChange={startTurn3 => syncHooks({ startTurn3: startTurn3.length ? startTurn3 : undefined })} />
     </section>
     <section className="au-panel au-effects-panel">
-      <SectionTitle eyebrow="While" title="While" description="Continuous: holds a live Power bonus and/or fires with Ongoing cadence for as long as the formula is true. Solo = exactly one revealed card on this Node (either seat)." />
+      <SectionTitle eyebrow="While" title="While" description="Continuous Ongoing: live Power and/or effects while the formula holds. Solo = each seat that has exactly one of their cards here qualifies independently (1–1 both get it)." />
       {whiles.map((entry, index) => (
         <LocationWhileEditor
           key={entry.id}
@@ -593,14 +593,14 @@ function LocationWhileEditor({ index, entry, cards, onChange, onRemove }: {
         value={entry.powerBonus}
         min={1}
         onChange={powerBonus => onChange({ ...entry, powerBonus: powerBonus || undefined })}
-        hint="Live bonus on the solo card while the formula holds. Leave empty for none."
+        hint="Live bonus on each seat’s lone card while that seat has only one card here. Leave empty for none."
       />
       <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={onRemove}>Remove while {index + 1}</button>
     </div>
     <StepList
       field={`whiles.${index}`}
       title={`While ${index + 1} effects`}
-      description="Fire with Ongoing cadence while the formula holds. Beneficiary is the solo card’s owner. Target → This card is that card."
+      description="Ongoing: fires once per seat that qualifies (exactly one of their cards here). Beneficiary = that seat; Target → This card is their lone card."
       scope="locationEvent"
       cards={cards}
       steps={entry.effects ?? []}

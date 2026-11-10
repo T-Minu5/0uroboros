@@ -48,6 +48,19 @@ export const DRAFT_COPIES_PER_PLAYER=2;
 /** Cycles 1–4 only offer cards costing 1–7 Crypto. */
 export const DRAFT_EARLY_COST_MAX=7;
 export const DRAFT_EARLY_CYCLES=4;
+/**
+ * From this Cycle on, Attack and Horror slots weight cards costing above DRAFT_LATE_COST_THRESHOLD
+ * more heavily when filling the offer.
+ */
+export const DRAFT_LATE_COST_BIAS_FROM=8;
+/** Heavier cost bias for Attack/Horror from this Cycle through the end of the game. */
+export const DRAFT_LATE_COST_BIAS_HEAVY_FROM=12;
+/** Cost must be strictly above this to receive the late Attack/Horror weight. */
+export const DRAFT_LATE_COST_THRESHOLD=6;
+/** Relative pick weight for high-cost Attack/Horror in Cycles DRAFT_LATE_COST_BIAS_FROM..heavy−1 (+40%). */
+export const DRAFT_LATE_COST_WEIGHT=1.4;
+/** Relative pick weight for high-cost Attack/Horror in Cycles DRAFT_LATE_COST_BIAS_HEAVY_FROM+ (+60%). */
+export const DRAFT_LATE_COST_WEIGHT_HEAVY=1.6;
 /** Soft floor: at least this many offered cards must print +N Crypto with N ≥ this amount. */
 export const DRAFT_CRYPTO_GAIN_MIN=2;
 export const DRAFT_CRYPTO_OFFER_MIN=2;
@@ -66,6 +79,19 @@ export function createCryptoPiles(_content?:MarketContent):MarketPile[]{
 
 function pick<T>(items:readonly T[],count:number,random:RandomSource):T[]{
  const shuffled=[...items];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}return shuffled.slice(0,Math.max(0,count));
+}
+
+/** One draw from `items` with non-negative relative `weights` (same length). Falls back to uniform if weights sum to 0. */
+function pickWeightedOne<T>(items:readonly T[],weights:readonly number[],random:RandomSource):T|undefined{
+ if(!items.length)return undefined;
+ const total=weights.reduce((sum,weight)=>sum+Math.max(0,weight),0);
+ if(!(total>0))return pick(items,1,random)[0];
+ let roll=random()*total;
+ for(let i=0;i<items.length;i++){
+  roll-=Math.max(0,weights[i]??0);
+  if(roll<=0)return items[i];
+ }
+ return items[items.length-1];
 }
 
 function characterPool(content?:MarketContent){
@@ -156,11 +182,26 @@ export const DRAFT_SLOTS_MIDDLE:readonly DraftSlot[]=DRAFT_SLOTS;
 
 export const DRAFT_SLOT_SUMMARY=DRAFT_SLOTS.map(slot=>slot.label).join(' → ');
 export const DRAFT_SLOT_SUMMARY_TEN=DRAFT_SLOTS_TEN.map(slot=>slot.label).join(' → ');
-/** @deprecated Phase weighting removed; kept for any leftover imports. */
+/** @deprecated Prefer DRAFT_LATE_COST_* constants; kept for leftover imports. */
 export type DraftPhase={from:number;to:number;favours:string;share:number;matches:(entry:PoolEntry)=>boolean};
 export const DRAFT_PHASES:readonly DraftPhase[]=[];
 export const draftPhase=(_cycle:number):DraftPhase=>({from:1,to:16,favours:'slot rules',share:1,matches:()=>true});
-export const DRAFT_PHASE_SUMMARY=`Default ${DRAFT_OFFER_COUNT} slots: ${DRAFT_SLOT_SUMMARY}. Optional ${DRAFT_OFFER_COUNT_TEN}: ${DRAFT_SLOT_SUMMARY_TEN}. At least ${DRAFT_CRYPTO_OFFER_MIN} cards with +${DRAFT_CRYPTO_GAIN_MIN} Crypto. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost.`;
+export const DRAFT_PHASE_SUMMARY=`Default ${DRAFT_OFFER_COUNT} slots: ${DRAFT_SLOT_SUMMARY}. Optional ${DRAFT_OFFER_COUNT_TEN}: ${DRAFT_SLOT_SUMMARY_TEN}. At least ${DRAFT_CRYPTO_OFFER_MIN} cards with +${DRAFT_CRYPTO_GAIN_MIN} Crypto. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost. From Cycle ${DRAFT_LATE_COST_BIAS_FROM}, Attack/Horror slots favour cost >${DRAFT_LATE_COST_THRESHOLD} (+${Math.round((DRAFT_LATE_COST_WEIGHT-1)*100)}%, +${Math.round((DRAFT_LATE_COST_WEIGHT_HEAVY-1)*100)}% from Cycle ${DRAFT_LATE_COST_BIAS_HEAVY_FROM}).`;
+
+/** Attack and Horror hard slots that receive late-game high-cost pick weighting. */
+export function isLateCostBiasedSlot(slot:Pick<DraftSlot,'id'>):boolean{
+ return slot.id==='attack'||slot.id==='horror';
+}
+
+/**
+ * Relative pick weight for a candidate in an Attack/Horror slot. Baseline 1; from Cycle 8,
+ * cost > 6 is 1.4× (Cycles 8–11) or 1.6× (Cycles 12+). Other slots always return 1.
+ */
+export function draftSlotPickWeight(slot:Pick<DraftSlot,'id'>,card:Card,cycle?:number):number{
+ if(!isLateCostBiasedSlot(slot)||cycle===undefined||cycle<DRAFT_LATE_COST_BIAS_FROM)return 1;
+ if(Math.max(0,card.cost)<=DRAFT_LATE_COST_THRESHOLD)return 1;
+ return cycle>=DRAFT_LATE_COST_BIAS_HEAVY_FROM?DRAFT_LATE_COST_WEIGHT_HEAVY:DRAFT_LATE_COST_WEIGHT;
+}
 
 /** True when the card prints at least one Crypto-gain amount ≥ DRAFT_CRYPTO_GAIN_MIN (Crypto cards also count via cryptoValue). */
 export function cardGainsCryptoAtLeast(card:Card,min=DRAFT_CRYPTO_GAIN_MIN):boolean{
@@ -196,7 +237,9 @@ function pickForSlot(
  const prefer=withCost.length?withCost:unused;
  const fresh=prefer.filter(({card})=>!previousIds.has(cardId(card)));
  const from=fresh.length?fresh:prefer;
- return pick(from,1,random)[0];
+ if(!isLateCostBiasedSlot(slot))return pick(from,1,random)[0];
+ const weights=from.map(({card})=>draftSlotPickWeight(slot,card,cycle));
+ return pickWeightedOne(from,weights,random);
 }
 
 /**

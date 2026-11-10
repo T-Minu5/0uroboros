@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * Builds the public website: the client build at the root (Play), plus the static pages in `site/` (Download) and the
- * CDN header rules. Output: dist/site. Set VITE_GAME_SERVER_URL to the hosted server (wss://...) before running.
+ * CDN header rules. Output: dist/site. For a domain release set VITE_GAME_SERVER_URL (wss://...). For Hostinger IP
+ * playtest leave it unset so the client uses the page host on port 8787.
  *
- *   VITE_GAME_SERVER_URL=wss://ouroboros-server.fly.dev npm run build:site
+ *   VITE_GAME_SERVER_URL=wss://api.yourdomain.com npm run build:site
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';

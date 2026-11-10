@@ -101,23 +101,112 @@ function MorphFormPicker({ cards, values, selection, cycleForms, onChange, onSel
   </div>;
 }
 
-function GainCardPicker({ cards, values, selection, onChange, onSelectionChange }: { cards: readonly CatalogCard[]; values: readonly string[]; selection: 'sequential' | 'random'; onChange: (ids: string[]) => void; onSelectionChange: (selection: 'sequential' | 'random') => void }) {
+type GainSourceMode = 'named' | 'matching';
+
+function GainCardPicker({ step, cards, onChange }: {
+  step: EffectStep;
+  cards: readonly CatalogCard[];
+  onChange: (changes: Partial<EffectStep>) => void;
+}) {
   const [search, setSearch] = useState('');
+  const mode: GainSourceMode = step.filter || step.maxCost !== undefined ? 'matching' : 'named';
+  const values = step.cardIds?.length ? step.cardIds : step.cardId ? [step.cardId] : [];
+  const selection = step.selection ?? (values.length > 1 ? 'random' : 'sequential');
   const available = enabledCards(cards);
   const allMatching = available.filter(card => `${card.name} ${definitionId(card)}`.toLowerCase().includes(search.toLowerCase()));
   const matching = allMatching.slice(0, 24);
   const unknown = values.filter(id => !available.some(card => definitionId(card) === id));
-  const toggle = (id: string, checked: boolean) => onChange(checked ? [...values, id] : values.filter(value => value !== id));
+  const classes = filterClasses(step.filter);
+  const setMode = (next: GainSourceMode) => {
+    if (next === mode) return;
+    if (next === 'matching') {
+      onChange({
+        cardId: undefined, cardIds: undefined,
+        filter: step.filter ?? { cardClass: 'Utility' },
+        maxCost: step.maxCost ?? 3,
+        selection: 'random',
+      });
+      return;
+    }
+    const first = available[0];
+    onChange({
+      filter: undefined, maxCost: undefined, selection: undefined,
+      cardId: first ? definitionId(first) : undefined, cardIds: undefined,
+    });
+  };
+  const setNamed = (cardIds: string[]) => onChange({
+    cardIds: cardIds.length ? cardIds : undefined,
+    cardId: undefined,
+    filter: undefined,
+    maxCost: undefined,
+    selection: cardIds.length > 1 ? (step.selection ?? 'random') : undefined,
+  });
+  const toggle = (id: string, checked: boolean) => setNamed(checked ? [...values, id] : values.filter(value => value !== id));
+  const setFilter = (cardType: CardType | undefined, picked: readonly CardClass[]) => {
+    const kept = picked.filter(item => classesFor(cardType).includes(item));
+    const filter: CardFilter = {
+      ...(cardType ? { cardType } : {}),
+      ...(kept.length === 1 ? { cardClass: kept[0] } : kept.length ? { cardClass: kept } : {}),
+    };
+    onChange({
+      cardId: undefined, cardIds: undefined,
+      filter: Object.keys(filter).length ? filter : { cardClass: 'Utility' },
+      maxCost: step.maxCost ?? 3,
+      selection: 'random',
+    });
+  };
+  const offered = classesFor(step.filter?.cardType);
   return <div className="au-morph-forms">
-    <Select label="How the gained card is chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Always the first selected card', random: 'Random from selected cards' }} onChange={onSelectionChange} />
-    <div className="au-morph-sequence"><b>{values.length <= 1 ? 'Card to gain' : 'Gain pool'}</b>{values.length === 0 && <span className="au-morph-empty">Select at least one card before saving.</span>}{values.map((id, index) => <div className="au-morph-sequence-item" key={id}><span>{index + 1}. {cards.find(card => definitionId(card) === id)?.name ?? 'Unavailable saved card'}</span><span className="au-morph-order-actions"><button type="button" aria-label={`Remove card ${index + 1}`} onClick={() => toggle(id, false)}>×</button></span></div>)}</div>
-    <label className="au-recipe-field"><span>Cards that can be gained</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search card names" aria-label="Search cards to gain" /></label>
-    <div className="au-morph-form-list">
-      {unknown.map(id => <label className="au-morph-form" key={id}><input type="checkbox" checked onChange={() => toggle(id, false)} /><span>Unavailable saved card</span></label>)}
-      {matching.map(card => <label className="au-morph-form" key={definitionId(card)}><input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />{card.art && <img src={card.art} alt="" />}<span>{card.name}</span></label>)}
-    </div>
-    {allMatching.length > matching.length && <small>Showing the first 24 matches. Search by name to find more cards.</small>}
-    <small>{selection === 'random' && values.length > 1 ? 'Each copy picks one selected card at random.' : values.length > 1 ? 'Always gains the first selected card.' : 'Gains a copy of the selected card.'}</small>
+    <Select
+      label="Gain from"
+      value={mode}
+      options={['named', 'matching']}
+      labels={{ named: 'Named cards', matching: 'Any matching (class / cost)' }}
+      onChange={setMode}
+    />
+    {mode === 'matching' ? <>
+      <div className="au-step-grid">
+        <Select
+          label="Card type"
+          value={step.filter?.cardType ?? 'any'}
+          options={['any', ...CARD_TYPES]}
+          labels={{ any: 'Any type' }}
+          onChange={value => setFilter(value === 'any' ? undefined : value as CardType, classes)}
+        />
+        {offered.length > 0 && <Select
+          label="Card class"
+          value={classes[0] ?? 'any'}
+          options={['any', ...offered]}
+          labels={{ any: 'Any class' }}
+          onChange={value => setFilter(step.filter?.cardType, value === 'any' ? [] : [value as CardClass])}
+        />}
+        <label className="au-recipe-field"><span>Max cost</span>
+          <NumberInput
+            aria-label="Max cost"
+            min={0}
+            max={100}
+            value={step.maxCost}
+            onChange={value => onChange({
+              cardId: undefined, cardIds: undefined,
+              filter: step.filter ?? { cardClass: 'Utility' },
+              maxCost: value,
+              selection: 'random',
+            })}
+          />
+        </label>
+      </div>
+      <small>Picks a random enabled catalog card matching the class and cost (Generated cards are excluded). Who receives it and which zone are set above.</small>
+    </> : <>
+      <Select label="How the gained card is chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Always the first selected card', random: 'Random from selected cards' }} onChange={value => onChange({ selection: value === 'sequential' && values.length <= 1 ? undefined : value })} />
+      <div className="au-morph-sequence"><b>{values.length <= 1 ? 'Card to gain' : 'Gain pool'}</b>{values.length === 0 && <span className="au-morph-empty">Select at least one card before saving.</span>}{values.map((id, index) => <div className="au-morph-sequence-item" key={id}><span>{index + 1}. {cards.find(card => definitionId(card) === id)?.name ?? 'Unavailable saved card'}</span><span className="au-morph-order-actions"><button type="button" aria-label={`Remove card ${index + 1}`} onClick={() => toggle(id, false)}>×</button></span></div>)}</div>
+      <label className="au-recipe-field"><span>Cards that can be gained</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search card names" aria-label="Search cards to gain" /></label>
+      <div className="au-morph-form-list">
+        {unknown.map(id => <label className="au-morph-form" key={id}><input type="checkbox" checked onChange={() => toggle(id, false)} /><span>Unavailable saved card</span></label>)}
+        {matching.map(card => <label className="au-morph-form" key={definitionId(card)}><input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />{card.art && <img src={card.art} alt="" />}<span>{card.name}</span></label>)}
+      </div>
+      {allMatching.length > matching.length && <small>Showing the first 24 matches. Search by name to find more cards.</small>}
+      <small>{selection === 'random' && values.length > 1 ? 'Each copy picks one selected card at random.' : values.length > 1 ? 'Always gains the first selected card.' : 'Gains a copy of the selected card.'}</small>
+    </>}
   </div>;
 }
 
@@ -315,13 +404,7 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {spec.chooser && scope !== 'locationCondition' && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
-    {step.action === 'gainCard' && <GainCardPicker
-      cards={cards}
-      values={step.cardIds?.length ? step.cardIds : step.cardId ? [step.cardId] : []}
-      selection={step.selection ?? (step.cardIds && step.cardIds.length > 1 ? 'random' : 'sequential')}
-      onChange={cardIds => patch({ cardIds: cardIds.length ? cardIds : undefined, cardId: undefined, selection: cardIds.length > 1 ? (step.selection ?? 'random') : undefined })}
-      onSelectionChange={selection => patch({ selection: selection === 'sequential' && !(step.cardIds && step.cardIds.length > 1) ? undefined : selection })}
-    />}
+    {step.action === 'gainCard' && <GainCardPicker step={step} cards={cards} onChange={patch} />}
     {step.action === 'attachModifier' && <>
       <ModifierPicker step={step} onChange={patch} />
       {step.target?.type === 'card' && step.target.where === 'collection' && <>

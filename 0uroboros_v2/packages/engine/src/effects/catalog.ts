@@ -87,8 +87,9 @@ export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   trashCard: { id: 'trashCard', label: 'Trash a card', family: 'Board', help: 'A trashed card goes to the shared Trash, from the board or any of its owner’s zones.', targets: [{ type: 'card', roles: SIDES, where: [...ANYWHERE, 'deck'], relations: ['self', 'previous', 'next'] }], picks: RANKED, pickCount: true, chooser: true, optional: true },
   sacrificeCards: {
     id: 'sacrificeCards', label: 'Sacrifice cards', family: 'Board',
-    help: 'Optionally destroy your revealed cards at this Node. Gain Crypto for each destroyed card.',
-    targets: [{ type: 'card', roles: ['ally'], where: ['thisNode'] }],
+    help: 'Optionally destroy revealed cards at this Node (each targeted seat chooses among its own). Gain Crypto for each destroyed card.',
+    // ally = winner/self; both = each seat at the Node (Consume Pit / Sacrificial Altar).
+    targets: [{ type: 'card', roles: ['ally', 'both'], where: ['thisNode'] }],
     amount: { label: 'Crypto each', min: 0, max: 20, default: 2 },
     picks: ['choose'], pickCount: true, chooser: true, optional: true,
     scopes: ['location', 'locationPlay', 'locationCondition', 'locationEvent', 'card'],
@@ -650,7 +651,9 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
         const classes = filterClasses(step.filter);
         const subtype = classes.length ? `${classes.join('/')} ` : '';
         const cost = step.maxCost !== undefined ? ` costing ${step.maxCost} or less` : '';
-        return `Gain ${amount === 1 ? `a ${subtype}card` : `${formatAmount(amount)} ${subtype}cards`}${cost}${where}`;
+        const random = step.selection !== 'sequential' ? 'random ' : '';
+        const one = amount === 1 ? `a ${random}${subtype}card` : `${formatAmount(amount)} ${random}${subtype}cards`;
+        return `Gain ${one}${cost}${where}`;
       }
       const names = pool.map(id => cardName(cards, id) ?? 'unavailable card');
       const name = names.length > 1

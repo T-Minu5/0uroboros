@@ -93,18 +93,70 @@ describe('Eco metrics Circuit differential and market VP', () => {
     const m = gameMetrics(report({
       finalVP: [10, 8], purchases: [],
       cycles: [
+        // Circuit winner 0, particle won by Circuit winner
         { cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null, particleNode: 2, particleWinner: 0 },
+        // Circuit winner 1, particle tied Node
         { cycle: 2, vp: [4, 2], servers: [3500, 3500], wallet: [0, 0], locationsWon: [2, 3], deckSize: [10, 10], locations: [], circuit: null, particleNode: 0, particleWinner: null },
+        // Circuit winner 0, particle won by Circuit loser
         { cycle: 3, vp: [6, 4], servers: [3500, 3500], wallet: [0, 0], locationsWon: [4, 1], deckSize: [10, 10], locations: [], circuit: null, particleNode: 4, particleWinner: 1 },
+        // Circuit tied, particle controlled
+        { cycle: 4, vp: [7, 5], servers: [3500, 3500], wallet: [0, 0], locationsWon: [2, 2], deckSize: [10, 10], locations: [], circuit: null, particleNode: 1, particleWinner: 0 },
         // Older cycle without particle fields — ignored for particle stats
-        { cycle: 4, vp: [8, 5], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
+        { cycle: 5, vp: [8, 5], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null },
       ],
     }));
     expect(m.mostNodesLeader).toBe(0);
-    expect(m.locationsWon).toEqual([12, 8]);
-    expect(m.particleControlled).toBe(2);
+    expect(m.locationsWon).toEqual([14, 10]);
+    expect(m.particleControlled).toBe(3);
     expect(m.particleTied).toBe(1);
-    expect(m.particleWins).toEqual([1, 1]);
+    expect(m.particleWins).toEqual([2, 1]);
+    expect(m.particleByCircuitWinner).toBe(1);
+    expect(m.particleByCircuitLoser).toBe(1);
+    expect(m.particleControlledWhileCircuitTied).toBe(1);
+  });
+
+  it('tracks winner vs loser Power, Crypto, plays, trash and destroy', () => {
+    const m = gameMetrics(report({
+      finalVP: [20, 10], winner: 0, purchases: [],
+      cycles: [{ cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null }],
+      telemetry: {
+        ...emptyTelemetry,
+        cryptoGained: [12, 5],
+        powerIncreased: [8, 3],
+        cardsTrashed: [4, 1],
+        cardsDestroyed: [2, 5],
+        cards: {
+          dash: { definitionId: 'dash', name: 'Dash', cost: 1, type: 'Character', plays: [6, 2], drain: [0, 0], restore: [0, 0], draw: [0, 0], actions: [0, 0], crypto: [0, 0], vp: [0, 0] },
+          nuke: { definitionId: 'nuke', name: 'Nuke', cost: 4, type: 'Character', plays: [1, 4], drain: [0, 0], restore: [0, 0], draw: [0, 0], actions: [0, 0], crypto: [0, 0], vp: [0, 0] },
+        },
+      } as unknown as MatchReport['telemetry'],
+    }));
+    expect(m.powerIncreased).toEqual([8, 3]);
+    expect(m.economy.cryptoGained).toEqual([12, 5]);
+    expect(m.cardsPlayed).toEqual([7, 6]);
+    expect(m.cardsTrashed).toEqual([4, 1]);
+    expect(m.cardsDestroyed).toEqual([2, 5]);
+
+    const cohort = cohortMetrics([{ id: 'g1', report: report({
+      finalVP: [20, 10], winner: 0, purchases: [],
+      cycles: [{ cycle: 1, vp: [2, 1], servers: [3500, 3500], wallet: [0, 0], locationsWon: [3, 2], deckSize: [10, 10], locations: [], circuit: null }],
+      telemetry: {
+        ...emptyTelemetry,
+        cryptoGained: [12, 5],
+        powerIncreased: [8, 3],
+        cardsTrashed: [4, 1],
+        cardsDestroyed: [2, 5],
+        cards: {
+          dash: { definitionId: 'dash', name: 'Dash', cost: 1, type: 'Character', plays: [6, 2], drain: [0, 0], restore: [0, 0], draw: [0, 0], actions: [0, 0], crypto: [0, 0], vp: [0, 0] },
+        },
+      } as unknown as MatchReport['telemetry'],
+    }) }]);
+    expect(cohort.boardAwards.particle.vsCircuit.byWinnerPerGame).toBe(0);
+    expect(cohort.winnerProfile.winnerPowerIncreasedMore.rate).toBe(1);
+    expect(cohort.winnerProfile.winnerCryptoGainedMore.rate).toBe(1);
+    expect(cohort.winnerProfile.winnerPlayedMoreCards.rate).toBe(1);
+    expect(cohort.winnerProfile.winnerTrashedMore.rate).toBe(1);
+    expect(cohort.winnerProfile.winnerDestroyedMoreCards.rate).toBe(0);
   });
 
   it('exposes market VP per seat separately from destruction VP', () => {

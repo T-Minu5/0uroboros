@@ -46,10 +46,10 @@ function PlayerTally({ owner, score, color, leading, showEffects, showDestructio
  const [vpOpen, setVpOpen] = useState(false);
  const [deckOpen, setDeckOpen] = useState(false);
  const rows: { key: string; label: string; value: number }[] = [
-  { key: 'locations', label: 'Locations', value: score.locationVP },
-  { key: 'circuit', label: 'Circuit rewards', value: score.circuitVP },
+  { key: 'locations', label: 'VP from locations', value: score.locationVP },
+  { key: 'circuit', label: 'VP from achievements', value: score.circuitVP },
   ...(showEffects ? [{ key: 'effects', label: 'Card effects', value: score.effectVP }] : []),
-  ...(showDestruction ? [{ key: 'destruction', label: 'Server destruction', value: score.destructionVP }] : []),
+  ...(showDestruction ? [{ key: 'destruction', label: 'VP from server destruction', value: score.destructionVP }] : []),
  ];
  const totalDelay = (rows.length + 3) * ROW_STAGGER_MS;
  const total = useCountUp(score.total, totalDelay);
@@ -62,16 +62,11 @@ function PlayerTally({ owner, score, color, leading, showEffects, showDestructio
    <li style={{ '--row-index': 0 } as CSSProperties}>
     <button className='summary-cards-toggle' aria-expanded={deckOpen} disabled={!deck.length} onClick={() => setDeckOpen(value => !value)}>
      <span className='summary-row-label'><i aria-hidden='true'>{deckOpen ? '−' : '+'}</i>Deck<em>{deck.length} {deck.length === 1 ? 'card' : 'cards'}</em></span>
-     <b>{deck.length}</b>
     </button>
     {deckOpen && <div className='summary-cards summary-cards-grid' role='list'>
-     {deck.map((card, index) => {
-      const vp = cardVP(card);
-      return <button key={`${card.id}-${index}`} role='listitem' className='summary-card' style={{ '--card-index': index } as CSSProperties} aria-label={vp ? `Inspect ${card.name}, ${vp} VP` : `Inspect ${card.name}`} onClick={() => inspect(card)}>
-       <CardFace card={card}/>
-       {vp !== 0 && <span className={`summary-card-vp ${vp < 0 ? 'negative' : ''}`}>{vp < 0 ? `−${-vp}` : `+${vp}`}</span>}
-      </button>;
-     })}
+     {deck.map((card, index) => <button key={`${card.id}-${index}`} role='listitem' className='summary-card' style={{ '--card-index': index } as CSSProperties} aria-label={`Inspect ${card.name}`} onClick={() => inspect(card)}>
+      <CardFace card={card}/>
+     </button>)}
     </div>}
    </li>
    <li style={{ '--row-index': 1 } as CSSProperties}>

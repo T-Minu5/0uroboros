@@ -47,6 +47,10 @@ export type CoachingStatus = {
   phases: { economyUntilCycle: number; midgameMix: number; endgameFromCycle: number };
   store: { appliedAt: string; share: number; competitors: { id: string; name: string; version: string }[]; change: ProfileChange; lines: string[] } | null;
 };
+export type HumanTempoStatus = {
+  games: number; minGames: number; share: number; applied: boolean; appliedAt: string | null; planBlurb: string | null; bands: string[];
+  error: string | null; applying: boolean; file: string;
+};
 export type AgentsStatus = {
   settings: AgentSettings; effective: { stratG: boolean; t5: boolean; dv8: boolean; vpDog: boolean; last2go: boolean; ecoStrat: boolean }; settingsFile: string;
   stratG: LearnerStatus;
@@ -57,6 +61,7 @@ export type AgentsStatus = {
   league: LeagueStatus;
   mentoring: MentoringStatus;
   coaching: CoachingStatus;
+  humanTempo: HumanTempoStatus;
   ecoStrat: {
     state: string; modelConfigured: boolean; model: string | null; preferredModels: string[]; build: { label: string } | null;
     baseline: { status: string; valid: number; target: number; invalid: number };

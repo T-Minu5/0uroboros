@@ -213,6 +213,44 @@ describe('location passives', () => {
 });
 
 describe('sacrificeCards / Sacrificial Altar', () => {
+  const sacrificeBoth: EffectStep = {
+    action: 'sacrificeCards',
+    amount: 2,
+    optional: true,
+    target: { type: 'card', who: 'both', where: 'thisNode' },
+    pick: { mode: 'choose', count: 4 },
+  };
+
+  it('offers the sacrifice choice to both seats on collapse, not only the winner', () => {
+    const game = baseSession({ effects: [sacrificeBoth] });
+    place(game, 0, card('p0-a', { power: 3, name: 'Winner A' }), true);
+    place(game, 0, card('p0-b', { power: 1, name: 'Winner B' }), true);
+    place(game, 1, card('p1-a', { power: 1, name: 'Loser A' }), true);
+    place(game, 1, card('p1-b', { power: 1, name: 'Loser B' }), true);
+    for (let node = 1; node < 5; node++) {
+      place(game, 0, card(`pad-${node}`, { power: 3 }), true, node);
+    }
+    game.state.turn = 3;
+    game.state.phase = 'runtime';
+    game.endTurn(0);
+    game.endTurn(1);
+    finish(game);
+    expect(game.state.nodes[0].winner).toBe(0);
+    expect(game.state.choice).toBeTruthy();
+    expect(game.state.choice!.owner).toBe(0);
+    expect(game.state.choice!.options.map(option => option.id)).toEqual(expect.arrayContaining(['card-p0-a', 'card-p0-b']));
+    game.choose([], 0);
+    finish(game);
+    expect(game.state.choice).toBeTruthy();
+    expect(game.state.choice!.owner).toBe(1);
+    expect(game.state.choice!.options.map(option => option.id)).toEqual(expect.arrayContaining(['card-p1-a', 'card-p1-b']));
+    game.choose(['card-p1-a'], 1);
+    finishAll(game);
+    expect(game.state.players[0].wallet).toBe(0);
+    expect(game.state.players[1].wallet).toBe(2);
+    expect(game.state.players[1].destroyed.map(entry => entry.id)).toContain('p1-a');
+  });
+
   it('skips for 0 Crypto; destroying 2 yields +4 Crypto', () => {
     const sacrifice: EffectStep = {
       action: 'sacrificeCards',

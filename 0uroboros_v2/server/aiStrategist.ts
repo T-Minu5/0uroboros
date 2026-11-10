@@ -166,6 +166,8 @@ export type StrategistOptions = {
   league?: boolean;
   /** Tips the designer handed to this agent from its mentors; read on every boot and folded into the baseline. */
   mentorTips?: () => Promise<BaselineTips | null>;
+  /** Extra markdown lines inserted into the notebook (e.g. Strat-G human-tempo soft coaching). */
+  notebookExtra?: () => Promise<string[] | null>;
 };
 
 type CatalogCard = Card & { pool?: string; enabled?: boolean };
@@ -530,7 +532,7 @@ function profileLine(p: StrategyProfile) {
 }
 
 /** `human`: it plays the human (every agent can be picked as the opponent); `defaultOpponent`: it is the one picked unless the human chooses another. */
-type NotebookVoice = { name: string; style: string | null; envelope: string | null; league: boolean; human: boolean; defaultOpponent?: boolean };
+type NotebookVoice = { name: string; style: string | null; envelope: string | null; league: boolean; human: boolean; defaultOpponent?: boolean; extraSections?: string[] };
 
 function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: NotebookVoice = { name: 'Strat-G', style: null, envelope: null, league: false, human: true, defaultOpponent: true }): string {
   const p = memory.profile, r = memory.record, b = memory.baseline;
@@ -602,6 +604,7 @@ function renderNotebook(memory: StrategistMemory, catalog: Catalog, voice: Noteb
       ...memory.sharedTips.tips.map(tip => `${tip.rank}. ${tip.text} (${describeChange(p, tip.change, cardName)})`),
       ``,
     ] : []),
+    ...(voice.extraSections ?? []),
     `## Adopted changes`,
     ``,
     ...list(adopted.map(item => `- **${item.id}** (${versionLabel(item.concludedBy ?? -1)}): ${item.changeSummary}. ${item.verdict ?? ''}`), '- none yet: playing the pure baseline.'),
@@ -775,7 +778,8 @@ export function createStrategist(options: StrategistOptions = {}) {
     if ((saved?.version ?? 0) > memory.version) { log(`${versionLabel(memory.version)} is stale (${versionLabel(saved!.version!)} is newer on disk); not saving`); return; }
     await recordVersion();
     await writeAtomic(memoryFile, `${JSON.stringify(memory, null, 2)}\n`);
-    await writeAtomic(join(root, 'NOTEBOOK.md'), renderNotebook(memory, catalog, voice));
+    const extraSections = await (options.notebookExtra?.() ?? null)?.catch(() => null) ?? null;
+    await writeAtomic(join(root, 'NOTEBOOK.md'), renderNotebook(memory, catalog, { ...voice, extraSections: extraSections ?? undefined }));
   }
 
   /** Freezes the current best as a league snapshot (`t-5@v1.0`, then `t-5@v1.1` after the next adoption). */
@@ -1271,6 +1275,24 @@ export function createStrategist(options: StrategistOptions = {}) {
     return start();
   }
 
+  /**
+   * Reloads designer hand-offs (mentor tips / coaching / human tempo) into the baseline without a full LLM boot.
+   * Used by soft-coaching observers that must not stall the app with askModel + lab trials on every game.
+   */
+  async function refreshTips(): Promise<void> {
+    await start();
+    if (!online) throw new Error(bootError ? `${name} failed to boot: ${bootError}` : `${name} is not online.`);
+    return serialize(async () => {
+      const tips = await (options.mentorTips?.() ?? null)?.catch(error => {
+        log(`mentor tips unreadable during refresh (${error instanceof Error ? error.message : String(error)})`);
+        return null;
+      }) ?? null;
+      refreshDesignedBaseline(tips);
+      memory.profile = composeProfile();
+      await persist();
+    });
+  }
+
   /** Only the fields experiments use, with values the runtime can read; card biases must name a known card. */
   function cleanChange(value: unknown): ProfileChange {
     const source = (value && typeof value === 'object' ? value : {}) as ProfileChange;
@@ -1518,7 +1540,7 @@ export function createStrategist(options: StrategistOptions = {}) {
   /** Resolves once queued debriefs and experiment steps have finished (tests and shutdown). */
   const idle = async () => { for (let last: unknown = null; last !== writes;) { last = writes; await writes; } };
 
-  return { get ready() { return start(); }, start, reboot, shareTips, status, snapshot, middleware, brief, observe, debrief, idle, leagueSnapshots, leagueTrialArms, concludeLeagueTrial, memory: () => memory, recordGuidance };
+  return { get ready() { return start(); }, start, reboot, refreshTips, shareTips, status, snapshot, middleware, brief, observe, debrief, idle, leagueSnapshots, leagueTrialArms, concludeLeagueTrial, memory: () => memory, recordGuidance };
 }
 
 function deepFreeze<T>(value: T): T {

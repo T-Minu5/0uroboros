@@ -1,5 +1,5 @@
 {
-  "revision": 1014,
+  "revision": 1018,
   "document": {
     "version": 3,
     "cards": [
@@ -1669,7 +1669,7 @@
         "type": "Character",
         "cost": 7,
         "art": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
-        "effect": "-225 Both enemy servers. If you pay -3 Crypto you get +7 in return.",
+        "effect": "-225 Both enemy servers. If you pay -3 Crypto you get +6 in return.",
         "power": 4,
         "onReveal": [
           {
@@ -2450,7 +2450,7 @@
         "effect": "Basic crypto unit used for data acquisition.",
         "cryptoValue": 1,
         "pool": "Crypto",
-        "enabled": true,
+        "enabled": false,
         "storyText": "Basic crypto unit used for data acquisition.",
         "onReveal": [
           {
@@ -5859,7 +5859,7 @@
             "optional": true,
             "target": {
               "type": "card",
-              "who": "winner",
+              "who": "both",
               "where": "thisNode"
             },
             "pick": {
@@ -5879,7 +5879,7 @@
             "optional": true,
             "target": {
               "type": "card",
-              "who": "winner",
+              "who": "both",
               "where": "thisNode"
             },
             "pick": {
@@ -6076,7 +6076,8 @@
               "type": "zone",
               "who": "winner",
               "zone": "hand"
-            }
+            },
+            "selection": "random"
           }
         ],
         "events": [],
@@ -6184,15 +6185,15 @@
             ]
           }
         ],
-        "rule": "While: only one card is here, +1 Card.",
-        "reward": "While: only one card is here, +1 Card.",
+        "rule": "Ongoing: While you have only 1 card here, +1 Card.",
+        "reward": "Ongoing: While you have only 1 card here, +1 Card.",
         "effects": []
       },
       {
         "id": "location-vwtph6e4",
         "name": "Stand Alone",
-        "rule": "While: only one card is here, +5 Power.",
-        "reward": "While: only one card is here, +5 Power.",
+        "rule": "Ongoing: While you have only 1 card here, +5 Power.",
+        "reward": "Ongoing: While you have only 1 card here, +5 Power.",
         "enabled": false,
         "whiles": [
           {
@@ -6961,10 +6962,6 @@
         "name": "Standard deck - cypto",
         "cards": [
           {
-            "cardId": "shyte-coin",
-            "count": 6
-          },
-          {
             "cardId": "basic-encryption",
             "count": 1
           },
@@ -7061,7 +7058,7 @@
         ]
       }
     ],
-    "activeStartingDeckId": "deck-nz9sfb0h",
+    "activeStartingDeckId": "deck-rd3wruoy",
     "mods": [
       {
         "id": "mod-r3emmf8z",

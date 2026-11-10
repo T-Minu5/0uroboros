@@ -1,136 +1,73 @@
-# Deploying 0uroboros (web release)
+# Deploying 0uroboros (Hostinger)
 
-Two things get hosted: the **game server** (one Node process, WebSocket + a few HTTP routes, SQLite on a volume) and the
-**website** (static files: the web client at `/`, the download page at `/download/`). Everything else — Content Studio,
-depth pipeline, agents, league — stays on your machine.
+Two things get hosted on one VPS: the **game server** (Node + WebSocket + SQLite) and the **website** (static client
+at `/`, download page at `/download/`). Everything else — Content Studio, depth pipeline, agents, league — stays on
+your machine.
+
+Full walkthrough: [`../ARCHITECTURE_AND_DEPLOY.md`](../ARCHITECTURE_AND_DEPLOY.md) (Parts 3–7).
 
 ```
-browser ── https ──> Cloudflare Pages (dist/site)        static client + download page
-browser ── wss ───> Fly.io machine  (deploy/Dockerfile)  game server, /auth, /evidence, /healthz
-studio  ── https ─> Fly.io /evidence                     Eco-Strat pulls online-pvp games
+browser ── http(s) ──> nginx on the VPS   → /var/www/0uroboros/site
+browser ── ws(s)  ──> game server        → :8787 (/auth, /evidence, /healthz)
+studio  ── https    ──> same server /evidence   Eco-Strat pulls online-pvp games
 ```
 
-## 1. Game server on Fly.io (once)
+## Quick playtest (IP address)
+
+From `0uroboros_v2/`:
 
 ```bash
-# from 0uroboros_v2/
-fly auth login
-fly launch --copy-config --config deploy/fly.toml --dockerfile deploy/Dockerfile --no-deploy   # pick the app name/region
-fly volumes create ouroboros_data --size 1 --region <region>
-fly secrets set \
-  OUROBOROS_ADMIN_TOKEN="$(openssl rand -base64 32)" \
-  RESEND_API_KEY="re_..." \
-  MAIL_FROM="0uroboros <play@your-domain>"
+npm run server:build
+npm run build:site
+./deploy/hostinger-up.sh                 # default: root@179.236.68.191
+# or: ./deploy/hostinger-up.sh root@YOUR.IP
 ```
 
-Edit `deploy/fly.toml` `[env]` first:
+With `VITE_GAME_SERVER_URL` unset, the client talks to the page host on port `8787` (`ws://YOUR.IP:8787`).
 
-- `OUROBOROS_PUBLIC_URL` — the server's own https URL (magic links point here), e.g. `https://ouroboros-server.fly.dev`.
-- `OUROBOROS_WEB_ORIGIN` — the website origin, e.g. `https://play.your-domain`. CORS and the post-sign-in redirect use it.
+## Full release (domain + HTTPS)
 
-Then `fly deploy --config deploy/fly.toml --dockerfile deploy/Dockerfile`. `GET /healthz` must answer `{"ok":true,...,"auth":true}`.
-One machine only (`max_machines_running = 1`): rooms and the quick-match queue live in memory; a second machine would
-split them. Scale the machine, not the count.
-
-Mail: [Resend](https://resend.com) needs a verified sending domain. Without `RESEND_API_KEY` the server logs magic
-links instead of mailing them (`fly logs` shows `"event":"magic-link"`), which is enough for a first private test.
-
-## 2. Website on Cloudflare Pages (once)
+See Part 5–6 of `ARCHITECTURE_AND_DEPLOY.md`. Summary:
 
 ```bash
-VITE_GAME_SERVER_URL=wss://ouroboros-server.fly.dev npm run build:site      # -> dist/site
-npx wrangler pages project create ouroboros
-npx wrangler pages deploy dist/site --project-name ouroboros
+npm run assets:manifest
+npm test
+npm run server:build
+VITE_GAME_SERVER_URL=wss://api.yourdomain.com npm run build:site
+# then rsync server + site as in Part 6, or extend hostinger-up.sh
 ```
 
-Point your domain at the Pages project. The client finds the server through `VITE_GAME_SERVER_URL` baked in at build
-time; `site/_headers` sets caching and basic security headers; `dist/site/version.json` records what was deployed.
-
-Edit `site/download/index.html` to replace `OWNER/REPO` with the GitHub repository once desktop builds exist (Phase 5).
-
-## 3. Continuous deployment (GitHub Actions)
-
-Workflows live at the repository root (`.github/workflows/`), running inside `0uroboros_v2/`:
-
-| Workflow | Trigger | Needs |
-| --- | --- | --- |
-| `ci.yml` | every push / PR | nothing |
-| `deploy-server.yml` | push to `main` touching server inputs | secret `FLY_API_TOKEN` (`fly tokens create deploy`) |
-| `deploy-site.yml` | push to `main` | secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; variables `GAME_SERVER_URL` (wss://…), `CLOUDFLARE_PAGES_PROJECT` |
-
-## 4. Local run of the hosted stack
+## Local run of the hosted stack
 
 ```bash
 npm run server:build
 OUROBOROS_AUTH=on OUROBOROS_WEB_ORIGIN=http://127.0.0.1:5173 OUROBOROS_DB=.data/dev.sqlite npm run server:start
-# In a second terminal. The client on :5173 talks to ws://127.0.0.1:8787 by default.
+# Second terminal — client on :5173 talks to ws://127.0.0.1:8787 by default.
 npm run dev
 ```
 
-(Keep comments on their own line: zsh passes an inline `# …` to the command, and Vite would use `#` as its root.)
+Magic links print to the server's stdout when mail is unset. `npm run test:online` runs the networked play gate.
 
-Magic links print to the server's stdout. `npm run test:online` runs the whole gate (server + two browsers + sign-in).
-
-## 5. Eco-Strat on online games
+## Eco-Strat on online games
 
 In the studio's `.env`:
 
 ```
-OUROBOROS_EVIDENCE_URL=https://ouroboros-server.fly.dev
-OUROBOROS_ADMIN_TOKEN=<same value as the Fly secret>
+OUROBOROS_EVIDENCE_URL=http://YOUR.IP:8787
+OUROBOROS_ADMIN_TOKEN=<same value as /etc/0uroboros/server.env on the VPS>
 ```
-
-While Eco-Strat is active the dev server pulls finished PvP games every five minutes (`/evidence`), publishes them as
-`source: 'online-pvp'`, and keeps its cursor in `ai-agents/online-evidence.json`. AI tables and games without a match
-report are skipped; e-mails never leave the server.
 
 ### Publishing an opponent
 
-The agents (Strat-G, T-5, DV-8, VP-Dog) learn locally; players only ever face the profiles published in the content
-pack's `opponents` list. To ship a re-tuned agent:
+1. `npm run dev`, open `/agents` › Agents, **Publish … to the pack**.
+2. `npm run assets:manifest`, commit, rebuild server + site, run `./deploy/hostinger-up.sh`.
+3. Online tables play the pack built into the server; local AI games use the pack bundled in the next client build.
 
-1. `npm run dev`, open `/agents` › Agents, pick the agent and press **Publish … to the pack**. This writes its current
-   best profile into `content/authored-content.json` (a revision-checked save, like the Content Studio's).
-2. `npm run assets:manifest`, commit, and push. The server deploy picks up the new pack: online tables (including AI
-   tables the server hosts) play it, and clients fetch it by the hash in `welcome`, so no client download is needed.
-3. Local games against the AI use the pack bundled in the client, so they get the new opponent with the next client
-   release.
+## Hardening notes
 
-Changes to the AI's code (`packages/engine/src/ai/strategy.ts`, `runtime.ts`) still need a client and server release.
+Optional env on the VPS (`/etc/0uroboros/server.env`):
 
-## 6. Hardening (Phase 6)
-
-Optional secrets and vars, all read by `packages/server/src/main.ts`:
-
-- `SENTRY_DSN` — server errors and client crash reports (`POST /errors`, rate limited per address) go to Sentry; unset,
-  they are logged as `"event":"error-report"`. `OUROBOROS_RELEASE` tags them (the deploy workflow sets it to the git sha).
-- `OUROBOROS_TRUST_PROXY` — on by default: client addresses come from `Fly-Client-IP` / `CF-Connecting-IP` /
-  `X-Forwarded-For` for the per-address limits (8 sockets, 30 auth calls/min, 10 magic links/hour, 10 crash reports/min).
-  Set `off` when the server is reached directly.
-- `OUROBOROS_PACK_URL` — CDN base for content packs by hash. The server announces its pack hash in `welcome`; a client
-  whose bundled pack differs fetches `<base>/<hash>` (default: the server's own `/pack/<hash>`, immutable-cached).
-  The server keeps the current and previous pack in SQLite, so older clients keep playing through a rollout.
-  To front it with Cloudflare, add a cache rule for `/pack/*` on the server's hostname — the responses are already
-  `immutable`.
-- Ratings: pvp games between two signed-in players are rated (Elo, 1200 start, K 32 for ten games then 16). Quick match
-  pairs players within 100 points, widening by 50 every 10 s. Guests queue at 1200 and are never rated.
-
-## 7. Friends playtest checklist
-
-Before inviting anyone:
-
-- `npm run test:online` passes on the commit being deployed (guide 14, networked play gate).
-- `/healthz` on the deployed server reports `auth: true`; a magic link to your own address arrives within a minute.
-- Two machines on different networks complete three Cycles; one reloads mid-Draft and rejoins.
-- `fly logs` shows no `dispatch-error` / `store-error` / `error-report` entries during the session.
-
-During the session:
-
-- Players sign in (optional) and share the six-character invite code; "Play the server AI" is the fallback when a friend is late.
-- Watch `fly logs` for `forfeit` / `abandon` events; a 20 s first-disconnect pause and 120 s later grace are expected behaviour (guide 06).
-- After each game the result and replay are in SQLite (`fly ssh console`, `/data/ouroboros.sqlite`); Eco-Strat picks up PvP games on its next pull.
-
-After:
-
-- Export notes from the players (what felt slow, unclear, or unfair) into `docs/playtests/<date>.md`.
-- Content changes raise the pack revision in `content/authored-content.json`; every replay records the revision it was played on, so redeploy the server after a content save rather than editing the pack in place.
+- `SENTRY_DSN` — server errors and client crash reports
+- `OUROBOROS_TRUST_PROXY` — set `off` when nginx is not forwarding client IPs (Hostinger quick path uses `off`)
+- `OUROBOROS_PACK_URL` — CDN base for content packs by hash (optional)
+- `OUROBOROS_RELEASE` — git short sha for logs (Part 6 sets this on each server upload)
