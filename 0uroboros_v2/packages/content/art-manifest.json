@@ -1,5 +1,5 @@
 {
-  "packRevision": 1014,
+  "packRevision": 1018,
   "files": [
     "assets/HUDs/Elipse_test.svg",
     "assets/HUDs/circles.svg",
@@ -84,7 +84,6 @@
     "assets/card_art/chaos cards/horrors/the-azimuthal-kill.png",
     "assets/card_art/chaos cards/horrors/tihkal-hound.png",
     "assets/card_art/chaos cards/horrors/veil-of-cthulhu.png",
-    "assets/card_art/crypto/shyte-coin.png",
     "assets/card_art/depth/00953b8ea63a471eeccd-v2.color.webp",
     "assets/card_art/depth/00953b8ea63a471eeccd-v2.depth.webp",
     "assets/card_art/depth/0ab2100a39e9f7c9779f-v2.color.webp",
@@ -155,8 +154,6 @@
     "assets/card_art/depth/4525553ef2901d98aee3-v2.depth.webp",
     "assets/card_art/depth/46dec8d833d1d935d194-v2.color.webp",
     "assets/card_art/depth/46dec8d833d1d935d194-v2.depth.webp",
-    "assets/card_art/depth/48640613679b51d9e401-v2.color.webp",
-    "assets/card_art/depth/48640613679b51d9e401-v2.depth.webp",
     "assets/card_art/depth/48a087f17641f8f1b24e-v2.color.webp",
     "assets/card_art/depth/48a087f17641f8f1b24e-v2.depth.webp",
     "assets/card_art/depth/49a88ea743eed8550dfc-v2.color.webp",

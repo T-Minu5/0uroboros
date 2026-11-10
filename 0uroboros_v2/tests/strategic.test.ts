@@ -94,8 +94,8 @@ describe("Strategic evaluation Draft", () => {
   });
 
   it("weights high-cost Attack and Horror picks from Cycle 8 (+40%, +60% from Cycle 12)", () => {
-    const attack = { id: "attack", label: "Attack" };
-    const horror = { id: "horror", label: "Horror" };
+    const attack = { id: "attack" };
+    const horror = { id: "horror" };
     const cheap = { cost: DRAFT_LATE_COST_THRESHOLD } as Card;
     const pricey = { cost: DRAFT_LATE_COST_THRESHOLD + 1 } as Card;
     expect(draftSlotPickWeight(attack, pricey, 7)).toBe(1);
@@ -104,7 +104,7 @@ describe("Strategic evaluation Draft", () => {
     expect(draftSlotPickWeight(horror, pricey, 11)).toBe(DRAFT_LATE_COST_WEIGHT);
     expect(draftSlotPickWeight(horror, pricey, DRAFT_LATE_COST_BIAS_HEAVY_FROM)).toBe(DRAFT_LATE_COST_WEIGHT_HEAVY);
     expect(draftSlotPickWeight(horror, pricey, 16)).toBe(DRAFT_LATE_COST_WEIGHT_HEAVY);
-    expect(draftSlotPickWeight({ id: "chaos-1", label: "Chaos" }, pricey, 14)).toBe(1);
+    expect(draftSlotPickWeight({ id: "chaos-1" }, pricey, 14)).toBe(1);
 
     const attackPool = EVALUATION_CHAOS_CARDS.filter(card => chaosClassOf(card) === "Attack");
     const horrorPool = EVALUATION_CHAOS_CARDS.filter(card => chaosClassOf(card) === "Horror");
