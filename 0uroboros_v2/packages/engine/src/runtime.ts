@@ -1,4 +1,4 @@
-import { EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, DRAFT_SLOTS_TEN, type MarketPile } from "./evaluationMarket";
+import { DRAFT_AVOID_ROUNDS, EVALUATION_ALL_CARDS, createStrategicMarket, draftOffer, DRAFT_SLOTS_TEN, type MarketPile } from "./evaluationMarket";
 import {
   describeConditionPredicate, meetsLocationCondition, revealedHere, type LocationCondition,
 } from "./locationConditions";
@@ -20,10 +20,10 @@ import {
   selectCircuitNode, revealOrder, starterEffects, canDeploy,
   shuffleCards, effectiveCardPower, cardPowerFloor, expandDeck, DEFAULT_STARTING_DECK, setPowerDelta, isCharacterCard,
 } from "./game";
-import { ACTIONS, describeStep, modBadge, optionText } from "./effects/catalog";
+import { ACTIONS, describeStep, inspectActionsFor, modBadge, optionText } from "./effects/catalog";
 import { migrateEffects } from "./effects/migrate";
 import { builtinMod } from "./builtinMods";
-import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type ModDefinition, type ModHook, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
+import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type InspectAction, type ModDefinition, type ModHook, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
 import { formatAmount, transferFlow, transferText } from "./transferText";
 import { DEFAULT_STRATEGY, deployPriority, draftScore, JUNK_KEEP_VALUE, keepValue, locationStakes, optionValue, planDraft, strategyPhase, thinningPicks, type StrategyContext, type StrategyProfile } from "./ai/strategy";
 import { TelemetryCollector, type GameTelemetry } from "./ai/telemetry";
@@ -172,12 +172,16 @@ export type RuntimeChoice = {
   id: number; owner: PlayerId; prompt: string; sourceName: string; node?: number; icon?: string;
   options: ChoiceOption[]; select?: { min: number; max: number }; groups?: ChoiceGroup[];
   transfer?: TransferChoice; zone?: ChoiceZone; /** Whose Discard when `zone` is `discard`. */ zoneOwner?: PlayerId; verb?: string;
+  /** Peek: look-only deck inspection; client auto-resolves after `autoResolveMs`. */
+  mode?: "peek";
+  autoResolveMs?: number;
 };
 /** `aiPick` returns a legal selection when the opponent chooses; without it the opponent picks at random. */
 type ChoiceRequest = {
   prompt: string; options: ChoiceOption[]; icon?: string; verb?: string;
   select?: { min: number; max: number }; groups?: ChoiceGroup[]; transfer?: TransferChoice;
   zone?: ChoiceZone; zoneOwner?: PlayerId;
+  mode?: "peek"; autoResolveMs?: number;
   resolve: (ids: string[]) => RuntimeEvent; aiPick?: () => string[];
 };
 export type PlayerState = {
@@ -320,7 +324,8 @@ export function seededRandom(seed: number): RandomSource {
 export function createSession(config: SessionConfig): RuntimeSession { return new RuntimeSession(config); }
 
 /** The first option in each group, or the leading options a `select` choice accepts; always legal to submit. */
-export function firstLegalSelection(choice: Pick<RuntimeChoice, "options" | "select" | "groups">): string[] {
+export function firstLegalSelection(choice: Pick<RuntimeChoice, "options" | "select" | "groups" | "mode">): string[] {
+  if (choice.mode === "peek") return [choice.options.find(option => !option.disabled)!.id];
   if (choice.groups) return choice.groups.map(group => choice.options.find(option => option.group === group.id)!.id);
   const count = choice.select ? Math.min(choice.select.max, Math.max(choice.select.min, 1)) : 1;
   return choice.options.filter(option => !option.disabled).slice(0, count).map(option => option.id);
@@ -442,6 +447,8 @@ export class RuntimeSession {
   private revealLog: RevealRecord[] = [];
   /** Runtime Hacks already awarded: `hackId:owner`. */
   private awardedRuntimeHacks = new Set<string>();
+  /** Rotating Draft identities from the last few rounds (avoided when the pool allows). */
+  private recentDraftOffers: string[][] = [];
 
   constructor(config: SessionConfig) {
     if (typeof config.carryover !== "boolean" || !["higher", "lower"].includes(config.priorityPreference)) throw new Error("Explicit Action carryover and priority policy are required.");
@@ -1341,14 +1348,17 @@ export class RuntimeSession {
       ...(request.zone ? { zone: request.zone } : {}),
       ...(request.zoneOwner !== undefined ? { zoneOwner: request.zoneOwner } : {}),
       ...(request.verb ? { verb: request.verb } : {}),
+      ...(request.mode ? { mode: request.mode } : {}),
+      ...(request.autoResolveMs !== undefined ? { autoResolveMs: request.autoResolveMs } : {}),
     };
     return this.event("choice", prompt, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
   }
 
-  private randomSelection(choice: Pick<RuntimeChoice, "options" | "select" | "groups">): string[] {
+  private randomSelection(choice: Pick<RuntimeChoice, "options" | "select" | "groups" | "mode">): string[] {
     const pick = <T>(items: T[]) => items[Math.floor(this.config.random() * items.length)];
-    if (choice.groups) return choice.groups.map(group => pick(choice.options.filter(option => option.group === group.id)).id);
     const open = choice.options.filter(option => !option.disabled);
+    if (choice.mode === "peek") return [pick(open).id];
+    if (choice.groups) return choice.groups.map(group => pick(choice.options.filter(option => option.group === group.id)).id);
     if (!choice.select) return [pick(open).id];
     const pool = [...open];
     const { min, max } = choice.select;
@@ -1363,7 +1373,9 @@ export class RuntimeSession {
     const ids = typeof selection === "string" ? [selection] : [...selection];
     const chosen = ids.map(id => choice.options.find(option => option.id === id));
     if (chosen.some(option => !option || option.disabled) || new Set(ids).size !== ids.length) throw new Error("Choose a legal option.");
-    if (choice.groups) {
+    if (choice.mode === "peek") {
+      if (ids.length !== 1) throw new Error("Choose one option.");
+    } else if (choice.groups) {
       if (ids.length !== choice.groups.length || choice.groups.some(group => chosen.filter(option => option!.group === group.id).length !== 1)) throw new Error("Choose one option for each card.");
     } else if (choice.select) {
       if (ids.length < choice.select.min || ids.length > choice.select.max) throw new Error(`Choose ${choice.select.min === choice.select.max ? choice.select.min : `${choice.select.min}–${choice.select.max}`} options.`);
@@ -1782,7 +1794,8 @@ export class RuntimeSession {
       }
       case "gainCard": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.gainCards(acting, step, recipient));
       case "mill": return this.forEachRecipient(ctx, step, true, (acting, recipient) => this.millStep(acting, step, recipient));
-      case "scry": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.resolveScry(acting.source, step.amount ?? 0, recipient));
+      case "scry": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.resolveScry(acting.source, step, recipient));
+      case "peek": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.resolvePeek(acting.source, step.amount ?? 0, recipient));
       case "stealCrypto": return this.forEachRecipient(ctx, step, true, (acting, recipient) => this.stealCrypto(acting, step, recipient));
       case "bump": return this.forEachRecipient(ctx, step, true, (acting, recipient) => this.bumpStep(acting, step, recipient));
       case "discardCards": case "trashCards": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.resolveHandSelection(acting, step, recipient));
@@ -2169,12 +2182,14 @@ export class RuntimeSession {
     });
   }
 
-  private resolveScry(placement: Deployment, amount: number, viewer: PlayerId): RuntimeEvent {
+  private resolveScry(placement: Deployment, step: EffectStep, viewer: PlayerId): RuntimeEvent {
+    const amount = step.amount ?? 0;
+    const allowed = inspectActionsFor(step);
     const player = this.state.players[viewer];
     const cards = player.draw.slice(0, amount);
     if (!cards.length) return this.event("choice", `${placement.card.name}: No target.`, { owner: placement.owner, amount: 0 });
-    const actions = new Map<string, { card: Card; action: "keep" | "discard" | "trash" }>();
-    const options = cards.flatMap(card => (["keep", "discard", "trash"] as const).map(action => {
+    const actions = new Map<string, { card: Card; action: InspectAction }>();
+    const options = cards.flatMap(card => allowed.map(action => {
       const id = `${action}:${card.id}`;
       actions.set(id, { card, action });
       return { id, label: action[0].toUpperCase() + action.slice(1), group: card.id };
@@ -2184,8 +2199,13 @@ export class RuntimeSession {
       if (action === "discard") player.discard.push(card); else { this.state.trash.push(card); this.recalculate(); }
       return this.event("trash", `${placement.card.name}: ${action} ${card.name}.`, { owner: placement.owner, targetOwner: viewer, target: action, amount: 1 });
     };
+    const prefer = (wanted: InspectAction, ...fallback: InspectAction[]) =>
+      [wanted, ...fallback].find(action => allowed.includes(action)) ?? allowed[0];
+    const list = allowed.length === 3 ? "keep, discard, or trash"
+      : allowed.length === 2 ? `${allowed[0]} or ${allowed[1]}`
+      : allowed[0];
     return this.openChoice(placement, {
-      prompt: `${placement.card.name}: inspect ${cards.length === 1 ? cards[0].name : `the top ${cards.length} cards`}. Choose keep, discard, or trash for each.`,
+      prompt: `${placement.card.name}: inspect ${cards.length === 1 ? cards[0].name : `the top ${cards.length} cards`}. Choose ${list} for each.`,
       groups: cards.map(card => ({ id: card.id, label: card.name, card: this.shownCard(card) })),
       options,
       aiPick: () => {
@@ -2193,16 +2213,36 @@ export class RuntimeSession {
         const thinned = viewer === placement.owner ? thinningPicks(cards, profile, context, cards.length) : [];
         return cards.map(card => {
           const value = keepValue(card, profile, context, true);
-          const action = viewer === placement.owner
-            ? thinned.includes(card) ? "trash" : value < AI_JUNK_VALUE * 2 ? "discard" : "keep"
-            : value >= AI_JUNK_VALUE * 3 ? "trash" : value >= AI_JUNK_VALUE * 2 ? "discard" : "keep";
-          return `${action}:${card.id}`;
+          const preferred = viewer === placement.owner
+            ? thinned.includes(card) ? prefer("trash", "discard", "keep")
+              : value < AI_JUNK_VALUE * 2 ? prefer("discard", "trash", "keep")
+              : prefer("keep", "discard", "trash")
+            : value >= AI_JUNK_VALUE * 3 ? prefer("trash", "discard", "keep")
+              : value >= AI_JUNK_VALUE * 2 ? prefer("discard", "trash", "keep")
+              : prefer("keep", "discard", "trash");
+          return `${preferred}:${card.id}`;
         });
       },
       resolve: ids => {
         const removals = ids.map(id => actions.get(id)!).filter((entry): entry is { card: Card; action: "discard" | "trash" } => entry.action !== "keep");
         return this.runSteps([...removals.map(apply), () => this.event("choice", `${placement.card.name}: deck inspection complete.`, { owner: placement.owner })]);
       },
+    });
+  }
+
+  private resolvePeek(placement: Deployment, amount: number, viewer: PlayerId): RuntimeEvent {
+    const player = this.state.players[viewer];
+    const cards = player.draw.slice(0, amount);
+    if (!cards.length) return this.event("choice", `${placement.card.name}: No target.`, { owner: placement.owner, amount: 0 });
+    const label = cards.length === 1 ? cards[0].name : `the top ${cards.length} cards`;
+    return this.openChoice(placement, {
+      prompt: `${placement.card.name}: peek at ${label}.`,
+      groups: cards.map(card => ({ id: card.id, label: card.name, card: this.shownCard(card) })),
+      options: [{ id: "done", label: "Done looking" }],
+      mode: "peek",
+      autoResolveMs: 6000,
+      aiPick: () => ["done"],
+      resolve: () => this.event("choice", `${placement.card.name}: peek complete.`, { owner: placement.owner, amount: cards.length }),
     });
   }
 
@@ -3523,18 +3563,17 @@ export class RuntimeSession {
     if (this.config.strategicMarket) {
       const identity = (pile: MarketPile) => pile.card.definitionId ?? pile.card.id;
       const persistent = this.state.market.filter(pile => !pile.rotating);
-      const previousOffer = new Set(this.state.market.filter(pile => pile.rotating).map(identity));
-      this.state.market = [
-        ...draftOffer(
-          this.config.random,
-          this.config.content,
-          new Set(persistent.map(identity)),
-          previousOffer,
-          this.state.cycle,
-          this.config.tenCardDraft ? DRAFT_SLOTS_TEN : undefined,
-        ),
-        ...persistent,
-      ];
+      const avoid = new Set(this.recentDraftOffers.flat());
+      const rotating = draftOffer(
+        this.config.random,
+        this.config.content,
+        new Set(persistent.map(identity)),
+        avoid,
+        this.state.cycle,
+        this.config.tenCardDraft ? DRAFT_SLOTS_TEN : undefined,
+      );
+      this.recentDraftOffers = [...this.recentDraftOffers, rotating.map(identity)].slice(-DRAFT_AVOID_ROUNDS);
+      this.state.market = [...rotating, ...persistent];
     }
     const record = this.cycleRecords[this.cycleRecords.length - 1];
     if (record) record.market = this.state.market.map(pile => ({ id: pile.card.definitionId ?? pile.card.id, name: pile.card.name, category: pile.category, cost: Math.max(0, pile.card.cost), stock: pile.remaining ? [pile.remaining[0], pile.remaining[1]] : [pile.supply, pile.supply] }));

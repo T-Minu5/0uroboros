@@ -1,6 +1,6 @@
 {
   "label": "strat-g@v1.28",
-  "savedAt": "2026-11-08T23:43:40.218Z",
+  "savedAt": "2026-11-12T01:54:53.170Z",
   "profile": {
     "version": 28,
     "plan": "",
@@ -14,7 +14,7 @@
     "dilution": 0.9,
     "weights": {
       "power": 1,
-      "draw": 2.36,
+      "draw": 2.32,
       "crypto": 2.88,
       "drain": 3,
       "restore": 2.5,
@@ -25,11 +25,11 @@
       "chaos": 2.02
     },
     "cardBias": {
-      "code-sniper": 0.7,
-      "cowl-obscyra": 0.7,
-      "card-jabbhu7e": 0.56,
-      "dash-dot": 0.56,
-      "delta-wave": 0.56
+      "koppy-kat": 0.7,
+      "code-sniper": 0.67,
+      "delta-wave": 0.67,
+      "cowl-obscyra": 0.5,
+      "card-jabbhu7e": 0.42
     }
   }
 }

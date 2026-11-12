@@ -614,13 +614,27 @@ const TRAILING_HINT = 'Only when Location counts differ: goes to the player who 
 function CircuitEditor({ item: reward, cards, update, applyAdvanced, onPendingChange }: EditorProps<AuthoredCircuitReward>) {
   const mods = useContext(ModsContext);
   const patch = (changes: Partial<AuthoredCircuitReward>) => update({ ...reward, ...changes });
-  const syncText = (effects: EffectStep[]) => patch({ effects, text: describeSteps(effects, 'circuit', asCards(cards), mods) });
+  const derived = describeSteps(reward.effects, 'circuit', asCards(cards), mods);
+  /* Text follows the effects until it is edited by hand; edited wording is kept, with the
+     generated line shown underneath to regenerate from. */
+  const syncEffects = (effects: EffectStep[]) => {
+    const following = !reward.text.trim() || reward.text.trim() === derived;
+    if (!following) { patch({ effects }); return; }
+    patch({ effects, text: describeSteps(effects, 'circuit', asCards(cards), mods) });
+  };
   return <div className="au-properties au-standalone-properties"><section className="au-panel"><SectionTitle title="Circuit reward properties" /><div className="au-field-grid">
     <TextField field="name" label="Name" value={reward.name} onChange={name => patch({ name })} />
-    <TextField field="text" className="au-span-all" label="Reward text (from effects)" value={reward.text} multiline readOnly hint="Written from the effects below." />
     <div className="au-span-all"><Toggle field="awardTrailing" label="Award to trailing player" checked={!!reward.awardTrailing} onChange={checked => update(withTrailing(reward, checked))} hint={TRAILING_HINT} /></div>
-  </div></section>
-    <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unique to this reward" title="Reward effects" description="An ordered recipe for the player claiming this reward. Select a step to edit it." /><StepList field="effects" title="On claim" scope="circuit" cards={asCards(cards)} steps={reward.effects} onChange={syncText} /></section>
+  </div>
+    <div className="au-printed-field">
+      <TextField field="text" label="Reward text" value={reward.text} onChange={text => patch({ text })} multiline hint="Shown when this Circuit reward is claimed. Shorten it as needed." />
+      {derived && derived !== reward.text.trim() && <div className="au-derived">
+        <span>Effects read as</span><p>{derived}</p>
+        <button type="button" className="au-button au-button-subtle" onClick={() => patch({ text: derived })}>Regenerate from effects</button>
+      </div>}
+    </div>
+  </section>
+    <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unique to this reward" title="Reward effects" description="An ordered recipe for the player claiming this reward. Select a step to edit it." /><StepList field="effects" title="On claim" scope="circuit" cards={asCards(cards)} steps={reward.effects} onChange={syncEffects} /></section>
     <details className="au-property-section"><summary>Identity</summary><IdentityFields id={reward.id} /></details>
     <AdvancedJson key={reward.id} item={reward} onApply={item => applyAdvanced(item as AuthoredCircuitReward)} onPendingChange={onPendingChange} />
   </div>;

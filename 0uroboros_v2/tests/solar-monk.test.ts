@@ -102,7 +102,7 @@ describe('Solar-monks', () => {
 
 describe('Location effects', () => {
   it('can target both players for card and zone effects, not just the winner or loser', () => {
-    for (const action of ['healCard', 'restoreCard', 'attachModifier', 'removeModifier', 'changePower', 'scry', 'bump', 'draw'] as const) {
+    for (const action of ['healCard', 'restoreCard', 'attachModifier', 'removeModifier', 'changePower', 'scry', 'peek', 'bump', 'draw'] as const) {
       expect(whoChoices(targetsFor(action, 'location')[0], 'location')).toEqual(expect.arrayContaining(['winner', 'loser', 'both']));
     }
     expect(whoLabel('both', 'location')).toBe('Both');

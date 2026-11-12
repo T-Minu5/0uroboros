@@ -43,11 +43,15 @@ export type Pick = { mode: PickMode; count?: number; chooser?: 'self' | 'opponen
 export type ActionId =
   | 'draw' | 'gainCrypto' | 'payCrypto' | 'gainVP' | 'gainCard'
   | 'damageServer' | 'repairServer' | 'destroyServer'
-  | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'recover' | 'stealCrypto' | 'bump'
+  | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'peek' | 'recover' | 'stealCrypto' | 'bump'
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'
   | 'createHologram' | 'copyPreviousOnReveal' | 'sacrificeCards'
   | 'stealDeckCard' | 'deckSwap' | 'placeCard' | 'copyText'
   | 'choice' | 'random';
+
+/** Per-card dispositions Inspect (`scry`) may offer. Absent / empty on a step means all three. */
+export type InspectAction = 'keep' | 'discard' | 'trash';
+export const INSPECT_ACTIONS: readonly InspectAction[] = ['keep', 'discard', 'trash'];
 
 export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
 export const BUILTIN_MODIFIERS: readonly ModifierKind[] = ['doublePrintedEffects', 'powerAuraAtLocation', 'movableEachTurn'];
@@ -73,6 +77,11 @@ export type EffectStep = {
   /** Follow-ups that run only once this step resolved without failing or being skipped. */
   then?: readonly EffectStep[];
   destination?: Destination;
+  /**
+   * Inspect (`scry`) only: which Keep / Discard / Trash choices are offered for each card.
+   * Omit or leave empty for the full three-way Inspect.
+   */
+  inspectActions?: readonly InspectAction[];
   cardId?: string;
   /**
    * Gain a card: optional pool of definition IDs. When set (and longer than one), each copy is

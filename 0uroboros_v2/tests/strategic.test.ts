@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_COPIES_PER_PLAYER, DRAFT_CRYPTO_OFFER_MIN, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_LATE_COST_BIAS_FROM, DRAFT_LATE_COST_BIAS_HEAVY_FROM, DRAFT_LATE_COST_THRESHOLD, DRAFT_LATE_COST_WEIGHT, DRAFT_LATE_COST_WEIGHT_HEAVY, DRAFT_SLOTS, DRAFT_SLOTS_TEN, cardGainsCryptoAtLeast, chaosClassOf, createStrategicMarket, draftOffer, draftSlotPickWeight, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
+import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_AVOID_ROUNDS, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_LATE_COST_BIAS_FROM, DRAFT_LATE_COST_BIAS_HEAVY_FROM, DRAFT_LATE_COST_THRESHOLD, DRAFT_LATE_COST_WEIGHT, DRAFT_LATE_COST_WEIGHT_HEAVY, DRAFT_SLOTS, DRAFT_SLOTS_TEN, chaosClassOf, createStrategicMarket, draftOffer, draftSlotPickWeight, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
 import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
 import { bundledContent } from "../src/contentPack/contentStore";
@@ -55,7 +55,6 @@ describe("Strategic evaluation Draft", () => {
     expect(isSolarMonk(built[6].card)).toBe(true);
     expect(built[7].card.type).toBe("VP");
     expect(isSolarMonk(built[7].card)).toBe(false);
-    expect(built.filter(pile => cardGainsCryptoAtLeast(pile.card)).length).toBeGreaterThanOrEqual(DRAFT_CRYPTO_OFFER_MIN);
   });
 
   it("never creates a persistent Crypto shelf, even if draftCrypto is requested", () => {
@@ -172,7 +171,6 @@ describe("Strategic evaluation Draft", () => {
         expect(offer[7].card.type).toBe("VP");
         expect(isSolarMonk(offer[7].card)).toBe(false);
       }
-      expect(offer.filter(pile => cardGainsCryptoAtLeast(pile.card)).length, `${label}: crypto floor`).toBeGreaterThanOrEqual(DRAFT_CRYPTO_OFFER_MIN);
     };
 
     for (const cycle of [1, 2, 3, 4, 5, 8, 12, 16] as const) {
@@ -182,22 +180,24 @@ describe("Strategic evaluation Draft", () => {
       }
     }
 
-    // Chained rounds: each offer avoids the previous identities when the pool allows.
+    // Chained rounds: each offer avoids identities from the last DRAFT_AVOID_ROUNDS when the pool allows.
     for (let seed = 1; seed <= 12; seed++) {
-      let previous = new Set<string>();
+      const recent: string[][] = [];
       for (const cycle of [1, 2, 3, 4, 5, 6] as const) {
-        const offer = draftOffer(seededRandom(seed * 31 + cycle), bundledContent, new Set(), previous, cycle);
+        const avoid = new Set(recent.flat());
+        const offer = draftOffer(seededRandom(seed * 31 + cycle), bundledContent, new Set(), avoid, cycle);
         assertOffer(offer, cycle, `chain seed ${seed} cycle ${cycle}`);
         const ids = offer.map(pile => pile.card.definitionId ?? pile.card.id);
-        if (previous.size) expect(ids.every(id => !previous.has(id)) || offer.length === DRAFT_SLOTS.length).toBe(true);
-        previous = new Set(ids);
+        if (avoid.size) expect(ids.every(id => !avoid.has(id)) || offer.length === DRAFT_SLOTS.length).toBe(true);
+        recent.push(ids);
+        if (recent.length > DRAFT_AVOID_ROUNDS) recent.shift();
       }
     }
   });
 
   it("enforces slot rules on live session Drafts for Cycles 1 through 5", () => {
     const session = make(19);
-    let previousIds = new Set<string>();
+    const recent: string[][] = [];
     for (let cycle = 1; cycle <= 5; cycle++) {
       draft(session);
       expect(session.state.cycle).toBe(cycle);
@@ -216,8 +216,10 @@ describe("Strategic evaluation Draft", () => {
         }
       }
       const ids = offer.map(pile => pile.card.definitionId ?? pile.card.id);
-      if (previousIds.size) expect(ids.some(id => previousIds.has(id))).toBe(false);
-      previousIds = new Set(ids);
+      const avoid = new Set(recent.flat());
+      if (avoid.size) expect(ids.some(id => avoid.has(id))).toBe(false);
+      recent.push(ids);
+      if (recent.length > DRAFT_AVOID_ROUNDS) recent.shift();
       session.endDraft(0); session.endDraft(1); session.nextCycle();
     }
   });

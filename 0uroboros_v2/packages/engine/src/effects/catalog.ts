@@ -7,9 +7,16 @@ import { describeWhileBody, describeWhilePredicate, type LocationWhile } from '.
 import { formatAmount, transferFlow, transferText } from '../transferText';
 import {
   DECK_ENDS, MOD_HOOKS, filterClasses, isBuiltinModifier, scopedWho,
-  type ActionId, type CardWhere, type ChoiceOption, type Destination, type EffectStep, type ModDefinition, type ModHook, type ModifierKind, type ModifierRef,
+  INSPECT_ACTIONS,
+  type ActionId, type CardWhere, type ChoiceOption, type Destination, type EffectStep, type InspectAction, type ModDefinition, type ModHook, type ModifierKind, type ModifierRef,
   type Pick, type PickMode, type Relation, type Scope, type ServerSlot, type Target, type TargetType, type Who, type ZoneId,
 } from './types';
+
+/** Allowed Inspect dispositions; missing or empty means Keep / Discard / Trash. */
+export function inspectActionsFor(step: Pick<EffectStep, 'inspectActions'>): readonly InspectAction[] {
+  const listed = step.inspectActions?.filter((action): action is InspectAction => INSPECT_ACTIONS.includes(action as InspectAction));
+  return listed?.length ? listed : INSPECT_ACTIONS;
+}
 
 /** Abstract sides a target may take; each scope spells them with its own `Who` values. */
 export type Role = 'ally' | 'enemy' | 'both' | 'any';
@@ -75,7 +82,8 @@ export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   discardCards: { id: 'discardCards', label: 'Discard', family: 'Zones', help: 'Up to this many cards. With a minimum and follow-ups, it works as a cost.', targets: [{ type: 'card', roles: PLAYERS, where: ['hand'] }], amount: { label: 'Cards', min: 1, max: 20, default: 1 }, picks: ['choose', 'random'], chooser: true, optional: true, min: true },
   trashCards: { id: 'trashCards', label: 'Trash', family: 'Zones', help: 'Up to this many cards go to the shared Trash.', targets: [{ type: 'card', roles: PLAYERS, where: ['hand', 'discard', 'deck'] }], amount: { label: 'Cards', min: 1, max: 20, default: 1 }, picks: ['choose', 'random'], chooser: true, optional: true, min: true },
   mill: { id: 'mill', label: 'Mill', family: 'Zones', help: 'Move cards from the top of a deck.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 0, max: 50, default: 1 }, destinations: ['discard', 'trash'] },
-  scry: { id: 'scry', label: 'Inspect', family: 'Zones', help: 'Look at the top cards and keep, discard or trash each.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 } },
+  scry: { id: 'scry', label: 'Inspect', family: 'Zones', help: 'Look at the top cards, then choose among the dispositions you author (Keep, Discard, and/or Trash) for each.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 } },
+  peek: { id: 'peek', label: 'Peek', family: 'Zones', help: 'Look at the top cards for a few seconds. No Keep / Discard / Trash — the deck stays as it was.', targets: [{ type: 'zone', roles: PLAYERS, zones: ['deck'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 } },
   recover: { id: 'recover', label: 'Recover', family: 'Zones', help: 'Take cards back from the shared Trash, your Discard, or your destroyed pile.', targets: [{ type: 'card', roles: ['ally'], where: ['trash', 'destroyed', 'discard'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], destinations: ['discard', 'hand', 'top'] },
   stealCrypto: { id: 'stealCrypto', label: 'Steal', family: 'Zones', help: 'Take Crypto cards from the enemy wallet into your hand.', targets: [{ type: 'zone', roles: ['enemy'], zones: ['wallet'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['random', 'choose'], chooser: true },
   bump: { id: 'bump', label: 'Bump', family: 'Zones', help: 'Send cards from the Effect Bank or wallet to their owner’s Discard.', targets: [{ type: 'zone', roles: ['enemy', 'ally', 'both'], zones: ['bank', 'wallet', 'bankOrWallet'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], chooser: true },
@@ -242,6 +250,7 @@ export const EDITOR_ENTRIES: readonly EditorEntry[] = [
     ],
   },
   { key: 'scry', label: 'Inspect', group: 'Deck', action: 'scry', targets: TOP_OF_DECK },
+  { key: 'peek', label: 'Peek', group: 'Deck', action: 'peek', targets: TOP_OF_DECK },
   { key: 'stealCrypto', label: 'Steal', group: 'Deck', action: 'stealCrypto', targets: [{ key: 'wallet', label: 'Wallet', zone: 'wallet' }] },
   { key: 'bump', label: 'Bump', group: 'Deck', action: 'bump', targets: [{ key: 'bank', label: 'Effect Bank', zone: 'bank' }, { key: 'wallet', label: 'Wallet', zone: 'wallet' }, { key: 'bankOrWallet', label: 'Effect Bank or Wallet', zone: 'bankOrWallet' }] },
   {
@@ -633,6 +642,14 @@ export function optionText(option: ChoiceOption, scope: Scope, cards: readonly C
   return option.cost?.length ? `${label} (${describeList(option.cost, scope, cards, mods)})` : label;
 }
 
+/** Printed Inspect clause for the allowed Keep / Discard / Trash set. */
+function inspectDispositionPhrase(actions: readonly InspectAction[]): string {
+  const labels = INSPECT_ACTIONS.filter(action => actions.includes(action));
+  if (labels.length === 3) return 'keep, discard or trash each';
+  if (labels.length === 2) return `${labels[0]} or ${labels[1]} each`;
+  return `${labels[0] ?? 'keep'} each`;
+}
+
 function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mods: readonly ModDefinition[]): string {
   const short = scope === 'card';
   const amount = step.amount ?? ACTIONS[step.action]?.amount?.default ?? 0;
@@ -688,7 +705,8 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
       return `${verb} ${count} from ${possessive(who, scope)} ${where}${random}${chooserText(step.pick, scope)}`;
     }
     case 'mill': return `Mill ${plural(amount, 'card')} from ${zoneOwner(step.target, scope)} deck${step.destination === 'trash' ? ' into the Trash' : ''}`;
-    case 'scry': return `Inspect the top ${plural(amount, 'card')} of ${zoneOwner(step.target, scope)} deck, then keep, discard or trash each`;
+    case 'scry': return `Inspect the top ${plural(amount, 'card')} of ${zoneOwner(step.target, scope)} deck, then ${inspectDispositionPhrase(inspectActionsFor(step))}`;
+    case 'peek': return `Peek at the top ${plural(amount, 'card')} of ${zoneOwner(step.target, scope)} deck`;
     case 'recover': {
       const from = step.target?.type === 'card' && step.target.where === 'destroyed' ? `${possessive(who, scope)} destroyed pile` : 'the shared Trash';
       const to = step.destination === 'hand' ? 'hand' : step.destination === 'top' ? 'deck top' : 'discard';
@@ -907,7 +925,7 @@ function mergeServerPairs(steps: readonly EffectStep[]): EffectStep[] {
 export type ValidationCards = { enabledIds: ReadonlySet<string>; types: ReadonlyMap<string, Card['type']>; modIds?: ReadonlySet<string> };
 const record = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value);
 const idPattern = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
-const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'cardId', 'cardIds', 'filter', 'maxCost', 'modifier', 'formIds', 'selection', 'cycleForms', 'resetAfterCycle', 'direction', 'flow', 'transfer', 'prompt', 'options', 'choose']);
+const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'inspectActions', 'cardId', 'cardIds', 'filter', 'maxCost', 'modifier', 'formIds', 'selection', 'cycleForms', 'resetAfterCycle', 'direction', 'flow', 'transfer', 'prompt', 'options', 'choose']);
 
 function amountIssue(spec: AmountSpec, value: unknown): string | null {
   if (spec.integer === false) {
@@ -974,6 +992,17 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
     else if (typeof step.amount === 'number' && step.min > step.amount) errors.push(`${p}.min: cannot exceed amount`);
   }
   if (step.destination !== undefined && !spec.destinations?.includes(step.destination)) errors.push(`${p}.destination: expected ${(spec.destinations ?? []).join(', ') || 'none'}`);
+  if (step.inspectActions !== undefined) {
+    if (action !== 'scry') errors.push(`${p}.inspectActions: unsupported field`);
+    else {
+      const listed = step.inspectActions as unknown;
+      if (!Array.isArray(listed) || !listed.length || listed.length > INSPECT_ACTIONS.length) errors.push(`${p}.inspectActions: pick at least one of Keep, Discard, Trash`);
+      else if (new Set(listed).size !== listed.length) errors.push(`${p}.inspectActions: each disposition may appear only once`);
+      else listed.forEach((item, at) => {
+        if (!INSPECT_ACTIONS.includes(item as InspectAction)) errors.push(`${p}.inspectActions[${at}]: expected keep, discard or trash`);
+      });
+    }
+  }
   if (action === 'gainCard') {
     const pool = step.cardIds as unknown;
     if (pool !== undefined) {

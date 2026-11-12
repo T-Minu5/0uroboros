@@ -135,27 +135,43 @@ export function declineLabel(verb:string,max:number){
 
 export function EffectChoice({choice,choose,transferView,transferHover}:{choice:Choice;choose:(selection:string|string[])=>void;transferView?:TransferView|null;transferHover?:(id:string|null)=>void}){
  const dialog=useRef<HTMLElement>(null);
+ const peekDone=useRef(false);
  const [picked,setPicked]=useState<string[]>([]);
+ const [peekLeft,setPeekLeft]=useState(()=>choice.mode==='peek'?Math.ceil((choice.autoResolveMs??6000)/1000):0);
+ const finishPeek=()=>{if(peekDone.current)return;peekDone.current=true;choose(['done']);};
  useEffect(()=>{
   setPicked([]);
+  peekDone.current=false;
   const previous=document.activeElement as HTMLElement|null;
   if(choice.transfer)dialog.current?.focus();
   else dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();
   return()=>{if(previous?.isConnected)previous.focus();};
  },[choice.id]);
+ useEffect(()=>{
+  if(choice.mode!=='peek')return;
+  const ms=choice.autoResolveMs??6000;
+  const started=Date.now();
+  peekDone.current=false;
+  setPeekLeft(Math.ceil(ms/1000));
+  const tick=window.setInterval(()=>setPeekLeft(Math.max(0,Math.ceil((ms-(Date.now()-started))/1000))),250);
+  const timer=window.setTimeout(()=>{if(peekDone.current)return;peekDone.current=true;choose(['done']);},ms);
+  return()=>{window.clearInterval(tick);window.clearTimeout(timer);};
+ // eslint-disable-next-line react-hooks/exhaustive-deps -- only restart the peek timer when the choice identity changes
+ },[choice.id,choice.mode,choice.autoResolveMs]);
  const nodes=choiceNodes(choice);
  const nodeMode=nodes.length>0;
+ const peekMode=choice.mode==='peek';
  const {select,groups}=choice;
  const cardOptions=choice.options.filter(hasCard);
  const declineOption=choice.options.find(option=>!option.card&&DECLINE_IDS.includes(option.id));
  const plainOptions=choice.options.filter(option=>!option.card&&option!==declineOption);
  const verb=choice.verb??'Select';
  /* Single card picks are confirmed too, so every card choice ends on the same verb button. */
- const singleCard=!select&&!groups&&!nodeMode&&cardOptions.length>0;
+ const singleCard=!select&&!groups&&!nodeMode&&!peekMode&&cardOptions.length>0;
  const selection=select??(singleCard?{min:declineOption?0:1,max:1}:undefined);
  const confirm=()=>singleCard?choose(picked[0]):choose(picked);
  /* An optional cost: the payment becomes the primary button beside its decline. */
- const payment=!!declineOption&&!cardOptions.length&&!select&&!groups&&!nodeMode;
+ const payment=!!declineOption&&!cardOptions.length&&!select&&!groups&&!nodeMode&&!peekMode;
  const decline=declineOption?()=>choose(declineOption.id):selection?.min===0?()=>choose([]):null;
  const toggle=(id:string)=>setPicked(current=>{
   if(current.includes(id))return current.filter(entry=>entry!==id);
@@ -163,18 +179,19 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
   return [...current,id];
  });
  const pickInGroup=(group:string,id:string)=>setPicked(current=>[...current.filter(entry=>choice.options.find(option=>option.id===entry)?.group!==group),id]);
- const ready=groups?groups.every(group=>picked.some(id=>choice.options.find(option=>option.id===id)?.group===group.id)):selection?picked.length>=Math.max(1,selection.min)&&picked.length<=selection.max:false;
+ const ready=groups&&!peekMode?groups.every(group=>picked.some(id=>choice.options.find(option=>option.id===id)?.group===group.id)):selection?picked.length>=Math.max(1,selection.min)&&picked.length<=selection.max:false;
  const transfer=!!choice.transfer&&!!transferView;
  const noun=cardOptions.length?'card':'option';
- const heading=nodeMode?'Select a Node':groups?'Decide for each card':select?(cardOptions.length?(select.max===1?'Select a card':'Select cards'):'Make your choices'):cardOptions.length?'Select a card':'Make your choice';
+ const heading=nodeMode?'Select a Node':peekMode?'Peek at these cards':groups?'Decide for each card':select?(cardOptions.length?(select.max===1?'Select a card':'Select cards'):'Make your choices'):cardOptions.length?'Select a card':'Make your choice';
  const instruction=nodeMode?'Click one of the highlighted Nodes on the board.'
+  :peekMode?`Look freely, then continue. Auto-continues in ${peekLeft}s.`
   :groups?'Choose an option under every card, then confirm. Nothing resolves until you confirm.'
   :select?`${select.min===select.max?`Select ${select.max}`:select.min?`Select ${select.min} to ${select.max}`:`Select up to ${select.max}`} ${noun}${select.max===1?'':'s'}, then confirm. Nothing resolves until you confirm.`
   :null;
- const footer=nodeMode?'Resolution continues after you select a Node.':groups?`${picked.length} of ${groups.length} decided`:selection?`${picked.length} of ${selection.max} selected`:'Resolution continues after your choice.';
- const primary=groups?'Confirm':selection?confirmLabel(verb,selection,picked.length,noun):null;
+ const footer=nodeMode?'Resolution continues after you select a Node.':peekMode?`Continues in ${peekLeft}s`:groups?`${picked.length} of ${groups.length} decided`:selection?`${picked.length} of ${selection.max} selected`:'Resolution continues after your choice.';
+ const primary=peekMode?'Done looking':groups?'Confirm':selection?confirmLabel(verb,selection,picked.length,noun):null;
  const onBoard=nodeMode||transfer;
- return <div className={`choice-backdrop ${onBoard?'node-choice':''}`}><section ref={dialog} className={`choice-dialog ${cardOptions.length||groups?'has-cards':''} ${transfer?'has-transfer':''}`} role='dialog' tabIndex={-1} aria-modal={onBoard?undefined:'true'} aria-label='Resolve card choice' data-choice-mode={transfer?'transfer':nodeMode?'node':groups?'groups':select?'select':'single'} onKeyDown={event=>{
+ return <div className={`choice-backdrop ${onBoard?'node-choice':''}`}><section ref={dialog} className={`choice-dialog ${cardOptions.length||groups?'has-cards':''} ${transfer?'has-transfer':''}`} role='dialog' tabIndex={-1} aria-modal={onBoard?undefined:'true'} aria-label='Resolve card choice' data-choice-mode={transfer?'transfer':peekMode?'peek':nodeMode?'node':groups?'groups':select?'select':'single'} onKeyDown={event=>{
   if(onBoard||event.key!=='Tab')return;
   const buttons=Array.from(dialog.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')??[]);
   const first=buttons[0],last=buttons[buttons.length-1];
@@ -188,6 +205,9 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
    {instruction&&<p className='choice-instruction'>{instruction}</p>}
   </>}
   {transfer?null
+  :peekMode&&groups?<div className='choice-groups'>{groups.map(group=><div className='choice-group' key={group.id}>
+    {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:<b>{group.label}</b>}
+   </div>)}</div>
   :groups?<div className='choice-groups'>{groups.map(group=><div className='choice-group' key={group.id}>
     {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:<b>{group.label}</b>}
     <div className='choice-group-actions' role='radiogroup' aria-label={group.label}>{choice.options.filter(option=>option.group===group.id).map(option=><button type='button' key={option.id} role='radio' aria-checked={picked.includes(option.id)} className={picked.includes(option.id)?'selected':''} data-choice-option={option.id} onClick={()=>pickInGroup(group.id,option.id)}>{option.label}</button>)}</div>
@@ -198,7 +218,7 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
   </>}
   {!transfer&&<footer><span>{footer}</span>{(primary||decline||payment)&&<div className='choice-actions'>
    {decline&&<button type='button' className='choice-decline' data-choice-decline onClick={decline}>{declineLabel(verb,selection?.max??1)}</button>}
-   {primary&&<button type='button' className='choice-confirm' disabled={!ready} onClick={confirm}>{primary}</button>}
+   {primary&&<button type='button' className='choice-confirm' disabled={peekMode?false:!ready} onClick={peekMode?finishPeek:confirm}>{primary}</button>}
    {payment&&plainOptions.map(option=><button type='button' key={option.id} className='choice-confirm' data-choice-option={option.id} onClick={()=>choose(option.id)}>{option.label}</button>)}
   </div>}</footer>}
  </section></div>;

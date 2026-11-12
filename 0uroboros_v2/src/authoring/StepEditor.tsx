@@ -4,12 +4,12 @@ import { builtinMod } from '@0uroboros/engine/builtinMods';
 import {
   ACTIONS, COST_ACTIONS, DESTINATION_LABELS, EDITOR_ENTRIES, EDITOR_GROUPS, MAX_DEPTH, PICK_LABELS, RELATION_LABELS, SERVER_LABELS,
   TARGET_TYPE_LABELS, WHERE_LABELS, ZONE_LABELS,
-  actionsFor, applyEditorEntry, applyTargetChoice, clampAmount, currentTargetChoice, editorEntryFor, targetChoicesFor, createStep, defaultTarget, describeStep, matchTargetSpec, targetsFor, whoChoices, whoLabel,
+  actionsFor, applyEditorEntry, applyTargetChoice, clampAmount, currentTargetChoice, editorEntryFor, inspectActionsFor, targetChoicesFor, createStep, defaultTarget, describeStep, matchTargetSpec, targetsFor, whoChoices, whoLabel,
   type TargetSpec,
 } from '@0uroboros/engine/effects/catalog';
 import {
-  BUILTIN_MODIFIERS, DECK_ENDS, filterClasses, isBuiltinModifier, scopedWho,
-  type CardClass, type CardFilter, type ChoiceOption, type EffectStep, type ModDefinition, type PickMode, type Relation, type Scope, type Target, type Who,
+  BUILTIN_MODIFIERS, DECK_ENDS, INSPECT_ACTIONS, filterClasses, isBuiltinModifier, scopedWho,
+  type CardClass, type CardFilter, type ChoiceOption, type EffectStep, type InspectAction, type ModDefinition, type PickMode, type Relation, type Scope, type Target, type Who,
 } from '@0uroboros/engine/effects/types';
 import { NumberInput } from './NumberInput';
 import { useEditorFocus } from './editorContext';
@@ -404,6 +404,24 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {spec.chooser && scope !== 'locationCondition' && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
+    {step.action === 'scry' && <div className="au-step-grid au-step-wide" role="group" aria-label="Inspect dispositions">
+      <span className="au-recipe-field"><span>For each card, allow</span></span>
+      {INSPECT_ACTIONS.map(action => {
+        const allowed = inspectActionsFor(step);
+        const checked = allowed.includes(action);
+        const label = action[0].toUpperCase() + action.slice(1);
+        return <label key={action} className="au-recipe-check">
+          <input type="checkbox" checked={checked} aria-label={label} onChange={event => {
+            const next = (event.target.checked
+              ? INSPECT_ACTIONS.filter(item => allowed.includes(item) || item === action)
+              : allowed.filter(item => item !== action)) as InspectAction[];
+            if (!next.length) return;
+            patch({ inspectActions: next.length === INSPECT_ACTIONS.length ? undefined : next });
+          }} />
+          <span>{label}</span>
+        </label>;
+      })}
+    </div>}
     {step.action === 'gainCard' && <GainCardPicker step={step} cards={cards} onChange={patch} />}
     {step.action === 'attachModifier' && <>
       <ModifierPicker step={step} onChange={patch} />

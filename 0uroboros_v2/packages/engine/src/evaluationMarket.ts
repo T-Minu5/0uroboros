@@ -45,9 +45,11 @@ export const DRAFT_OFFER_COUNT_TEN=10;
 export const DRAFT_OFFER_COUNT_MIDDLE=DRAFT_OFFER_COUNT;
 export const DRAFT_SOLAR_MONK_COUNT=1;
 export const DRAFT_COPIES_PER_PLAYER=2;
-/** Cycles 1–4 only offer cards costing 1–7 Crypto. */
-export const DRAFT_EARLY_COST_MAX=7;
+/** Cycles 1–4 only offer cards costing 1–8 Crypto. */
+export const DRAFT_EARLY_COST_MAX=8;
 export const DRAFT_EARLY_CYCLES=4;
+/** Prefer identities not seen in this many prior Draft rounds, when the pool allows. */
+export const DRAFT_AVOID_ROUNDS=3;
 /**
  * From this Cycle on, Attack and Horror slots weight cards costing above DRAFT_LATE_COST_THRESHOLD
  * more heavily when filling the offer.
@@ -61,9 +63,8 @@ export const DRAFT_LATE_COST_THRESHOLD=6;
 export const DRAFT_LATE_COST_WEIGHT=1.4;
 /** Relative pick weight for high-cost Attack/Horror in Cycles DRAFT_LATE_COST_BIAS_HEAVY_FROM+ (+60%). */
 export const DRAFT_LATE_COST_WEIGHT_HEAVY=1.6;
-/** Soft floor: at least this many offered cards must print +N Crypto with N ≥ this amount. */
+/** @deprecated Soft crypto floor removed; kept for older imports that still check Crypto income. */
 export const DRAFT_CRYPTO_GAIN_MIN=2;
-export const DRAFT_CRYPTO_OFFER_MIN=2;
 
 /** Classic Crypto definition ids that often fill Hacker/Crypto Draft slots (not a persistent shelf). */
 export const CURRENCY_CARD_IDS:readonly string[]=['shyte-coin','byte-coin','kilo-coin','mega-cache'];
@@ -153,16 +154,14 @@ export type DraftSlot={
  label:string;
  category:(entry:PoolEntry)=>MarketCategory;
  matches:(entry:PoolEntry)=>boolean;
- /** Soft slots may be swapped to meet the crypto-gain floor. */
- soft?:boolean;
 };
 
 /** Default 8-card Draft: Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP. */
 export const DRAFT_SLOTS:readonly DraftSlot[]=[
- {id:'action-utility-1',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility',soft:true},
- {id:'action-utility-2',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility',soft:true},
- {id:'hacker-crypto-1',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto',soft:true},
- {id:'hacker-crypto-2',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto',soft:true},
+ {id:'action-utility-1',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility'},
+ {id:'action-utility-2',label:'Action or Utility',category:()=>'Base',matches:({card})=>card.cardClass==='Action'||card.cardClass==='Utility'},
+ {id:'hacker-crypto-1',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto'},
+ {id:'hacker-crypto-2',label:'Hacker or Crypto',category:entry=>entry.category,matches:({card})=>card.cardClass==='Hacker'||card.type==='Crypto'},
  {id:'attack',label:'Attack',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Attack'},
  {id:'horror',label:'Horror',category:()=>'Chaos',matches:({card,category})=>category==='Chaos'&&chaosClassOf(card)==='Horror'},
  {id:'solar-monk',label:'Solar Monk',category:()=>'VP',matches:({card})=>isSolarMonk(card)},
@@ -172,8 +171,8 @@ export const DRAFT_SLOTS:readonly DraftSlot[]=[
 /** Optional 10-card Draft: default eight plus two general Chaos fills. */
 export const DRAFT_SLOTS_TEN:readonly DraftSlot[]=[
  ...DRAFT_SLOTS.slice(0,4),
- {id:'chaos-1',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos',soft:true},
- {id:'chaos-2',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos',soft:true},
+ {id:'chaos-1',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
+ {id:'chaos-2',label:'Chaos',category:()=>'Chaos',matches:({category})=>category==='Chaos'},
  ...DRAFT_SLOTS.slice(4),
 ];
 
@@ -186,7 +185,7 @@ export const DRAFT_SLOT_SUMMARY_TEN=DRAFT_SLOTS_TEN.map(slot=>slot.label).join('
 export type DraftPhase={from:number;to:number;favours:string;share:number;matches:(entry:PoolEntry)=>boolean};
 export const DRAFT_PHASES:readonly DraftPhase[]=[];
 export const draftPhase=(_cycle:number):DraftPhase=>({from:1,to:16,favours:'slot rules',share:1,matches:()=>true});
-export const DRAFT_PHASE_SUMMARY=`Default ${DRAFT_OFFER_COUNT} slots: ${DRAFT_SLOT_SUMMARY}. Optional ${DRAFT_OFFER_COUNT_TEN}: ${DRAFT_SLOT_SUMMARY_TEN}. At least ${DRAFT_CRYPTO_OFFER_MIN} cards with +${DRAFT_CRYPTO_GAIN_MIN} Crypto. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost. From Cycle ${DRAFT_LATE_COST_BIAS_FROM}, Attack/Horror slots favour cost >${DRAFT_LATE_COST_THRESHOLD} (+${Math.round((DRAFT_LATE_COST_WEIGHT-1)*100)}%, +${Math.round((DRAFT_LATE_COST_WEIGHT_HEAVY-1)*100)}% from Cycle ${DRAFT_LATE_COST_BIAS_HEAVY_FROM}).`;
+export const DRAFT_PHASE_SUMMARY=`Default ${DRAFT_OFFER_COUNT} slots: ${DRAFT_SLOT_SUMMARY}. Optional ${DRAFT_OFFER_COUNT_TEN}: ${DRAFT_SLOT_SUMMARY_TEN}. Prefer identities not offered in the last ${DRAFT_AVOID_ROUNDS} Drafts. Cycles 1–${DRAFT_EARLY_CYCLES} cost ${1}–${DRAFT_EARLY_COST_MAX}; later Cycles any cost. From Cycle ${DRAFT_LATE_COST_BIAS_FROM}, Attack/Horror slots favour cost >${DRAFT_LATE_COST_THRESHOLD} (+${Math.round((DRAFT_LATE_COST_WEIGHT-1)*100)}%, +${Math.round((DRAFT_LATE_COST_WEIGHT_HEAVY-1)*100)}% from Cycle ${DRAFT_LATE_COST_BIAS_HEAVY_FROM}).`;
 
 /** Attack and Horror hard slots that receive late-game high-cost pick weighting. */
 export function isLateCostBiasedSlot(slot:Pick<DraftSlot,'id'>):boolean{
@@ -243,48 +242,9 @@ function pickForSlot(
 }
 
 /**
- * After slots fill, soft-swap until at least DRAFT_CRYPTO_OFFER_MIN cards gain ≥ DRAFT_CRYPTO_GAIN_MIN Crypto.
- * Hard slots (Attack / Horror / Solar Monk / VP) stay put.
- */
-function ensureCryptoFloor(
- offered:{card:Card;category:MarketCategory}[],
- slots:readonly DraftSlot[],
- pool:readonly PoolEntry[],
- taken:Set<string>,
- previousIds:ReadonlySet<string>,
- random:RandomSource,
- cycle?:number,
-){
- const soft=slots.map((slot,index)=>slot.soft?index:-1).filter(index=>index>=0&&index<offered.length);
- let need=DRAFT_CRYPTO_OFFER_MIN-offered.filter(entry=>cardGainsCryptoAtLeast(entry.card)).length;
- if(need<=0)return;
- for(const index of soft){
-  if(need<=0)break;
-  if(cardGainsCryptoAtLeast(offered[index].card))continue;
-  const slot=slots[index];
-  const candidates=pool.filter(entry=>
-   slot.matches(entry)
-   &&cardGainsCryptoAtLeast(entry.card)
-   &&!taken.has(cardId(entry.card))
-   &&inEarlyCost(entry.card,cycle)
-  );
-  const prefer=candidates.filter(entry=>!previousIds.has(cardId(entry.card)));
-  const pickFrom=prefer.length?prefer:candidates.length?candidates:pool.filter(entry=>
-   slot.matches(entry)&&cardGainsCryptoAtLeast(entry.card)&&!taken.has(cardId(entry.card))
-  );
-  const next=pick(pickFrom,1,random)[0];
-  if(!next)continue;
-  taken.delete(cardId(offered[index].card));
-  taken.add(cardId(next.card));
-  offered[index]={card:next.card,category:slot.category(next)};
-  need-=1;
- }
-}
-
-/**
  * One Draft round: ordered rotating offers (2 copies per player). Slot order is top row then
- * bottom row. Last round's identities are avoided while the pool allows. `gameIds` is ignored
- * (fixed piles removed). Pass `DRAFT_SLOTS_TEN` for the optional 10-card Draft.
+ * bottom row. Identities from the last DRAFT_AVOID_ROUNDS rounds are avoided while the pool allows.
+ * `gameIds` is ignored (fixed piles removed). Pass `DRAFT_SLOTS_TEN` for the optional 10-card Draft.
  */
 export function draftOffer(
  random:RandomSource,
@@ -303,7 +263,6 @@ export function draftOffer(
   taken.add(cardId(entry.card));
   offered.push({card:entry.card,category:slot.category(entry)});
  }
- ensureCryptoFloor(offered,slots,pool,taken,previousIds,random,cycle);
  return offered.map(({card,category})=>({
   id:`Draft:${cardId(card)}`,
   card:structuredClone(card),

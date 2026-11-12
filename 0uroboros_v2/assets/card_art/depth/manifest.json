@@ -604,6 +604,15 @@
       "height": 300,
       "focus": 0.5049
     },
+    "/assets/card_art/uploads/agent-bateman.png": {
+      "sha": "1be4479cf257055bd94d88610fa3c602a299cabb503f2230a553b296f9d70615",
+      "v": 2,
+      "color": "/assets/card_art/depth/1be4479cf257055bd94d-v2.color.webp",
+      "depth": "/assets/card_art/depth/1be4479cf257055bd94d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4472
+    },
     "/assets/card_art/uploads/agent-reaper.png": {
       "sha": "c13e9db8b16a42eabdb1103dc74c1673a653afa2118e6e2771a6d9d181ebe442",
       "v": 2,

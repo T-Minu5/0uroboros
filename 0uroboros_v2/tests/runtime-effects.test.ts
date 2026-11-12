@@ -1,10 +1,11 @@
 import {expect,it} from 'vitest';
 import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '@0uroboros/engine/runtime';
 import {EVALUATION_ALL_CARDS} from '@0uroboros/engine/evaluationMarket';
-import {starterCards,type Card,type EvaluationEffect} from '@0uroboros/engine/game';
+import {starterCards,type Card} from '@0uroboros/engine/game';
+import type {AnyEffect} from '@0uroboros/engine/effects/types';
 import {transferText} from '@0uroboros/engine/transferText';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,midCycleDraw:false,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
-const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>{
+const card=(id:string,effects:AnyEffect[]=[],extra:Partial<Card>={}):Card=>{
  const next:Card={...starterCards[0],id,onReveal:effects,...extra};
  // Starter Character power must not leak onto wallet Crypto stand-ins.
  if(next.type==='Crypto'&&!('power' in extra))delete (next as {power?:number}).power;
@@ -57,6 +58,53 @@ it('scry asks keep, discard, or trash for every inspected card and applies them 
  expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','d']);
  expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['b']);
  expect(s.state.trash.map(c=>c.id)).toEqual(['c']);
+});
+
+it('scry respects authored Keep / Discard / Trash subsets',()=>{
+ const s=make();s.state.players[0].draw=['a','b','c'].map(id=>card(id));
+ play(s,card('scry-subset',[{
+  action:'scry',amount:2,inspectActions:['discard','trash'],
+  target:{type:'zone',who:'self',zone:'deck'},
+ }]));
+ expect(s.state.choice?.options.filter(o=>o.group==='a').map(o=>o.label)).toEqual(['Discard','Trash']);
+ expect(s.state.choice?.prompt).toMatch(/discard or trash/);
+ s.choose(['discard:a','trash:b']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['c']);
+ expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['a']);
+ expect(s.state.trash.map(c=>c.id)).toEqual(['b']);
+});
+
+it('scry with keep-only leaves the deck untouched',()=>{
+ const s=make();s.state.players[0].draw=['a','b'].map(id=>card(id));
+ play(s,card('scry-keep',[{
+  action:'scry',amount:2,inspectActions:['keep'],
+  target:{type:'zone',who:'self',zone:'deck'},
+ }]));
+ expect(s.state.choice?.options.map(o=>o.label)).toEqual(['Keep','Keep']);
+ s.choose(['keep:a','keep:b']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b']);
+ expect(s.state.players[0].discard).toHaveLength(0);
+ expect(s.state.trash).toHaveLength(0);
+});
+
+it('peek shows the top cards then leaves the deck unchanged after Done looking',()=>{
+ const s=make();s.state.players[0].draw=['a','b','c'].map(id=>card(id));
+ play(s,card('peek',[{action:'peek',amount:2,target:{type:'zone',who:'self',zone:'deck'}}]));
+ expect(s.state.choice).toMatchObject({mode:'peek',autoResolveMs:6000});
+ expect(s.state.choice?.groups?.map(g=>g.card?.id)).toEqual(['a','b']);
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['done']);
+ s.choose(['done']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b','c']);
+ expect(s.state.players[0].discard).toHaveLength(0);
+ expect(s.state.trash).toHaveLength(0);
+});
+
+it('peek times out through resolveChoiceTimeout without moving cards',()=>{
+ const s=make();s.state.players[0].draw=['a','b'].map(id=>card(id));
+ play(s,card('peek',[{action:'peek',amount:1,target:{type:'zone',who:'self',zone:'deck'}}]));
+ expect(s.state.choice?.mode).toBe('peek');
+ s.resolveChoiceTimeout();drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b']);
 });
 
 it('scoped attacking-owner choice can choose an opposing card without exposing the rest of the hand view',()=>{

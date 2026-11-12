@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import source from '../assets/card_art/cards.json';
 import { HISTORIC_CARDS, HISTORIC_EXCLUSIONS, HISTORIC_SOURCE_METADATA } from '@0uroboros/engine/historicCatalog';
-import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_CRYPTO_OFFER_MIN, DRAFT_SLOTS, cardGainsCryptoAtLeast, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
+import { EVALUATION_ALL_CARDS, EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, DRAFT_EARLY_COST_MAX, DRAFT_SLOTS, draftOffer, createStrategicMarket, isSolarMonk } from '@0uroboros/engine/evaluationMarket';
 import { CARD_ART_PLACEHOLDER, cardArtworkPath } from '@0uroboros/engine/cardArtwork';
 import { migrateEffects } from '@0uroboros/engine/effects/migrate';
 import type { AnyEffect, EffectStep } from '@0uroboros/engine/effects/types';
@@ -52,17 +52,16 @@ describe('Historic catalog activation',()=>{
   expect(isSolarMonk(offer[6].card)).toBe(true);
   expect(offer[7].card.type).toBe('VP');
   expect(isSolarMonk(offer[7].card)).toBe(false);
-  expect(offer.filter(p=>cardGainsCryptoAtLeast(p.card)).length).toBeGreaterThanOrEqual(DRAFT_CRYPTO_OFFER_MIN);
   const ids=offer.map(p=>p.card.definitionId??p.card.id);
   expect(new Set(ids).size).toBe(ids.length);
   const next=draftOffer(()=>.71,bundledContent,new Set(),new Set(ids),1);
   expect(next.every(p=>!offer.some(previous=>previous.id===p.id))).toBe(true);
  });
- it('caps offer costs at 1–7 in Cycles 1–4 and still rotates later',()=>{
+ it('caps offer costs at 1–8 in Cycles 1–4 and still rotates later',()=>{
   for(let seed=1;seed<=80;seed++){
    const offer=draftOffer(seededRandom(seed),bundledContent,new Set(),new Set(),2);
    for(const pile of offer)expect(pile.card.cost,pile.card.name).toBeGreaterThanOrEqual(1);
-   for(const pile of offer)expect(pile.card.cost,pile.card.name).toBeLessThanOrEqual(7);
+   for(const pile of offer)expect(pile.card.cost,pile.card.name).toBeLessThanOrEqual(DRAFT_EARLY_COST_MAX);
   }
   const late=draftOffer(seededRandom(3),bundledContent,new Set(),new Set(),14);
   expect(late.length).toBeGreaterThanOrEqual(8);
