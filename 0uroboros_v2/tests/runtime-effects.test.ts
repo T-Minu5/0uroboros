@@ -1,7 +1,7 @@
 import {expect,it} from 'vitest';
 import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '@0uroboros/engine/runtime';
 import {EVALUATION_ALL_CARDS} from '@0uroboros/engine/evaluationMarket';
-import {starterCards,type Card} from '@0uroboros/engine/game';
+import {starterCards,type Card,type EvaluationEffect} from '@0uroboros/engine/game';
 import type {AnyEffect} from '@0uroboros/engine/effects/types';
 import {transferText} from '@0uroboros/engine/transferText';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,midCycleDraw:false,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};

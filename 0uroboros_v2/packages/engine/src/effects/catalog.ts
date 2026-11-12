@@ -13,8 +13,8 @@ import {
 } from './types';
 
 /** Allowed Inspect dispositions; missing or empty means Keep / Discard / Trash. */
-export function inspectActionsFor(step: Pick<EffectStep, 'inspectActions'>): readonly InspectAction[] {
-  const listed = step.inspectActions?.filter((action): action is InspectAction => INSPECT_ACTIONS.includes(action as InspectAction));
+export function inspectActionsFor(step: { inspectActions?: readonly InspectAction[] }): readonly InspectAction[] {
+  const listed = step.inspectActions?.filter((action): action is InspectAction => INSPECT_ACTIONS.includes(action));
   return listed?.length ? listed : INSPECT_ACTIONS;
 }
 
