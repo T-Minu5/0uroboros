@@ -4718,7 +4718,7 @@
         "cardClass": "Utility",
         "power": 1,
         "cost": 7,
-        "art": "/assets/card_art/placeholder.png",
+        "art": "/assets/card_art/image_placeHolder.png",
         "effect": "+1 Crypto every time your enemy draws a card.",
         "pool": "Base",
         "enabled": true,
