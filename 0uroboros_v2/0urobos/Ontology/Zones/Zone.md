@@ -37,4 +37,4 @@ flowchart LR
 | [[Trash]] | Shared | Recoverable |
 | [[Destroyed]] | Player | Removed from play |
 
-In effect targets, "board" = any revealed card, "thisNode" = revealed cards here, "collection" = deck, then Discard, then hand.
+In effect targets, "board" = any revealed card, "thisNode" = revealed cards here, "handOrDiscard" = hand and Discard together, "collection" = deck, then Discard, then hand.

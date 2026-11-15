@@ -185,6 +185,26 @@ describe('phase 2 events and actions', () => {
     expect(game.state.players[1].draw[0]?.id).not.toBe(top.id);
   });
 
+  it('optional stealDeckCard lets the player skip without taking a card', () => {
+    const game = baseSession({});
+    const top = game.state.players[1].draw[0]!;
+    game.state.players[0].hand = [card('polite-thief', {
+      power: 1,
+      onReveal: [{
+        action: 'stealDeckCard', amount: 1, optional: true,
+        target: { type: 'zone', who: 'opponent', zone: 'deck' },
+      }],
+    })];
+    game.deploy('polite-thief', 0);
+    game.endTurn(0); game.endTurn(1);
+    while (!game.state.choice && game.pendingCount) game.step();
+    expect(game.state.choice?.options.map(option => option.id)).toEqual(['resolve', 'skip']);
+    game.choose('skip');
+    finish(game);
+    expect(game.state.players[0].hand.some(entry => entry.id === top.id)).toBe(false);
+    expect(game.state.players[1].draw[0]?.id).toBe(top.id);
+  });
+
   it('deckSwap exchanges top cards', () => {
     const game = baseSession({});
     const a = game.state.players[0].draw[0]!;

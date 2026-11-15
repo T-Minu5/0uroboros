@@ -357,7 +357,7 @@ describe("Strategic card systems", () => {
   it("enforces four bank slots and resolves stored cards oldest first", () => {
     const session = make(); empty(session);
     const player = session.state.players[0];
-    player.bank = [4, 3, 2, 1].map(order => ({ card: { ...card("Cycle Cache", `bank-${order}`), duration: 99 }, enteredCycle: 1, order }));
+    player.bank = [4, 3, 2, 1].map(order => ({ card: { ...card("Cycle Cache", `bank-${order}`), duration: 99 }, owner: 0 as const, enteredCycle: 1, order }));
     player.hand = [card("Cycle Cache", "overflow")];
     session.deploy("overflow", session.view().openNodes[0]);
     const events = cycle(session);
@@ -479,7 +479,7 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
       { card: chronos, owner: 0, node, order: 2, revealed: true },
     ];
     session.state.players[1].servers = { primary: 0, backup: 30 };
-    session.state.players[0].bank = [{ card: card("Cycle Cache", "bank-must-not-fire"), enteredCycle: 1, expiresCycle: 2, order: 0 }];
+    session.state.players[0].bank = [{ card: card("Cycle Cache", "bank-must-not-fire"), owner: 0 as const, enteredCycle: 1, expiresCycle: 2, order: 0 }];
     session.endTurn(); const events = drain(session);
     const lethal = events.findIndex(event => event.cardId === "lethal-glitch" && event.kind === "drain");
     const remaining = events.findIndex(event => event.cardId === "remaining-card" && event.kind === "crypto");

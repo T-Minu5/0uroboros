@@ -2,11 +2,13 @@ export type Phase = "runtime" | "collapse" | "draft";
 export type CardType = "Character" | "VP" | "Crypto";
 
 import type { AnyEffect, EffectStep } from "./effects/types";
+import type { CardTrigger } from "./effects/triggers";
+export type { CardTrigger } from "./effects/triggers";
 
 export type EffectChoiceOption = { id: string; label: string; effects: readonly LegacyEffect[] };
 export type CardModifier = {
   id: string;
-  kind: 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn' | 'authored';
+  kind: 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn' | 'multiplyNodePower' | 'authored';
   amount?: number;
   sourceName?: string;
   /** Authored mods carry a snapshot of their definition, taken when attached. */
@@ -83,10 +85,17 @@ export type Card = {
   cryptoValue?: number;
   duration?: number;
   durationPeriod?: "runtime" | "cycle";
+  /**
+   * After Collapse, enter the opponent's Effect Bank if a slot is free (else owner Discard).
+   * Ownership never changes; only meaningful with `duration`.
+   */
+  foreignBank?: boolean;
   schedule?: readonly {at:number;timing?:"start"|"end";effects:readonly AnyEffect[]}[];
   recurring?: readonly AnyEffect[];
   onReveal?: readonly AnyEffect[];
   onCollapse?: readonly AnyEffect[];
+  /** Card Ongoing: reactive rules while revealed (silenced by Location suppressOngoing). */
+  triggers?: readonly CardTrigger[];
   modifiers?: CardModifier[];
   storyText?: string;
   id: string;
@@ -209,6 +218,8 @@ export const serverMaximums: Servers = { primary: 2000, backup: 1500 };
 export const defaultServerVP: Servers = { primary: 12, backup: 16 };
 /** End-game bonus VP for the seat with the most Circuit wins (Eco-Strat initial). 0 disables. */
 export const defaultMostCircuitsBonusVP = 6;
+/** Collapse bonus VP for controlling a Node (strict Power lead). Ties award nothing. 0 disables. */
+export const defaultNodeWinVP = 1;
 
 /**
  * A player's VP plus, for each enemy Server still standing, the share of its destruction VP matching the share of its

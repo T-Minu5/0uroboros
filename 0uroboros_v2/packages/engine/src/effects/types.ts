@@ -16,14 +16,22 @@ export type ServerSlot = 'auto' | 'primary' | 'backup' | 'both';
 /** `wallet` is the Crypto cards held in hand; `bankOrWallet` offers both. */
 export type ZoneId = 'hand' | 'deck' | 'discard' | 'trash' | 'bank' | 'wallet' | 'bankOrWallet' | 'destroyed';
 /**
- * `collection` searches the deck, then Discard, then hand. `wallet` is the Crypto cards in hand.
+ * `collection` searches the deck, then Discard, then hand. `handOrDiscard` offers hand and Discard together.
+ * `wallet` is the Crypto cards in hand.
  * `deckTop` and `deckBottom` take matching cards in deck order from that end, so pick modes don't apply.
  */
-export type CardWhere = 'board' | 'thisNode' | 'hand' | 'wallet' | 'deck' | 'deckTop' | 'deckBottom' | 'discard' | 'trash' | 'bank' | 'destroyed' | 'collection';
+export type CardWhere = 'board' | 'thisNode' | 'hand' | 'wallet' | 'deck' | 'deckTop' | 'deckBottom' | 'discard' | 'handOrDiscard' | 'trash' | 'bank' | 'destroyed' | 'collection';
 export const DECK_ENDS: readonly CardWhere[] = ['deckTop', 'deckBottom'];
 export type CardClass = NonNullable<Card['cardClass']>;
 /** `cardClass` matches any one of the listed classes; older content stores a single class. */
-export type CardFilter = { cardType?: CardType; cardClass?: CardClass | readonly CardClass[]; definitionId?: string };
+export type CardFilter = {
+  cardType?: CardType;
+  cardClass?: CardClass | readonly CardClass[];
+  definitionId?: string;
+  /** Inclusive printed-cost bounds for changePower / gain recipes. */
+  minCost?: number;
+  maxCost?: number;
+};
 export const filterClasses = (filter?: CardFilter): readonly CardClass[] =>
   filter?.cardClass === undefined ? [] : typeof filter.cardClass === 'string' ? [filter.cardClass] : filter.cardClass;
 export type Relation = 'self' | 'previous' | 'next';
@@ -40,21 +48,24 @@ export type PickMode = 'choose' | 'random' | 'all' | 'weakest' | 'strongest' | '
 /** How cards are picked from the target's candidates; `chooser` is relative to the controller. */
 export type Pick = { mode: PickMode; count?: number; chooser?: 'self' | 'opponent' };
 
+/** Attach a mod: single `modifier`, or pick at random from `modifierPool`. */
+
+
 export type ActionId =
   | 'draw' | 'gainCrypto' | 'payCrypto' | 'gainVP' | 'gainCard'
   | 'damageServer' | 'repairServer' | 'destroyServer'
   | 'discardCards' | 'trashCards' | 'mill' | 'scry' | 'peek' | 'recover' | 'stealCrypto' | 'bump'
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'
   | 'createHologram' | 'copyPreviousOnReveal' | 'sacrificeCards'
-  | 'stealDeckCard' | 'deckSwap' | 'placeCard' | 'copyText'
+  | 'stealDeckCard' | 'deckSwap' | 'placeCard' | 'copyText' | 'silenceOngoing'
   | 'choice' | 'random';
 
 /** Per-card dispositions Inspect (`scry`) may offer. Absent / empty on a step means all three. */
 export type InspectAction = 'keep' | 'discard' | 'trash';
 export const INSPECT_ACTIONS: readonly InspectAction[] = ['keep', 'discard', 'trash'];
 
-export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn';
-export const BUILTIN_MODIFIERS: readonly ModifierKind[] = ['doublePrintedEffects', 'powerAuraAtLocation', 'movableEachTurn'];
+export type ModifierKind = 'doublePrintedEffects' | 'powerAuraAtLocation' | 'movableEachTurn' | 'multiplyNodePower';
+export const BUILTIN_MODIFIERS: readonly ModifierKind[] = ['doublePrintedEffects', 'powerAuraAtLocation', 'movableEachTurn', 'multiplyNodePower'];
 export const isBuiltinModifier = (value: unknown): value is ModifierKind => BUILTIN_MODIFIERS.includes(value as ModifierKind);
 /** A built-in modifier kind, or the ID of an authored mod. */
 export type ModifierRef = ModifierKind | (string & {});
@@ -98,6 +109,8 @@ export type EffectStep = {
   maxCost?: number;
   /** Attach: the mod to attach. Remove: the mod to strip; absent strips every mod. */
   modifier?: ModifierRef;
+  /** Attach: when set, pick one mod at random from this list (overrides a single `modifier` for the roll). */
+  modifierPool?: readonly ModifierRef[];
   formIds?: readonly string[];
   selection?: 'sequential' | 'random';
   /**

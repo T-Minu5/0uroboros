@@ -1,6 +1,6 @@
 {
   "label": "strat-g@v1.28",
-  "savedAt": "2026-11-12T01:54:53.170Z",
+  "savedAt": "2026-11-15T02:24:19.119Z",
   "profile": {
     "version": 28,
     "plan": "",
@@ -8,27 +8,27 @@
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
     "midgameMix": 0.5,
-    "handCryptoTarget": 11.78,
+    "handCryptoTarget": 11.84,
     "minCryptoValue": 2,
     "minBuyScore": 1.75,
     "dilution": 0.9,
     "weights": {
       "power": 1,
       "draw": 2.32,
-      "crypto": 2.88,
+      "crypto": 2.91,
       "drain": 3,
       "restore": 2.5,
-      "vp": 2.57,
+      "vp": 2.69,
       "duration": 0.8,
       "thin": 1.27,
       "disrupt": 1.77,
-      "chaos": 2.02
+      "chaos": 2.16
     },
     "cardBias": {
-      "koppy-kat": 0.7,
-      "code-sniper": 0.67,
-      "delta-wave": 0.67,
-      "cowl-obscyra": 0.5,
+      "code-sniper": 0.47,
+      "cowl-obscyra": 0.47,
+      "delta-wave": 0.47,
+      "koppy-kat": 0.47,
       "card-jabbhu7e": 0.42
     }
   }

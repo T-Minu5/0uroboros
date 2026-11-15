@@ -276,7 +276,7 @@ describe('Morph recipes', () => {
       const form = card(`form-${variant}`, { duration, durationPeriod });
       const { game } = make([form]);
       const source = card(`source-${variant}`, { duration: 1, durationPeriod: 'cycle', onCollapse: [{ kind: 'morph', formIds: [form.definitionId!] }] });
-      game.state.players[0].bank.push({ card: source, enteredCycle: 1, expiresCycle: 1, order: 1 });
+      game.state.players[0].bank.push({ card: source, owner: 0 as const, enteredCycle: 1, expiresCycle: 1, order: 1 });
       game.state.turn = 3;
       game.endTurn();
       const events = finish(game);

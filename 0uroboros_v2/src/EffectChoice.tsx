@@ -206,10 +206,16 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
   </>}
   {transfer?null
   :peekMode&&groups?<div className='choice-groups'>{groups.map(group=><div className='choice-group' key={group.id}>
-    {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:<b>{group.label}</b>}
+    <div className='choice-group-card'>
+     {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:null}
+     {(!group.card||(group.label&&group.label!==group.card.name))&&<small className='choice-group-label'>{group.label}</small>}
+    </div>
    </div>)}</div>
   :groups?<div className='choice-groups'>{groups.map(group=><div className='choice-group' key={group.id}>
-    {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:<b>{group.label}</b>}
+    <div className='choice-group-card'>
+     {group.card?<span className='choice-card-face'><CardFace card={group.card}/></span>:null}
+     {(!group.card||(group.label&&group.label!==group.card.name))&&<small className='choice-group-label'>{group.label}</small>}
+    </div>
     <div className='choice-group-actions' role='radiogroup' aria-label={group.label}>{choice.options.filter(option=>option.group===group.id).map(option=><button type='button' key={option.id} role='radio' aria-checked={picked.includes(option.id)} className={picked.includes(option.id)?'selected':''} data-choice-option={option.id} onClick={()=>pickInGroup(group.id,option.id)}>{option.label}</button>)}</div>
    </div>)}</div>
   :<>

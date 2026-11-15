@@ -49,6 +49,10 @@ describe('Location text colours', () => {
     expect(describeStep({ action: 'scry', amount: 1, target: deck, inspectActions: ['discard', 'trash'] }, 'card')).toBe('Inspect the top 1 card of your deck, then discard or trash each');
     expect(describeStep({ action: 'scry', amount: 3, target: deck, inspectActions: ['keep'] }, 'card')).toBe('Inspect the top 3 cards of your deck, then keep each');
     expect(describeStep({ action: 'peek', amount: 2, target: deck }, 'card')).toBe('Peek at the top 2 cards of your deck');
+    expect(describeStep({ action: 'scry', amount: 2, target: { type: 'zone', who: 'both', zone: 'deck' } }, 'card'))
+      .toBe('Inspect the top 2 cards of both decks, then keep, discard or trash each');
+    expect(describeStep({ action: 'peek', amount: 1, target: { type: 'zone', who: 'both', zone: 'deck' } }, 'card'))
+      .toBe('Peek at the top 1 card of both decks');
   });
 
   it('words Reset, Restore, random, chosen and all targets the concise way', () => {

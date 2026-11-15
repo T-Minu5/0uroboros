@@ -12,6 +12,7 @@ export const DEFAULT_BUILTIN_MODS: Record<ModifierKind, BuiltinModDetails> = {
   doublePrintedEffects: { name: 'Printed effects happen twice', badge: '[x2]', text: 'The card’s own printed reveal and collapse effects happen twice. Effects from other mods are not doubled.' },
   powerAuraAtLocation: { name: '+N Power aura to allies at its Location', badge: '[+N]', text: 'While the card is revealed, every other revealed ally at its Location has +N Power.' },
   movableEachTurn: { name: 'Movable once each turn', badge: '[↔]', text: 'Once each Runtime turn, while the card is revealed, its owner may move it to another open Location for free.' },
+  multiplyNodePower: { name: '×N Power at its Location', badge: '[×N]', text: 'While the card is revealed, your Power at its Location is multiplied by N (1.10–2.00).' },
 };
 
 let active: Record<ModifierKind, BuiltinModDetails> = DEFAULT_BUILTIN_MODS;

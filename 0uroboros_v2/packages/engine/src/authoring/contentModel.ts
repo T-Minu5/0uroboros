@@ -17,7 +17,11 @@ export type { AuthoredRuntimeHack, RuntimeHackDefinition, RuntimeHackWindow } fr
 
 export type CardPool = 'Base' | 'Chaos' | 'VP' | 'Crypto';
 export type { CardClass } from '../game';
-type CardHooks = { onReveal?: EffectStep[]; onCollapse?: EffectStep[]; recurring?: EffectStep[]; schedule?: { at: number; timing?: 'start' | 'end'; effects: EffectStep[] }[] };
+type CardHooks = {
+  onReveal?: EffectStep[]; onCollapse?: EffectStep[]; recurring?: EffectStep[];
+  schedule?: { at: number; timing?: 'start' | 'end'; effects: EffectStep[] }[];
+  triggers?: Card['triggers'];
+};
 export type AuthoredCard = Omit<Card, keyof CardHooks> & CardHooks & {
   pool: CardPool;
   enabled: boolean;
@@ -267,7 +271,7 @@ export function validateContent(value: unknown): string[] {
   cards.forEach((item, index) => {
     const p = `cards[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a card object`); return; }
-    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'schedule', 'recurring', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'storyText', 'pool', 'enabled', 'cardClass', 'generated', 'modifiers', 'powerSource', 'aura', 'selfMove'], p, errors);
+    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'foreignBank', 'schedule', 'recurring', 'triggers', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'storyText', 'pool', 'enabled', 'cardClass', 'generated', 'modifiers', 'powerSource', 'aura', 'selfMove'], p, errors);
     requiredId(item.id, `${p}.id`, errors);
     if (item.definitionId !== undefined) requiredId(item.definitionId, `${p}.definitionId`, errors);
     requiredText(item.name, `${p}.name`, errors, 200);
@@ -284,7 +288,7 @@ export function validateContent(value: unknown): string[] {
     else if(item.cardClass!==undefined&&(item.type==='VP')!==VP_CLASSES.includes(item.cardClass as CardClass))errors.push(`${p}.cardClass: ${item.type==='VP'?'VP cards are Volumes or Solar-monks':`${item.cardClass} is a VP subtype`}`);
     if(item.powerSource!==undefined&&(item.type!=='Character'||!(POWER_SOURCES as readonly unknown[]).includes(item.powerSource)))errors.push(`${p}.powerSource: expected ${POWER_SOURCES.join(', ')} on a Character`);
     if(item.aura!==undefined&&(item.type!=='Character'||!integer(item.aura,1,20)))errors.push(`${p}.aura: expected integer from 1 to 20 on a Character`);
-    if(item.selfMove!==undefined&&(item.type!=='Character'||!['turn','cycle'].includes(String(item.selfMove))))errors.push(`${p}.selfMove: expected turn or cycle on a Character`);
+    if(item.selfMove!==undefined&&((item.type!=='Character'&&item.type!=='Crypto')||!['turn','cycle'].includes(String(item.selfMove))))errors.push(`${p}.selfMove: expected turn or cycle on a Character or Crypto`);
     if((item.cardClass==='Hacker'||item.cardClass==='Attack'||item.cardClass==='Horror')&&(item.type!=='Character'||item.pool!=='Chaos'))errors.push(`${p}.cardClass: ${item.cardClass} cards must be Chaos Characters`);
     if((item.cardClass==='Action'||item.cardClass==='Utility'||item.cardClass==='Runtime')&&item.type==='Character'&&item.pool==='Chaos')errors.push(`${p}.cardClass: ${item.cardClass} cards must be Base Characters`);
     if (!integer(item.cost, 0, 1000)) errors.push(`${p}.cost: expected integer from 0 to 1000`);
@@ -295,8 +299,22 @@ export function validateContent(value: unknown): string[] {
     if (item.type === 'VP' && item.vp === undefined) errors.push(`${p}.vp: VP cards require explicit scoring points`);
     if (item.duration !== undefined && !integer(item.duration, 1, 100)) errors.push(`${p}.duration: expected integer from 1 to 100`);
     if (item.durationPeriod !== undefined && !['runtime', 'cycle'].includes(String(item.durationPeriod))) errors.push(`${p}.durationPeriod: expected runtime or cycle`);
+    if (item.foreignBank !== undefined && typeof item.foreignBank !== 'boolean') errors.push(`${p}.foreignBank: expected boolean`);
+    else if (item.foreignBank === true && !integer(item.duration, 1, 100)) errors.push(`${p}.foreignBank: only valid when duration is set`);
     if ((Array.isArray(item.schedule) && item.schedule.length > 0 || Array.isArray(item.recurring) && item.recurring.length > 0) && !integer(item.duration, 1, 100)) errors.push(`${p}.duration: schedule and recurring effects require a duration`);
     for (const hook of ['onReveal', 'onCollapse', 'recurring']) if (item[hook] !== undefined) steps(item[hook], `${p}.${hook}`, 'card');
+    if (item.triggers !== undefined) {
+      if (!Array.isArray(item.triggers) || item.triggers.length > 20) errors.push(`${p}.triggers: expected up to 20 Ongoing rules`);
+      else item.triggers.forEach((trigger: unknown, at: number) => {
+        const tp = `${p}.triggers[${at}]`;
+        if (!trigger || typeof trigger !== 'object' || !('kind' in trigger)) { errors.push(`${tp}: expected Ongoing rule`); return; }
+        const kind = String((trigger as { kind: string }).kind);
+        if (kind === 'when' || kind === 'whenPlayed' || kind === 'listenAccess') {
+          const then = (trigger as { then?: unknown }).then;
+          if (then !== undefined) steps(then, `${tp}.then`, 'card');
+        }
+      });
+    }
     if (item.schedule !== undefined) {
       if (!Array.isArray(item.schedule) || item.schedule.length > 100) errors.push(`${p}.schedule: expected up to 100 entries`);
       else item.schedule.forEach((entry, at) => {

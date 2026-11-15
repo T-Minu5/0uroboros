@@ -33,7 +33,7 @@ describe('authored content', () => {
     document.cards.filter(card => card.pool === 'Chaos' || card.pool === 'Base').forEach(card => { card.enabled = false; });
     const errors = validateContent(document);
     expect(errors).toEqual(expect.arrayContaining([
-      expect.stringContaining('cards: at least 10 enabled non-Generated Base or Chaos cards'),
+      expect.stringContaining('cards: at least 8 enabled non-Generated Base or Chaos cards'),
       expect.stringContaining('cards: at least 1 enabled non-Generated Attack Chaos card'),
       expect.stringContaining('cards: at least 1 enabled non-Generated Horror Chaos card'),
       expect.stringMatching(/^startingDecks\[0\]\.cards\[\d+\]\.cardId: unknown card rezz-blade$/),

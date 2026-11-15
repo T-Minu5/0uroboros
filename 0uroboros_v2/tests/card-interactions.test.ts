@@ -226,14 +226,14 @@ describe('Effect Bank card interactions', () => {
     const mover = card('bank-mover', [], { name: 'Bank Mover', duration: 99, onCollapse: [{ kind: 'moveSelf' }] });
     const transfer = card('bank-transfer', [], { name: 'Bank Transfer', duration: 99, onCollapse: [{ kind: 'transferPower', amount: 2 }] });
     session.state.players[0].bank = [
-      { card: mover, enteredCycle: 1, order: 1 },
-      { card: transfer, enteredCycle: 1, order: 2 },
+      { card: mover, owner: 0 as const, enteredCycle: 1, order: 1 },
+      { card: transfer, owner: 0 as const, enteredCycle: 1, order: 2 },
     ];
     session.state.turn = 3;
     session.endTurn();
     const events = finish(session);
-    expect(events.find(event => event.sourceName === mover.name && event.kind === 'choice')).toMatchObject({ kind: 'choice', owner: 0 });
-    expect(events.find(event => event.sourceName === mover.name && event.kind === 'choice')?.text).toMatch(/No target/i);
+    expect(events.find(event => event.sourceName === mover.name && event.kind === 'move')).toMatchObject({ kind: 'move', owner: 0 });
+    expect(events.find(event => event.sourceName === mover.name && event.kind === 'move')?.text).toMatch(/No target/i);
     expect(events.find(event => event.cardId === transfer.id)).toMatchObject({ kind: 'power', owner: 0, amount: 0 });
     expect(events.find(event => event.cardId === transfer.id)?.text).toMatch(/No target/i);
     expect(session.state.choice).toBeNull();

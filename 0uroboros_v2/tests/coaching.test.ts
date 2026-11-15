@@ -54,9 +54,10 @@ describe("Location valuation", () => {
     expect(facts.rules.mods).toMatch(/Hologram/i);
     expect(facts.rules.vpSources).toMatch(/destruction/);
     expect(facts.configurable.map(item => item.id)).toEqual(expect.arrayContaining([
-      "serverVP.primary", "noLocations", "mostCircuitsBonusVP",
+      "serverVP.primary", "noLocations", "nodeWinVP", "mostCircuitsBonusVP",
       "cards", "locations", "circuitRewards", "mods", "serverIntegrity",
     ]));
+    expect(facts.configurable.find(item => item.id === "nodeWinVP")).toMatchObject({ default: 1, surface: "configure" });
     expect(facts.configurable.find(item => item.id === "mostCircuitsBonusVP")).toMatchObject({ default: 6, surface: "configure" });
     expect(facts.configurable.find(item => item.id === "draftCrypto")).toBeUndefined();
     expect(facts.configurable.find(item => item.id === "serverIntegrity")?.surface).toBe("code-constant");

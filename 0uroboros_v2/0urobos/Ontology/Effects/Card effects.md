@@ -23,7 +23,7 @@ Act on individual cards, chosen with a card [[Target]] and a [[Pick]].
 
 ## Targets
 
-All Card effects except Move a card and Morph share one Target list: the board places, Card in hand, Top card, Bottom card, **Deck (random)** and **Effect Bank**.
+All Card effects except Move a card and Morph share one Target list: the board places, Card in hand, Discard pile, **Hand or Discard**, Top card, Bottom card, **Deck (random)** and **Effect Bank**.
 
 - Deck (random) takes a random card from anywhere in the [[Deck]] ("Restore 2 cards in your deck +1").
 - Effect Bank reaches cards stored in the [[Effect Bank]] ("Destroy a card in enemy Effect Bank").
