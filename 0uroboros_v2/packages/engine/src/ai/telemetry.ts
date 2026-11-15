@@ -43,6 +43,8 @@ export type GameTelemetry = {
   cardsTrashed: Pair;
   /** Cards this seat destroyed into a destroyed pile (effect actor; not Server kills). */
   cardsDestroyed: Pair;
+  /** Wallet Crypto this seat stole or bumped, plus Effect Bank cards bumped (1 each). */
+  cryptoStolenBumped: Pair;
   destructions: Destruction[];
   cards: Record<string, CardTelemetry>;
   locations: Record<string, SourceTelemetry>;
@@ -64,7 +66,7 @@ export function emptyTelemetry(): GameTelemetry {
     wastedRestores: pair(), restoreEvents: pair(), drainEvents: pair(),
     drawn: pair(), actionsGained: pair(), cryptoGained: pair(), vpGained: pair(),
     powerIncreased: pair(), cardPowerDrained: pair(), cardPowerRestored: pair(),
-    cardsTrashed: pair(), cardsDestroyed: pair(),
+    cardsTrashed: pair(), cardsDestroyed: pair(), cryptoStolenBumped: pair(),
     destructions: [], cards: {}, locations: {}, circuit: {}, perCycle: [],
     failedOutcomes: pair(), randomResults: 0, choices: pair(),
   };
@@ -121,7 +123,12 @@ export class TelemetryCollector {
         return;
       case "draw": data.drawn[beneficiary] += amount; this.attribute(event, "draw", beneficiary, amount); return;
       case "actions": data.actionsGained[beneficiary] += amount; this.attribute(event, "actions", beneficiary, amount); return;
-      case "crypto": data.cryptoGained[beneficiary] += amount; this.attribute(event, "crypto", beneficiary, amount); return;
+      case "crypto": {
+        data.cryptoGained[beneficiary] += amount;
+        if (/\bsteals?\b|\bbumps?\b/.test(event.text) && amount > 0) data.cryptoStolenBumped[owner] += amount;
+        this.attribute(event, "crypto", beneficiary, amount);
+        return;
+      }
       case "vp": data.vpGained[beneficiary] += amount; this.attribute(event, "vp", beneficiary, amount); return;
       case "power": {
         // Event amounts are signed (after − before); `amount` above is clamped nonnegative.
@@ -146,6 +153,7 @@ export class TelemetryCollector {
         if (!amount) return;
         if (event.target === "destroyed" || /\bdestroys?\b/.test(event.text)) data.cardsDestroyed[owner] += amount;
         else if (event.target === "trash" || /\btrashes?\b|shared Trash|mill /.test(event.text)) data.cardsTrashed[owner] += amount;
+        if (/\bbumps?\b/.test(event.text) && /Effect Bank/.test(event.text)) data.cryptoStolenBumped[owner] += amount;
         return;
       }
     }

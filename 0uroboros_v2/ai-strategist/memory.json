@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 28,
-    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, including Basic Encryption and Shyte-Coins as better options emerge. This will build a strong foundation for future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -33,7 +33,7 @@
       "card-jabbhu7e": 0.42
     }
   },
-  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, including Basic Encryption and Shyte-Coins as better options emerge. This will build a strong foundation for future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -5576,126 +5576,6 @@
   "notes": [
     {
       "version": 27,
-      "at": "2026-11-08T16:23:30.787Z",
-      "text": "Evaluate the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:23:30.787Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:24:52.070Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:25:11.051Z",
-      "text": "Monitor new Locations for their impact on strategies and adjust accordingly."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:25:11.051Z",
-      "text": "Evaluate the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:25:11.051Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:25:11.051Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:31:45.153Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:31:50.319Z",
-      "text": "Evaluate the impact of new Locations on overall strategy and adapt accordingly."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:31:50.319Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:31:50.319Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T16:31:50.319Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:27:12.417Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:27:29.061Z",
-      "text": "Evaluate the impact of new Locations on overall strategy and adapt accordingly."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:27:29.061Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:27:29.061Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:27:29.061Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:29:09.201Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:29:15.400Z",
-      "text": "Evaluate the impact of new Locations on strategies, especially those that alter power or card availability."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:29:15.400Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:29:15.400Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T19:29:15.400Z",
-      "text": "Assess the value of aggressive strategies against various opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:28:14.178Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:28:24.454Z",
-      "text": "Evaluate the effectiveness of new Locations on overall strategy."
-    },
-    {
-      "version": 27,
       "at": "2026-11-08T20:28:24.454Z",
       "text": "Consider drafting high-value Characters to maintain early pressure."
     },
@@ -7073,6 +6953,126 @@
       "version": 28,
       "at": "2026-11-15T02:24:19.119Z",
       "text": "Assess the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:09.481Z",
+      "text": "v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Crypto-Wraith, Packet Sniffer, Crypto-Echo. Removed cards: eval-relocation-relay."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:17.195Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:17.195Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:17.195Z",
+      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:17.195Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T02:49:17.195Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:18.488Z",
+      "text": "v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Bloody Mary."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:24.350Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:24.350Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:24.350Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:24.350Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:38:24.350Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:24.659Z",
+      "text": "v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:29.793Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:29.793Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:29.793Z",
+      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:29.793Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:41:29.793Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:10.924Z",
+      "text": "v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:16.006Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:16.006Z",
+      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:16.006Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:16.006Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-15T16:44:16.006Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
     }
   ],
   "cardNotes": {
@@ -7256,7 +7256,11 @@
     "card-fhn5ikg2": "low-value Crypto (skip); est. hand value 3.6 early / 1.5 late at cost 11. Untested.",
     "card-y7nje0x2": "utility; est. hand value 2.3 early / 2.3 late at cost 0. Untested.",
     "card-4sxu69gf": "low-value Crypto (skip); est. hand value 3.6 early / 1.5 late at cost 5. Untested.",
-    "card-kcc86x0f": "low-value Crypto (skip); est. hand value 3.6 early / 1.5 late at cost 0. Untested."
+    "card-kcc86x0f": "low-value Crypto (skip); est. hand value 3.6 early / 1.5 late at cost 0. Untested.",
+    "card-txgs0kml": "low-value Crypto (skip); est. hand value 10 early / 5.7 late at cost 2. Untested.",
+    "card-3t0karr1": "utility; est. hand value 1 early / 1 late at cost 6. Untested.",
+    "card-aro3pgdc": "low-value Crypto (skip); est. hand value 4.6 early / 2.5 late at cost 4. Untested.",
+    "card-b4fjznmc": "utility; est. hand value 1 early / 1 late at cost 7. Untested."
   },
   "knownCards": [
     "eval-signal-surveyor",
@@ -7319,7 +7323,6 @@
     "neural-wetware",
     "zenith-worx",
     "zenith-wetware",
-    "eval-relocation-relay",
     "eval-hostile-reroute",
     "salem-surge",
     "foder-fox",
@@ -7367,7 +7370,11 @@
     "card-fhn5ikg2",
     "card-y7nje0x2",
     "card-4sxu69gf",
-    "card-kcc86x0f"
+    "card-kcc86x0f",
+    "card-txgs0kml",
+    "card-3t0karr1",
+    "card-aro3pgdc",
+    "card-b4fjznmc"
   ],
   "knownLocations": [
     "quantum_commons",
@@ -9142,7 +9149,7 @@
     },
     {
       "label": "strat-g@v1.28",
-      "savedAt": "2026-11-15T02:24:19.119Z",
+      "savedAt": "2026-11-15T16:44:16.007Z",
       "profile": {
         "version": 28,
         "plan": "",

@@ -37,6 +37,8 @@ export interface GameClient {
   endTurn(): Maybe<RuntimeEvent | null>;
   undoEndTurn(): Maybe<RuntimeEvent>;
   choose(selection: string | readonly string[]): Maybe<RuntimeEvent>;
+  /** Local tables: auto-pick when a choice deadline elapses. Online uses the room timer. */
+  resolveChoiceTimeout?(): Maybe<RuntimeEvent>;
   claimCircuitReward(): Maybe<RuntimeEvent>;
   buy(pileId: string): Maybe<RuntimeEvent>;
   endDraft(): Maybe<RuntimeEvent>;
@@ -86,6 +88,7 @@ export class LocalClient implements GameClient {
   endTurn() { return this.session.endTurn(); }
   undoEndTurn() { return this.session.undoEndTurn(); }
   choose(selection: string | readonly string[]) { return this.session.choose(selection); }
+  resolveChoiceTimeout() { return this.session.resolveChoiceTimeout(); }
   claimCircuitReward() { return this.session.claimCircuitReward(); }
   buy(pileId: string) { return this.session.buy(pileId); }
   endDraft() { return this.session.endDraft(); }

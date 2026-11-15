@@ -249,6 +249,64 @@ describe('card Ongoing triggers', () => {
     expect(game.state.players[0].wallet).toBe(before + 5);
   });
 
+  it('Crypto Canary Listen fires when the enemy discards from your hand', () => {
+    const game = session();
+    play(game, card('crypto-canary', {
+      type: 'Crypto', cryptoValue: 1, power: 2,
+      triggers: [{
+        kind: 'listenAccess', whose: 'enemyAccessesYours',
+        then: [{ action: 'gainCrypto', amount: 5, target: { type: 'player', who: 'self' } }],
+      }],
+    }));
+    game.state.players[0].hand = [card('victim-a'), card('victim-b')];
+    const before = game.state.players[0].wallet;
+    play(game, card('qubit-kid', {
+      power: 1,
+      onReveal: [{
+        action: 'discardCards', amount: 1, optional: true,
+        target: { type: 'card', who: 'opponent', where: 'hand' },
+        pick: { mode: 'choose' },
+      }],
+    }), 0, 1);
+    expect(game.state.players[0].wallet).toBe(before + 5);
+  });
+
+  it('Ms. Mosquito draws when a card is destroyed from hand', () => {
+    const game = session();
+    play(game, card('ms-mosquito', {
+      power: 3, cardClass: 'Hacker',
+      triggers: [{ kind: 'when', event: 'anyCardDestroyed', then: [{ action: 'draw', amount: 2, target: { type: 'player', who: 'self' } }] }],
+    }));
+    game.state.players[0].hand = [];
+    game.state.players[0].draw = [card('d1'), card('d2'), card('d3')];
+    game.state.players[1].hand = [card('hand-victim')];
+    const before = game.state.players[0].hand.length;
+    play(game, card('hand-bomber', {
+      power: 1,
+      onReveal: [{
+        action: 'destroyCard',
+        target: { type: 'card', who: 'opponent', where: 'hand' },
+        pick: { mode: 'first' },
+      }],
+    }));
+    expect(game.state.players[0].hand.length).toBe(before + 2);
+  });
+
+  it('Expo-Net multiplies Node Power in 10% steps when random', () => {
+    const game = session();
+    play(game, card('tank', { power: 10 }));
+    play(game, card('expo-net', {
+      power: 0, cardClass: 'Utility',
+      triggers: [{ kind: 'multiplyNode', min: 1.1, max: 2, random: true }],
+    }));
+    const host = game.state.nodes[0].cards[0].find(entry => entry.card.id === 'expo-net');
+    const rolled = (host?.card.triggers?.[0] as { rolled?: number } | undefined)?.rolled;
+    expect(rolled).toBeDefined();
+    expect(Math.abs(rolled! * 10 - Math.round(rolled! * 10))).toBeLessThan(1e-9);
+    expect(rolled!).toBeGreaterThanOrEqual(1.1);
+    expect(rolled!).toBeLessThanOrEqual(2);
+  });
+
   it('Expo-Net multiplies Node Power', () => {
     const game = session();
     play(game, card('tank', { power: 10 }));
@@ -263,12 +321,14 @@ describe('card Ongoing triggers', () => {
     const game = session();
     game.state.players[1].draw = [
       card('loot', {
+        name: 'loot',
         power: 1,
         onReveal: [{ action: 'gainCrypto', amount: 4, target: { type: 'player', who: 'self' } }],
       }),
     ];
     const before = game.state.players[0].wallet;
-    play(game, card('deepfake', {
+    const events: string[] = [];
+    game.state.players[0].hand.unshift(card('deepfake', {
       power: 1, cardClass: 'Hacker',
       onReveal: [{
         action: 'copyText',
@@ -276,7 +336,19 @@ describe('card Ongoing triggers', () => {
         pick: { mode: 'random' },
       }],
     }));
+    game.deploy('deepfake', 0, 0);
+    game.endTurn(0);
+    try { game.endTurn(1); } catch { /* */ }
+    let n = 0;
+    while (game.pendingCount || game.state.choice) {
+      const event = game.state.choice
+        ? game.choose((game.state.choice.options.find(option => !option.disabled) ?? game.state.choice.options[0]!).id, game.state.choice.owner)
+        : game.step()!.event;
+      events.push(event.text);
+      if (++n > 500) throw new Error('stalled');
+    }
     expect(game.state.players[0].wallet).toBe(before + 4);
+    expect(events.some(text => /deepfake copied 'loot'/i.test(text))).toBe(true);
   });
 
   it('authored playtest cards validate and print Ongoing text', () => {

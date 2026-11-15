@@ -47,6 +47,29 @@
  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
 .strategic-draft .circuit-privilege.compact .primary-button{flex:0 0 auto;min-height:32px;padding:6px 12px;font-size:11px}
+.strategic-draft .circuit-above-market{
+ max-width:1400px;width:100%;margin:0 auto;padding:12px 16px;
+ display:flex;align-items:center;gap:16px;
+}
+.strategic-draft .circuit-above-market .privilege-copy{flex:1 1 auto;min-width:0}
+.strategic-draft .circuit-above-market .privilege-copy>h2{margin:2px 0 4px;font:600 16px Orbitron}
+.strategic-draft .circuit-above-market .circuit-auto-claim{display:block;margin-top:4px;font:600 10px Orbitron;letter-spacing:.4px;color:#c9a227}
+.strategic-draft .mod-badge-preview{font:700 12px Orbitron;letter-spacing:.5px;color:#ffcc12}
+.choice-card-wrap{position:relative;display:inline-flex;transition:transform .35s ease}
+.choice-card-wrap.is-slammed{animation:mod-host-rock .42s ease}
+.choice-card-wrap.is-nudged{transform:rotate(-6deg) translateX(-10px)}
+.mod-slam-badge{
+ position:absolute;inset:auto 8px 28px auto;z-index:3;
+ font:700 11px Orbitron;color:#111;background:#ffcc12;border-radius:4px;padding:3px 6px;
+ animation:mod-badge-slam .38s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes mod-badge-slam{from{transform:translateY(-28px) scale(1.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes mod-host-rock{0%{transform:scale(1)}40%{transform:scale(1.04) rotate(2deg)}100%{transform:scale(1) rotate(1deg)}}
+.enemy-decision-toast{
+ position:absolute;left:50%;bottom:210px;transform:translateX(-50%);z-index:55;
+ padding:8px 14px;border-radius:8px;border:1px solid #9c8451;background:#1a1528ee;
+ font:600 12px Orbitron;letter-spacing:.4px;color:#eff4ff;pointer-events:none;
+}
 
 .cycle-summary{
  flex:1 1 auto;min-width:0;

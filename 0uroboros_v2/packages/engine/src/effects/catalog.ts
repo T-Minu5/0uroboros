@@ -372,8 +372,9 @@ export function modBadge(mod: ModHooks & { id?: string }): string {
 }
 /** A mod's rules text: each trigger's effects under its label. */
 export function describeMod(mod: ModHooks & { id?: string }, cards: readonly Card[] = [], mods: readonly ModDefinition[] = []): string {
-  if (mod.id === 'aura-farming') return 'Host gains +1 Power when a card moves onto its Location.';
-  return MOD_HOOKS.filter(hook => mod[hook]?.length).map(hook => `${MOD_HOOK_LABELS[hook]}: ${describeSteps(mod[hook]!, 'card', cards, mods)}`).join(' ');
+  const hooks = MOD_HOOKS.filter(hook => mod[hook]?.length);
+  if (!hooks.length && mod.id === 'aura-farming') return 'When revealed: +1 Card.';
+  return hooks.map(hook => `${MOD_HOOK_LABELS[hook]}: ${describeSteps(mod[hook]!, 'card', cards, mods)}`).join(' ');
 }
 export const MAX_DEPTH = 5;
 

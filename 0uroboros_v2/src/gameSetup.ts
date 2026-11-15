@@ -1,12 +1,19 @@
 import { defaultMostCircuitsBonusVP, defaultNodeWinVP, defaultServerVP, type Servers } from '@0uroboros/engine/game';
+import {
+  DEFAULT_END_GAME_AWARDS,
+  END_GAME_AWARD_LABELS,
+  type EndGameAwardId,
+  type EndGameAwards,
+} from '@0uroboros/engine/runtime';
 
 /** Runtime turn countdown choices in seconds; null leaves turns untimed. */
 export const TURN_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);
 /** Draft-phase countdown choices in seconds; null leaves Draft untimed. */
-export const DRAFT_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);
+export const DRAFT_TIMER_CHOICES: readonly number[] = [60, 90, 120, 180, 240, 300, 600];
 export const SERVER_VP_MAX = 50;
 export const MOST_CIRCUITS_BONUS_VP_MAX = 50;
 export const NODE_WIN_VP_MAX = 50;
+export const END_GAME_AWARD_VP_MAX = 50;
 
 export type GameSetup = {
   serverVP: Servers;
@@ -31,16 +38,34 @@ export type GameSetup = {
    * Default 1; 0 disables.
    */
   nodeWinVP: number;
+  /** Configurable end-game achievement awards; ties grant both seats. */
+  endGameAwards: EndGameAwards;
 };
+
+export { DEFAULT_END_GAME_AWARDS, END_GAME_AWARD_LABELS, type EndGameAwardId, type EndGameAwards };
 
 const SETUP_KEY = 'ouroboros.gameSetup';
 const clampInt = (value: unknown, min: number, max: number, fallback: number) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value))) : fallback;
+
+function sanitizeEndGameAwards(raw: unknown): EndGameAwards {
+  const value = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<EndGameAwardId, Partial<{ enabled: unknown; vp: unknown }>>>;
+  const awards = { ...DEFAULT_END_GAME_AWARDS };
+  for (const id of Object.keys(awards) as EndGameAwardId[]) {
+    const next = value[id];
+    if (!next || typeof next !== 'object') continue;
+    awards[id] = {
+      enabled: next.enabled === false ? false : next.enabled === true ? true : awards[id].enabled,
+      vp: clampInt(next.vp, 0, END_GAME_AWARD_VP_MAX, awards[id].vp),
+    };
+  }
+  return awards;
+}
 
 export function sanitizeGameSetup(raw: unknown): GameSetup {
   const value = (raw && typeof raw === 'object' ? raw : {}) as {
     serverVP?: Partial<Servers>; turnSeconds?: unknown; draftSeconds?: unknown; noLocations?: unknown;
     middleNodesOnly?: unknown; trailingRewards?: unknown; noTrailingRewards?: unknown;
-    mostCircuitsBonusVP?: unknown; nodeWinVP?: unknown;
+    mostCircuitsBonusVP?: unknown; nodeWinVP?: unknown; endGameAwards?: unknown;
   };
   const trailingRewards = value.trailingRewards === false || value.noTrailingRewards === true
     ? false
@@ -56,6 +81,7 @@ export function sanitizeGameSetup(raw: unknown): GameSetup {
     trailingRewards,
     mostCircuitsBonusVP: clampInt(value.mostCircuitsBonusVP, 0, MOST_CIRCUITS_BONUS_VP_MAX, defaultMostCircuitsBonusVP),
     nodeWinVP: clampInt(value.nodeWinVP, 0, NODE_WIN_VP_MAX, defaultNodeWinVP),
+    endGameAwards: sanitizeEndGameAwards(value.endGameAwards),
   };
 }
 

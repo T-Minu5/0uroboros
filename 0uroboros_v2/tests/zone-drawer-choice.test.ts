@@ -76,4 +76,71 @@ describe('optional unmet pile effects', () => {
     expect(unmetEffectNotice(unmet!)).toBe('Not enough cards in Discard for benefit');
     expect(session.state.players[0].wallet).toBe(0);
   });
+
+  it('auto-discards when hand size equals the required count', () => {
+    const session = createSession({
+      carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true,
+      random: seededRandom(4), aiSeats: [], midCycleDraw: false,
+    });
+    session.state.nodeOrder = [0, 1, 2, 3, 4];
+    session.state.turn = 1;
+    session.state.phase = 'runtime';
+    session.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
+    const a = { ...starterCards[0], id: 'a', name: 'A', type: 'Character' as const, onReveal: [] };
+    const b = { ...starterCards[0], id: 'b', name: 'B', type: 'Character' as const, onReveal: [] };
+    const c = { ...starterCards[0], id: 'c', name: 'C', type: 'Character' as const, onReveal: [] };
+    session.state.players[0].hand = [
+      {
+        ...starterCards[0], id: 'dump', name: 'Dump', type: 'Character', onReveal: migrateEffects([{
+          action: 'discardCards', amount: 3,
+          target: { type: 'card', who: 'self', where: 'hand' },
+          pick: { mode: 'choose' },
+        }], 'card'),
+      },
+      a, b, c,
+    ];
+    session.deploy('dump', 0);
+    session.endTurn(0); session.endTurn(1);
+    let sawAutoDiscard = false;
+    while (session.pendingCount || session.state.choice) {
+      if (session.state.choice) throw new Error(`expected auto-resolve without a modal: ${session.state.choice.prompt}`);
+      const event = session.step()!.event;
+      if (/Dump: selection complete \(3\)/.test(event.text)) {
+        sawAutoDiscard = true;
+        expect(session.state.players[0].discard.map(card => card.id).sort()).toEqual(['a', 'b', 'c']);
+        expect(session.state.players[0].hand).toHaveLength(0);
+        break;
+      }
+    }
+    expect(sawAutoDiscard).toBe(true);
+  });
+
+  it('toasts Condition not met when mandatory discard exceeds hand size', () => {
+    const session = createSession({
+      carryover: true, priorityPreference: 'higher', strategicMarket: true, evaluationContent: true, random: seededRandom(5), aiSeats: [],
+    });
+    session.state.nodeOrder = [0, 1, 2, 3, 4];
+    session.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
+    session.state.players[0].hand = [
+      {
+        ...starterCards[0], id: 'dump', name: 'Dump',
+        onReveal: migrateEffects([{
+          action: 'discardCards', amount: 3,
+          target: { type: 'card', who: 'self', where: 'hand' },
+          pick: { mode: 'choose' },
+        }], 'card'),
+      },
+      { ...starterCards[0], id: 'a', name: 'A' },
+      { ...starterCards[0], id: 'b', name: 'B' },
+    ];
+    session.deploy('dump', 0);
+    session.endTurn(0); session.endTurn(1);
+    const events = [];
+    while (session.pendingCount) events.push(session.step()!.event);
+    expect(session.state.choice).toBeNull();
+    const unmet = events.find(event => /Condition not met: discard 3 cards \(have 2\)/.test(event.text));
+    expect(unmet).toBeTruthy();
+    expect(unmetEffectNotice(unmet!)).toBe('Condition not met: discard 3 cards (have 2)');
+    expect(session.state.players[0].hand.map(card => card.id).sort()).toEqual(['a', 'b']);
+  });
 });

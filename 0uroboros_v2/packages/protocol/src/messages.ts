@@ -48,7 +48,7 @@ export const RoomSettingsSchema = z.object({
   /** Draft-phase deadline in seconds; 0 disables the Draft timer. */
   draftSeconds: z.number().int().min(0).max(600).default(0),
   /** Seconds to answer a mandatory choice before the server picks a random legal option. */
-  choiceSeconds: z.number().int().min(5).max(300).default(45),
+  choiceSeconds: z.number().int().min(5).max(300).default(50),
   carryover: z.boolean().default(true),
   priorityPreference: z.enum(["higher", "lower"]).default("higher"),
   /** Seed for the table's shuffles; unset, the server draws one. Recorded in the replay. */

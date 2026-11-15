@@ -78,7 +78,7 @@ export function configurableFacts(): ConfigurableFact[] {
     {
       id: "mostCircuitsBonusVP", surface: "configure", label: "Most Circuits end-game bonus VP",
       default: defaultMostCircuitsBonusVP, cohortDefault: 0,
-      notes: "Awarded once at game end to the seat with more Circuit wins across completed Cycles (a Circuit win = strictly more Locations that Cycle). Ties award nothing. 0 disables. Eco-Strat set the initial default to 6; headless cohorts omit it unless the harness passes a value. Irrelevant when noLocations is on.",
+      notes: "Awarded once at game end to the seat with more Circuit wins across completed Cycles (a Circuit win = strictly more Locations that Cycle). Ties award nothing. 0 disables. Eco-Strat set the initial default to 6; headless cohorts omit it unless the harness passes a value. Still awarded under noLocations (No Man's Land).",
     },
     {
       id: "turnSeconds", surface: "configure", label: "Runtime turn timer",

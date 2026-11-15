@@ -137,10 +137,14 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
  const dialog=useRef<HTMLElement>(null);
  const peekDone=useRef(false);
  const [picked,setPicked]=useState<string[]>([]);
+ const [slammed,setSlammed]=useState<string|null>(null);
  const [peekLeft,setPeekLeft]=useState(()=>choice.mode==='peek'?Math.ceil((choice.autoResolveMs??6000)/1000):0);
+ const [choiceLeft,setChoiceLeft]=useState(()=>choice.endsAt?Math.max(0,Math.ceil((choice.endsAt-Date.now())/1000)):0);
  const finishPeek=()=>{if(peekDone.current)return;peekDone.current=true;choose(['done']);};
+ const isModAttach=/attach|mod|Aura Farming|Lefty|Overclock|modifier/i.test(`${choice.prompt} ${choice.verb??''} ${choice.sourceName}`);
  useEffect(()=>{
   setPicked([]);
+  setSlammed(null);
   peekDone.current=false;
   const previous=document.activeElement as HTMLElement|null;
   if(choice.transfer)dialog.current?.focus();
@@ -158,6 +162,12 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
   return()=>{window.clearInterval(tick);window.clearTimeout(timer);};
  // eslint-disable-next-line react-hooks/exhaustive-deps -- only restart the peek timer when the choice identity changes
  },[choice.id,choice.mode,choice.autoResolveMs]);
+ useEffect(()=>{
+  if(!choice.endsAt||choice.mode==='peek'){setChoiceLeft(0);return;}
+  const tick=window.setInterval(()=>setChoiceLeft(Math.max(0,Math.ceil((choice.endsAt!-Date.now())/1000))),250);
+  setChoiceLeft(Math.max(0,Math.ceil((choice.endsAt-Date.now())/1000)));
+  return()=>window.clearInterval(tick);
+ },[choice.id,choice.endsAt,choice.mode]);
  const nodes=choiceNodes(choice);
  const nodeMode=nodes.length>0;
  const peekMode=choice.mode==='peek';
@@ -189,9 +199,18 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
   :select?`${select.min===select.max?`Select ${select.max}`:select.min?`Select ${select.min} to ${select.max}`:`Select up to ${select.max}`} ${noun}${select.max===1?'':'s'}, then confirm. Nothing resolves until you confirm.`
   :null;
  const footer=nodeMode?'Resolution continues after you select a Node.':peekMode?`Continues in ${peekLeft}s`:groups?`${picked.length} of ${groups.length} decided`:selection?`${picked.length} of ${selection.max} selected`:'Resolution continues after your choice.';
- const primary=peekMode?'Done looking':groups?'Confirm':selection?confirmLabel(verb,selection,picked.length,noun):null;
+ const deadline=choiceLeft>0?` (${choiceLeft}s)`:'';
+ const primary=peekMode?'Done looking':groups?`Confirm${deadline}`:selection?`${confirmLabel(verb,selection,picked.length,noun)}${deadline}`:null;
  const onBoard=nodeMode||transfer;
- return <div className={`choice-backdrop ${onBoard?'node-choice':''}`}><section ref={dialog} className={`choice-dialog ${cardOptions.length||groups?'has-cards':''} ${transfer?'has-transfer':''}`} role='dialog' tabIndex={-1} aria-modal={onBoard?undefined:'true'} aria-label='Resolve card choice' data-choice-mode={transfer?'transfer':peekMode?'peek':nodeMode?'node':groups?'groups':select?'select':'single'} onKeyDown={event=>{
+ const pickCard=(id:string)=>{
+  if(isModAttach&&selection?.max===1){
+   setSlammed(id);setPicked([id]);
+   window.setTimeout(()=>choose(id),380);
+   return;
+  }
+  toggle(id);
+ };
+ return <div className={`choice-backdrop ${onBoard?'node-choice':''}`}><section ref={dialog} className={`choice-dialog ${cardOptions.length||groups?'has-cards':''} ${transfer?'has-transfer':''} ${isModAttach?'mod-attach-choice':''}`} role='dialog' tabIndex={-1} aria-modal={onBoard?undefined:'true'} aria-label='Resolve card choice' data-choice-mode={transfer?'transfer':peekMode?'peek':nodeMode?'node':groups?'groups':select?'select':'single'} onKeyDown={event=>{
   if(onBoard||event.key!=='Tab')return;
   const buttons=Array.from(dialog.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')??[]);
   const first=buttons[0],last=buttons[buttons.length-1];
@@ -219,13 +238,13 @@ export function EffectChoice({choice,choose,transferView,transferHover}:{choice:
     <div className='choice-group-actions' role='radiogroup' aria-label={group.label}>{choice.options.filter(option=>option.group===group.id).map(option=><button type='button' key={option.id} role='radio' aria-checked={picked.includes(option.id)} className={picked.includes(option.id)?'selected':''} data-choice-option={option.id} onClick={()=>pickInGroup(group.id,option.id)}>{option.label}</button>)}</div>
    </div>)}</div>
   :<>
-   {cardOptions.length>0&&<div className='choice-cards'>{cardOptions.map(option=><CardOption key={option.id} option={option} selected={picked.includes(option.id)} disabled={option.disabled} onClick={()=>toggle(option.id)}/>)}</div>}
-   {plainOptions.length>0&&!payment&&<div className={`choice-options ${nodeMode?'node-options':''}`}>{plainOptions.map(option=><button type='button' key={option.id} data-choice-option={option.id} className={select&&picked.includes(option.id)?'selected':''} aria-pressed={select?picked.includes(option.id):undefined} disabled={option.disabled} title={option.disabled?'Cannot pay this cost':undefined} onClick={()=>select?toggle(option.id):choose(option.id)}>{option.label}{option.disabled&&<small className='choice-unpayable'>Cannot pay</small>}</button>)}</div>}
+   {cardOptions.length>0&&<div className='choice-cards'>{cardOptions.map(option=><div key={option.id} className={`choice-card-wrap ${slammed===option.id?'is-slammed':''} ${slammed&&slammed!==option.id?'is-nudged':''}`}><CardOption option={option} selected={picked.includes(option.id)} disabled={option.disabled||!!slammed} onClick={()=>pickCard(option.id)}/>{slammed===option.id&&<span className='mod-slam-badge' aria-hidden>[MOD]</span>}</div>)}</div>}
+   {plainOptions.length>0&&!payment&&<div className={`choice-options ${nodeMode?'node-options':''}`}>{plainOptions.map(option=><button type='button' key={option.id} data-choice-option={option.id} className={select&&picked.includes(option.id)?'selected':''} aria-pressed={select?picked.includes(option.id):undefined} disabled={option.disabled} title={option.disabled?'Cannot pay this cost':undefined} onClick={()=>select?toggle(option.id):choose(option.id)}>{option.label}{option.disabled&&<small className='choice-unpayable'>Cannot pay</small>}{!select&&choiceLeft>0?` · ${choiceLeft}s`:''}</button>)}</div>}
   </>}
-  {!transfer&&<footer><span>{footer}</span>{(primary||decline||payment)&&<div className='choice-actions'>
+  {!transfer&&<footer><span>{footer}{choiceLeft>0&&!peekMode?` · ${choiceLeft}s left`:''}</span>{(primary||decline||payment)&&<div className='choice-actions'>
    {decline&&<button type='button' className='choice-decline' data-choice-decline onClick={decline}>{declineLabel(verb,selection?.max??1)}</button>}
-   {primary&&<button type='button' className='choice-confirm' disabled={peekMode?false:!ready} onClick={peekMode?finishPeek:confirm}>{primary}</button>}
-   {payment&&plainOptions.map(option=><button type='button' key={option.id} className='choice-confirm' data-choice-option={option.id} onClick={()=>choose(option.id)}>{option.label}</button>)}
+   {primary&&<button type='button' className='choice-confirm' disabled={peekMode?false:!ready||!!slammed} onClick={peekMode?finishPeek:confirm}>{primary}</button>}
+   {payment&&plainOptions.map(option=><button type='button' key={option.id} className='choice-confirm' data-choice-option={option.id} onClick={()=>choose(option.id)}>{option.label}{choiceLeft>0?` (${choiceLeft}s)`:''}</button>)}
   </div>}</footer>}
  </section></div>;
 }

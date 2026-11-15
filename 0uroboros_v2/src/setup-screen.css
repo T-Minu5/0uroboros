@@ -23,6 +23,14 @@
 .game-configure-vp button{padding:5px 9px;font-size:11px}
 .game-configure-check{cursor:pointer}
 .game-configure-row.game-configure-check input{width:18px;height:18px;padding:0;accent-color:var(--green,#1fffb1);cursor:pointer}
+.game-configure-awards{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px}
+.game-configure-award-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;width:100%}
+.game-configure-award-list li{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:6px;min-width:0;padding:6px 8px;border:1px solid #ffffff14;border-radius:6px;background:#ffffff06}
+.game-configure-award-list .game-configure-check{display:flex;align-items:flex-start;gap:6px;min-width:0;font-size:11px;line-height:1.25;color:#c4bfd2}
+.game-configure-award-list .game-configure-check input{flex:none;width:16px;height:16px;margin-top:1px;padding:0;accent-color:var(--green,#1fffb1);cursor:pointer}
+.game-configure-award-list .game-configure-check span{min-width:0}
+.game-configure-award-list input[type='number']{width:52px;padding:5px 6px;font-size:11px}
+@media(max-width:520px){.game-configure-award-list{grid-template-columns:1fr}}
 .game-mode-toggle{display:inline-flex;padding:2px;border:1px solid #1fffb144;border-radius:7px;background:#04150f88;gap:2px}
 .game-mode-toggle>button{padding:7px 11px;border:0;border-radius:5px;background:transparent;color:#9ff5d6;font:600 11px Inter,sans-serif;white-space:nowrap}
 .game-mode-toggle>button:hover:not(:disabled):not(.selected){background:#1fffb114}

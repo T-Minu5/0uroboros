@@ -20,7 +20,7 @@ import {
   selectCircuitNode, revealOrder, starterEffects, canDeploy,
   shuffleCards, effectiveCardPower, cardPowerFloor, expandDeck, DEFAULT_STARTING_DECK, setPowerDelta, isCharacterCard,
 } from "./game";
-import { ACTIONS, describeStep, inspectActionsFor, modBadge, optionText } from "./effects/catalog";
+import { ACTIONS, describeStep, describeSteps, inspectActionsFor, modBadge, optionText } from "./effects/catalog";
 import { migrateEffects } from "./effects/migrate";
 import { builtinMod } from "./builtinMods";
 import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type InspectAction, type ModDefinition, type ModHook, type ModifierRef, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
@@ -112,8 +112,42 @@ export type SessionConfig = {
    * 0 or unset awards nothing; Configure defaults to 1.
    */
   nodeWinVP?: number;
+  /**
+   * Seconds to answer a mandatory choice before auto-picking a legal option.
+   * `null` or `0` disables; unset defaults to 50. Peek uses its own `autoResolveMs`.
+   */
+  choiceSeconds?: number | null;
+  /** Configurable end-game achievement VP awards (ties grant both seats). */
+  endGameAwards?: Partial<EndGameAwards>;
   /** The clock Draft deadlines read; defaults to Date.now. Inject for tests and servers. */
   now?: () => number;
+};
+
+/** End-game achievement keys Mel can toggle in Configure. */
+export type EndGameAwardId =
+  | "mostDestroyed"
+  | "mostTrashed"
+  | "mostPowerRemoved"
+  | "mostPowerBoosted"
+  | "mostCryptoBanked"
+  | "mostCryptoStolen";
+export type EndGameAwardSetting = { enabled: boolean; vp: number };
+export type EndGameAwards = Record<EndGameAwardId, EndGameAwardSetting>;
+export const DEFAULT_END_GAME_AWARDS: EndGameAwards = {
+  mostDestroyed: { enabled: true, vp: 4 },
+  mostTrashed: { enabled: true, vp: 2 },
+  mostPowerRemoved: { enabled: true, vp: 4 },
+  mostPowerBoosted: { enabled: true, vp: 2 },
+  mostCryptoBanked: { enabled: true, vp: 2 },
+  mostCryptoStolen: { enabled: true, vp: 4 },
+};
+export const END_GAME_AWARD_LABELS: Record<EndGameAwardId, string> = {
+  mostDestroyed: "Most cards destroyed",
+  mostTrashed: "Most cards trashed",
+  mostPowerRemoved: "Most power removed from cards",
+  mostPowerBoosted: "Most card power boosted",
+  mostCryptoBanked: "Most crypto banked",
+  mostCryptoStolen: "Most crypto stolen/bumped",
 };
 export type PurchaseRecord = {
   cycle: number; owner: PlayerId; definitionId: string; name: string; category: MarketPile["category"]; cost: number;
@@ -189,6 +223,8 @@ export type RuntimeChoice = {
   /** Peek: look-only deck inspection; client auto-resolves after `autoResolveMs`. */
   mode?: "peek";
   autoResolveMs?: number;
+  /** Absolute deadline (ms) for answering; client/server auto-resolve when reached. Peek uses `autoResolveMs` instead. */
+  endsAt?: number;
 };
 /** `aiPick` returns a legal selection when the opponent chooses; without it the opponent picks at random. */
 type ChoiceRequest = {
@@ -815,8 +851,13 @@ export class RuntimeSession {
       for (const trigger of placement.card.triggers ?? []) {
         if (trigger.kind !== "multiplyNode") continue;
         if (trigger.random && trigger.rolled === undefined) {
-          const span = Math.max(0, trigger.max - trigger.min);
-          (trigger as { rolled?: number }).rolled = Math.round((trigger.min + this.config.random() * span) * 100) / 100;
+          // Discrete 10% steps (e.g. 1.1, 1.2, …, 2.0) so Expo-Net lands on 10–100%.
+          const step = 0.1;
+          const minSteps = Math.round(trigger.min / step);
+          const maxSteps = Math.round(trigger.max / step);
+          const span = Math.max(0, maxSteps - minSteps);
+          const picked = minSteps + (span > 0 ? Math.floor(this.config.random() * (span + 1)) : 0);
+          (trigger as { rolled?: number }).rolled = Math.round(picked * step * 100) / 100;
         }
         factor *= trigger.random ? (trigger.rolled ?? trigger.min) : trigger.min;
       }
@@ -831,18 +872,6 @@ export class RuntimeSession {
   private occupancy(node: number, owner: PlayerId): number {
     const state = this.state.nodes[node];
     return state.cards[owner].length + state.holograms.filter(entry => entry.owner === owner).length;
-  }
-
-  /** Aura Farming: host gains +1 Power when another card arrives at its Location. */
-  private rewardAuraFarming(destination: number, arrivedCardId: string): void {
-    for (const owner of [0, 1] as const) {
-      for (const placement of this.state.nodes[destination].cards[owner]) {
-        if (!placement.revealed || placement.card.id === arrivedCardId) continue;
-        const farming = (placement.card.modifiers ?? []).some(modifier => modifier.kind === "authored" && modifier.modId === "aura-farming");
-        if (!farming) continue;
-        setPowerDelta(placement.card, (placement.card.powerDelta ?? 0) + 1);
-      }
-    }
   }
 
   /** Mirrored Node for Superpositioning: N1↔N5, N2↔N4; N3 is null (no-op). */
@@ -1056,7 +1085,6 @@ export class RuntimeSession {
     if (reason) throw new Error(reason);
     player.hand = player.hand.filter(item => item.id !== cardId);
     this.state.nodes[node].cards[owner].push({ card, owner, node, order: ++this.order, revealed: false });
-    this.rewardAuraFarming(node, card.id);
     this.recalculate();
     // The card's identity is the owner's secret until it reveals: the AI's placements are announced face down, and a
     // human's placement carries the public wording for the other seat (see redactEvent).
@@ -1434,6 +1462,8 @@ export class RuntimeSession {
       return this.event("choice", `${this.config.seatNames ? this.subject(placement.owner) : placement.owner === 1 ? "Opponent" : "AI"} chooses: ${labels.join(", ") || "nothing"}.`, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
     }
     this.choiceResolver = resolve;
+    const choiceSeconds = this.config.choiceSeconds === undefined ? 50 : this.config.choiceSeconds;
+    const timed = request.mode !== "peek" && choiceSeconds !== null && choiceSeconds > 0;
     this.state.choice = {
       id: ++this.serial, owner: placement.owner, prompt, sourceName: placement.card.name, node: placement.node,
       ...(icon ? { icon } : {}), ...shape,
@@ -1443,6 +1473,7 @@ export class RuntimeSession {
       ...(request.verb ? { verb: request.verb } : {}),
       ...(request.mode ? { mode: request.mode } : {}),
       ...(request.autoResolveMs !== undefined ? { autoResolveMs: request.autoResolveMs } : {}),
+      ...(timed ? { endsAt: this.now() + choiceSeconds * 1000 } : {}),
     };
     return this.event("choice", prompt, { node: placement.node, owner: placement.owner, source: "card", sourceName: placement.card.name });
   }
@@ -2268,9 +2299,13 @@ export class RuntimeSession {
       return this.event("choice", `${placement.card.name}: selection complete (${selected}).`, { owner, source: "card", sourceName: placement.card.name });
     };
     const eligible = poolCards();
+    const accessingHand = !fromDiscard && !fromDeck && victim !== owner;
+    if (accessingHand) this.announceHandAccess(owner, victim);
     // Cost-for-benefit: if the seat cannot pay the full minimum, skip the modal and explain why.
-    if (step.then?.length && minimum > 0 && eligible.length < minimum) {
-      return this.skipUnmet(ctx, unmet(), { owner });
+    if (minimum > 0 && eligible.length < minimum) {
+      if (step.then?.length || !step.optional) {
+        return this.skipUnmet(ctx, step.then?.length ? unmet() : `Condition not met: ${verb} ${minimum} cards (have ${eligible.length})`, { owner });
+      }
     }
     if (!eligible.length) return finish(0);
     const remove = (id: string) => (): RuntimeEvent => {
@@ -2294,12 +2329,15 @@ export class RuntimeSession {
       this.refreshScores();
       return this.event("trash", `${placement.card.name}: ${removed.name} enters ${trash ? "shared Trash" : "Discard"}.`, { owner, cardId: placement.card.id, source: "card", sourceName: placement.card.name, targetOwner: victim, target: trash ? "trash" : "discard", amount: 1 });
     };
-    // A hand smaller than the minimum is emptied, but the chained effects still require the full minimum.
     const max = Math.min(maximum, eligible.length), min = Math.min(minimum, max);
     if (step.pick?.mode === "random") {
       const pool = [...eligible];
       const ids = Array.from({ length: max }, () => pool.splice(Math.floor(this.config.random() * pool.length), 1)[0].id);
       return this.runSteps([...ids.map(remove), () => finish(ids.length)]);
+    }
+    // Exact set: no real choice — auto-resolve all eligible cards.
+    if (min === max && eligible.length === max && max > 0) {
+      return this.runSteps([...eligible.map(card => remove(card.id)), () => finish(eligible.length)]);
     }
     const count = min === max ? `${max}` : min ? `${min}–${max}` : `up to ${max}`;
     const place = fromDiscard ? " from Discard" : fromHandOrDiscard ? " from hand or Discard" : "";
@@ -2619,6 +2657,9 @@ export class RuntimeSession {
         const kept = this.retire(card, retireOwner, zone);
         this.recalculate();
         this.refreshScores();
+        if (kept && zone === "destroyed") {
+          this.emitCardTriggers("anyCardDestroyed", { actor: source.owner, victim: retireOwner, card, node: -1 });
+        }
         const whose = owner === source.owner ? "its owner's" : this.whose(owner);
         return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${card.name} from ${whose} ${from}.` : `${source.card.name}: ${card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
       }
@@ -2752,8 +2793,12 @@ export class RuntimeSession {
         const destroyedCard = target.card;
         lane.splice(index, 1);
         this.stripModifiers(target.card);
-        (this.retire(target.card, target.owner, zone) ? hit : removed).push(target.card.name);
-        if (destroy) this.queueLocationEvent("cardDestroyed", node, owner, destroyedCard);
+        const kept = this.retire(target.card, target.owner, zone);
+        (kept ? hit : removed).push(target.card.name);
+        if (destroy) {
+          this.queueLocationEvent("cardDestroyed", node, owner, destroyedCard);
+          if (kept) this.emitCardTriggers("anyCardDestroyed", { actor: ctx.source.owner, victim: owner, card: destroyedCard, node });
+        }
       }
     }
     this.recalculate();
@@ -2919,11 +2964,11 @@ export class RuntimeSession {
     if (callbacks.length) this.queue.unshift(...callbacks);
   }
 
-  /** Announce a deck access for Listen Ongoing (Inspect, Peek, steal/gain/mill/mod on deck, etc.). */
-  private announceDeckAccess(accessor: PlayerId, deckOwner: PlayerId): void {
+  /** Announce a deck or hand access for Listen Ongoing (peek/scry/mill/hand look/forced discard). */
+  private announceAccess(accessor: PlayerId, zoneOwner: PlayerId): void {
     for (const host of this.activeTriggerHosts()) {
       let relative: ListenWhose | null = null;
-      if (deckOwner === host.owner) relative = accessor === host.owner ? "youAccessYours" : "enemyAccessesYours";
+      if (zoneOwner === host.owner) relative = accessor === host.owner ? "youAccessYours" : "enemyAccessesYours";
       else if (accessor === host.owner) relative = "youAccessEnemy";
       if (!relative) continue;
       const ctx = this.cardContext(host);
@@ -2932,6 +2977,16 @@ export class RuntimeSession {
         this.queue.unshift(...trigger.then.map(step => () => this.resolveStep(ctx, step)));
       }
     }
+  }
+
+  /** Announce a deck access for Listen Ongoing (Inspect, Peek, steal/gain/mill/mod on deck, etc.). */
+  private announceDeckAccess(accessor: PlayerId, deckOwner: PlayerId): void {
+    this.announceAccess(accessor, deckOwner);
+  }
+
+  /** Enemy looking at or forcing discard/trash from a hand counts as access for Listen Ongoing. */
+  private announceHandAccess(accessor: PlayerId, handOwner: PlayerId): void {
+    this.announceAccess(accessor, handOwner);
   }
 
   private nodeBlocksDestroy(node: number): boolean {
@@ -3422,9 +3477,10 @@ export class RuntimeSession {
         const victimCard = target.card;
         lane.splice(index, 1);
         this.stripModifiers(target.card);
-        this.retire(target.card, target.owner, "destroyed");
+        const kept = this.retire(target.card, target.owner, "destroyed");
         destroyed.push(target.card.name);
         this.queueLocationEvent("cardDestroyed", node, victim, victimCard);
+        if (kept) this.emitCardTriggers("anyCardDestroyed", { actor: owner, victim, card: victimCard, node });
       }
       this.recalculate();
       this.refreshScores();
@@ -3547,8 +3603,9 @@ export class RuntimeSession {
       if (!printed.length) {
         return this.event("choice", `${card.name}: nothing to copy from ${source.name}.`, this.base(ctx));
       }
+      const summary = describeSteps(printed, "card", this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
       return this.resolveChained(ctx, printed, () =>
-        this.event("choice", `${card.name}: copies ${source.name}'s On Reveal.`, this.base(ctx)));
+        this.event("choice", `${card.name} copied '${source.name}': ${summary}`, this.base(ctx)));
     };
     if (target?.relation === "previous") {
       const sides = this.whoPlayers(ctx, target.who ?? "opponent", true);
@@ -3655,7 +3712,6 @@ export class RuntimeSession {
     this.state.nodes[destination].cards[target.owner].push(target);
     this.state.movedTotal++;
     if (!source.card.id.startsWith("location:")) this.state.players[source.owner].moved++;
-    this.rewardAuraFarming(destination, target.card.id);
     this.recalculate();
     if (target.revealed) {
       this.queueLocationConditionCheck(from, destination);
@@ -3688,8 +3744,8 @@ export class RuntimeSession {
     this.recalculate();
     this.refreshScores();
     if (wasRevealed) this.queueLocationConditionCheck(atNode);
-    if (wasRevealed && zone === "destroyed") {
-      this.queueLocationEvent("cardDestroyed", atNode, victim, victimCard);
+    if (zone === "destroyed" && kept) {
+      if (wasRevealed) this.queueLocationEvent("cardDestroyed", atNode, victim, victimCard);
       this.emitCardTriggers("anyCardDestroyed", { actor: source.owner, victim, card: victimCard, node: atNode });
     }
     return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${target.card.name}.` : `${source.card.name}: ${target.card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
@@ -4138,7 +4194,7 @@ export class RuntimeSession {
    */
   private awardMostCircuitsBonus(): string | null {
     const bonus = this.config.mostCircuitsBonusVP ?? 0;
-    if (bonus <= 0 || this.config.noLocations) return null;
+    if (bonus <= 0) return null;
     const wins: [number, number] = [0, 0];
     let ties = 0;
     for (const record of this.cycleRecords) {
@@ -4155,13 +4211,66 @@ export class RuntimeSession {
     return `${this.say(leader, "You earn", "earns")} +${bonus} VP for most Circuits won (${tally}).`;
   }
 
+  private resolvedEndGameAwards(): EndGameAwards | null {
+    const override = this.config.endGameAwards;
+    if (!override) return null;
+    const awards = { ...DEFAULT_END_GAME_AWARDS };
+    for (const id of Object.keys(awards) as EndGameAwardId[]) {
+      const next = override[id];
+      if (!next) continue;
+      const vp = Math.max(0, Math.round(typeof next.vp === "number" ? next.vp : awards[id].vp));
+      awards[id] = {
+        enabled: (next.enabled ?? awards[id].enabled) !== false && vp > 0,
+        vp,
+      };
+    }
+    return awards;
+  }
+
+  /** Credits end-game achievement VP. Strict lead → that seat; ties → both. */
+  private awardStatLead(label: string, stats: [number, number], vp: number): string | null {
+    if (vp <= 0) return null;
+    if (stats[0] === stats[1]) {
+      this.state.players[0].rewardVP += vp;
+      this.state.players[1].rewardVP += vp;
+      this.rewardSources[0].circuit += vp;
+      this.rewardSources[1].circuit += vp;
+      return `Both earn +${vp} VP for ${label} (tied ${stats[0]}–${stats[1]}).`;
+    }
+    const leader = (stats[0] > stats[1] ? 0 : 1) as PlayerId;
+    this.state.players[leader].rewardVP += vp;
+    this.rewardSources[leader].circuit += vp;
+    return `${this.say(leader, "You earn", "earns")} +${vp} VP for ${label} (${stats[leader]}–${stats[1 - leader]}).`;
+  }
+
+  private awardEndGameAchievements(): string[] {
+    const awards = this.resolvedEndGameAwards();
+    if (!awards) return [];
+    const data = this.telemetry.data;
+    const notes: string[] = [];
+    const push = (id: EndGameAwardId, stats: [number, number]) => {
+      const setting = awards[id];
+      if (!setting.enabled || setting.vp <= 0) return;
+      const note = this.awardStatLead(END_GAME_AWARD_LABELS[id], stats, setting.vp);
+      if (note) notes.push(note);
+    };
+    push("mostDestroyed", data.cardsDestroyed);
+    push("mostTrashed", data.cardsTrashed);
+    push("mostPowerRemoved", data.cardPowerDrained);
+    push("mostPowerBoosted", data.powerIncreased);
+    push("mostCryptoBanked", data.cryptoGained);
+    push("mostCryptoStolen", data.cryptoStolenBumped);
+    return notes;
+  }
+
   private gameOver(reason: string): RuntimeEvent {
-    const bonusNote = this.awardMostCircuitsBonus();
+    const bonusNotes = [this.awardMostCircuitsBonus(), ...this.awardEndGameAchievements()].filter(Boolean) as string[];
     this.refreshScores();
     this.state.phase = "gameover";
     const [local, opponent] = this.state.players.map(player => player.totalVP);
     this.state.winner = nodeWinner([local, opponent]);
-    this.state.endedReason = `${reason}${bonusNote ? ` ${bonusNote}` : ""} ${local === opponent ? "Tie" : this.say(local > opponent ? 0 : 1, "You win", "wins")}, ${local} to ${opponent} VP.`;
+    const awardsText = bonusNotes.length ? ` ${bonusNotes.join(" ")}` : "";
+    this.state.endedReason = `${reason}${awardsText} ${local === opponent ? "Tie" : this.say(local > opponent ? 0 : 1, "You win", "wins")}, ${local} to ${opponent} VP.`;
     this.queue = []; this.state.choice = null; this.choiceResolver = null;
     return this.event("gameover", this.state.endedReason);
   }

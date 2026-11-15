@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { defaultMostCircuitsBonusVP, defaultNodeWinVP, defaultServerVP, type Servers } from '@0uroboros/engine/game';
 import type { DeckOption } from './contentPack/loadGameContent';
-import { DRAFT_TIMER_CHOICES, MOST_CIRCUITS_BONUS_VP_MAX, NODE_WIN_VP_MAX, SERVER_VP_MAX, TURN_TIMER_CHOICES, type GameSetup } from './gameSetup';
+import {
+  DRAFT_TIMER_CHOICES, END_GAME_AWARD_LABELS, END_GAME_AWARD_VP_MAX, MOST_CIRCUITS_BONUS_VP_MAX, NODE_WIN_VP_MAX,
+  SERVER_VP_MAX, TURN_TIMER_CHOICES, type EndGameAwardId, type GameSetup,
+} from './gameSetup';
 import { faceNameFor } from './OpponentFacePicker';
 import { StartingDeckPicker } from './StartingDeckPicker';
 
@@ -17,7 +20,9 @@ type Props = {
 export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent, disabled }: Props) {
   const [open, setOpen] = useState(false);
   const deck = decks?.find(option => option.id === deckId);
-  const { serverVP, turnSeconds, draftSeconds, noLocations, middleNodesOnly, trailingRewards, mostCircuitsBonusVP, nodeWinVP } = setup;
+  const { serverVP, turnSeconds, draftSeconds, noLocations, middleNodesOnly, trailingRewards, mostCircuitsBonusVP, nodeWinVP, endGameAwards } = setup;
+  const setAward = (id: EndGameAwardId, patch: Partial<{ enabled: boolean; vp: number }>) =>
+    onChange({ ...setup, endGameAwards: { ...endGameAwards, [id]: { ...endGameAwards[id], ...patch } } });
   const setVP = (slot: keyof Servers, value: string) =>
     onChange({ ...setup, serverVP: { ...serverVP, [slot]: Math.min(SERVER_VP_MAX, Math.max(0, Math.round(Number(value) || 0))) } });
   const summary = [
@@ -81,12 +86,27 @@ export function GameConfigure({ setup, onChange, decks, deckId, onDeck, opponent
         </div>
       </label>
       <label className='game-configure-row'>
-        <span>Most Circuits VP <small>End of game. 0 off</small></span>
+        <span>Most Circuits VP <small>End of game. 0 off. Ties give 0</small></span>
         <div className='game-configure-vp'>
-          <input aria-label='Most Circuits bonus VP' type='number' min={0} max={MOST_CIRCUITS_BONUS_VP_MAX} disabled={disabled || noLocations} value={mostCircuitsBonusVP} onChange={event => onChange({ ...setup, mostCircuitsBonusVP: Math.min(MOST_CIRCUITS_BONUS_VP_MAX, Math.max(0, Math.round(Number(event.target.value) || 0))) })} />
-          <button type='button' title={`Back to ${defaultMostCircuitsBonusVP}`} disabled={disabled || noLocations || mostCircuitsBonusVP === defaultMostCircuitsBonusVP} onClick={() => onChange({ ...setup, mostCircuitsBonusVP: defaultMostCircuitsBonusVP })}>Reset</button>
+          <input aria-label='Most Circuits bonus VP' type='number' min={0} max={MOST_CIRCUITS_BONUS_VP_MAX} disabled={disabled} value={mostCircuitsBonusVP} onChange={event => onChange({ ...setup, mostCircuitsBonusVP: Math.min(MOST_CIRCUITS_BONUS_VP_MAX, Math.max(0, Math.round(Number(event.target.value) || 0))) })} />
+          <button type='button' title={`Back to ${defaultMostCircuitsBonusVP}`} disabled={disabled || mostCircuitsBonusVP === defaultMostCircuitsBonusVP} onClick={() => onChange({ ...setup, mostCircuitsBonusVP: defaultMostCircuitsBonusVP })}>Reset</button>
         </div>
       </label>
+      <div className='game-configure-row game-configure-awards' role='group' aria-labelledby='end-game-awards-label'>
+        <span id='end-game-awards-label'>End-game awards <small>Ties grant both players the VP</small></span>
+        <ul className='game-configure-award-list'>
+          {(Object.keys(endGameAwards) as EndGameAwardId[]).map(id => {
+            const award = endGameAwards[id];
+            return <li key={id}>
+              <label className='game-configure-check'>
+                <input aria-label={`Enable ${END_GAME_AWARD_LABELS[id]}`} type='checkbox' disabled={disabled} checked={award.enabled} onChange={event => setAward(id, { enabled: event.target.checked })} />
+                <span>{END_GAME_AWARD_LABELS[id]}</span>
+              </label>
+              <input aria-label={`${END_GAME_AWARD_LABELS[id]} VP`} type='number' min={0} max={END_GAME_AWARD_VP_MAX} disabled={disabled || !award.enabled} value={award.vp} onChange={event => setAward(id, { vp: Math.min(END_GAME_AWARD_VP_MAX, Math.max(0, Math.round(Number(event.target.value) || 0))) })} />
+            </li>;
+          })}
+        </ul>
+      </div>
       <StartingDeckPicker decks={decks} value={deckId} onChange={onDeck} disabled={disabled} />
     </div>}
   </div>;

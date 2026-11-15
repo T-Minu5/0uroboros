@@ -433,6 +433,15 @@
       "height": 1205,
       "focus": 0.6472
     },
+    "/assets/card_art/chaos cards/hackers/tulpa-polymer.png": {
+      "sha": "cfe5b174a1b7fe0391ae54c6277ab79a18e8832f414f91be1f50d14ae17e4f20",
+      "v": 2,
+      "color": "/assets/card_art/depth/cfe5b174a1b7fe0391ae-v2.color.webp",
+      "depth": "/assets/card_art/depth/cfe5b174a1b7fe0391ae-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.376
+    },
     "/assets/card_art/chaos cards/horrors/cicada-3301.png": {
       "sha": "64efe1ddd44cb48dc57f21e03fe8a2c782488d2543ebc1fc5f591fb1f1143c10",
       "v": 2,
@@ -594,6 +603,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.4111
+    },
+    "/assets/card_art/uploads/0ni-exe.png": {
+      "sha": "008e914ee338556e5e87aa3da3fe83682f3d9aafe904ea0c6db5e5876a1cf2c2",
+      "v": 2,
+      "color": "/assets/card_art/depth/008e914ee338556e5e87-v2.color.webp",
+      "depth": "/assets/card_art/depth/008e914ee338556e5e87-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6376
     },
     "/assets/card_art/uploads/501-ar-2.png": {
       "sha": "36bf9423630e9f2194b7dd5d37364b35c1da00dba67995a8b0bc2cdf69f8bc06",
@@ -847,6 +865,24 @@
       "height": 300,
       "focus": 0.5872
     },
+    "/assets/card_art/uploads/dot-slash.png": {
+      "sha": "3b6e39caedb83059eed5732b50d21d736f306f718a79bd7e22baf35a6ed2349c",
+      "v": 2,
+      "color": "/assets/card_art/depth/3b6e39caedb83059eed5-v2.color.webp",
+      "depth": "/assets/card_art/depth/3b6e39caedb83059eed5-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5714
+    },
+    "/assets/card_art/uploads/dumpster-diver.png": {
+      "sha": "f49cda109c8f25d8c958164c399dcf9c5d91d96854987eb732d7847a5400e5b1",
+      "v": 2,
+      "color": "/assets/card_art/depth/f49cda109c8f25d8c958-v2.color.webp",
+      "depth": "/assets/card_art/depth/f49cda109c8f25d8c958-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3083
+    },
     "/assets/card_art/uploads/expo-net.png": {
       "sha": "fcba57b99ec1f2021188fed58a96ad0928d731323f1be1213185e2cd66fe8ae9",
       "v": 2,
@@ -855,6 +891,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.4165
+    },
+    "/assets/card_art/uploads/expo-net2.png": {
+      "sha": "cdf312f0cf556060534075f9a0f10b884af146ede2d44793efa5850fecd85cc2",
+      "v": 2,
+      "color": "/assets/card_art/depth/cdf312f0cf5560605340-v2.color.webp",
+      "depth": "/assets/card_art/depth/cdf312f0cf5560605340-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3595
     },
     "/assets/card_art/uploads/ghetto-blaster.png": {
       "sha": "3321652bfa5836a4f3c14b057e4054ad0e2c5d2299e017fcdfbe7105b3f4497c",
@@ -910,6 +955,15 @@
       "height": 300,
       "focus": 0.552
     },
+    "/assets/card_art/uploads/holly-hedge.png": {
+      "sha": "49e815b867e55241da9488d431da04816ab2466ae7bbf1b2f300e32736dd3bfb",
+      "v": 2,
+      "color": "/assets/card_art/depth/49e815b867e55241da94-v2.color.webp",
+      "depth": "/assets/card_art/depth/49e815b867e55241da94-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5491
+    },
     "/assets/card_art/uploads/i0n.png": {
       "sha": "921afea44c4376a851eeb8931a0812319a800949c09254a2ca215b83959b644a",
       "v": 2,
@@ -918,6 +972,24 @@
       "width": 400,
       "height": 300,
       "focus": 0.4775
+    },
+    "/assets/card_art/uploads/inti.png": {
+      "sha": "21476bacb413da7805d9e1beca4d060994d999b01238300df6b6c3b0120a09d3",
+      "v": 2,
+      "color": "/assets/card_art/depth/21476bacb413da7805d9-v2.color.webp",
+      "depth": "/assets/card_art/depth/21476bacb413da7805d9-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3563
+    },
+    "/assets/card_art/uploads/jump-ship.png": {
+      "sha": "5b226b0217141c83a62d69fb8c2095d91a501cde79ce51e738511fe6d6e5ddb5",
+      "v": 2,
+      "color": "/assets/card_art/depth/5b226b0217141c83a62d-v2.color.webp",
+      "depth": "/assets/card_art/depth/5b226b0217141c83a62d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5297
     },
     "/assets/card_art/uploads/kinich.png": {
       "sha": "1d8e9dfffc803a41b7f3abdb5243a1a093780cdf6f10f7eb8847f76fc4a9fbc5",
@@ -1018,6 +1090,15 @@
       "height": 300,
       "focus": 0.7132
     },
+    "/assets/card_art/uploads/r-0-1-matrix.png": {
+      "sha": "a21014674ce9018e7535612c5aaf0a6a1b65e1d05df2a81fdfd03a72188694eb",
+      "v": 2,
+      "color": "/assets/card_art/depth/a21014674ce9018e7535-v2.color.webp",
+      "depth": "/assets/card_art/depth/a21014674ce9018e7535-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.9067
+    },
     "/assets/card_art/uploads/rezz-rizz.png": {
       "sha": "14048e9de2f2957555cac193cadb567366d66aa963b18373bf5706a94ff4ee40",
       "v": 2,
@@ -1107,6 +1188,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.616
+    },
+    "/assets/card_art/uploads/trixy.png": {
+      "sha": "81bde9ddec1b622822f75600550de3800f09901c693f3729fc10107ba35b83a5",
+      "v": 2,
+      "color": "/assets/card_art/depth/81bde9ddec1b622822f7-v2.color.webp",
+      "depth": "/assets/card_art/depth/81bde9ddec1b622822f7-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5007
     },
     "/assets/card_art/uploads/v-0-d-nyc.png": {
       "sha": "2c3cac14b9aebf0dbae960a20a2f56c91c05dafa09ab3df1d5baa21e0ceddf2a",
