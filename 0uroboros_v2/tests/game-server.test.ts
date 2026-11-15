@@ -31,7 +31,7 @@ function table(options: { mode?: "pvp" | "ai"; turnSeconds?: number; choiceSecon
   const scheduler = options.scheduler ?? new ManualScheduler();
   const store = options.store ?? new MemoryStore();
   const lobby = new Lobby({ content, contentRevision: PACK_REVISION, scheduler, store });
-  const room = lobby.createRoom(options.mode ?? "pvp", { turnSeconds: options.turnSeconds ?? 0, choiceSeconds: options.choiceSeconds ?? 45, seed: options.seed ?? 7 });
+  const room = lobby.createRoom(options.mode ?? "pvp", { turnSeconds: options.turnSeconds ?? 0, choiceSeconds: options.choiceSeconds ?? 50, seed: options.seed ?? 7 });
   const a = new FakeConnection(), b = new FakeConnection();
   const seatA = room.join("Ada", a)!;
   const seatB = room.mode === "pvp" ? room.join("Bo", b)! : null;

@@ -65,10 +65,10 @@ describe("No trailing rewards", () => {
 
 describe("online tables", () => {
   it("defaults trailing rewards in the pool and hands options to the room's session", () => {
-    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6 });
+    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, draftSeconds: 0, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6, nodeWinVP: 1 });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("pvp", { seed: 5, noLocations: true, noTrailingRewards: false, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
-    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, midCycleDraw: true, middleNodesOnly: true, mostCircuitsBonusVP: 4 });
+    const room = lobby.createRoom("pvp", { seed: 5, noLocations: true, noTrailingRewards: false, draftSeconds: 90, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
+    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, draftSeconds: 90, midCycleDraw: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
     room.join("Bo", { send: () => undefined, close: () => undefined } as never);
     expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
@@ -84,11 +84,12 @@ describe("setup and look defaults", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("keeps game options through a save; trailing rewards and Draft Crypto shelf are not Configure fields", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, mostCircuitsBonusVP: 6 });
-    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0 })).toMatchObject({ noLocations: true, middleNodesOnly: true, mostCircuitsBonusVP: 0 });
+  it("keeps game options through a save; Draft Crypto shelf is not a Configure field", () => {
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, trailingRewards: true, draftSeconds: null, mostCircuitsBonusVP: 6, nodeWinVP: 1 });
+    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0, nodeWinVP: 0 })).toMatchObject({ noLocations: true, middleNodesOnly: true, trailingRewards: false, mostCircuitsBonusVP: 0, nodeWinVP: 0 });
     expect(sanitizeGameSetup(null)).not.toHaveProperty("noTrailingRewards");
     expect(sanitizeGameSetup(null)).not.toHaveProperty("draftCrypto");
+    expect(sanitizeGameSetup(null)).not.toHaveProperty("tenCardDraft");
   });
 
   it("defaults the board to Neon once, then keeps a saved Classic", () => {

@@ -110,6 +110,7 @@ const SOFT_ACTIONS: Partial<Record<ActionId, string>> = {
   choice: 'Player choice branches are not fixed value.',
   random: 'Random branches are not fixed value.',
   scry: 'Inspect/reorder without a fixed card gain.',
+  peek: 'Look at top cards without moving them.',
   recover: 'Recovery value depends on Trash/Discard contents.',
   stealCrypto: 'Steal depends on the opponent’s wallet.',
   bump: 'Bump value depends on what sits in Bank/wallet.',

@@ -33,9 +33,10 @@ export const LOCATION_EFFECT_COLORS = {
  reset: '#ffff00',
  transfer: '#ffff00',
  discard: '#c9b6ff',
- mill: '#c9b6ff',
- inspect: '#27e2ff',
- recover: '#27e2ff',
+  mill: '#c9b6ff',
+  inspect: '#27e2ff',
+  peek: '#27e2ff',
+  recover: '#27e2ff',
 } as const;
 export type LocationEffect = keyof typeof LOCATION_EFFECT_COLORS;
 
@@ -58,6 +59,7 @@ const EFFECT_PATTERNS: Record<LocationEffect, string> = {
  discard: String.raw`\bDiscard (?:up to )?(?:an?|${NUMBER}(?:–${NUMBER})?) cards?\b`,
  mill: String.raw`\bMill (?:an?|${NUMBER}) cards?\b`,
  inspect: String.raw`\bInspect the top (?:${NUMBER} )?cards?\b`,
+ peek: String.raw`\bPeek at the top (?:${NUMBER} )?cards?\b`,
  recover: String.raw`\bRecover (?:an?|${NUMBER}) (?:random )?cards?\b`,
 };
 

@@ -20,7 +20,7 @@ What an [[Effect step]] acts on. Five shapes:
 | Node | this / neighbours | Node Power transfers |
 
 ## Card targets (editor Target select)
-Any revealed card · Revealed card here · This card · Next revealed card · Previously revealed card · Card in hand · Top card · Bottom card · Deck (random) · Effect Bank. Filters: card type and card class.
+Any revealed card · Revealed card here · This card · Next revealed card · Previously revealed card · Card in hand · Discard pile · Hand or Discard · Top card · Bottom card · Deck (random) · Effect Bank. Filters: card type and card class.
 
 - **Deck (random)** picks a random card anywhere in the [[Deck]]. It fixes the [[Pick]] to random, so the editor hides the Pick select, but a count is kept ("Restore 2 cards in your deck +1").
 - **Effect Bank** reaches cards stored in the [[Effect Bank]] ("Destroy a card in enemy Effect Bank").

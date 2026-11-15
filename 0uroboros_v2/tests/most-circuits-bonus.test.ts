@@ -65,15 +65,33 @@ describe("mostCircuitsBonusVP", () => {
     expect(awarded!.view().finalScore![1 - leader].circuitVP).toBe(control!.view().finalScore![1 - leader].circuitVP);
   });
 
-  it("does nothing when the bonus is 0 or Locations are off", () => {
+  it("does nothing when the bonus is 0", () => {
     const seed = 21;
     const off = play({ mostCircuitsBonusVP: 0 }, seed, 3);
-    const none = play({ mostCircuitsBonusVP: 6, noLocations: true }, seed, 3);
     const beforeOff = off.view().players.map(player => player.totalVP);
-    const beforeNone = none.view().players.map(player => player.totalVP);
     off.endSessionNow();
-    none.endSessionNow();
     expect(off.view().players.map(player => player.totalVP)).toEqual(beforeOff);
-    expect(none.view().players.map(player => player.totalVP)).toEqual(beforeNone);
+  });
+
+  it("still awards most Circuits under No Man's Land", () => {
+    const bonus = 6;
+    let awarded: RuntimeSession | null = null;
+    let control: RuntimeSession | null = null;
+    let leader: 0 | 1 = 0;
+    let tally = { wins: [0, 0] as [number, number], ties: 0 };
+    for (const seed of [1, 2, 3, 5, 7, 8, 11, 13, 17, 19, 23, 29, 31, 37, 41]) {
+      const candidate = play({ mostCircuitsBonusVP: bonus, noLocations: true }, seed, 5);
+      tally = circuitTally(candidate);
+      if (tally.wins[0] === tally.wins[1]) continue;
+      awarded = candidate;
+      control = play({ mostCircuitsBonusVP: 0, noLocations: true }, seed, 5);
+      leader = tally.wins[0] > tally.wins[1] ? 0 : 1;
+      break;
+    }
+    expect(awarded).not.toBeNull();
+    expect(control).not.toBeNull();
+    awarded!.endSessionNow();
+    control!.endSessionNow();
+    expect(awarded!.view().players[leader].totalVP).toBe(control!.view().players[leader].totalVP + bonus);
   });
 });

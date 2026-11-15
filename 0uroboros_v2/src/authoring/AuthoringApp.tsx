@@ -34,6 +34,7 @@ import {
 } from '@0uroboros/engine/locationWhiles';
 import { getBundledDocument } from '../contentPack/contentStore';
 import { ModsContext, StepList } from './StepEditor';
+import { TriggersEditor } from './TriggersEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
 import { DeckEditor } from './DeckEditor';
 import { NumberInput } from './NumberInput';
@@ -291,7 +292,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
         <NumberField field="power" label="Power" value={card.power} onChange={power => patch(card.type === 'Crypto' ? { power: power === undefined ? undefined : power } : { power: power ?? 0 })} hint={card.type === 'Crypto' ? 'Optional board Power. Leave empty for wallet-only currency; any integer is allowed.' : undefined} />
         {card.type === 'Character' && <SelectField field="powerSource" label="Power bonus" value={card.powerSource ?? 'none'} options={POWER_SOURCE_OPTIONS} labels={POWER_SOURCE_LABELS} hint="Live bonus added to printed Power while the card is in play." onChange={source => update(syncPrinted({ ...card, powerSource: source === 'none' ? undefined : source }))} />}
         {card.type === 'Character' && <NumberField field="aura" label="Power aura" value={card.aura} min={1} onChange={aura => update(syncPrinted({ ...card, aura: aura || undefined }))} hint="This card’s own effect: +N Power to its other revealed allies at its Location. No mod badge. Leave empty for none." />}
-        {card.type === 'Character' && <SelectField field="selfMove" label="Moves itself" value={card.selfMove ?? 'none'} options={['none', 'turn', 'cycle'] as const} labels={SELF_MOVE_LABELS} hint="While revealed, its owner may drag it to another open Node for free. Undo all actions puts it back." onChange={selfMove => update(syncPrinted({ ...card, selfMove: selfMove === 'none' ? undefined : selfMove }))} />}
+        {(card.type === 'Character' || card.type === 'Crypto') && <SelectField field="selfMove" label="Moves itself" value={card.selfMove ?? 'none'} options={['none', 'turn', 'cycle'] as const} labels={SELF_MOVE_LABELS} hint="While revealed, its owner may drag it to another open Node for free. Undo all actions puts it back." onChange={selfMove => update(syncPrinted({ ...card, selfMove: selfMove === 'none' ? undefined : selfMove }))} />}
         {card.type === 'VP' && <NumberField field="vp" label="Victory points" value={card.vp} onChange={vp => patch({ vp: vp ?? 0 })} />}
         {card.type === 'Crypto' && <NumberField field="cryptoValue" label="Crypto value" value={card.cryptoValue} min={0} onChange={cryptoValue => patch({ cryptoValue: cryptoValue ?? 0 })} />}
         {card.type === 'Character' && <SelectField field="cardClass" label="Card class" value={cardClassOf(card)} options={cardClasses} onChange={changeClass} />}
@@ -342,8 +343,10 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
       {card.type === 'Crypto' && <p className="au-recipe-help">Crypto deploys free. cryptoValue auto-resolves from hand at Draft; On reveal / On collapse fire when the card is played (currency usually reprints its payout on reveal).</p>}
       <StepList field="onReveal" title="On reveal" description="When this card turns face up." steps={card.onReveal ?? []} scope="card" cards={asCards(cards)} onChange={onReveal => update(syncPrinted({ ...card, onReveal }))} />
       <StepList field="onCollapse" title="On collapse" description="When its Location resolves." steps={card.onCollapse ?? []} scope="card" cards={asCards(cards)} onChange={onCollapse => update(syncPrinted({ ...card, onCollapse }))} />
-      <div className="au-duration-fields au-field-grid"><NumberField field="duration" label="Duration" value={card.duration} min={1} onChange={duration => update(syncPrinted({ ...card, duration }))} hint="Leave empty for no duration; 99 is permanent." /><SelectField field="durationPeriod" label="Duration period" value={card.durationPeriod ?? 'cycle'} options={['cycle', 'runtime']} labels={DURATION_LABELS} onChange={durationPeriod => update(syncPrinted({ ...card, durationPeriod }))} hint="The time scale for the whole card: the duration, every-turn steps and schedule all count Runtime turns or Cycles." /></div>
+      <div className="au-duration-fields au-field-grid"><NumberField field="duration" label="Duration" value={card.duration} min={1} onChange={duration => update(syncPrinted({ ...card, duration, ...(duration === undefined ? { foreignBank: undefined } : {}) }))} hint="Leave empty for no duration; 99 is permanent." /><SelectField field="durationPeriod" label="Duration period" value={card.durationPeriod ?? 'cycle'} options={['cycle', 'runtime']} labels={DURATION_LABELS} onChange={durationPeriod => update(syncPrinted({ ...card, durationPeriod }))} hint="The time scale for the whole card: the duration, every-turn steps and schedule all count Runtime turns or Cycles." /></div>
+      <div className="au-toggle-row"><Toggle field="foreignBank" label="Enemy Effect Bank" checked={!!card.foreignBank} disabled={!card.duration} onChange={foreignBank => update(syncPrinted({ ...card, foreignBank: foreignBank || undefined }))} hint="After Collapse, enter the opponent's Effect Bank if a slot is free (else your Discard). Ownership never changes." /></div>
       <StepList field="recurring" title="Recurring" description={card.durationPeriod === 'runtime' ? 'Every Runtime turn while active, starting with the reveal turn.' : 'Every Cycle while active, starting with the reveal Cycle.'} steps={card.recurring ?? []} scope="card" cards={asCards(cards)} onChange={recurring => update(syncPrinted({ ...card, recurring }))} />
+      <TriggersEditor card={card} cards={cards} onChange={triggers => update(syncPrinted({ ...card, triggers }))} />
       <div className="au-schedule-heading"><h3>Scheduled steps</h3><button type="button" className="au-button au-button-subtle" onClick={() => patch({ schedule: [...schedule, { at: 2, timing: 'start', effects: [] }], duration: Math.max(card.duration ?? 0, 2) })}>+ Add schedule</button></div>
       {schedule.map((entry, index) => <div className="au-schedule" key={index}><div className="au-schedule-fields"><NumberField field={`schedule.${index}.at`} label={`Schedule ${index + 1} ${card.durationPeriod === 'runtime' ? 'turn' : 'Cycle'}`} value={entry.at} min={1} onChange={at => patch({ schedule: schedule.map((step, i) => i === index ? { ...step, at: at ?? 1 } : step) })} /><SelectField field={`schedule.${index}.timing`} label={`Schedule ${index + 1} timing`} value={entry.timing ?? 'start'} options={['start', 'end']} labels={card.durationPeriod === 'runtime' ? TIMING_LABELS : CYCLE_TIMING_LABELS} onChange={timing => patch({ schedule: schedule.map((step, i) => i === index ? { ...step, timing } : step) })} /><button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={() => patch({ schedule: schedule.filter((_, i) => i !== index) })}>Remove schedule {index + 1}</button></div><StepList field={`schedule.${index}`} title={`Schedule ${index + 1}`} scope="card" cards={asCards(cards)} steps={entry.effects} onChange={effects => update(syncPrinted({ ...card, schedule: schedule.map((step, i) => i === index ? { ...step, effects } : step) }))} /></div>)}
     </section>
@@ -614,13 +617,27 @@ const TRAILING_HINT = 'Only when Location counts differ: goes to the player who 
 function CircuitEditor({ item: reward, cards, update, applyAdvanced, onPendingChange }: EditorProps<AuthoredCircuitReward>) {
   const mods = useContext(ModsContext);
   const patch = (changes: Partial<AuthoredCircuitReward>) => update({ ...reward, ...changes });
-  const syncText = (effects: EffectStep[]) => patch({ effects, text: describeSteps(effects, 'circuit', asCards(cards), mods) });
+  const derived = describeSteps(reward.effects, 'circuit', asCards(cards), mods);
+  /* Text follows the effects until it is edited by hand; edited wording is kept, with the
+     generated line shown underneath to regenerate from. */
+  const syncEffects = (effects: EffectStep[]) => {
+    const following = !reward.text.trim() || reward.text.trim() === derived;
+    if (!following) { patch({ effects }); return; }
+    patch({ effects, text: describeSteps(effects, 'circuit', asCards(cards), mods) });
+  };
   return <div className="au-properties au-standalone-properties"><section className="au-panel"><SectionTitle title="Circuit reward properties" /><div className="au-field-grid">
     <TextField field="name" label="Name" value={reward.name} onChange={name => patch({ name })} />
-    <TextField field="text" className="au-span-all" label="Reward text (from effects)" value={reward.text} multiline readOnly hint="Written from the effects below." />
     <div className="au-span-all"><Toggle field="awardTrailing" label="Award to trailing player" checked={!!reward.awardTrailing} onChange={checked => update(withTrailing(reward, checked))} hint={TRAILING_HINT} /></div>
-  </div></section>
-    <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unique to this reward" title="Reward effects" description="An ordered recipe for the player claiming this reward. Select a step to edit it." /><StepList field="effects" title="On claim" scope="circuit" cards={asCards(cards)} steps={reward.effects} onChange={syncText} /></section>
+  </div>
+    <div className="au-printed-field">
+      <TextField field="text" label="Reward text" value={reward.text} onChange={text => patch({ text })} multiline hint="Shown when this Circuit reward is claimed. Shorten it as needed." />
+      {derived && derived !== reward.text.trim() && <div className="au-derived">
+        <span>Effects read as</span><p>{derived}</p>
+        <button type="button" className="au-button au-button-subtle" onClick={() => patch({ text: derived })}>Regenerate from effects</button>
+      </div>}
+    </div>
+  </section>
+    <section className="au-panel au-effects-panel"><SectionTitle eyebrow="Unique to this reward" title="Reward effects" description="An ordered recipe for the player claiming this reward. Select a step to edit it." /><StepList field="effects" title="On claim" scope="circuit" cards={asCards(cards)} steps={reward.effects} onChange={syncEffects} /></section>
     <details className="au-property-section"><summary>Identity</summary><IdentityFields id={reward.id} /></details>
     <AdvancedJson key={reward.id} item={reward} onApply={item => applyAdvanced(item as AuthoredCircuitReward)} onPendingChange={onPendingChange} />
   </div>;

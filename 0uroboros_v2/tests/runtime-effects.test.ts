@@ -2,9 +2,10 @@ import {expect,it} from 'vitest';
 import {createSession,firstLegalSelection,seededRandom,type RuntimeSession} from '@0uroboros/engine/runtime';
 import {EVALUATION_ALL_CARDS} from '@0uroboros/engine/evaluationMarket';
 import {starterCards,type Card,type EvaluationEffect} from '@0uroboros/engine/game';
+import type {AnyEffect} from '@0uroboros/engine/effects/types';
 import {transferText} from '@0uroboros/engine/transferText';
 const make=()=>{const session=createSession({carryover:true,priorityPreference:'higher',strategicMarket:true,midCycleDraw:false,random:seededRandom(19)});session.state.nodeOrder=[0,1,2,3,4];session.state.players.forEach(p=>{p.hand=[];p.draw=[];p.discard=[];});return session;};
-const card=(id:string,effects:EvaluationEffect[]=[],extra:Partial<Card>={}):Card=>{
+const card=(id:string,effects:AnyEffect[]=[],extra:Partial<Card>={}):Card=>{
  const next:Card={...starterCards[0],id,onReveal:effects,...extra};
  // Starter Character power must not leak onto wallet Crypto stand-ins.
  if(next.type==='Crypto'&&!('power' in extra))delete (next as {power?:number}).power;
@@ -57,6 +58,84 @@ it('scry asks keep, discard, or trash for every inspected card and applies them 
  expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','d']);
  expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['b']);
  expect(s.state.trash.map(c=>c.id)).toEqual(['c']);
+});
+
+it('scry respects authored Keep / Discard / Trash subsets',()=>{
+ const s=make();s.state.players[0].draw=['a','b','c'].map(id=>card(id));
+ play(s,card('scry-subset',[{
+  action:'scry',amount:2,inspectActions:['discard','trash'],
+  target:{type:'zone',who:'self',zone:'deck'},
+ }]));
+ expect(s.state.choice?.options.filter(o=>o.group==='a').map(o=>o.label)).toEqual(['Discard','Trash']);
+ expect(s.state.choice?.prompt).toMatch(/discard or trash/);
+ s.choose(['discard:a','trash:b']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['c']);
+ expect(s.state.players[0].discard.map(c=>c.id)).toEqual(['a']);
+ expect(s.state.trash.map(c=>c.id)).toEqual(['b']);
+});
+
+it('scry with keep-only leaves the deck untouched',()=>{
+ const s=make();s.state.players[0].draw=['a','b'].map(id=>card(id));
+ play(s,card('scry-keep',[{
+  action:'scry',amount:2,inspectActions:['keep'],
+  target:{type:'zone',who:'self',zone:'deck'},
+ }]));
+ expect(s.state.choice?.options.map(o=>o.label)).toEqual(['Keep','Keep']);
+ s.choose(['keep:a','keep:b']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b']);
+ expect(s.state.players[0].discard).toHaveLength(0);
+ expect(s.state.trash).toHaveLength(0);
+});
+
+it('peek shows the top cards then leaves the deck unchanged after Done looking',()=>{
+ const s=make();s.state.players[0].draw=['a','b','c'].map(id=>card(id));
+ play(s,card('peek',[{action:'peek',amount:2,target:{type:'zone',who:'self',zone:'deck'}}]));
+ expect(s.state.choice).toMatchObject({mode:'peek',autoResolveMs:6000});
+ expect(s.state.choice?.groups?.map(g=>g.card?.id)).toEqual(['a','b']);
+ expect(s.state.choice?.options.map(o=>o.id)).toEqual(['done']);
+ s.choose(['done']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b','c']);
+ expect(s.state.players[0].discard).toHaveLength(0);
+ expect(s.state.trash).toHaveLength(0);
+});
+
+it('peek times out through resolveChoiceTimeout without moving cards',()=>{
+ const s=make();s.state.players[0].draw=['a','b'].map(id=>card(id));
+ play(s,card('peek',[{action:'peek',amount:1,target:{type:'zone',who:'self',zone:'deck'}}]));
+ expect(s.state.choice?.mode).toBe('peek');
+ s.resolveChoiceTimeout();drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['a','b']);
+});
+
+it('scry both shows Yours and Enemy\'s decks to the controller in one choice',()=>{
+ const s=make();
+ s.state.players[0].draw=['mine-a','mine-b'].map(id=>card(id));
+ s.state.players[1].draw=['theirs-a','theirs-b'].map(id=>card(id));
+ play(s,card('scry-both',[{
+  action:'scry',amount:1,target:{type:'zone',who:'both',zone:'deck'},
+ }]));
+ expect(s.state.choice?.owner).toBe(0);
+ expect(s.state.choice?.groups?.map(g=>({id:g.card?.id,label:g.label}))).toEqual([
+  {id:'mine-a',label:'Yours'},
+  {id:'theirs-a',label:"Enemy's"},
+ ]);
+ expect(s.state.choice?.prompt).toMatch(/both decks/);
+ s.choose(['keep:mine-a','trash:theirs-a']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['mine-a','mine-b']);
+ expect(s.state.players[1].draw.map(c=>c.id)).toEqual(['theirs-b']);
+ expect(s.state.trash.map(c=>c.id)).toEqual(['theirs-a']);
+});
+
+it('peek both labels Yours and Enemy\'s without moving cards',()=>{
+ const s=make();
+ s.state.players[0].draw=['mine'].map(id=>card(id));
+ s.state.players[1].draw=['theirs'].map(id=>card(id));
+ play(s,card('peek-both',[{action:'peek',amount:1,target:{type:'zone',who:'both',zone:'deck'}}]));
+ expect(s.state.choice).toMatchObject({mode:'peek',owner:0});
+ expect(s.state.choice?.groups?.map(g=>g.label)).toEqual(['Yours',"Enemy's"]);
+ s.choose(['done']);drain(s);
+ expect(s.state.players[0].draw.map(c=>c.id)).toEqual(['mine']);
+ expect(s.state.players[1].draw.map(c=>c.id)).toEqual(['theirs']);
 });
 
 it('scoped attacking-owner choice can choose an opposing card without exposing the rest of the hand view',()=>{
@@ -196,7 +275,7 @@ it('evaluation injection is explicit, unique, and blocked after any planning pla
 });
 
 it('a Runtime duration rejected by a full Bank stops scheduling once it enters Discard',()=>{
- const s=make();s.state.players[0].bank=Array.from({length:4},(_,i)=>({card:card(`permanent-${i}`,[],{duration:99}),enteredCycle:1,order:i}));
+ const s=make();s.state.players[0].bank=Array.from({length:4},(_,i)=>({card:card(`permanent-${i}`,[],{duration:99}),owner:0 as const,enteredCycle:1,order:i}));
  play(s,card('rejected',[],{duration:5,durationPeriod:'runtime',schedule:[{at:4,effects:[{kind:'crypto',amount:99}]}]}));
  s.endTurn();drain(s);s.endTurn();drain(s);expect(s.state.players[0].discard.some(c=>c.id==='rejected')).toBe(true);
  s.endDraft(0);s.endDraft(1);s.nextCycle();drain(s);expect(s.state.players[0].wallet).toBe(0);
@@ -286,7 +365,7 @@ it('a split at the edge sends the whole amount to the only neighbour',()=>{
  expect(s.state.nodes[0].powers[0]).toBe(3);
 });
 
-const banked=(...ids:string[])=>ids.map((id,order)=>({card:card(id,[],{duration:5}),enteredCycle:1,order}));
+const banked=(...ids:string[])=>ids.map((id,order)=>({card:card(id,[],{duration:5}),owner:1 as const,enteredCycle:1,order}));
 
 it('a random bump moves an opponent Effect Bank card to their discard pile',()=>{
  const s=make();s.state.players[1].bank=banked('bank-a','bank-b');
@@ -297,68 +376,58 @@ it('a random bump moves an opponent Effect Bank card to their discard pile',()=>
  expect(events.find(e=>e.text.includes('bumps'))).toMatchObject({kind:'trash',target:'discard',targetOwner:1,amount:1});
 });
 
-it('a chosen bump lets the player pick from the opponent Crypto wallet',()=>{
+it('bumping a foreign bank occupant sends it to the caster Discard',()=>{
  const s=make();
- s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('not-crypto')];
- s.state.players[1].bank=banked('bank-a');
- play(s,card('bumper',[{kind:'bump',amount:1,zone:'wallet',cardPick:'choice'}]));
- expect(s.state.choice?.options.map(o=>o.id)).toEqual(['coin-a','coin-b']);
- expect(s.state.choice?.options[0].card?.id).toBe('coin-a');
- s.choose('coin-b');
- expect(s.state.players[1].hand.filter(c=>c.type==='Crypto').map(c=>c.id)).toEqual(['coin-a']);
- expect(s.state.players[1].discard.map(c=>c.id)).toEqual(['coin-b']);
- expect(s.state.players[1].bank).toHaveLength(1);
+ s.state.players[1].bank=[{card:card('foreign',[],{duration:5}),owner:0 as const,enteredCycle:1,order:0}];
+ const events=play(s,card('bumper',[{kind:'bump',amount:1,zone:'bank',cardPick:'random'}]));
+ expect(s.state.players[1].bank).toHaveLength(0);
+ expect(s.state.players[0].discard.map(c=>c.id)).toContain('foreign');
+ expect(s.state.players[1].discard.map(c=>c.id)).not.toContain('foreign');
+ expect(events.find(e=>e.text.includes('bumps'))).toMatchObject({kind:'trash',target:'discard',targetOwner:0,amount:1});
 });
 
-it('a bump from either zone offers bank and wallet cards together',()=>{
+it('a wallet bump burns enemy Crypto; neither player receives it',()=>{
  const s=make();
- s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1})];
+ s.state.players[1].wallet=5;
+ s.state.players[0].wallet=1;
  s.state.players[1].bank=banked('bank-a');
- play(s,card('bumper',[{kind:'bump',amount:2,zone:'either'}]));
- expect(s.state.choice?.options.map(o=>o.id)).toEqual(['bank-a','coin-a']);
- s.choose(['bank-a','coin-a']);
- expect(s.state.players[1].discard.map(c=>c.id).sort()).toEqual(['bank-a','coin-a']);
+ const events=play(s,card('bumper',[{kind:'bump',amount:3,zone:'wallet'}]));
+ expect(s.state.players[1].wallet).toBe(2);
+ expect(s.state.players[0].wallet).toBe(1);
+ expect(s.state.players[1].bank).toHaveLength(1);
+ expect(events.find(e=>e.text.includes('bumps'))).toMatchObject({kind:'crypto',target:'wallet',targetOwner:1,amount:3});
+});
+
+it('a bump from either zone bumps bank cards then burns wallet Crypto',()=>{
+ const s=make();
+ s.state.players[1].wallet=4;
+ s.state.players[1].bank=banked('bank-a');
+ play(s,card('bumper',[{kind:'bump',amount:1,zone:'either',cardPick:'random'}]));
+ expect(s.state.players[1].bank).toHaveLength(0);
+ expect(s.state.players[1].discard.map(c=>c.id)).toEqual(['bank-a']);
+ expect(s.state.players[1].wallet).toBe(3);
 });
 
 it('a bump with nothing to hit reports no target',()=>{
  const s=make();
  const events=play(s,card('bumper',[{kind:'bump',amount:1,zone:'either',cardPick:'random'}]));
- expect(events.some(e=>e.text==='bumper: No target.'||e.text.endsWith(': No target.'))).toBe(true);
+ expect(events.some(e=>e.text==='bumper: No target.'||e.text.endsWith(': No target.')||e.text.includes('No target'))).toBe(true);
  expect(s.state.players[1].discard).toHaveLength(0);
 });
 
-it('stealing Crypto moves cards from the opponent wallet into your hand',()=>{
+it('stealing Crypto transfers wallet amount into yours',()=>{
  const s=make();
- s.state.players[1].hand=[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('coin-c',[],{type:'Crypto',cryptoValue:3})];
+ s.state.players[1].wallet=5;
+ s.state.players[0].wallet=1;
  play(s,card('thief',[{kind:'stealCrypto',amount:2}]));
- expect(s.state.players[1].hand.filter(c=>c.type==='Crypto')).toHaveLength(1);
- expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(2);
+ expect(s.state.players[1].wallet).toBe(3);
+ expect(s.state.players[0].wallet).toBe(3);
 });
 
-const coins=()=>[card('coin-a',[],{type:'Crypto',cryptoValue:1}),card('coin-b',[],{type:'Crypto',cryptoValue:2}),card('coin-c',[],{type:'Crypto',cryptoValue:3})];
-
-it("attacker's-choice steal lets you pick which opponent Crypto cards to take",()=>{
- const s=make();s.state.players[1].hand=coins();
- play(s,card('thief',[{kind:'stealCrypto',amount:2,cardPick:'choice'}]));
- expect(s.state.choice).toMatchObject({owner:0,select:{min:2,max:2},prompt:"Slash-Dot: choose 2 Crypto cards to steal from the opponent's wallet."});
- expect(s.state.choice?.options.map(o=>o.id)).toEqual(['coin-a','coin-b','coin-c']);
- s.choose(['coin-a','coin-c']);
- expect(s.state.players[0].hand.map(c=>c.id)).toEqual(['coin-a','coin-c']);
- expect(s.state.players[1].hand.map(c=>c.id)).toEqual(['coin-b']);
-});
-
-it("victim's-choice steal hands the pick to the opponent",()=>{
- const s=make();s.state.players[1].hand=coins();
- const events=play(s,card('thief',[{kind:'stealCrypto',amount:1,cardPick:'choice',chooser:'opponent'}]));
- expect(s.state.choice).toBeFalsy();
- expect(events.some(e=>e.text.startsWith('Opponent chooses:'))).toBe(true);
- expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(1);
- expect(s.state.players[1].hand.filter(c=>c.type==='Crypto')).toHaveLength(2);
-});
-
-it('stealing Crypto from an opponent holding none reports no target',()=>{
+it('stealing Crypto from an empty wallet reports no target',()=>{
  const s=make();
+ s.state.players[1].wallet=0;
  const events=play(s,card('thief',[{kind:'stealCrypto',amount:1}]));
- expect(events.some(e=>e.kind==='crypto'&&e.text.includes('No target'))).toBe(true);
- expect(s.state.players[0].hand.filter(c=>c.type==='Crypto')).toHaveLength(0);
+ expect(events.some(e=>e.kind==='crypto'&&(e.text.includes('No target')||e.text.includes('Wallet is empty')))).toBe(true);
+ expect(s.state.players[0].wallet).toBe(0);
 });

@@ -84,18 +84,21 @@ describe('Remove vs Steal Power', () => {
 });
 
 describe('Aura Farming and Lefty', () => {
-  it('Aura Farming grants +1 when a card deploys onto its Location', () => {
-    const farming: AuthoredMod = { id: 'aura-farming', name: 'Aura Farming', enabled: true };
+  it('Aura Farming does not grant Power when a card deploys onto its Location', () => {
+    const farming: AuthoredMod = {
+      id: 'aura-farming', name: 'Aura Farming', enabled: true,
+      onReveal: [{ action: 'draw', amount: 1, target: you }],
+    };
     const game = session([farming]);
     const host = card('farmer', {
       power: 2,
-      modifiers: [{ id: 'm1', kind: 'authored', modId: 'aura-farming', name: 'Aura Farming' }],
+      modifiers: [{ id: 'm1', kind: 'authored', modId: 'aura-farming', name: 'Aura Farming', onReveal: farming.onReveal }],
     });
     game.state.nodes[1].cards[0].push({ card: host, owner: 0, node: 1, order: 1, revealed: true });
     const arriver = card('arriver', { power: 1 });
     game.state.players[0].hand = [arriver];
     game.deploy(arriver.id, 1);
-    expect(host.powerDelta).toBe(1);
+    expect(host.powerDelta ?? 0).toBe(0);
   });
 
   it('Lefty onReveal pushes 1 Node Power left', () => {

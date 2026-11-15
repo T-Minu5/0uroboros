@@ -48,8 +48,8 @@ export const JOURNAL_RESETS = [
 /** One-time Mel rule notices written into designer guidance on load. */
 export const DESIGNER_NOTICES = [
   {
-    id: 'trailing-rewards-always-on',
-    text: 'Rule change: trailing Circuit Rewards (awardTrailing catch-up rewards) are always in the pool. Configure no longer has an Include trailing rewards toggle. Evaluate snowball and comeback with those catch-up rewards present every game; facts.rules.circuit is authoritative.',
+    id: 'trailing-rewards-configure',
+    text: 'Trailing Circuit Rewards (awardTrailing) stay in the pool when Configure Trailing rewards is on (default). Off maps to noTrailingRewards. Evaluate snowball with catch-ups present unless Mel turns them off; facts.rules.circuit is authoritative.',
   },
   {
     id: 'crypto-cards-playable',
@@ -61,7 +61,7 @@ export const DESIGNER_NOTICES = [
   },
   {
     id: 'trailing-boost-not-enable',
-    text: 'Trailing Circuit catch-up (awardTrailing) is always present — Configure no longer toggles it. Do not recommend "turning trailing rewards on" or setting noTrailingRewards. If snowball persists with catch-ups already in the pool, recommend boosting catch-up strength or adding more awardTrailing rewards. facts.rules.circuit is authoritative.',
+    text: 'Trailing Circuit catch-up (awardTrailing) is on by default via Configure. If snowball persists with catch-ups in the pool, recommend boosting catch-up strength or adding more awardTrailing rewards — not "turning trailing on" unless Mel disabled it. facts.rules.circuit is authoritative.',
   },
 ];
 /** Cards both players start with are played in every game; Eco-Strat must not read that exposure as power. */

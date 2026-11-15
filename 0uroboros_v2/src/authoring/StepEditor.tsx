@@ -4,12 +4,12 @@ import { builtinMod } from '@0uroboros/engine/builtinMods';
 import {
   ACTIONS, COST_ACTIONS, DESTINATION_LABELS, EDITOR_ENTRIES, EDITOR_GROUPS, MAX_DEPTH, PICK_LABELS, RELATION_LABELS, SERVER_LABELS,
   TARGET_TYPE_LABELS, WHERE_LABELS, ZONE_LABELS,
-  actionsFor, applyEditorEntry, applyTargetChoice, clampAmount, currentTargetChoice, editorEntryFor, targetChoicesFor, createStep, defaultTarget, describeStep, matchTargetSpec, targetsFor, whoChoices, whoLabel,
+  actionsFor, applyEditorEntry, applyTargetChoice, clampAmount, currentTargetChoice, editorEntryFor, inspectActionsFor, targetChoicesFor, createStep, defaultTarget, describeStep, matchTargetSpec, targetsFor, whoChoices, whoLabel,
   type TargetSpec,
 } from '@0uroboros/engine/effects/catalog';
 import {
-  BUILTIN_MODIFIERS, DECK_ENDS, filterClasses, isBuiltinModifier, scopedWho,
-  type CardClass, type CardFilter, type ChoiceOption, type EffectStep, type ModDefinition, type PickMode, type Relation, type Scope, type Target, type Who,
+  BUILTIN_MODIFIERS, DECK_ENDS, INSPECT_ACTIONS, filterClasses, isBuiltinModifier, scopedWho,
+  type CardClass, type CardFilter, type ChoiceOption, type EffectStep, type InspectAction, type ModDefinition, type PickMode, type Relation, type Scope, type Target, type Who,
 } from '@0uroboros/engine/effects/types';
 import { NumberInput } from './NumberInput';
 import { useEditorFocus } from './editorContext';
@@ -38,19 +38,37 @@ function Select<T extends string>({ label, value, options, labels, onChange, dis
 function ModifierPicker({ step, onChange }: { step: EffectStep; onChange: (changes: Partial<EffectStep>) => void }) {
   const mods = useContext(ModsContext);
   const removing = step.action === 'removeModifier';
+  const poolMode = !removing && !!step.modifierPool?.length;
   const value = step.modifier ?? (removing ? '' : 'doublePrintedEffects');
   const known = value === '' || isBuiltinModifier(value) || mods.some(mod => mod.id === value);
-  const pick = (next: string) => onChange(removing ? { modifier: next || undefined } : { modifier: next, amount: next === 'powerAuraAtLocation' ? step.amount ?? 1 : undefined });
+  const amountFor = (next: string) => next === 'powerAuraAtLocation' ? step.amount ?? 1 : next === 'multiplyNodePower' ? step.amount ?? 1.5 : undefined;
+  const pick = (next: string) => onChange(removing ? { modifier: next || undefined } : { modifier: next, modifierPool: undefined, amount: amountFor(next) });
+  const allRefs = [...BUILTIN_MODIFIERS, ...mods.map(mod => mod.id)];
   const label = removing ? 'Mods to remove' : 'Mod';
-  return <div className="au-step-grid"><label className="au-recipe-field"><span>{label}</span>
-    <select aria-label={label} value={value} onChange={event => pick(event.target.value)}>
-      {!known && <option value={value}>Unavailable mod ({value})</option>}
-      {removing && <option value="">Every mod</option>}
-      {mods.length > 0 && <optgroup label="Card mods">{mods.map(mod => <option key={mod.id} value={mod.id}>{mod.name}</option>)}</optgroup>}
-      <optgroup label="Built-in">{BUILTIN_MODIFIERS.map(kind => <option key={kind} value={kind}>{builtinMod(kind).name}</option>)}</optgroup>
-    </select>
-    {!removing && !mods.length && <small>Author your own in the Card mods section.</small>}
-  </label></div>;
+  return <div className="au-step-grid">
+    {!removing && <label className="au-recipe-check au-step-wide"><input type="checkbox" checked={poolMode} onChange={event => onChange(event.target.checked
+      ? { modifierPool: step.modifierPool?.length ? step.modifierPool : [value || 'doublePrintedEffects'], modifier: undefined }
+      : { modifierPool: undefined, modifier: step.modifierPool?.[0] ?? 'doublePrintedEffects' })} /><span>Random from a list</span></label>}
+    {poolMode ? <fieldset className="au-class-checks au-step-wide">
+      <legend>Mod pool <small>Attach picks one at random</small></legend>
+      {allRefs.map(ref => {
+        const checked = (step.modifierPool ?? []).includes(ref);
+        const name = isBuiltinModifier(ref) ? builtinMod(ref).name : mods.find(mod => mod.id === ref)?.name ?? ref;
+        return <label key={ref} className="au-recipe-check"><input type="checkbox" checked={checked} onChange={event => {
+          const next = event.target.checked ? [...(step.modifierPool ?? []), ref] : (step.modifierPool ?? []).filter(id => id !== ref);
+          onChange({ modifierPool: next.length ? next : [ref], modifier: undefined });
+        }} /><span>{name}</span></label>;
+      })}
+    </fieldset> : <label className="au-recipe-field"><span>{label}</span>
+      <select aria-label={label} value={value} onChange={event => pick(event.target.value)}>
+        {!known && <option value={value}>Unavailable mod ({value})</option>}
+        {removing && <option value="">Every mod</option>}
+        {mods.length > 0 && <optgroup label="Card mods">{mods.map(mod => <option key={mod.id} value={mod.id}>{mod.name}</option>)}</optgroup>}
+        <optgroup label="Built-in">{BUILTIN_MODIFIERS.map(kind => <option key={kind} value={kind}>{builtinMod(kind).name}</option>)}</optgroup>
+      </select>
+      {!removing && !mods.length && <small>Author your own in the Card mods section.</small>}
+    </label>}
+  </div>;
 }
 
 function CardDefinitionPicker({ label, cards, value, onChange }: { label: string; cards: readonly CatalogCard[]; value?: string; onChange: (id: string) => void }) {
@@ -150,7 +168,8 @@ function GainCardPicker({ step, cards, onChange }: {
     };
     onChange({
       cardId: undefined, cardIds: undefined,
-      filter: Object.keys(filter).length ? filter : { cardClass: 'Utility' },
+      // Empty filter + maxCost still means “any matching”; none ticked = any class.
+      filter,
       maxCost: step.maxCost ?? 3,
       selection: 'random',
     });
@@ -173,13 +192,6 @@ function GainCardPicker({ step, cards, onChange }: {
           labels={{ any: 'Any type' }}
           onChange={value => setFilter(value === 'any' ? undefined : value as CardType, classes)}
         />
-        {offered.length > 0 && <Select
-          label="Card class"
-          value={classes[0] ?? 'any'}
-          options={['any', ...offered]}
-          labels={{ any: 'Any class' }}
-          onChange={value => setFilter(step.filter?.cardType, value === 'any' ? [] : [value as CardClass])}
-        />}
         <label className="au-recipe-field"><span>Max cost</span>
           <NumberInput
             aria-label="Max cost"
@@ -195,6 +207,15 @@ function GainCardPicker({ step, cards, onChange }: {
           />
         </label>
       </div>
+      {offered.length > 0 && <fieldset className="au-class-checks au-step-wide">
+        <legend>Card class <small>{classes.length ? '' : '(none ticked: any class)'}</small></legend>
+        {offered.map(item => <label key={item} className="au-recipe-check"><input type="checkbox" checked={classes.includes(item)} onChange={event => {
+          const next = event.target.checked
+            ? offered.filter(entry => entry === item || classes.includes(entry))
+            : classes.filter(entry => entry !== item);
+          setFilter(step.filter?.cardType, next);
+        }} /><span>{item}</span></label>)}
+      </fieldset>}
       <small>Picks a random enabled catalog card matching the class and cost (Generated cards are excluded). Who receives it and which zone are set above.</small>
     </> : <>
       <Select label="How the gained card is chosen" value={selection} options={['sequential', 'random']} labels={{ sequential: 'Always the first selected card', random: 'Random from selected cards' }} onChange={value => onChange({ selection: value === 'sequential' && values.length <= 1 ? undefined : value })} />
@@ -262,9 +283,16 @@ function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectSte
   const whoOptions = spec.type === 'node' || hidePlayerWho ? [] : whoChoices(spec, scope).filter(who => !asCost || allyWho(scope).includes(who));
   const whoLabels = Object.fromEntries(whoOptions.map(who => [who, whoLabel(who, scope, target.type === 'player' ? 'player' : 'card')])) as Record<Who, string>;
   if (specs.length > 1 && !entry?.targets) fields.push(<Select key="type" label="Target" value={target.type} options={specs.map(entry => entry.type)} labels={TARGET_TYPE_LABELS} onChange={type => onChange(defaultTarget(specs.find(entry => entry.type === type)!, scope))} />);
-  if (target.type !== 'node' && !hidePlayerWho) fields.push(<Select key="who" label={target.type === 'card' ? 'Whose cards' : target.type === 'player' ? 'Which player' : 'Whose'} value={target.who} options={whoOptions} labels={whoLabels} onChange={who => onChange({ ...target, who })} />);
+  if (target.type !== 'node' && !hidePlayerWho) {
+    const whoLabelText = step.action === 'silenceOngoing' ? 'Whose Ongoing'
+      : target.type === 'card' ? 'Whose cards'
+      : target.type === 'player' ? 'Which player' : 'Whose';
+    fields.push(<Select key="who" label={whoLabelText} value={target.who} options={whoOptions} labels={whoLabels} onChange={who => onChange({ ...target, who })} />);
+  }
   if (entry?.targets) {
-    if (target.type === 'card' && target.relation === undefined) fields.push(...cardFilters(target, onChange, step.action === 'attachModifier'));
+    if (target.type === 'card' && target.relation === undefined && step.action !== 'silenceOngoing') {
+      fields.push(...cardFilters(target, onChange));
+    }
     return <div className="au-step-grid">{fields}</div>;
   }
   if (target.type === 'server' && spec.type === 'server') fields.push(<Select key="server" label="Server" value={target.server} options={spec.servers} labels={SERVER_LABELS} onChange={server => onChange({ ...target, server })} />);
@@ -285,7 +313,7 @@ function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectSte
         onChange(next);
       }} />);
     }
-    if (target.relation === undefined) fields.push(...cardFilters(target, onChange, step.action === 'attachModifier'));
+    if (target.relation === undefined) fields.push(...cardFilters(target, onChange));
   }
   return <div className="au-step-grid">{fields}</div>;
 }
@@ -294,27 +322,34 @@ function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectSte
 const classesFor = (cardType?: CardType): readonly CardClass[] =>
   cardType === 'Crypto' ? [] : cardType === 'VP' ? VP_CLASSES : cardType === 'Character' ? CARD_CLASSES.filter(item => !VP_CLASSES.includes(item)) : CARD_CLASSES;
 
-function cardFilters(target: Extract<Target, { type: 'card' }>, onChange: (target: Target) => void, multiClass = false): ReactNode[] {
+function cardFilters(target: Extract<Target, { type: 'card' }>, onChange: (target: Target) => void): ReactNode[] {
   const classes = filterClasses(target.filter);
-  const save = (cardType: CardType | undefined, picked: readonly CardClass[]) => {
+  const save = (cardType: CardType | undefined, picked: readonly CardClass[], costs?: { minCost?: number; maxCost?: number }) => {
     const kept = picked.filter(item => classesFor(cardType).includes(item));
+    const minCost = costs?.minCost ?? target.filter?.minCost;
+    const maxCost = costs?.maxCost ?? target.filter?.maxCost;
     const filter: CardFilter = {
       ...(cardType ? { cardType } : {}),
       ...(kept.length === 1 ? { cardClass: kept[0] } : kept.length ? { cardClass: kept } : {}),
+      ...(minCost !== undefined ? { minCost } : {}),
+      ...(maxCost !== undefined ? { maxCost } : {}),
     };
     onChange({ ...target, filter: Object.keys(filter).length ? filter : undefined });
   };
   const offered = classesFor(target.filter?.cardType);
   const typeField = <Select key="cardType" label="Card type" value={target.filter?.cardType ?? 'any'} options={['any', ...CARD_TYPES]} labels={{ any: 'Any type' }} onChange={value => save(value === 'any' ? undefined : value, classes)} />;
-  if (!offered.length) return [typeField];
-  if (!multiClass && classes.length <= 1) return [typeField,
-    <Select key="cardClass" label="Card class" value={classes[0] ?? 'any'} options={['any', ...offered]} labels={{ any: 'Any class' }} onChange={value => save(target.filter?.cardType, value === 'any' ? [] : [value])} />];
+  const costFields = [
+    <label key="minCost" className="au-recipe-field"><span>Min cost</span><input type="number" min={0} max={100} value={target.filter?.minCost ?? ''} placeholder="any" onChange={event => save(target.filter?.cardType, classes, { minCost: event.target.value === '' ? undefined : Number(event.target.value), maxCost: target.filter?.maxCost })} /></label>,
+    <label key="maxCost" className="au-recipe-field"><span>Max cost</span><input type="number" min={0} max={100} value={target.filter?.maxCost ?? ''} placeholder="any" onChange={event => save(target.filter?.cardType, classes, { maxCost: event.target.value === '' ? undefined : Number(event.target.value), minCost: target.filter?.minCost })} /></label>,
+  ];
+  if (!offered.length) return [typeField, ...costFields];
   const toggle = (item: CardClass, checked: boolean) => save(target.filter?.cardType, checked ? offered.filter(entry => entry === item || classes.includes(entry)) : classes.filter(entry => entry !== item));
   return [typeField,
     <fieldset key="cardClass" className="au-class-checks au-step-wide">
       <legend>Card class <small>{classes.length ? '' : '(none ticked: any class)'}</small></legend>
       {offered.map(item => <label key={item} className="au-recipe-check"><input type="checkbox" checked={classes.includes(item)} onChange={event => toggle(item, event.target.checked)} /><span>{item}</span></label>)}
-    </fieldset>];
+    </fieldset>,
+    ...costFields];
 }
 
 /* ---------------------------------------------------------------- step body */
@@ -370,7 +405,7 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
   const hasRelation = step.target?.type === 'card' && step.target.relation !== undefined;
   const atDeckEnd = step.target?.type === 'card' && DECK_ENDS.includes(step.target.where);
   const offBoard = step.target?.type === 'card' && step.target.where !== 'board' && step.target.where !== 'thisNode';
-  const amountShown = spec.amount && (step.action !== 'attachModifier' || step.modifier === 'powerAuraAtLocation');
+  const amountShown = spec.amount && (step.action !== 'attachModifier' || step.modifier === 'powerAuraAtLocation' || step.modifier === 'multiplyNodePower');
   const entry = editorEntryFor(step);
   const entries = EDITOR_ENTRIES.filter(item => available.some(action => action.id === item.action));
   const fixedPick = entry?.targets ? currentTargetChoice(step, entry.targets)?.pick : undefined;
@@ -380,10 +415,23 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
     onChange(lockConditionStep(next, scope));
   };
   const amountField = () => {
-    const amount = spec.amount!, sign = entry?.sign;
+    const multiply = step.action === 'attachModifier' && step.modifier === 'multiplyNodePower';
+    const amount = multiply
+      ? { label: '× factor', min: 1.1, max: 2, default: 1.5, integer: false as const }
+      : spec.amount!;
+    const sign = multiply ? undefined : entry?.sign;
     const value = step.amount ?? amount.default;
-    return <label className="au-recipe-field"><span>{amount.label}</span><NumberInput aria-label={amount.label} min={sign ? 0 : amount.min} max={amount.max} step={amount.integer === false ? 0.5 : 1} value={sign ? Math.abs(value) : value}
-      onChange={next => { if (next !== undefined) patch({ amount: sign ? sign * Math.abs(clampAmount(amount, Math.abs(next))) : clampAmount(amount, next) }); }} /></label>;
+    const stepSize = multiply ? 0.05 : amount.integer === false ? 0.5 : 1;
+    return <label className="au-recipe-field"><span>{amount.label}</span><NumberInput aria-label={amount.label} min={sign ? 0 : amount.min} max={amount.max} step={stepSize} value={sign ? Math.abs(value) : value}
+      onChange={next => {
+        if (next === undefined) return;
+        if (multiply) {
+          const clamped = Math.min(2, Math.max(1.1, Math.round(next * 20) / 20));
+          patch({ amount: clamped });
+          return;
+        }
+        patch({ amount: sign ? sign * Math.abs(clampAmount(amount, Math.abs(next))) : clampAmount(amount, next) });
+      }} /></label>;
   };
   return <div className="au-step-body">
     <div className="au-step-grid">
@@ -404,6 +452,24 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {spec.chooser && scope !== 'locationCondition' && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
+    {step.action === 'scry' && <div className="au-step-grid au-step-wide" role="group" aria-label="Inspect dispositions">
+      <span className="au-recipe-field"><span>For each card, allow</span></span>
+      {INSPECT_ACTIONS.map(action => {
+        const allowed = inspectActionsFor(step);
+        const checked = allowed.includes(action);
+        const label = action[0].toUpperCase() + action.slice(1);
+        return <label key={action} className="au-recipe-check">
+          <input type="checkbox" checked={checked} aria-label={label} onChange={event => {
+            const next = (event.target.checked
+              ? INSPECT_ACTIONS.filter(item => allowed.includes(item) || item === action)
+              : allowed.filter(item => item !== action)) as InspectAction[];
+            if (!next.length) return;
+            patch({ inspectActions: next.length === INSPECT_ACTIONS.length ? undefined : next });
+          }} />
+          <span>{label}</span>
+        </label>;
+      })}
+    </div>}
     {step.action === 'gainCard' && <GainCardPicker step={step} cards={cards} onChange={patch} />}
     {step.action === 'attachModifier' && <>
       <ModifierPicker step={step} onChange={patch} />

@@ -91,7 +91,7 @@ describe('card targets off the board', () => {
 
   it('destroys a card in the Effect Bank', () => {
     const game = session();
-    game.state.players[1].bank = [{ card: card('banked'), enteredCycle: 1, order: 1 }];
+    game.state.players[1].bank = [{ card: card('banked'), owner: 1 as const, enteredCycle: 1, order: 1 }];
     play(game, step('destroyCard', 'bank'));
     expect(game.state.players[1].bank).toEqual([]);
     expect(game.state.players[1].destroyed.map(entry => entry.id)).toEqual(['banked']);
@@ -147,7 +147,7 @@ describe('card targets off the board', () => {
   it('changes the Power of a card in your Effect Bank', () => {
     const game = session();
     const stored = card('stored');
-    game.state.players[0].bank = [{ card: stored, enteredCycle: 1, order: 0 }];
+    game.state.players[0].bank = [{ card: stored, owner: 0 as const, enteredCycle: 1, order: 0 }];
     play(game, step('changePower', 'bank', 'self', 'random', { amount: 2 }));
     expect(stored.powerDelta).toBe(2);
   });
@@ -158,6 +158,49 @@ describe('card targets off the board', () => {
     play(game, step('trashCards', 'deck', 'opponent', 'random', { amount: 2 }));
     expect(game.state.players[1].draw).toHaveLength(1);
     expect(game.state.trash.filter(entry => ['one', 'two', 'three'].includes(entry.id))).toHaveLength(2);
+  });
+
+  it('trashes or destroys from hand or Discard as one pool', () => {
+    expect(describeStep(step('trashCard', 'handOrDiscard', 'self', 'choose'), 'card'))
+      .toBe('Choose a card in your hand or Discard to trash');
+    expect(describeStep(step('trashCards', 'handOrDiscard', 'self', 'choose', { amount: 1 }), 'card'))
+      .toBe('Trash 1 card from your hand or Discard');
+
+    const trashGame = session([]);
+    trashGame.state.players[0].hand = [card('held')];
+    trashGame.state.players[0].discard = [card('discarded')];
+    const trashSource = card('picker', { onReveal: [step('trashCard', 'handOrDiscard', 'self', 'choose')] });
+    trashGame.state.players[0].hand.unshift(trashSource);
+    trashGame.deploy(trashSource.id, 0);
+    trashGame.endTurn(0); trashGame.endTurn(1);
+    while (trashGame.pendingCount && !trashGame.state.choice) trashGame.step();
+    expect(trashGame.state.choice?.options.map(option => option.label)).toEqual(expect.arrayContaining([
+      expect.stringMatching(/held · hand/),
+      expect.stringMatching(/discarded · Discard/),
+    ]));
+    trashGame.choose('card-discarded', 0);
+    finish(trashGame);
+    expect(trashGame.state.players[0].discard.map(entry => entry.id)).not.toContain('discarded');
+    expect(trashGame.state.trash.map(entry => entry.id)).toContain('discarded');
+    expect(trashGame.state.players[0].hand.map(entry => entry.id)).toContain('held');
+
+    const destroyGame = session();
+    destroyGame.state.players[1].hand = [handFoe('foe-hand')];
+    destroyGame.state.players[1].discard = [card('foe-discard')];
+    play(destroyGame, step('destroyCard', 'handOrDiscard', 'opponent', 'random'));
+    const removed = [
+      ...destroyGame.state.players[1].destroyed.map(entry => entry.id),
+    ];
+    expect(removed).toHaveLength(1);
+    expect(['foe-hand', 'foe-discard']).toContain(removed[0]);
+    expect(destroyGame.state.players[1].hand.length + destroyGame.state.players[1].discard.length).toBe(1);
+
+    const bulk = session();
+    bulk.state.players[0].hand = [card('keep-hand')];
+    bulk.state.players[0].discard = [card('from-discard')];
+    play(bulk, step('trashCards', 'handOrDiscard', 'self', 'random', { amount: 1 }));
+    expect(bulk.state.trash.filter(entry => ['keep-hand', 'from-discard'].includes(entry.id))).toHaveLength(1);
+    expect(bulk.state.players[0].hand.length + bulk.state.players[0].discard.length).toBe(1);
   });
 
   it('trashes and destroys cards from Discard and opens a discard-zone choice when picking', () => {

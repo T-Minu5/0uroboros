@@ -43,10 +43,12 @@ const seatToken = z.string().min(16).max(128);
 
 /** Table rules the host may set; everything else comes from the published content pack. */
 export const RoomSettingsSchema = z.object({
-  /** Seconds a seat has to commit a Runtime turn; 0 disables the turn timer. The Draft is the engine's 90 s. */
+  /** Seconds a seat has to commit a Runtime turn; 0 disables the turn timer. */
   turnSeconds: z.number().int().min(0).max(600).default(0),
+  /** Draft-phase deadline in seconds; 0 disables the Draft timer. */
+  draftSeconds: z.number().int().min(0).max(600).default(0),
   /** Seconds to answer a mandatory choice before the server picks a random legal option. */
-  choiceSeconds: z.number().int().min(5).max(300).default(45),
+  choiceSeconds: z.number().int().min(5).max(300).default(50),
   carryover: z.boolean().default(true),
   priorityPreference: z.enum(["higher", "lower"]).default("higher"),
   /** Seed for the table's shuffles; unset, the server draws one. Recorded in the replay. */
@@ -55,7 +57,7 @@ export const RoomSettingsSchema = z.object({
   opponent: z.string().trim().min(1).max(80).optional(),
   /** Every Node is No Man's Land for the whole game. */
   noLocations: z.boolean().default(false),
-  /** Legacy opt-out: when true, Circuit Rewards that go to the trailing player are never drawn. Defaults off — trailing rewards are always in the pool; Configure no longer exposes this. */
+  /** When true, Circuit Rewards that go to the trailing player are never drawn. Configure maps Trailing rewards off → true. */
   noTrailingRewards: z.boolean().default(false),
   /** Fixed rule: each player draws 1 at the start of Runtime turns 2 and 3. Kept for replay compat; always treated as on. */
   midCycleDraw: z.boolean().default(true),
@@ -63,10 +65,12 @@ export const RoomSettingsSchema = z.object({
   draftCrypto: z.boolean().default(false),
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly: z.boolean().default(false),
-  /** When true, Draft offers 10 rotating cards; default is the 8-card offer. */
+  /** When true, Draft offers 10 rotating cards; default is the 8-card offer. Configure no longer exposes this. */
   tenCardDraft: z.boolean().default(false),
   /** End-game bonus VP for most Circuit wins; 0 disables. Eco-Strat initial default is 6. */
   mostCircuitsBonusVP: z.number().int().min(0).max(50).default(6),
+  /** Collapse VP for controlling a Node; ties award nothing. 0 disables. Default 1. */
+  nodeWinVP: z.number().int().min(0).max(50).default(1),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

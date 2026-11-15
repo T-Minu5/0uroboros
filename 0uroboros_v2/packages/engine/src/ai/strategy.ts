@@ -202,6 +202,7 @@ function effectValue(step: EffectStep, w: StrategyWeights, m: Multipliers): numb
     case 'trashCards': value = foe ? w.disrupt * amount : w.thin * amount * m.econ; break;
     case 'discardCards': value = foe ? w.disrupt * amount : -0.3 * amount; break;
     case 'scry': value = w.thin * 0.3 * amount * m.econ; break;
+    case 'peek': value = w.thin * 0.1 * amount * m.econ; break;
     case 'mill': case 'stealCrypto': case 'bump': value = (foe || mixed ? 1 : -0.5) * w.disrupt * amount; break;
     case 'destroyCard': case 'trashCard': {
       const relation = step.target?.type === 'card' ? step.target.relation : undefined;

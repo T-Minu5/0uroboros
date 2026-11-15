@@ -21,4 +21,4 @@ Crypto cards are offered in the rotating **Hacker or Crypto** [[Draft]] slots (n
 | Mega-Cache | Common rotating Crypto |
 | Shyte-Coin | Starter filler and Location punishment |
 
-Crypto cards can be stolen or bumped from the Wallet ([[Deck effects]]).
+Spendable Wallet Crypto can be Stolen (transferred) or Bumped (burned). Crypto cards in the Cache are not moved by Steal or Bump ([[Deck effects]], [[Wallet]]).

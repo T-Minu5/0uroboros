@@ -2,11 +2,13 @@ import { boardScanTotalMs } from './NeonHorizonScan';
 import type { RuntimeEvent } from '@0uroboros/engine/runtime';
 
 export function isNoTargetEvent(event: Pick<RuntimeEvent, 'text' | 'amount'>): boolean {
-  return /no target|not enough cards|is empty\./i.test(event.text);
+  return /no target|not enough cards|is empty\.|condition not met:/i.test(event.text);
 }
 
 /** Short toast copy for unmet optional costs / empty piles. */
 export function unmetEffectNotice(event: Pick<RuntimeEvent, 'text'>): string {
+  const condition = /Condition not met: (.+)$/i.exec(event.text);
+  if (condition) return `Condition not met: ${condition[1].replace(/\.$/, '')}`;
   const match = /: (.+)$/.exec(event.text);
   return match?.[1]?.replace(/\.$/, '') ?? 'No target';
 }

@@ -24,6 +24,22 @@
  box-shadow:0 4px 10px #0009;
 }
 .world-anchor .duration.far.live-bank .bank-slot { filter:saturate(.92); }
+/* Foreign Duration: host holds the slot; caster owns the card — slow attack-red mono pulse (both seats). */
+.world-anchor .bank-slot.bank-slot--foreign > .cf-card {
+ filter:grayscale(1) sepia(1) saturate(8) hue-rotate(-35deg) brightness(.95);
+ animation:bank-foreign-pulse 3.5s ease-in-out infinite;
+}
+.world-anchor .bank-slot.bank-slot--foreign {
+ outline:1px solid color-mix(in srgb,#fa0048 55%,transparent);
+ box-shadow:0 0 10px color-mix(in srgb,#fa0048 35%,transparent), 0 4px 10px #0009;
+}
+@keyframes bank-foreign-pulse {
+ 0%,100% { filter:grayscale(1) sepia(1) saturate(6) hue-rotate(-35deg) brightness(.88); opacity:.88; }
+ 50% { filter:grayscale(1) sepia(1) saturate(10) hue-rotate(-35deg) brightness(1.08); opacity:1; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .world-anchor .bank-slot.bank-slot--foreign > .cf-card { animation:none; }
+}
 /* Empty bays: the Undo button's dark blue at 80%, inset so the bay's glowing rim stays clear, and sunk by an inner shadow. */
 .world-anchor .duration.live-bank i.bank-slot::before {
  content:''; position:absolute; inset:3px; border-radius:2px; background:#0b1e45cc; pointer-events:none;

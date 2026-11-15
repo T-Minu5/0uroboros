@@ -37,7 +37,22 @@ describe('Location text colours', () => {
     expect(coloured('Discard 2 cards from your hand. Mill 3 cards. Inspect the top 2 cards of your deck. Recover a card from the shared Trash.')).toEqual([
       ['Discard 2 cards', 'discard'], ['Mill 3 cards', 'mill'], ['Inspect the top 2 cards', 'inspect'], ['Recover a card', 'recover'],
     ]);
+    expect(coloured('Peek at the top 2 cards of your deck.')).toEqual([
+      ['Peek at the top 2 cards', 'peek'],
+    ]);
     expect(coloured('Bump a card to discard. Move a card. Attach a mod.')).toEqual([]);
+  });
+
+  it('words Inspect disposition subsets and Peek', () => {
+    const deck = { type: 'zone' as const, who: 'self' as const, zone: 'deck' as const };
+    expect(describeStep({ action: 'scry', amount: 2, target: deck }, 'card')).toBe('Inspect the top 2 cards of your deck, then keep, discard or trash each');
+    expect(describeStep({ action: 'scry', amount: 1, target: deck, inspectActions: ['discard', 'trash'] }, 'card')).toBe('Inspect the top 1 card of your deck, then discard or trash each');
+    expect(describeStep({ action: 'scry', amount: 3, target: deck, inspectActions: ['keep'] }, 'card')).toBe('Inspect the top 3 cards of your deck, then keep each');
+    expect(describeStep({ action: 'peek', amount: 2, target: deck }, 'card')).toBe('Peek at the top 2 cards of your deck');
+    expect(describeStep({ action: 'scry', amount: 2, target: { type: 'zone', who: 'both', zone: 'deck' } }, 'card'))
+      .toBe('Inspect the top 2 cards of both decks, then keep, discard or trash each');
+    expect(describeStep({ action: 'peek', amount: 1, target: { type: 'zone', who: 'both', zone: 'deck' } }, 'card'))
+      .toBe('Peek at the top 1 card of both decks');
   });
 
   it('words Reset, Restore, random, chosen and all targets the concise way', () => {
