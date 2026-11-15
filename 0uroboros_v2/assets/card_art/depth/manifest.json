@@ -685,6 +685,24 @@
       "height": 300,
       "focus": 0.4586
     },
+    "/assets/card_art/uploads/bloody-mary.png": {
+      "sha": "daf89a97951e793344b65fc6cec4592742f75eb7021d5ab89efa77087b46d58a",
+      "v": 2,
+      "color": "/assets/card_art/depth/daf89a97951e793344b6-v2.color.webp",
+      "depth": "/assets/card_art/depth/daf89a97951e793344b6-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4512
+    },
+    "/assets/card_art/uploads/bump-key.png": {
+      "sha": "e4d97eb6699becb4a138e1f22876409d29ba68ffb5c4803fac133407d651e3da",
+      "v": 2,
+      "color": "/assets/card_art/depth/e4d97eb6699becb4a138-v2.color.webp",
+      "depth": "/assets/card_art/depth/e4d97eb6699becb4a138-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6743
+    },
     "/assets/card_art/uploads/chin-dai-b.png": {
       "sha": "175a0ff732d7e1a98007d1c5080a8bd640c6f08b560daef166a14051a590c5be",
       "v": 2,
@@ -909,6 +927,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.402
+    },
+    "/assets/card_art/uploads/kopy-kat.png": {
+      "sha": "cebbcff6f5b0ecfa42bf816cb24988503e93234dcb284bdf44ae25bf51b25a4d",
+      "v": 2,
+      "color": "/assets/card_art/depth/cebbcff6f5b0ecfa42bf-v2.color.webp",
+      "depth": "/assets/card_art/depth/cebbcff6f5b0ecfa42bf-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4245
     },
     "/assets/card_art/uploads/luz-del-501.png": {
       "sha": "61e7997355f0452b0d9f754a5889cb4baa5e761cccebe02c20176aa519e50772",

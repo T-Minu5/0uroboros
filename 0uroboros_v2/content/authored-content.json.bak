@@ -1,5 +1,5 @@
 {
-  "revision": 1196,
+  "revision": 1202,
   "document": {
     "version": 3,
     "cards": [
@@ -776,7 +776,7 @@
         "name": "Koppy-Kat",
         "type": "Character",
         "cost": 6,
-        "art": "/assets/library/card_art/base cards/image_placeHolder.png",
+        "art": "/assets/card_art/uploads/kopy-kat.png",
         "effect": "Copy the text of your last revealed card.",
         "power": 2,
         "onReveal": [
@@ -5073,15 +5073,15 @@
       {
         "id": "card-aro3pgdc",
         "definitionId": "card-aro3pgdc",
-        "name": "New card",
+        "name": "Crypto-Echo",
         "pool": "Crypto",
         "type": "Crypto",
         "generated": false,
         "enabled": true,
         "cost": 4,
         "cryptoValue": 1,
-        "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "Ongoing: When any card is destroyed, +1 Card.",
+        "art": "/assets/card_art/crypto/print-crypto-echo.png",
+        "effect": "Ongoing: When any card is destroyed, +1 Crypto.",
         "onReveal": [],
         "triggers": [
           {
@@ -5100,6 +5100,41 @@
           }
         ],
         "power": 1
+      },
+      {
+        "id": "card-b4fjznmc",
+        "definitionId": "card-b4fjznmc",
+        "name": "Bloody Mary",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Attack",
+        "generated": false,
+        "enabled": true,
+        "cost": 7,
+        "power": 1,
+        "art": "/assets/card_art/uploads/bloody-mary.png",
+        "effect": "Ongoing: When an Attack card is played this Cycle, Drain -75.",
+        "onReveal": [],
+        "triggers": [
+          {
+            "kind": "whenPlayed",
+            "match": {
+              "cardClass": "Attack"
+            },
+            "scope": "cycle",
+            "then": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                },
+                "amount": 75
+              }
+            ]
+          }
+        ]
       }
     ],
     "locations": [
