@@ -61,7 +61,7 @@ export function configurableFacts(): ConfigurableFact[] {
       notes: "When on (default), Circuit Rewards with awardTrailing stay in the pool. Off maps to noTrailingRewards and strips catch-up rewards from the draw.",
     },
     {
-      id: "tenCardDraft", surface: "code", label: "10-card Draft (engine)",
+      id: "tenCardDraft", surface: "code-constant", label: "10-card Draft (engine)",
       default: false, cohortDefault: false,
       notes: "Configure no longer exposes this. Default Draft is 8 rotating offers; engine still supports tenCardDraft for harnesses (two Chaos fills).",
     },

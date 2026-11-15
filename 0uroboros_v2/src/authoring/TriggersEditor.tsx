@@ -8,7 +8,7 @@ import { StepList } from './StepEditor';
 
 type Props = {
   card: AuthoredCard;
-  cards: AuthoredCard[];
+  cards: readonly AuthoredCard[];
   onChange: (triggers: CardTrigger[] | undefined) => void;
 };
 
