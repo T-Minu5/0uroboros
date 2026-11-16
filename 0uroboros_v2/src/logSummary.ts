@@ -131,7 +131,7 @@ function absorb(play: Play, event: RuntimeEvent, names: SeatNames) {
       return;
     }
     default:
-      if ((play.kind === 'location' || play.kind === 'circuit') && event.kind !== 'choice' && amount !== 0) note(detail(event));
+      if ((play.kind === 'location' || play.kind === 'circuit') && amount !== 0) note(detail(event));
   }
 }
 
