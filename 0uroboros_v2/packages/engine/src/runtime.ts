@@ -2095,7 +2095,11 @@ export class RuntimeSession {
     const destination = zone === "hand" ? "hand" : zone === "discard" ? "Discard" : "the top of the deck";
     const names = [...new Set(cards.map(card => card.name))];
     const label = names.length === 1 ? names[0] : names.join(" / ");
-    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${label} to ${destination}.`, { owner: ctx.source.owner, cardId: cards[0]?.id, definitionId: cards[0]?.definitionId, source: "card", sourceName: ctx.source.card.name, amount, targetOwner, ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}) });
+    // Keep cardId on the effect source (Deepfake / Glitch-Witch), not the generated copy, so the Runtime log attributes the gain.
+    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${label} to ${destination}.`, {
+      ...this.base(ctx), definitionId: cards[0]?.definitionId, amount, targetOwner,
+      ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}),
+    });
   }
 
   private millStep(ctx: EffectContext, step: EffectStep, targetOwner: PlayerId): RuntimeEvent {
@@ -3683,12 +3687,13 @@ export class RuntimeSession {
     if (!previous || !isCharacterCard(previous.card)) {
       return this.event("choice", `${card.name}: no previous revealed card to copy.`, this.base(ctx));
     }
-    const printed = this.steps(previous.card.onReveal, "card");
-    if (!printed.length || printed.some(step => step.action === "copyPreviousOnReveal")) {
+    const printed = this.steps(previous.card.onReveal, "card").filter(entry => entry.action !== "copyPreviousOnReveal" && entry.action !== "copyText");
+    if (!printed.length) {
       return this.event("choice", `${card.name}: nothing to copy from ${previous.card.name}.`, this.base(ctx));
     }
+    const summary = describeSteps(printed, "card", this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
     return this.resolveChained(ctx, printed, () =>
-      this.event("choice", `${card.name}: copies ${previous.card.name}'s On Reveal.`, this.base(ctx)));
+      this.event("choice", `${card.name} copied '${previous.card.name}': ${summary}`, this.base(ctx)));
   }
 
   private chooseMoveDestination(source: Deployment, target: Deployment): RuntimeEvent {

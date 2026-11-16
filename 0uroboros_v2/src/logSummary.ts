@@ -17,6 +17,54 @@ const joinAnd = (parts: string[]) => parts.length < 2 ? parts.join('') : `${part
 const detail = (event: RuntimeEvent) => event.text.replace(/^[^:]*:\s*/, '').trim();
 const cardName = (event: RuntimeEvent) => event.text.replace(/ reveals\.$/, '');
 
+/** Readable note for an engine `choice` event (copy, pick, skip, no target, etc.). */
+function choiceLogNote(text: string): string | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  const copied = /^(.+?) copied '(.+?)'(?::\s*(.+))?\.?$/i.exec(trimmed);
+  if (copied) {
+    const [, , source, summary] = copied;
+    return summary?.trim() ? `Copying ${source} (${summary.trim()})` : `Copying ${source}`;
+  }
+  if (/no previous revealed card to copy/i.test(trimmed)) return 'No card to copy';
+  if (/No matching card to copy/i.test(trimmed)) return 'No card to copy';
+  if (/nothing to copy from (.+)\.?$/i.test(trimmed)) {
+    const from = /nothing to copy from (.+?)\.?$/i.exec(trimmed)?.[1]?.trim();
+    return from ? `Nothing to copy from ${from}` : 'Nothing to copy';
+  }
+  const chooses = /chooses:\s*(.+)$/i.exec(trimmed);
+  if (chooses) return `Choosing ${chooses[1].replace(/\.$/, '').trim()}`;
+  const afterCard = detail({ text: trimmed } as RuntimeEvent);
+  const body = (afterCard && afterCard !== trimmed ? afterCard : trimmed).replace(/\.$/, '').trim();
+  if (!body) return null;
+  return body.charAt(0).toUpperCase() + body.slice(1);
+}
+
+function attachNote(play: Play, text: string) {
+  if (!play.notes.includes(text)) play.notes.push(text);
+}
+
+function playForEvent(
+  plays: Play[],
+  byCard: Map<string, Play>,
+  event: RuntimeEvent,
+  kind: Play['kind'] = 'trigger',
+): Play {
+  const key = event.cardId ? `${event.owner}|${event.cardId}` : undefined;
+  let play = (event.cardId ? byCard.get(event.cardId) : undefined)
+    ?? (key ? byCard.get(key) : undefined)
+    ?? (event.sourceName
+      ? [...plays].reverse().find(entry => entry.owner === event.owner && entry.card === event.sourceName)
+      : undefined);
+  if (!play) {
+    play = newPlay(event.owner!, event.sourceName ?? 'A card', kind, event.node);
+    plays.push(play);
+    if (event.cardId) byCard.set(kind === 'trigger' ? event.cardId : key!, play);
+    else if (key) byCard.set(key, play);
+  }
+  return play;
+}
+
 function newPlay(owner: PlayerId, card: string, kind: Play['kind'], node?: number): Play {
   return { owner, card, node, kind, drained: new Map(), restored: 0, cards: 0, crypto: 0, vp: 0, trashedNames: [], destroyedNames: [], notes: [] };
 }
@@ -35,14 +83,33 @@ function affectedCardName(text: string): string | undefined {
 
 function absorb(play: Play, event: RuntimeEvent, names: SeatNames) {
   const amount = event.amount ?? 0, to = event.targetOwner ?? play.owner, mine = to === play.owner;
-  const note = (text: string) => { if (!play.notes.includes(text)) play.notes.push(text); };
+  const note = (text: string) => attachNote(play, text);
   switch (event.kind) {
+    case 'choice': {
+      const choice = choiceLogNote(event.text);
+      if (choice) note(choice);
+      return;
+    }
     case 'drain':
       if (/: destroy /.test(event.text)) note(`Destroying ${mine ? 'their own' : possessive(names[to])} ${event.target === 'backup' ? 'Backup' : 'Primary'} Server`);
       else if (amount > 0) play.drained.set(to, (play.drained.get(to) ?? 0) + amount);
       return;
     case 'restore': if (amount > 0) { if (mine) play.restored += amount; else note(`Restoring ${amount} to ${possessive(names[to])} Server`); } return;
-    case 'draw': if (amount > 0 && event.target === 'hand') { if (mine) play.cards += amount; else note(`${names[to]} draws ${amount}`); } return;
+    case 'draw': {
+      if (amount > 0 && event.target === 'hand') {
+        if (mine) play.cards += amount;
+        else note(`${names[to]} draws ${amount}`);
+        return;
+      }
+      if (amount > 0 && event.target === 'discard') {
+        const gained = /gain \d+ (.+) to Discard/i.exec(event.text)?.[1]?.trim();
+        const label = gained || plural(amount, 'card');
+        note(mine
+          ? `Gaining ${label} to Discard`
+          : `Giving ${label} to ${possessive(names[to])} Discard`);
+      }
+      return;
+    }
     case 'actions': return;
     case 'crypto': if (amount) { if (mine) play.crypto += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${Math.abs(amount)} Crypto`); } return;
     case 'vp': if (amount) { if (mine) play.vp += amount; else note(`${amount > 0 ? 'Giving' : 'Costing'} ${names[to]} ${plural(Math.abs(amount), 'VP').replace(/VPs$/, 'VP')}`); } return;
@@ -102,17 +169,17 @@ export function summarizeEvents(events: readonly RuntimeEvent[], names: SeatName
       purchases.push({ owner: event.owner, line: bought ? `Buys ${bought[1]} for ${bought[2]} Crypto.` : event.text });
       continue;
     }
-    if (!event.cardId || ['choice', 'bank', 'deploy', 'turn'].includes(event.kind)) continue;
+    if (event.kind === 'choice') {
+      const kind = event.source === 'location' ? 'location' : event.source === 'circuit' ? 'circuit' : 'trigger';
+      // Choice outcomes always belong in the Circuit log (picks, skips, copy, no target).
+      if (event.cardId || event.sourceName) absorb(playForEvent(plays, byCard, event, kind), event, names);
+      continue;
+    }
+    if (!event.cardId || ['bank', 'deploy', 'turn'].includes(event.kind)) continue;
     // Held Crypto settling at the end of the Cycle is already in the Collapse table.
     if (event.phase === 'collapse' && event.node === undefined && event.source === 'card') continue;
-    const key = `${event.owner}|${event.cardId}`;
-    let play = byCard.get(event.cardId) ?? byCard.get(key);
-    if (!play) {
-      const kind = event.source === 'location' ? 'location' : event.source === 'circuit' ? 'circuit' : 'trigger';
-      play = newPlay(event.owner, event.sourceName ?? 'A card', kind, event.node);
-      plays.push(play); byCard.set(kind === 'trigger' ? event.cardId : key, play);
-    }
-    absorb(play, event, names);
+    const kind = event.source === 'location' ? 'location' : event.source === 'circuit' ? 'circuit' : 'trigger';
+    absorb(playForEvent(plays, byCard, event, kind), event, names);
   }
   return ([0, 1] as PlayerId[]).map(owner => ({
     owner,

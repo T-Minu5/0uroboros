@@ -4,14 +4,20 @@
 .setup-card h1{margin:14px 0 16px}
 .setup-note{margin:0}
 
-/* Configure: a summary button that opens the turn timer, Server VP and starting deck. */
-.game-configure{margin:0 0 16px}
-.game-configure-toggle{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:10px;width:100%;padding:10px 12px;border-color:#ffffff24;border-radius:7px;background:#ffffff08;text-align:left}
-.game-configure-toggle b{font:600 12px Inter,sans-serif;color:#e8ecf4}
-.game-configure-toggle small{font-size:10px;color:#8b93a7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.game-configure-toggle span{font-size:10px;color:#8b93a7}
-.game-configure-toggle[aria-expanded='true']{border-color:#1fffb166;border-bottom-left-radius:0;border-bottom-right-radius:0}
-.game-configure-panel{display:flex;flex-direction:column;gap:14px;padding:14px 12px 2px;border:1px solid #1fffb166;border-top:0;border-radius:0 0 7px 7px;background:#ffffff05}
+/* Configure: topline sliders icon left of Sign in; panel opens as a settings popover. */
+.topline nav{display:inline-flex;align-items:center;gap:8px}
+.game-configure{margin:0}
+.topline nav .game-configure-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;min-width:36px;height:36px;padding:0}
+.topline nav .game-configure-icon .icon{width:16px;height:16px;background:currentColor}
+.topline nav .game-configure-icon[aria-expanded='true']{border-color:#1fffb166;color:#9ff5d6;background:#1fffb114}
+.game-configure-popover{width:min(420px,92vw);padding:0;overflow:hidden}
+.game-configure-head{display:flex;flex-direction:column;gap:4px;padding:12px 12px 10px;border-bottom:1px solid #ffffff14}
+.game-configure-head b{font:600 12px Inter,sans-serif;color:#e8ecf4}
+.game-configure-head small{font-size:10px;line-height:1.35;color:#8b93a7}
+.game-configure-panel{display:flex;flex-direction:column;gap:14px;padding:12px;max-height:min(70vh,640px);overflow-y:auto;background:#ffffff05}
+.topline nav .game-configure-popover .game-mode-toggle>button,
+.topline nav .game-configure-popover .game-configure-vp button,
+.topline nav .game-configure-popover .deck-picker-options button{width:auto;padding:7px 11px;font-size:11px;text-align:center}
 .game-configure-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:0;border:0;min-width:0;font-size:12px;color:#c4bfd2}
 .game-configure-row>span{display:flex;flex-direction:column;gap:2px}
 .game-configure-row small{font-size:10px;color:#7f899e}

@@ -200,11 +200,13 @@ describe('Koppy-Kat', () => {
 
     const game = session();
     game.state.nodes[0].cards[0].push({ card: first, owner: 0, node: 0, order: 1, revealed: true });
-    play(game, koppy, 1);
+    const events = play(game, koppy, 1);
     expect(game.state.players[0].wallet).toBe(2);
+    expect(events.some(event => /koppy copied 'first'/i.test(event.text))).toBe(true);
 
     const empty = session();
-    play(empty, card('lonely', { power: 2, onReveal: [{ action: 'copyPreviousOnReveal' }] }), 0);
+    const missed = play(empty, card('lonely', { power: 2, onReveal: [{ action: 'copyPreviousOnReveal' }] }), 0);
     expect(empty.state.players[0].wallet).toBe(0);
+    expect(missed.some(event => /no previous revealed card to copy/i.test(event.text))).toBe(true);
   });
 });

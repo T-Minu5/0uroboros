@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 28,
-    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -33,7 +33,7 @@
       "card-jabbhu7e": 0.42
     }
   },
-  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -5576,41 +5576,6 @@
   "notes": [
     {
       "version": 27,
-      "at": "2026-11-08T20:28:24.454Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:28:24.454Z",
-      "text": "Monitor new Locations for their impact on strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:28:24.454Z",
-      "text": "Assess the value of aggressive strategies against various opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:05.933Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:10.547Z",
-      "text": "Evaluate the impact of new Locations on overall strategy."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:10.547Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:10.547Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
       "at": "2026-11-08T20:29:10.547Z",
       "text": "Adapt to the human's Draft wallet for mid-game strategies."
     },
@@ -7073,6 +7038,41 @@
       "version": 28,
       "at": "2026-11-15T16:44:16.006Z",
       "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:14.809Z",
+      "text": "Rule change from the designer: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP (was 12 and 16), 40 VP for both. Server damage now moves the score more: Drain pressure and finishing a damaged Server swing games more, Restore protects more VP, and the trailing-player count weighs damage more. Re-check theories and plans built on the old values."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:14.809Z",
+      "text": "v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Super Positsion, Tulpa-Polymer, Dot-Slash, 1nti, R.0.1. Matrix, Trixy, 0N1.exe. New Locations: A Mayan Victory."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:22.750Z",
+      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:22.750Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:22.750Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:22.750Z",
+      "text": "Assess the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T00:22:22.750Z",
+      "text": "Monitor the potential of new card 'Banishing Ritual' for deck thinning."
     }
   ],
   "cardNotes": {
@@ -7105,7 +7105,7 @@
     "summon-the-acolytes": "deck-cycling draw engine; est. hand value 7.5 early / 7.5 late at cost 3. Untested.",
     "temporal-rift": "Potential for delayed card draw; may enhance endgame strategies if used effectively.",
     "ghost-key": "deck thinning; est. hand value 5.3 early / 3.6 late at cost 4. Untested.",
-    "banishing-ritual": "deck thinning; est. hand value 4.4 early / 3 late at cost 4. Untested.",
+    "banishing-ritual": "Consider its potential for deck thinning and resource recovery.",
     "opulent-void": "deck thinning; est. hand value 6.5 early / 3.8 late at cost 4. Untested.",
     "sacrifical-sigil": "utility; est. hand value 5.7 early / 3.4 late at cost 4. Untested.",
     "byte-heist": "utility; est. hand value 7.6 early / 7.6 late at cost 5. Untested.",
@@ -7260,7 +7260,14 @@
     "card-txgs0kml": "low-value Crypto (skip); est. hand value 10 early / 5.7 late at cost 2. Untested.",
     "card-3t0karr1": "utility; est. hand value 1 early / 1 late at cost 6. Untested.",
     "card-aro3pgdc": "low-value Crypto (skip); est. hand value 4.6 early / 2.5 late at cost 4. Untested.",
-    "card-b4fjznmc": "utility; est. hand value 1 early / 1 late at cost 7. Untested."
+    "card-b4fjznmc": "utility; est. hand value 1 early / 1 late at cost 7. Untested.",
+    "card-vwe403ql": "utility; est. hand value 2 early / 2 late at cost 5. Untested.",
+    "card-85izaeru": "utility; est. hand value 1 early / 1 late at cost 6. Untested.",
+    "card-h4njgiff": "8 VP finisher; est. hand value 4.2 early / 4.2 late at cost 0. Untested.",
+    "card-soulvmyc": "2 VP finisher; est. hand value 2 early / 2 late at cost 7. Untested.",
+    "card-eaiximbv": "Monitor for its ability to gain VP while restoring Power.",
+    "card-5dex4abw": "utility; est. hand value 3 early / 3 late at cost 11. Untested.",
+    "location-6n85k3ai": "New Location: \"On collapse: Destroy the strongest revealed card on the winning side here, then drain -150 from the losing player's server.\" Read: contest it: holding it is worth about 2.78 hand points more than losing it. Untested; watch who wins it and how it shifts the economy."
   },
   "knownCards": [
     "eval-signal-surveyor",
@@ -7288,6 +7295,7 @@
     "summon-the-acolytes",
     "temporal-rift",
     "ghost-key",
+    "banishing-ritual",
     "opulent-void",
     "sacrifical-sigil",
     "byte-heist",
@@ -7374,7 +7382,13 @@
     "card-txgs0kml",
     "card-3t0karr1",
     "card-aro3pgdc",
-    "card-b4fjznmc"
+    "card-b4fjznmc",
+    "card-vwe403ql",
+    "card-85izaeru",
+    "card-h4njgiff",
+    "card-soulvmyc",
+    "card-eaiximbv",
+    "card-5dex4abw"
   ],
   "knownLocations": [
     "quantum_commons",
@@ -7433,7 +7447,8 @@
     "loc-death-spire",
     "loc-subtype-bazaar",
     "loc-neighbour-beacon",
-    "loc-solo-draw"
+    "loc-solo-draw",
+    "location-6n85k3ai"
   ],
   "cardStats": {
     "sudo-demiurge": {
@@ -9149,7 +9164,7 @@
     },
     {
       "label": "strat-g@v1.28",
-      "savedAt": "2026-11-15T16:44:16.007Z",
+      "savedAt": "2026-11-16T00:22:22.751Z",
       "profile": {
         "version": 28,
         "plan": "",
@@ -9184,7 +9199,7 @@
     }
   ],
   "knownServerVP": {
-    "primary": 12,
-    "backup": 16
+    "primary": 16,
+    "backup": 24
   }
 }

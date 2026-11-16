@@ -85,7 +85,7 @@ describe("setup and look defaults", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("keeps game options through a save; Draft Crypto shelf is not a Configure field", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, trailingRewards: true, draftSeconds: null, mostCircuitsBonusVP: 6, nodeWinVP: 1 });
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, trailingRewards: true, draftSeconds: 300, mostCircuitsBonusVP: 6, nodeWinVP: 1, serverVP: { primary: 16, backup: 24 } });
     expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0, nodeWinVP: 0 })).toMatchObject({ noLocations: true, middleNodesOnly: true, trailingRewards: false, mostCircuitsBonusVP: 0, nodeWinVP: 0 });
     expect(sanitizeGameSetup(null)).not.toHaveProperty("noTrailingRewards");
     expect(sanitizeGameSetup(null)).not.toHaveProperty("draftCrypto");

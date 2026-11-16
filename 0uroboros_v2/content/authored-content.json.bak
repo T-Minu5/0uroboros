@@ -1,5 +1,5 @@
 {
-  "revision": 1224,
+  "revision": 1236,
   "document": {
     "version": 3,
     "cards": [
@@ -1603,7 +1603,7 @@
         "definitionId": "chrome-mitchell",
         "name": "Chrome Mitchell",
         "type": "Character",
-        "cost": 7,
+        "cost": 8,
         "art": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
         "effect": "-225 Both enemy servers. If you pay -3 Crypto you get +6 in return.",
         "power": 4,
@@ -1645,9 +1645,9 @@
       {
         "id": "delta-wave",
         "definitionId": "delta-wave",
-        "name": "∆-Wave",
+        "name": "\u2206-Wave",
         "type": "Character",
-        "cost": 9,
+        "cost": 11,
         "art": "/assets/card_art/chaos cards/attack/delta-wave.png",
         "effect": "-300 Both enemy servers.",
         "power": 4,
@@ -1742,7 +1742,7 @@
         "cost": 6,
         "art": "/assets/card_art/chaos cards/horrors/cicada-3301.png",
         "effect": "Remove -1 Power from 3 revealed enemy cards. Drain -150. Repair +50.",
-        "power": 4,
+        "power": 3,
         "onReveal": [
           {
             "action": "changePower",
@@ -1754,7 +1754,7 @@
             "amount": -1,
             "pick": {
               "mode": "random",
-              "count": 3
+              "count": 2
             },
             "transfer": false
           },
@@ -2964,7 +2964,7 @@
         "cardClass": "Attack",
         "generated": false,
         "enabled": true,
-        "cost": 5,
+        "cost": 6,
         "power": 2,
         "art": "/assets/library/card_art/chaos cards/attack/glitch-witch.png",
         "effect": "Put a -1VP Glitch into the enemy discard pile. +2 cards.",
@@ -3590,7 +3590,7 @@
         "cardClass": "Utility",
         "generated": false,
         "enabled": true,
-        "cost": 5,
+        "cost": 6,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png",
         "effect": "+1 Crypto. Gain a random Quark, playable for +1VP, in your discard pile.",
@@ -3680,7 +3680,7 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/library/card_art/base cards/utility/the-heisenberg-hag.png",
-        "effect": "Gain a Schrödinger Box. +1 Crypto.",
+        "effect": "Gain a Schr\u00f6dinger Box. +1 Crypto.",
         "onReveal": [
           {
             "action": "gainCard",
@@ -3915,7 +3915,7 @@
       {
         "id": "card-4ozi9vtu",
         "definitionId": "card-4ozi9vtu",
-        "name": "Schrödinger Box",
+        "name": "Schr\u00f6dinger Box",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Runtime",
@@ -4093,10 +4093,10 @@
         "cardClass": "Utility",
         "generated": false,
         "enabled": true,
-        "cost": 8,
+        "cost": 7,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/entropic-infantry.png",
-        "effect": "After each play, cycle Alpha → Bravo → Charlie → Alpha.",
+        "effect": "After each play, cycle Alpha \u2192 Bravo \u2192 Charlie \u2192 Alpha.",
         "onReveal": [
           {
             "action": "morph",
@@ -4415,7 +4415,7 @@
       {
         "id": "card-3xh1uc8u",
         "definitionId": "card-3xh1uc8u",
-        "name": "Slash-ØN1",
+        "name": "Slash-\u00d8N1",
         "pool": "Chaos",
         "type": "Character",
         "cardClass": "Horror",
@@ -4462,7 +4462,7 @@
       {
         "id": "card-bsg56g48",
         "definitionId": "card-bsg56g48",
-        "name": "Hack-ØN1",
+        "name": "Hack-\u00d8N1",
         "pool": "Chaos",
         "type": "Character",
         "cardClass": "Horror",
@@ -4623,10 +4623,10 @@
         "name": "Expo-Net",
         "type": "Character",
         "cardClass": "Utility",
-        "power": 0,
+        "power": 1,
         "cost": 5,
-        "art": "/assets/card_art/uploads/expo-net.png",
-        "effect": "Ongoing: Increase the Power here randomly between 10–100%.",
+        "art": "/assets/card_art/uploads/expo-net2.png",
+        "effect": "Ongoing: Increase the Power here randomly between 10\u2013100%.",
         "pool": "Base",
         "enabled": true,
         "onReveal": [],
@@ -4711,7 +4711,7 @@
         "type": "Character",
         "cardClass": "Utility",
         "power": 1,
-        "cost": 7,
+        "cost": 8,
         "art": "/assets/card_art/uploads/holly-hedge.png",
         "effect": "+1 Crypto every time your enemy draws a card.",
         "pool": "Base",
@@ -5282,20 +5282,7 @@
         "vp": 2,
         "art": "/assets/card_art/uploads/r-0-1-matrix.png",
         "effect": "Ongoing: When a Volume card is played this Cycle, +1 VP.",
-        "onReveal": [
-          {
-            "action": "moveCard",
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board",
-              "relation": "next"
-            },
-            "pick": {
-              "mode": "choose"
-            }
-          }
-        ],
+        "onReveal": [],
         "triggers": [
           {
             "kind": "whenPlayed",
@@ -5964,8 +5951,8 @@
       {
         "id": "location-m78m3xz4",
         "name": "Wreck my shit ",
-        "rule": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
-        "reward": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
+        "rule": "On collapse: Remove \u201cMovable\u201d Mod from a card anywhere in the winning player's deck.",
+        "reward": "On collapse: Remove \u201cMovable\u201d Mod from a card anywhere in the winning player's deck.",
         "effects": [
           {
             "action": "removeModifier",
@@ -6874,7 +6861,7 @@
       {
         "id": "recursive-curse",
         "name": "Recursive Curse",
-        "text": "Attach “printed effects happen twice” to an Action or Utility Character in your deck.",
+        "text": "Attach \u201cprinted effects happen twice\u201d to an Action or Utility Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -6927,7 +6914,7 @@
       {
         "id": "telemetry",
         "name": "Telemetry",
-        "text": "Attach “movable each turn” to a random Character in the eligible player's deck.",
+        "text": "Attach \u201cmovable each turn\u201d to a random Character in the eligible player's deck.",
         "cost": 0,
         "effects": [
           {
@@ -7155,7 +7142,7 @@
       {
         "id": "reward-xr6csfdv",
         "name": "The Giver",
-        "text": "Attach the “The Giver” mod to a Character in your deck.",
+        "text": "Attach the \u201cThe Giver\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7180,7 +7167,7 @@
       {
         "id": "reward-fa5nxeut",
         "name": "Lil Prick",
-        "text": "Attach the “Lil Prick” mod to a Character in your deck.",
+        "text": "Attach the \u201cLil Prick\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7204,7 +7191,7 @@
       {
         "id": "reward-g2lyyg6u",
         "name": "On Deck",
-        "text": "Attach the “On Deck” mod to a Character in your deck.",
+        "text": "Attach the \u201cOn Deck\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7229,7 +7216,7 @@
       {
         "id": "reward-iag9ld3w",
         "name": "Repel Spell",
-        "text": "Attach the “Repel Spell” mod to a Character in your deck.",
+        "text": "Attach the \u201cRepel Spell\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7253,7 +7240,7 @@
       {
         "id": "reward-jfdvg12d",
         "name": "The Healer",
-        "text": "Attach the “The Healer” mod to a Character in your deck.",
+        "text": "Attach the \u201cThe Healer\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7277,7 +7264,7 @@
       {
         "id": "reward-rdih7pg5",
         "name": "Loose Change",
-        "text": "Attach the “Loose Change” mod to a Character in your deck.",
+        "text": "Attach the \u201cLoose Change\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7301,7 +7288,7 @@
       {
         "id": "reward-xz0nqngp",
         "name": "Enhance",
-        "text": "Attach the “Enhance” mod  to a Character in your deck.\n(On collapse +1 Power to this card)",
+        "text": "Attach the \u201cEnhance\u201d mod  to a Character in your deck.\n(On collapse +1 Power to this card)",
         "cost": 0,
         "effects": [
           {
@@ -7325,7 +7312,7 @@
       {
         "id": "reward-yz5dnv4k",
         "name": "Repairman",
-        "text": "Attach the “Repairman” mod to a Character in your deck.",
+        "text": "Attach the \u201cRepairman\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7349,7 +7336,7 @@
       {
         "id": "reward-aura-farming",
         "name": "Aura Farming",
-        "text": "Attach the “Aura Farming” mod to a Character in your deck.\n(When revealed: +1 Card.)",
+        "text": "Attach the \u201cAura Farming\u201d mod to a Character in your deck.\n(When revealed: +1 Card.)",
         "cost": 0,
         "effects": [
           {
@@ -7374,7 +7361,7 @@
       {
         "id": "reward-lefty",
         "name": "Lefty",
-        "text": "Attach the “Lefty” mod to a Character in your deck.\n(Push 1 power left.)",
+        "text": "Attach the \u201cLefty\u201d mod to a Character in your deck.\n(Push 1 power left.)",
         "cost": 0,
         "effects": [
           {
@@ -7399,7 +7386,7 @@
       {
         "id": "reward-superpositioning-mod",
         "name": "Superpositioning",
-        "text": "Attach the “Superpositioning” mod to a Character in your deck.",
+        "text": "Attach the \u201cSuperpositioning\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7424,7 +7411,7 @@
       {
         "id": "reward-i5ty0sta",
         "name": "Double Vision",
-        "text": "Attach the “Double Vision” mod to a Character in your deck.\n(Create hologram at mirrored Node.)",
+        "text": "Attach the \u201cDouble Vision\u201d mod to a Character in your deck.\n(Create hologram at mirrored Node.)",
         "cost": 0,
         "effects": [
           {
@@ -7448,7 +7435,7 @@
       {
         "id": "reward-lst6sa50",
         "name": "Mill-E",
-        "text": "Attach the “Mill-E” mod to a Character in your deck.",
+        "text": "Attach the \u201cMill-E\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7472,7 +7459,7 @@
       {
         "id": "reward-o2qj2dqb",
         "name": "2-Slit Split",
-        "text": "Attach the “2-Slit Split” mod to a Character in your deck.\n(Push 1 power left and right.)",
+        "text": "Attach the \u201c2-Slit Split\u201d mod to a Character in your deck.\n(Push 1 power left and right.)",
         "cost": 0,
         "effects": [
           {
@@ -7496,7 +7483,7 @@
       {
         "id": "reward-qpd0nht2",
         "name": "Righty",
-        "text": "Attach the “Righty” mod to a Character in your deck.",
+        "text": "Attach the \u201cRighty\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7520,7 +7507,7 @@
       {
         "id": "reward-rnfe76yo",
         "name": "Node Gravity",
-        "text": "Attach the “Node Gravity” mod to a Character in your deck.",
+        "text": "Attach the \u201cNode Gravity\u201d mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7544,7 +7531,7 @@
       {
         "id": "reward-tdfxhls2",
         "name": "Action Jackson",
-        "text": "Attach the “Action Jackson” mod to a Character in your deck.\n(on reveal +1 Card)",
+        "text": "Attach the \u201cAction Jackson\u201d mod to a Character in your deck.\n(on reveal +1 Card)",
         "cost": 0,
         "effects": [
           {
@@ -8139,7 +8126,7 @@
         "style": "Balanced",
         "profile": {
           "version": 12,
-          "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: econ",
+          "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01\u21921.26; Crypto target 11.67\u219212, crypto weight 2.04\u21922.34; disrupt weight 0.8\u21921.05; restore weight 1.3\u21921.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: econ",
           "economyUntilCycle": 4,
           "chaosFromCycle": 9,
           "vpFromCycle": 9,
@@ -8256,7 +8243,7 @@
         "style": "Reactive majority",
         "profile": {
           "version": 0,
-          "plan": "Most VP wins; destroying Servers awards VP and can end the game early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free from hand; there is no Draft Crypto shelf (Hacker/Crypto slots only). Shared early economy through Cycle 4, then mirror the opponent's Draft buys with a mild Drain/Chaos/disrupt bias. Never play Runtime turn 1 — hold the hand, then contest Nodes on turns 2 and 3 for at least one more Location win than the enemy — ties are fine tools for that majority.",
+          "plan": "Most VP wins; destroying Servers awards VP and can end the game early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free from hand; there is no Draft Crypto shelf (Hacker/Crypto slots only). Shared early economy through Cycle 4, then mirror the opponent's Draft buys with a mild Drain/Chaos/disrupt bias. Never play Runtime turn 1 \u2014 hold the hand, then contest Nodes on turns 2 and 3 for at least one more Location win than the enemy \u2014 ties are fine tools for that majority.",
           "economyUntilCycle": 4,
           "chaosFromCycle": 6,
           "vpFromCycle": 10,

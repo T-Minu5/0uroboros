@@ -67,8 +67,8 @@ export function configurableFacts(): ConfigurableFact[] {
     },
     {
       id: "draftSeconds", surface: "configure", label: "Draft timer",
-      default: "off", cohortDefault: "off",
-      notes: "Optional countdown for the Draft phase. Off (default) leaves Draft untimed. Separate from the Runtime turn timer.",
+      default: 300, cohortDefault: "off",
+      notes: "Optional countdown for the Draft phase. Default is 300s; Off leaves Draft untimed. Separate from the Runtime turn timer.",
     },
     {
       id: "nodeWinVP", surface: "configure", label: "Node win Collapse VP",
