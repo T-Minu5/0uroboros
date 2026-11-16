@@ -558,45 +558,43 @@
   .world-anchor .field-card.hologram-card::after{animation:none}
 }
 
-/* Far-left ControlledWeight tug-of-war — outside the 3D board canvas. */
-.weight-tug{
-  position:absolute;left:8px;top:14%;bottom:22%;z-index:26;
-  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
-  width:78px;pointer-events:none;
+/* Far-left live end-game awards — outside the 3D board canvas (WeightTug hidden for now). */
+.endgame-awards{
+  position:absolute;left:10px;top:12%;z-index:26;
+  display:flex;flex-direction:column;gap:6px;
+  width:148px;max-height:62%;padding:8px 8px 7px;
+  pointer-events:none;
+  background:#0a0a14e8;border:1px solid #ffffff18;border-radius:8px;
+  box-shadow:0 10px 28px #0008;
+  overflow:hidden;
 }
-.weight-tug-end{font:700 8px Orbitron,sans-serif;letter-spacing:.6px;opacity:.85;padding-right:6px}
-.weight-tug-body{display:flex;flex:1;align-items:stretch;gap:5px;min-height:100px;width:100%}
-.weight-tug-track{position:relative;flex:none;width:24px;min-height:100px}
-.weight-tug-line{
-  position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;
-  background:linear-gradient(#ffffff22,#e8e0f055 50%,#ffffff22);border-radius:1px;
+.endgame-awards-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.endgame-awards-head b{
+  font:700 8px Orbitron,sans-serif;letter-spacing:.7px;text-transform:uppercase;color:#c9c0d8;
 }
-.weight-tug-dot{
-  position:absolute;left:50%;width:12px;height:12px;margin:-6px 0 0 -6px;
-  border-radius:50%;border:1px solid #fff8;transition:top .45s ease,background .3s,box-shadow .3s;
+.endgame-awards-list{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:3px;min-height:0;overflow:auto;
 }
-.weight-tug-particle{
-  position:absolute;left:50%;font:700 11px Orbitron,sans-serif;color:#ffe39c;
-  text-shadow:0 0 8px #ffcc1266;letter-spacing:.5px;white-space:nowrap;
-  animation:weight-particle-in .35s ease-out both;
+.endgame-awards-list li{
+  display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:baseline;gap:5px;
+  padding:3px 4px;border-radius:4px;background:#ffffff06;
+  font:600 9px Inter,sans-serif;color:#b8b0c8;line-height:1.2;
 }
-.weight-tug-particle.far{top:8%;transform:translate(-50%,0);margin-left:14px}
-.weight-tug-particle.near{bottom:8%;transform:translate(-50%,0);margin-left:14px}
-.weight-tug-particle.tie{top:50%;transform:translate(-50%,-50%);margin-left:14px}
-.weight-tug-nodes{
-  list-style:none;margin:0;padding:2px 0;flex:1;min-width:0;
-  display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;gap:2px;
+.endgame-awards-list li.is-lead{background:#ffffff0c}
+.endgame-awards-label{display:flex;flex-direction:column;gap:1px;min-width:0}
+.endgame-awards-label>span{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:600 9px Inter,sans-serif;color:#e6e0f0;
 }
-.weight-tug-nodes li{
-  display:flex;flex-direction:column;align-items:flex-end;gap:0;line-height:1.05;
-  font:700 7px Orbitron,sans-serif;letter-spacing:.3px;color:#e8e0f0;
-  transition:opacity .3s;
+.endgame-awards-label small{font:600 7px Inter,sans-serif;color:#7f788f;letter-spacing:.2px}
+.endgame-awards-leader{
+  font:700 8px Orbitron,sans-serif;letter-spacing:.3px;color:#9a93a8;
+  max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;
 }
-.weight-tug-nodes li.active{color:#ffe39c;text-shadow:0 0 6px #ffcc1244}
-.weight-tug-nodes small{font:600 6px Inter,sans-serif;letter-spacing:0}
-@keyframes weight-particle-in{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
-@media(prefers-reduced-motion:reduce){
-  .weight-tug-dot{transition:none}
-  .weight-tug-particle{animation:none}
-  .weight-tug-nodes li{transition:none}
+.endgame-awards-score{
+  font:700 9px Inter,sans-serif;font-variant-numeric:tabular-nums;color:#d8d0e4;min-width:2.6em;text-align:right;
 }
+.endgame-awards-list li.is-tie .endgame-awards-leader{color:#7f788f}
+/* Kept for a quick restore of the ControlledWeight tug. */
+.weight-tug{display:none}

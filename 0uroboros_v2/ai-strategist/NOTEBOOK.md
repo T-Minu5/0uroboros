@@ -18,7 +18,7 @@ League snapshots (newest first): strat-g@v1.28, strat-g@v1.27, strat-g@v1.26, st
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
@@ -119,13 +119,6 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 
 ## Card and Location notes
 
-- **Consume Pit**: New Location: "On collapse: You may destroy your cards here. +2 Crypto for each." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Couch Surf**: New Location: "When: a card moves here, Trash it." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Departure Lounge**: New Location: "When: a card leaves here, +1 Crypto." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Vamping Grounds**: New Location: "When: a card moves here, Drain -50." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **loc-move-station**: New Location: "On reveal: Move the card that was played to another open Node." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 0.63. Untested; watch who wins it and how it shifts the economy.
-- **Sanctuary**: New Location: "Ongoing: Cards here cannot be destroyed. Ongoing: Cards here ignore Power loss." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Not Welcome**: New Location: "Ongoing: Cards cannot move onto this Node." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **loc-silent-field**: New Location: "Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
 - **Echo Chamber**: New Location: "Ongoing: Ongoing effects here are doubled. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
 - **loc-solo-peak**: New Location: "Condition: Once you have only one card here, +3 Crypto." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.
@@ -159,6 +152,13 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 - **Packet Sniffer**: utility; est. hand value 1 early / 1 late at cost 6. Untested.
 - **Crypto-Echo**: low-value Crypto (skip); est. hand value 4.6 early / 2.5 late at cost 4. Untested.
 - **Bloody Mary**: utility; est. hand value 1 early / 1 late at cost 7. Untested.
+- **Tulpa-Polymer**: utility; est. hand value 2 early / 2 late at cost 5. Untested.
+- **Dot-Slash**: utility; est. hand value 1 early / 1 late at cost 6. Untested.
+- **1nti**: 8 VP finisher; est. hand value 4.2 early / 4.2 late at cost 0. Untested.
+- **R.0.1. Matrix**: 2 VP finisher; est. hand value 2 early / 2 late at cost 7. Untested.
+- **Trixy**: Monitor for its ability to gain VP while restoring Power.
+- **0N1.exe**: utility; est. hand value 3 early / 3 late at cost 11. Untested.
+- **A Mayan Victory**: New Location: "On collapse: Destroy the strongest revealed card on the winning side here, then drain -150 from the losing player's server." Read: contest it: holding it is worth about 2.78 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
 
 ## Card results (complete games where a side bought it)
 
@@ -198,6 +198,13 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 
 ## Recent notes
 
+- v1.28 · 2026-11-16 00:22 · Monitor the potential of new card 'Banishing Ritual' for deck thinning.
+- v1.28 · 2026-11-16 00:22 · Assess the impact of new Locations on game dynamics.
+- v1.28 · 2026-11-16 00:22 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
+- v1.28 · 2026-11-16 00:22 · Monitor the synergy of new cards with existing strategies.
+- v1.28 · 2026-11-16 00:22 · The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy.
+- v1.28 · 2026-11-16 00:22 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Super Positsion, Tulpa-Polymer, Dot-Slash, 1nti, R.0.1. Matrix, Trixy, 0N1.exe. New Locations: A Mayan Victory.
+- v1.28 · 2026-11-16 00:22 · Rule change from the designer: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP (was 12 and 16), 40 VP for both. Server damage now moves the score more: Drain pressure and finishing a damaged Server swing games more, Restore protects more VP, and the trailing-player count weighs damage more. Re-check theories and plans built on the old values.
 - v1.28 · 2026-11-15 16:44 · Evaluate the impact of new Locations on game dynamics.
 - v1.28 · 2026-11-15 16:44 · Monitor the synergy of new cards with existing strategies.
 - v1.28 · 2026-11-15 16:44 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
@@ -231,13 +238,6 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 - v1.28 · 2026-11-15 01:35 · High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft.
 - v1.28 · 2026-11-15 01:35 · Assess the impact of new Locations on game dynamics.
 - v1.28 · 2026-11-15 01:35 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 01:35 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 01:34 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0.
-- v1.28 · 2026-11-15 01:34 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 01:34 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 01:34 · High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft.
-- v1.28 · 2026-11-15 01:34 · Evaluate the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 01:34 · Monitor the synergy of new cards with existing strategies.
 
 ## Version history
 

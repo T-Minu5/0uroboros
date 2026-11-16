@@ -10,6 +10,8 @@ import {
 export const TURN_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);
 /** Draft-phase countdown choices in seconds; null leaves Draft untimed. */
 export const DRAFT_TIMER_CHOICES: readonly number[] = [60, 90, 120, 180, 240, 300, 600];
+/** Fresh installs and missing localStorage use a 300s Draft timer; Off still saves as null. */
+export const DEFAULT_DRAFT_SECONDS = 300;
 export const SERVER_VP_MAX = 50;
 export const MOST_CIRCUITS_BONUS_VP_MAX = 50;
 export const NODE_WIN_VP_MAX = 50;
@@ -75,7 +77,11 @@ export function sanitizeGameSetup(raw: unknown): GameSetup {
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
     turnSeconds: typeof value.turnSeconds === 'number' && TURN_TIMER_CHOICES.includes(value.turnSeconds) ? value.turnSeconds : null,
-    draftSeconds: typeof value.draftSeconds === 'number' && DRAFT_TIMER_CHOICES.includes(value.draftSeconds) ? value.draftSeconds : null,
+    draftSeconds: typeof value.draftSeconds === 'number' && DRAFT_TIMER_CHOICES.includes(value.draftSeconds)
+      ? value.draftSeconds
+      : Object.prototype.hasOwnProperty.call(value, 'draftSeconds') && value.draftSeconds === null
+        ? null
+        : DEFAULT_DRAFT_SECONDS,
     noLocations: value.noLocations === true,
     middleNodesOnly: value.middleNodesOnly === true,
     trailingRewards,

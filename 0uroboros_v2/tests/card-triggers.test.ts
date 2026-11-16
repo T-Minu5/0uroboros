@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { describeCard, describeStep } from '@0uroboros/engine/effects/catalog';
 import { describeTrigger } from '@0uroboros/engine/effects/triggers';
-import { normalizeDocument, validateContent } from '@0uroboros/engine/authoring/contentModel';
+import { compileContent, normalizeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import { starterCards, type Card } from '@0uroboros/engine/game';
 import { createSession, seededRandom, type RuntimeSession } from '@0uroboros/engine/runtime';
 import authored from '../content/authored-content.json';
@@ -349,6 +349,53 @@ describe('card Ongoing triggers', () => {
     }
     expect(game.state.players[0].wallet).toBe(before + 4);
     expect(events.some(text => /deepfake copied 'loot'/i.test(text))).toBe(true);
+  });
+
+  it('copying Glitch-Witch hands the enemy a Generated Glitch and logs the source', () => {
+    const document = normalizeDocument(((authored as { document?: unknown }).document ?? authored) as never) as ContentDocument;
+    const pack = compileContent(document);
+    const witch = pack.cards.find(entry => entry.name === 'Glitch-Witch');
+    const deepfake = pack.cards.find(entry => entry.name === 'Deepfake' || (entry.definitionId ?? entry.id) === 'deepfake');
+    expect(witch).toBeTruthy();
+    expect(deepfake).toBeTruthy();
+    const game = createSession({
+      content: pack, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: 'higher',
+      random: seededRandom(11), midCycleDraw: false, aiSeats: [],
+    });
+    game.state.nodeOrder = [0, 1, 2, 3, 4];
+    game.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; player.wallet = 0; });
+    game.state.turn = 1;
+    game.state.phase = 'runtime';
+    game.state.players[1].draw = [{ ...structuredClone(witch!), id: 'witch-in-deck' }];
+    game.state.players[0].hand = [{ ...structuredClone(deepfake!), id: 'deepfake-1' }];
+    game.state.players[0].draw = [card('pad-a'), card('pad-b'), card('pad-c')];
+    const beforeHand = game.state.players[0].hand.length;
+    const events: string[] = [];
+    game.deploy('deepfake-1', 0, 0);
+    game.endTurn(0);
+    try { game.endTurn(1); } catch { /* */ }
+    let n = 0;
+    while (game.pendingCount || game.state.choice) {
+      const event = game.state.choice
+        ? game.choose((game.state.choice.options.find(option => !option.disabled) ?? game.state.choice.options[0]!).id, game.state.choice.owner)
+        : game.step()!.event;
+      events.push(event.text);
+      if (++n > 500) throw new Error('stalled');
+    }
+    expect(events.some(text => /deepfake copied 'Glitch-Witch'/i.test(text))).toBe(true);
+    expect(events.some(text => /gain 1 Glitch-[A-E] to Discard/i.test(text))).toBe(true);
+    expect(game.state.players[0].hand.length).toBe(beforeHand - 1 + 2);
+    const enemy = [...game.state.players[1].discard, ...game.state.players[1].hand, ...game.state.players[1].draw];
+    expect(enemy.some(entry => entry.generated === true && /glitch/i.test(entry.name))).toBe(true);
+  });
+
+  it('R.0.1. Matrix has no next-card move On Reveal', () => {
+    const raw = (authored as { document?: unknown }).document ?? authored;
+    const document = normalizeDocument(raw as never);
+    const matrix = document.cards.find(entry => entry.name === 'R.0.1. Matrix');
+    expect(matrix).toBeTruthy();
+    expect(matrix!.onReveal ?? []).toEqual([]);
+    expect(matrix!.triggers?.some(trigger => trigger.kind === 'whenPlayed')).toBe(true);
   });
 
   it('authored playtest cards validate and print Ongoing text', () => {

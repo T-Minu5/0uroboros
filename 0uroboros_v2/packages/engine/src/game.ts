@@ -215,7 +215,7 @@ export function setPowerDelta(card: Card, delta: number) {
 }
 export const serverMaximums: Servers = { primary: 2000, backup: 1500 };
 /** VP the destroyer scores for taking each enemy Server to zero. */
-export const defaultServerVP: Servers = { primary: 12, backup: 16 };
+export const defaultServerVP: Servers = { primary: 16, backup: 24 };
 /** End-game bonus VP for the seat with the most Circuit wins (Eco-Strat initial). 0 disables. */
 export const defaultMostCircuitsBonusVP = 6;
 /** Collapse bonus VP for controlling a Node (strict Power lead). Ties award nothing. 0 disables. */

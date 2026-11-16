@@ -1,5 +1,5 @@
 {
-  "packRevision": 1225,
+  "packRevision": 1236,
   "files": [
     "assets/HUDs/Elipse_test.svg",
     "assets/HUDs/circles.svg",
@@ -21,6 +21,7 @@
     "assets/Icons/icon-priority.svg",
     "assets/Icons/icon-runtime-new.svg",
     "assets/Icons/icon-runtime.svg",
+    "assets/Icons/icon-sliders.svg",
     "assets/Icons/icon-solar.svg",
     "assets/Icons/icon-trash.svg",
     "assets/Icons/icon-turns.svg",

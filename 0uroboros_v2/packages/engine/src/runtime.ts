@@ -149,6 +149,26 @@ export const END_GAME_AWARD_LABELS: Record<EndGameAwardId, string> = {
   mostCryptoBanked: "Most crypto banked",
   mostCryptoStolen: "Most crypto stolen/bumped",
 };
+export type EndGameStandingId = EndGameAwardId | "mostCircuits";
+/** Compact HUD labels for the live end-game standings column. */
+export const END_GAME_STANDING_LABELS: Record<EndGameStandingId, string> = {
+  mostCircuits: "Most Circuits",
+  mostDestroyed: "Destroyed",
+  mostTrashed: "Trashed",
+  mostPowerRemoved: "Power removed",
+  mostPowerBoosted: "Power boosted",
+  mostCryptoBanked: "Crypto banked",
+  mostCryptoStolen: "Crypto stolen",
+};
+/** Live end-game award race: scores are seat-indexed like SessionView (viewer at 0). */
+export type EndGameStanding = {
+  id: EndGameStandingId;
+  label: string;
+  vp: number;
+  scores: [number, number];
+  /** Strict lead; null when tied (including 0–0). */
+  leader: PlayerId | null;
+};
 export type PurchaseRecord = {
   cycle: number; owner: PlayerId; definitionId: string; name: string; category: MarketPile["category"]; cost: number;
   /** Printed Victory Points on the bought card (0 for non-VP cards). */
@@ -310,6 +330,8 @@ export type SessionView = Omit<SessionState, "players" | "nodes" | "nodeOrder"> 
   canUndoPlanning: boolean;
   planningCardIds: string[];
   movableCardIds: string[];
+  /** Enabled end-game awards and Most Circuits, with live tallies (viewer at scores[0]). */
+  endGameStandings: EndGameStanding[];
   players: [Omit<PlayerState, "draw"> & { draw: { id: string; hidden: true }[] }, Omit<PlayerState, "draw" | "hand"> & { draw: { id: string; hidden: true }[]; hand: { id: string; hidden: true }[] }];
   nodes: (Omit<NodeState, "cards"> & { cards: [VisiblePlacement[], VisiblePlacement[]] })[];
 };
@@ -433,6 +455,11 @@ export function mirrorView(view: SessionView): SessionView {
     draftReady: swapPair(view.draftReady),
     turnReady: swapPair(view.turnReady),
     finalScore: view.finalScore ? swapPair(view.finalScore) : null,
+    endGameStandings: view.endGameStandings.map(row => ({
+      ...row,
+      scores: swapPair(row.scores),
+      leader: row.leader === null ? null : otherSeat(row.leader),
+    })),
     choice: view.choice ? { ...view.choice, owner: otherSeat(view.choice.owner) } : null,
     market: view.market.map(pile => pile.remaining ? { ...pile, remaining: swapPair(pile.remaining) } : pile),
   };
@@ -664,7 +691,8 @@ export class RuntimeSession {
         !this.relocateBlocker(placement) && this.moveDestinations(placement).length > 0).map(placement => placement.card.id)
       : [];
     // Built seat-0-indexed with `me` redaction; a seat-1 reader gets the mirror below.
-    const view = {...snapshot, seat: 0 as PlayerId, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: this.openNodes(), playableNodes: [...this.playableNodeList()], canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !this.state.turnReady[me] && !!planning, planningCardIds: planning ? this.state.nodes.flatMap(node => node.cards[me]).filter(card => card.order > planning.order).map(card => card.card.id) : [], movableCardIds} as unknown as SessionView;
+    // Absolute-seat standings; mirrorView reindexes when the reader is seat 1 (same as players/nodes).
+    const view = {...snapshot, seat: 0 as PlayerId, finalScore: this.state.phase === "gameover" ? [this.scoreBreakdown(0), this.scoreBreakdown(1)] : null, openNodes: this.openNodes(), playableNodes: [...this.playableNodeList()], canUndoPlanning: this.state.phase === "runtime" && !this.queue.length && !this.state.turnReady[me] && !!planning, planningCardIds: planning ? this.state.nodes.flatMap(node => node.cards[me]).filter(card => card.order > planning.order).map(card => card.card.id) : [], movableCardIds, endGameStandings: this.endGameStandings()} as unknown as SessionView;
     if (!this.state.circuitEligible.includes(me)) view.circuitReward.definition = null;
     view.players.forEach((player,owner)=>player.bank.forEach((entry,index)=>{const timer=this.runtimeTimers.get(entry.card.id);if(timer&&Number.isFinite(this.timerUntil(timer)))entry.remainingTurns=Math.max(0,this.timerUntil(timer)-timer.age);entry.effectsLeft=this.bankEffectsLeft(this.state.players[owner].bank[index]);}));
     const hidden = (_card: Card, index: number) => ({ id: `hidden-${index}`, hidden: true as const });
@@ -2095,7 +2123,11 @@ export class RuntimeSession {
     const destination = zone === "hand" ? "hand" : zone === "discard" ? "Discard" : "the top of the deck";
     const names = [...new Set(cards.map(card => card.name))];
     const label = names.length === 1 ? names[0] : names.join(" / ");
-    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${label} to ${destination}.`, { owner: ctx.source.owner, cardId: cards[0]?.id, definitionId: cards[0]?.definitionId, source: "card", sourceName: ctx.source.card.name, amount, targetOwner, ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}) });
+    // Keep cardId on the effect source (Deepfake / Glitch-Witch), not the generated copy, so the Runtime log attributes the gain.
+    return this.event("draw", `${ctx.source.card.name}: gain ${amount} ${label} to ${destination}.`, {
+      ...this.base(ctx), definitionId: cards[0]?.definitionId, amount, targetOwner,
+      ...(zone === "hand" ? { target: "hand" as const, before, after: player.hand.length } : zone === "discard" ? { target: "discard" as const } : {}),
+    });
   }
 
   private millStep(ctx: EffectContext, step: EffectStep, targetOwner: PlayerId): RuntimeEvent {
@@ -3683,12 +3715,13 @@ export class RuntimeSession {
     if (!previous || !isCharacterCard(previous.card)) {
       return this.event("choice", `${card.name}: no previous revealed card to copy.`, this.base(ctx));
     }
-    const printed = this.steps(previous.card.onReveal, "card");
-    if (!printed.length || printed.some(step => step.action === "copyPreviousOnReveal")) {
+    const printed = this.steps(previous.card.onReveal, "card").filter(entry => entry.action !== "copyPreviousOnReveal" && entry.action !== "copyText");
+    if (!printed.length) {
       return this.event("choice", `${card.name}: nothing to copy from ${previous.card.name}.`, this.base(ctx));
     }
+    const summary = describeSteps(printed, "card", this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
     return this.resolveChained(ctx, printed, () =>
-      this.event("choice", `${card.name}: copies ${previous.card.name}'s On Reveal.`, this.base(ctx)));
+      this.event("choice", `${card.name} copied '${previous.card.name}': ${summary}`, this.base(ctx)));
   }
 
   private chooseMoveDestination(source: Deployment, target: Deployment): RuntimeEvent {
@@ -4188,13 +4221,8 @@ export class RuntimeSession {
     return this.gameOver("Session ended early for evaluation.");
   }
 
-  /**
-   * Tallies Circuit wins from completed Cycle records (strict Location lead that Cycle) and, when
-   * `mostCircuitsBonusVP` > 0, credits that VP to the sole leader as circuit reward VP.
-   */
-  private awardMostCircuitsBonus(): string | null {
-    const bonus = this.config.mostCircuitsBonusVP ?? 0;
-    if (bonus <= 0) return null;
+  /** Circuit wins from completed Cycles (strict Location lead); ties do not count for either seat. */
+  private circuitWinTally(): { wins: [number, number]; ties: number } {
     const wins: [number, number] = [0, 0];
     let ties = 0;
     for (const record of this.cycleRecords) {
@@ -4203,6 +4231,17 @@ export class RuntimeSession {
       else if (b > a) wins[1]++;
       else ties++;
     }
+    return { wins, ties };
+  }
+
+  /**
+   * Tallies Circuit wins from completed Cycle records (strict Location lead that Cycle) and, when
+   * `mostCircuitsBonusVP` > 0, credits that VP to the sole leader as circuit reward VP.
+   */
+  private awardMostCircuitsBonus(): string | null {
+    const bonus = this.config.mostCircuitsBonusVP ?? 0;
+    if (bonus <= 0) return null;
+    const { wins, ties } = this.circuitWinTally();
     if (wins[0] === wins[1]) return null;
     const leader = (wins[0] > wins[1] ? 0 : 1) as PlayerId;
     this.state.players[leader].rewardVP += bonus;
@@ -4225,6 +4264,48 @@ export class RuntimeSession {
       };
     }
     return awards;
+  }
+
+  /** Absolute-seat standings for the live HUD; `view()` reindexes them for the reader. */
+  private endGameStandings(): EndGameStanding[] {
+    const rows: EndGameStanding[] = [];
+    const lead = (scores: [number, number]): PlayerId | null =>
+      scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
+    const circuitsVP = this.config.mostCircuitsBonusVP ?? 0;
+    if (circuitsVP > 0) {
+      const { wins } = this.circuitWinTally();
+      rows.push({
+        id: "mostCircuits",
+        label: END_GAME_STANDING_LABELS.mostCircuits,
+        vp: circuitsVP,
+        scores: wins,
+        leader: lead(wins),
+      });
+    }
+    const awards = this.resolvedEndGameAwards();
+    if (!awards) return rows;
+    const data = this.telemetry.data;
+    const stats: Record<EndGameAwardId, [number, number]> = {
+      mostDestroyed: data.cardsDestroyed,
+      mostTrashed: data.cardsTrashed,
+      mostPowerRemoved: data.cardPowerDrained,
+      mostPowerBoosted: data.powerIncreased,
+      mostCryptoBanked: data.cryptoGained,
+      mostCryptoStolen: data.cryptoStolenBumped,
+    };
+    for (const id of Object.keys(awards) as EndGameAwardId[]) {
+      const setting = awards[id];
+      if (!setting.enabled || setting.vp <= 0) continue;
+      const scores = stats[id];
+      rows.push({
+        id,
+        label: END_GAME_STANDING_LABELS[id],
+        vp: setting.vp,
+        scores: [scores[0], scores[1]],
+        leader: lead(scores),
+      });
+    }
+    return rows;
   }
 
   /** Credits end-game achievement VP. Strict lead → that seat; ties → both. */
