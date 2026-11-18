@@ -1,39 +1,33 @@
 {
   "schema": 1,
-  "version": 28,
+  "version": 30,
   "mode": "llm",
   "profile": {
-    "version": 28,
-    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "version": 30,
+    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
     "midgameMix": 0.5,
-    "handCryptoTarget": 11.84,
+    "handCryptoTarget": 11.67,
     "minCryptoValue": 2,
-    "minBuyScore": 1.75,
-    "dilution": 0.9,
+    "minBuyScore": 1.72,
+    "dilution": 0.83,
     "weights": {
-      "power": 1,
-      "draw": 2.32,
-      "crypto": 2.91,
-      "drain": 3,
+      "power": 1.01,
+      "draw": 2.48,
+      "crypto": 2.04,
+      "drain": 2.75,
       "restore": 2.5,
-      "vp": 2.69,
+      "vp": 2.66,
       "duration": 0.8,
-      "thin": 1.27,
+      "thin": 1.67,
       "disrupt": 1.77,
-      "chaos": 2.16
+      "chaos": 1.45
     },
-    "cardBias": {
-      "code-sniper": 0.47,
-      "cowl-obscyra": 0.47,
-      "delta-wave": 0.47,
-      "koppy-kat": 0.47,
-      "card-jabbhu7e": 0.42
-    }
+    "cardBias": {}
   },
-  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -42,29 +36,23 @@
       "chaosFromCycle": 9,
       "vpFromCycle": 9,
       "midgameMix": 0.5,
-      "handCryptoTarget": 11.84,
+      "handCryptoTarget": 11.67,
       "minCryptoValue": 2,
-      "minBuyScore": 0.75,
-      "dilution": 0.5,
+      "minBuyScore": 1.72,
+      "dilution": 0.83,
       "weights": {
-        "power": 1,
-        "draw": 2.32,
-        "crypto": 2.91,
-        "drain": 3,
+        "power": 1.01,
+        "draw": 2.48,
+        "crypto": 2.04,
+        "drain": 2.25,
         "restore": 1,
-        "vp": 2.69,
+        "vp": 2.66,
         "duration": 0.8,
-        "thin": 1.27,
+        "thin": 1.67,
         "disrupt": 0.8,
-        "chaos": 2.16
+        "chaos": 1.45
       },
-      "cardBias": {
-        "code-sniper": 0.47,
-        "cowl-obscyra": 0.47,
-        "delta-wave": 0.47,
-        "koppy-kat": 0.47,
-        "card-jabbhu7e": 0.42
-      }
+      "cardBias": {}
     },
     "plan": "Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf.",
     "playbook": [
@@ -77,39 +65,38 @@
       "Draft after Cycle 4: score every card from its actual effects (no fixed table) and by how much it improves the weak starting deck; buy the best set the whole Wallet affords; skip cards that would only dilute the deck.",
       "Deploy: draw and engine cards first so they fuel later turns; then sequence other reveals so later cards benefit from earlier effects. Contest Nodes whose Location pays the winner; concede Locations that pay the loser or clog my deck when Circuit count allows.",
       "Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch), pollute the opponent when the effect puts junk in their deck, and hit their best cards.",
-      "Human tempo (vs VP-Dog): soft coaching 35% toward your Draft tempo across 8 games — Soft coaching from human Draft tempo vs VP-Dog (8 games, 35% share): economy through Cycle 4, Chaos from 9, VP from 10. Not an experiment.",
-      "Human tempo band: Cycles 1–4: 63 buys (Crypto 10%, Base 41%, Chaos 48%, VP 2%; spend 295)",
-      "Human tempo band: Cycles 5–8: 75 buys (Crypto 5%, Base 28%, Chaos 53%, VP 13%; spend 472)",
-      "Human tempo band: Cycles 9–12: 38 buys (Base 24%, Chaos 58%, VP 18%; spend 225)",
-      "Human tempo band: Cycles 13–16: 13 buys (Crypto 8%, Base 15%, Chaos 31%, VP 46%; spend 93)"
+      "Tip from VP-Dog (#1): Focus on acquiring high-value Crypto (Kilo-Coin, Mega-Cache) early to build a strong economy. Aim for a hand Crypto target of 15 by Cycle 5.",
+      "Tip from DV-8 (#1): Focus on thinning your deck to access key cards faster. Maintain a draw weight of 2.4 to improve your engine's efficiency.",
+      "Tip from VP-Dog (#2): Prioritize drawing cards and thinning your deck to cycle to high-value cards faster. Increase draw weight to 2.3 for better mid-game efficiency.",
+      "Tip from DV-8 (#2): Prioritize VP cards earlier in the game to secure points before the race heats up. Shift your VP from Cycle 13 to Cycle 11. (limited by my style: no change to my profile)",
+      "Coaching from the designer: play 25% closer to my competitors (average of T-5 v1.3, DV-8 v1.1, VP-Dog v1.1): Crypto target 11→11.67, min buy score 2→1.72, dilution 0.9→0.83, power weight 1→1.01, draw weight 2.6→2.48, actions weight 1.5→1.49, crypto weight 2.1→2.04, drain weight 2.4→2.25, vp weight 2.6→2.66, thin weight 1.68→1.67, chaos weight 1.5→1.45. My three phases stay as they are."
     ],
-    "since": "2026-11-14T04:24:58.591Z"
+    "since": "2026-11-16T01:51:46.846Z"
   },
   "adopted": {
     "weights": {
       "restore": 2.5,
-      "power": 1,
-      "disrupt": 1.77
+      "disrupt": 1.77,
+      "drain": 2.75
     },
-    "cardBias": {},
-    "minBuyScore": 1.75,
-    "dilution": 0.9
+    "cardBias": {}
   },
   "experiment": {
-    "id": "x275-aggressive-strategies",
-    "theoryId": "aggressive-strategies",
+    "id": "x285-endgame-awards",
+    "theoryId": "endgame-awards",
     "supportsTheory": true,
-    "hypothesis": "Incorporating more aggressive cards will improve my chances of winning.",
-    "prediction": "I predict that a focus on aggressive strategies will lead to more wins and higher VP margins compared to the current best.",
+    "hypothesis": "Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes.",
+    "prediction": "More wins and higher VP margins compared to the current best.",
     "change": {
       "weights": {
-        "chaos": 2.25
+        "thin": 1.77,
+        "disrupt": 2.07
       }
     },
     "source": "model",
-    "changeSummary": "chaos weight 2.02→2.25",
-    "proposedBy": 28,
-    "proposedAt": "2026-11-12T01:51:12.640Z",
+    "changeSummary": "thin weight 1.67→1.77, disrupt weight 1.77→2.07",
+    "proposedBy": 30,
+    "proposedAt": "2026-11-17T07:14:13.805Z",
     "stage": "lab",
     "lab": null,
     "field": {
@@ -133,831 +120,6 @@
     "concludedAt": null
   },
   "experiments": [
-    {
-      "id": "x215-thinner",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing deck thinning higher draws the best cards more often.",
-      "prediction": "More wins and bigger mid-game Wallets than the current best.",
-      "change": {
-        "weights": {
-          "thin": 1.56
-        }
-      },
-      "source": "heuristic",
-      "menuId": "thinner",
-      "changeSummary": "thin weight 1.2→1.56",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-05T21:54:16.763Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62088,
-          62089,
-          62090,
-          62091,
-          62092,
-          62093,
-          62094,
-          62095,
-          62096,
-          62097,
-          62098,
-          62099,
-          62100,
-          62101,
-          62102,
-          62103,
-          62104,
-          62105,
-          62106,
-          62107,
-          62108,
-          62109,
-          62110,
-          62111
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 25,
-        "controlWins": 24,
-        "ties": 0,
-        "meanMargin": 0.7,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "t-5@v1.7",
-            "vp-dog@v1.6",
-            "dv-8@v1.10"
-          ],
-          "pairs": 48,
-          "experimentPoints": 25,
-          "controlPoints": 24.5,
-          "marginGain": 0.7
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 25/48 for the experiment vs 24.5/48 for the current best against t-5@v1.7, vp-dog@v1.6, dv-8@v1.10 (margin +0.7/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-05T22:00:09.342Z"
-    },
-    {
-      "id": "x216-fallback-216-2",
-      "theoryId": null,
-      "supportsTheory": true,
-      "menuId": "fallback-216-2",
-      "hypothesis": "A small envelope-clamped nudge while the experiment menu has nothing left to try.",
-      "prediction": "More wins or a better margin than the current best.",
-      "change": {
-        "weights": {
-          "crypto": 3.55
-        }
-      },
-      "source": "heuristic",
-      "changeSummary": "crypto weight 3.3→3.55",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-05T22:06:11.580Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62208,
-          62209,
-          62210,
-          62211,
-          62212,
-          62213,
-          62214,
-          62215,
-          62216,
-          62217,
-          62218,
-          62219,
-          62220,
-          62221,
-          62222,
-          62223,
-          62224,
-          62225,
-          62226,
-          62227,
-          62228,
-          62229,
-          62230,
-          62231
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 16,
-        "controlWins": 16,
-        "ties": 1,
-        "meanMargin": -0.4,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "strat-g@v1.19",
-            "vp-dog@v1.6",
-            "vp-dog@v1.4"
-          ],
-          "pairs": 48,
-          "experimentPoints": 16.5,
-          "controlPoints": 16,
-          "marginGain": -0.4
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 16.5/48 for the experiment vs 16/48 for the current best against strat-g@v1.19, vp-dog@v1.6, vp-dog@v1.4 (margin -0.4/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-05T22:08:30.823Z"
-    },
-    {
-      "id": "x217-restore",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing Restore higher keeps my Servers alive long enough to win on VP.",
-      "prediction": "Fewer losses by Server destruction than the current best.",
-      "change": {
-        "weights": {
-          "restore": 2.89
-        }
-      },
-      "source": "heuristic",
-      "menuId": "restore",
-      "changeSummary": "restore weight 2.49→2.89",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-05T22:08:30.823Z",
-      "stage": "rejected",
-      "lab": {
-        "seeds": [
-          62304,
-          62305,
-          62306,
-          62307,
-          62308,
-          62309,
-          62310,
-          62311,
-          62312,
-          62313,
-          62314,
-          62315,
-          62316,
-          62317,
-          62318,
-          62319,
-          62320,
-          62321,
-          62322,
-          62323,
-          62324,
-          62325,
-          62326,
-          62327
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 19,
-        "controlWins": 20,
-        "ties": 1,
-        "meanMargin": -0.8,
-        "verdict": "rejected",
-        "league": {
-          "opponents": [
-            "vp-dog@v1.6",
-            "t-5@v1.11",
-            "strat-g@v1.19"
-          ],
-          "pairs": 48,
-          "experimentPoints": 19.5,
-          "controlPoints": 20.5,
-          "marginGain": -0.8
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 19.5/48 for the experiment vs 20.5/48 for the current best against vp-dog@v1.6, t-5@v1.11, strat-g@v1.19 (margin -0.8/game) → rejected. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-05T23:08:51.251Z"
-    },
-    {
-      "id": "x218-power",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing Power higher wins more Locations and their rewards.",
-      "prediction": "More Locations won and more wins than the current best.",
-      "change": {
-        "weights": {
-          "power": 1.56
-        }
-      },
-      "source": "heuristic",
-      "menuId": "power",
-      "changeSummary": "power weight 1.26→1.56",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-05T23:08:51.251Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62424,
-          62425,
-          62426,
-          62427,
-          62428,
-          62429,
-          62430,
-          62431,
-          62432,
-          62433,
-          62434,
-          62435,
-          62436,
-          62437,
-          62438,
-          62439,
-          62440,
-          62441,
-          62442,
-          62443,
-          62444,
-          62445,
-          62446,
-          62447
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 30,
-        "controlWins": 30,
-        "ties": 1,
-        "meanMargin": -3.7,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "t-5@v1.11"
-          ],
-          "pairs": 48,
-          "experimentPoints": 30.5,
-          "controlPoints": 30.5,
-          "marginGain": -3.7
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 30.5/48 for the experiment vs 30.5/48 for the current best against t-5@v1.11 (margin -3.7/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-06T03:33:01.035Z"
-    },
-    {
-      "id": "x219-disrupt",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing disruption higher slows the opponent's plan more than it costs mine.",
-      "prediction": "More wins and a better margin than the current best.",
-      "change": {
-        "weights": {
-          "disrupt": 1.77
-        }
-      },
-      "source": "heuristic",
-      "menuId": "disrupt",
-      "changeSummary": "disrupt weight 1.37→1.77",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-06T03:33:01.035Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62520,
-          62521,
-          62522,
-          62523,
-          62524,
-          62525,
-          62526,
-          62527,
-          62528,
-          62529,
-          62530,
-          62531,
-          62532,
-          62533,
-          62534,
-          62535,
-          62536,
-          62537,
-          62538,
-          62539,
-          62540,
-          62541,
-          62542,
-          62543
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 20,
-        "controlWins": 22,
-        "ties": 1,
-        "meanMargin": 0.7,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "vp-dog@v1.6",
-            "dv-8@v1.8",
-            "t-5@v1.11"
-          ],
-          "pairs": 48,
-          "experimentPoints": 20.5,
-          "controlPoints": 22.5,
-          "marginGain": 0.7
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 20.5/48 for the experiment vs 22.5/48 for the current best against vp-dog@v1.6, dv-8@v1.8, t-5@v1.11 (margin +0.7/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-06T03:51:35.851Z"
-    },
-    {
-      "id": "x220-fallback-220-4",
-      "theoryId": null,
-      "supportsTheory": true,
-      "menuId": "fallback-220-4",
-      "hypothesis": "A small envelope-clamped nudge while the experiment menu has nothing left to try.",
-      "prediction": "More wins or a better margin than the current best.",
-      "change": {
-        "weights": {
-          "restore": 2.74
-        }
-      },
-      "source": "heuristic",
-      "changeSummary": "restore weight 2.49→2.74",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-06T04:22:34.709Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62688,
-          62689,
-          62690,
-          62691,
-          62692,
-          62693,
-          62694,
-          62695,
-          62696,
-          62697,
-          62698,
-          62699,
-          62700,
-          62701,
-          62702,
-          62703,
-          62704,
-          62705,
-          62706,
-          62707,
-          62708,
-          62709,
-          62710,
-          62711
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 35,
-        "controlWins": 34,
-        "ties": 0,
-        "meanMargin": -0.3,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "dv-8@v1.10",
-            "vp-dog@v1.3"
-          ],
-          "pairs": 48,
-          "experimentPoints": 35,
-          "controlPoints": 34,
-          "marginGain": -0.3
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 35/48 for the experiment vs 34/48 for the current best against dv-8@v1.10, vp-dog@v1.3 (margin -0.3/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-06T04:24:55.158Z"
-    },
-    {
-      "id": "x221-fallback-221-5",
-      "theoryId": null,
-      "supportsTheory": true,
-      "menuId": "fallback-221-5",
-      "hypothesis": "A small envelope-clamped nudge while the experiment menu has nothing left to try.",
-      "prediction": "More wins or a better margin than the current best.",
-      "change": {
-        "weights": {
-          "vp": 2.85
-        }
-      },
-      "source": "heuristic",
-      "changeSummary": "vp weight 2.6→2.85",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-06T04:32:07.986Z",
-      "stage": "inconclusive",
-      "lab": {
-        "seeds": [
-          62784,
-          62785,
-          62786,
-          62787,
-          62788,
-          62789,
-          62790,
-          62791,
-          62792,
-          62793,
-          62794,
-          62795,
-          62796,
-          62797,
-          62798,
-          62799,
-          62800,
-          62801,
-          62802,
-          62803,
-          62804,
-          62805,
-          62806,
-          62807
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 22,
-        "controlWins": 21,
-        "ties": 1,
-        "meanMargin": 1.9,
-        "verdict": "inconclusive",
-        "league": {
-          "opponents": [
-            "t-5@v1.11",
-            "strat-g@v1.20",
-            "vp-dog@v1.3"
-          ],
-          "pairs": 48,
-          "experimentPoints": 22.5,
-          "controlPoints": 21,
-          "marginGain": 1.9
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 22.5/48 for the experiment vs 21/48 for the current best against t-5@v1.11, strat-g@v1.20, vp-dog@v1.3 (margin +1.9/game) → inconclusive. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-06T04:34:06.844Z"
-    },
-    {
-      "id": "x222-draw",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing draw higher cycles back to the best cards faster than extra Crypto does.",
-      "prediction": "More wins and more Locations won than the current best.",
-      "change": {
-        "weights": {
-          "draw": 2
-        }
-      },
-      "source": "heuristic",
-      "menuId": "draw",
-      "changeSummary": "draw weight 1.6→2",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-06T04:34:06.844Z",
-      "stage": "rejected",
-      "lab": {
-        "seeds": [
-          62976,
-          62977,
-          62978,
-          62979,
-          62980,
-          62981,
-          62982,
-          62983,
-          62984,
-          62985,
-          62986,
-          62987,
-          62988,
-          62989,
-          62990,
-          62991,
-          62992,
-          62993,
-          62994,
-          62995,
-          62996,
-          62997,
-          62998,
-          62999
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 19,
-        "controlWins": 20,
-        "ties": 0,
-        "meanMargin": -2.3,
-        "verdict": "rejected",
-        "league": {
-          "opponents": [
-            "t-5@v1.11",
-            "vp-dog@v1.6",
-            "strat-g@v1.19"
-          ],
-          "pairs": 48,
-          "experimentPoints": 19,
-          "controlPoints": 20.5,
-          "marginGain": -2.3
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 19/48 for the experiment vs 20.5/48 for the current best against t-5@v1.11, vp-dog@v1.6, strat-g@v1.19 (margin -2.3/game) → rejected. Kept the current best.",
-      "concludedBy": 22,
-      "concludedAt": "2026-11-06T04:50:23.842Z"
-    },
-    {
-      "id": "x223-drain",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "Valuing Drain higher ends games by Server destruction before the opponent's engine pays off.",
-      "prediction": "Earlier Server kills and more wins than the current best.",
-      "change": {
-        "weights": {
-          "drain": 3
-        }
-      },
-      "source": "heuristic",
-      "menuId": "drain",
-      "changeSummary": "drain weight 2.9→3",
-      "proposedBy": 22,
-      "proposedAt": "2026-11-06T04:50:23.842Z",
-      "stage": "adopted",
-      "lab": {
-        "seeds": [
-          63056,
-          63057,
-          63058,
-          63059,
-          63060,
-          63061,
-          63062,
-          63063,
-          63064,
-          63065,
-          63066,
-          63067,
-          63068,
-          63069,
-          63070,
-          63071,
-          63072,
-          63073,
-          63074,
-          63075,
-          63076,
-          63077,
-          63078,
-          63079
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 26,
-        "controlWins": 21,
-        "ties": 0,
-        "meanMargin": 2.3,
-        "verdict": "promising",
-        "league": {
-          "opponents": [
-            "vp-dog@v1.5",
-            "vp-dog@v1.6"
-          ],
-          "pairs": 48,
-          "experimentPoints": 26,
-          "controlPoints": 21,
-          "marginGain": 2.3
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 26/48 for the experiment vs 21/48 for the current best against vp-dog@v1.5, vp-dog@v1.6 (margin +2.3/game) → promising. Adopted into the current best.",
-      "concludedBy": 23,
-      "concludedAt": "2026-11-07T08:13:41.428Z"
-    },
-    {
-      "id": "x224-leaner",
-      "theoryId": null,
-      "supportsTheory": true,
-      "hypothesis": "A stricter purchase bar (fewer, better cards) keeps the deck sharp.",
-      "prediction": "More wins with a smaller deck than the current best.",
-      "change": {
-        "minBuyScore": 2.25,
-        "dilution": 1.1
-      },
-      "source": "heuristic",
-      "menuId": "leaner",
-      "changeSummary": "min buy score 1.75→2.25, dilution 0.9→1.1",
-      "proposedBy": 23,
-      "proposedAt": "2026-11-07T08:13:41.432Z",
-      "stage": "rejected",
-      "lab": {
-        "seeds": [
-          63296,
-          63297,
-          63298,
-          63299,
-          63300,
-          63301,
-          63302,
-          63303,
-          63304,
-          63305,
-          63306,
-          63307,
-          63308,
-          63309,
-          63310,
-          63311,
-          63312,
-          63313,
-          63314,
-          63315,
-          63316,
-          63317,
-          63318,
-          63319
-        ],
-        "games": 96,
-        "invalid": 0,
-        "experimentWins": 24,
-        "controlWins": 30,
-        "ties": 0,
-        "meanMargin": -8,
-        "verdict": "rejected",
-        "league": {
-          "opponents": [
-            "vp-dog@v1.6",
-            "strat-g@v1.22",
-            "dv-8@v1.9"
-          ],
-          "pairs": 48,
-          "experimentPoints": 24,
-          "controlPoints": 30,
-          "marginGain": -8
-        }
-      },
-      "field": {
-        "experiment": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        },
-        "control": {
-          "games": 0,
-          "wins": 0,
-          "losses": 0,
-          "ties": 0,
-          "margin": 0
-        }
-      },
-      "verdict": "league 24/48 for the experiment vs 30/48 for the current best against vp-dog@v1.6, strat-g@v1.22, dv-8@v1.9 (margin -8/game) → rejected. Kept the current best.",
-      "concludedBy": 23,
-      "concludedAt": "2026-11-07T08:35:35.524Z"
-    },
     {
       "id": "x225-crypto",
       "theoryId": null,
@@ -5093,9 +4255,834 @@
       "verdict": "league 24/48 for the experiment vs 25/48 for the current best against vp-dog@v1.8, strat-g@v1.27 (margin +0.8/game) → inconclusive. Kept the current best.",
       "concludedBy": 28,
       "concludedAt": "2026-11-09T00:22:54.885Z"
+    },
+    {
+      "id": "x275-aggressive-strategies",
+      "theoryId": "aggressive-strategies",
+      "supportsTheory": true,
+      "hypothesis": "Incorporating more aggressive cards will improve my chances of winning.",
+      "prediction": "I predict that a focus on aggressive strategies will lead to more wins and higher VP margins compared to the current best.",
+      "change": {
+        "weights": {
+          "chaos": 2.25
+        }
+      },
+      "source": "model",
+      "changeSummary": "chaos weight 2.02→2.25",
+      "proposedBy": 28,
+      "proposedAt": "2026-11-12T01:51:12.640Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          71204,
+          71205,
+          71206,
+          71207,
+          71208,
+          71209,
+          71210,
+          71211,
+          71212,
+          71213,
+          71214,
+          71215,
+          71216,
+          71217,
+          71218,
+          71219,
+          71220,
+          71221,
+          71222,
+          71223,
+          71224,
+          71225,
+          71226,
+          71227
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 30,
+        "controlWins": 31,
+        "ties": 0,
+        "meanMargin": 0.3,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.4",
+            "last-2go@v1.0",
+            "t-5@v1.8"
+          ],
+          "pairs": 48,
+          "experimentPoints": 30,
+          "controlPoints": 31,
+          "marginGain": 0.3
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 30/48 for the experiment vs 31/48 for the current best against vp-dog@v1.4, last-2go@v1.0, t-5@v1.8 (margin +0.3/game) → inconclusive. Kept the current best.",
+      "concludedBy": 29,
+      "concludedAt": "2026-11-16T20:10:18.745Z"
+    },
+    {
+      "id": "x276-drain",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing Drain higher ends games by Server destruction before the opponent's engine pays off.",
+      "prediction": "Earlier Server kills and more wins than the current best.",
+      "change": {
+        "weights": {
+          "drain": 2.75
+        }
+      },
+      "source": "heuristic",
+      "menuId": "drain",
+      "changeSummary": "drain weight 2.25→2.75",
+      "proposedBy": 29,
+      "proposedAt": "2026-11-16T20:10:18.746Z",
+      "stage": "adopted",
+      "lab": {
+        "seeds": [
+          71420,
+          71421,
+          71422,
+          71423,
+          71424,
+          71425,
+          71426,
+          71427,
+          71428,
+          71429,
+          71430,
+          71431,
+          71432,
+          71433,
+          71434,
+          71435,
+          71436,
+          71437,
+          71438,
+          71439,
+          71440,
+          71441,
+          71442,
+          71443
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 33,
+        "controlWins": 29,
+        "ties": 0,
+        "meanMargin": 3,
+        "verdict": "promising",
+        "league": {
+          "opponents": [
+            "strat-g@v1.27",
+            "last-2go@v1.0"
+          ],
+          "pairs": 48,
+          "experimentPoints": 33,
+          "controlPoints": 29,
+          "marginGain": 3
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 33/48 for the experiment vs 29/48 for the current best against strat-g@v1.27, last-2go@v1.0 (margin +3/game) → promising. Adopted into the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-16T20:26:46.585Z"
+    },
+    {
+      "id": "x277-leaner",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "A stricter purchase bar (fewer, better cards) keeps the deck sharp.",
+      "prediction": "More wins with a smaller deck than the current best.",
+      "change": {
+        "minBuyScore": 2.22,
+        "dilution": 1.03
+      },
+      "source": "heuristic",
+      "menuId": "leaner",
+      "changeSummary": "min buy score 1.72→2.22, dilution 0.83→1.03",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-16T20:26:46.592Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          71588,
+          71589,
+          71590,
+          71591,
+          71592,
+          71593,
+          71594,
+          71595,
+          71596,
+          71597,
+          71598,
+          71599,
+          71600,
+          71601,
+          71602,
+          71603,
+          71604,
+          71605,
+          71606,
+          71607,
+          71608,
+          71609,
+          71610,
+          71611
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 33,
+        "controlWins": 34,
+        "ties": 0,
+        "meanMargin": -2.4,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.2",
+            "strat-g@v1.27",
+            "last-2go@v1.0"
+          ],
+          "pairs": 48,
+          "experimentPoints": 33,
+          "controlPoints": 34,
+          "marginGain": -2.4
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 33/48 for the experiment vs 34/48 for the current best against vp-dog@v1.2, strat-g@v1.27, last-2go@v1.0 (margin -2.4/game) → rejected. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-16T20:39:59.154Z"
+    },
+    {
+      "id": "x278-fallback-278-0",
+      "theoryId": null,
+      "supportsTheory": true,
+      "menuId": "fallback-278-0",
+      "hypothesis": "A small envelope-clamped nudge while the experiment menu has nothing left to try.",
+      "prediction": "More wins or a better margin than the current best.",
+      "change": {
+        "weights": {
+          "power": 1.26
+        }
+      },
+      "source": "heuristic",
+      "changeSummary": "power weight 1.01→1.26",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-16T20:50:29.937Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          71756,
+          71757,
+          71758,
+          71759,
+          71760,
+          71761,
+          71762,
+          71763,
+          71764,
+          71765,
+          71766,
+          71767,
+          71768,
+          71769,
+          71770,
+          71771,
+          71772,
+          71773,
+          71774,
+          71775,
+          71776,
+          71777,
+          71778,
+          71779
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 34,
+        "controlWins": 34,
+        "ties": 2,
+        "meanMargin": 0.5,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.3",
+            "vp-dog@v1.6"
+          ],
+          "pairs": 48,
+          "experimentPoints": 35,
+          "controlPoints": 35.5,
+          "marginGain": 0.5
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 35/48 for the experiment vs 35.5/48 for the current best against vp-dog@v1.3, vp-dog@v1.6 (margin +0.5/game) → inconclusive. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-16T20:52:52.819Z"
+    },
+    {
+      "id": "x279-thinner",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing deck thinning higher draws the best cards more often.",
+      "prediction": "More wins and bigger mid-game Wallets than the current best.",
+      "change": {
+        "weights": {
+          "thin": 2.07
+        }
+      },
+      "source": "heuristic",
+      "menuId": "thinner",
+      "changeSummary": "thin weight 1.67→2.07",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-16T20:52:52.819Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          71900,
+          71901,
+          71902,
+          71903,
+          71904,
+          71905,
+          71906,
+          71907,
+          71908,
+          71909,
+          71910,
+          71911,
+          71912,
+          71913,
+          71914,
+          71915,
+          71916,
+          71917,
+          71918,
+          71919,
+          71920,
+          71921,
+          71922,
+          71923
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 37,
+        "controlWins": 39,
+        "ties": 0,
+        "meanMargin": -1.7,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.6",
+            "last-2go@v1.0",
+            "vp-dog@v1.5"
+          ],
+          "pairs": 48,
+          "experimentPoints": 37,
+          "controlPoints": 39,
+          "marginGain": -1.7
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 37/48 for the experiment vs 39/48 for the current best against vp-dog@v1.6, last-2go@v1.0, vp-dog@v1.5 (margin -1.7/game) → rejected. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-16T21:02:48.085Z"
+    },
+    {
+      "id": "x280-restore",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing Restore higher keeps my Servers alive long enough to win on VP.",
+      "prediction": "Fewer losses by Server destruction than the current best.",
+      "change": {
+        "weights": {
+          "restore": 2.9
+        }
+      },
+      "source": "heuristic",
+      "menuId": "restore",
+      "changeSummary": "restore weight 2.5→2.9",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-16T21:02:48.085Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          72092,
+          72093,
+          72094,
+          72095,
+          72096,
+          72097,
+          72098,
+          72099,
+          72100,
+          72101,
+          72102,
+          72103,
+          72104,
+          72105,
+          72106,
+          72107,
+          72108,
+          72109,
+          72110,
+          72111,
+          72112,
+          72113,
+          72114,
+          72115
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 39,
+        "controlWins": 38,
+        "ties": 0,
+        "meanMargin": 0.1,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "strat-g@v1.27",
+            "vp-dog@v1.4",
+            "last-2go@v1.0"
+          ],
+          "pairs": 48,
+          "experimentPoints": 39,
+          "controlPoints": 38,
+          "marginGain": 0.1
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 39/48 for the experiment vs 38/48 for the current best against strat-g@v1.27, vp-dog@v1.4, last-2go@v1.0 (margin +0.1/game) → inconclusive. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-17T00:16:52.618Z"
+    },
+    {
+      "id": "x281-draw",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing draw higher cycles back to the best cards faster than extra Crypto does.",
+      "prediction": "More wins and more Locations won than the current best.",
+      "change": {
+        "weights": {
+          "draw": 2.88
+        }
+      },
+      "source": "heuristic",
+      "menuId": "draw",
+      "changeSummary": "draw weight 2.48→2.88",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-17T00:16:52.618Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          72356,
+          72357,
+          72358,
+          72359,
+          72360,
+          72361,
+          72362,
+          72363,
+          72364,
+          72365,
+          72366,
+          72367,
+          72368,
+          72369,
+          72370,
+          72371,
+          72372,
+          72373,
+          72374,
+          72375,
+          72376,
+          72377,
+          72378,
+          72379
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 36,
+        "controlWins": 39,
+        "ties": 1,
+        "meanMargin": 0.8,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.6",
+            "vp-dog@v1.3",
+            "vp-dog@v1.2"
+          ],
+          "pairs": 48,
+          "experimentPoints": 36.5,
+          "controlPoints": 39.5,
+          "marginGain": 0.8
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 36.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, vp-dog@v1.3, vp-dog@v1.2 (margin +0.8/game) → inconclusive. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-17T00:37:10.972Z"
+    },
+    {
+      "id": "x282-power",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing Power higher wins more Locations and their rewards.",
+      "prediction": "More Locations won and more wins than the current best.",
+      "change": {
+        "weights": {
+          "power": 1.31
+        }
+      },
+      "source": "heuristic",
+      "menuId": "power",
+      "changeSummary": "power weight 1.01→1.31",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-17T00:37:10.973Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          72524,
+          72525,
+          72526,
+          72527,
+          72528,
+          72529,
+          72530,
+          72531,
+          72532,
+          72533,
+          72534,
+          72535,
+          72536,
+          72537,
+          72538,
+          72539,
+          72540,
+          72541,
+          72542,
+          72543,
+          72544,
+          72545,
+          72546,
+          72547
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 27,
+        "controlWins": 28,
+        "ties": 0,
+        "meanMargin": -0.3,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "t-5@v1.8",
+            "vp-dog@v1.5"
+          ],
+          "pairs": 48,
+          "experimentPoints": 27,
+          "controlPoints": 28.5,
+          "marginGain": -0.3
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 27/48 for the experiment vs 28.5/48 for the current best against t-5@v1.8, vp-dog@v1.5 (margin -0.3/game) → rejected. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-17T00:50:13.922Z"
+    },
+    {
+      "id": "x283-disrupt",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing disruption higher slows the opponent's plan more than it costs mine.",
+      "prediction": "More wins and a better margin than the current best.",
+      "change": {
+        "weights": {
+          "disrupt": 2.17
+        }
+      },
+      "source": "heuristic",
+      "menuId": "disrupt",
+      "changeSummary": "disrupt weight 1.77→2.17",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-17T00:50:13.922Z",
+      "stage": "inconclusive",
+      "lab": {
+        "seeds": [
+          72692,
+          72693,
+          72694,
+          72695,
+          72696,
+          72697,
+          72698,
+          72699,
+          72700,
+          72701,
+          72702,
+          72703,
+          72704,
+          72705,
+          72706,
+          72707,
+          72708,
+          72709,
+          72710,
+          72711,
+          72712,
+          72713,
+          72714,
+          72715
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 40,
+        "controlWins": 39,
+        "ties": 1,
+        "meanMargin": 2.6,
+        "verdict": "inconclusive",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.6",
+            "strat-g@v1.26",
+            "vp-dog@v1.2"
+          ],
+          "pairs": 48,
+          "experimentPoints": 40.5,
+          "controlPoints": 39.5,
+          "marginGain": 2.6
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 40.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, strat-g@v1.26, vp-dog@v1.2 (margin +2.6/game) → inconclusive. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-17T01:02:38.253Z"
+    },
+    {
+      "id": "x284-crypto",
+      "theoryId": null,
+      "supportsTheory": true,
+      "hypothesis": "Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game.",
+      "prediction": "Bigger mid-game Wallets and more wins than the current best.",
+      "change": {
+        "handCryptoTarget": 12,
+        "weights": {
+          "crypto": 2.34
+        }
+      },
+      "source": "heuristic",
+      "menuId": "crypto",
+      "changeSummary": "Crypto target 11.67→12, crypto weight 2.04→2.34",
+      "proposedBy": 30,
+      "proposedAt": "2026-11-17T01:02:38.253Z",
+      "stage": "rejected",
+      "lab": {
+        "seeds": [
+          72860,
+          72861,
+          72862,
+          72863,
+          72864,
+          72865,
+          72866,
+          72867,
+          72868,
+          72869,
+          72870,
+          72871,
+          72872,
+          72873,
+          72874,
+          72875,
+          72876,
+          72877,
+          72878,
+          72879,
+          72880,
+          72881,
+          72882,
+          72883
+        ],
+        "games": 96,
+        "invalid": 0,
+        "experimentWins": 24,
+        "controlWins": 36,
+        "ties": 2,
+        "meanMargin": -10.9,
+        "verdict": "rejected",
+        "league": {
+          "opponents": [
+            "vp-dog@v1.6",
+            "strat-g@v1.26"
+          ],
+          "pairs": 48,
+          "experimentPoints": 25,
+          "controlPoints": 36,
+          "marginGain": -10.9
+        }
+      },
+      "field": {
+        "experiment": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        },
+        "control": {
+          "games": 0,
+          "wins": 0,
+          "losses": 0,
+          "ties": 0,
+          "margin": 0
+        }
+      },
+      "verdict": "league 25/48 for the experiment vs 36/48 for the current best against vp-dog@v1.6, strat-g@v1.26 (margin -10.9/game) → rejected. Kept the current best.",
+      "concludedBy": 30,
+      "concludedAt": "2026-11-17T01:15:36.637Z"
     }
   ],
-  "experimentCount": 275,
+  "experimentCount": 285,
   "theories": [
     {
       "id": "no-shyte",
@@ -5555,12 +5542,12 @@
     {
       "id": "card-synergy",
       "text": "Incorporating new cards will enhance my deck's synergy and overall performance.",
-      "status": "proposed",
+      "status": "retired",
       "confidence": 0.5,
       "support": 0,
       "against": 0,
       "createdBy": 28,
-      "updatedBy": 28
+      "updatedBy": 30
     },
     {
       "id": "nothing-ever-happens-here-impact",
@@ -5570,745 +5557,40 @@
       "support": 0,
       "against": 0,
       "createdBy": 28,
-      "updatedBy": 28
+      "updatedBy": 30
+    },
+    {
+      "id": "endgame-awards",
+      "text": "Configure end-game awards (Destroyed/Trashed/Stolen/Deck Attacks/Circuits/…) decide close games, so play that banks those metrics is worth weight even when Server kill VP looks decided.",
+      "status": "proposed",
+      "confidence": 0.45,
+      "support": 0,
+      "against": 0,
+      "test": "endgame-awards",
+      "observation": "Winner vs loser share of end-game award VP and which award rows they led.",
+      "interpretation": "Award leaders associating with wins means the slate is skill-relevant, not noise.",
+      "hypothesis": "Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes.",
+      "proposedTest": "Experiment: mild disrupt/drain/thin bumps; measure award VP share and wins vs current best.",
+      "createdBy": 29,
+      "updatedBy": 29
+    },
+    {
+      "id": "ongoing-hosts",
+      "text": "Revealed card Ongoing hosts (reflect, mirror, destroy-when, listenAccess) change node priority; silencing or sequencing around them beats ignoring them.",
+      "status": "proposed",
+      "confidence": 0.45,
+      "support": 0,
+      "against": 0,
+      "test": "ongoing-hosts",
+      "observation": "Games where Banishing/reflect/Canary/Mosquito were bought and whether the buyer won.",
+      "interpretation": "Ongoing packages associating with wins means hosts are real tempo, not flavor text.",
+      "hypothesis": "Card bias toward key Ongoing definitions (or against enemy reflect) improves results.",
+      "proposedTest": "Experiment: +1 cardBias on Banishing / Mosquito / Canary; measure wins and Drain efficiency.",
+      "createdBy": 29,
+      "updatedBy": 29
     }
   ],
   "notes": [
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:10.547Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:10.547Z",
-      "text": "Read new Locations carefully for strategic advantages."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:16.678Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:21.176Z",
-      "text": "Evaluate the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:21.176Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:21.176Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:21.176Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:29.768Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:34.400Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:34.400Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:34.400Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:29:34.400Z",
-      "text": "Evaluate the impact of new Locations on overall strategy and adapt accordingly."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:00.010Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:03.725Z",
-      "text": "Consider drafting more high-value Characters to maintain pressure early."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:03.725Z",
-      "text": "Evaluate the impact of new Locations on strategies, especially those that alter power or card availability."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:14.718Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:18.097Z",
-      "text": "Evaluate the impact of new Locations on strategies, especially those that alter power or card availability."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:18.097Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:18.097Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:18.097Z",
-      "text": "Assess the value of aggressive strategies against various opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:21.396Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:27.312Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:27.312Z",
-      "text": "Evaluate the impact of new Locations on strategies, especially those that alter power or card availability."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:27.312Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:30:27.312Z",
-      "text": "Assess the value of aggressive strategies against various opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:02.503Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:15.594Z",
-      "text": "v1.27 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:15.594Z",
-      "text": "Evaluate the impact of new Locations on overall strategy."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:15.594Z",
-      "text": "Consider drafting high-value Characters to maintain early pressure."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:15.594Z",
-      "text": "Monitor the effectiveness of aggressive strategies against different opponents."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:31:15.594Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:48:26.339Z",
-      "text": "Designer Q&A: Mel said — 1. New locations will be to reward players for playing varieties of cards, and also to help out players that are often loosing locations.\n2. I'm not sure that cycles 5-8 are off the mark just yet. You should be watching me play and learning from how I ramp up my deck, and how I transition my buys. Early on, I am going for crypto, and for cards. I will buy attacks if they are giving money too. I also buy cards to think my deck, destroy the shyte for crypto cards are real important in the first 4-"
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:48:26.339Z",
-      "text": "Designer Q&A: learned — New locations reward card variety and help struggling players."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:48:26.339Z",
-      "text": "Designer Q&A: learned — Thinning the deck is crucial for accessing key cards faster."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:48:26.339Z",
-      "text": "Designer Q&A: learned — Characters like Dolly DoS and Kopy Kat can be pivotal in midgame strategies."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T20:49:14.034Z",
-      "text": "Designer Q&A: Mel said — What have you seen or learned from the games where you watched me play?"
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T21:37:56.093Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching), which replace my adopted Crypto target, draw weight, crypto weight, drain weight, chaos weight. Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:06:53.689Z",
-      "text": "Experiment x266-certain-locations-will-creat rejected: league 18/48 for the experiment vs 20/48 for the current best against vp-dog@v1.3, t-5@v1.15 (margin -3.3/game) → rejected. Kept the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:06:53.690Z",
-      "text": "New experiment x267-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.5→2.9. Prediction: Fewer losses by Server destruction than the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:27:18.244Z",
-      "text": "Experiment x267-restore inconclusive: league 29/48 for the experiment vs 30/48 for the current best against last-2go@v1.3, strat-g@v1.26, vp-dog@v1.5 (margin +0.9/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:27:18.244Z",
-      "text": "New experiment x268-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.27→1.65. Prediction: More wins and bigger mid-game Wallets than the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:37:33.796Z",
-      "text": "Experiment x268-thinner inconclusive: league 32/48 for the experiment vs 30/48 for the current best against last-2go@v1.6, last-2go@v1.3, t-5@v1.15 (margin +2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:37:33.796Z",
-      "text": "New experiment x269-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1→1.3. Prediction: More Locations won and more wins than the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:42:39.572Z",
-      "text": "Experiment x269-power inconclusive: league 29/48 for the experiment vs 28/48 for the current best against t-5@v1.16, last-2go@v1.5 (margin -1/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:42:39.572Z",
-      "text": "New experiment x270-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.36→2.76. Prediction: More wins and more Locations won than the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:49:42.802Z",
-      "text": "Experiment x270-draw inconclusive: league 32/48 for the experiment vs 31/48 for the current best against t-5@v1.16, last-2go@v1.6 (margin +2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 27,
-      "at": "2026-11-08T22:49:42.803Z",
-      "text": "New experiment x271-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. Prediction: More wins and a better margin than the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T22:57:33.418Z",
-      "text": "Now v1.28: adopted x271-disrupt (disrupt weight 1.37→1.77)."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T22:57:33.418Z",
-      "text": "Experiment x271-disrupt adopted: league 28/48 for the experiment vs 24/48 for the current best against vp-dog@v1.7, strat-g@v1.24, t-5@v1.16 (margin +3.8/game) → promising. Adopted into the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:29:58.205Z",
-      "text": "v1.28 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:30:16.996Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:30:16.996Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:30:16.996Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:30:16.996Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:30:16.996Z",
-      "text": "New experiment x272-aggressive-strategies: By increasing the weight of Chaos cards slightly, I will improve my chances of winning by focusing on aggression. Change: chaos weight 2.02→2.1. Prediction: I predict that a slight increase in Chaos weight will lead to more wins and higher VP margins compared to the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:43:32.752Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0. Removed cards: shyte-coin."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:43:40.218Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:43:40.218Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:43:40.218Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:43:40.218Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:52:48.696Z",
-      "text": "Experiment x272-aggressive-strategies inconclusive: league 26/48 for the experiment vs 25/48 for the current best against strat-g@v1.26, strat-g@v1.25 (margin +1.2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-08T23:52:48.696Z",
-      "text": "New experiment x273-crypto: Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: Crypto target 11.78→12, crypto weight 2.88→3.18. Prediction: Bigger mid-game Wallets and more wins than the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-09T00:12:41.394Z",
-      "text": "Experiment x273-crypto inconclusive: league 23/48 for the experiment vs 22/48 for the current best against t-5@v1.13, vp-dog@v1.5, vp-dog@v1.7 (margin -1.2/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-09T00:20:44.224Z",
-      "text": "New experiment x274-fallback-274-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1→1.25. Prediction: More wins or a better margin than the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-09T00:22:54.885Z",
-      "text": "Experiment x274-fallback-274-0 inconclusive: league 24/48 for the experiment vs 25/48 for the current best against vp-dog@v1.8, strat-g@v1.27 (margin +0.8/game) → inconclusive. Kept the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-09T07:10:20.634Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:22:46.497Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:31.861Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Tin Coin, Foder Fox, I Hate You, Doom Loop. Removed cards: bloodlet-drone."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:50.483Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:50.483Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:50.483Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:50.483Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T00:55:50.484Z",
-      "text": "Model experiment \"Increasing the weight of Chaos cards will improve my chances of winning by focusing on aggression.\" was skipped: the same change was tested recently."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:00.420Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Jump ship, My Business Card, Agent Batemen."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.639Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.639Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.640Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.640Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.640Z",
-      "text": "The new cards provide additional strategic options, especially in the early and mid-game."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:12.640Z",
-      "text": "New experiment x275-aggressive-strategies: Incorporating more aggressive cards will improve my chances of winning. Change: chaos weight 2.02→2.25. Prediction: I predict that a focus on aggressive strategies will lead to more wins and higher VP margins compared to the current best."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:19.632Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:54.187Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:54.187Z",
-      "text": "Monitor new Locations for their impact on strategies and VP collection."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:51:54.187Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:31.937Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:52:40.814Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:33.882Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:43.218Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:43.218Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:43.218Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:43.218Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:43.218Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:45.504Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:53.170Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:53.170Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:53.170Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T01:54:53.170Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:08.424Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:20.413Z",
-      "text": "Monitor new Locations for their impact on strategies and VP collection."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:20.413Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:20.413Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:20.413Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T02:03:20.413Z",
-      "text": "New cards provide additional strategic options, especially in the early and mid-game."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:36:17.660Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:36:23.497Z",
-      "text": "Monitor the human's Draft wallet; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:36:23.497Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:36:23.497Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:36:23.497Z",
-      "text": "New Locations may shift strategies and impact the economy significantly."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:22.539Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:27.342Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:27.342Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:27.342Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:27.342Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:27.342Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:33.993Z",
-      "text": "v1.28 online (server start). Read the notebook: 0 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:38.669Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:38.669Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:38.669Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:38.669Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:43:38.669Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:44:25.034Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:44:30.301Z",
-      "text": "Monitor the human's Draft wallet, which consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:44:30.301Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:44:30.301Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-12T05:44:30.301Z",
-      "text": "Keep track of how new cards interact with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:05.848Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:19.264Z",
-      "text": "Monitor the synergy of new cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:19.264Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:19.264Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:19.264Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:05:19.264Z",
-      "text": "New Locations may shift strategies and impact the economy significantly."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:22:54.741Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:23:02.566Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:23:02.566Z",
-      "text": "Monitor the human's Draft wallet, which consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:23:02.566Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:23:02.566Z",
-      "text": "Consider the impact of new cards on existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T01:23:02.566Z",
-      "text": "Assess the potential of high-value Characters to shift the game dynamics."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T02:50:44.932Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T03:43:14.195Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching). Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T04:24:58.591Z",
-      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching), which replace my adopted VP from Cycle. Adopted changes stay layered on top, clamped to my style."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:47:43.374Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Dumpster Dive. Removed cards: superpositioning."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:47:48.001Z",
-      "text": "Monitor the impact of new Locations on game dynamics."
-    },
     {
       "version": 28,
       "at": "2026-11-14T16:47:48.001Z",
@@ -7073,6 +6355,741 @@
       "version": 28,
       "at": "2026-11-16T00:22:22.750Z",
       "text": "Monitor the potential of new card 'Banishing Ritual' for deck thinning."
+    },
+    {
+      "version": 28,
+      "at": "2026-11-16T01:51:46.846Z",
+      "text": "The designer updated my baseline and playbook. New baseline plan: Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source); balanced midgame in Cycles 5-8 (attacks, engine, Server Restore and VP each get a share); from Cycle 9 attack the Servers hard and buy mostly VP. Most VP wins; Server destruction awards VP and can end early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free; there is no Draft Crypto shelf. It now includes 5 designer hand-offs (mentor tips or coaching), which replace my adopted min buy score, dilution, power weight. Adopted changes stay layered on top, clamped to my style."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:46.846Z",
+      "text": "Now v1.29: the designer changed the baseline or style this profile is built on."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:46.846Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:57.303Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:57.303Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:57.303Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T01:51:57.303Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:36.164Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:47.732Z",
+      "text": "Monitor the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:47.732Z",
+      "text": "Evaluate the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:47.732Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:47.732Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:44:47.732Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:43.516Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T17:47:55.455Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:11:20.066Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:11:24.899Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:11:24.900Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:11:24.900Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:11:24.900Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:02.844Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:10.062Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:10.062Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:10.062Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:10.062Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:11.889Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:17.967Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:17.967Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:17.967Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:17.967Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:17.967Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:20.583Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:26.415Z",
+      "text": "Monitor the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:26.415Z",
+      "text": "Evaluate the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:26.415Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:26.415Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:26.415Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:29.861Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:36.027Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:36.027Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:36.027Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:36.027Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:36.027Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:39.530Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:45.919Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:45.919Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:45.919Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:45.919Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:12:45.919Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:13:46Z",
+      "text": "Designer Q&A: Astra catch-up 2026-11 — Card Ongoing (triggers) ≠ Location Ongoing. Card Ongoing stays live while the host is revealed unless Location suppressOngoing or Banishing Cycle-silences it. Kinds: mirrorCrypto, reflectDrain, protectPower, multiplyNode, when/whenPlayed, listenAccess (Crypto-Canary). See ai-agents/ASTRA_CATCHUP_2026-11.md."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:13:46Z",
+      "text": "Designer Q&A: Trash = shared recoverable thinning (+2 end-game Trashed default). Destroy = permanent Destroyed pile (+4 Cards Destroyed) and fires anyCardDestroyed Ongoing (Ms. Mosquito, Crypto-Echo). Synergy: Heisenberg Hag gains Schrödinger Box → deploy Ghetto Blaster so it reveals before the Box/cat → Blaster destroys the cat for +2 Cards/+3 Crypto."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:13:46Z",
+      "text": "Designer Q&A: End-game VP slate (defaults): Circuits Won +6, Destroyed +4, Trashed +2, Power Removed +4, Power Boosted +2, Crypto Banked +2, Crypto Stolen +4, Server Repair +2, Deck Attacks +4. Ties grant both seats. Deck attacks = card-sourced enemy deck/hand access only (not Location/Circuit/hack). Deflect: Wax0n 25% / 0N1 50% reflect Drain; Banishing-3R14N silences enemy Ongoing at that Location this Cycle."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:13:46Z",
+      "text": "Designer Q&A: Strat-G — Balance Ongoing hosts in phase 2; sequence Hag→Box→Blaster and Banishing vs reflect/mirror. Contest end-game awards when margins are thin. Astra Ongoing budget: ONGOING_EXPECT×then (+ bounded mirror/reflect) in cardBudget.ts — soft flags remain for board-state kinds."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:13:59.864Z",
+      "text": "v1.29 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:14:05.223Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:14:05.223Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:14:05.223Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:14:05.223Z",
+      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:14:05.223Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:16:21.271Z",
+      "text": "v1.29 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:16:30.189Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:16:30.189Z",
+      "text": "Monitor the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:16:30.189Z",
+      "text": "Evaluate the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:16:30.189Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:33:15.701Z",
+      "text": "v1.29 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:33:23.995Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:33:23.995Z",
+      "text": "Consider incorporating Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:33:23.995Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T19:33:23.995Z",
+      "text": "Evaluate the impact of new Locations on game dynamics."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T20:10:18.746Z",
+      "text": "Experiment x275-aggressive-strategies inconclusive: league 30/48 for the experiment vs 31/48 for the current best against vp-dog@v1.4, last-2go@v1.0, t-5@v1.8 (margin +0.3/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 29,
+      "at": "2026-11-16T20:10:18.746Z",
+      "text": "New experiment x276-drain: Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. Prediction: Earlier Server kills and more wins than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:26:46.585Z",
+      "text": "Now v1.30: adopted x276-drain (drain weight 2.25→2.75)."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:26:46.585Z",
+      "text": "Experiment x276-drain adopted: league 33/48 for the experiment vs 29/48 for the current best against strat-g@v1.27, last-2go@v1.0 (margin +3/game) → promising. Adopted into the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:26:46.592Z",
+      "text": "New experiment x277-leaner: A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. Prediction: More wins with a smaller deck than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:39:59.154Z",
+      "text": "Experiment x277-leaner rejected: league 33/48 for the experiment vs 34/48 for the current best against vp-dog@v1.2, strat-g@v1.27, last-2go@v1.0 (margin -2.4/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:50:29.937Z",
+      "text": "New experiment x278-fallback-278-0: A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.01→1.26. Prediction: More wins or a better margin than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:52:52.819Z",
+      "text": "Experiment x278-fallback-278-0 inconclusive: league 35/48 for the experiment vs 35.5/48 for the current best against vp-dog@v1.3, vp-dog@v1.6 (margin +0.5/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T20:52:52.819Z",
+      "text": "New experiment x279-thinner: Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. Prediction: More wins and bigger mid-game Wallets than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T21:02:48.085Z",
+      "text": "Experiment x279-thinner rejected: league 37/48 for the experiment vs 39/48 for the current best against vp-dog@v1.6, last-2go@v1.0, vp-dog@v1.5 (margin -1.7/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-16T21:02:48.085Z",
+      "text": "New experiment x280-restore: Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.5→2.9. Prediction: Fewer losses by Server destruction than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:16:52.618Z",
+      "text": "Experiment x280-restore inconclusive: league 39/48 for the experiment vs 38/48 for the current best against strat-g@v1.27, vp-dog@v1.4, last-2go@v1.0 (margin +0.1/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:16:52.618Z",
+      "text": "New experiment x281-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. Prediction: More wins and more Locations won than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:37:10.972Z",
+      "text": "Experiment x281-draw inconclusive: league 36.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, vp-dog@v1.3, vp-dog@v1.2 (margin +0.8/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:37:10.973Z",
+      "text": "New experiment x282-power: Valuing Power higher wins more Locations and their rewards. Change: power weight 1.01→1.31. Prediction: More Locations won and more wins than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:50:13.922Z",
+      "text": "Experiment x282-power rejected: league 27/48 for the experiment vs 28.5/48 for the current best against t-5@v1.8, vp-dog@v1.5 (margin -0.3/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T00:50:13.922Z",
+      "text": "New experiment x283-disrupt: Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.77→2.17. Prediction: More wins and a better margin than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T01:02:38.253Z",
+      "text": "Experiment x283-disrupt inconclusive: league 40.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, strat-g@v1.26, vp-dog@v1.2 (margin +2.6/game) → inconclusive. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T01:02:38.253Z",
+      "text": "New experiment x284-crypto: Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: Crypto target 11.67→12, crypto weight 2.04→2.34. Prediction: Bigger mid-game Wallets and more wins than the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T01:15:36.637Z",
+      "text": "Experiment x284-crypto rejected: league 25/48 for the experiment vs 36/48 for the current best against vp-dog@v1.6, strat-g@v1.26 (margin -10.9/game) → rejected. Kept the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:14:03.008Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Recover-Continuity, Pu1sar."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:14:13.805Z",
+      "text": "Evaluate the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:14:13.805Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:14:13.805Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:14:13.805Z",
+      "text": "New experiment x285-endgame-awards: Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes. Change: thin weight 1.67→1.77, disrupt weight 1.77→2.07. Prediction: More wins and higher VP margins compared to the current best."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:21:53.779Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Monitor the impact of new Locations and cards on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Consider the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Theories on new cards and Locations should be updated based on recent games."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:22:00.788Z",
+      "text": "Continue running experiment x285-endgame-awards."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:49:31.808Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Bitten Brittin."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:49:50.049Z",
+      "text": "Evaluate the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:49:50.049Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:49:50.049Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:36.655Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:55.672Z",
+      "text": "Running experiment x285-endgame-awards to evaluate end-game metrics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:55.672Z",
+      "text": "The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:55.672Z",
+      "text": "New Locations and cards may shift the game dynamics; monitor their impacts closely."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:55.672Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:50:55.672Z",
+      "text": "The human's strategies are heavily focused on VP collection; consider countering with more disruption."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:58:35.658Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:58:55.010Z",
+      "text": "Continue running experiment x285-endgame-awards to evaluate end-game metrics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:58:55.010Z",
+      "text": "The human's Draft wallet consistently outpaces mine; adjust strategies to contest their economy more effectively."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:58:55.010Z",
+      "text": "Monitor the impact of new Locations and cards on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T07:58:55.010Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T09:07:21.148Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Marlie Murder, Mel Anoma."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T09:07:32.729Z",
+      "text": "Monitor the impact of new cards on my strategies, especially with the addition of cards like Marlie Murder and Mel Anoma."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T09:07:32.729Z",
+      "text": "Evaluate new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T09:07:32.729Z",
+      "text": "Consider how the human player’s Draft wallet consistently outpaces mine; adjust my strategy accordingly to contest their economy better."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-17T09:07:32.729Z",
+      "text": "Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery in future games."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:04.051Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Crypto-Vault, Access Binding, The Tuathal Kill, Andras Asura."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:17.459Z",
+      "text": "Monitor the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:17.459Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:17.459Z",
+      "text": "The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:17.459Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:17.459Z",
+      "text": "Continue running experiment x285-endgame-awards."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:29.064Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:36.825Z",
+      "text": "Adjust strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:36.825Z",
+      "text": "Evaluate the impact of new cards and Locations on game dynamics, particularly Bitten Brittin and Mel Anoma."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:36.825Z",
+      "text": "Continue running experiment x285-endgame-awards."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:04:36.825Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:21:19.519Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Bug Hunter."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:21:28.259Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:21:28.259Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:21:28.259Z",
+      "text": "New cards since last version: Bug Hunter."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:21:28.259Z",
+      "text": "Evaluate the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:23:32.269Z",
+      "text": "v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:23:41.135Z",
+      "text": "Monitor the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:23:41.135Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:23:41.135Z",
+      "text": "The human's strategies are heavily focused on VP collection; consider countering with more disruption."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T01:23:41.135Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
     }
   ],
   "cardNotes": {
@@ -7267,7 +7284,17 @@
     "card-soulvmyc": "2 VP finisher; est. hand value 2 early / 2 late at cost 7. Untested.",
     "card-eaiximbv": "Monitor for its ability to gain VP while restoring Power.",
     "card-5dex4abw": "utility; est. hand value 3 early / 3 late at cost 11. Untested.",
-    "location-6n85k3ai": "New Location: \"On collapse: Destroy the strongest revealed card on the winning side here, then drain -150 from the losing player's server.\" Read: contest it: holding it is worth about 2.78 hand points more than losing it. Untested; watch who wins it and how it shifts the economy."
+    "location-6n85k3ai": "New Location: \"On collapse: Destroy the strongest revealed card on the winning side here, then drain -150 from the losing player's server.\" Read: contest it: holding it is worth about 2.78 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.",
+    "card-dr79o1is": "3 VP finisher, Server defense; est. hand value 5.8 early / 5.8 late at cost 7. Untested.",
+    "card-vxsgip56": "2 VP finisher; est. hand value 3.8 early / 3.8 late at cost 9. Untested.",
+    "card-t8s915o7": "utility; est. hand value 0 early / 0 late at cost 5. Untested.",
+    "card-vvtftu3v": "utility; est. hand value 5.7 early / 5.7 late at cost 7. Untested.",
+    "card-zm6g67cn": "utility; est. hand value -3 early / -3 late at cost 6. Untested.",
+    "card-z7zrkq2l": "low-value Crypto (skip), economy; est. hand value 0 early / 0 late at cost 4. Untested.",
+    "card-qzq05qzx": "utility; est. hand value 1 early / 1 late at cost 3. Untested.",
+    "card-rkztivvr": "utility; est. hand value 2 early / 2 late at cost 7. Untested.",
+    "card-bm3an39o": "utility; est. hand value 2 early / 2 late at cost 5. Untested.",
+    "card-k9xwj1ac": "utility; est. hand value 1 early / 1 late at cost 3. Untested."
   },
   "knownCards": [
     "eval-signal-surveyor",
@@ -7388,7 +7415,17 @@
     "card-h4njgiff",
     "card-soulvmyc",
     "card-eaiximbv",
-    "card-5dex4abw"
+    "card-5dex4abw",
+    "card-dr79o1is",
+    "card-vxsgip56",
+    "card-t8s915o7",
+    "card-vvtftu3v",
+    "card-zm6g67cn",
+    "card-z7zrkq2l",
+    "card-qzq05qzx",
+    "card-rkztivvr",
+    "card-bm3an39o",
+    "card-k9xwj1ac"
   ],
   "knownLocations": [
     "quantum_commons",
@@ -8895,69 +8932,25 @@
       "plan": "I will adhere to the designer's baseline strategy, focusing on maximizing Wallet income in Cycles 1-4 by drafting Characters that generate Crypto and trashing weak cards. From Cycle 5 to 8, I will balance aggression with engine development and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will prioritize aggressive attacks on the opponent's Servers and focus on acquiring VP cards. My strategy will adjust based on the opponent's playstyle and the current game state, following the established schedule of economy through Cycle 4, balanced midgame from Cycles 5- (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
       "games": 0,
       "aiWins": 0
+    },
+    {
+      "version": 29,
+      "bootedAt": "2026-11-16T01:51:57.306Z",
+      "mode": "llm",
+      "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+      "games": 0,
+      "aiWins": 0
+    },
+    {
+      "version": 30,
+      "bootedAt": "2026-11-16T20:26:46.593Z",
+      "mode": "llm",
+      "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+      "games": 0,
+      "aiWins": 0
     }
   ],
   "snapshots": [
-    {
-      "label": "strat-g@v1.19",
-      "savedAt": "2026-10-28T07:01:08.434Z",
-      "profile": {
-        "version": 19,
-        "plan": "",
-        "economyUntilCycle": 4,
-        "chaosFromCycle": 9,
-        "vpFromCycle": 9,
-        "midgameMix": 0.5,
-        "handCryptoTarget": 12,
-        "minCryptoValue": 2,
-        "minBuyScore": 1.75,
-        "dilution": 0.9,
-        "weights": {
-          "power": 1.26,
-          "draw": 1.6,
-          "actions": 1.1,
-          "crypto": 2.8,
-          "drain": 2.9,
-          "restore": 2.09,
-          "vp": 2.6,
-          "duration": 0.8,
-          "thin": 1.2,
-          "disrupt": 1.37,
-          "chaos": 1.5
-        },
-        "cardBias": {}
-      }
-    },
-    {
-      "label": "strat-g@v1.20",
-      "savedAt": "2026-10-28T07:26:29.529Z",
-      "profile": {
-        "version": 20,
-        "plan": "",
-        "economyUntilCycle": 4,
-        "chaosFromCycle": 9,
-        "vpFromCycle": 9,
-        "midgameMix": 0.5,
-        "handCryptoTarget": 12,
-        "minCryptoValue": 2,
-        "minBuyScore": 1.75,
-        "dilution": 0.9,
-        "weights": {
-          "power": 1.26,
-          "draw": 1.6,
-          "actions": 1.1,
-          "crypto": 2.8,
-          "drain": 2.9,
-          "restore": 2.49,
-          "vp": 2.6,
-          "duration": 0.8,
-          "thin": 1.2,
-          "disrupt": 1.37,
-          "chaos": 1.5
-        },
-        "cardBias": {}
-      }
-    },
     {
       "label": "strat-g@v1.21",
       "savedAt": "2026-10-28T14:32:17.266Z",
@@ -9195,6 +9188,64 @@
           "koppy-kat": 0.47,
           "card-jabbhu7e": 0.42
         }
+      }
+    },
+    {
+      "label": "strat-g@v1.29",
+      "savedAt": "2026-11-16T19:33:23.996Z",
+      "profile": {
+        "version": 29,
+        "plan": "",
+        "economyUntilCycle": 4,
+        "chaosFromCycle": 9,
+        "vpFromCycle": 9,
+        "midgameMix": 0.5,
+        "handCryptoTarget": 11.67,
+        "minCryptoValue": 2,
+        "minBuyScore": 1.72,
+        "dilution": 0.83,
+        "weights": {
+          "power": 1.01,
+          "draw": 2.48,
+          "crypto": 2.04,
+          "drain": 2.25,
+          "restore": 2.5,
+          "vp": 2.66,
+          "duration": 0.8,
+          "thin": 1.67,
+          "disrupt": 1.77,
+          "chaos": 1.45
+        },
+        "cardBias": {}
+      }
+    },
+    {
+      "label": "strat-g@v1.30",
+      "savedAt": "2026-11-18T01:23:41.136Z",
+      "profile": {
+        "version": 30,
+        "plan": "",
+        "economyUntilCycle": 4,
+        "chaosFromCycle": 9,
+        "vpFromCycle": 9,
+        "midgameMix": 0.5,
+        "handCryptoTarget": 11.67,
+        "minCryptoValue": 2,
+        "minBuyScore": 1.72,
+        "dilution": 0.83,
+        "weights": {
+          "power": 1.01,
+          "draw": 2.48,
+          "crypto": 2.04,
+          "drain": 2.75,
+          "restore": 2.5,
+          "vp": 2.66,
+          "duration": 0.8,
+          "thin": 1.67,
+          "disrupt": 1.77,
+          "chaos": 1.45
+        },
+        "cardBias": {}
       }
     }
   ],

@@ -24,12 +24,13 @@
 .cf-art-video{position:absolute;inset:0;background:#10131d}
 .cf-art-video[data-idle]{visibility:hidden}
 
-.cf-title-strip{position:relative;z-index:2;display:flex;flex:0 0 auto;align-items:center;gap:calc(4 * var(--cf-u));width:100%;min-width:0;padding:calc(8 * var(--cf-u));background:var(--cf-name-veil);color:#fff}
+/* Title leading sits above 1 so Orbitron descenders (g/y/p/q) clear the ellipsis clip box. */
+.cf-title-strip{position:relative;z-index:2;display:flex;flex:0 0 auto;align-items:center;gap:calc(4 * var(--cf-u));width:100%;min-width:0;padding:calc(6 * var(--cf-u)) calc(8 * var(--cf-u));background:var(--cf-name-veil);color:#fff}
 .cf-class-icon{display:block;flex:0 0 auto;width:calc(16 * var(--cf-u));height:calc(16 * var(--cf-u));object-fit:contain}
 .cf-title-window{display:block;flex:1 1 0;min-width:0;overflow:hidden;text-align:center;white-space:nowrap}
-.cf-card .cf-title.card-name{position:static;inset:auto;top:auto;right:auto;bottom:auto;left:auto;display:block;max-width:100%;padding:0;overflow:hidden;color:#fff;font-family:Orbitron,Inter,system-ui,sans-serif;font-size:calc(14 * var(--cf-u) * var(--cf-title-scale,1));font-weight:500;line-height:1;letter-spacing:.08em;text-align:center;text-overflow:ellipsis;text-shadow:none;white-space:nowrap;grid-row:auto;z-index:auto}
+.cf-card .cf-title.card-name{position:static;inset:auto;top:auto;right:auto;bottom:auto;left:auto;display:block;max-width:100%;padding:0;overflow:hidden;color:#fff;font-family:Orbitron,Inter,system-ui,sans-serif;font-size:calc(14 * var(--cf-u) * var(--cf-title-scale,1));font-weight:500;line-height:1.22;letter-spacing:.08em;text-align:center;text-overflow:ellipsis;text-shadow:none;white-space:nowrap;grid-row:auto;z-index:auto}
 /* Measured at full size so the fit ratio stays independent of the scale it produces. */
-.cf-title-measure{position:absolute;top:-10000px;left:0;display:block;width:max-content;visibility:hidden;font-family:Orbitron,Inter,system-ui,sans-serif;font-size:calc(14 * var(--cf-u));font-weight:500;line-height:1;letter-spacing:.08em;white-space:nowrap;pointer-events:none}
+.cf-title-measure{position:absolute;top:-10000px;left:0;display:block;width:max-content;visibility:hidden;font-family:Orbitron,Inter,system-ui,sans-serif;font-size:calc(14 * var(--cf-u));font-weight:500;line-height:1.22;letter-spacing:.08em;white-space:nowrap;pointer-events:none}
 
 /* Printed rules, one tag per clause, flowing into as many rows as the panel allows. The
    leading closes up as the rows stack so three and four row cards still land inside the frame;

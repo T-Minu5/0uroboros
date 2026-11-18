@@ -21,6 +21,7 @@ type CardHooks = {
   onReveal?: EffectStep[]; onCollapse?: EffectStep[]; recurring?: EffectStep[];
   schedule?: { at: number; timing?: 'start' | 'end'; effects: EffectStep[] }[];
   triggers?: Card['triggers'];
+  ifs?: Card['ifs'];
 };
 export type AuthoredCard = Omit<Card, keyof CardHooks> & CardHooks & {
   pool: CardPool;
@@ -271,7 +272,7 @@ export function validateContent(value: unknown): string[] {
   cards.forEach((item, index) => {
     const p = `cards[${index}]`;
     if (!record(item)) { errors.push(`${p}: expected a card object`); return; }
-    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'foreignBank', 'schedule', 'recurring', 'triggers', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'storyText', 'pool', 'enabled', 'cardClass', 'generated', 'modifiers', 'powerSource', 'aura', 'selfMove'], p, errors);
+    extraFields(item, ['definitionId', 'vp', 'cryptoValue', 'duration', 'durationPeriod', 'foreignBank', 'schedule', 'recurring', 'triggers', 'ifs', 'onReveal', 'onCollapse', 'id', 'name', 'type', 'power', 'cost', 'art', 'effect', 'storyText', 'pool', 'enabled', 'cardClass', 'generated', 'modifiers', 'powerSource', 'aura', 'selfMove'], p, errors);
     requiredId(item.id, `${p}.id`, errors);
     if (item.definitionId !== undefined) requiredId(item.definitionId, `${p}.definitionId`, errors);
     requiredText(item.name, `${p}.name`, errors, 200);
@@ -313,6 +314,15 @@ export function validateContent(value: unknown): string[] {
           const then = (trigger as { then?: unknown }).then;
           if (then !== undefined) steps(then, `${tp}.then`, 'card');
         }
+      });
+    }
+    if (item.ifs !== undefined) {
+      if (!Array.isArray(item.ifs) || item.ifs.length > 20) errors.push(`${p}.ifs: expected up to 20 If rules`);
+      else item.ifs.forEach((rule: unknown, at: number) => {
+        const ip = `${p}.ifs[${at}]`;
+        if (!rule || typeof rule !== 'object' || !('kind' in rule)) { errors.push(`${ip}: expected If rule`); return; }
+        const then = (rule as { then?: unknown }).then;
+        if (then !== undefined) steps(then, `${ip}.then`, 'card');
       });
     }
     if (item.schedule !== undefined) {

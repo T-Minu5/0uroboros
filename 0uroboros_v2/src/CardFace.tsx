@@ -10,7 +10,7 @@ import './card-face.css';
  * `playing: false` keeps the clip loaded but hidden on its first frame, so a later start has no load delay.
  */
 export type CardArtVideo = { src: string; loop?: boolean; sound?: boolean; playing?: boolean; rate?: number; onEnd?: () => void };
-export type CardFaceProps = { card: CardWithPresentation; context?: 'runtime' | 'draft' | 'preview'; compact?: boolean; remainingDuration?: number; /** In the Effect Bank: effect steps left to resolve (null = unending); replaces Power. */ bankEffects?: number | null; powerChanging?: boolean; className?: string; movableCue?: boolean; video?: CardArtVideo };
+export type CardFaceProps = { card: CardWithPresentation; context?: 'runtime' | 'draft' | 'preview'; compact?: boolean; remainingDuration?: number; /** In the Effect Bank: effect steps left to resolve (null = unending); replaces Power. */ bankEffects?: number | null; powerChanging?: boolean; className?: string; movableCue?: boolean; /** Stolen / foreign copy — pink mono like enemy Effect Bank. */ foreign?: boolean; video?: CardArtVideo };
 
 function ArtVideo({src,loop=false,sound=false,playing=true,rate=1,onEnd}:CardArtVideo){
   const ref=useRef<HTMLVideoElement>(null);
@@ -111,7 +111,7 @@ export function effectKeywords(effect:string|undefined):string[]{
 
 const DURATION_ICONS={infinite:'/assets/Icons/icon-infinite.svg',runtime:'/assets/Icons/icon-turns.svg',cycle:'/assets/Icons/icon-duration.svg'};
 
-export function CardFace({card,context='runtime',compact=false,remainingDuration,bankEffects,powerChanging=false,className='',movableCue=false,video}:CardFaceProps){
+export function CardFace({card,context='runtime',compact=false,remainingDuration,bankEffects,powerChanging=false,className='',movableCue=false,foreign=false,video}:CardFaceProps){
   const {style,icon}=cardPresentation(card),{windowRef,measureRef,fit}=useTitleFit(card.name,compact);
   const art=cardArtworkPath(card);
   const duration=card.duration===undefined?undefined:remainingDuration??card.duration,printed=card.basePower;
@@ -121,12 +121,13 @@ export function CardFace({card,context='runtime',compact=false,remainingDuration
   const keywords=compact?[]:effectKeywords(card.effect);
   const {panelRef,tier}=useKeywordFit(keywords.join('|'));
   const modifiers=card.modifiers??[];
+  const stolen=foreign||card.stolenFrom!==undefined;
   const badges=modifiers.map(modifier=>{
     if(modifier.kind==='authored')return {key:modifier.id,label:modifier.badge??'[MOD]',title:modifier.name??'Card mod'};
     const details=builtinMod(modifier.kind,modifier.kind==='powerAuraAtLocation'?modifier.amount??1:undefined);
     return {key:modifier.id,label:details.badge,title:details.name};
   });
-  return <div className={`cf-card${compact?' cf-card--compact':''}${movableCue?' cf-card--movable':''}${className?` ${className}`:''}`} data-card-style={style} data-card-context={context} data-movable={movableCue||undefined} title={card.name}>
+  return <div className={`cf-card${compact?' cf-card--compact':''}${movableCue?' cf-card--movable':''}${stolen?' cf-card--foreign':''}${className?` ${className}`:''}`} data-card-style={style} data-card-context={context} data-movable={movableCue||undefined} data-foreign={stolen||undefined} title={card.name}>
     <div className="cf-body">
       <div className="cf-image-wrap" data-depth-art-src={art} data-depth-intensity={compact?.7:1}>
         <img className="cf-art" src={servedArtPath(art)} alt="" onError={event=>{const current=event.currentTarget.getAttribute('src');event.currentTarget.src=current!==art&&current!==CARD_ART_PLACEHOLDER?art:CARD_ART_PLACEHOLDER}}/>

@@ -71,6 +71,17 @@ export const RoomSettingsSchema = z.object({
   mostCircuitsBonusVP: z.number().int().min(0).max(50).default(6),
   /** Collapse VP for controlling a Node; ties award nothing. 0 disables. Default 1. */
   nodeWinVP: z.number().int().min(0).max(50).default(1),
+  /**
+   * End-game achievement VP slate from Configure. Partial maps merge onto engine defaults;
+   * omitted keys keep their default enabled/vp. Absent entirely → server uses full defaults.
+   */
+  endGameAwards: z.record(
+    z.string(),
+    z.object({
+      enabled: z.boolean().optional(),
+      vp: z.number().int().min(0).max(50).optional(),
+    }),
+  ).optional(),
 });
 export type RoomSettings = z.infer<typeof RoomSettingsSchema>;
 

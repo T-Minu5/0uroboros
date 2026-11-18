@@ -58,8 +58,18 @@ export function CardEffectMotion({event,duration}:{event:RuntimeEvent;duration:n
   const cardId=event.targetCardId??event.cardId;
   if(!cardId)return;
   const source=document.querySelector<HTMLElement>(`.field-card[data-card-id="${CSS.escape(cardId)}"]`);
+  if(!source)return;
+  // Directed move blocked: brief nudge + Can't move badge (stay put).
+  if(event.amount===0){
+    const from=event.sourceNode??event.node;
+    const dir=from!==undefined&&event.targetNode>from?1:-1;
+    source.style.setProperty('--cant-move-dir',String(dir));
+    source.classList.add('cant-move-card');
+    const timer=window.setTimeout(()=>{source.classList.remove('cant-move-card');source.style.removeProperty('--cant-move-dir');},1000);
+    return()=>{clearTimeout(timer);source.classList.remove('cant-move-card');source.style.removeProperty('--cant-move-dir');};
+  }
   const lane=document.querySelector<HTMLElement>(`[data-lane-node="${event.targetNode}"][data-lane-owner="${event.targetOwner??event.owner??0}"]`);
-  if(!source||!lane)return;
+  if(!lane)return;
   const start=source.getBoundingClientRect(),end=lane.getBoundingClientRect();
   const index=lane.querySelectorAll('.field-card').length;
   const style=getComputedStyle(lane),scale=end.width/lane.offsetWidth;

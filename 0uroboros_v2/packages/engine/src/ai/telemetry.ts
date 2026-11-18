@@ -45,6 +45,11 @@ export type GameTelemetry = {
   cardsDestroyed: Pair;
   /** Wallet Crypto this seat stole or bumped, plus Effect Bank cards bumped (1 each). */
   cryptoStolenBumped: Pair;
+  /**
+   * Card-sourced accesses of the enemy deck or hand (peek/scry/mill/steal/poison/forced discard).
+   * One count per announce; location/circuit/runtimeHack sources are excluded.
+   */
+  enemyAccesses: Pair;
   destructions: Destruction[];
   cards: Record<string, CardTelemetry>;
   locations: Record<string, SourceTelemetry>;
@@ -66,7 +71,7 @@ export function emptyTelemetry(): GameTelemetry {
     wastedRestores: pair(), restoreEvents: pair(), drainEvents: pair(),
     drawn: pair(), actionsGained: pair(), cryptoGained: pair(), vpGained: pair(),
     powerIncreased: pair(), cardPowerDrained: pair(), cardPowerRestored: pair(),
-    cardsTrashed: pair(), cardsDestroyed: pair(), cryptoStolenBumped: pair(),
+    cardsTrashed: pair(), cardsDestroyed: pair(), cryptoStolenBumped: pair(), enemyAccesses: pair(),
     destructions: [], cards: {}, locations: {}, circuit: {}, perCycle: [],
     failedOutcomes: pair(), randomResults: 0, choices: pair(),
   };

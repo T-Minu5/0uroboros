@@ -8,29 +8,29 @@ Style: Balanced in three phases: economy and engine (Cycles 1-4), a balanced mid
 
 Style envelope (every profile is clamped into it): economyUntilCycle 4-4, chaosFromCycle 9-9, vpFromCycle 9-9, handCryptoTarget 7-12, vp weight 1.6-3, drain weight 1.4-3.
 
-## Current agent: v1.28 (model-assisted)
+## Current agent: v1.30 (model-assisted)
 
 Record against the human (complete games only): 3 wins, 11 losses, 0 ties over 14 games. Ignored 28 sessions that were not complete games.
 
-League snapshots (newest first): strat-g@v1.28, strat-g@v1.27, strat-g@v1.26, strat-g@v1.25, strat-g@v1.24
+League snapshots (newest first): strat-g@v1.30, strat-g@v1.29, strat-g@v1.28, strat-g@v1.27, strat-g@v1.26
 
 ### Plan of play
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encryption and Shyte-Coins as better options emerge. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will emphasize aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. (Schedule: economy through Cycle 4, bal (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
-Economy through Cycle 4 · midgame mix 0.5 · Chaos from Cycle 9 · VP from Cycle 9 · Crypto target 11.8/hand · min Crypto value 2 · min buy score 1.75 · dilution 0.9
+Economy through Cycle 4 · midgame mix 0.5 · Chaos from Cycle 9 · VP from Cycle 9 · Crypto target 11.7/hand · min Crypto value 2 · min buy score 1.72 · dilution 0.83
 
-Weights: power 1, draw 2.32, crypto 2.91, drain 3, restore 2.5, vp 2.69, duration 0.8, thin 1.27, disrupt 1.77, chaos 2.16
+Weights: power 1.01, draw 2.48, crypto 2.04, drain 2.75, restore 2.5, vp 2.66, duration 0.8, thin 1.67, disrupt 1.77, chaos 1.45
 
-Card biases: Code Sniper +0.47, Cowl Obscyra +0.47, ∆-Wave +0.47, Koppy-Kat +0.47, Delete.Detritus.exe +0.42
+Card biases: none.
 
 ## Baseline strategy (protected)
 
-The designer's playbook, in force since 2026-11-14. Learning never edits it; changes are layered on top only when an experiment earns them.
+The designer's playbook, in force since 2026-11-16. Learning never edits it; changes are layered on top only when an experiment earns them.
 
 - Cycles 1-4 (all AI players, before your own objective): raise Wallet income and trash the weak starters. The current Standard starting deck is weaker than older builds: 6× Shyte-Coin (1 Crypto each), 1× Basic Encryption, 1× Night Scythe, 1× Doom Loop, 1× Rezz Razor. It still prints 6 Crypto from Shyte alone, but with no Byte-Coin and fewer strong Characters, so early hands are softer — and that softness is the flexibility: many more cards in the pack now print Crypto, so you shape the economy by Draft picks, not by a fixed starter engine.
 - Cycles 1-4 Draft: prefer cards that raise future Wallet — Characters that gain Crypto, Crypto cards from the Hacker/Crypto slots (Kilo then Mega when offered; Byte as a cheaper fallback), plus draw/Action/trash that set up your plan. Skip Shyte-Coin; skip Chaos Attack/Horror and market VP unless nothing else is worth buying.
@@ -41,69 +41,54 @@ The designer's playbook, in force since 2026-11-14. Learning never edits it; cha
 - Draft after Cycle 4: score every card from its actual effects (no fixed table) and by how much it improves the weak starting deck; buy the best set the whole Wallet affords; skip cards that would only dilute the deck.
 - Deploy: draw and engine cards first so they fuel later turns; then sequence other reveals so later cards benefit from earlier effects. Contest Nodes whose Location pays the winner; concede Locations that pay the loser or clog my deck when Circuit count allows.
 - Choices after Cycle 4: trash, discard and Scry are picked deliberately: trash my own junk (Shyte-Coin, Glitch), pollute the opponent when the effect puts junk in their deck, and hit their best cards.
-- Human tempo (vs VP-Dog): soft coaching 35% toward your Draft tempo across 8 games — Soft coaching from human Draft tempo vs VP-Dog (8 games, 35% share): economy through Cycle 4, Chaos from 9, VP from 10. Not an experiment.
-- Human tempo band: Cycles 1–4: 63 buys (Crypto 10%, Base 41%, Chaos 48%, VP 2%; spend 295)
-- Human tempo band: Cycles 5–8: 75 buys (Crypto 5%, Base 28%, Chaos 53%, VP 13%; spend 472)
-- Human tempo band: Cycles 9–12: 38 buys (Base 24%, Chaos 58%, VP 18%; spend 225)
-- Human tempo band: Cycles 13–16: 13 buys (Crypto 8%, Base 15%, Chaos 31%, VP 46%; spend 93)
+- Tip from VP-Dog (#1): Focus on acquiring high-value Crypto (Kilo-Coin, Mega-Cache) early to build a strong economy. Aim for a hand Crypto target of 15 by Cycle 5.
+- Tip from DV-8 (#1): Focus on thinning your deck to access key cards faster. Maintain a draw weight of 2.4 to improve your engine's efficiency.
+- Tip from VP-Dog (#2): Prioritize drawing cards and thinning your deck to cycle to high-value cards faster. Increase draw weight to 2.3 for better mid-game efficiency.
+- Tip from DV-8 (#2): Prioritize VP cards earlier in the game to secure points before the race heats up. Shift your VP from Cycle 13 to Cycle 11. (limited by my style: no change to my profile)
+- Coaching from the designer: play 25% closer to my competitors (average of T-5 v1.3, DV-8 v1.1, VP-Dog v1.1): Crypto target 11→11.67, min buy score 2→1.72, dilution 0.9→0.83, power weight 1→1.01, draw weight 2.6→2.48, actions weight 1.5→1.49, crypto weight 2.1→2.04, drain weight 2.4→2.25, vp weight 2.6→2.66, thin weight 1.68→1.67, chaos weight 1.5→1.45. My three phases stay as they are.
 
-Baseline profile: Economy through Cycle 4 · midgame mix 0.5 · Chaos from Cycle 9 · VP from Cycle 9 · Crypto target 11.8/hand · min Crypto value 2 · min buy score 0.75 · dilution 0.5
+Baseline profile: Economy through Cycle 4 · midgame mix 0.5 · Chaos from Cycle 9 · VP from Cycle 9 · Crypto target 11.7/hand · min Crypto value 2 · min buy score 1.72 · dilution 0.83
 
-Baseline weights: power 1, draw 2.32, crypto 2.91, drain 3, restore 1, vp 2.69, duration 0.8, thin 1.27, disrupt 0.8, chaos 2.16
+Baseline weights: power 1.01, draw 2.48, crypto 2.04, drain 2.25, restore 1, vp 2.66, duration 0.8, thin 1.67, disrupt 0.8, chaos 1.45
 
 ## Human tempo (vs VP-Dog)
 
-Soft coaching from human Draft tempo vs VP-Dog (8 games, 35% share): economy through Cycle 4, Chaos from 9, VP from 10. Not an experiment.
-
-Soft coaching: applied at 2026-11-14 04:24 (35% share). This is not an experiment and does not adopt into the versioned current best.
-
-- Cycles 1–4: 63 buys (Crypto 10%, Base 41%, Chaos 48%, VP 2%; spend 295)
-- Cycles 5–8: 75 buys (Crypto 5%, Base 28%, Chaos 53%, VP 13%; spend 472)
-- Cycles 9–12: 38 buys (Base 24%, Chaos 58%, VP 18%; spend 225)
-- Cycles 13–16: 13 buys (Crypto 8%, Base 15%, Chaos 31%, VP 46%; spend 93)
-
-Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, card-jabbhu7e×8, node-feratu×7, card-q6u1qrf2×6, chrome-mitchell×6
-
-- Human tempo (vs VP-Dog): soft coaching 35% toward your Draft tempo across 8 games — Soft coaching from human Draft tempo vs VP-Dog (8 games, 35% share): economy through Cycle 4, Chaos from 9, VP from 10. Not an experiment.
-- Human tempo band: Cycles 1–4: 63 buys (Crypto 10%, Base 41%, Chaos 48%, VP 2%; spend 295)
-- Human tempo band: Cycles 5–8: 75 buys (Crypto 5%, Base 28%, Chaos 53%, VP 13%; spend 472)
-- Human tempo band: Cycles 9–12: 38 buys (Base 24%, Chaos 58%, VP 18%; spend 225)
-- Human tempo band: Cycles 13–16: 13 buys (Crypto 8%, Base 15%, Chaos 31%, VP 46%; spend 93)
+Watching complete local games where you play seat 0 against VP-Dog. Draft buys are tallied in Cycles 1–4 / 5–8 / 9–12 / 13–16. After 3 games, Strat-G soft-applies a 35% coaching nudge toward that tempo (not an experiment).
 
 ## Adopted changes
 
-- **x223-drain** (v1.23): drain weight 2.9→3. league 26/48 for the experiment vs 21/48 for the current best against vp-dog@v1.5, vp-dog@v1.6 (margin +2.3/game) → promising. Adopted into the current best.
 - **x235-draw** (v1.24): draw weight 1.6→2. league 32.5/48 for the experiment vs 27.5/48 for the current best against dv-8@v1.12, vp-dog@v1.6, t-5@v1.14 (margin +2.4/game) → promising. Adopted into the current best.
 - **x240-incorporating-new-cards-will** (v1.25): power weight 1.26→1, draw weight 2→2.25, crypto weight 3.3→3.5, restore weight 2.49→2.5. league 28.5/48 for the experiment vs 21/48 for the current best against t-5@v1.15, strat-g@v1.20, vp-dog@v1.6 (margin +4.3/game) → promising. Adopted into the current best.
 - **x252-incorporating-more-early-agg** (v1.26): chaos weight 1.5→1.95. league 30.5/48 for the experiment vs 24.5/48 for the current best against vp-dog@v1.3, last-2go@v1.1, last-2go@v1.2 (margin +3.8/game) → promising. Adopted into the current best.
 - **x261-fallback-261-2** (v1.27): crypto weight 3.5→3.75. league 28.5/48 for the experiment vs 23.5/48 for the current best against last-2go@v1.3, vp-dog@v1.7 (margin +8.9/game) → promising. Adopted into the current best.
 - **x271-disrupt** (v1.28): disrupt weight 1.37→1.77. league 28/48 for the experiment vs 24/48 for the current best against vp-dog@v1.7, strat-g@v1.24, t-5@v1.16 (margin +3.8/game) → promising. Adopted into the current best.
+- **x276-drain** (v1.30): drain weight 2.25→2.75. league 33/48 for the experiment vs 29/48 for the current best against strat-g@v1.27, last-2go@v1.0 (margin +3/game) → promising. Adopted into the current best.
 
 ## Current experiment
 
-- **x275-aggressive-strategies** (lab, proposed by v1.28, model): Incorporating more aggressive cards will improve my chances of winning.
-- Change: chaos weight 2.02→2.25
-- Prediction: I predict that a focus on aggressive strategies will lead to more wins and higher VP margins compared to the current best.
-- Theory: aggressive-strategies (success supports it)
+- **x285-endgame-awards** (lab, proposed by v1.30, model): Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes.
+- Change: thin weight 1.67→1.77, disrupt weight 1.77→2.07
+- Prediction: More wins and higher VP margins compared to the current best.
+- Theory: endgame-awards (success supports it)
 - League trial: pending
 
 ## Experiment log
 
+- **x284-crypto** rejected (v1.30): Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: Crypto target 11.67→12, crypto weight 2.04→2.34. league 25/48 for the experiment vs 36/48 for the current best against vp-dog@v1.6, strat-g@v1.26 (margin -10.9/game) → rejected. Kept the current best.
+- **x283-disrupt** inconclusive (v1.30): Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.77→2.17. league 40.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, strat-g@v1.26, vp-dog@v1.2 (margin +2.6/game) → inconclusive. Kept the current best.
+- **x282-power** rejected (v1.30): Valuing Power higher wins more Locations and their rewards. Change: power weight 1.01→1.31. league 27/48 for the experiment vs 28.5/48 for the current best against t-5@v1.8, vp-dog@v1.5 (margin -0.3/game) → rejected. Kept the current best.
+- **x281-draw** inconclusive (v1.30): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.48→2.88. league 36.5/48 for the experiment vs 39.5/48 for the current best against vp-dog@v1.6, vp-dog@v1.3, vp-dog@v1.2 (margin +0.8/game) → inconclusive. Kept the current best.
+- **x280-restore** inconclusive (v1.30): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.5→2.9. league 39/48 for the experiment vs 38/48 for the current best against strat-g@v1.27, vp-dog@v1.4, last-2go@v1.0 (margin +0.1/game) → inconclusive. Kept the current best.
+- **x279-thinner** rejected (v1.30): Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.67→2.07. league 37/48 for the experiment vs 39/48 for the current best against vp-dog@v1.6, last-2go@v1.0, vp-dog@v1.5 (margin -1.7/game) → rejected. Kept the current best.
+- **x278-fallback-278-0** inconclusive (v1.30): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1.01→1.26. league 35/48 for the experiment vs 35.5/48 for the current best against vp-dog@v1.3, vp-dog@v1.6 (margin +0.5/game) → inconclusive. Kept the current best.
+- **x277-leaner** rejected (v1.30): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.72→2.22, dilution 0.83→1.03. league 33/48 for the experiment vs 34/48 for the current best against vp-dog@v1.2, strat-g@v1.27, last-2go@v1.0 (margin -2.4/game) → rejected. Kept the current best.
+- **x276-drain** adopted (v1.30): Valuing Drain higher ends games by Server destruction before the opponent's engine pays off. Change: drain weight 2.25→2.75. league 33/48 for the experiment vs 29/48 for the current best against strat-g@v1.27, last-2go@v1.0 (margin +3/game) → promising. Adopted into the current best.
+- **x275-aggressive-strategies** inconclusive (v1.29): Incorporating more aggressive cards will improve my chances of winning. Change: chaos weight 2.02→2.25. league 30/48 for the experiment vs 31/48 for the current best against vp-dog@v1.4, last-2go@v1.0, t-5@v1.8 (margin +0.3/game) → inconclusive. Kept the current best.
 - **x274-fallback-274-0** inconclusive (v1.28): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: power weight 1→1.25. league 24/48 for the experiment vs 25/48 for the current best against vp-dog@v1.8, strat-g@v1.27 (margin +0.8/game) → inconclusive. Kept the current best.
 - **x273-crypto** inconclusive (v1.28): Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: Crypto target 11.78→12, crypto weight 2.88→3.18. league 23/48 for the experiment vs 22/48 for the current best against t-5@v1.13, vp-dog@v1.5, vp-dog@v1.7 (margin -1.2/game) → inconclusive. Kept the current best.
 - **x272-aggressive-strategies** inconclusive (v1.28): By increasing the weight of Chaos cards slightly, I will improve my chances of winning by focusing on aggression. Change: chaos weight 2.02→2.1. league 26/48 for the experiment vs 25/48 for the current best against strat-g@v1.26, strat-g@v1.25 (margin +1.2/game) → inconclusive. Kept the current best.
 - **x271-disrupt** adopted (v1.28): Valuing disruption higher slows the opponent's plan more than it costs mine. Change: disrupt weight 1.37→1.77. league 28/48 for the experiment vs 24/48 for the current best against vp-dog@v1.7, strat-g@v1.24, t-5@v1.16 (margin +3.8/game) → promising. Adopted into the current best.
 - **x270-draw** inconclusive (v1.27): Valuing draw higher cycles back to the best cards faster than extra Crypto does. Change: draw weight 2.36→2.76. league 32/48 for the experiment vs 31/48 for the current best against t-5@v1.16, last-2go@v1.6 (margin +2/game) → inconclusive. Kept the current best.
-- **x269-power** inconclusive (v1.27): Valuing Power higher wins more Locations and their rewards. Change: power weight 1→1.3. league 29/48 for the experiment vs 28/48 for the current best against t-5@v1.16, last-2go@v1.5 (margin -1/game) → inconclusive. Kept the current best.
-- **x268-thinner** inconclusive (v1.27): Valuing deck thinning higher draws the best cards more often. Change: thin weight 1.27→1.65. league 32/48 for the experiment vs 30/48 for the current best against last-2go@v1.6, last-2go@v1.3, t-5@v1.15 (margin +2/game) → inconclusive. Kept the current best.
-- **x267-restore** inconclusive (v1.27): Valuing Restore higher keeps my Servers alive long enough to win on VP. Change: restore weight 2.5→2.9. league 29/48 for the experiment vs 30/48 for the current best against last-2go@v1.3, strat-g@v1.26, vp-dog@v1.5 (margin +0.9/game) → inconclusive. Kept the current best.
-- **x266-certain-locations-will-creat** rejected (v1.27): Certain Locations will create opportunities for aggressive VP collection or server defense. Change: draw weight 2.25→2.5, crypto weight 3.75→3.5, restore weight 2.5→2, vp weight 2.6→3, disrupt weight 1.37→1, chaos weight 1.95→2. league 18/48 for the experiment vs 20/48 for the current best against vp-dog@v1.3, t-5@v1.15 (margin -3.3/game) → rejected. Kept the current best.
-- **x265-early-agg-adoption** rejected (v1.27): Increasing the focus on early aggression will yield more wins and greater VP margins. Change: chaos weight 1.95→2.5. league 23.5/48 for the experiment vs 24.5/48 for the current best against strat-g@v1.24, last-2go@v1.5, vp-dog@v1.4 (margin -1.3/game) → rejected. Kept the current best.
-- **x264-fallback-264-2** rejected (v1.27): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 3.75→4. league 21.5/48 for the experiment vs 24/48 for the current best against t-5@v1.16, last-2go@v1.5 (margin -4.6/game) → rejected. Kept the current best.
-- **x263-leaner** inconclusive (v1.27): A stricter purchase bar (fewer, better cards) keeps the deck sharp. Change: min buy score 1.75→2.25, dilution 0.9→1.1. league 23/48 for the experiment vs 23/48 for the current best against vp-dog@v1.7, last-2go@v1.1 (margin -3.5/game) → inconclusive. Kept the current best.
-- **x262-crypto** rejected (v1.27): Valuing Crypto income more — Character Crypto lines and shelf Coins when present — and aiming for a richer hand out-buys the opponent mid-game. Change: crypto weight 3.75→4.05. league 21/48 for the experiment vs 22/48 for the current best against vp-dog@v1.7, last-2go@v1.5 (margin -1.8/game) → rejected. Kept the current best.
-- **x261-fallback-261-2** adopted (v1.27): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: crypto weight 3.5→3.75. league 28.5/48 for the experiment vs 23.5/48 for the current best against last-2go@v1.3, vp-dog@v1.7 (margin +8.9/game) → promising. Adopted into the current best.
-- **x260-fallback-260-1** inconclusive (v1.26): A small envelope-clamped nudge while the experiment menu has nothing left to try. Change: draw weight 2.25→2.5. league 26/48 for the experiment vs 25/48 for the current best against last-2go@v1.2, vp-dog@v1.7, t-5@v1.16 (margin +2.4/game) → inconclusive. Kept the current best.
 
 ## Theories
 
@@ -111,24 +96,17 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 - none yet
 
 ### Under test
-- **card-synergy** (untested · v1.28): Incorporating new cards will enhance my deck's synergy and overall performance.
 - **nothing-ever-happens-here-impact** (untested · v1.28): The Nothing Ever Happens Here location may incentivize aggressive VP collection strategies, impacting game dynamics.
+- **endgame-awards** (untested · v1.29 · scored every game): Configure end-game awards (Destroyed/Trashed/Stolen/Deck Attacks/Circuits/…) decide close games, so play that banks those metrics is worth weight even when Server kill VP looks decided.
+  - obs: Winner vs loser share of end-game award VP and which award rows they led. · hyp: Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes. · test: Experiment: mild disrupt/drain/thin bumps; measure award VP share and wins vs current best.
+- **ongoing-hosts** (untested · v1.29 · scored every game): Revealed card Ongoing hosts (reflect, mirror, destroy-when, listenAccess) change node priority; silencing or sequencing around them beats ignoring them.
+  - obs: Games where Banishing/reflect/Canary/Mosquito were bought and whether the buyer won. · hyp: Card bias toward key Ongoing definitions (or against enemy reflect) improves results. · test: Experiment: +1 cardBias on Banishing / Mosquito / Canary; measure wins and Drain efficiency.
 
 ### Refuted
 - none yet
 
 ## Card and Location notes
 
-- **loc-silent-field**: New Location: "Ongoing: Ongoing effects here do not resolve. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
-- **Echo Chamber**: New Location: "Ongoing: Ongoing effects here are doubled. Ongoing: +1 Card to the winning player." Read: contest it: holding it is worth about 6.4 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
-- **loc-solo-peak**: New Location: "Condition: Once you have only one card here, +3 Crypto." Read: about even for both sides; it matters through which cards sit there; each card you reveal here gains you about 4.45. Untested; watch who wins it and how it shifts the economy.
-- **Altar of Death**: New Location: "When: a card is destroyed here, +2 Crypto." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Utility Station**: New Location: "On collapse: Gain a Utility card costing 3 or less into your hand." Read: contest it: holding it is worth about 3.84 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
-- **loc-deck-raid**: New Location: "On reveal: Steal 1 card from the top of the other player's deck into your hand." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **loc-swap-floor**: New Location: "Start of turn 2: Swap the top 1 card of both decks." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **loc-placement-pad**: New Location: "On collapse: You may place a card from your hand onto this Node." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **loc-copy-archive**: New Location: "On reveal: Copy the On Reveal of your previously revealed card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
-- **Lucky Loser**: New Location: "On collapse: Push 1 Power to a nearby location." Read: contest it: holding it is worth about 1.52 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
 - **Lone Outpost**: New Location: "While: only one card is here, +1 Card." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **location-vwtph6e4**: New Location: "While: only one card is here, +5 Power." Read: about even for both sides; it matters through which cards sit there. Untested; watch who wins it and how it shifts the economy.
 - **data_exchange**: New Location: "Ongoing: +2 Cards." Read: winning it hands the other player about 12.8 hand points, so commit only what the Circuit count needs or concede it. Untested; watch who wins it and how it shifts the economy.
@@ -159,6 +137,16 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 - **Trixy**: Monitor for its ability to gain VP while restoring Power.
 - **0N1.exe**: utility; est. hand value 3 early / 3 late at cost 11. Untested.
 - **A Mayan Victory**: New Location: "On collapse: Destroy the strongest revealed card on the winning side here, then drain -150 from the losing player's server." Read: contest it: holding it is worth about 2.78 hand points more than losing it. Untested; watch who wins it and how it shifts the economy.
+- **Recover-Continuity**: 3 VP finisher, Server defense; est. hand value 5.8 early / 5.8 late at cost 7. Untested.
+- **Pu1sar**: 2 VP finisher; est. hand value 3.8 early / 3.8 late at cost 9. Untested.
+- **Bitten Brittin**: utility; est. hand value 0 early / 0 late at cost 5. Untested.
+- **Marlie Murder**: utility; est. hand value 5.7 early / 5.7 late at cost 7. Untested.
+- **Mel Anoma**: utility; est. hand value -3 early / -3 late at cost 6. Untested.
+- **Crypto-Vault**: low-value Crypto (skip), economy; est. hand value 0 early / 0 late at cost 4. Untested.
+- **Access Binding**: utility; est. hand value 1 early / 1 late at cost 3. Untested.
+- **The Tuathal Kill**: utility; est. hand value 2 early / 2 late at cost 7. Untested.
+- **Andras Asura**: utility; est. hand value 2 early / 2 late at cost 5. Untested.
+- **Bug Hunter**: utility; est. hand value 1 early / 1 late at cost 3. Untested.
 
 ## Card results (complete games where a side bought it)
 
@@ -198,49 +186,51 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 
 ## Recent notes
 
-- v1.28 · 2026-11-16 00:22 · Monitor the potential of new card 'Banishing Ritual' for deck thinning.
-- v1.28 · 2026-11-16 00:22 · Assess the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-16 00:22 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-16 00:22 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-16 00:22 · The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy.
-- v1.28 · 2026-11-16 00:22 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Super Positsion, Tulpa-Polymer, Dot-Slash, 1nti, R.0.1. Matrix, Trixy, 0N1.exe. New Locations: A Mayan Victory.
-- v1.28 · 2026-11-16 00:22 · Rule change from the designer: destroying an enemy Primary Server now gives +16 VP and a Backup +24 VP (was 12 and 16), 40 VP for both. Server damage now moves the score more: Drain pressure and finishing a damaged Server swing games more, Restore protects more VP, and the trailing-player count weighs damage more. Re-check theories and plans built on the old values.
-- v1.28 · 2026-11-15 16:44 · Evaluate the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 16:44 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 16:44 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 16:44 · High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft.
-- v1.28 · 2026-11-15 16:44 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 16:44 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0.
-- v1.28 · 2026-11-15 16:41 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 16:41 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 16:41 · High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft.
-- v1.28 · 2026-11-15 16:41 · Evaluate the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 16:41 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 16:41 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0.
-- v1.28 · 2026-11-15 16:38 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 16:38 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 16:38 · Prioritize high-value Characters like Iterative Incubus for early pressure.
-- v1.28 · 2026-11-15 16:38 · Evaluate the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 16:38 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 16:38 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Bloody Mary.
-- v1.28 · 2026-11-15 02:49 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 02:49 · Prioritize high-value Characters like Iterative Incubus for early pressure.
-- v1.28 · 2026-11-15 02:49 · The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy.
-- v1.28 · 2026-11-15 02:49 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.28 · 2026-11-15 02:49 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 02:49 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Crypto-Wraith, Packet Sniffer, Crypto-Echo. Removed cards: eval-relocation-relay.
-- v1.28 · 2026-11-15 02:24 · Assess the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 02:24 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 02:24 · Monitor the synergy of new cards with existing strategies.
-- v1.28 · 2026-11-15 02:24 · The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy.
-- v1.28 · 2026-11-15 02:24 · v1.28 online (server start). Read the notebook: 2 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Crypto-Heist, Crypto-Drone.
-- v1.28 · 2026-11-15 01:35 · Bloodlet Drone offers good synergy with Drain strategies; prioritize in Draft.
-- v1.28 · 2026-11-15 01:35 · High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft.
-- v1.28 · 2026-11-15 01:35 · Assess the impact of new Locations on game dynamics.
-- v1.28 · 2026-11-15 01:35 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-18 01:23 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-18 01:23 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
+- v1.30 · 2026-11-18 01:23 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-18 01:23 · Monitor the impact of new cards and Locations on game dynamics.
+- v1.30 · 2026-11-18 01:23 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-18 01:21 · Evaluate the impact of new cards and Locations on game dynamics.
+- v1.30 · 2026-11-18 01:21 · New cards since last version: Bug Hunter.
+- v1.30 · 2026-11-18 01:21 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-18 01:21 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-18 01:21 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Bug Hunter.
+- v1.30 · 2026-11-18 01:04 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-18 01:04 · Continue running experiment x285-endgame-awards.
+- v1.30 · 2026-11-18 01:04 · Evaluate the impact of new cards and Locations on game dynamics, particularly Bitten Brittin and Mel Anoma.
+- v1.30 · 2026-11-18 01:04 · Adjust strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-18 01:04 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-18 01:04 · Continue running experiment x285-endgame-awards.
+- v1.30 · 2026-11-18 01:04 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-18 01:04 · The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better.
+- v1.30 · 2026-11-18 01:04 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-18 01:04 · Monitor the impact of new cards and Locations on game dynamics.
+- v1.30 · 2026-11-18 01:04 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Crypto-Vault, Access Binding, The Tuathal Kill, Andras Asura.
+- v1.30 · 2026-11-17 09:07 · Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery in future games.
+- v1.30 · 2026-11-17 09:07 · Consider how the human player’s Draft wallet consistently outpaces mine; adjust my strategy accordingly to contest their economy better.
+- v1.30 · 2026-11-17 09:07 · Evaluate new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management.
+- v1.30 · 2026-11-17 09:07 · Monitor the impact of new cards on my strategies, especially with the addition of cards like Marlie Murder and Mel Anoma.
+- v1.30 · 2026-11-17 09:07 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Marlie Murder, Mel Anoma.
+- v1.30 · 2026-11-17 07:58 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-17 07:58 · Monitor the impact of new Locations and cards on game dynamics.
+- v1.30 · 2026-11-17 07:58 · The human's Draft wallet consistently outpaces mine; adjust strategies to contest their economy more effectively.
+- v1.30 · 2026-11-17 07:58 · Continue running experiment x285-endgame-awards to evaluate end-game metrics.
+- v1.30 · 2026-11-17 07:58 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-17 07:50 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
+- v1.30 · 2026-11-17 07:50 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-17 07:50 · New Locations and cards may shift the game dynamics; monitor their impacts closely.
+- v1.30 · 2026-11-17 07:50 · The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better.
+- v1.30 · 2026-11-17 07:50 · Running experiment x285-endgame-awards to evaluate end-game metrics.
+- v1.30 · 2026-11-17 07:50 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-17 07:49 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-17 07:49 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-17 07:49 · Evaluate the impact of new cards and Locations on game dynamics.
 
 ## Version history
 
+- v1.30 (llm) since 2026-11-16 20:26 · 0/0 wins · In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encrypti…
+- v1.29 (llm) since 2026-11-16 01:51 · 0/0 wins · In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, specifically Basic Encrypti…
 - v1.28 (llm) since 2026-11-08 22:57 · 0/0 wins · I will adhere to the designer's baseline strategy, focusing on maximizing Wallet income in Cycles 1-4 by drafting Characters that generate Crypto and trashing w…
 - v1.27 (llm) since 2026-11-08 15:43 · 0/0 wins · I will follow the designer's baseline while incorporating strategies for early aggression and server defense. My focus will be on raising Wallet income through …
 - v1.26 (llm) since 2026-11-08 08:57 · 0/0 wins · I will follow the designer's baseline while incorporating strategies for early aggression and server defense. My focus will be on raising Wallet income through …
@@ -259,5 +249,3 @@ Repeated buys: code-sniper×9, cowl-obscyra×9, delta-wave×9, koppy-kat×9, car
 - v1.13 (heuristic) since 2026-10-26 18:47 · 0/0 wins · v1.13 plays the designer's baseline plus 4 adopted changes (Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69; m…
 - v1.12 (heuristic) since 2026-10-17 18:48 · 0/0 wins · v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; re…
 - v1.11 (llm) since 2026-10-16 16:53 · 0/0 wins · I will maintain focus on acquiring high-value Crypto early, targeting a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, …
-- v1.10 (llm) since 2026-10-16 08:07 · 0/0 wins · I will maintain focus on acquiring high-value Crypto early, targeting a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, …
-- v1.9 (llm) since 2026-10-16 05:27 · 0/0 wins · I will maintain focus on acquiring high-value Crypto early, targeting a Crypto value of 11.67 by Cycle 4. In Cycles 5-8, I will balance my Draft among attacks, …

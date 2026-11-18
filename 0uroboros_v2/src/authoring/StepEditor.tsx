@@ -290,7 +290,7 @@ function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectSte
     fields.push(<Select key="who" label={whoLabelText} value={target.who} options={whoOptions} labels={whoLabels} onChange={who => onChange({ ...target, who })} />);
   }
   if (entry?.targets) {
-    if (target.type === 'card' && target.relation === undefined && step.action !== 'silenceOngoing') {
+    if (target.type === 'card' && target.relation === undefined && step.action !== 'silenceOngoing' && step.action !== 'merge') {
       fields.push(...cardFilters(target, onChange));
     }
     return <div className="au-step-grid">{fields}</div>;
@@ -313,9 +313,69 @@ function TargetBuilder({ step, scope, asCost, cards, onStep }: { step: EffectSte
         onChange(next);
       }} />);
     }
-    if (target.relation === undefined) fields.push(...cardFilters(target, onChange));
+    if (target.relation === undefined && step.action !== 'merge') fields.push(...cardFilters(target, onChange));
   }
   return <div className="au-step-grid">{fields}</div>;
+}
+
+/** Merge: checkbox “this card” + named cards that may be absorbed. Empty = any legal target. */
+function MergeTargetPicker({
+  target, cards, onChange,
+}: {
+  target: Extract<Target, { type: 'card' }>;
+  cards: readonly CatalogCard[];
+  onChange: (target: Extract<Target, { type: 'card' }>) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const available = enabledCards(cards).filter(card => card.type !== 'Crypto');
+  const values = [
+    ...(target.filter?.definitionId ? [target.filter.definitionId] : []),
+    ...(target.filter?.definitionIds ?? []),
+  ];
+  const matchThis = !!target.filter?.this;
+  const allMatching = available.filter(card => `${card.name} ${definitionId(card)}`.toLowerCase().includes(search.toLowerCase()));
+  const matching = allMatching.slice(0, 40);
+  const unknown = values.filter(id => !available.some(card => definitionId(card) === id));
+  const write = (nextThis: boolean, ids: readonly string[]) => {
+    const unique = [...new Set(ids)];
+    if (!nextThis && !unique.length) {
+      const { filter: _drop, ...rest } = target;
+      onChange(rest as Extract<Target, { type: 'card' }>);
+      return;
+    }
+    onChange({
+      ...target,
+      filter: {
+        ...(nextThis ? { this: true } : {}),
+        ...(unique.length === 1 ? { definitionId: unique[0] } : unique.length ? { definitionIds: unique } : {}),
+      },
+    });
+  };
+  const toggle = (id: string, checked: boolean) => write(matchThis, checked ? [...values, id] : values.filter(value => value !== id));
+  return <div className="au-morph-forms" data-field="merge-targets">
+    <p className="au-recipe-help">Tick cards this Merge may absorb. “Another copy of this card” merges automatically (no choice) and stacks effects. Pair with If “second copy at this Location” so only the later reveal Merges. None ticked = any legal target here.</p>
+    <label className="au-recipe-check au-step-wide">
+      <input type="checkbox" checked={matchThis} onChange={event => write(event.target.checked, values)} />
+      <span>Another copy of this card</span>
+    </label>
+    <div className="au-morph-sequence">
+      <b>{values.length ? 'Also merge with' : 'Named cards (optional)'}</b>
+      {unknown.map(id => <div className="au-morph-sequence-item" key={id}><span>{id}</span><button type="button" aria-label={`Remove ${id}`} onClick={() => toggle(id, false)}>×</button></div>)}
+      {values.map(id => {
+        const card = available.find(entry => definitionId(entry) === id);
+        if (!card) return null;
+        return <div className="au-morph-sequence-item" key={id}><span>{card.name}</span><button type="button" aria-label={`Remove ${card.name}`} onClick={() => toggle(id, false)}>×</button></div>;
+      })}
+    </div>
+    <label className="au-recipe-field au-step-wide"><span>Find cards</span><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Name or id" /></label>
+    <div className="au-morph-grid">
+      {matching.map(card => <label className="au-morph-form" key={definitionId(card)}>
+        <input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />
+        {card.art && <img src={card.art} alt="" />}
+        <span>{card.name}</span>
+      </label>)}
+    </div>
+  </div>;
 }
 
 /** Classes a card type can have; any type offers them all. */
@@ -452,6 +512,15 @@ function StepBody({ step, field, scope, cards, depth, asCost, onChange }: { step
       {spec.chooser && scope !== 'locationCondition' && !atDeckEnd && (step.pick?.mode ?? spec.picks[0]) === 'choose' && <Select label="Who chooses" value={step.pick?.chooser ?? 'self'} options={['self', 'opponent']} labels={{ self: whoLabel(scopedWho('self', scope), scope), opponent: whoLabel(scopedWho('opponent', scope), scope) }} onChange={chooser => patch({ pick: { mode: step.pick?.mode ?? 'choose', ...step.pick, chooser: chooser === 'self' ? undefined : chooser } })} />}
     </div>}
     {spec.destinations && <div className="au-step-grid"><Select label="Destination" value={step.destination ?? spec.destinations[0]} options={spec.destinations} labels={DESTINATION_LABELS} onChange={destination => patch({ destination })} /></div>}
+    {step.action === 'moveCard' && <div className="au-step-grid"><Select label="Move direction" value={step.moveDir ?? 'choose'} options={['choose', 'left', 'right']} labels={{ choose: 'Player chooses', left: 'Left (adjacent)', right: 'Right (adjacent)' }} onChange={value => patch({ moveDir: value === 'choose' ? undefined : value as 'left' | 'right' })} /></div>}
+    {step.action === 'merge' && step.target?.type === 'card' && (
+      <MergeTargetPicker
+        target={step.target}
+        cards={cards}
+        onChange={target => patch({ target })}
+      />
+    )}
+    {step.action === 'merge' && <label className="au-recipe-check"><input type="checkbox" checked={!!step.absorbPower} onChange={event => patch({ absorbPower: event.target.checked || undefined })} /><span>Absorb victim’s live Power</span></label>}
     {step.action === 'scry' && <div className="au-step-grid au-step-wide" role="group" aria-label="Inspect dispositions">
       <span className="au-recipe-field"><span>For each card, allow</span></span>
       {INSPECT_ACTIONS.map(action => {

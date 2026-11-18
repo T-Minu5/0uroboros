@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
 import { CARD_CLASSES, type CardClass } from '@0uroboros/engine/game';
 import {
@@ -16,6 +17,9 @@ const KINDS: { id: CardTrigger['kind']; label: string }[] = [
   { id: 'mirrorCrypto', label: 'Mirror crypto' },
   { id: 'reflectDrain', label: 'Reflect Drain' },
   { id: 'protectPower', label: 'Protect power' },
+  { id: 'protectCrypto', label: 'Protect Crypto' },
+  { id: 'protectDestroy', label: 'Protect from destroy' },
+  { id: 'protectDeckAccess', label: 'Protect deck access' },
   { id: 'multiplyNode', label: 'Multiply node power' },
   { id: 'listenAccess', label: 'Listen (deck access)' },
   { id: 'whenPlayed', label: 'To me my X-men (when played)' },
@@ -26,7 +30,16 @@ const WHEN_EVENTS: { id: TriggerEvent; label: string }[] = [
   { id: 'anyCardDestroyed', label: 'Any card destroyed' },
   { id: 'enemyDraws', label: 'Enemy draws' },
   { id: 'enemyDrainsYou', label: 'Enemy Drains you' },
+  { id: 'enemyDrainsBackup', label: 'Enemy Drains your Backup' },
+  { id: 'serverRepaired', label: 'Server repaired' },
+  { id: 'cardTrashedHere', label: 'Card trashed here' },
+  { id: 'cardTrashedThisCycle', label: 'Card trashed this Cycle' },
+  { id: 'cardMoved', label: 'Card moved' },
+  { id: 'cardMovedHere', label: 'Card moved here' },
+  { id: 'handDiscarded', label: 'Hand discarded' },
 ];
+
+const ACTOR_EVENTS = new Set<TriggerEvent>(['serverRepaired', 'cardTrashedThisCycle', 'cardMoved', 'handDiscarded']);
 
 const LISTEN: { id: ListenWhose; label: string }[] = [
   { id: 'enemyAccessesYours', label: 'Enemy accesses your deck' },
@@ -34,16 +47,78 @@ const LISTEN: { id: ListenWhose; label: string }[] = [
   { id: 'youAccessEnemy', label: 'You access enemy deck' },
 ];
 
+const definitionId = (card: AuthoredCard) => card.definitionId ?? card.id;
+
 function defaultTrigger(kind: CardTrigger['kind']): CardTrigger {
   switch (kind) {
     case 'mirrorCrypto': return { kind };
     case 'protectPower': return { kind };
+    case 'protectCrypto': return { kind };
+    case 'protectDestroy': return { kind };
+    case 'protectDeckAccess': return { kind };
     case 'reflectDrain': return { kind, percent: 25, random: false };
     case 'multiplyNode': return { kind, min: MULTIPLY_MIN, max: MULTIPLY_MAX, random: true };
     case 'listenAccess': return { kind, whose: 'enemyAccessesYours', then: [{ action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } }] };
-    case 'whenPlayed': return { kind, match: { cardClass: 'Action' }, scope: 'thisNode', then: [{ action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } }] };
+    case 'whenPlayed': return { kind, match: {}, scope: 'thisNode', then: [{ action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } }] };
     case 'when': return { kind, event: 'anyCardDestroyed', then: [{ action: 'draw', amount: 1, target: { type: 'player', who: 'self' } }] };
   }
+}
+
+type WhenPlayed = Extract<CardTrigger, { kind: 'whenPlayed' }>;
+
+/** Checkbox list of cards that fire whenPlayed (OR). Empty = any / subtype only. */
+function WhenPlayedCardPicker({
+  trigger, cards, onChange,
+}: {
+  trigger: WhenPlayed;
+  cards: readonly AuthoredCard[];
+  onChange: (match: WhenPlayed['match']) => void;
+}) {
+  const [search, setSearch] = useState('');
+  const available = cards.filter(card => card.enabled !== false);
+  const values = [
+    ...(trigger.match.definitionId ? [trigger.match.definitionId] : []),
+    ...(trigger.match.definitionIds ?? []),
+  ];
+  const matching = available
+    .filter(card => `${card.name} ${definitionId(card)}`.toLowerCase().includes(search.toLowerCase()))
+    .slice(0, 48);
+  const write = (ids: readonly string[], keepClass = false) => {
+    const unique = [...new Set(ids)];
+    if (!unique.length) {
+      onChange(keepClass
+        ? { cardClass: trigger.match.cardClass, cardType: trigger.match.cardType }
+        : {});
+      return;
+    }
+    onChange(unique.length === 1
+      ? { definitionId: unique[0] }
+      : { definitionIds: unique });
+  };
+  const toggle = (id: string, checked: boolean) => write(checked ? [...values, id] : values.filter(value => value !== id));
+  return <div className="au-morph-forms au-step-wide" data-field="whenPlayed-cards">
+    <p className="au-recipe-help">Tick every card that should fire this Ongoing (e.g. each Glitch and Liaison). Leave empty to use subtype / any card.</p>
+    <div className="au-morph-sequence">
+      <b>{values.length ? `Watching ${values.length} card${values.length === 1 ? '' : 's'}` : 'Named cards (optional)'}</b>
+      {values.map(id => {
+        const entry = available.find(card => definitionId(card) === id);
+        return <div className="au-morph-sequence-item" key={id}>
+          <span>{entry?.name ?? id}</span>
+          <button type="button" aria-label={`Remove ${entry?.name ?? id}`} onClick={() => toggle(id, false)}>×</button>
+        </div>;
+      })}
+    </div>
+    <label className="au-recipe-field au-step-wide"><span>Find cards</span>
+      <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Name or id" />
+    </label>
+    <div className="au-morph-grid">
+      {matching.map(card => <label className="au-morph-form" key={definitionId(card)}>
+        <input type="checkbox" checked={values.includes(definitionId(card))} onChange={event => toggle(definitionId(card), event.target.checked)} />
+        {card.art && <img src={card.art} alt="" />}
+        <span>{card.name}</span>
+      </label>)}
+    </div>
+  </div>;
 }
 
 /** Card Ongoing rules editor (reactive triggers while revealed). */
@@ -89,31 +164,47 @@ export function TriggersEditor({ card, cards, onChange }: Props) {
             {LISTEN.map(entry => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
           </select>
         </label>}
-        {trigger.kind === 'when' && <label><span>When</span>
-          <select value={trigger.event} onChange={event => replace(index, { ...trigger, event: event.target.value as typeof trigger.event })}>
-            {WHEN_EVENTS.map(entry => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
-          </select>
-        </label>}
+        {trigger.kind === 'when' && <>
+          <label><span>When</span>
+            <select value={trigger.event} onChange={event => replace(index, { ...trigger, event: event.target.value as typeof trigger.event, actor: undefined, serverWhose: undefined })}>
+              {WHEN_EVENTS.map(entry => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+            </select>
+          </label>
+          {ACTOR_EVENTS.has(trigger.event) && <label><span>Who</span>
+            <select value={trigger.actor ?? 'any'} onChange={event => replace(index, { ...trigger, actor: event.target.value === 'any' ? undefined : event.target.value as 'self' | 'opponent' })}>
+              <option value="any">Anyone</option>
+              <option value="self">You</option>
+              <option value="opponent">Enemy</option>
+            </select>
+          </label>}
+          {trigger.event === 'serverRepaired' && <label><span>Whose Server</span>
+            <select value={trigger.serverWhose ?? 'any'} onChange={event => replace(index, { ...trigger, serverWhose: event.target.value === 'any' ? undefined : event.target.value as 'self' | 'opponent' })}>
+              <option value="any">Any</option>
+              <option value="self">Yours</option>
+              <option value="opponent">Enemy</option>
+            </select>
+          </label>}
+        </>}
         {trigger.kind === 'whenPlayed' && <>
           <label><span>Subtype</span>
             <select
               value={trigger.match.cardType === 'Crypto' ? 'Crypto' : (trigger.match.cardClass ?? '')}
+              disabled={!!(trigger.match.definitionId || trigger.match.definitionIds?.length)}
               onChange={event => {
                 const value = event.target.value;
                 if (value === 'Crypto') {
-                  replace(index, { ...trigger, match: { ...trigger.match, cardType: 'Crypto', cardClass: undefined, definitionId: undefined } });
+                  replace(index, { ...trigger, match: { cardType: 'Crypto' } });
+                } else if (!value) {
+                  replace(index, { ...trigger, match: {} });
                 } else {
-                  replace(index, { ...trigger, match: { ...trigger.match, cardClass: (value || undefined) as CardClass | undefined, cardType: undefined, definitionId: undefined } });
+                  replace(index, { ...trigger, match: { cardClass: value as CardClass } });
                 }
               }}
             >
-              <option value="">Any / use card id</option>
+              <option value="">Any (or pick cards below)</option>
               {CARD_CLASSES.map(value => <option key={value} value={value}>{value}</option>)}
               <option value="Crypto">Crypto</option>
             </select>
-          </label>
-          <label><span>Card id</span>
-            <input value={trigger.match.definitionId ?? ''} onChange={event => replace(index, { ...trigger, match: { ...trigger.match, definitionId: event.target.value || undefined, cardClass: event.target.value ? undefined : trigger.match.cardClass, cardType: event.target.value ? undefined : trigger.match.cardType } })} placeholder="definitionId" />
           </label>
           <label><span>Scope</span>
             <select value={trigger.scope} onChange={event => replace(index, { ...trigger, scope: event.target.value as 'thisNode' | 'cycle' })}>
@@ -121,6 +212,11 @@ export function TriggersEditor({ card, cards, onChange }: Props) {
               <option value="cycle">This Cycle</option>
             </select>
           </label>
+          <WhenPlayedCardPicker
+            trigger={trigger}
+            cards={cards}
+            onChange={match => replace(index, { ...trigger, match })}
+          />
         </>}
         <button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={() => remove(index)}>Remove</button>
       </div>

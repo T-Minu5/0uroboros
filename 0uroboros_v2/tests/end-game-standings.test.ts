@@ -20,10 +20,14 @@ describe('endGameStandings', () => {
       'mostPowerBoosted',
       'mostCryptoBanked',
       'mostCryptoStolen',
+      'mostServerRepair',
+      'mostDeckAttacks',
     ]);
     expect(view.endGameStandings[0]).toMatchObject({
-      id: 'mostCircuits', vp: 6, scores: [0, 0], leader: null,
+      id: 'mostCircuits', label: 'Circuits Won', vp: 6, scores: [0, 0], leader: null,
     });
+    expect(view.endGameStandings.find(row => row.id === 'mostServerRepair')).toMatchObject({ vp: 2 });
+    expect(view.endGameStandings.find(row => row.id === 'mostDeckAttacks')).toMatchObject({ vp: 4 });
     for (const row of view.endGameStandings) {
       expect(row.scores).toEqual([0, 0]);
       expect(row.leader).toBeNull();

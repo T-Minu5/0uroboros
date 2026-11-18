@@ -6,7 +6,7 @@ import type { PlayerId } from "@0uroboros/engine/game";
 import type { CompiledContent } from "@0uroboros/engine/authoring/contentModel";
 import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
 import { pickOpponent } from "@0uroboros/engine/ai/opponents";
-import { createSession, seededRandom, type RuntimeEvent, type RuntimeSession } from "@0uroboros/engine/runtime";
+import { createSession, mergeEndGameAwards, seededRandom, type RuntimeEvent, type RuntimeSession } from "@0uroboros/engine/runtime";
 import type { Command } from "@0uroboros/protocol/messages";
 import type { ReplayRecord, SystemCommand } from "./store";
 
@@ -26,6 +26,7 @@ export function replayGame(replay: ReplayRecord, content: CompiledContent, strat
     draftSeconds: replay.settings.draftSeconds > 0 ? replay.settings.draftSeconds : null,
     mostCircuitsBonusVP: replay.settings.mostCircuitsBonusVP,
     nodeWinVP: replay.settings.nodeWinVP,
+    endGameAwards: mergeEndGameAwards(replay.settings.endGameAwards),
     random: seededRandom(replay.seed), aiSeats: replay.aiSeats, seatNames: replay.seatNames, recordDecisions: false,
     ...(profile ? { strategy: profile } : {}),
     now: () => clock.now,

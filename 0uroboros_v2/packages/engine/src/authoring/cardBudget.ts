@@ -9,9 +9,15 @@
  *
  * Astra (2026-11): flat durationFactor 0.75; crypto floors softFlagPlusPenalty (2→3, 3→6, 5→9);
  * novel aura/bump/scry stay soft; curve retuned so Mel’s exemplars land near band.
+ *
+ * Astra (2026-11 Ongoing): card.triggers scored with expected-firings × then-package credits
+ * (ONGOING_EXPECT). Board-state kinds (protectPower, multiplyNode, mirrorCrypto, reflectDrain)
+ * keep a soft flag; reflect/mirror also take a bounded expected credit so Strat can balance them
+ * without treating every Ongoing as free soft value.
  */
 import { serverMaximums, type Card } from '../game';
 import { migrateEffects } from '../effects/migrate';
+import type { CardTrigger } from '../effects/triggers';
 import type { ActionId, EffectStep } from '../effects/types';
 
 export type BudgetBand = 'under' | 'near' | 'over';
@@ -94,6 +100,30 @@ export const BUDGET_WEIGHTS = {
 } as const;
 
 /**
+ * Astra Ongoing expected-firings while a host stays revealed for a typical contested Cycle.
+ * V_ongoing += expect × walk(then). Built-ins without then use the side credits below.
+ */
+export const ONGOING_EXPECT = {
+  enemyDraws: 2.2,
+  enemyDrainsYou: 1.6,
+  anyCardDestroyed: 1.1,
+  whenPlayedThisNode: 0.55,
+  whenPlayedCycle: 0.95,
+  listenAccessEnemy: 0.45,
+  listenAccessSelf: 0.35,
+  listenAccessYouEnemy: 0.4,
+  /** Expected Crypto amount mirrored once while the host is up. */
+  mirrorCryptoAmount: 2.5,
+  /**
+   * Expected share of a mid Drain package that reflectDrain converts (before × percent/100).
+   * Credit = (percent/100) × reflectDrainShare × BUDGET_WEIGHTS.drain × (150 / serverIntegrity).
+   */
+  reflectDrainShare: 0.4,
+  /** Nominal Drain amount used for reflect expected credit. */
+  reflectDrainNominal: 150,
+} as const;
+
+/**
  * B(c) = α + β·c + γ·c^1.35.
  * Calibrated so Dash-Dot (3), Chrome Mitchell (7), and ∆-Wave (9) land near E≈1
  * with the post-Actions weight table.
@@ -124,6 +154,7 @@ const SOFT_ACTIONS: Partial<Record<ActionId, string>> = {
   healCard: 'Restoring card Power is situational vs printed Power.',
   restoreCard: 'Resetting card Power is situational.',
   moveCard: 'Moving cards is positional.',
+  silenceOngoing: 'Silencing Ongoing depends on what the enemy has revealed.',
 };
 
 type Curve = { alpha: number; beta: number; gamma: number };
@@ -353,6 +384,93 @@ function walkSteps(
   }
 }
 
+function listenExpect(whose: string): number {
+  if (whose === 'enemyAccessesYours') return ONGOING_EXPECT.listenAccessEnemy;
+  if (whose === 'youAccessYours') return ONGOING_EXPECT.listenAccessSelf;
+  return ONGOING_EXPECT.listenAccessYouEnemy;
+}
+
+/** Astra: expected-firings × then-package (plus bounded credits for reflect/mirror). */
+function scoreTriggers(
+  triggers: readonly CardTrigger[] | undefined,
+  into: WalkResult,
+  serverIntegrity: number,
+  cardPower: number,
+) {
+  if (!triggers?.length) return;
+  for (const trigger of triggers) {
+    switch (trigger.kind) {
+      case 'protectPower':
+        pushSoft(into, 'ongoing:protectPower', 'Ongoing protectPower is board-state defense — soft only.');
+        break;
+      case 'protectCrypto':
+        pushSoft(into, 'ongoing:protectCrypto', 'Ongoing protectCrypto is board-state defense — soft only.');
+        break;
+      case 'protectDestroy':
+        pushSoft(into, 'ongoing:protectDestroy', 'Ongoing protectDestroy is board-state defense — soft only.');
+        break;
+      case 'protectDeckAccess':
+        pushSoft(into, 'ongoing:protectDeckAccess', 'Ongoing protectDeckAccess is board-state defense — soft only.');
+        break;
+      case 'multiplyNode': {
+        const mid = trigger.random ? (trigger.min + trigger.max) / 2 : trigger.min;
+        pushSoft(into, 'ongoing:multiplyNode', `Ongoing ×${mid.toFixed(2)} Node Power depends on allies/enemies at the Location.`);
+        break;
+      }
+      case 'mirrorCrypto': {
+        pushSoft(into, 'ongoing:mirrorCrypto', 'Ongoing mirrorCrypto depends on how much Crypto the enemy gains.');
+        const credit = BUDGET_WEIGHTS.crypto * ONGOING_EXPECT.mirrorCryptoAmount;
+        into.parts.push({
+          id: `ongoing:mirrorCrypto:${into.parts.length}`,
+          label: `Ongoing mirror ~${ONGOING_EXPECT.mirrorCryptoAmount} Crypto (expected)`,
+          credit: round2(credit),
+        });
+        into.credit += credit;
+        break;
+      }
+      case 'reflectDrain': {
+        const pct = trigger.random ? 0.3 : trigger.percent / 100;
+        pushSoft(into, 'ongoing:reflectDrain', 'Ongoing reflectDrain depends on enemy Drain volume and timing.');
+        const credit = pct
+          * ONGOING_EXPECT.reflectDrainShare
+          * BUDGET_WEIGHTS.drain
+          * (ONGOING_EXPECT.reflectDrainNominal / Math.max(1, serverIntegrity));
+        into.parts.push({
+          id: `ongoing:reflectDrain:${into.parts.length}`,
+          label: `Ongoing reflect ~${Math.round(pct * 100)}% of Drain (expected)`,
+          credit: round2(credit),
+        });
+        into.credit += credit;
+        break;
+      }
+      case 'when': {
+        const expect = trigger.event === 'enemyDraws' ? ONGOING_EXPECT.enemyDraws
+          : trigger.event === 'enemyDrainsYou' ? ONGOING_EXPECT.enemyDrainsYou
+          : ONGOING_EXPECT.anyCardDestroyed;
+        pushSoft(into, `ongoing:when:${trigger.event}`, `Ongoing when(${trigger.event}) firings vary by match pace — scored at expect×${expect}.`);
+        walkSteps(trigger.then, expect, into, serverIntegrity, cardPower, 'duration');
+        break;
+      }
+      case 'whenPlayed': {
+        const expect = trigger.scope === 'thisNode' ? ONGOING_EXPECT.whenPlayedThisNode : ONGOING_EXPECT.whenPlayedCycle;
+        const match = trigger.match.definitionId ?? trigger.match.cardClass ?? trigger.match.cardType ?? 'match';
+        pushSoft(into, `ongoing:whenPlayed:${match}`, `Ongoing whenPlayed(${match}/${trigger.scope}) is lineup-dependent — scored at expect×${expect}.`);
+        walkSteps(trigger.then, expect, into, serverIntegrity, cardPower, 'duration');
+        break;
+      }
+      case 'listenAccess': {
+        const expect = listenExpect(trigger.whose);
+        pushSoft(into, `ongoing:listenAccess:${trigger.whose}`, `Ongoing listenAccess(${trigger.whose}) needs card-sourced access — scored at expect×${expect}.`);
+        walkSteps(trigger.then, expect, into, serverIntegrity, cardPower, 'duration');
+        break;
+      }
+      default:
+        pushSoft(into, 'ongoing:unknown', 'Unrecognized Ongoing trigger kind.');
+        break;
+    }
+  }
+}
+
 /** Score a card (authored or runtime Card shape with effect hooks). */
 export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number }): CardBudgetScore {
   const serverIntegrity = opts?.serverIntegrity ?? fullServerIntegrity();
@@ -395,6 +513,7 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
   walkSteps(card.onCollapse, 1, walk, serverIntegrity, power, 'instant');
   walkSteps(card.recurring, 1, walk, serverIntegrity, power, 'duration');
   for (const entry of card.schedule ?? []) walkSteps(entry.effects, 1, walk, serverIntegrity, power, 'duration');
+  scoreTriggers(card.triggers, walk, serverIntegrity, power);
 
   for (const flag of walk.soft) {
     if (!soft.some(existing => existing.id === flag.id)) soft.push(flag);
@@ -430,7 +549,7 @@ export function scoreCard(card: BudgetCard, opts?: { serverIntegrity?: number })
     soft,
     density,
     cryptoFloor,
-    formula: 'E = V / B(cost) + cryptoFloorPenalty; B = α + β·c + γ·c^1.35; duration ×0.75 on positive recurring/schedule credits; free +2/+3/+5 Crypto floors cost 3/6/9 unless paid for; soft effects flagged only.',
+    formula: 'E = V / B(cost) + cryptoFloorPenalty; B = α + β·c + γ·c^1.35; duration ×0.75 on positive recurring/schedule/Ongoing-then credits; Ongoing V += ONGOING_EXPECT×then (+ bounded mirror/reflect); free +2/+3/+5 Crypto floors cost 3/6/9 unless paid for; soft effects flagged.',
   };
 }
 

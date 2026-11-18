@@ -20,11 +20,12 @@ import {
   selectCircuitNode, revealOrder, starterEffects, canDeploy,
   shuffleCards, effectiveCardPower, cardPowerFloor, expandDeck, DEFAULT_STARTING_DECK, setPowerDelta, isCharacterCard,
 } from "./game";
-import { ACTIONS, describeStep, describeSteps, inspectActionsFor, modBadge, optionText } from "./effects/catalog";
+import { ACTIONS, describeCard, describeStep, describeSteps, inspectActionsFor, modBadge, optionText } from "./effects/catalog";
 import { migrateEffects } from "./effects/migrate";
 import { builtinMod } from "./builtinMods";
 import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEffect, type CardFilter, type CardWhere, type ChoiceOption as ChoiceOptionStep, type EffectStep, type InspectAction, type ModDefinition, type ModHook, type ModifierRef, type Scope, type ServerSlot, type Target, type Who } from "./effects/types";
 import { MULTIPLY_MAX, MULTIPLY_MIN, REFLECT_PERCENTS, type CardTrigger, type ListenWhose, type TriggerEvent } from "./effects/triggers";
+import type { CardIf } from "./effects/cardIfs";
 import { formatAmount, transferFlow, transferText } from "./transferText";
 import { DEFAULT_STRATEGY, deployPriority, draftScore, JUNK_KEEP_VALUE, keepValue, locationStakes, optionValue, planDraft, strategyPhase, thinningPicks, type StrategyContext, type StrategyProfile } from "./ai/strategy";
 import { TelemetryCollector, type GameTelemetry } from "./ai/telemetry";
@@ -130,7 +131,9 @@ export type EndGameAwardId =
   | "mostPowerRemoved"
   | "mostPowerBoosted"
   | "mostCryptoBanked"
-  | "mostCryptoStolen";
+  | "mostCryptoStolen"
+  | "mostServerRepair"
+  | "mostDeckAttacks";
 export type EndGameAwardSetting = { enabled: boolean; vp: number };
 export type EndGameAwards = Record<EndGameAwardId, EndGameAwardSetting>;
 export const DEFAULT_END_GAME_AWARDS: EndGameAwards = {
@@ -140,6 +143,8 @@ export const DEFAULT_END_GAME_AWARDS: EndGameAwards = {
   mostPowerBoosted: { enabled: true, vp: 2 },
   mostCryptoBanked: { enabled: true, vp: 2 },
   mostCryptoStolen: { enabled: true, vp: 4 },
+  mostServerRepair: { enabled: true, vp: 2 },
+  mostDeckAttacks: { enabled: true, vp: 4 },
 };
 export const END_GAME_AWARD_LABELS: Record<EndGameAwardId, string> = {
   mostDestroyed: "Most cards destroyed",
@@ -148,17 +153,36 @@ export const END_GAME_AWARD_LABELS: Record<EndGameAwardId, string> = {
   mostPowerBoosted: "Most card power boosted",
   mostCryptoBanked: "Most crypto banked",
   mostCryptoStolen: "Most crypto stolen/bumped",
+  mostServerRepair: "Most server repair",
+  mostDeckAttacks: "Most attacks on enemy deck",
 };
+/** Merge Configure / room overrides onto the default achievement slate. */
+export function mergeEndGameAwards(raw?: Partial<EndGameAwards> | null): EndGameAwards {
+  const awards = { ...DEFAULT_END_GAME_AWARDS };
+  if (!raw) return awards;
+  for (const id of Object.keys(awards) as EndGameAwardId[]) {
+    const next = raw[id];
+    if (!next) continue;
+    const vp = Math.max(0, Math.round(typeof next.vp === "number" ? next.vp : awards[id].vp));
+    awards[id] = {
+      enabled: (next.enabled ?? awards[id].enabled) !== false && vp > 0,
+      vp,
+    };
+  }
+  return awards;
+}
 export type EndGameStandingId = EndGameAwardId | "mostCircuits";
 /** Compact HUD labels for the live end-game standings column. */
 export const END_GAME_STANDING_LABELS: Record<EndGameStandingId, string> = {
-  mostCircuits: "Most Circuits",
-  mostDestroyed: "Destroyed",
-  mostTrashed: "Trashed",
-  mostPowerRemoved: "Power removed",
-  mostPowerBoosted: "Power boosted",
-  mostCryptoBanked: "Crypto banked",
-  mostCryptoStolen: "Crypto stolen",
+  mostCircuits: "Circuits Won",
+  mostDestroyed: "Cards Destroyed",
+  mostTrashed: "Cards Trashed",
+  mostPowerRemoved: "Power Removed",
+  mostPowerBoosted: "Power Boosted",
+  mostCryptoBanked: "Crypto Banked",
+  mostCryptoStolen: "Crypto Stolen",
+  mostServerRepair: "Server Repair",
+  mostDeckAttacks: "Attacks on Enemy Deck",
 };
 /** Live end-game award race: scores are seat-indexed like SessionView (viewer at 0). */
 export type EndGameStanding = {
@@ -356,6 +380,8 @@ type EffectContext = {
   winner?: PlayerId | null;
   /** Owner of the card whose reveal triggered an On Play effect. */
   played?: PlayerId;
+  /** Board placement that fired a whenPlayed Ongoing (relation `trigger`). */
+  triggerPlacement?: Deployment;
   /** Event source for Location, Circuit and Runtime Hack effects. */
   label?: { source: "location" | "circuit" | "runtimeHack"; sourceName: string; node?: number };
 };
@@ -368,11 +394,12 @@ const STEP_EVENT: Partial<Record<ActionId, RuntimeEvent["kind"]>> = {
   moveCard: "move", changePower: "power", healCard: "power", restoreCard: "power", destroyCard: "trash", trashCard: "trash", attachModifier: "power", removeModifier: "power", transferPower: "power", morph: "morph",
   createHologram: "power", copyPreviousOnReveal: "choice", sacrificeCards: "trash",
   stealDeckCard: "draw", deckSwap: "draw", placeCard: "move", copyText: "choice", silenceOngoing: "power",
+  reclaimStolen: "move", merge: "trash", absorbPower: "power",
   choice: "choice", random: "choice",
 };
 /** The confirm button's verb when a player picks targets for a card step. */
-const CHOICE_VERBS: Partial<Record<ActionId, string>> = { moveCard: "Move", healCard: "Heal", restoreCard: "Reset", destroyCard: "Destroy", trashCard: "Trash", attachModifier: "Attach", sacrificeCards: "Sacrifice" };
-const CARD_VERBS: Partial<Record<ActionId, string>> = { moveCard: "move", changePower: "change Power", healCard: "heal", restoreCard: "restore", destroyCard: "destroy", trashCard: "trash", attachModifier: "attach a mod to", removeModifier: "remove mods from", sacrificeCards: "sacrifice" };
+const CHOICE_VERBS: Partial<Record<ActionId, string>> = { moveCard: "Move", healCard: "Heal", restoreCard: "Reset", destroyCard: "Destroy", trashCard: "Trash", attachModifier: "Attach", sacrificeCards: "Sacrifice", merge: "Merge" };
+const CARD_VERBS: Partial<Record<ActionId, string>> = { moveCard: "move", changePower: "change Power", healCard: "heal", restoreCard: "restore", destroyCard: "destroy", trashCard: "trash", attachModifier: "attach a mod to", removeModifier: "remove mods from", sacrificeCards: "sacrifice", merge: "merge with" };
 const ZONE_PLACE_TEXT: Partial<Record<CardWhere, string>> = { hand: "hand", wallet: "wallet", bank: "Effect Bank", deck: "deck", discard: "Discard", handOrDiscard: "hand or Discard" };
 /** A card off the board and the player who owns it. */
 type ZoneCard = { card: Card; owner: PlayerId };
@@ -380,15 +407,25 @@ type ZoneCard = { card: Card; owner: PlayerId };
 type NodePlayRecord = { node: number; owner: PlayerId; definitionId: string; cardClass?: CardClass; turn: number };
 /** Actions that handle `optional` themselves rather than through a yes/skip prompt. */
 const OPTIONAL_INSIDE = new Set<ActionId>(["discardCards", "trashCards", "sacrificeCards", "placeCard", "copyText"]);
-const matchesFilter = (card: Card, filter?: CardFilter) => {
+const matchesFilter = (card: Card, filter?: CardFilter, source?: Card) => {
+  if (!filter) return true;
   const classes = filterClasses(filter), cardClass = card.cardClass ?? (card.type === "VP" ? "Volume" : undefined);
   const identity = card.definitionId ?? card.id;
   const cost = card.cost ?? 0;
-  return (!filter?.cardType || card.type === filter.cardType || filter.cardType === "Character" && isCharacterCard(card))
+  const named = [
+    ...(filter.definitionId ? [filter.definitionId] : []),
+    ...(filter.definitionIds ?? []),
+  ];
+  const sameAsSource = !!filter.this && !!source
+    && identity === (source.definitionId ?? source.id);
+  const idOk = !named.length && !filter.this
+    ? true
+    : (named.length ? named.includes(identity) : false) || sameAsSource;
+  return (!filter.cardType || card.type === filter.cardType || filter.cardType === "Character" && isCharacterCard(card))
     && (!classes.length || cardClass !== undefined && classes.includes(cardClass))
-    && (!filter?.definitionId || identity === filter.definitionId)
-    && (filter?.minCost === undefined || cost >= filter.minCost)
-    && (filter?.maxCost === undefined || cost <= filter.maxCost);
+    && idOk
+    && (filter.minCost === undefined || cost >= filter.minCost)
+    && (filter.maxCost === undefined || cost <= filter.maxCost);
 };
 
 export function seededRandom(seed: number): RandomSource {
@@ -518,6 +555,10 @@ export class RuntimeSession {
   private migrated = new WeakMap<readonly AnyEffect[], EffectStep[]>();
   private failedOutcomes = 0;
   private revealCounter = 0;
+  /** Reveal counts for card-level If (first/last). Reset each Cycle / Turn. */
+  private revealCountCycle = 0;
+  private revealCountTurn = 0;
+  private revealCountNodeCycle: number[] = [0, 0, 0, 0, 0];
   /** Slices of `rewardVP` by where the VP came from; card effects are the remainder. */
   private rewardSources: [{ location: number; circuit: number }, { location: number; circuit: number }] = [{ location: 0, circuit: 0 }, { location: 0, circuit: 0 }];
   private purchases: PurchaseRecord[] = [];
@@ -666,6 +707,9 @@ export class RuntimeSession {
     this.awardedLocationEvents.clear();
     this.nodeDrainThisCycle = Array.from({ length: 5 }, () => [0, 0] as [number, number]);
     this.nodePlaysThisCycle = [];
+    this.revealCountCycle = 0;
+    this.revealCountTurn = 0;
+    this.revealCountNodeCycle = [0, 0, 0, 0, 0];
   }
 
   get pendingCount() { return this.state.choice ? 0 : this.queue.length; }
@@ -925,7 +969,11 @@ export class RuntimeSession {
     return card.durationPeriod === "runtime" || !!card.duration && (!!card.recurring?.length || !!card.schedule?.length);
   }
 
-  /** Sends a card that left the board to `zone`; returns false when a Runtime card was removed from the game instead. */
+  /**
+   * Sends a card that left play to `zone`; returns false when a Runtime card was removed from the
+   * game instead of entering Trash/Destroyed/Discard. Destroy/trash of Runtime still counts as a
+   * destroy/trash for Ongoing listeners and telemetry — callers must fire those even when false.
+   */
   private retire(card: Card, owner: PlayerId, zone: "trash" | "destroyed" | "discard"): boolean {
     this.runtimeTimers.delete(card.id);
     this.expiredOnBoard.delete(card.id);
@@ -934,6 +982,13 @@ export class RuntimeSession {
     else if (zone === "destroyed") this.state.players[owner].destroyed.push(card);
     else this.state.players[owner].discard.push(card);
     return true;
+  }
+
+  /** Log line for destroy/trash when the card may or may not enter the destination pile. */
+  private retireVerb(action: "destroys" | "trashes", sourceName: string, cardName: string, kept: boolean, from?: string): string {
+    const where = from ? ` from ${from}` : "";
+    if (kept) return `${sourceName} ${action} ${cardName}${where}.`;
+    return `${sourceName} ${action} ${cardName}${where} (removed from the game).`;
   }
 
   private timerUntil(timer: RuntimeTimer) {
@@ -1228,6 +1283,7 @@ export class RuntimeSession {
       if (wins[0] !== wins[1]) this.state.priority = wins[0] > wins[1] ? 0 : 1;
       if (this.state.turn < 3) {
         this.state.turn++;
+        this.revealCountTurn = 0;
         // Turn-window matching scopes to the new turn; keep the full reveal log for game / cycle / location hacks.
         this.relocatedThisTurn.clear();
         for (const key of [...this.awardedLocationEvents]) {
@@ -1284,14 +1340,19 @@ export class RuntimeSession {
 
   private enqueueRevealWindow() {
     const ordered = revealOrder(this.state.nodes.flatMap(node => node.cards.flat()), this.state.turn, this.state.priority, this.openNodes());
-    for (const placement of ordered) {
+    ordered.forEach((placement, index) => {
       const revealEffects=this.hookEffects(placement.card, 'onReveal');
       const locationOnPlay=(this.state.nodes[placement.node]?.location?.onPlay?.length ?? 0) > 0;
       const runtimeOpening=this.turnTimed(placement.card) && ((placement.card.recurring?.length ?? 0)>0 || (placement.card.schedule ?? []).some(entry=>entry.at===1&&(entry.timing ?? "start")==="start") || revealEffects.some(effect=>effect.action==="morph"));
-      const followers=revealEffects.length+(locationOnPlay?1:0)+(runtimeOpening?1:0);
+      // If bus runs before On Reveal so “two at Location → Merge” can still see the other copy.
+      const followers=1+revealEffects.length+(locationOnPlay?1:0)+(runtimeOpening?1:0); // +1 for fireRevealIfs
+      const isLastInWindow = index === ordered.length - 1;
       this.queue.push(() => {
         placement.revealed = true;
         placement.revealSequence = ++this.revealCounter;
+        this.revealCountCycle++;
+        this.revealCountTurn++;
+        if (placement.node >= 0 && placement.node < this.revealCountNodeCycle.length) this.revealCountNodeCycle[placement.node]++;
         this.playedThisCycle.add(placement.card.id);
         if(this.turnTimed(placement.card)) {
           const duration=placement.card.duration ?? 0, cycleBound=placement.card.durationPeriod !== "runtime";
@@ -1307,6 +1368,7 @@ export class RuntimeSession {
         return this.event("reveal", `${placement.card.name} reveals.`, { node: placement.node, owner: placement.owner, cardId: placement.card.id });
       });
       const ctx = this.cardContext(placement);
+      this.queue.push(() => this.fireRevealIfs(placement, isLastInWindow));
       for (const effect of revealEffects) this.queue.push(() => this.resolveStep(ctx, effect));
       // Location on-play: when a card reveals here.
       if (locationOnPlay) {
@@ -1325,7 +1387,85 @@ export class RuntimeSession {
         this.queueLocationConditionCheck(placement.node);
       }
       if (this.runtimeHacks().length) this.queue.push(() => this.enqueueRuntimeHackCheck(placement));
+    });
+  }
+
+  /** Card-level If bus: first/last reveal and two-at-location, evaluated on this card’s reveal. */
+  private fireRevealIfs(placement: Deployment, lastInWindow: boolean): RuntimeEvent {
+    const rules = placement.card.ifs ?? [];
+    const callbacks: (() => RuntimeEvent)[] = [];
+    const ctx = this.cardContext(placement);
+    const fire = (then: readonly EffectStep[]) => {
+      for (const step of then) callbacks.push(() => this.resolveStep(ctx, step));
+    };
+    for (const rule of rules) {
+      if (rule.kind === "firstRevealed") {
+        const count = rule.scope === "turn" ? this.revealCountTurn
+          : rule.scope === "cycle" ? this.revealCountCycle
+          : this.revealCountNodeCycle[placement.node] ?? 0;
+        if (count === 1) fire(rule.then);
+      } else if (rule.kind === "lastRevealed") {
+        if (lastInWindow && this.state.turn >= 3) fire(rule.then);
+      } else if (rule.kind === "twoAtLocation") {
+        if (this.matchingRevealedAtNode(placement, rule) === 2) fire(rule.then);
+      }
     }
+    // Hosts already on the board: enemyPlayedHere only.
+    // twoAtLocation fires solely on the revealing card (the second copy) — never on the first,
+    // or both would Merge each other and vanish.
+    for (const host of this.state.nodes[placement.node]?.cards.flat() ?? []) {
+      if (host.card.id === placement.card.id || !host.revealed) continue;
+      for (const rule of host.card.ifs ?? []) {
+        if (rule.kind === "enemyPlayedHere" && placement.owner !== host.owner && this.matchesIfIdentity(placement.card, rule.match)) {
+          const hostCtx = this.cardContext(host);
+          for (const step of rule.then) callbacks.push(() => this.resolveStep(hostCtx, step));
+        }
+      }
+    }
+    if (callbacks.length) this.queue.unshift(...callbacks);
+    return this.event("reward", callbacks.length ? `${placement.card.name}: If rules fire.` : `${placement.card.name}: no If rules.`, {
+      node: placement.node, owner: placement.owner, cardId: placement.card.id, amount: callbacks.length,
+    });
+  }
+
+  private matchesIfIdentity(
+    card: Card,
+    match: { definitionId?: string; cardClass?: CardClass; cardType?: import("./game").CardType; this?: boolean },
+    host?: Deployment,
+  ): boolean {
+    if (match.this && host) {
+      const hostId = host.card.definitionId ?? host.card.id;
+      return (card.definitionId ?? card.id) === hostId;
+    }
+    const identity = card.definitionId ?? card.id;
+    if (match.definitionId && identity !== match.definitionId) return false;
+    if (match.cardClass && card.cardClass !== match.cardClass) return false;
+    if (match.cardType && card.type !== match.cardType) return false;
+    if (!match.definitionId && !match.cardClass && !match.cardType && !match.this) return true;
+    return !!(match.definitionId || match.cardClass || match.cardType);
+  }
+
+  private matchingRevealedAtNode(host: Deployment, rule: Extract<CardIf, { kind: "twoAtLocation" }>): number {
+    const match = rule.match ?? { this: true };
+    return (this.state.nodes[host.node]?.cards[host.owner] ?? [])
+      .filter(entry => entry.revealed && this.matchesIfIdentity(entry.card, match, host))
+      .length;
+  }
+
+  private fireNodeOutcomeIfs(node: number): RuntimeEvent {
+    const winner = this.state.nodes[node].winner;
+    const callbacks: (() => RuntimeEvent)[] = [];
+    for (const placement of this.state.nodes[node].cards.flat().filter(entry => entry.revealed)) {
+      for (const rule of placement.card.ifs ?? []) {
+        if (rule.kind !== "nodeOutcome") continue;
+        const outcome = winner === null ? "tie" : winner === placement.owner ? "win" : "lose";
+        if (rule.outcome !== outcome) continue;
+        const ctx = this.cardContext(placement);
+        for (const step of rule.then) callbacks.push(() => this.resolveStep(ctx, step));
+      }
+    }
+    if (callbacks.length) this.queue.unshift(...callbacks);
+    return this.event("reward", callbacks.length ? `Node ${node + 1}: If nodeOutcome fires.` : `Node ${node + 1}: no nodeOutcome If.`, { node, amount: callbacks.length });
   }
 
   /** Record a reveal for Location play conditions / events, then fire matching events. */
@@ -1962,7 +2102,7 @@ export class RuntimeSession {
       case "bump": return this.forEachRecipient(ctx, step, true, (acting, recipient) => this.bumpStep(acting, step, recipient));
       case "discardCards": case "trashCards": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.resolveHandSelection(acting, step, recipient));
       case "recover": return this.forEachRecipient(ctx, step, false, (acting, recipient) => this.recoverStep(acting, step, recipient));
-      case "moveCard": case "changePower": case "healCard": case "restoreCard": case "destroyCard": case "trashCard": case "attachModifier": case "removeModifier":
+      case "moveCard": case "changePower": case "healCard": case "restoreCard": case "destroyCard": case "trashCard": case "attachModifier": case "removeModifier": case "merge":
         return this.resolveCardStep(ctx, step);
       // Each targeted seat chooses among its own cards here and keeps the Crypto (Consume Pit / Sacrificial Altar use who:both).
       case "sacrificeCards": return this.forEachRecipient(ctx, step, false, acting => this.resolveSacrificeCards(acting, step));
@@ -1971,6 +2111,8 @@ export class RuntimeSession {
       case "placeCard": return this.resolvePlaceCard(ctx, step);
       case "copyText": return this.resolveCopyText(ctx, step);
       case "silenceOngoing": return this.resolveSilenceOngoing(ctx, step);
+      case "reclaimStolen": return this.resolveReclaimStolen(ctx, step);
+      case "absorbPower": return this.resolveAbsorbPower(ctx);
       case "transferPower": return this.transferPower(ctx, step);
       case "morph": return this.resolveMorph(ctx.source, step);
       case "createHologram": return this.createHologram(ctx);
@@ -2055,6 +2197,12 @@ export class RuntimeSession {
     const output = this.event(kind, result.target ? `${card.name}: ${kind === "drain" ? "Drain" : "Restore"} ${result.amount} at ${result.target} Server.${destructionVP ? ` +${destructionVP} destruction VP.` : ""}` : `${card.name}: No target.`, { ...this.base(ctx), amount: result.amount, before, after: result.target ? result.servers[result.target] : 0, targetOwner, ...(result.target ? { target: result.target } : {}) });
     if (kind === "drain" && result.amount > 0 && targetOwner !== owner) {
       this.emitCardTriggers("enemyDrainsYou", { actor: owner, victim: targetOwner, amount: result.amount });
+      if (result.target === "backup") {
+        this.emitCardTriggers("enemyDrainsBackup", { actor: owner, victim: targetOwner, amount: result.amount });
+      }
+    }
+    if (kind === "restore" && result.amount > 0) {
+      this.emitCardTriggers("serverRepaired", { actor: owner, victim: targetOwner, amount: result.amount });
     }
     if (kind === "drain" && this.state.phase !== "collapse" && targetPlayer.servers.primary === 0 && targetPlayer.servers.backup === 0) {
       this.queue = [() => this.gameOver(targetOwner === owner ? "Both Servers destroyed by own effect." : "Both Servers destroyed.")];
@@ -2119,7 +2267,7 @@ export class RuntimeSession {
     else if (zone === "discard") player.discard.push(...cards);
     else player.draw.unshift(...cards);
     this.refreshScores();
-    if (zone === "deck" || zone === "discard") this.announceDeckAccess(ctx.source.owner, targetOwner);
+    if (zone === "deck" || zone === "discard") this.announceDeckAccess(ctx.source.owner, targetOwner, ctx);
     const destination = zone === "hand" ? "hand" : zone === "discard" ? "Discard" : "the top of the deck";
     const names = [...new Set(cards.map(card => card.name))];
     const label = names.length === 1 ? names[0] : names.join(" / ");
@@ -2135,7 +2283,7 @@ export class RuntimeSession {
     const milled = this.millCards(targetOwner, step.amount ?? 0, toTrash);
     const target = toTrash ? "trash" as const : "discard" as const;
     if (!milled) return this.noTarget(ctx, step, { target, targetOwner });
-    this.announceDeckAccess(ctx.source.owner, targetOwner);
+    this.announceDeckAccess(ctx.source.owner, targetOwner, ctx);
     return this.event("trash", `${ctx.source.card.name}: mill ${milled} from ${this.whose(targetOwner, 0, "opponent")} deck${toTrash ? " to shared Trash" : ""}.`, { ...this.base(ctx), target, targetOwner, amount: milled });
   }
 
@@ -2161,6 +2309,9 @@ export class RuntimeSession {
   private stealCrypto(ctx: EffectContext, step: EffectStep, victim: PlayerId): RuntimeEvent {
     const { card, owner } = ctx.source;
     const base = this.base(ctx);
+    if (this.ownerHasProtectCrypto(victim) && owner !== victim) {
+      return this.event("crypto", `${card.name}: steal blocked (Crypto protected).`, { ...base, target: "wallet", targetOwner: victim, amount: 0 });
+    }
     const victimPlayer = this.state.players[victim];
     const want = Math.max(1, step.amount ?? 1);
     const taken = Math.min(want, Math.max(0, victimPlayer.wallet));
@@ -2185,8 +2336,14 @@ export class RuntimeSession {
     const whose = this.whose(victim, chooser);
     const amount = Math.max(1, step.amount ?? 1);
     const cleanse = this.bankRemovalMode(victim, ctx.source.owner) === "foreign";
+    if (this.ownerHasProtectCrypto(victim) && ctx.source.owner !== victim && (zone === "wallet" || zone === "bankOrWallet")) {
+      if (zone === "wallet") {
+        return this.event("crypto", `${card.name}: bump blocked (Crypto protected).`, { ...base, target: "wallet", targetOwner: victim, amount: 0 });
+      }
+    }
 
     const burnWallet = (): RuntimeEvent | null => {
+      if (this.ownerHasProtectCrypto(victim) && ctx.source.owner !== victim) return null;
       const burned = Math.min(amount, Math.max(0, player.wallet));
       if (!burned) return null;
       player.wallet -= burned;
@@ -2271,7 +2428,7 @@ export class RuntimeSession {
         names.push(taken.name);
       }
       this.recalculate(); this.refreshScores();
-      if (destination === "top" || destination === "discard") this.announceDeckAccess(ctx.source.owner, recipient);
+      if (destination === "top" || destination === "discard") this.announceDeckAccess(ctx.source.owner, recipient, ctx);
       return this.event("trash", `${card.name} recovers ${names.join(", ")} to ${whose} ${placeName}.`, { ...this.base(ctx), target: destination === "hand" ? "hand" : "discard", targetOwner: recipient, amount: names.length });
     };
     if (step.pick?.mode === "random") {
@@ -2332,7 +2489,7 @@ export class RuntimeSession {
     };
     const eligible = poolCards();
     const accessingHand = !fromDiscard && !fromDeck && victim !== owner;
-    if (accessingHand) this.announceHandAccess(owner, victim);
+    if (accessingHand) this.announceHandAccess(owner, victim, ctx);
     // Cost-for-benefit: if the seat cannot pay the full minimum, skip the modal and explain why.
     if (minimum > 0 && eligible.length < minimum) {
       if (step.then?.length || !step.optional) {
@@ -2356,7 +2513,13 @@ export class RuntimeSession {
         removed = player.hand.splice(handIndex, 1)[0];
       }
       if (!removed) throw new Error(`Selected card is no longer in ${fromDiscard ? "Discard" : fromDeck ? "the deck" : fromHandOrDiscard ? "hand or Discard" : "hand"}.`);
-      if (trash) this.state.trash.push(removed); else player.discard.push(removed);
+      if (trash) {
+        this.state.trash.push(removed);
+        this.emitCardTriggers("cardTrashedThisCycle", { actor: owner, victim, card: removed });
+      } else {
+        player.discard.push(removed);
+        this.emitCardTriggers("handDiscarded", { actor: owner, victim, card: removed });
+      }
       this.recalculate();
       this.refreshScores();
       return this.event("trash", `${placement.card.name}: ${removed.name} enters ${trash ? "shared Trash" : "Discard"}.`, { owner, cardId: placement.card.id, source: "card", sourceName: placement.card.name, targetOwner: victim, target: trash ? "trash" : "discard", amount: 1 });
@@ -2403,7 +2566,8 @@ export class RuntimeSession {
     const allowed = inspectActionsFor(step);
     const entries = decks.flatMap(owner => this.state.players[owner].draw.slice(0, amount).map(card => ({ owner, card })));
     if (!entries.length) return this.event("choice", `${placement.card.name}: No target.`, { owner: placement.owner, amount: 0 });
-    for (const deckOwner of decks) this.announceDeckAccess(placement.owner, deckOwner);
+    const scryCtx = this.cardContext(placement);
+    for (const deckOwner of decks) this.announceDeckAccess(placement.owner, deckOwner, scryCtx);
     const both = decks.length > 1;
     const sideLabel = (owner: PlayerId) => (owner === placement.owner ? "Yours" : "Enemy's");
     const actions = new Map<string, { card: Card; owner: PlayerId; action: InspectAction }>();
@@ -2461,7 +2625,8 @@ export class RuntimeSession {
   private resolvePeek(placement: Deployment, amount: number, decks: readonly PlayerId[]): RuntimeEvent {
     const entries = decks.flatMap(owner => this.state.players[owner].draw.slice(0, amount).map(card => ({ owner, card })));
     if (!entries.length) return this.event("choice", `${placement.card.name}: No target.`, { owner: placement.owner, amount: 0 });
-    for (const deckOwner of decks) this.announceDeckAccess(placement.owner, deckOwner);
+    const peekCtx = this.cardContext(placement);
+    for (const deckOwner of decks) this.announceDeckAccess(placement.owner, deckOwner, peekCtx);
     const both = decks.length > 1;
     const sideLabel = (owner: PlayerId) => (owner === placement.owner ? "Yours" : "Enemy's");
     const subject = both
@@ -2484,12 +2649,16 @@ export class RuntimeSession {
 
   /* ---------------------------------------------------------------- cards */
 
-  private isCardTargetLegal(step: EffectStep, target: Deployment): boolean {
+  private isCardTargetLegal(step: EffectStep, target: Deployment, source?: Card): boolean {
     if (!target.revealed || this.collapseResolvedNodes.has(target.node)) return false;
     if (!this.state.nodes[target.node]?.cards[target.owner].includes(target)) return false;
-    if (step.target?.type === "card" && !matchesFilter(target.card, step.target.filter)) return false;
-    if (step.action === "moveCard") return this.moveDestinations(target).length > 0;
+    if (step.target?.type === "card" && !matchesFilter(target.card, step.target.filter, source)) return false;
+    if (step.action === "moveCard") {
+      if (step.moveDir === "left" || step.moveDir === "right") return true;
+      return this.moveDestinations(target).length > 0;
+    }
     if (step.action === "destroyCard" && this.nodeBlocksDestroy(target.node)) return false;
+    if (step.action === "destroyCard" && this.ownerHasProtectDestroy(target.owner)) return false;
     if (step.action === "changePower" && (step.amount ?? 0) < 0) {
       if (this.state.nodes[target.node]?.location?.passives?.immunePowerDown) return false;
       if (this.ownerHasProtectPower(target.owner)) return false;
@@ -2521,6 +2690,7 @@ export class RuntimeSession {
       const self = this.state.nodes[ctx.source.node]?.cards[ctx.source.owner].includes(ctx.source) ? ctx.source : null;
       if (step.action === "moveCard") {
         if (!self) return this.noTarget(ctx, step);
+        if (step.moveDir === "left" || step.moveDir === "right") return this.movePlacementDirected(ctx.source, self, step.moveDir);
         // Location on-play / auto-moves never pause for a destination pick; card effects still may.
         const mode = step.pick?.mode ?? "choose";
         const locationAuto = ctx.scope === "location" || ctx.scope === "locationPlay" || ctx.scope === "locationEvent" || ctx.scope === "locationCondition";
@@ -2529,14 +2699,21 @@ export class RuntimeSession {
         }
         return this.chooseMoveDestination(ctx.source, self);
       }
-      return self && this.isCardTargetLegal(step, self) ? this.applyCardStep(ctx, step, self, true) : this.noTarget(ctx, step);
+      return self && this.isCardTargetLegal(step, self, ctx.source.card) ? this.applyCardStep(ctx, step, self, true) : this.noTarget(ctx, step);
     }
     const owners = this.whoPlayers(ctx, target.who, true);
     if (!owners.length) return this.noTarget(ctx, step);
     if (target.relation) {
       if (target.relation === "next") return this.awaitNextReveal(ctx, step, owners);
+      if (target.relation === "trigger") {
+        const related = ctx.triggerPlacement;
+        if (!related || !owners.includes(related.owner) || !this.isCardTargetLegal(step, related, ctx.source.card)) {
+          return this.noTarget(ctx, step, { targetOwner: owners.length === 1 ? owners[0] : undefined });
+        }
+        return this.applyCardStep(ctx, step, related, true);
+      }
       const related = this.relatedPlayedCard(ctx.source, owners, "previous");
-      if (!related || !this.isCardTargetLegal(step, related)) return this.noTarget(ctx, step, { targetOwner: owners.length === 1 ? owners[0] : undefined });
+      if (!related || !this.isCardTargetLegal(step, related, ctx.source.card)) return this.noTarget(ctx, step, { targetOwner: owners.length === 1 ? owners[0] : undefined });
       return this.applyCardStep(ctx, step, related, true);
     }
     const mode = step.pick?.mode ?? "choose";
@@ -2547,7 +2724,9 @@ export class RuntimeSession {
       if (node !== null && node < 0) return this.noTarget(ctx, step);
       if (ctx.scope !== "card" && node !== null && mode !== "choose" && mode !== "random" && (step.action === "trashCard" || step.action === "destroyCard")) return this.removeRankedAtNode(ctx, step, node, groups);
       if (ctx.scope !== "card" && node !== null && mode === "all" && step.action === "changePower") return this.boostAtNode(ctx, step, node, owners);
-      const candidates = (group: PlayerId[]) => group.flatMap(owner => this.state.nodes.flatMap((state, index) => node === null || index === node ? state.cards[owner] : [])).filter(placement => this.isCardTargetLegal(step, placement));
+      const candidates = (group: PlayerId[]) => group.flatMap(owner => this.state.nodes.flatMap((state, index) => node === null || index === node ? state.cards[owner] : []))
+        .filter(placement => this.isCardTargetLegal(step, placement, ctx.source.card)
+          && !(step.action === "merge" && placement.card.id === ctx.source.card.id));
       const actionable = groups.filter(group => candidates(group).length);
       if (!actionable.length) return this.noTarget(ctx, step, { targetOwner: owners.length === 1 ? owners[0] : undefined });
       return this.runSteps(actionable.map(group => () => this.pickBoardCards(ctx, step, candidates(group))));
@@ -2689,11 +2868,14 @@ export class RuntimeSession {
         const kept = this.retire(card, retireOwner, zone);
         this.recalculate();
         this.refreshScores();
-        if (kept && zone === "destroyed") {
+        if (zone === "destroyed") {
           this.emitCardTriggers("anyCardDestroyed", { actor: source.owner, victim: retireOwner, card, node: -1 });
         }
         const whose = owner === source.owner ? "its owner's" : this.whose(owner);
-        return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${card.name} from ${whose} ${from}.` : `${source.card.name}: ${card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
+        const verb = zone === "destroyed" ? "destroys" as const : "trashes" as const;
+        return this.event("trash", this.retireVerb(verb, source.card.name, card.name, kept, `${whose} ${from}`), {
+          ...detail, target: zone, amount: 1,
+        });
       }
       case "attachModifier": return this.attachModifier(ctx, step, card);
       case "removeModifier": return this.removeModifiers(ctx, step, card);
@@ -2716,12 +2898,24 @@ export class RuntimeSession {
     }
   }
 
+  /** Same-card Merge never pauses for a pick — the earlier copy is absorbed automatically. */
+  private mergeAutoPicksSameCard(ctx: EffectContext, step: EffectStep, candidates: readonly Deployment[]): boolean {
+    if (step.action !== "merge" || !candidates.length) return false;
+    const filter = step.target?.type === "card" ? step.target.filter : undefined;
+    if (filter?.this) return true;
+    return candidates.every(entry => this.sameCardDefinition(ctx.source.card, entry.card));
+  }
+
   /** Picks among board candidates by the step's pick rule, then applies the step to each pick. */
   private pickBoardCards(ctx: EffectContext, step: EffectStep, candidates: Deployment[]): RuntimeEvent {
     if (!candidates.length) return this.noTarget(ctx, step);
     const mode = step.pick?.mode ?? "choose";
     const count = Math.min(Math.max(1, step.pick?.count ?? 1), candidates.length);
     const apply = (targets: Deployment[], chosen: boolean) => this.runSteps(targets.map(target => () => this.applyCardStep(ctx, step, target, chosen)));
+    if (this.mergeAutoPicksSameCard(ctx, step, candidates)) {
+      const ordered = this.rankPlacements(candidates, "first");
+      return apply(ordered.slice(0, count), false);
+    }
     if (mode === "all") return apply(candidates, false);
     if (mode === "random") {
       const pool = [...candidates];
@@ -2760,10 +2954,20 @@ export class RuntimeSession {
   private applyCardStep(ctx: EffectContext, step: EffectStep, target: Deployment, chosen: boolean): RuntimeEvent {
     const source = ctx.source;
     switch (step.action) {
-      case "moveCard": return chosen ? this.chooseMoveDestination(source, target) : this.movePlacementRandom(source, target, ctx.scope === "card" || ctx.scope === "circuit" ? "card" : "location");
+      case "moveCard": {
+        if (step.moveDir === "left" || step.moveDir === "right") return this.movePlacementDirected(source, target, step.moveDir);
+        return chosen ? this.chooseMoveDestination(source, target) : this.movePlacementRandom(source, target, ctx.scope === "card" || ctx.scope === "circuit" ? "card" : "location");
+      }
+      case "merge":
+        return this.resolveMergeAbsorb(ctx, step, target);
       case "destroyCard":
         if (this.nodeBlocksDestroy(target.node)) {
           return this.event("trash", `${source.card.name}: ${target.card.name} cannot be destroyed here.`, {
+            ...this.base(ctx), targetCardId: target.card.id, targetOwner: target.owner, targetNode: target.node, amount: 0,
+          });
+        }
+        if (this.ownerHasProtectDestroy(target.owner)) {
+          return this.event("trash", `${source.card.name}: ${target.card.name} cannot be destroyed (protected).`, {
             ...this.base(ctx), targetCardId: target.card.id, targetOwner: target.owner, targetNode: target.node, amount: 0,
           });
         }
@@ -2829,7 +3033,7 @@ export class RuntimeSession {
         (kept ? hit : removed).push(target.card.name);
         if (destroy) {
           this.queueLocationEvent("cardDestroyed", node, owner, destroyedCard);
-          if (kept) this.emitCardTriggers("anyCardDestroyed", { actor: ctx.source.owner, victim: owner, card: destroyedCard, node });
+          this.emitCardTriggers("anyCardDestroyed", { actor: ctx.source.owner, victim: owner, card: destroyedCard, node });
         }
       }
     }
@@ -2839,7 +3043,7 @@ export class RuntimeSession {
     if (!hit.length && !removed.length) return this.event("trash", `${name}: No target.`, { ...detail, amount: 0 });
     const parts = [
       ...(hit.length ? [`${destroy ? "destroy" : "trash"} ${hit.join(", ")}`] : []),
-      ...(removed.length ? [`${removed.join(", ")} ${removed.length === 1 ? "is" : "are"} removed from the game`] : []),
+      ...(removed.length ? [`${destroy ? "destroy" : "trash"} ${removed.join(", ")} (removed from the game)`] : []),
     ];
     return this.event("trash", `${name}: ${parts.join("; ")}.`, { ...detail, amount: hit.length + removed.length });
   }
@@ -2875,6 +3079,21 @@ export class RuntimeSession {
   private ownerHasProtectPower(owner: PlayerId): boolean {
     return this.activeTriggerHosts().some(host => host.owner === owner && (host.card.triggers ?? []).some(trigger => trigger.kind === "protectPower"));
   }
+
+  private ownerHasProtectCrypto(owner: PlayerId): boolean {
+    return this.activeTriggerHosts().some(host => host.owner === owner && (host.card.triggers ?? []).some(trigger => trigger.kind === "protectCrypto"));
+  }
+
+  private ownerHasProtectDestroy(owner: PlayerId): boolean {
+    return this.activeTriggerHosts().some(host => host.owner === owner && (host.card.triggers ?? []).some(trigger => trigger.kind === "protectDestroy"));
+  }
+
+  private ownerHasProtectDeckAccess(owner: PlayerId): boolean {
+    return this.activeTriggerHosts().some(host => host.owner === owner && (host.card.triggers ?? []).some(trigger => trigger.kind === "protectDeckAccess"));
+  }
+
+  /** Live Power of the last successful Merge victim (for absorbPower). */
+  private lastAbsorbedPower: number | null = null;
 
   /** Revealed board cards whose Ongoing triggers are live (Location not suppressOngoing; not Cycle-silenced). */
   private activeTriggerHosts(): Deployment[] {
@@ -2941,8 +3160,8 @@ export class RuntimeSession {
     for (const host of this.activeTriggerHosts()) {
       const ctx = this.cardContext(host);
       for (const trigger of host.card.triggers ?? []) {
-        const fire = (then: readonly EffectStep[]) => {
-          for (const step of then) callbacks.push(() => this.resolveStep(ctx, step));
+        const fire = (then: readonly EffectStep[], triggerCtx: EffectContext = ctx) => {
+          for (const step of then) callbacks.push(() => this.resolveStep(triggerCtx, step));
         };
         switch (trigger.kind) {
           case "mirrorCrypto":
@@ -2970,7 +3189,23 @@ export class RuntimeSession {
           case "when":
             if (trigger.event === event) {
               if (event === "enemyDraws" && detail.actor === host.owner) break;
-              if (event === "enemyDrainsYou" && detail.victim !== host.owner) break;
+              if ((event === "enemyDrainsYou" || event === "enemyDrainsBackup") && detail.victim !== host.owner) break;
+              if (event === "cardMovedHere" && detail.node !== host.node) break;
+              if (event === "cardTrashedHere" && detail.node !== host.node) break;
+              if (trigger.actor && trigger.actor !== "any") {
+                const wantSelf = trigger.actor === "self";
+                if (event === "serverRepaired") {
+                  const actorIsHost = detail.actor === host.owner;
+                  if (wantSelf !== actorIsHost) break;
+                  if (trigger.serverWhose && trigger.serverWhose !== "any") {
+                    const serverIsHost = detail.victim === host.owner;
+                    if ((trigger.serverWhose === "self") !== serverIsHost) break;
+                  }
+                } else if (event === "cardTrashedThisCycle" || event === "cardMoved" || event === "handDiscarded") {
+                  const actorIsHost = detail.actor === host.owner;
+                  if (wantSelf !== actorIsHost) break;
+                }
+              }
               fire(trigger.then);
             }
             break;
@@ -2979,10 +3214,17 @@ export class RuntimeSession {
               const identity = detail.card.definitionId ?? detail.card.id;
               const classOk = !trigger.match.cardClass || detail.card.cardClass === trigger.match.cardClass;
               const typeOk = !trigger.match.cardType || detail.card.type === trigger.match.cardType;
-              const idOk = !trigger.match.definitionId || identity === trigger.match.definitionId;
+              const named = [
+                ...(trigger.match.definitionId ? [trigger.match.definitionId] : []),
+                ...(trigger.match.definitionIds ?? []),
+              ];
+              const idOk = !named.length || named.includes(identity);
               if (!classOk || !typeOk || !idOk) break;
               if (trigger.scope === "thisNode" && detail.node !== host.node) break;
-              fire(trigger.then);
+              const node = detail.node ?? host.node;
+              const triggerPlacement = (node >= 0 ? this.state.nodes[node]?.cards[detail.actor] ?? [] : [])
+                .find(placement => placement.card.id === detail.card!.id);
+              fire(trigger.then, triggerPlacement ? { ...ctx, triggerPlacement } : ctx);
             }
             break;
           case "listenAccess":
@@ -2996,8 +3238,14 @@ export class RuntimeSession {
     if (callbacks.length) this.queue.unshift(...callbacks);
   }
 
-  /** Announce a deck or hand access for Listen Ongoing (peek/scry/mill/hand look/forced discard). */
-  private announceAccess(accessor: PlayerId, zoneOwner: PlayerId): void {
+  /**
+   * Announce a deck or hand access for Listen Ongoing (peek/scry/mill/hand look/forced discard/poison).
+   * Card-sourced accesses only: location / circuit / runtimeHack do not fire Canary or count as deck attacks.
+   */
+  private announceAccess(accessor: PlayerId, zoneOwner: PlayerId, source?: EffectContext): void {
+    if (source && source.scope !== "card") return;
+    if (accessor !== zoneOwner && this.ownerHasProtectDeckAccess(zoneOwner)) return;
+    if (accessor !== zoneOwner) this.telemetry.data.enemyAccesses[accessor]++;
     for (const host of this.activeTriggerHosts()) {
       let relative: ListenWhose | null = null;
       if (zoneOwner === host.owner) relative = accessor === host.owner ? "youAccessYours" : "enemyAccessesYours";
@@ -3012,13 +3260,13 @@ export class RuntimeSession {
   }
 
   /** Announce a deck access for Listen Ongoing (Inspect, Peek, steal/gain/mill/mod on deck, etc.). */
-  private announceDeckAccess(accessor: PlayerId, deckOwner: PlayerId): void {
-    this.announceAccess(accessor, deckOwner);
+  private announceDeckAccess(accessor: PlayerId, deckOwner: PlayerId, source?: EffectContext): void {
+    this.announceAccess(accessor, deckOwner, source);
   }
 
   /** Enemy looking at or forcing discard/trash from a hand counts as access for Listen Ongoing. */
-  private announceHandAccess(accessor: PlayerId, handOwner: PlayerId): void {
-    this.announceAccess(accessor, handOwner);
+  private announceHandAccess(accessor: PlayerId, handOwner: PlayerId, source?: EffectContext): void {
+    this.announceAccess(accessor, handOwner, source);
   }
 
   private nodeBlocksDestroy(node: number): boolean {
@@ -3085,7 +3333,7 @@ export class RuntimeSession {
     this.recalculate();
     const deckOwner = this.cardOwner(host);
     if (deckOwner !== undefined && (step.target?.type === "card" && (step.target.where === "collection" || step.target.where === "deck"))) {
-      this.announceDeckAccess(ctx.source.owner, deckOwner);
+      this.announceDeckAccess(ctx.source.owner, deckOwner, ctx);
     }
     return this.event("power", `${card.name}: attach ${this.modifierName(modifier)} to ${host.name}.`, { ...this.base(ctx), targetOwner: this.cardOwner(host) ?? ctx.source.owner, amount: modifier.amount ?? 1, targetCardId: host.id });
   }
@@ -3110,7 +3358,7 @@ export class RuntimeSession {
     if (kept.length) host.modifiers = kept; else delete host.modifiers;
     this.recalculate();
     if (step.target?.type === "card" && (step.target.where === "collection" || step.target.where === "deck")) {
-      this.announceDeckAccess(ctx.source.owner, targetOwner);
+      this.announceDeckAccess(ctx.source.owner, targetOwner, ctx);
     }
     const names = [...new Set(removed.map(modifier => this.modifierName(modifier)))].join(", ");
     return this.event("power", `${ctx.source.card.name}: remove ${names} from ${host.name}.`, { ...this.base(ctx), targetOwner, amount: removed.length, targetCardId: host.id });
@@ -3509,10 +3757,10 @@ export class RuntimeSession {
         const victimCard = target.card;
         lane.splice(index, 1);
         this.stripModifiers(target.card);
-        const kept = this.retire(target.card, target.owner, "destroyed");
+        this.retire(target.card, target.owner, "destroyed");
         destroyed.push(target.card.name);
         this.queueLocationEvent("cardDestroyed", node, victim, victimCard);
-        if (kept) this.emitCardTriggers("anyCardDestroyed", { actor: owner, victim, card: victimCard, node });
+        this.emitCardTriggers("anyCardDestroyed", { actor: owner, victim, card: victimCard, node });
       }
       this.recalculate();
       this.refreshScores();
@@ -3536,16 +3784,146 @@ export class RuntimeSession {
     });
   }
 
+  /** My Business Card: reclaim a stolen card revealed at this Node. */
+  private resolveReclaimStolen(ctx: EffectContext, _step: EffectStep): RuntimeEvent {
+    const business = ctx.source;
+    const original = business.owner;
+    const node = business.node;
+    if (node < 0 || !this.state.nodes[node]?.cards[original].includes(business)) {
+      return this.event("move", `${business.card.name}: nothing to reclaim.`, { ...this.base(ctx), amount: 0 });
+    }
+    const candidates = ([0, 1] as PlayerId[]).flatMap(seat => this.state.nodes[node].cards[seat])
+      .filter(placement => placement.revealed
+        && placement.card.id !== business.card.id
+        && placement.card.stolenFrom === original);
+    if (!candidates.length) {
+      return this.event("move", `${business.card.name}: no stolen card here.`, { ...this.base(ctx), amount: 0 });
+    }
+    const apply = (stolen: Deployment): RuntimeEvent => {
+      const thiefLane = this.state.nodes[node].cards[stolen.owner];
+      const ownerLane = this.state.nodes[node].cards[original];
+      const stolenIndex = thiefLane.indexOf(stolen);
+      const businessIndex = ownerLane.indexOf(business);
+      if (stolenIndex < 0 || businessIndex < 0) {
+        return this.event("move", `${business.card.name}: reclaim failed.`, { ...this.base(ctx), amount: 0 });
+      }
+      thiefLane.splice(stolenIndex, 1);
+      ownerLane.splice(businessIndex, 1);
+      const thiefOwner = stolen.owner;
+      stolen.owner = original;
+      business.owner = thiefOwner;
+      ownerLane.splice(businessIndex, 0, stolen);
+      thiefLane.splice(stolenIndex, 0, business);
+      delete stolen.card.stolenFrom;
+      this.recalculate();
+      this.refreshScores();
+      const revealEffects = this.hookEffects(stolen.card, "onReveal");
+      const stolenCtx = this.cardContext(stolen);
+      this.queue.unshift(...revealEffects.map(effect => () => this.resolveStep(stolenCtx, effect)));
+      return this.event("move", `${business.card.name} reclaims ${stolen.card.name}.`, {
+        ...this.base(ctx), targetCardId: stolen.card.id, targetOwner: original, targetNode: node, amount: 1,
+      });
+    };
+    if (candidates.length === 1) return apply(candidates[0]);
+    return this.openChoice({ ...business, owner: original }, {
+      prompt: `${business.card.name}: reclaim which stolen card?`,
+      options: candidates.map(entry => ({ id: `card-${entry.card.id}`, label: entry.card.name, card: this.choiceCard(entry) })),
+      verb: "Select",
+      aiPick: () => ({ ids: [`card-${candidates[0].card.id}`] }),
+      resolve: ids => {
+        const pick = candidates.find(entry => ids.includes(`card-${entry.card.id}`)) ?? candidates[0];
+        return apply(pick);
+      },
+    });
+  }
+
+  /** Same definition (or same name when neither has a definitionId): two instances of one card. */
+  private sameCardDefinition(a: Card, b: Card): boolean {
+    if (a.definitionId || b.definitionId) return !!a.definitionId && a.definitionId === b.definitionId;
+    return a.name === b.name;
+  }
+
+  /**
+   * When Merge absorbs another instance of the same card, stack that copy’s effect packages onto
+   * the survivor so a later play runs both (e.g. two Batz → +2 Crypto and +2 cards).
+   */
+  private stackMergedSameCardEffects(survivor: Card, absorbed: Card): boolean {
+    if (!this.sameCardDefinition(survivor, absorbed)) return false;
+    const add = <T>(into: readonly T[] | undefined, from: readonly T[] | undefined): T[] | undefined => {
+      if (!from?.length) return into ? [...into] : undefined;
+      return [...(into ?? []), ...structuredClone(from as T[])];
+    };
+    survivor.onReveal = add(survivor.onReveal, absorbed.onReveal);
+    survivor.onCollapse = add(survivor.onCollapse, absorbed.onCollapse);
+    survivor.recurring = add(survivor.recurring, absorbed.recurring);
+    survivor.schedule = add(survivor.schedule, absorbed.schedule);
+    survivor.triggers = add(survivor.triggers, absorbed.triggers);
+    survivor.ifs = add(survivor.ifs, absorbed.ifs);
+    const text = describeCard(survivor, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods);
+    if (text) survivor.effect = text;
+    return true;
+  }
+
+  /** Absorb a revealed card at this Location; victim leaves like Runtime (no destroy bus). */
+  private resolveMergeAbsorb(ctx: EffectContext, step: EffectStep, target: Deployment): RuntimeEvent {
+    const source = ctx.source;
+    if (!target.revealed || target.card.id === source.card.id) return this.noTarget(ctx, step);
+    const power = this.cardPower(target, false);
+    this.lastAbsorbedPower = power;
+    const lane = this.state.nodes[target.node]?.cards[target.owner];
+    const index = lane ? lane.indexOf(target) : -1;
+    if (index < 0) return this.noTarget(ctx, step);
+    const stacked = this.stackMergedSameCardEffects(source.card, target.card);
+    lane!.splice(index, 1);
+    this.runtimeTimers.delete(target.card.id);
+    this.expiredOnBoard.delete(target.card.id);
+    this.stripModifiers(target.card);
+    this.recalculate();
+    this.refreshScores();
+    if (step.absorbPower) {
+      setPowerDelta(source.card, (source.card.powerDelta ?? 0) + power);
+      this.recalculate();
+    }
+    this.queue.unshift(...(step.then ?? []).map(next => () => this.resolveStep(ctx, next)));
+    const bits = [
+      `${source.card.name} merges with ${target.card.name} (removed from the game)`,
+      stacked ? "stacking its effects" : null,
+      step.absorbPower ? `absorbing ${power} Power` : null,
+    ].filter(Boolean);
+    return this.event("trash", `${bits.join(", ")}.`, {
+      ...this.base(ctx), targetCardId: target.card.id, targetOwner: target.owner, targetNode: target.node, amount: 1,
+    });
+  }
+
+  private resolveAbsorbPower(ctx: EffectContext): RuntimeEvent {
+    const power = this.lastAbsorbedPower;
+    if (power === null || power === undefined) {
+      return this.event("power", `${ctx.source.card.name}: nothing to absorb.`, { ...this.base(ctx), amount: 0 });
+    }
+    setPowerDelta(ctx.source.card, (ctx.source.card.powerDelta ?? 0) + power);
+    this.lastAbsorbedPower = null;
+    this.recalculate();
+    return this.event("power", `${ctx.source.card.name}: absorb +${power} Power.`, {
+      ...this.base(ctx), amount: power, after: this.livePower(ctx.source.card),
+    });
+  }
+
   /** Take cards from the top of `victim`'s deck into the acting seat's hand. */
   private stealDeckCard(ctx: EffectContext, step: EffectStep, victim: PlayerId): RuntimeEvent {
     const amount = Math.max(1, step.amount ?? 1);
     const thief = ctx.source.owner;
     const deck = this.state.players[victim].draw;
     if (!deck.length) return this.noTarget(ctx, step, { targetOwner: victim }, "Deck is empty.");
+    if (this.ownerHasProtectDeckAccess(victim) && thief !== victim) {
+      return this.event("draw", `${ctx.source.card.name}: steal blocked (deck access protected).`, {
+        ...this.base(ctx), amount: 0, targetOwner: victim, target: "hand",
+      });
+    }
     const taken = deck.splice(0, Math.min(amount, deck.length));
+    for (const card of taken) card.stolenFrom = victim;
     this.state.players[thief].hand.push(...taken);
     this.refreshScores();
-    this.announceDeckAccess(thief, victim);
+    this.announceDeckAccess(thief, victim, ctx);
     return this.event("draw", `${ctx.source.card.name}: steal ${taken.map(card => card.name).join(", ")} from ${this.whose(victim)} deck.`, {
       ...this.base(ctx), amount: taken.length, targetOwner: victim, target: "hand",
     });
@@ -3560,8 +3938,8 @@ export class RuntimeSession {
     const takeB = b.splice(0, Math.min(amount, b.length));
     a.unshift(...takeB);
     b.unshift(...takeA);
-    this.announceDeckAccess(ctx.source.owner, 0);
-    this.announceDeckAccess(ctx.source.owner, 1);
+    this.announceDeckAccess(ctx.source.owner, 0, ctx);
+    this.announceDeckAccess(ctx.source.owner, 1, ctx);
     return this.event("draw", `${ctx.source.card.name}: swap top ${amount} of both decks (${takeA.length}↔${takeB.length}).`, {
       ...this.base(ctx), amount: Math.max(takeA.length, takeB.length),
     });
@@ -3630,7 +4008,7 @@ export class RuntimeSession {
     const target = step.target?.type === "card" ? step.target : undefined;
     const filter = step.filter ?? target?.filter;
     const runCopy = (source: Card, deckOwner?: PlayerId): RuntimeEvent => {
-      if (deckOwner !== undefined) this.announceDeckAccess(owner, deckOwner);
+      if (deckOwner !== undefined) this.announceDeckAccess(owner, deckOwner, ctx);
       const printed = this.steps(source.onReveal, "card").filter(entry => entry.action !== "copyPreviousOnReveal" && entry.action !== "copyText");
       if (!printed.length) {
         return this.event("choice", `${card.name}: nothing to copy from ${source.name}.`, this.base(ctx));
@@ -3735,6 +4113,20 @@ export class RuntimeSession {
     })));
   }
 
+  /** Forced adjacent move; blocked destinations nudge in place with a Can’t move cue. */
+  private movePlacementDirected(source: Deployment, target: Deployment, dir: "left" | "right"): RuntimeEvent {
+    const from = target.node;
+    const destination = dir === "left" ? from - 1 : from + 1;
+    if (!this.moveDestinations(target).includes(destination)) {
+      return this.event("move", `${source === target ? target.card.name : `${source.card.name}: ${target.card.name}`} Can’t move ${dir}.`, {
+        node: from, owner: source.owner, cardId: source.card.id,
+        targetCardId: target.card.id, targetOwner: target.owner, sourceNode: from, targetNode: destination,
+        source: "card", sourceName: source.card.name, amount: 0,
+      });
+    }
+    return this.movePlacement(source, destination, target);
+  }
+
   private movePlacement(source: Deployment, destination: number, target: Deployment): RuntimeEvent {
     const from = target.node;
     if (!this.moveDestinations(target).includes(destination)) throw new Error("Destination Node is unavailable.");
@@ -3751,6 +4143,8 @@ export class RuntimeSession {
       this.queueLocationEvent("cardLeft", from, target.owner, target.card);
       this.queueLocationEvent("cardMovedHere", destination, target.owner, target.card);
     }
+    this.emitCardTriggers("cardMoved", { actor: source.owner, node: destination, card: target.card });
+    this.emitCardTriggers("cardMovedHere", { actor: source.owner, node: destination, card: target.card });
     return this.event("move", `${source === target ? target.card.name : `${source.card.name}: ${target.card.name}`} moves from Node ${from + 1} to Node ${destination + 1}.`, {
       node: source.node >= 0 ? source.node : undefined, owner: source.owner, cardId: source.card.id,
       targetCardId: target.card.id, targetOwner: target.owner, sourceNode: from, targetNode: destination,
@@ -3777,11 +4171,17 @@ export class RuntimeSession {
     this.recalculate();
     this.refreshScores();
     if (wasRevealed) this.queueLocationConditionCheck(atNode);
-    if (zone === "destroyed" && kept) {
+    if (zone === "destroyed") {
       if (wasRevealed) this.queueLocationEvent("cardDestroyed", atNode, victim, victimCard);
       this.emitCardTriggers("anyCardDestroyed", { actor: source.owner, victim, card: victimCard, node: atNode });
+    } else {
+      this.emitCardTriggers("cardTrashedThisCycle", { actor: source.owner, victim, card: victimCard, node: atNode });
+      if (wasRevealed) this.emitCardTriggers("cardTrashedHere", { actor: source.owner, victim, card: victimCard, node: atNode });
     }
-    return this.event("trash", kept ? `${source.card.name} ${zone === "destroyed" ? "destroys" : "trashes"} ${target.card.name}.` : `${source.card.name}: ${target.card.name} is removed from the game.`, { ...detail, ...(kept ? { target: zone } : {}), amount: 1 });
+    const verb = zone === "destroyed" ? "destroys" as const : "trashes" as const;
+    return this.event("trash", this.retireVerb(verb, source.card.name, target.card.name, kept), {
+      ...detail, target: zone, amount: 1,
+    });
   }
 
   /** Heal raises a weakened card toward printed Power and never above it; with no amount
@@ -3843,6 +4243,7 @@ export class RuntimeSession {
         const winner = this.state.nodes[node].winner;
         return this.event("power", winner === null ? "Node tied." : `${this.say(winner, "You control", "controls")} this Node.`, { node, ...(winner !== null ? { owner: winner } : {}) });
       });
+      this.queue.push(() => this.fireNodeOutcomeIfs(node));
       this.queue.push(() => {
         const location = this.state.nodes[node].location;
         const winner = this.state.nodes[node].winner;
@@ -4250,20 +4651,8 @@ export class RuntimeSession {
     return `${this.say(leader, "You earn", "earns")} +${bonus} VP for most Circuits won (${tally}).`;
   }
 
-  private resolvedEndGameAwards(): EndGameAwards | null {
-    const override = this.config.endGameAwards;
-    if (!override) return null;
-    const awards = { ...DEFAULT_END_GAME_AWARDS };
-    for (const id of Object.keys(awards) as EndGameAwardId[]) {
-      const next = override[id];
-      if (!next) continue;
-      const vp = Math.max(0, Math.round(typeof next.vp === "number" ? next.vp : awards[id].vp));
-      awards[id] = {
-        enabled: (next.enabled ?? awards[id].enabled) !== false && vp > 0,
-        vp,
-      };
-    }
-    return awards;
+  private resolvedEndGameAwards(): EndGameAwards {
+    return mergeEndGameAwards(this.config.endGameAwards);
   }
 
   /** Absolute-seat standings for the live HUD; `view()` reindexes them for the reader. */
@@ -4283,7 +4672,6 @@ export class RuntimeSession {
       });
     }
     const awards = this.resolvedEndGameAwards();
-    if (!awards) return rows;
     const data = this.telemetry.data;
     const stats: Record<EndGameAwardId, [number, number]> = {
       mostDestroyed: data.cardsDestroyed,
@@ -4292,6 +4680,8 @@ export class RuntimeSession {
       mostPowerBoosted: data.powerIncreased,
       mostCryptoBanked: data.cryptoGained,
       mostCryptoStolen: data.cryptoStolenBumped,
+      mostServerRepair: data.restoreDone,
+      mostDeckAttacks: data.enemyAccesses,
     };
     for (const id of Object.keys(awards) as EndGameAwardId[]) {
       const setting = awards[id];
@@ -4326,7 +4716,6 @@ export class RuntimeSession {
 
   private awardEndGameAchievements(): string[] {
     const awards = this.resolvedEndGameAwards();
-    if (!awards) return [];
     const data = this.telemetry.data;
     const notes: string[] = [];
     const push = (id: EndGameAwardId, stats: [number, number]) => {
@@ -4341,6 +4730,8 @@ export class RuntimeSession {
     push("mostPowerBoosted", data.powerIncreased);
     push("mostCryptoBanked", data.cryptoGained);
     push("mostCryptoStolen", data.cryptoStolenBumped);
+    push("mostServerRepair", data.restoreDone);
+    push("mostDeckAttacks", data.enemyAccesses);
     return notes;
   }
 

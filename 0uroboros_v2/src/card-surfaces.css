@@ -1,4 +1,39 @@
 /* Card surfaces keep the same face in the editor, hand, Draft and inspection. */
+/* Stolen / foreign play: same pink mono as enemy Effect Bank. */
+.cf-card.cf-card--foreign {
+  filter:grayscale(1) sepia(1) saturate(8) hue-rotate(-35deg) brightness(.95);
+  animation:cf-foreign-pulse 3.5s ease-in-out infinite;
+}
+@keyframes cf-foreign-pulse {
+  0%,100% { filter:grayscale(1) sepia(1) saturate(6) hue-rotate(-35deg) brightness(.88); opacity:.88; }
+  50% { filter:grayscale(1) sepia(1) saturate(10) hue-rotate(-35deg) brightness(1.08); opacity:1; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .cf-card.cf-card--foreign { animation:none; }
+}
+.field-card.cant-move-card {
+  animation:cf-cant-move-nudge .45s ease-out;
+}
+.field-card.cant-move-card::after {
+  content:"Can't move";
+  position:absolute; z-index:12; left:50%; bottom:108%;
+  translate:-50% 0; white-space:nowrap;
+  padding:2px 6px; border-radius:4px;
+  font:700 9px/1.2 Inter,system-ui,sans-serif; letter-spacing:.04em;
+  color:#ffe8f2; background:#5a0828e6; border:1px solid #fa0048aa;
+  box-shadow:0 2px 8px #000a; pointer-events:none;
+  animation:cf-cant-move-badge 1s ease-out both;
+}
+@keyframes cf-cant-move-nudge {
+  0%,100% { transform:translateX(0); }
+  25% { transform:translateX(calc(var(--cant-move-dir, 1) * -6px)); }
+  55% { transform:translateX(calc(var(--cant-move-dir, 1) * 4px)); }
+}
+@keyframes cf-cant-move-badge {
+  0% { opacity:0; transform:translateY(4px); }
+  15%,70% { opacity:1; transform:translateY(0); }
+  100% { opacity:0; transform:translateY(-2px); }
+}
 .hand-card:has(> .cf-card),
 .flying-face.hand-card.flight-face-card:has(> .cf-card) {
  display:block !important;padding:0;border:0;background:transparent;overflow:visible;
@@ -9,7 +44,7 @@
 .hand-card:has(> .cf-card) .cf-card .cf-title.card-name,
 .flying-face:has(> .cf-card) .cf-card .cf-title.card-name {
  position:static;inset:auto;top:auto;grid-row:auto;max-width:100%;padding:0;
- font-size:calc(14 * var(--cf-u) * var(--cf-title-scale,1));line-height:1;letter-spacing:.08em;color:#fff;
+ font-size:calc(14 * var(--cf-u) * var(--cf-title-scale,1));line-height:1.22;letter-spacing:.08em;color:#fff;
 }
 .flying-card:has(.cf-card) {border:0;overflow:visible;background:transparent;}
 .flying-card:not(.crypto-flight) .flying-face:has(> .cf-card) {display:block;}

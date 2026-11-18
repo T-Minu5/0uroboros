@@ -28,13 +28,20 @@ export type CardFilter = {
   cardType?: CardType;
   cardClass?: CardClass | readonly CardClass[];
   definitionId?: string;
+  /** Match any of these definition ids (OR). Used by Merge named-card checkboxes. */
+  definitionIds?: readonly string[];
+  /**
+   * Match another copy of the resolving card (same definitionId).
+   * OR’d with `definitionId` / `definitionIds` when those are also set.
+   */
+  this?: boolean;
   /** Inclusive printed-cost bounds for changePower / gain recipes. */
   minCost?: number;
   maxCost?: number;
 };
 export const filterClasses = (filter?: CardFilter): readonly CardClass[] =>
   filter?.cardClass === undefined ? [] : typeof filter.cardClass === 'string' ? [filter.cardClass] : filter.cardClass;
-export type Relation = 'self' | 'previous' | 'next';
+export type Relation = 'self' | 'previous' | 'next' | 'trigger';
 
 export type Target =
   | { type: 'player'; who: Who }
@@ -58,7 +65,11 @@ export type ActionId =
   | 'moveCard' | 'changePower' | 'healCard' | 'restoreCard' | 'destroyCard' | 'trashCard' | 'attachModifier' | 'removeModifier' | 'transferPower' | 'morph'
   | 'createHologram' | 'copyPreviousOnReveal' | 'sacrificeCards'
   | 'stealDeckCard' | 'deckSwap' | 'placeCard' | 'copyText' | 'silenceOngoing'
+  | 'reclaimStolen' | 'merge' | 'absorbPower'
   | 'choice' | 'random';
+
+/** Spatial move for `moveCard` (adjacent Node). Distinct from `transferPower.direction`. */
+export type MoveDir = 'left' | 'right';
 
 /** Per-card dispositions Inspect (`scry`) may offer. Absent / empty on a step means all three. */
 export type InspectAction = 'keep' | 'discard' | 'trash';
@@ -122,6 +133,13 @@ export type EffectStep = {
   resetAfterCycle?: boolean;
   direction?: 'choice' | 'left' | 'right' | 'split';
   flow?: 'either' | 'push' | 'pull';
+  /** `moveCard` only: force the card one Node left/right (board index). */
+  moveDir?: MoveDir;
+  /**
+   * `merge` only: after absorbing the victim, add its live Power onto the merger as lasting powerDelta.
+   * Prefer pairing with `absorbPower` in `then` when composing resource packages; this flag is shorthand.
+   */
+  absorbPower?: boolean;
   /**
    * `changePower` only. Negative amount vs an enemy card normally steals (moves Power onto the source).
    * Set `transfer: false` to remove Power without giving it to the source.

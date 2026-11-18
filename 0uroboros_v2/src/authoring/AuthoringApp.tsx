@@ -35,6 +35,7 @@ import {
 import { getBundledDocument } from '../contentPack/contentStore';
 import { ModsContext, StepList } from './StepEditor';
 import { TriggersEditor } from './TriggersEditor';
+import { IfsEditor } from './IfsEditor';
 import { createModReward, followModRename, isModReward, withTrailing } from './modRewards';
 import { DeckEditor } from './DeckEditor';
 import { NumberInput } from './NumberInput';
@@ -347,6 +348,7 @@ function CardEditor({ item: card, cards, update, applyAdvanced, onPendingChange 
       <div className="au-toggle-row"><Toggle field="foreignBank" label="Enemy Effect Bank" checked={!!card.foreignBank} disabled={!card.duration} onChange={foreignBank => update(syncPrinted({ ...card, foreignBank: foreignBank || undefined }))} hint="After Collapse, enter the opponent's Effect Bank if a slot is free (else your Discard). Ownership never changes." /></div>
       <StepList field="recurring" title="Recurring" description={card.durationPeriod === 'runtime' ? 'Every Runtime turn while active, starting with the reveal turn.' : 'Every Cycle while active, starting with the reveal Cycle.'} steps={card.recurring ?? []} scope="card" cards={asCards(cards)} onChange={recurring => update(syncPrinted({ ...card, recurring }))} />
       <TriggersEditor card={card} cards={cards} onChange={triggers => update(syncPrinted({ ...card, triggers }))} />
+      <IfsEditor card={card} cards={cards} onChange={ifs => update(syncPrinted({ ...card, ifs }))} />
       <div className="au-schedule-heading"><h3>Scheduled steps</h3><button type="button" className="au-button au-button-subtle" onClick={() => patch({ schedule: [...schedule, { at: 2, timing: 'start', effects: [] }], duration: Math.max(card.duration ?? 0, 2) })}>+ Add schedule</button></div>
       {schedule.map((entry, index) => <div className="au-schedule" key={index}><div className="au-schedule-fields"><NumberField field={`schedule.${index}.at`} label={`Schedule ${index + 1} ${card.durationPeriod === 'runtime' ? 'turn' : 'Cycle'}`} value={entry.at} min={1} onChange={at => patch({ schedule: schedule.map((step, i) => i === index ? { ...step, at: at ?? 1 } : step) })} /><SelectField field={`schedule.${index}.timing`} label={`Schedule ${index + 1} timing`} value={entry.timing ?? 'start'} options={['start', 'end']} labels={card.durationPeriod === 'runtime' ? TIMING_LABELS : CYCLE_TIMING_LABELS} onChange={timing => patch({ schedule: schedule.map((step, i) => i === index ? { ...step, timing } : step) })} /><button type="button" className="au-button au-button-subtle au-schedule-remove" onClick={() => patch({ schedule: schedule.filter((_, i) => i !== index) })}>Remove schedule {index + 1}</button></div><StepList field={`schedule.${index}`} title={`Schedule ${index + 1}`} scope="card" cards={asCards(cards)} steps={entry.effects} onChange={effects => update(syncPrinted({ ...card, schedule: schedule.map((step, i) => i === index ? { ...step, effects } : step) }))} /></div>)}
     </section>

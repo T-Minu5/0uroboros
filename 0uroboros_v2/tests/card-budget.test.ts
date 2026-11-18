@@ -3,6 +3,7 @@ import authored from '../content/authored-content.json';
 import {
   ANCHOR_CARD_IDS,
   BUDGET_WEIGHTS,
+  ONGOING_EXPECT,
   freeCryptoGain,
   fullServerIntegrity,
   meanAnchorEfficiency,
@@ -48,7 +49,10 @@ describe('cardBudget', () => {
     const score = scoreCard(byId('night-scythe'));
     expect(score.soft.some(flag => flag.id === 'trashCards')).toBe(true);
     expect(score.parts.every(part => !part.id.startsWith('trashCards'))).toBe(true);
-    expect(score.value).toBe(score.parts.find(part => part.id === 'power')?.credit ?? 0);
+    const power = score.parts.find(part => part.id === 'power')?.credit ?? 0;
+    const crypto = score.parts.filter(part => part.id === 'cryptoValue' || part.id.startsWith('gainCrypto'))
+      .reduce((sum, part) => sum + part.credit, 0);
+    expect(score.value).toBeCloseTo(power + crypto, 5);
   });
 
   it('scales Drain credit with Server integrity', () => {
@@ -220,5 +224,42 @@ describe('cardBudget', () => {
     expect(score.cryptoFloor).toBe(3);
     expect(score.soft.some(flag => flag.id === 'cryptoFloor')).toBe(false);
     expect(score.band).toBe('near');
+  });
+
+  it('Astra Ongoing: scores when(then) at expected firings × duration, and flags soft', () => {
+    const score = scoreCard({
+      id: 'budget-mosquito',
+      name: 'Budget Mosquito',
+      type: 'Character',
+      cost: 4,
+      power: 2,
+      triggers: [{
+        kind: 'when',
+        event: 'anyCardDestroyed',
+        then: [{ action: 'draw', amount: 4, target: { type: 'player', who: 'self' } }],
+      }],
+    });
+    const draw = score.parts.find(part => part.id.startsWith('draw'));
+    expect(draw?.credit).toBeCloseTo(
+      BUDGET_WEIGHTS.draw * 4 * ONGOING_EXPECT.anyCardDestroyed * BUDGET_WEIGHTS.durationFactor,
+      2,
+    );
+    expect(score.soft.some(flag => flag.id === 'ongoing:when:anyCardDestroyed')).toBe(true);
+    expect(score.value).toBeGreaterThan(BUDGET_WEIGHTS.power * 2);
+  });
+
+  it('Astra Ongoing: reflectDrain takes a bounded expected credit plus soft flag', () => {
+    const score = scoreCard({
+      id: 'budget-wax',
+      name: 'Budget Wax',
+      type: 'Character',
+      cost: 8,
+      power: 1,
+      triggers: [{ kind: 'reflectDrain', percent: 25, random: false }],
+    });
+    expect(score.soft.some(flag => flag.id === 'ongoing:reflectDrain')).toBe(true);
+    const reflect = score.parts.find(part => part.id.startsWith('ongoing:reflectDrain'));
+    expect(reflect?.credit).toBeGreaterThan(0);
+    expect(score.value).toBeGreaterThan(BUDGET_WEIGHTS.power * 1);
   });
 });

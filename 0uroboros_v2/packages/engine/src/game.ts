@@ -2,7 +2,9 @@ export type Phase = "runtime" | "collapse" | "draft";
 export type CardType = "Character" | "VP" | "Crypto";
 
 import type { AnyEffect, EffectStep } from "./effects/types";
+import type { CardIf } from "./effects/cardIfs";
 import type { CardTrigger } from "./effects/triggers";
+export type { CardIf } from "./effects/cardIfs";
 export type { CardTrigger } from "./effects/triggers";
 
 export type EffectChoiceOption = { id: string; label: string; effects: readonly LegacyEffect[] };
@@ -111,6 +113,13 @@ export type Card = {
   selfMove?: "turn" | "cycle";
   /** Power gained or lost from effects. Stays with this copy for the rest of the game, in every zone. */
   powerDelta?: number;
+  /**
+   * Seat this copy was stolen from (stealDeckCard). Cleared on reclaim. Drives foreign/pink styling
+   * while the thief holds the card.
+   */
+  stolenFrom?: 0 | 1;
+  /** Parallel If bus: moment checks on this card (reveal / collapse). */
+  ifs?: readonly CardIf[];
   /** View only: printed Power, set when the shown Power differs from it. */
   basePower?: number;
   cost: number;

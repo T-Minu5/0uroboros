@@ -560,9 +560,9 @@
 
 /* Far-left live end-game awards — outside the 3D board canvas (WeightTug hidden for now). */
 .endgame-awards{
-  position:absolute;left:10px;top:12%;z-index:26;
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:26;
   display:flex;flex-direction:column;gap:6px;
-  width:148px;max-height:62%;padding:8px 8px 7px;
+  width:188px;max-height:70%;padding:8px 9px 8px;
   pointer-events:none;
   background:#0a0a14e8;border:1px solid #ffffff18;border-radius:8px;
   box-shadow:0 10px 28px #0008;
@@ -574,27 +574,23 @@
 }
 .endgame-awards-list{
   list-style:none;margin:0;padding:0;
-  display:flex;flex-direction:column;gap:3px;min-height:0;overflow:auto;
+  display:flex;flex-direction:column;gap:4px;min-height:0;overflow:auto;
 }
 .endgame-awards-list li{
-  display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:baseline;gap:5px;
-  padding:3px 4px;border-radius:4px;background:#ffffff06;
-  font:600 9px Inter,sans-serif;color:#b8b0c8;line-height:1.2;
+  display:flex;flex-direction:column;gap:2px;
+  padding:4px 5px;border-radius:4px;background:#ffffff06;
+  font:600 9px Inter,sans-serif;color:#b8b0c8;line-height:1.25;
 }
 .endgame-awards-list li.is-lead{background:#ffffff0c}
-.endgame-awards-label{display:flex;flex-direction:column;gap:1px;min-width:0}
-.endgame-awards-label>span{
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+.endgame-awards-title{
   font:600 9px Inter,sans-serif;color:#e6e0f0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.endgame-awards-label small{font:600 7px Inter,sans-serif;color:#7f788f;letter-spacing:.2px}
-.endgame-awards-leader{
-  font:700 8px Orbitron,sans-serif;letter-spacing:.3px;color:#9a93a8;
-  max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;
+.endgame-awards-race{
+  font:700 8px Inter,sans-serif;font-variant-numeric:tabular-nums;color:#9a93a8;
 }
-.endgame-awards-score{
-  font:700 9px Inter,sans-serif;font-variant-numeric:tabular-nums;color:#d8d0e4;min-width:2.6em;text-align:right;
-}
-.endgame-awards-list li.is-tie .endgame-awards-leader{color:#7f788f}
+.endgame-awards-race .is-winner{font-weight:700}
+.endgame-awards-sep{color:#6f687c;font-weight:600}
+.endgame-awards-list li.is-tie .endgame-awards-race{color:#7f788f}
 /* Kept for a quick restore of the ControlledWeight tug. */
 .weight-tug{display:none}

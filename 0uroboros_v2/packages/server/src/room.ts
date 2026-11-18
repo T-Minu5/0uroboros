@@ -10,7 +10,7 @@
 import { randomBytes } from "node:crypto";
 import type { PlayerId } from "@0uroboros/engine/game";
 import type { CompiledContent } from "@0uroboros/engine/authoring/contentModel";
-import { createSession, mirrorEvent, redactEvent, seededRandom, type RuntimeEvent, type RuntimeSession, type SessionView } from "@0uroboros/engine/runtime";
+import { createSession, mergeEndGameAwards, mirrorEvent, redactEvent, seededRandom, type RuntimeEvent, type RuntimeSession, type SessionView } from "@0uroboros/engine/runtime";
 import type { StrategyProfile } from "@0uroboros/engine/ai/strategy";
 import type { Command, GameResult, RoomMode, RoomSettings, RoomStatus, SeatSummary, ServerMessage, Timers } from "@0uroboros/protocol/messages";
 import type { Scheduler } from "./scheduler";
@@ -200,6 +200,7 @@ export class Room {
       draftSeconds: this.settings.draftSeconds > 0 ? this.settings.draftSeconds : null,
       mostCircuitsBonusVP: this.settings.mostCircuitsBonusVP,
       nodeWinVP: this.settings.nodeWinVP,
+      endGameAwards: mergeEndGameAwards(this.settings.endGameAwards),
       random: seededRandom(this.config.seed), aiSeats, seatNames: names, recordDecisions: false,
       ...(this.config.strategy ? { strategy: this.config.strategy } : {}),
       now: () => this.now,

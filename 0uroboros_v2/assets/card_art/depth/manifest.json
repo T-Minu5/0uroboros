@@ -649,6 +649,15 @@
       "height": 300,
       "focus": 0.5049
     },
+    "/assets/card_art/uploads/access-binding.png": {
+      "sha": "bf50ed20e3ec5f16f79efc7c2b85e73cec72e929f504c0b573dc73038fef297e",
+      "v": 2,
+      "color": "/assets/card_art/depth/bf50ed20e3ec5f16f79e-v2.color.webp",
+      "depth": "/assets/card_art/depth/bf50ed20e3ec5f16f79e-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5013
+    },
     "/assets/card_art/uploads/agent-bateman.png": {
       "sha": "1be4479cf257055bd94d88610fa3c602a299cabb503f2230a553b296f9d70615",
       "v": 2,
@@ -675,6 +684,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.5115
+    },
+    "/assets/card_art/uploads/andras-asura.png": {
+      "sha": "a4a2e240fea8dd0f33959b0649f2595129eac3a6f17b77d321ccbfcbce287223",
+      "v": 2,
+      "color": "/assets/card_art/depth/a4a2e240fea8dd0f3395-v2.color.webp",
+      "depth": "/assets/card_art/depth/a4a2e240fea8dd0f3395-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.497
     },
     "/assets/card_art/uploads/astra-wraith.png": {
       "sha": "c4cdad5818c5b6fa78a07ec4d3cf6097b945dd62df3cf4f0a752f24d78d47a58",
@@ -703,6 +721,24 @@
       "height": 300,
       "focus": 0.4586
     },
+    "/assets/card_art/uploads/batz.png": {
+      "sha": "fdd460919c9cfa0139058392ede090374dbc8f32c6a27adef464adaecb2fe5e2",
+      "v": 2,
+      "color": "/assets/card_art/depth/fdd460919c9cfa013905-v2.color.webp",
+      "depth": "/assets/card_art/depth/fdd460919c9cfa013905-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4371
+    },
+    "/assets/card_art/uploads/bitten-brittin.png": {
+      "sha": "a55a1ffd515c73212a5267a7b3126096091340e8bff182ed4c2683cce0d97a2b",
+      "v": 2,
+      "color": "/assets/card_art/depth/a55a1ffd515c73212a52-v2.color.webp",
+      "depth": "/assets/card_art/depth/a55a1ffd515c73212a52-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6655
+    },
     "/assets/card_art/uploads/bloody-mary.png": {
       "sha": "daf89a97951e793344b65fc6cec4592742f75eb7021d5ab89efa77087b46d58a",
       "v": 2,
@@ -711,6 +747,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.4512
+    },
+    "/assets/card_art/uploads/bug-hunter.png": {
+      "sha": "9f9553c7f7d6265142897779efd13bd2e7c972128ae6c7dcb0adc966b4adfe3f",
+      "v": 2,
+      "color": "/assets/card_art/depth/9f9553c7f7d626514289-v2.color.webp",
+      "depth": "/assets/card_art/depth/9f9553c7f7d626514289-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5074
     },
     "/assets/card_art/uploads/bump-key.png": {
       "sha": "e4d97eb6699becb4a138e1f22876409d29ba68ffb5c4803fac133407d651e3da",
@@ -792,6 +837,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.481
+    },
+    "/assets/card_art/uploads/crypto-vault.png": {
+      "sha": "ffc861c90222f9c2c7fd9edc6372b070f432b022d028300cd9c14b0e6e657ce7",
+      "v": 2,
+      "color": "/assets/card_art/depth/ffc861c90222f9c2c7fd-v2.color.webp",
+      "depth": "/assets/card_art/depth/ffc861c90222f9c2c7fd-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4351
     },
     "/assets/card_art/uploads/crypto-wraith.png": {
       "sha": "e560f668b9aa8cb6408a81b528bebd1d0264700abb7bbbbcbe1688b013692408",
@@ -973,6 +1027,15 @@
       "height": 300,
       "focus": 0.4775
     },
+    "/assets/card_art/uploads/inti-2.png": {
+      "sha": "bbc73c198a98ac6b22fee7920d2efc4e33946bbc70a2772bda1e4f7be0b31ccb",
+      "v": 2,
+      "color": "/assets/card_art/depth/bbc73c198a98ac6b22fe-v2.color.webp",
+      "depth": "/assets/card_art/depth/bbc73c198a98ac6b22fe-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.4103
+    },
     "/assets/card_art/uploads/inti.png": {
       "sha": "21476bacb413da7805d9e1beca4d060994d999b01238300df6b6c3b0120a09d3",
       "v": 2,
@@ -1018,6 +1081,15 @@
       "height": 300,
       "focus": 0.5954
     },
+    "/assets/card_art/uploads/marlie-murder.png": {
+      "sha": "3cfc442250872ce9ee3df6c338a75ba8c9045a72f6751ccc79a61b50366d3dc6",
+      "v": 2,
+      "color": "/assets/card_art/depth/3cfc442250872ce9ee3d-v2.color.webp",
+      "depth": "/assets/card_art/depth/3cfc442250872ce9ee3d-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.5478
+    },
     "/assets/card_art/uploads/mary-mallon-1.png": {
       "sha": "94cf8852a895f86dd466cd45733a179f885e4d5832fa55ef9878aac4ee5b490f",
       "v": 2,
@@ -1026,6 +1098,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.3955
+    },
+    "/assets/card_art/uploads/mel-anoma.png": {
+      "sha": "c2ca514894e347fc2371a17d3eb82740ed54d04cdd718c179eb453b7ff049e70",
+      "v": 2,
+      "color": "/assets/card_art/depth/c2ca514894e347fc2371-v2.color.webp",
+      "depth": "/assets/card_art/depth/c2ca514894e347fc2371-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.2611
     },
     "/assets/card_art/uploads/ms-mosquito.png": {
       "sha": "0dda3781089cf5dfc10b1b0b55da3bbf5539be8121679ccaa8f230d57d8e68e4",
@@ -1081,6 +1162,15 @@
       "height": 300,
       "focus": 0.2318
     },
+    "/assets/card_art/uploads/pu1sar.png": {
+      "sha": "4af1f7a0bd37fc9441460aee35079e7f3e39a865a7cb5c7a33000c1b6b40a55c",
+      "v": 2,
+      "color": "/assets/card_art/depth/4af1f7a0bd37fc944146-v2.color.webp",
+      "depth": "/assets/card_art/depth/4af1f7a0bd37fc944146-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.3555
+    },
     "/assets/card_art/uploads/quark.png": {
       "sha": "f711a2bc47275d5a15352b60eb15d8f194b26b8df16dfcedd5b91f60ae65f56b",
       "v": 2,
@@ -1098,6 +1188,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.9067
+    },
+    "/assets/card_art/uploads/recover-continuity.png": {
+      "sha": "9162bed314a849be1084bb28765b9b0e41b9f784239565be47457401fddcfc91",
+      "v": 2,
+      "color": "/assets/card_art/depth/9162bed314a849be1084-v2.color.webp",
+      "depth": "/assets/card_art/depth/9162bed314a849be1084-v2.depth.webp",
+      "width": 1600,
+      "height": 1205,
+      "focus": 0.5656
     },
     "/assets/card_art/uploads/rezz-rizz.png": {
       "sha": "14048e9de2f2957555cac193cadb567366d66aa963b18373bf5706a94ff4ee40",
@@ -1179,6 +1278,15 @@
       "width": 400,
       "height": 300,
       "focus": 0.3136
+    },
+    "/assets/card_art/uploads/the-tuathal-kill.png": {
+      "sha": "835405105cf8cb4f7f5f91527661c8f7b27ca3ad560494bf4b0771afe826304a",
+      "v": 2,
+      "color": "/assets/card_art/depth/835405105cf8cb4f7f5f-v2.color.webp",
+      "depth": "/assets/card_art/depth/835405105cf8cb4f7f5f-v2.depth.webp",
+      "width": 400,
+      "height": 300,
+      "focus": 0.6527
     },
     "/assets/card_art/uploads/trash-collector.png": {
       "sha": "db158eb42c7017fc82f1d0d8b6fb83120b3128d58cbe23498c8dd7dd54b05bc8",

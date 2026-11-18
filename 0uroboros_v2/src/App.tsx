@@ -339,7 +339,7 @@ export function App(){
   });
   return next;
  }
- const roomRules=()=>({turnSeconds:setup.turnSeconds??0,draftSeconds:setup.draftSeconds??0,choiceSeconds:50,noLocations:setup.noLocations,noTrailingRewards:!setup.trailingRewards,midCycleDraw:true,middleNodesOnly:setup.middleNodesOnly,tenCardDraft:false,mostCircuitsBonusVP:setup.mostCircuitsBonusVP,nodeWinVP:setup.nodeWinVP});
+ const roomRules=()=>({turnSeconds:setup.turnSeconds??0,draftSeconds:setup.draftSeconds??0,choiceSeconds:50,noLocations:setup.noLocations,noTrailingRewards:!setup.trailingRewards,midCycleDraw:true,middleNodesOnly:setup.middleNodesOnly,tenCardDraft:false,mostCircuitsBonusVP:setup.mostCircuitsBonusVP,nodeWinVP:setup.nodeWinVP,endGameAwards:setup.endGameAwards});
  const createOnline=(mode:RoomMode,name:string)=>{if(mode!=='pvp')return;void onlineClient().createRoom('pvp',name,roomRules()).catch(()=>undefined);};
  const quickMatch=(name:string)=>{void onlineClient().quickMatch(name,roomRules()).catch(()=>undefined);};
  const cancelQuickMatch=()=>{online.current?.cancelQuickMatch();};

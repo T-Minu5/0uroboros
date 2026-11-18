@@ -1,5 +1,5 @@
 {
-  "revision": 1236,
+  "revision": 1342,
   "document": {
     "version": 3,
     "cards": [
@@ -58,15 +58,6 @@
             "target": {
               "type": "player",
               "who": "self"
-            }
-          },
-          {
-            "action": "trashCard",
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board",
-              "relation": "self"
             }
           }
         ],
@@ -1137,7 +1128,7 @@
         "durationPeriod": "cycle",
         "pool": "Crypto",
         "enabled": true,
-        "cryptoValue": 5
+        "cryptoValue": 1
       },
       {
         "id": "dit-bot",
@@ -1241,7 +1232,7 @@
         "name": "V.0.D. - NYC",
         "type": "Character",
         "power": 3,
-        "cost": 5,
+        "cost": 6,
         "effect": "Leech: Drain -100 on collapse. Last 3 cycles",
         "art": "/assets/card_art/uploads/v-0-d-nyc.png",
         "duration": 2,
@@ -1335,7 +1326,7 @@
         "type": "Character",
         "cost": 4,
         "art": "/assets/card_art/chaos cards/attack/rezz-blade.png",
-        "effect": "Drain -100. +1 Card.",
+        "effect": "Drain -100. +2 Cards.",
         "power": 4,
         "onReveal": [
           {
@@ -1349,7 +1340,7 @@
           },
           {
             "action": "draw",
-            "amount": 1,
+            "amount": 2,
             "target": {
               "type": "player",
               "who": "self"
@@ -1508,7 +1499,7 @@
         "definitionId": "h3x1-d3x1",
         "name": "H3X1-D3X1",
         "type": "Character",
-        "cost": 6,
+        "cost": 7,
         "art": "/assets/card_art/chaos cards/attack/h3x1-d3x1.PNG",
         "effect": "Drain -250. +2 Crypto.",
         "power": 2,
@@ -1543,12 +1534,12 @@
         "type": "Character",
         "cost": 5,
         "art": "/assets/card_art/chaos cards/attack/1337-speaker.png",
-        "effect": "Drain -200 Backup. +2 Crypto.",
+        "effect": "Drain -150 Backup. +2 Crypto.",
         "power": 2,
         "onReveal": [
           {
             "action": "damageServer",
-            "amount": 200,
+            "amount": 150,
             "target": {
               "type": "server",
               "who": "opponent",
@@ -1574,7 +1565,7 @@
         "definitionId": "qubit-kid",
         "name": "The Qubit Kid",
         "type": "Character",
-        "cost": 5,
+        "cost": 6,
         "art": "/assets/card_art/chaos cards/attack/qubit-kid.png",
         "effect": "Choose a card from the enemy's hand to discard.",
         "power": 3,
@@ -1603,14 +1594,14 @@
         "definitionId": "chrome-mitchell",
         "name": "Chrome Mitchell",
         "type": "Character",
-        "cost": 8,
+        "cost": 9,
         "art": "/assets/card_art/chaos cards/attack/chrome-mitchell.png",
-        "effect": "-225 Both enemy servers. If you pay -3 Crypto you get +6 in return.",
-        "power": 4,
+        "effect": "-200 Both enemy servers. You may pay 3 Crypto. If you do +6 Crypto.",
+        "power": 3,
         "onReveal": [
           {
             "action": "damageServer",
-            "amount": 225,
+            "amount": 200,
             "target": {
               "type": "server",
               "who": "opponent",
@@ -1645,11 +1636,11 @@
       {
         "id": "delta-wave",
         "definitionId": "delta-wave",
-        "name": "\u2206-Wave",
+        "name": "∆-Wave",
         "type": "Character",
         "cost": 11,
         "art": "/assets/card_art/chaos cards/attack/delta-wave.png",
-        "effect": "-300 Both enemy servers.",
+        "effect": "-300 Both Enemy servers",
         "power": 4,
         "onReveal": [
           {
@@ -1672,7 +1663,7 @@
         "definitionId": "system-seppuku",
         "name": "System Seppuku",
         "type": "Character",
-        "cost": 16,
+        "cost": 14,
         "art": "/assets/card_art/chaos cards/attack/system-seppuku.png",
         "effect": "Destroy your backup server, robbing your enemy of its VP points.",
         "power": 5,
@@ -1923,10 +1914,10 @@
         "definitionId": "node-feratu",
         "name": "Node Feratu",
         "type": "Character",
-        "cost": 7,
+        "cost": 8,
         "art": "/assets/card_art/chaos cards/horrors/node-feratu.png",
         "effect": "Drain -225. Repair +225.",
-        "power": 3,
+        "power": 1,
         "onReveal": [
           {
             "action": "damageServer",
@@ -1959,7 +1950,7 @@
         "cost": 8,
         "art": "/assets/card_art/chaos cards/horrors/the-azimuthal-kill.png",
         "effect": "On reveal: Drain -125. Next 2 Cycles: Drain -25.  At the end of the Cycle 3 Drain -400 from enemy's Backup. ",
-        "power": 3,
+        "power": 2,
         "onReveal": [
           {
             "action": "damageServer",
@@ -1971,7 +1962,7 @@
             }
           }
         ],
-        "duration": 3,
+        "duration": 4,
         "durationPeriod": "cycle",
         "schedule": [
           {
@@ -2009,24 +2000,30 @@
             "effects": [
               {
                 "action": "damageServer",
-                "amount": 400,
+                "amount": 25,
                 "target": {
                   "type": "server",
                   "who": "opponent",
-                  "server": "backup"
-                }
-              },
-              {
-                "action": "damageServer",
-                "amount": 450,
-                "target": {
-                  "type": "server",
-                  "who": "opponent",
-                  "server": "backup"
+                  "server": "auto"
                 }
               }
             ],
-            "timing": "end"
+            "timing": "start"
+          },
+          {
+            "at": 4,
+            "timing": "end",
+            "effects": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "backup"
+                },
+                "amount": 400
+              }
+            ]
           }
         ],
         "pool": "Chaos",
@@ -2039,9 +2036,9 @@
         "definitionId": "tihkal-hound",
         "name": "Tihkal Hound",
         "type": "Character",
-        "cost": 9,
+        "cost": 10,
         "art": "/assets/card_art/chaos cards/horrors/tihkal-hound.png",
-        "effect": "Drain -300. Drain -125, for the next 4 Cycles.",
+        "effect": "Drain -300. Drain -100, for the next 4 Cycles.",
         "power": 4,
         "onReveal": [
           {
@@ -2067,7 +2064,7 @@
               "who": "opponent",
               "server": "auto"
             },
-            "amount": 125
+            "amount": 100
           }
         ]
       },
@@ -2178,7 +2175,7 @@
         "art": "/assets/card_art/volume/2vp-b.png",
         "effect": "Repair +100.",
         "power": 1,
-        "vp": 1,
+        "vp": 2,
         "onReveal": [
           {
             "action": "repairServer",
@@ -2203,7 +2200,7 @@
         "art": "/assets/card_art/volume/3vp.png",
         "effect": "Repair +75 for the next 4 Cycles.",
         "power": 1,
-        "vp": 3,
+        "vp": 4,
         "pool": "VP",
         "enabled": true,
         "storyText": "Stores data across multiple quantum states.",
@@ -2229,7 +2226,7 @@
         "art": "/assets/card_art/volume/4vp.png",
         "effect": "Repair +15 every turn.",
         "power": 1,
-        "vp": 2,
+        "vp": 3,
         "duration": 99,
         "durationPeriod": "runtime",
         "recurring": [
@@ -2256,7 +2253,7 @@
         "art": "/assets/card_art/volume/6vp-b.png",
         "effect": "Repair +75, for the next 4 Cycles.",
         "power": 1,
-        "vp": 4,
+        "vp": 6,
         "pool": "VP",
         "enabled": true,
         "storyText": "Spellbound encryption.",
@@ -2282,7 +2279,7 @@
         "art": "/assets/card_art/volume/6vp.png",
         "effect": "Repair +25 every turn.",
         "power": 1,
-        "vp": 4,
+        "vp": 6,
         "duration": 99,
         "durationPeriod": "runtime",
         "recurring": [
@@ -2309,7 +2306,7 @@
         "art": "/assets/card_art/volume/10vp.png",
         "effect": "Repair +125, for the next 3 Cycles.",
         "power": 1,
-        "vp": 5,
+        "vp": 7,
         "pool": "VP",
         "enabled": true,
         "storyText": "Quantum entangled storage.",
@@ -2335,7 +2332,7 @@
         "art": "/assets/card_art/volume/10vp-b.png",
         "effect": "Repair +50, every turn.",
         "power": 1,
-        "vp": 6,
+        "vp": 8,
         "duration": 99,
         "durationPeriod": "runtime",
         "recurring": [
@@ -2475,18 +2472,6 @@
               "where": "board",
               "relation": "next"
             }
-          },
-          {
-            "action": "trashCard",
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board",
-              "relation": "self"
-            },
-            "pick": {
-              "mode": "choose"
-            }
           }
         ]
       },
@@ -2548,7 +2533,7 @@
         "definitionId": "trash-collector",
         "name": "Trash Collector",
         "power": 0,
-        "cost": 5,
+        "cost": 6,
         "effect": "+1 Power for each card in the Trash. +1 Crypto.",
         "pool": "Base",
         "cardClass": "Utility",
@@ -2563,7 +2548,7 @@
         "definitionId": "kim-dracula",
         "name": "Kim Dracula",
         "power": 0,
-        "cost": 5,
+        "cost": 7,
         "effect": "+1 Power for each destroyed card.",
         "pool": "Chaos",
         "cardClass": "Hacker",
@@ -2581,18 +2566,6 @@
               "who": "opponent",
               "where": "board",
               "relation": "next"
-            }
-          },
-          {
-            "action": "trashCard",
-            "target": {
-              "type": "card",
-              "who": "self",
-              "where": "board",
-              "relation": "self"
-            },
-            "pick": {
-              "mode": "choose"
             }
           }
         ],
@@ -2700,7 +2673,7 @@
         "cardClass": "Solar-monk",
         "cost": 9,
         "power": 4,
-        "vp": 2,
+        "vp": 3,
         "art": "/assets/card_art/solar_monks/Apollo-Ascii.png",
         "effect": "Reset the power of all revealed cards here, on both sides. +2 Crypto. Repair +100.",
         "onReveal": [
@@ -2760,7 +2733,7 @@
         "power": 2,
         "vp": 1,
         "art": "/assets/card_art/uploads/dama-de-fuego.png",
-        "effect": "Reset 1 of your card's Power here. +1 Crypto.",
+        "effect": "Reset 1 of your card's Power here. +2 Crypto.",
         "onReveal": [
           {
             "action": "restoreCard",
@@ -2775,6 +2748,14 @@
             "pick": {
               "mode": "random"
             }
+          },
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
           }
         ]
       },
@@ -2791,7 +2772,7 @@
         "power": 2,
         "vp": 1,
         "art": "/assets/card_art/uploads/501-ar-2.png",
-        "effect": "Restore +1  to 2 of your revealed cards. On collapse +1 Crypto",
+        "effect": "Restore +1  to 2 of your revealed cards. On collapse +2 Crypto",
         "onReveal": [
           {
             "action": "healCard",
@@ -2814,7 +2795,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           }
         ],
         "durationPeriod": "runtime"
@@ -2831,7 +2812,7 @@
         "cost": 2,
         "power": -9,
         "art": "/assets/card_art/uploads/not-a-total-loss-3.png",
-        "effect": "Steal 2 Power from a revealed enemy card.",
+        "effect": "Steal 2 Power from a revealed enemy card. If you win this Node, +5 Crypto.",
         "onReveal": [
           {
             "action": "changePower",
@@ -2844,6 +2825,22 @@
             "pick": {
               "mode": "random"
             }
+          }
+        ],
+        "ifs": [
+          {
+            "kind": "nodeOutcome",
+            "outcome": "win",
+            "then": [
+              {
+                "action": "gainCrypto",
+                "amount": 5,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
           }
         ]
       },
@@ -2937,7 +2934,7 @@
         "cardClass": "Horror",
         "generated": false,
         "enabled": true,
-        "cost": 10,
+        "cost": 9,
         "power": 1,
         "art": "/assets/card_art/uploads/the-shoggoth.png",
         "effect": "Drain -350. Aura +2. You may move this card once each Cycle",
@@ -3430,10 +3427,8 @@
             },
             "amount": 1,
             "pick": {
-              "mode": "choose",
-              "chooser": "opponent"
-            },
-            "min": 0
+              "mode": "choose"
+            }
           },
           {
             "action": "repairServer",
@@ -3590,7 +3585,7 @@
         "cardClass": "Utility",
         "generated": false,
         "enabled": true,
-        "cost": 6,
+        "cost": 7,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png",
         "effect": "+1 Crypto. Gain a random Quark, playable for +1VP, in your discard pile.",
@@ -3680,7 +3675,7 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/library/card_art/base cards/utility/the-heisenberg-hag.png",
-        "effect": "Gain a Schr\u00f6dinger Box. +1 Crypto.",
+        "effect": "Gain a Schrödinger Box. +1 Crypto.",
         "onReveal": [
           {
             "action": "gainCard",
@@ -3915,7 +3910,7 @@
       {
         "id": "card-4ozi9vtu",
         "definitionId": "card-4ozi9vtu",
-        "name": "Schr\u00f6dinger Box",
+        "name": "Schrödinger Box",
         "pool": "Base",
         "type": "Character",
         "cardClass": "Runtime",
@@ -4096,7 +4091,7 @@
         "cost": 7,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/entropic-infantry.png",
-        "effect": "After each play, cycle Alpha \u2192 Bravo \u2192 Charlie \u2192 Alpha.",
+        "effect": "After each play, cycle Alpha → Bravo → Charlie → Alpha.",
         "onReveal": [
           {
             "action": "morph",
@@ -4366,7 +4361,7 @@
         "cardClass": "Action",
         "generated": false,
         "enabled": true,
-        "cost": 2,
+        "cost": 3,
         "power": 1,
         "art": "/assets/card_art/uploads/atomic-mass2.png",
         "effect": "+2 Cards. You may move this once.",
@@ -4394,28 +4389,37 @@
         "cost": 4,
         "power": 2,
         "art": "/assets/card_art/uploads/doom-loop.png",
-        "effect": "You may destroy your cards here. +1 Crypto for each.",
+        "effect": "You may trash up to 3 revealed cards here. If you do +2 Crypto.",
         "onReveal": [
           {
-            "action": "sacrificeCards",
+            "action": "trashCard",
             "target": {
               "type": "card",
               "who": "self",
-              "where": "thisNode"
+              "where": "board"
             },
-            "amount": 1,
             "pick": {
               "mode": "choose",
-              "count": 4
+              "count": 3
             },
-            "optional": true
+            "optional": true,
+            "then": [
+              {
+                "action": "gainCrypto",
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                },
+                "amount": 2
+              }
+            ]
           }
         ]
       },
       {
         "id": "card-3xh1uc8u",
         "definitionId": "card-3xh1uc8u",
-        "name": "Slash-\u00d8N1",
+        "name": "Slash-ØN1",
         "pool": "Chaos",
         "type": "Character",
         "cardClass": "Horror",
@@ -4462,7 +4466,7 @@
       {
         "id": "card-bsg56g48",
         "definitionId": "card-bsg56g48",
-        "name": "Hack-\u00d8N1",
+        "name": "Hack-ØN1",
         "pool": "Chaos",
         "type": "Character",
         "cardClass": "Horror",
@@ -4512,21 +4516,10 @@
         "cost": 0,
         "power": 0,
         "art": "/assets/card_art/image_placeHolder.png",
-        "effect": "On collapse: Swap the top card of both decks.\nNew card, what do ya think?",
+        "effect": "Reclaim a stolen card revealed here. Swap seats with it; that card reveals again for you.",
         "onReveal": [
           {
-            "action": "draw",
-            "target": {
-              "type": "player",
-              "who": "self"
-            },
-            "amount": 1
-          }
-        ],
-        "onCollapse": [
-          {
-            "action": "deckSwap",
-            "amount": 1
+            "action": "reclaimStolen"
           }
         ],
         "storyText": "But wait. You ain't seen nothin' yet. Raised lettering, pale nimbus. White."
@@ -4626,7 +4619,7 @@
         "power": 1,
         "cost": 5,
         "art": "/assets/card_art/uploads/expo-net2.png",
-        "effect": "Ongoing: Increase the Power here randomly between 10\u2013100%.",
+        "effect": "Ongoing: Increase the Power here randomly between 10–100%.",
         "pool": "Base",
         "enabled": true,
         "onReveal": [],
@@ -4684,7 +4677,7 @@
               "type": "player",
               "who": "self"
             },
-            "amount": 1
+            "amount": 2
           }
         ],
         "triggers": [
@@ -4861,7 +4854,7 @@
         "triggers": [
           {
             "kind": "reflectDrain",
-            "percent": 25,
+            "percent": 20,
             "random": false
           }
         ]
@@ -5037,7 +5030,7 @@
         "cost": 6,
         "power": 1,
         "art": "/assets/card_art/base cards/action/packet-sniffer.png",
-        "effect": "Ongoing: When the enemy Drains your Server, +1 Crypto. +1 Card.",
+        "effect": "Ongoing: When the enemy Drains your Server, +2 Crypto. +1 Card.",
         "onReveal": [],
         "triggers": [
           {
@@ -5050,7 +5043,7 @@
                   "type": "player",
                   "who": "self"
                 },
-                "amount": 1
+                "amount": 2
               },
               {
                 "action": "draw",
@@ -5104,7 +5097,7 @@
         "cardClass": "Attack",
         "generated": false,
         "enabled": true,
-        "cost": 7,
+        "cost": 6,
         "power": 1,
         "art": "/assets/card_art/uploads/bloody-mary.png",
         "effect": "Ongoing: When an Attack card is played this Cycle, Drain -75.",
@@ -5215,10 +5208,10 @@
         "cardClass": "Solar-monk",
         "generated": false,
         "enabled": true,
-        "cost": 0,
+        "cost": 8,
         "power": 1,
-        "vp": 8,
-        "art": "/assets/card_art/uploads/inti.png",
+        "vp": 2,
+        "art": "/assets/card_art/uploads/inti-2.png",
         "effect": "Choose one: Restore 2 cards in your deck, +2 power or Choose 2 cards in your hand, +1 Power, for the next 4 Cycles.",
         "onReveal": [],
         "duration": 4,
@@ -5278,7 +5271,7 @@
         "generated": false,
         "enabled": true,
         "cost": 7,
-        "power": 2,
+        "power": 1,
         "vp": 2,
         "art": "/assets/card_art/uploads/r-0-1-matrix.png",
         "effect": "Ongoing: When a Volume card is played this Cycle, +1 VP.",
@@ -5363,6 +5356,539 @@
             "kind": "reflectDrain",
             "percent": 50,
             "random": false
+          }
+        ]
+      },
+      {
+        "id": "card-dr79o1is",
+        "definitionId": "card-dr79o1is",
+        "name": "Recover-Continuity",
+        "pool": "VP",
+        "type": "VP",
+        "cardClass": "Volume",
+        "generated": false,
+        "enabled": true,
+        "cost": 7,
+        "power": 1,
+        "vp": 3,
+        "art": "/assets/card_art/uploads/recover-continuity.png",
+        "effect": "BACKUP SERVER.  Repair +100 for the next 4 Cycles.",
+        "onReveal": [
+          {
+            "action": "repairServer",
+            "target": {
+              "type": "server",
+              "who": "self",
+              "server": "backup"
+            },
+            "amount": 100
+          }
+        ],
+        "duration": 4,
+        "recurring": [
+          {
+            "action": "repairServer",
+            "target": {
+              "type": "server",
+              "who": "self",
+              "server": "backup"
+            },
+            "amount": 100
+          }
+        ]
+      },
+      {
+        "id": "card-vxsgip56",
+        "definitionId": "card-vxsgip56",
+        "name": "Pu1sar",
+        "pool": "VP",
+        "type": "VP",
+        "cardClass": "Solar-monk",
+        "generated": false,
+        "enabled": true,
+        "cost": 9,
+        "power": 1,
+        "vp": 1,
+        "art": "/assets/card_art/uploads/pu1sar.png",
+        "effect": "Ongoing: Your cards cannot lose Power .When the enemy Drains your Backup Server, +1 VP.",
+        "onReveal": [],
+        "triggers": [
+          {
+            "kind": "protectPower"
+          },
+          {
+            "kind": "when",
+            "event": "enemyDrainsBackup",
+            "then": [
+              {
+                "action": "gainVP",
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                },
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "schedule": []
+      },
+      {
+        "id": "card-t8s915o7",
+        "definitionId": "card-t8s915o7",
+        "name": "Bitten Brittin",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Attack",
+        "generated": false,
+        "enabled": true,
+        "cost": 5,
+        "power": 0,
+        "art": "/assets/card_art/uploads/bitten-brittin.png",
+        "effect": "Gain 2 Batz in your Discard.  Absorb any Batz played here",
+        "onReveal": [
+          {
+            "action": "gainCard",
+            "target": {
+              "type": "zone",
+              "who": "self",
+              "zone": "deck"
+            },
+            "amount": 2,
+            "cardIds": [
+              "card-v25fcky3"
+            ]
+          }
+        ],
+        "triggers": [
+          {
+            "kind": "whenPlayed",
+            "match": {
+              "definitionId": "card-v25fcky3"
+            },
+            "scope": "thisNode",
+            "then": [
+              {
+                "action": "merge",
+                "target": {
+                  "type": "card",
+                  "who": "self",
+                  "where": "thisNode",
+                  "filter": {
+                    "definitionId": "card-v25fcky3"
+                  }
+                },
+                "pick": {
+                  "mode": "random"
+                },
+                "absorbPower": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-v25fcky3",
+        "definitionId": "card-v25fcky3",
+        "name": "Batz",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Horror",
+        "generated": true,
+        "enabled": true,
+        "cost": 0,
+        "power": 1,
+        "art": "/assets/card_art/uploads/batz.png",
+        "effect": "Drain -20.  If another Batz is played here, merge with it.",
+        "onReveal": [
+          {
+            "action": "damageServer",
+            "target": {
+              "type": "server",
+              "who": "opponent",
+              "server": "auto"
+            },
+            "amount": 20
+          }
+        ],
+        "ifs": [
+          {
+            "kind": "twoAtLocation",
+            "match": {
+              "definitionId": "card-v25fcky3"
+            },
+            "then": [
+              {
+                "action": "merge",
+                "target": {
+                  "type": "card",
+                  "who": "self",
+                  "where": "thisNode",
+                  "filter": {
+                    "this": true
+                  }
+                },
+                "pick": {
+                  "mode": "random"
+                },
+                "absorbPower": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-vvtftu3v",
+        "definitionId": "card-vvtftu3v",
+        "name": "Marlie Murder",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Hacker",
+        "generated": false,
+        "enabled": true,
+        "cost": 7,
+        "power": 3,
+        "art": "/assets/card_art/uploads/marlie-murder.png",
+        "effect": "Destroy a  4 cost or less revealed enemy card here.",
+        "onReveal": [
+          {
+            "action": "destroyCard",
+            "target": {
+              "type": "card",
+              "who": "opponent",
+              "where": "thisNode",
+              "filter": {
+                "maxCost": 4
+              }
+            },
+            "pick": {
+              "mode": "random"
+            }
+          }
+        ]
+      },
+      {
+        "id": "card-zm6g67cn",
+        "definitionId": "card-zm6g67cn",
+        "name": "Mel Anoma",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Hacker",
+        "generated": false,
+        "enabled": true,
+        "cost": 6,
+        "power": 2,
+        "art": "/assets/card_art/uploads/mel-anoma.png",
+        "effect": "Enemy gains a Lesion on top of their deck. If you win this Node, +3 Crypto.",
+        "onReveal": [
+          {
+            "action": "gainCard",
+            "target": {
+              "type": "zone",
+              "who": "opponent",
+              "zone": "deck"
+            },
+            "amount": 1,
+            "cardIds": [
+              "card-42dxj25j"
+            ]
+          }
+        ],
+        "ifs": [
+          {
+            "kind": "nodeOutcome",
+            "outcome": "win",
+            "then": [
+              {
+                "action": "gainCrypto",
+                "amount": 3,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-42dxj25j",
+        "definitionId": "card-42dxj25j",
+        "name": "Lesion",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Hacker",
+        "generated": true,
+        "enabled": true,
+        "cost": 0,
+        "power": 2,
+        "art": "/assets/card_art/uploads/not-a-total-loss.png",
+        "effect": "Drain -15 from your own server, then trash this card.",
+        "onReveal": [
+          {
+            "action": "damageServer",
+            "target": {
+              "type": "server",
+              "who": "self",
+              "server": "auto"
+            },
+            "amount": 15,
+            "then": [
+              {
+                "action": "trashCard",
+                "target": {
+                  "type": "card",
+                  "who": "self",
+                  "where": "board",
+                  "relation": "self"
+                },
+                "pick": {
+                  "mode": "choose"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-z7zrkq2l",
+        "definitionId": "card-z7zrkq2l",
+        "name": "Crypto-Vault",
+        "pool": "Crypto",
+        "type": "Crypto",
+        "generated": false,
+        "enabled": true,
+        "cost": 4,
+        "cryptoValue": 0,
+        "art": "/assets/card_art/uploads/crypto-vault.png",
+        "effect": "+2 crypto. Ongoing: Your Crypto cannot be bumped or stolen",
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 2
+          }
+        ],
+        "triggers": [
+          {
+            "kind": "protectCrypto"
+          }
+        ]
+      },
+      {
+        "id": "card-qzq05qzx",
+        "definitionId": "card-qzq05qzx",
+        "name": "Access Binding",
+        "pool": "Base",
+        "type": "Character",
+        "cardClass": "Utility",
+        "generated": false,
+        "enabled": true,
+        "cost": 3,
+        "power": 1,
+        "art": "/assets/card_art/uploads/access-binding.png",
+        "effect": "Ongoing: Your enemy cannot access your deck.\nIf this is the last card revealed this Cycle, +3 Crypto.",
+        "onReveal": [],
+        "ifs": [
+          {
+            "kind": "lastRevealed",
+            "scope": "cycle",
+            "then": [
+              {
+                "action": "gainCrypto",
+                "amount": 3,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ],
+        "triggers": [
+          {
+            "kind": "protectDeckAccess"
+          }
+        ]
+      },
+      {
+        "id": "card-rkztivvr",
+        "definitionId": "card-rkztivvr",
+        "name": "The Tuathal Kill",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Horror",
+        "generated": false,
+        "enabled": true,
+        "cost": 7,
+        "power": 2,
+        "art": "/assets/card_art/uploads/the-tuathal-kill.png",
+        "effect": "If you win this Node = Drain -150.\nTie = +3 Crypto.\nLoose = Drain -350",
+        "onReveal": [],
+        "ifs": [
+          {
+            "kind": "nodeOutcome",
+            "outcome": "lose",
+            "then": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                },
+                "amount": 350
+              }
+            ]
+          },
+          {
+            "kind": "nodeOutcome",
+            "outcome": "win",
+            "then": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                },
+                "amount": 150
+              }
+            ]
+          },
+          {
+            "kind": "nodeOutcome",
+            "outcome": "tie",
+            "then": [
+              {
+                "action": "gainCrypto",
+                "amount": 3,
+                "target": {
+                  "type": "player",
+                  "who": "self"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-bm3an39o",
+        "definitionId": "card-bm3an39o",
+        "name": "Andras Asura",
+        "pool": "Chaos",
+        "type": "Character",
+        "cardClass": "Horror",
+        "generated": false,
+        "enabled": true,
+        "cost": 5,
+        "power": 2,
+        "art": "/assets/card_art/uploads/andras-asura.png",
+        "effect": "Drain -150 from Backup server If this is the last card revealed this cycle. \nOtherwise, Drain -50 when Enemy plays a card here.",
+        "onReveal": [],
+        "ifs": [
+          {
+            "kind": "lastRevealed",
+            "scope": "cycle",
+            "then": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "backup"
+                },
+                "amount": 150
+              }
+            ]
+          },
+          {
+            "kind": "enemyPlayedHere",
+            "match": {},
+            "then": [
+              {
+                "action": "damageServer",
+                "target": {
+                  "type": "server",
+                  "who": "opponent",
+                  "server": "auto"
+                },
+                "amount": 50
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "card-k9xwj1ac",
+        "definitionId": "card-k9xwj1ac",
+        "name": "Bug Basher",
+        "pool": "Base",
+        "type": "Character",
+        "cardClass": "Utility",
+        "generated": false,
+        "enabled": true,
+        "cost": 3,
+        "power": 1,
+        "art": "/assets/card_art/uploads/bug-hunter.png",
+        "effect": "Ongoing: When a Glitch or Lesion is played at this location, destroy it. Then +1 Power to this card and +1 Crypto.",
+        "onReveal": [],
+        "triggers": [
+          {
+            "kind": "whenPlayed",
+            "match": {
+              "definitionIds": [
+                "glitch",
+                "card-3v2c7kzx",
+                "card-583tezoi",
+                "card-5tkahnma",
+                "card-83befkos",
+                "card-42dxj25j"
+              ]
+            },
+            "scope": "thisNode",
+            "then": [
+              {
+                "action": "destroyCard",
+                "target": {
+                  "type": "card",
+                  "who": "self",
+                  "where": "board",
+                  "relation": "trigger"
+                },
+                "pick": {
+                  "mode": "choose"
+                },
+                "then": [
+                  {
+                    "action": "changePower",
+                    "target": {
+                      "type": "card",
+                      "who": "self",
+                      "where": "board",
+                      "relation": "self"
+                    },
+                    "amount": 1,
+                    "pick": {
+                      "mode": "choose"
+                    },
+                    "then": [
+                      {
+                        "action": "gainCrypto",
+                        "target": {
+                          "type": "player",
+                          "who": "self"
+                        },
+                        "amount": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -5951,8 +6477,8 @@
       {
         "id": "location-m78m3xz4",
         "name": "Wreck my shit ",
-        "rule": "On collapse: Remove \u201cMovable\u201d Mod from a card anywhere in the winning player's deck.",
-        "reward": "On collapse: Remove \u201cMovable\u201d Mod from a card anywhere in the winning player's deck.",
+        "rule": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
+        "reward": "On collapse: Remove “Movable” Mod from a card anywhere in the winning player's deck.",
         "effects": [
           {
             "action": "removeModifier",
@@ -6861,7 +7387,7 @@
       {
         "id": "recursive-curse",
         "name": "Recursive Curse",
-        "text": "Attach \u201cprinted effects happen twice\u201d to an Action or Utility Character in your deck.",
+        "text": "Attach “printed effects happen twice” to an Action or Utility Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -6914,7 +7440,7 @@
       {
         "id": "telemetry",
         "name": "Telemetry",
-        "text": "Attach \u201cmovable each turn\u201d to a random Character in the eligible player's deck.",
+        "text": "Attach “movable each turn” to a random Character in the eligible player's deck.",
         "cost": 0,
         "effects": [
           {
@@ -7142,7 +7668,7 @@
       {
         "id": "reward-xr6csfdv",
         "name": "The Giver",
-        "text": "Attach the \u201cThe Giver\u201d mod to a Character in your deck.",
+        "text": "Attach the “The Giver” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7167,7 +7693,7 @@
       {
         "id": "reward-fa5nxeut",
         "name": "Lil Prick",
-        "text": "Attach the \u201cLil Prick\u201d mod to a Character in your deck.",
+        "text": "Attach the “Lil Prick” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7191,7 +7717,7 @@
       {
         "id": "reward-g2lyyg6u",
         "name": "On Deck",
-        "text": "Attach the \u201cOn Deck\u201d mod to a Character in your deck.",
+        "text": "Attach the “On Deck” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7216,7 +7742,7 @@
       {
         "id": "reward-iag9ld3w",
         "name": "Repel Spell",
-        "text": "Attach the \u201cRepel Spell\u201d mod to a Character in your deck.",
+        "text": "Attach the “Repel Spell” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7240,7 +7766,7 @@
       {
         "id": "reward-jfdvg12d",
         "name": "The Healer",
-        "text": "Attach the \u201cThe Healer\u201d mod to a Character in your deck.",
+        "text": "Attach the “The Healer” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7264,7 +7790,7 @@
       {
         "id": "reward-rdih7pg5",
         "name": "Loose Change",
-        "text": "Attach the \u201cLoose Change\u201d mod to a Character in your deck.",
+        "text": "Attach the “Loose Change” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7288,7 +7814,7 @@
       {
         "id": "reward-xz0nqngp",
         "name": "Enhance",
-        "text": "Attach the \u201cEnhance\u201d mod  to a Character in your deck.\n(On collapse +1 Power to this card)",
+        "text": "Attach the “Enhance” mod  to a Character in your deck.\n(On collapse +1 Power to this card)",
         "cost": 0,
         "effects": [
           {
@@ -7312,7 +7838,7 @@
       {
         "id": "reward-yz5dnv4k",
         "name": "Repairman",
-        "text": "Attach the \u201cRepairman\u201d mod to a Character in your deck.",
+        "text": "Attach the “Repairman” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7336,7 +7862,7 @@
       {
         "id": "reward-aura-farming",
         "name": "Aura Farming",
-        "text": "Attach the \u201cAura Farming\u201d mod to a Character in your deck.\n(When revealed: +1 Card.)",
+        "text": "Attach the “Aura Farming” mod to a Character in your deck.\n(When revealed: +1 Card.)",
         "cost": 0,
         "effects": [
           {
@@ -7361,7 +7887,7 @@
       {
         "id": "reward-lefty",
         "name": "Lefty",
-        "text": "Attach the \u201cLefty\u201d mod to a Character in your deck.\n(Push 1 power left.)",
+        "text": "Attach the “Lefty” mod to a Character in your deck.\n(Push 1 power left.)",
         "cost": 0,
         "effects": [
           {
@@ -7386,7 +7912,7 @@
       {
         "id": "reward-superpositioning-mod",
         "name": "Superpositioning",
-        "text": "Attach the \u201cSuperpositioning\u201d mod to a Character in your deck.",
+        "text": "Attach the “Superpositioning” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7411,7 +7937,7 @@
       {
         "id": "reward-i5ty0sta",
         "name": "Double Vision",
-        "text": "Attach the \u201cDouble Vision\u201d mod to a Character in your deck.\n(Create hologram at mirrored Node.)",
+        "text": "Attach the “Double Vision” mod to a Character in your deck.\n(Create hologram at mirrored Node.)",
         "cost": 0,
         "effects": [
           {
@@ -7435,7 +7961,7 @@
       {
         "id": "reward-lst6sa50",
         "name": "Mill-E",
-        "text": "Attach the \u201cMill-E\u201d mod to a Character in your deck.",
+        "text": "Attach the “Mill-E” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7459,7 +7985,7 @@
       {
         "id": "reward-o2qj2dqb",
         "name": "2-Slit Split",
-        "text": "Attach the \u201c2-Slit Split\u201d mod to a Character in your deck.\n(Push 1 power left and right.)",
+        "text": "Attach the “2-Slit Split” mod to a Character in your deck.\n(Push 1 power left and right.)",
         "cost": 0,
         "effects": [
           {
@@ -7483,7 +8009,7 @@
       {
         "id": "reward-qpd0nht2",
         "name": "Righty",
-        "text": "Attach the \u201cRighty\u201d mod to a Character in your deck.",
+        "text": "Attach the “Righty” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7507,7 +8033,7 @@
       {
         "id": "reward-rnfe76yo",
         "name": "Node Gravity",
-        "text": "Attach the \u201cNode Gravity\u201d mod to a Character in your deck.",
+        "text": "Attach the “Node Gravity” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7531,7 +8057,7 @@
       {
         "id": "reward-tdfxhls2",
         "name": "Action Jackson",
-        "text": "Attach the \u201cAction Jackson\u201d mod to a Character in your deck.\n(on reveal +1 Card)",
+        "text": "Attach the “Action Jackson” mod to a Character in your deck.\n(on reveal +1 Card)",
         "cost": 0,
         "effects": [
           {
@@ -7680,6 +8206,40 @@
           },
           {
             "cardId": "night-scythe",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "id": "deck-nvah411g",
+        "name": "NewCardz",
+        "cards": [
+          {
+            "cardId": "card-t8s915o7",
+            "count": 1
+          },
+          {
+            "cardId": "card-vxsgip56",
+            "count": 1
+          },
+          {
+            "cardId": "card-dr79o1is",
+            "count": 1
+          },
+          {
+            "cardId": "1337_speaker",
+            "count": 1
+          },
+          {
+            "cardId": "card-vvtftu3v",
+            "count": 2
+          },
+          {
+            "cardId": "crypto-shyte",
+            "count": 3
+          },
+          {
+            "cardId": "card-zm6g67cn",
             "count": 1
           }
         ]
@@ -8126,7 +8686,7 @@
         "style": "Balanced",
         "profile": {
           "version": 12,
-          "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01\u21921.26; Crypto target 11.67\u219212, crypto weight 2.04\u21922.34; disrupt weight 0.8\u21921.05; restore weight 1.3\u21921.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: econ",
+          "plan": "v1.12 plays the designer's baseline plus 4 adopted changes (power weight 1.01→1.26; Crypto target 11.67→12, crypto weight 2.04→2.34; disrupt weight 0.8→1.05; restore weight 1.3→1.69). Through Cycle 4: strong draw/Action Base cards and Crypto worth 2+ (never Shyte-Coin), aiming for ~12 Crypto per hand. Cycles 5-8: a balanced midgame of attacks, engine, Server Restore and VP. From Cycle 9: Chaos and Drain for the endgame push; VP cards from Cycle 9, and the last Draft buys only VP. Testing x120-draw: Valuing draw higher cycles back to the best cards faster than extra Crypto does. (Schedule: econ",
           "economyUntilCycle": 4,
           "chaosFromCycle": 9,
           "vpFromCycle": 9,
@@ -8243,7 +8803,7 @@
         "style": "Reactive majority",
         "profile": {
           "version": 0,
-          "plan": "Most VP wins; destroying Servers awards VP and can end the game early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free from hand; there is no Draft Crypto shelf (Hacker/Crypto slots only). Shared early economy through Cycle 4, then mirror the opponent's Draft buys with a mild Drain/Chaos/disrupt bias. Never play Runtime turn 1 \u2014 hold the hand, then contest Nodes on turns 2 and 3 for at least one more Location win than the enemy \u2014 ties are fine tools for that majority.",
+          "plan": "Most VP wins; destroying Servers awards VP and can end the game early. Location majority drives Circuit eligibility; trailing Circuit catch-up rewards are always on. Crypto deploys free from hand; there is no Draft Crypto shelf (Hacker/Crypto slots only). Shared early economy through Cycle 4, then mirror the opponent's Draft buys with a mild Drain/Chaos/disrupt bias. Never play Runtime turn 1 — hold the hand, then contest Nodes on turns 2 and 3 for at least one more Location win than the enemy — ties are fine tools for that majority.",
           "economyUntilCycle": 4,
           "chaosFromCycle": 6,
           "vpFromCycle": 10,

@@ -269,6 +269,94 @@ describe('card Ongoing triggers', () => {
       }],
     }), 0, 1);
     expect(game.state.players[0].wallet).toBe(before + 5);
+    expect(game.matchReport().telemetry.enemyAccesses).toEqual([0, 1]);
+  });
+
+  it('Crypto Canary Listen fires when Glitch-Witch poisons your discard', () => {
+    const game = session();
+    play(game, card('crypto-canary', {
+      type: 'Crypto', cryptoValue: 1, power: 2,
+      triggers: [{
+        kind: 'listenAccess', whose: 'enemyAccessesYours',
+        then: [{ action: 'gainCrypto', amount: 5, target: { type: 'player', who: 'self' } }],
+      }],
+    }));
+    const before = game.state.players[0].wallet;
+    play(game, card('glitch-witch', {
+      power: 2,
+      onReveal: [{
+        action: 'gainCard', amount: 1, cardId: 'dash', selection: 'sequential',
+        target: { type: 'zone', who: 'opponent', zone: 'discard' },
+      }],
+    }), 0, 1);
+    expect(game.state.players[0].discard.some(entry => (entry.definitionId ?? entry.id) === 'dash' || entry.name === 'Dash Relay')).toBe(true);
+    expect(game.state.players[0].wallet).toBe(before + 5);
+    expect(game.matchReport().telemetry.enemyAccesses).toEqual([0, 1]);
+  });
+
+  it('card mill counts as a deck attack and fires Crypto Canary', () => {
+    const game = session();
+    play(game, card('crypto-canary', {
+      type: 'Crypto', cryptoValue: 1, power: 2,
+      triggers: [{
+        kind: 'listenAccess', whose: 'enemyAccessesYours',
+        then: [{ action: 'gainCrypto', amount: 5, target: { type: 'player', who: 'self' } }],
+      }],
+    }));
+    const before = game.state.players[0].wallet;
+    play(game, card('miller', {
+      power: 1,
+      onReveal: [{ action: 'mill', amount: 1, target: { type: 'player', who: 'opponent' } }],
+    }), 0, 1);
+    expect(game.state.players[0].wallet).toBe(before + 5);
+    expect(game.matchReport().telemetry.enemyAccesses).toEqual([0, 1]);
+  });
+
+  it('stealDeckCard counts as a deck attack and fires Crypto Canary', () => {
+    const game = session();
+    play(game, card('crypto-canary', {
+      type: 'Crypto', cryptoValue: 1, power: 2,
+      triggers: [{
+        kind: 'listenAccess', whose: 'enemyAccessesYours',
+        then: [{ action: 'gainCrypto', amount: 5, target: { type: 'player', who: 'self' } }],
+      }],
+    }));
+    const before = game.state.players[0].wallet;
+    const deckBefore = game.state.players[0].draw.length;
+    play(game, card('thief', {
+      power: 1,
+      onReveal: [{ action: 'stealDeckCard', amount: 1, target: { type: 'player', who: 'opponent' } }],
+    }), 0, 1);
+    expect(game.state.players[0].draw.length).toBe(deckBefore - 1);
+    expect(game.state.players[0].wallet).toBe(before + 5);
+    expect(game.matchReport().telemetry.enemyAccesses).toEqual([0, 1]);
+  });
+
+  it('location poison into discard does not fire Crypto Canary or count deck attacks', () => {
+    const game = session();
+    play(game, card('crypto-canary', {
+      type: 'Crypto', cryptoValue: 1, power: 2,
+      triggers: [{
+        kind: 'listenAccess', whose: 'enemyAccessesYours',
+        then: [{ action: 'gainCrypto', amount: 5, target: { type: 'player', who: 'self' } }],
+      }],
+    }));
+    game.state.nodes[0].location = {
+      id: 'poison-loc', name: 'Poison Spot', rule: 'On play, poison.', reward: 'Poison.',
+      events: [{
+        id: 'poison-play',
+        kind: 'cardPlayed',
+        effects: [{
+          action: 'gainCard', amount: 1, cardId: 'dash', selection: 'sequential',
+          target: { type: 'zone', who: 'opponent', zone: 'discard' },
+        }],
+      }],
+    };
+    const before = game.state.players[0].wallet;
+    play(game, card('trigger-card', { power: 1, onReveal: [] }), 0, 1);
+    expect(game.state.players[0].discard.some(entry => entry.name === 'Dash Relay' || (entry.definitionId ?? entry.id) === 'dash')).toBe(true);
+    expect(game.state.players[0].wallet).toBe(before);
+    expect(game.matchReport().telemetry.enemyAccesses).toEqual([0, 0]);
   });
 
   it('Ms. Mosquito draws when a card is destroyed from hand', () => {
@@ -389,6 +477,95 @@ describe('card Ongoing triggers', () => {
     expect(enemy.some(entry => entry.generated === true && /glitch/i.test(entry.name))).toBe(true);
   });
 
+  it('Ghetto Blaster destroys the next self reveal and pays draw/Crypto (Hag→Box→Blaster line)', () => {
+    const game = session();
+    // Authored Schrödinger cats are Runtime: they never enter the Destroyed pile, but a destroy
+    // still fires anyCardDestroyed (Ms. Mosquito / Crypto-Echo) and Blaster's then package.
+    play(game, card('ms-mosquito', {
+      power: 1, cardClass: 'Hacker',
+      triggers: [{ kind: 'when', event: 'anyCardDestroyed', then: [{ action: 'draw', amount: 1, target: { type: 'player', who: 'self' } }] }],
+    }), 1, 0);
+    game.state.players[0].hand = [];
+    game.state.players[0].draw = [card('fuel-a'), card('fuel-b'), card('fuel-c'), card('fuel-d'), card('fuel-e')];
+    const blaster = card('ghetto-blaster', {
+      power: 1, cardClass: 'Hacker',
+      onReveal: [{
+        action: 'destroyCard',
+        target: { type: 'card', who: 'self', where: 'board', relation: 'next' },
+        then: [
+          { action: 'draw', amount: 2, target: { type: 'player', who: 'self' } },
+          { action: 'gainCrypto', amount: 3, target: { type: 'player', who: 'self' } },
+        ],
+      }],
+    });
+    const cat = card('box-cat', {
+      power: 2, cardClass: 'Runtime',
+      onReveal: [{ action: 'gainCrypto', amount: 1, target: { type: 'player', who: 'self' } }],
+    });
+    game.state.players[0].hand.unshift(cat, blaster);
+    const walletBefore = game.state.players[0].wallet;
+    game.deploy('ghetto-blaster', 0, 0);
+    game.deploy('box-cat', 0, 0);
+    game.endTurn(0);
+    try { game.endTurn(1); } catch { /* */ }
+    const texts: string[] = [];
+    let n = 0;
+    while (game.pendingCount || game.state.choice) {
+      const event = game.state.choice
+        ? game.choose((game.state.choice.options.find(option => !option.disabled) ?? game.state.choice.options[0]!).id, game.state.choice.owner)
+        : game.step()!.event;
+      texts.push(event.text);
+      if (++n > 500) throw new Error('stalled');
+    }
+    expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'box-cat')).toBe(false);
+    expect(game.state.players[0].destroyed.some(entry => entry.id === 'box-cat')).toBe(false);
+    expect(game.state.players[0].wallet).toBeGreaterThanOrEqual(walletBefore + 3);
+    expect(texts.some(text => /ghetto-blaster destroys box-cat/i.test(text))).toBe(true);
+    expect(texts.some(text => /ms-mosquito: draw/i.test(text))).toBe(true);
+  });
+
+  it('destroying a Runtime morph-cat still wakes Mosquito even though it never enters Destroyed', () => {
+    const game = session();
+    play(game, card('ms-mosquito', {
+      power: 1, cardClass: 'Hacker',
+      triggers: [{ kind: 'when', event: 'anyCardDestroyed', then: [{ action: 'draw', amount: 1, target: { type: 'player', who: 'self' } }] }],
+    }), 1, 0);
+    game.state.players[0].hand = [];
+    game.state.players[0].draw = [card('fuel-a'), card('fuel-b'), card('fuel-c')];
+    const blaster = card('ghetto-blaster', {
+      power: 1, cardClass: 'Hacker',
+      onReveal: [{
+        action: 'destroyCard',
+        target: { type: 'card', who: 'self', where: 'board', relation: 'next' },
+        then: [{ action: 'gainCrypto', amount: 3, target: { type: 'player', who: 'self' } }],
+      }],
+    });
+    const runtimeCat = card('dead-cat', {
+      power: 0, cardClass: 'Runtime',
+      onReveal: [],
+    });
+    game.state.players[0].hand.unshift(runtimeCat, blaster);
+    const walletBefore = game.state.players[0].wallet;
+    game.deploy('ghetto-blaster', 0, 0);
+    game.deploy('dead-cat', 0, 0);
+    game.endTurn(0);
+    try { game.endTurn(1); } catch { /* */ }
+    const texts: string[] = [];
+    let n = 0;
+    while (game.pendingCount || game.state.choice) {
+      const event = game.state.choice
+        ? game.choose((game.state.choice.options.find(option => !option.disabled) ?? game.state.choice.options[0]!).id, game.state.choice.owner)
+        : game.step()!.event;
+      texts.push(event.text);
+      if (++n > 500) throw new Error('stalled');
+    }
+    expect(game.state.nodes[0].cards[0].some(entry => entry.card.id === 'dead-cat')).toBe(false);
+    expect(game.state.players[0].destroyed.some(entry => entry.id === 'dead-cat')).toBe(false);
+    expect(game.state.players[0].wallet).toBe(walletBefore + 3);
+    expect(texts.some(text => /ghetto-blaster destroys dead-cat \(removed from the game\)/i.test(text))).toBe(true);
+    expect(texts.some(text => /ms-mosquito: draw/i.test(text))).toBe(true);
+  });
+
   it('R.0.1. Matrix has no next-card move On Reveal', () => {
     const raw = (authored as { document?: unknown }).document ?? authored;
     const document = normalizeDocument(raw as never);
@@ -410,7 +587,7 @@ describe('card Ongoing triggers', () => {
       expect(found!.enabled).toBe(true);
       expect(describeCard(found!).length).toBeGreaterThan(0);
     }
-    const banish = document.cards.find(entry => entry.name === '3rian-Banish')!;
+    const banish = document.cards.find(entry => entry.name === 'Banishing-3R14N')!;
     expect(banish.cost).toBe(3);
     expect(banish.power).toBe(1);
     expect(banish.onReveal?.some(step => step.action === 'silenceOngoing')).toBe(true);

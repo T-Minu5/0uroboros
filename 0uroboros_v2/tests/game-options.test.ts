@@ -74,6 +74,32 @@ describe("online tables", () => {
     expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
     expect(room.session!.view().playableNodes).toEqual([1, 2, 3]);
   });
+
+  it("applies Configure end-game awards on a pvp table (including defaults when omitted)", () => {
+    const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
+    const withAwards = lobby.createRoom("pvp", {
+      seed: 9,
+      endGameAwards: {
+        mostDestroyed: { enabled: true, vp: 8 },
+        mostDeckAttacks: { enabled: true, vp: 4 },
+        mostServerRepair: { enabled: false, vp: 2 },
+      },
+    });
+    withAwards.join("Ada", { send: () => undefined, close: () => undefined } as never);
+    withAwards.join("Bo", { send: () => undefined, close: () => undefined } as never);
+    const standings = withAwards.session!.view().endGameStandings;
+    expect(standings.find(row => row.id === "mostDestroyed")).toMatchObject({ vp: 8 });
+    expect(standings.find(row => row.id === "mostDeckAttacks")).toMatchObject({ vp: 4 });
+    expect(standings.some(row => row.id === "mostServerRepair")).toBe(false);
+    expect(standings.some(row => row.id === "mostTrashed")).toBe(true);
+
+    const defaults = lobby.createRoom("pvp", { seed: 10 });
+    defaults.join("Ada", { send: () => undefined, close: () => undefined } as never);
+    defaults.join("Bo", { send: () => undefined, close: () => undefined } as never);
+    const ids = defaults.session!.view().endGameStandings.map(row => row.id);
+    expect(ids).toContain("mostDeckAttacks");
+    expect(ids).toContain("mostServerRepair");
+  });
 });
 
 describe("setup and look defaults", () => {

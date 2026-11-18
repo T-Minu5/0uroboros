@@ -6,6 +6,7 @@ import { describeEventPredicate, describePassives, type LocationEvent, type Loca
 import { describeWhileBody, describeWhilePredicate, type LocationWhile } from '../locationWhiles';
 import { formatAmount, transferFlow, transferText } from '../transferText';
 import { describeTrigger, MULTIPLY_MAX, MULTIPLY_MIN } from './triggers';
+import { describeCardIf } from './cardIfs';
 import {
   DECK_ENDS, MOD_HOOKS, filterClasses, isBuiltinModifier, scopedWho,
   INSPECT_ACTIONS,
@@ -88,12 +89,29 @@ export const ACTIONS: Readonly<Record<ActionId, ActionSpec>> = {
   recover: { id: 'recover', label: 'Recover', family: 'Zones', help: 'Take cards back from the shared Trash, your Discard, or your destroyed pile.', targets: [{ type: 'card', roles: ['ally'], where: ['trash', 'destroyed', 'discard'] }], amount: { label: 'Cards', min: 1, max: 10, default: 1 }, picks: ['choose', 'random'], destinations: ['discard', 'hand', 'top'] },
   stealCrypto: { id: 'stealCrypto', label: 'Steal', family: 'Zones', help: 'Take spendable Crypto from the enemy wallet into yours.', targets: [{ type: 'zone', roles: ['enemy'], zones: ['wallet'] }], amount: { label: 'Crypto', min: 1, max: 20, default: 1 } },
   bump: { id: 'bump', label: 'Bump', family: 'Zones', help: 'Effect Bank: send cards to their owner\'s Discard. Your bank: Foreign infectors only. Enemy bank: all occupants. Wallet: burn spendable Crypto (neither player gets it). Either: bank then wallet.', targets: [{ type: 'zone', roles: ['enemy', 'ally', 'both'], zones: ['bank', 'wallet', 'bankOrWallet'] }], amount: { label: 'Amount', min: 1, max: 20, default: 1 }, picks: ['choose', 'random'], chooser: true },
-  moveCard: { id: 'moveCard', label: 'Move a card', family: 'Board', help: 'Move a revealed card to any legal Node with room (including Nodes not yet open this Cycle).', targets: [{ type: 'card', roles: SIDES, where: BOARD, relations: ['self', 'previous', 'next'] }], picks: ['choose', 'random'], chooser: true, optional: true },
+  moveCard: { id: 'moveCard', label: 'Move a card', family: 'Board', help: 'Move a revealed card to any legal Node with room (including Nodes not yet open this Cycle). Optional left/right forces an adjacent Node; blocked moves stay put with a Can’t move cue.', targets: [{ type: 'card', roles: SIDES, where: BOARD, relations: ['self', 'previous', 'next'] }], picks: ['choose', 'random'], chooser: true, optional: true },
+  reclaimStolen: {
+    id: 'reclaimStolen', label: 'Reclaim a stolen card', family: 'Board',
+    help: 'If a card stolen from you is revealed at this Location, reclaim it: swap seats with this card, then that card On Reveals again for you. Multiple candidates: you choose one. No stolen card here: nothing happens.',
+    scopes: ['card'],
+  },
+  merge: {
+    id: 'merge', label: 'Merge (absorb a card)', family: 'Board',
+    help: 'Absorb a revealed card at this Location. The other card is removed from the game (no destroy bus). Merging another instance of the same card is automatic (no choice) and stacks its effects onto the survivor (e.g. two Batz → one Batz that draws/gains twice). With If “second copy here”, only the second revealed copy Merges. Optional absorb Power adds its live Power as a lasting bonus. Then-steps run on success.',
+    targets: [{ type: 'card', roles: SIDES, where: ['thisNode'] }],
+    picks: ['choose', 'random'], chooser: true, optional: true,
+    scopes: ['card', 'location', 'locationPlay', 'locationCondition', 'locationEvent'],
+  },
+  absorbPower: {
+    id: 'absorbPower', label: 'Absorb Power', family: 'Board',
+    help: 'Add the last merged card’s live Power onto this card as a lasting Power bonus. Only meaningful after Merge.',
+    scopes: ['card'],
+  },
   changePower: { id: 'changePower', label: 'Add, steal or remove power', family: 'Board', help: 'A lasting change for the rest of the game, wherever the card goes. Stealing Power from an enemy card moves it onto this card; Remove Power deletes it without transferring.', targets: [{ type: 'card', roles: SIDES, where: [...POWERED, 'deck'], relations: ['self', 'previous', 'next'] }], amount: { label: 'Power', min: -100, max: 100, default: 1 }, picks: RANKED, pickCount: true, chooser: true, optional: true },
   healCard: { id: 'healCard', label: 'Restore power', family: 'Board', help: 'Restore a weakened card toward its printed Power, never above it. Boosts are left alone.', targets: [{ type: 'card', roles: SIDES, where: [...POWERED, 'deck', 'discard'], relations: ['self', 'previous', 'next'] }], amount: { label: 'Power', min: 1, max: 100, default: 1 }, picks: ['choose', 'random', 'all', 'weakest', 'strongest'], pickCount: true, chooser: true, optional: true },
   restoreCard: { id: 'restoreCard', label: 'Reset power', family: 'Board', help: 'Reset a card to exactly its printed Power, removing boosts too.', targets: [{ type: 'card', roles: SIDES, where: [...POWERED, 'deck', 'discard'], relations: ['self', 'previous', 'next'] }], picks: ['choose', 'random', 'all', 'weakest', 'strongest'], pickCount: true, chooser: true, optional: true },
-  destroyCard: { id: 'destroyCard', label: 'Destroy a card', family: 'Board', help: 'A destroyed card goes to its owner’s destroyed pile, from the board or any of their zones.', targets: [{ type: 'card', roles: SIDES, where: [...ANYWHERE, 'deck'], relations: ['previous', 'next'] }], picks: RANKED, pickCount: true, chooser: true, optional: true },
-  trashCard: { id: 'trashCard', label: 'Trash a card', family: 'Board', help: 'A trashed card goes to the shared Trash, from the board or any of its owner’s zones.', targets: [{ type: 'card', roles: SIDES, where: [...ANYWHERE, 'deck'], relations: ['self', 'previous', 'next'] }], picks: RANKED, pickCount: true, chooser: true, optional: true },
+  destroyCard: { id: 'destroyCard', label: 'Destroy a card', family: 'Board', help: 'A destroyed card goes to its owner’s destroyed pile, from the board or any of their zones.', targets: [{ type: 'card', roles: SIDES, where: [...ANYWHERE, 'deck'], relations: ['previous', 'next', 'trigger'] }], picks: RANKED, pickCount: true, chooser: true, optional: true },
+  trashCard: { id: 'trashCard', label: 'Trash a card', family: 'Board', help: 'A trashed card goes to the shared Trash, from the board or any of its owner’s zones.', targets: [{ type: 'card', roles: SIDES, where: [...ANYWHERE, 'deck'], relations: ['self', 'previous', 'next', 'trigger'] }], picks: RANKED, pickCount: true, chooser: true, optional: true },
   sacrificeCards: {
     id: 'sacrificeCards', label: 'Sacrifice cards', family: 'Board',
     help: 'Optionally destroy revealed cards at this Node (each targeted seat chooses among its own). Gain Crypto for each destroyed card.',
@@ -184,6 +202,7 @@ const BOARD_TARGETS: readonly TargetChoice[] = [
   cardChoice('board', 'Any revealed card', 'board'), cardChoice('thisNode', 'Revealed card here', 'thisNode'),
   cardChoice('self', 'This card', 'board', 'self'), cardChoice('next', 'Next revealed card', 'board', 'next'),
   cardChoice('previous', 'Previously revealed card', 'board', 'previous'),
+  cardChoice('trigger', 'Card that triggered this Ongoing', 'board', 'trigger'),
 ];
 const CARD_TARGETS: readonly TargetChoice[] = [
   ...BOARD_TARGETS,
@@ -252,6 +271,32 @@ export const EDITOR_ENTRIES: readonly EditorEntry[] = [
     { ...cardChoice('allAll', 'All Ongoing at all Locations', 'board'), who: 'both' },
   ] },
   { key: 'moveCard', label: 'Move a card', group: 'Cards', action: 'moveCard', targets: BOARD_TARGETS },
+  { key: 'reclaimStolen', label: 'Reclaim a stolen card', group: 'Cards', action: 'reclaimStolen', fixedTarget: true },
+  {
+    key: 'mergeThisCopy', label: 'Merge with another copy of this card', group: 'Cards', action: 'merge',
+    targets: [{ ...cardChoice('allyHere', 'Your revealed here', 'thisNode'), who: 'self' }],
+    preset: scope => ({
+      absorbPower: true,
+      pick: { mode: 'random' as const },
+      target: { type: 'card', who: scopedWho('self', scope), where: 'thisNode', filter: { this: true } },
+    }),
+    matches: step => step.action === 'merge' && !!step.target && step.target.type === 'card'
+      && !!step.target.filter?.this
+      && !step.target.filter.definitionId && !(step.target.filter.definitionIds?.length)
+      && !step.target.filter.cardType && !step.target.filter.cardClass,
+  },
+  {
+    key: 'merge', label: 'Merge (absorb a card)', group: 'Cards', action: 'merge',
+    targets: [
+      { ...cardChoice('anyHere', 'Any revealed here', 'thisNode') },
+      { ...cardChoice('enemyHere', 'Enemy revealed here', 'thisNode'), who: 'opponent' },
+      { ...cardChoice('allyHere', 'Your revealed here', 'thisNode'), who: 'self' },
+    ],
+    matches: step => !(step.target?.type === 'card' && step.target.filter?.this
+      && !step.target.filter.definitionId && !(step.target.filter.definitionIds?.length)
+      && !step.target.filter.cardType && !step.target.filter.cardClass),
+  },
+  { key: 'absorbPower', label: 'Absorb Power', group: 'Cards', action: 'absorbPower', fixedTarget: true },
   { key: 'stealDeckCard', label: 'Steal from deck', group: 'Deck', action: 'stealDeckCard', targets: TOP_OF_DECK },
   { key: 'deckSwap', label: 'Deck swap', group: 'Deck', action: 'deckSwap', fixedTarget: true },
   { key: 'morph', label: 'Morph', group: 'Cards', action: 'morph' },
@@ -531,7 +576,12 @@ export const ZONE_LABELS: Record<ZoneId, string> = {
   hand: 'Hand', deck: 'Deck', discard: 'Discard', trash: 'Trash', bank: 'Effect Bank', wallet: 'Crypto wallet', bankOrWallet: 'Effect Bank or wallet', destroyed: 'Destroyed pile',
 };
 export const SERVER_LABELS: Record<ServerSlot, string> = { auto: 'Available Server', primary: 'Primary', backup: 'Backup', both: 'Both Servers' };
-export const RELATION_LABELS: Record<Relation, string> = { self: 'This card', previous: 'Previously revealed card', next: 'Next revealed card' };
+export const RELATION_LABELS: Record<Relation, string> = {
+  self: 'This card',
+  previous: 'Previously revealed card',
+  next: 'Next revealed card',
+  trigger: 'Card that triggered this Ongoing',
+};
 export const PICK_LABELS: Record<PickMode, string> = { choose: 'Chosen', random: 'Random', all: 'All', weakest: 'Weakest', strongest: 'Strongest', first: 'First revealed' };
 export const DESTINATION_LABELS: Record<Destination, string> = { hand: 'Hand', top: 'Top of deck', discard: 'Discard', trash: 'Trash' };
 export const TARGET_TYPE_LABELS: Record<TargetType, string> = { player: 'Player', server: 'Server', zone: 'Zone', card: 'Card', node: 'Node' };
@@ -601,6 +651,7 @@ export function cardTargetText(target: Target | undefined, pick: Pick | undefine
     if (scope === 'locationEvent') return 'that card';
     return 'this card';
   }
+  if (target.relation === 'trigger') return 'the card that triggered this Ongoing';
   if (target.relation === 'next') return target.who === 'self' || target.who === 'played' ? 'your next revealed card' : `the next revealed ${enemy}card`;
   if (target.relation === 'previous') return target.who === 'self' || target.who === 'played' ? 'your previously revealed card' : `the previously revealed ${enemy}card`;
   const count = pick?.count ?? 1, mode = pick?.mode ?? 'choose';
@@ -750,7 +801,31 @@ function describeHead(step: EffectStep, scope: Scope, cards: readonly Card[], mo
       const bank = `Bump ${amount === 1 ? `a ${random}${kind}card` : `${amount} ${random}${kind}cards`} from ${zoneOwner(step.target, scope)} Effect Bank to discard${chooserText(step.pick, scope)}`;
       return zone === 'bankOrWallet' ? `${bank}, then bump ${amount} Crypto from their wallet` : bank;
     }
-    case 'moveCard': return cardAction(step, scope, target => `Move ${target} to another Node`, 'move to another Node');
+    case 'moveCard': {
+      const dir = step.moveDir === 'left' ? ' left' : step.moveDir === 'right' ? ' right' : ' to another Node';
+      return cardAction(step, scope, target => `Move ${target}${dir}`, `move${dir}`);
+    }
+    case 'reclaimStolen':
+      return 'Reclaim a stolen card here (swap seats; it On Reveals again for you)';
+    case 'merge': {
+      const power = step.absorbPower ? ', absorbing its Power' : '';
+      const filter = step.target?.type === 'card' ? step.target.filter : undefined;
+      const named = [
+        ...(filter?.definitionId ? [filter.definitionId] : []),
+        ...(filter?.definitionIds ?? []),
+      ].map(id => cardName(cards, id) ?? id);
+      const bits = [
+        ...(filter?.this ? ['another copy of this card'] : []),
+        ...named,
+      ];
+      const which = bits.length ? bits.join(' or ') : undefined;
+      if (which) {
+        return cardAction(step, scope, () => `Merge with ${which}${power}`, `merge with ${which}${power}`);
+      }
+      return cardAction(step, scope, target => `Merge with ${target}${power}`, `merge with${power}`);
+    }
+    case 'absorbPower':
+      return 'Absorb the merged card’s Power';
     case 'changePower': {
       if (amount < 0 && who === 'opponent' && step.target?.type === 'card' && scope === 'card') {
         const steal = step.transfer !== false;
@@ -891,6 +966,7 @@ type CardSteps = {
   selfMove?: 'turn' | 'cycle';
   powerSource?: PowerSource;
   triggers?: Card['triggers'];
+  ifs?: Card['ifs'];
 };
 
 const POWER_SOURCE_TEXT: Record<PowerSource, string> = {
@@ -924,6 +1000,11 @@ export function describeCard(card: CardSteps, cards: readonly Card[] = [], mods:
     }
     return lead;
   });
+  const ifs = (card.ifs ?? []).map(rule => {
+    const lead = describeCardIf(rule);
+    const then = text(rule.then);
+    return then ? `${lead.replace(/\.$/, '')}, ${then}` : lead;
+  });
   return [
     card.powerSource ? powerSourceText(card.powerSource) : '',
     text(card.onReveal),
@@ -933,6 +1014,7 @@ export function describeCard(card: CardSteps, cards: readonly Card[] = [], mods:
     scheduled && !card.recurring?.length && span && card.duration! < 99 ? `Lasts ${span.replace(/^for the next /, '')}.` : '',
     card.foreignBank && card.duration ? 'After Collapse, enters the enemy Effect Bank.' : '',
     ...ongoing,
+    ...ifs,
     card.aura ? auraText(card.aura) : '',
     card.selfMove ? selfMoveText(card.selfMove) : '',
   ].filter(Boolean).join(' ');
@@ -1000,7 +1082,7 @@ function mergeServerPairs(steps: readonly EffectStep[]): EffectStep[] {
 export type ValidationCards = { enabledIds: ReadonlySet<string>; types: ReadonlyMap<string, Card['type']>; modIds?: ReadonlySet<string> };
 const record = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value);
 const idPattern = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,79}$/;
-const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'inspectActions', 'cardId', 'cardIds', 'filter', 'maxCost', 'modifier', 'modifierPool', 'formIds', 'selection', 'cycleForms', 'resetAfterCycle', 'direction', 'flow', 'transfer', 'prompt', 'options', 'choose']);
+const STEP_FIELDS = new Set(['action', 'amount', 'target', 'pick', 'optional', 'min', 'then', 'destination', 'inspectActions', 'cardId', 'cardIds', 'filter', 'maxCost', 'modifier', 'modifierPool', 'formIds', 'selection', 'cycleForms', 'resetAfterCycle', 'direction', 'flow', 'moveDir', 'absorbPower', 'transfer', 'prompt', 'options', 'choose']);
 
 function amountIssue(spec: AmountSpec, value: unknown): string | null {
   if (spec.integer === false) {
@@ -1032,7 +1114,7 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
     const filter = step.target.filter as Record<string, unknown>;
     if (!record(filter)) errors.push(`${p}.target.filter: expected an object`);
     else {
-      for (const key of Object.keys(filter)) if (!['cardType', 'cardClass', 'definitionId', 'minCost', 'maxCost'].includes(key)) errors.push(`${p}.target.filter.${key}: unsupported field`);
+      for (const key of Object.keys(filter)) if (!['cardType', 'cardClass', 'definitionId', 'definitionIds', 'this', 'minCost', 'maxCost'].includes(key)) errors.push(`${p}.target.filter.${key}: unsupported field`);
       if (filter.cardType !== undefined && !['Character', 'VP', 'Crypto'].includes(String(filter.cardType))) errors.push(`${p}.target.filter.cardType: expected Character, VP or Crypto`);
       if (Array.isArray(filter.cardClass)) {
         if (!filter.cardClass.length) errors.push(`${p}.target.filter.cardClass: list at least one class or leave it out`);
@@ -1044,6 +1126,22 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
         } else if (!cards.enabledIds.has(filter.definitionId)) {
           errors.push(`${p}.target.filter.definitionId: unknown or disabled card ${filter.definitionId}`);
         }
+      }
+      if (filter.definitionIds !== undefined) {
+        if (!Array.isArray(filter.definitionIds) || filter.definitionIds.length > 40) {
+          errors.push(`${p}.target.filter.definitionIds: expected up to 40 card ids`);
+        } else {
+          for (const id of filter.definitionIds) {
+            if (typeof id !== 'string' || !id || !idPattern.test(id)) {
+              errors.push(`${p}.target.filter.definitionIds: use 1–80 letters, numbers, underscores or hyphens`);
+            } else if (!cards.enabledIds.has(id)) {
+              errors.push(`${p}.target.filter.definitionIds: unknown or disabled card ${id}`);
+            }
+          }
+        }
+      }
+      if (filter.this !== undefined && typeof filter.this !== 'boolean') {
+        errors.push(`${p}.target.filter.this: expected true or false`);
       }
       if (filter.minCost !== undefined && (!Number.isFinite(filter.minCost) || Number(filter.minCost) < 0 || Number(filter.minCost) > 100)) {
         errors.push(`${p}.target.filter.minCost: expected a number from 0 to 100`);
@@ -1177,6 +1275,12 @@ function validateStep(item: unknown, p: string, scope: Scope, cards: ValidationC
     if (step.direction !== undefined) errors.push(`${p}.direction: unsupported field`);
     if (step.flow !== undefined) errors.push(`${p}.flow: unsupported field`);
   }
+  if (action === 'moveCard') {
+    if (step.moveDir !== undefined && !['left', 'right'].includes(String(step.moveDir))) errors.push(`${p}.moveDir: expected left or right`);
+  } else if (step.moveDir !== undefined) errors.push(`${p}.moveDir: unsupported field`);
+  if (action === 'merge') {
+    if (step.absorbPower !== undefined && typeof step.absorbPower !== 'boolean') errors.push(`${p}.absorbPower: expected true or false`);
+  } else if (step.absorbPower !== undefined) errors.push(`${p}.absorbPower: unsupported field`);
   if (step.transfer !== undefined) {
     if (action !== 'changePower') errors.push(`${p}.transfer: unsupported field`);
     else if (typeof step.transfer !== 'boolean') errors.push(`${p}.transfer: expected true or false`);
