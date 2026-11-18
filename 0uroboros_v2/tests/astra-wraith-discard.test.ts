@@ -23,10 +23,10 @@ describe('Astra Wraith discard', () => {
     const pack = compileContent(document);
     const wraith = pack.cards.find(entry => entry.name === 'Astra Wraith' || (entry.definitionId ?? entry.id) === 'card-tgyg8mea');
     expect(wraith).toBeTruthy();
-    const discard = (wraith!.onReveal ?? []).find(step => step.action === 'discardCards');
+    const discard = (wraith!.onReveal ?? []).find(step => 'action' in step && step.action === 'discardCards');
     expect(discard).toBeTruthy();
-    expect(discard!.min).toBeUndefined();
-    expect(discard!.optional).toBeUndefined();
+    expect(discard && 'min' in discard ? discard.min : undefined).toBeUndefined();
+    expect(discard && 'optional' in discard ? discard.optional : undefined).toBeUndefined();
 
     const game = createSession({
       content: pack, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: 'higher',

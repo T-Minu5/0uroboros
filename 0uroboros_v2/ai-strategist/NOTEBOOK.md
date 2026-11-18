@@ -18,7 +18,7 @@ League snapshots (newest first): strat-g@v1.30, strat-g@v1.29, strat-g@v1.28, st
 
 _Documentary only: the numeric profile below governs what is actually played. The plan must not invent settings the profile does not have._
 
-In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
+In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, focusing on Basic Encryption and Shyte-Coins. By building a strong economy, I will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions through each phas (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)
 
 ### Profile in play (current best — executable)
 
@@ -146,7 +146,7 @@ Watching complete local games where you play seat 0 against VP-Dog. Draft buys a
 - **Access Binding**: utility; est. hand value 1 early / 1 late at cost 3. Untested.
 - **The Tuathal Kill**: utility; est. hand value 2 early / 2 late at cost 7. Untested.
 - **Andras Asura**: utility; est. hand value 2 early / 2 late at cost 5. Untested.
-- **Bug Hunter**: utility; est. hand value 1 early / 1 late at cost 3. Untested.
+- **Bug Basher**: utility; est. hand value 1 early / 1 late at cost 3. Untested.
 
 ## Card results (complete games where a side bought it)
 
@@ -186,6 +186,22 @@ Watching complete local games where you play seat 0 against VP-Dog. Draft buys a
 
 ## Recent notes
 
+- v1.30 · 2026-11-18 02:28 · The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better.
+- v1.30 · 2026-11-18 02:28 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-18 02:28 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
+- v1.30 · 2026-11-18 02:28 · Evaluate new cards and Locations for their potential impacts on strategies.
+- v1.30 · 2026-11-18 02:28 · v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-18 02:27 · Evaluate new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management.
+- v1.30 · 2026-11-18 02:27 · Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery in future games.
+- v1.30 · 2026-11-18 02:27 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
+- v1.30 · 2026-11-18 02:27 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-18 02:27 · Monitor the synergy of new cards with existing strategies.
+- v1.30 · 2026-11-18 02:27 · v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0.
+- v1.30 · 2026-11-18 02:27 · Evaluate the new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management.
+- v1.30 · 2026-11-18 02:27 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
+- v1.30 · 2026-11-18 02:27 · Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery.
+- v1.30 · 2026-11-18 02:27 · Monitor the impact of new cards and Locations on game dynamics.
+- v1.30 · 2026-11-18 02:27 · v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0.
 - v1.30 · 2026-11-18 01:23 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
 - v1.30 · 2026-11-18 01:23 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
 - v1.30 · 2026-11-18 01:23 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
@@ -210,22 +226,6 @@ Watching complete local games where you play seat 0 against VP-Dog. Draft buys a
 - v1.30 · 2026-11-17 09:07 · Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery in future games.
 - v1.30 · 2026-11-17 09:07 · Consider how the human player’s Draft wallet consistently outpaces mine; adjust my strategy accordingly to contest their economy better.
 - v1.30 · 2026-11-17 09:07 · Evaluate new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management.
-- v1.30 · 2026-11-17 09:07 · Monitor the impact of new cards on my strategies, especially with the addition of cards like Marlie Murder and Mel Anoma.
-- v1.30 · 2026-11-17 09:07 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0. New cards since last version: Marlie Murder, Mel Anoma.
-- v1.30 · 2026-11-17 07:58 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
-- v1.30 · 2026-11-17 07:58 · Monitor the impact of new Locations and cards on game dynamics.
-- v1.30 · 2026-11-17 07:58 · The human's Draft wallet consistently outpaces mine; adjust strategies to contest their economy more effectively.
-- v1.30 · 2026-11-17 07:58 · Continue running experiment x285-endgame-awards to evaluate end-game metrics.
-- v1.30 · 2026-11-17 07:58 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
-- v1.30 · 2026-11-17 07:50 · The human's strategies are heavily focused on VP collection; consider countering with more disruption.
-- v1.30 · 2026-11-17 07:50 · Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery.
-- v1.30 · 2026-11-17 07:50 · New Locations and cards may shift the game dynamics; monitor their impacts closely.
-- v1.30 · 2026-11-17 07:50 · The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better.
-- v1.30 · 2026-11-17 07:50 · Running experiment x285-endgame-awards to evaluate end-game metrics.
-- v1.30 · 2026-11-17 07:50 · v1.30 online (server start). Read the notebook: 4 active theories, 60 concluded experiments, record 3-11-0.
-- v1.30 · 2026-11-17 07:49 · Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine.
-- v1.30 · 2026-11-17 07:49 · Monitor the synergy of new cards with existing strategies.
-- v1.30 · 2026-11-17 07:49 · Evaluate the impact of new cards and Locations on game dynamics.
 
 ## Version history
 

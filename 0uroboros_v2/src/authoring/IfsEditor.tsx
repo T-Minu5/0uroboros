@@ -1,5 +1,5 @@
 import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
-import { CARD_CLASSES, type CardClass } from '@0uroboros/engine/game';
+import { CARD_CLASSES, type CardClass, type CardType } from '@0uroboros/engine/game';
 import {
   CARD_IF_KINDS, describeCardIf, type CardIf, type IfRevealScope, type NodeOutcome,
 } from '@0uroboros/engine/effects/cardIfs';
@@ -19,7 +19,7 @@ const KIND_LABELS: Record<CardIf['kind'], string> = {
   nodeOutcome: 'Node outcome',
 };
 
-type MatchShape = { definitionId?: string; cardClass?: CardClass; cardType?: 'Crypto'; this?: boolean };
+type MatchShape = { definitionId?: string; cardClass?: CardClass; cardType?: CardType; this?: boolean };
 
 function defaultIf(kind: CardIf['kind']): CardIf {
   const then = [{ action: 'gainCrypto' as const, amount: 1, target: { type: 'player' as const, who: 'self' as const } }];
@@ -116,10 +116,8 @@ export function IfsEditor({ card, cards, onChange }: Props) {
                 const definitionId = event.target.value.trim() || undefined;
                 if (!definitionId) {
                   // Clearing the id returns to any (enemy) or this-card (two at Location).
-                  replace(index, {
-                    ...rule,
-                    match: rule.kind === 'enemyPlayedHere' ? {} : { this: true },
-                  });
+                  if (rule.kind === 'enemyPlayedHere') replace(index, { ...rule, match: {} });
+                  else if (rule.kind === 'twoAtLocation') replace(index, { ...rule, match: { this: true } });
                   return;
                 }
                 replace(index, { ...rule, match: { definitionId } });

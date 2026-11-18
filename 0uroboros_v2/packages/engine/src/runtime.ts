@@ -3829,7 +3829,7 @@ export class RuntimeSession {
       prompt: `${business.card.name}: reclaim which stolen card?`,
       options: candidates.map(entry => ({ id: `card-${entry.card.id}`, label: entry.card.name, card: this.choiceCard(entry) })),
       verb: "Select",
-      aiPick: () => ({ ids: [`card-${candidates[0].card.id}`] }),
+      aiPick: () => [`card-${candidates[0].card.id}`],
       resolve: ids => {
         const pick = candidates.find(entry => ids.includes(`card-${entry.card.id}`)) ?? candidates[0];
         return apply(pick);
@@ -3859,7 +3859,7 @@ export class RuntimeSession {
     survivor.schedule = add(survivor.schedule, absorbed.schedule);
     survivor.triggers = add(survivor.triggers, absorbed.triggers);
     survivor.ifs = add(survivor.ifs, absorbed.ifs);
-    const text = describeCard(survivor, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods);
+    const text = describeCard(survivor as Parameters<typeof describeCard>[0], this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods);
     if (text) survivor.effect = text;
     return true;
   }

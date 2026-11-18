@@ -225,7 +225,7 @@ describe('Bateman reclaimStolen', () => {
     const pack = compileContent(document);
     const business = pack.cards.find(entry => (entry.definitionId ?? entry.id) === 'card-hwz1k87f');
     expect(business).toBeTruthy();
-    expect(business!.onReveal?.[0]?.action).toBe('reclaimStolen');
+    expect(business!.onReveal?.[0] && 'action' in business!.onReveal[0] ? business!.onReveal[0].action : undefined).toBe('reclaimStolen');
     expect(business!.onCollapse ?? []).toHaveLength(0);
   });
 

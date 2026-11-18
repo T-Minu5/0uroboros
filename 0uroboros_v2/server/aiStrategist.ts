@@ -41,7 +41,7 @@ export type Theory = {
   hypothesis?: string;
   proposedTest?: string;
 };
-type TheoryTest = 'no-shyte' | 'economy-first' | 'chaos-endgame' | 'draw-engine' | 'vp-late' | 'early-aggression' | 'drain-race';
+type TheoryTest = 'no-shyte' | 'economy-first' | 'chaos-endgame' | 'draw-engine' | 'vp-late' | 'early-aggression' | 'drain-race' | 'endgame-awards' | 'ongoing-hosts';
 type SideStat = { bought: number; games: number; wins: number };
 type LocationStat = { seen: number; aiWon: number; humanWon: number };
 type Note = { version: number; at: string; text: string };
@@ -454,6 +454,22 @@ function testTheory(test: TheoryTest, report: MatchReport, catalog: Catalog): Ev
     case 'drain-race': {
       const destroyed = /Servers destroyed/i.test(report.endedReason ?? '');
       return { support: destroyed && report.cycle < 12, reason: destroyed ? `Servers destroyed at Cycle ${report.cycle}` : `went to Cycle ${report.cycle} on VP` };
+    }
+    case 'endgame-awards': {
+      const score = (owner: 0 | 1) => {
+        const breakdown = report.finalScore?.[owner];
+        if (breakdown) {
+          return (breakdown.destructionVP ?? 0) + (breakdown.circuitVP ?? 0) + (breakdown.effectVP ?? 0);
+        }
+        const t = report.telemetry;
+        return (t.cardsDestroyed?.[owner] ?? 0) + (t.cardsTrashed?.[owner] ?? 0) + (t.enemyAccesses?.[owner] ?? 0);
+      };
+      return compare(score(winner), score(loser), 'end-game award metrics');
+    }
+    case 'ongoing-hosts': {
+      const hosts = new Set(['banishing', 'mosquito', 'crypto-canary', 'card-k9xwj1ac']);
+      const owned = (owner: 0 | 1) => of(owner).filter(item => hosts.has(item.definitionId)).length;
+      return compare(owned(winner), owned(loser), 'Ongoing-host buys');
     }
   }
 }

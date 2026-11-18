@@ -4,7 +4,7 @@
   "mode": "llm",
   "profile": {
     "version": 30,
-    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, focusing on Basic Encryption and Shyte-Coins. By building a strong economy, I will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions through each phas (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
     "economyUntilCycle": 4,
     "chaosFromCycle": 9,
     "vpFromCycle": 9,
@@ -27,7 +27,7 @@
     },
     "cardBias": {}
   },
-  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, particularly Basic Encryption and Shyte-Coins. This foundational economy will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions throughout the game. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, focusing on Basic Encryption and Shyte-Coins. By building a strong economy, I will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide my decisions through each phas (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
   "baseline": {
     "profile": {
       "version": 0,
@@ -5593,86 +5593,6 @@
   "notes": [
     {
       "version": 28,
-      "at": "2026-11-14T16:47:48.001Z",
-      "text": "Assess the effectiveness of new cards in enhancing deck synergy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:47:48.001Z",
-      "text": "High-value Characters remain crucial for early pressure; prioritize them."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:47:48.001Z",
-      "text": "Adapt to the human's Draft wallet for mid-game strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:47:48.001Z",
-      "text": "Evaluate the impact of high-value Characters on early game performance."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:48:58.567Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:02.400Z",
-      "text": "Monitor the synergy of new Cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:02.400Z",
-      "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them in Draft."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:02.400Z",
-      "text": "Assess the impact of high-value Characters on early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:02.400Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:02.400Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:30.724Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:36.176Z",
-      "text": "Prioritize high-value Characters like Iterative Incubus for early pressure."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:36.176Z",
-      "text": "The human's Draft wallet consistently outpaces mine; adapt strategies to contest their economy."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:36.176Z",
-      "text": "Monitor the synergy of new cards with existing strategies."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:49:36.176Z",
-      "text": "Evaluate the effectiveness of new Locations in future games."
-    },
-    {
-      "version": 28,
-      "at": "2026-11-14T16:50:12.610Z",
-      "text": "v1.28 online (server start). Read the notebook: 1 active theories, 60 concluded experiments, record 3-11-0."
-    },
-    {
-      "version": 28,
       "at": "2026-11-14T16:50:17.561Z",
       "text": "High-value Characters like Iterative Incubus are crucial for early pressure; prioritize them."
     },
@@ -7090,6 +7010,86 @@
       "version": 30,
       "at": "2026-11-18T01:23:41.135Z",
       "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:23.727Z",
+      "text": "v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:36.993Z",
+      "text": "Monitor the impact of new cards and Locations on game dynamics."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:36.993Z",
+      "text": "Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:36.993Z",
+      "text": "Adapt strategies to contest the human's Draft wallet, which consistently outpaces mine."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:36.993Z",
+      "text": "Evaluate the new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:42.054Z",
+      "text": "v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:50.669Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:50.669Z",
+      "text": "Evaluate the effectiveness of Banishing Ritual for deck thinning and resource recovery."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:50.669Z",
+      "text": "The human's strategies are heavily focused on VP collection; consider countering with more disruption."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:50.669Z",
+      "text": "Assess the effectiveness of Banishing Ritual for deck thinning and resource recovery in future games."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:27:50.669Z",
+      "text": "Evaluate new Locations for their potential to shift game dynamics, particularly those affecting VP and Server management."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:28:03.778Z",
+      "text": "v1.30 online (server start). Read the notebook: 3 active theories, 60 concluded experiments, record 3-11-0."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:28:16.528Z",
+      "text": "Evaluate new cards and Locations for their potential impacts on strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:28:16.528Z",
+      "text": "The human's strategies are heavily focused on VP collection; consider countering with more disruption."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:28:16.528Z",
+      "text": "Monitor the synergy of new cards with existing strategies."
+    },
+    {
+      "version": 30,
+      "at": "2026-11-18T02:28:16.528Z",
+      "text": "The human consistently outpaces my Draft wallet; I need to adjust my strategy to contest their economy better."
     }
   ],
   "cardNotes": {
@@ -9221,7 +9221,7 @@
     },
     {
       "label": "strat-g@v1.30",
-      "savedAt": "2026-11-18T01:23:41.136Z",
+      "savedAt": "2026-11-18T02:28:16.528Z",
       "profile": {
         "version": 30,
         "plan": "",
