@@ -134,8 +134,3 @@
 
 .landing-auth{display:inline-flex;align-items:center;gap:10px}
 .landing-auth-name{font:600 11px Inter,sans-serif;color:#c4bfd2;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.landing-auth-popover{min-width:240px}
-.landing-auth-form{display:flex;flex-direction:column;gap:8px}
-.landing-auth-form .online-field{margin:0}
-.landing-auth-form input{padding:7px 9px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit;font-size:12px}
-.landing-auth-form button{width:100%}

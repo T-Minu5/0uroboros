@@ -67,10 +67,10 @@ for (const name of ['Ada', 'Bo']) {
 const [ada, bo] = seats;
 const shot = (seat, label) => seat.page.screenshot({ path: `${prefix}-${seat.name.toLowerCase()}-${label}.png` });
 
-// Sign-in: Ada asks for a magic link, follows it, and comes back signed in; the seat then carries her account name.
-await ada.page.getByLabel('E-mail for sign-in link').fill('ada.lovelace@example.com');
-await ada.page.getByRole('button', { name: 'E-mail me a sign-in link' }).click();
-await ada.page.getByRole('status').filter({ hasText: 'Check your e-mail' }).waitFor();
+// Sign-in: the landing has no e-mail form while mail is off, so Ada requests the magic link from the server
+// directly, follows it, and comes back signed in; the seat then carries her account name.
+const linkRequest = await fetch(`http://127.0.0.1:${serverPort}/auth/magic-link`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: webOrigin }, body: JSON.stringify({ email: 'ada.lovelace@example.com' }) });
+if (!linkRequest.ok) throw new Error(`Magic link request failed (${linkRequest.status})`);
 for (let i = 0; i < 50 && !magicLinks.length; i++) await new Promise(r => setTimeout(r, 100));
 if (!magicLinks.length) throw new Error('The server logged no magic link');
 await ada.page.goto(magicLinks[0]);
