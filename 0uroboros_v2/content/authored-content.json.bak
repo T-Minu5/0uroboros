@@ -1,5 +1,5 @@
 {
-  "revision": 1342,
+  "revision": 1370,
   "document": {
     "version": 3,
     "cards": [
@@ -9,7 +9,7 @@
         "name": "Surge Splitter",
         "type": "Character",
         "power": 4,
-        "cost": 5,
+        "cost": 6,
         "effect": "Push or pull 2 power. +1 Card. +2 Crypto.",
         "art": "/assets/card_art/uploads/surge-splitter.png",
         "onReveal": [
@@ -1111,7 +1111,7 @@
         "definitionId": "chronos-cache",
         "name": "Crypt-Cache",
         "type": "Crypto",
-        "cost": 9,
+        "cost": 8,
         "art": "/assets/card_art/uploads/chronos-cache.png",
         "effect": "+5 Crypto.",
         "power": 1,
@@ -2253,7 +2253,7 @@
         "art": "/assets/card_art/volume/6vp-b.png",
         "effect": "Repair +75, for the next 4 Cycles.",
         "power": 1,
-        "vp": 6,
+        "vp": 5,
         "pool": "VP",
         "enabled": true,
         "storyText": "Spellbound encryption.",
@@ -2279,7 +2279,7 @@
         "art": "/assets/card_art/volume/6vp.png",
         "effect": "Repair +25 every turn.",
         "power": 1,
-        "vp": 6,
+        "vp": 5,
         "duration": 99,
         "durationPeriod": "runtime",
         "recurring": [
@@ -2302,11 +2302,11 @@
         "definitionId": "zenith-worx",
         "name": "Zenith Worx",
         "type": "VP",
-        "cost": 10,
+        "cost": 11,
         "art": "/assets/card_art/volume/10vp.png",
-        "effect": "Repair +125, for the next 3 Cycles.",
+        "effect": "Repair +80 for the next 3 Cycles.",
         "power": 1,
-        "vp": 7,
+        "vp": 6,
         "pool": "VP",
         "enabled": true,
         "storyText": "Quantum entangled storage.",
@@ -2319,7 +2319,7 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 125
+            "amount": 80
           }
         ]
       },
@@ -2330,15 +2330,15 @@
         "type": "VP",
         "cost": 12,
         "art": "/assets/card_art/volume/10vp-b.png",
-        "effect": "Repair +50, every turn.",
+        "effect": "Repair +40, every turn.",
         "power": 1,
-        "vp": 8,
+        "vp": 7,
         "duration": 99,
         "durationPeriod": "runtime",
         "recurring": [
           {
             "action": "repairServer",
-            "amount": 50,
+            "amount": 40,
             "target": {
               "type": "server",
               "who": "self",
@@ -3104,7 +3104,7 @@
         "cost": 0,
         "power": 1,
         "art": "/assets/library/card_art/base cards/utility/alchemic-mega.png",
-        "effect": "+1 Card.",
+        "effect": "+5 Crypto.",
         "onReveal": [
           {
             "action": "gainCrypto",
@@ -3588,7 +3588,7 @@
         "cost": 7,
         "power": 3,
         "art": "/assets/library/card_art/base cards/utility/merchant-of-chaos.png",
-        "effect": "+1 Crypto. Gain a random Quark, playable for +1VP, in your discard pile.",
+        "effect": "+1 Crypto. Gain a random Quark or Gluon, playable for +1VP, on top of your deck.",
         "onReveal": [
           {
             "action": "gainCrypto",
@@ -4867,7 +4867,7 @@
         "type": "Crypto",
         "generated": false,
         "enabled": true,
-        "cost": 11,
+        "cost": 10,
         "cryptoValue": 1,
         "art": "/assets/card_art/uploads/crypto-achangel.png",
         "effect": "Ongoing: Mirror any Crypto the enemy gains",
@@ -5068,8 +5068,17 @@
         "cost": 4,
         "cryptoValue": 1,
         "art": "/assets/card_art/crypto/print-crypto-echo.png",
-        "effect": "Ongoing: When any card is destroyed, +1 Crypto.",
-        "onReveal": [],
+        "effect": "\n+1 Crypto.Ongoing: When any card is destroyed, +2 Crypto.",
+        "onReveal": [
+          {
+            "action": "gainCrypto",
+            "target": {
+              "type": "player",
+              "who": "self"
+            },
+            "amount": 1
+          }
+        ],
         "triggers": [
           {
             "kind": "when",
@@ -5081,7 +5090,7 @@
                   "type": "player",
                   "who": "self"
                 },
-                "amount": 1
+                "amount": 2
               }
             ]
           }
@@ -5372,7 +5381,7 @@
         "power": 1,
         "vp": 3,
         "art": "/assets/card_art/uploads/recover-continuity.png",
-        "effect": "BACKUP SERVER.  Repair +100 for the next 4 Cycles.",
+        "effect": "BACKUP SERVER.  Repair +75 for the next 4 Cycles.",
         "onReveal": [
           {
             "action": "repairServer",
@@ -5381,7 +5390,7 @@
               "who": "self",
               "server": "backup"
             },
-            "amount": 100
+            "amount": 75
           }
         ],
         "duration": 4,
@@ -5623,7 +5632,7 @@
         "cost": 0,
         "power": 2,
         "art": "/assets/card_art/uploads/not-a-total-loss.png",
-        "effect": "Drain -15 from your own server, then trash this card.",
+        "effect": "Drain -15 from your own server.  On collapse:  trash this card.",
         "onReveal": [
           {
             "action": "damageServer",
@@ -5632,21 +5641,21 @@
               "who": "self",
               "server": "auto"
             },
-            "amount": 15,
-            "then": [
-              {
-                "action": "trashCard",
-                "target": {
-                  "type": "card",
-                  "who": "self",
-                  "where": "board",
-                  "relation": "self"
-                },
-                "pick": {
-                  "mode": "choose"
-                }
-              }
-            ]
+            "amount": 15
+          }
+        ],
+        "onCollapse": [
+          {
+            "action": "trashCard",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "board",
+              "relation": "self"
+            },
+            "pick": {
+              "mode": "choose"
+            }
           }
         ]
       },
@@ -5834,7 +5843,7 @@
         "cost": 3,
         "power": 1,
         "art": "/assets/card_art/uploads/bug-hunter.png",
-        "effect": "Ongoing: When a Glitch or Lesion is played at this location, destroy it. Then +1 Power to this card and +1 Crypto.",
+        "effect": "Ongoing: When a Glitch or Lesion is played at this location, destroy it. Then +2 Power to this card and +2 Crypto.",
         "onReveal": [],
         "triggers": [
           {
@@ -5871,7 +5880,7 @@
                       "where": "board",
                       "relation": "self"
                     },
-                    "amount": 1,
+                    "amount": 2,
                     "pick": {
                       "mode": "choose"
                     },
@@ -5882,7 +5891,7 @@
                           "type": "player",
                           "who": "self"
                         },
-                        "amount": 1
+                        "amount": 2
                       }
                     ]
                   }
@@ -7766,7 +7775,7 @@
       {
         "id": "reward-jfdvg12d",
         "name": "The Healer",
-        "text": "Attach the “The Healer” mod to a Character in your deck.",
+        "text": "Attach the “Heal +1 to a card here” mod to a Character in your deck.",
         "cost": 0,
         "effects": [
           {
@@ -7912,7 +7921,7 @@
       {
         "id": "reward-superpositioning-mod",
         "name": "Superpositioning",
-        "text": "Attach the “Superpositioning” mod to a Character in your deck.",
+        "text": "Attach the “Superpositioning” mod to a Character in your deck. \n(Create a hologram at a mirrored node)",
         "cost": 0,
         "effects": [
           {
@@ -7956,7 +7965,8 @@
             }
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "reward-lst6sa50",
@@ -8076,7 +8086,8 @@
             }
           }
         ],
-        "enabled": true
+        "enabled": true,
+        "awardTrailing": true
       },
       {
         "id": "reward-joxkp48t",
@@ -8117,6 +8128,31 @@
             "cardIds": [
               "foder-fox"
             ]
+          }
+        ],
+        "enabled": true,
+        "awardTrailing": true
+      },
+      {
+        "id": "reward-4gm54dtz",
+        "name": "Vamping",
+        "text": "Attach the “Vamping” mod to a Character in your deck.",
+        "cost": 0,
+        "effects": [
+          {
+            "action": "attachModifier",
+            "target": {
+              "type": "card",
+              "who": "self",
+              "where": "collection",
+              "filter": {
+                "cardType": "Character"
+              }
+            },
+            "pick": {
+              "mode": "choose"
+            },
+            "modifier": "mod-vamping"
           }
         ],
         "enabled": true,
@@ -8391,11 +8427,14 @@
         "enabled": true,
         "onReveal": [
           {
-            "action": "draw",
-            "amount": 1,
+            "action": "restoreCard",
             "target": {
-              "type": "player",
-              "who": "self"
+              "type": "card",
+              "who": "self",
+              "where": "board"
+            },
+            "pick": {
+              "mode": "choose"
             }
           }
         ]
@@ -8564,7 +8603,7 @@
         "onReveal": [
           {
             "action": "changePower",
-            "amount": -2,
+            "amount": -1,
             "transfer": true,
             "target": {
               "type": "card",
@@ -8580,7 +8619,7 @@
       {
         "id": "mod-deck-thief",
         "name": "Deck Thief",
-        "enabled": true,
+        "enabled": false,
         "onReveal": [
           {
             "action": "stealDeckCard",
@@ -8596,7 +8635,7 @@
       {
         "id": "mod-deck-swap",
         "name": "Deck Swap",
-        "enabled": true,
+        "enabled": false,
         "onReveal": [
           {
             "action": "deckSwap",
@@ -8626,7 +8665,7 @@
       {
         "id": "mod-copy-text",
         "name": "Copy Text",
-        "enabled": true,
+        "enabled": false,
         "onReveal": [
           {
             "action": "copyText",

@@ -24,12 +24,14 @@ function anchor(id: (typeof ANCHOR_CARD_IDS)[number]): BudgetCard {
 }
 
 describe('cardBudget', () => {
-  it('calibrates Mel’s hard-scored anchors near efficiency 1 (Chrome, ∆-Wave, Dash-Dot)', () => {
+  it('calibrates Mel’s hard-scored anchors near efficiency 1 (Dash-Dot)', () => {
     const mean = meanAnchorEfficiency(packCards, { hardOnly: true });
     expect(mean).toBeGreaterThanOrEqual(0.95);
     expect(mean).toBeLessThanOrEqual(1.10);
 
-    for (const id of ['chrome-mitchell', 'delta-wave', 'dash-dot'] as const) {
+    // Mel deliberately priced Chrome Mitchell and ∆-Wave above the curve; they still count toward the mean.
+    const repriced = new Set<string>(['chrome-mitchell', 'delta-wave']);
+    for (const id of ['dash-dot'] as const) {
       const score = scoreCard(anchor(id));
       expect(score.efficiency, id).toBeGreaterThanOrEqual(0.85);
       expect(score.efficiency, id).toBeLessThanOrEqual(1.15);
@@ -37,6 +39,7 @@ describe('cardBudget', () => {
     }
 
     for (const id of ANCHOR_CARD_IDS) {
+      if (repriced.has(id)) continue;
       const score = scoreCard(anchor(id));
       const softExcuse = score.soft.some(flag => flag.id !== 'cryptoFloor' && flag.id !== 'selfMove');
       if (softExcuse) continue;
@@ -156,7 +159,7 @@ describe('cardBudget', () => {
   });
 
   it('does not double-count Crypto value and On Reveal gainCrypto', () => {
-    const score = scoreCard(byId('byte-coin'));
+    const score = scoreCard(byId('byte-heist'));
     expect(score.parts.filter(part => part.id === 'cryptoValue' || part.id.startsWith('gainCrypto'))).toHaveLength(1);
   });
 

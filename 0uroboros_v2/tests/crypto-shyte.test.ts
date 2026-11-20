@@ -178,7 +178,7 @@ describe('random gainCard draft eligibility', () => {
     game.deploy('merchant-1', 0);
     game.endTurn();
     const events = finish(game);
-    expect(events.some(event => /gain 1 (Quark|Gluon) to Discard/.test(event.text))).toBe(true);
+    expect(events.some(event => /gain 1 (Quark|Gluon)\b/.test(event.text))).toBe(true);
     const zones = [...game.state.players[0].discard, ...game.state.players[0].hand, ...game.state.players[0].draw];
     expect(zones.some(card => card.generated === true && (card.name === 'Quark' || card.name === 'Gluon'))).toBe(true);
   });

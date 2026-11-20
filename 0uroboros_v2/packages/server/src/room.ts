@@ -194,7 +194,8 @@ export class Room {
     this.session = createSession({
       content: this.config.content, strategicMarket: true, evaluationContent: true,
       carryover: this.settings.carryover, priorityPreference: this.settings.priorityPreference,
-      noLocations: this.settings.noLocations, noTrailingRewards: this.settings.noTrailingRewards,
+      noLocations: this.settings.noLocations,
+      noCircuitRewards: this.settings.noCircuitRewards, noTrailingRewards: this.settings.noTrailingRewards,
       midCycleDraw: true, middleNodesOnly: this.settings.middleNodesOnly,
       tenCardDraft: this.settings.tenCardDraft,
       draftSeconds: this.settings.draftSeconds > 0 ? this.settings.draftSeconds : null,

@@ -15,13 +15,14 @@ function drain(session:RuntimeSession){const events=[];while(session.pendingCoun
 function play(session:RuntimeSession,source:Card){session.state.players[0].hand.unshift(source);session.deploy(source.id,0);session.endTurn();return drain(session);}
 
 it('optional discard cost is all-or-none and pays the benefit only after the complete cost',()=>{
- const s=make();s.state.players[0].hand=[card('one'),card('two')];
+ // A third card keeps the selection a real choice; an exact fit discards automatically.
+ const s=make();s.state.players[0].hand=[card('one'),card('two'),card('three')];
  play(s,card('payment',[{kind:'handDiscard',amount:2,optional:true,then:[{kind:'crypto',amount:3}]}]));
  expect(s.state.choice?.options.map(o=>o.id)).toEqual(['decline','pay']);
  s.choose('pay');expect(s.state.choice).toMatchObject({select:{min:2,max:2}});
- expect(s.state.choice?.options.map(o=>o.card?.id)).toEqual(['one','two']);
+ expect(s.state.choice?.options.map(o=>o.card?.id)).toEqual(['one','two','three']);
  expect(()=>s.choose(['one'])).toThrow(/Choose 2/);
- expect(s.state.players[0].hand).toHaveLength(2);
+ expect(s.state.players[0].hand).toHaveLength(3);
  s.choose(['one','two']);drain(s);expect(s.state.players[0].wallet).toBe(3);
  // Paid cards leave hand; mid-cycle draw may reshuffle Discard into the deck afterward.
  expect(['one','two'].every(id=>[...s.state.players[0].hand,...s.state.players[0].draw,...s.state.players[0].discard].some(c=>c.id===id))).toBe(true);
@@ -231,12 +232,13 @@ it.each(EVALUATION_ALL_CARDS.map(definition=>[definition.name,definition] as con
  const initial=37,generated=new Set<string>();
  const check=()=>{
   const cards=s.state.players.flatMap((p,owner)=>[...p.hand,...p.draw,...p.discard,...p.destroyed,...p.bank.map(e=>e.card),...s.state.nodes.flatMap(n=>n.cards[owner].map(c=>c.card))]).concat(s.state.trash);
+  for(const c of cards)if(c.id.includes(':generated-'))generated.add(c.id);
   expect(cards.length).toBe(initial+generated.size);
   expect(new Set(cards.map(c=>c.id)).size).toBe(cards.length);
   expect(cards.filter(c=>c.id===added.cardId)).toHaveLength(1);
   s.state.players.forEach(p=>{for(const value of [p.wallet,p.servers.primary,p.servers.backup,p.totalVP]){expect(Number.isFinite(value)).toBe(true);expect(value).toBeGreaterThanOrEqual(0);}expect(p.bank.length).toBeLessThanOrEqual(4);});
  };
- const pump=()=>{let steps=0;while(s.pendingCount||s.state.choice){const event=s.state.choice?s.choose(firstLegalSelection(s.state.choice)):s.step()!.event;if(event.cardId?.includes(':generated-'))generated.add(event.cardId);check();if(++steps>500)throw new Error(`Choice/schedule loop for ${definition.name}`);}};
+ const pump=()=>{let steps=0;while(s.pendingCount||s.state.choice){if(s.state.choice)s.choose(firstLegalSelection(s.state.choice));else s.step();check();if(++steps>500)throw new Error(`Choice/schedule loop for ${definition.name}`);}};
  if(definition.type!=='Crypto')s.deploy(added.cardId!,0);
  for(let cycle=0;cycle<4;cycle++){
   pump();
@@ -251,8 +253,9 @@ it('Chronos Cache gains exactly one Mega-Cache atop the deck at the end of its t
  const s=make();const added=s.addEvaluationCard('chronos-cache');const stock=s.state.market.map(p=>[p.id,p.supply]);
  s.deploy(added.cardId!,0);s.endTurn();drain(s);s.endTurn();drain(s);
  expect(s.state.players[0].draw).toHaveLength(0);
- s.endTurn();const events=drain(s);const generated=events.filter(e=>e.cardId?.includes(':generated-'));
- expect(generated).toHaveLength(1);expect(s.state.players[0].draw[0]).toMatchObject({definitionId:'mega-cache',cryptoValue:5});
+ s.endTurn();const events=drain(s);const gains=events.filter(e=>/gain 1 Mega-Cache to the top of the deck/.test(e.text));
+ expect(gains).toHaveLength(1);expect(s.state.players[0].draw).toHaveLength(1);
+ expect(s.state.players[0].draw[0]).toMatchObject({definitionId:'mega-cache',cryptoValue:5});expect(s.state.players[0].draw[0].id).toContain(':generated-');
  expect(s.state.market.filter(p=>stock.some(([id])=>id===p.id)).map(p=>[p.id,p.supply])).toEqual(stock);
 });
 

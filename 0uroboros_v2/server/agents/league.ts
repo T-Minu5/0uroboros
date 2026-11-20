@@ -1,8 +1,9 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { ELO_START, expectedScore, kFactor, eloUpdate } from '@0uroboros/engine/elo';
-import type { SelfPlayResult } from '@0uroboros/engine/ai/selfPlay';
+import type { SelfPlayResult, SelfPlayRules } from '@0uroboros/engine/ai/selfPlay';
 import type { StrategyProfile } from '@0uroboros/engine/ai/strategy';
+import type { MatchReport } from '@0uroboros/engine/runtime';
 import type { LeagueArms, LeagueOutcome, Snapshot } from '../aiStrategist';
 import type { GameEvidence } from './evidence';
 
@@ -55,8 +56,9 @@ export type LeagueMember = {
 };
 type Harness = {
   compileForSelfPlay: (document: never) => unknown;
-  playSelfPlayGame: (options: { content: never; seed: number; strategy: StrategyProfile; seatStrategies?: [StrategyProfile, StrategyProfile]; recordDecisions?: boolean }) => SelfPlayResult;
+  playSelfPlayGame: (options: { content: never; seed: number; strategy: StrategyProfile; seatStrategies?: [StrategyProfile, StrategyProfile]; recordDecisions?: boolean; rules?: SelfPlayRules }) => SelfPlayResult;
 };
+export type LeagueTableRow = { agent: string; label: string | null; elo: number | null; games: number; wins: number; losses: number; ties: number };
 export type LeagueSettings = { rounds: number; seedsPerBlock: number; ecoObserves: boolean };
 export type LeagueOptions = {
   /** `ai-agents/league`: ratings and results only, never profiles. */
@@ -65,6 +67,14 @@ export type LeagueOptions = {
   harness: () => Promise<Harness>;
   document: () => Promise<unknown>;
   settings: () => LeagueSettings;
+  /** The ruleset for every game; read once when a run starts so a run never mixes rules. */
+  rules?: () => SelfPlayRules;
+  /** Short hash of the ruleset, stamped on published games and run entries. */
+  rulesHash?: () => string;
+  /** Every valid game's report (rating and trial games), for the epoch tally. */
+  onGame?: (report: MatchReport) => Promise<void> | void;
+  /** Called after each run with the Elo table, once the store is saved. */
+  onRunFinished?: (table: LeagueTableRow[]) => Promise<void> | void;
   /** Eco-Strat's evidence bus; rating games go out as frozen copies. */
   publish?: (evidence: GameEvidence) => void;
   log?: (message: string) => void;
@@ -79,6 +89,7 @@ type Rating = { agent: string; elo: number; games: number; wins: number; losses:
 type HeadToHead = { a: string; b: string; aWins: number; bWins: number; ties: number };
 type RunEntry = {
   startedAt: string; finishedAt: string; rounds: number; games: number; stopped: boolean;
+  rulesHash?: string;
   /** Process died or the server restarted before the run finished. */
   interrupted?: boolean;
   trialsSkipped?: number; playErrors?: number;
@@ -107,7 +118,7 @@ type Store = { schema: 1; ratings: Record<string, Rating>; headToHead: Record<st
 export type LeagueStatus = {
   running: boolean; stopping: boolean; resuming: boolean; phase: 'rating' | 'trial' | null; round: number; rounds: number; learner: string | null;
   games: number; total: number; trialsSkipped: number; playErrors: number; startedAt: string | null; error: string | null;
-  table: { agent: string; label: string | null; elo: number | null; games: number; wins: number; losses: number; ties: number }[];
+  table: LeagueTableRow[];
   headToHead: HeadToHead[];
   lastRun: RunEntry | null;
   window: number; latestRatio: number; blocksPerTrial: number; ratedSnapshots: number;
@@ -228,11 +239,17 @@ export function createLeague(options: LeagueOptions) {
       }
       const harness = await options.harness();
       const content = harness.compileForSelfPlay(await options.document() as never);
+      const rules = options.rules ? structuredClone(options.rules()) : undefined;
+      const rulesHash = options.rulesHash?.();
+      if (rulesHash) run.rulesHash = rulesHash;
       const play = async (seed: number, seats: [StrategyProfile, StrategyProfile]): Promise<SelfPlayResult> => {
         await tick();
         try {
-          const result = harness.playSelfPlayGame({ content: content as never, seed, strategy: seats[0], seatStrategies: seats, recordDecisions: false });
+          const result = harness.playSelfPlayGame({ content: content as never, seed, strategy: seats[0], seatStrategies: seats, recordDecisions: false, ...(rules ? { rules } : {}) });
           state.games++; run.games++; checkpoint.games = state.games;
+          if (result.valid && result.report && options.onGame) {
+            try { await options.onGame(result.report); } catch (error) { log(`epoch tally failed (ignored): ${error instanceof Error ? error.message : String(error)}`); }
+          }
           return result;
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
@@ -283,7 +300,7 @@ export function createLeague(options: LeagueOptions) {
               if (settings.ecoObserves && !shared && options.publish) {
                 shared = true;
                 try {
-                  options.publish({ id: `league-${a.label}-vs-${b.label}-s${seed}`.replace(/[^\w.@-]/g, '-'), source: 'league', recordedAt: now(), seed, durationMs: result.durationMs, valid: true, report: result.report, stratG: null, seats: seat === 0 ? [a.agent, b.agent] : [b.agent, a.agent] });
+                  options.publish({ id: `league-${a.label}-vs-${b.label}-s${seed}`.replace(/[^\w.@-]/g, '-'), source: 'league', recordedAt: now(), seed, durationMs: result.durationMs, valid: true, report: result.report, stratG: null, seats: seat === 0 ? [a.agent, b.agent] : [b.agent, a.agent], ...(rulesHash ? { rulesHash } : {}) });
                 } catch (error) { log(`publishing a league game failed (ignored): ${error instanceof Error ? error.message : String(error)}`); }
               }
             }
@@ -378,6 +395,9 @@ export function createLeague(options: LeagueOptions) {
       store.activeRun = null;
       await save().catch(() => undefined);
       state = { ...state, running: false, stop: false, resuming: false, phase: null, learner: null };
+      if (options.onRunFinished) {
+        try { await options.onRunFinished(status().table); } catch (error) { log(`run summary failed (ignored): ${error instanceof Error ? error.message : String(error)}`); }
+      }
     }
   }
 

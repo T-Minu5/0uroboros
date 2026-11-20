@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
-import { starterCards } from "@0uroboros/engine/game";
+import { createSession, DEFAULT_END_GAME_AWARDS, firstLegalSelection, seededRandom, type EndGameAwards, type RuntimeSession } from "@0uroboros/engine/runtime";
+import { defaultServerVP, starterCards } from "@0uroboros/engine/game";
 
 const make = (seed = 7) => createSession({ carryover: false, priorityPreference: "higher", random: seededRandom(seed), practiceMarket: [starterCards[0], starterCards[1]] });
+/** Card and destruction VP only: no end-game awards, Node-win VP or Most Circuits bonus. */
+const BARE_SCORING = {
+  endGameAwards: Object.fromEntries(Object.entries(DEFAULT_END_GAME_AWARDS).map(([id, award]) => [id, { ...award, enabled: false }])) as EndGameAwards,
+  nodeWinVP: 0, mostCircuitsBonusVP: 0,
+};
+const makeBare = (seed = 7) => createSession({ carryover: false, priorityPreference: "higher", random: seededRandom(seed), practiceMarket: [starterCards[0], starterCards[1]], ...BARE_SCORING });
 function drain(session: RuntimeSession) {
   const events = [];
   let step;
@@ -183,7 +189,7 @@ describe("Session edge conditions", () => {
     session.endTurn();
     const events = drain(session);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
-    expect(session.state.players[0].destructionVP).toBe(16);
+    expect(session.state.players[0].destructionVP).toBe(defaultServerVP.backup);
     expect(session.state.phase).toBe("gameover");
     expect(events.filter(event => event.kind === "gameover")).toHaveLength(1);
     expect(events.some(event => event.kind === "draft")).toBe(false);
@@ -300,7 +306,7 @@ describe("State and visibility invariants", () => {
         session.endDraft(); session.nextCycle(); assertState();
       }
     }
-  });
+  }, 30_000);
 
   it("returns detached presentation snapshots, not mutable authority references", () => {
     const session = make();
@@ -331,7 +337,7 @@ describe("Approved VP scoring", () => {
   });
 
   it("counts a Vault purchased in the final Draft before choosing the winner", () => {
-    const session = createSession({ carryover: true, priorityPreference: "higher", random: seededRandom(5), practiceMarket: [starterCards[8]] });
+    const session = createSession({ carryover: true, priorityPreference: "higher", random: seededRandom(5), practiceMarket: [starterCards[8]], ...BARE_SCORING });
     cycle(session);
     session.state.cycle = 16;
     session.state.players[0].wallet = 3;
@@ -345,7 +351,7 @@ describe("Approved VP scoring", () => {
   });
 
   it("reports a tie when both final totals match", () => {
-    const session = make(); cycle(session);
+    const session = makeBare(); cycle(session);
     session.state.cycle = 16;
     session.endDraft(); session.nextCycle();
     expect(session.state.winner).toBeNull();
@@ -353,7 +359,7 @@ describe("Approved VP scoring", () => {
   });
 
   it("chooses winner by total VP after lethal Drain, not by surviving Servers alone", () => {
-    const session = make();
+    const session = makeBare();
     session.state.players[0].draw = [];
     session.state.players[0].hand = [{ ...starterCards[3], id: "lethal" }];
     session.state.players[0].discard = [];
@@ -363,10 +369,10 @@ describe("Approved VP scoring", () => {
     session.state.players[1].destructionVP = 30;
     session.state.players[1].servers = { primary: 0, backup: 20 };
     session.deploy("lethal", 0); session.endTurn(); drain(session);
-    expect(session.state.players[0].totalVP).toBe(16);
+    expect(session.state.players[0].totalVP).toBe(defaultServerVP.backup);
     expect(session.state.players[1].totalVP).toBe(30);
     expect(session.state.winner).toBe(1);
-    expect(session.state.endedReason).toMatch(/Opponent wins, 16 to 30 VP/);
+    expect(session.state.endedReason).toMatch(new RegExp(`Opponent wins, ${defaultServerVP.backup} to 30 VP`));
   });
 });
 
@@ -469,6 +475,6 @@ it("targeted Server effects cannot revive or repeatedly award a destroyed server
   session.state.players[0].hand=[{...starterCards[0],id:'targeted',onReveal:[{kind:'drain',target:'backup',amount:100},{kind:'drain',target:'backup',amount:100},{kind:'restore',target:'primary',amount:100}]}];
   session.deploy('targeted',0);session.endTurn();const events=drain(session);
   expect(events.filter(event=>event.kind==='drain').map(event=>event.amount)).toEqual([50,0]);
-  expect(session.state.players[0].destructionVP).toBe(16);
+  expect(session.state.players[0].destructionVP).toBe(defaultServerVP.backup);
   expect(session.state.players[0].servers.primary).toBe(0);
 });

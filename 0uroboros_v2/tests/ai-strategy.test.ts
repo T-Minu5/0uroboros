@@ -2,16 +2,19 @@ import { describe, expect, it } from "vitest";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_STRATEGY, draftScore, effectTotal, handValue, optionValue, planDraft, sanitizeProfile, thinningPicks, type StrategyContext } from "@0uroboros/engine/ai/strategy";
+import { cryptoPayout, cryptoPerDraw, cryptoPerHand, cryptoPlays, DEFAULT_STRATEGY, draftScore, effectTotal, handValue, isJunkCrypto, optionValue, planDraft, sanitizeProfile, thinningPicks, type StrategyContext } from "@0uroboros/engine/ai/strategy";
 import { createSession, firstLegalSelection, seededRandom, type MatchReport, type RuntimeSession } from "@0uroboros/engine/runtime";
 import { canDeploy, legalNodes, type Card } from "@0uroboros/engine/game";
 import { createStrategist } from "../server/aiStrategist";
 import { playSelfPlayGame } from "@0uroboros/engine/ai/selfPlay";
 import { emptyTelemetry } from "@0uroboros/engine/ai/telemetry";
+import { HISTORIC_CARDS } from "@0uroboros/engine/historicCatalog";
 import { compileContent, type ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import authored from "../content/authored-content.json";
 
-const cards = (authored as unknown as { document: { cards: (Card & { pool: string })[] } }).document.cards;
+const live = (authored as unknown as { document: { cards: (Card & { pool: string })[] } }).document.cards;
+// The older tests below use the Byte/Kilo/Mega/Shyte coins, which now live only in the historic catalog.
+const cards: Card[] = [...live, ...HISTORIC_CARDS.filter(card => !live.some(item => item.id === card.id))];
 const byId = (id: string): Card => structuredClone(cards.find(card => card.id === id)!);
 const starter = ["slash-dot", "dash-dot", "dotkrawler", "rezz-razor", "rezz-blade", "byte-coin", "byte-coin", "kilo-coin", "vault-encryption", "vault-encryption"].map(byId);
 const context = (cycle: number, owned: Card[] = starter, extra: Partial<StrategyContext> = {}): StrategyContext => ({ cycle, finalCycle: 16, owned, ownServers: 3500, ownServersMax: 3500, enemyServers: 3500, enemyServersMax: 3500, ...extra });
@@ -42,7 +45,7 @@ describe("opponent draft strategy", () => {
     expect(planDraft([option("basic-encryption"), option("vault-encryption")], 10, DEFAULT_STRATEGY, context(2, deck))).toEqual([]);
   });
 
-  it("trashes Basic Encryption first, keeps Crypto until a Kilo, then trashes Shyte", () => {
+  it("trashes Basic Encryption first, then Shyte once a Kilo and the thinner deck keep Crypto per hand", () => {
     const unique = (list: Card[], tag: string) => list.map((card, index) => ({ ...card, id: `${card.id}#${tag}${index}` }));
     const standard = unique(["byte-coin", "byte-coin", "shyte-coin", "shyte-coin", "basic-encryption", "basic-encryption", "dotkrawler", "slash-dot", "rezz-blade", "night-scythe"].map(byId), "e");
     const pick = (...names: string[]) => names.map(name => standard.find(card => card.name === name)!);
@@ -117,7 +120,9 @@ function playMatch(session: RuntimeSession, localDraft: (session: RuntimeSession
     drain();
     for (let turn = 1; turn <= 3 && session.state.phase === "runtime"; turn++) {
       for (const item of [...session.state.players[0].hand]) {
-        const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.turn, node, session.state.nodes[node].cards[0].length));
+        const occupancy = (node: number) => session.state.nodes[node].cards[0].length
+          + session.state.nodes[node].holograms.filter(entry => entry.owner === 0).length;
+        const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.turn, node, occupancy(node)));
         if (target !== undefined) session.deploy(item.id, target);
       }
       session.endTurn(); drain();
@@ -151,6 +156,83 @@ function legacyDraft(session: RuntimeSession, time: number) {
   legal.sort((a, b) => score(b.card) - score(a.card));
   try { session.buy(legal[0].id, time, 0); } catch { /* pile cooldown */ }
 }
+
+describe("live Crypto cards", () => {
+  const lookup = (id: string) => live.find(card => (card.definitionId ?? card.id) === id);
+  const name = (cardName: string) => structuredClone(live.find(card => card.name === cardName)!);
+  const liveDeck = (["Rezz Razor", "Basic Encryption", ...Array(7).fill("Crypto-Shyte"), "Night Scythe"] as string[])
+    .map((cardName, index) => ({ ...name(cardName), id: `start-${index}` }));
+  const liveContext = (cycle: number, owned: Card[] = liveDeck) => context(cycle, owned, { lookup });
+  const liveOption = (cardName: string) => ({ id: cardName, card: name(cardName), available: 2 });
+
+  it("values Crypto by what it pays per draw, including reveal gains, steals and random morph forms", () => {
+    const payout = (cardName: string) => cryptoPayout(name(cardName), liveContext(2));
+    expect(payout("Crypto-Binary")).toBe(2);
+    expect(payout("Crypto-Cycle")).toBe(3);
+    expect(payout("Crypt-Cache")).toBe(5);
+    expect(payout("Crypto-Heist")).toBe(2);
+    expect(payout("Crypto-Alchemist")).toBeCloseTo((1 + 2 + 3 + 5) / 4, 5);
+    expect(payout("Crypto-Shyte")).toBe(1);
+  });
+
+  it("never buys Crypto-Shyte but does buy Crypto with Ongoing or disruption", () => {
+    expect(isJunkCrypto(name("Crypto-Shyte"), DEFAULT_STRATEGY, liveContext(2))).toBe(true);
+    expect(draftScore(name("Crypto-Shyte"), DEFAULT_STRATEGY, liveContext(6))).toBe(-Infinity);
+    for (const cardName of ["Crypto-Canary", "Crypto-Wraith", "Crypto-Echo", "Crypto-Archangel"]) {
+      expect(isJunkCrypto(name(cardName), DEFAULT_STRATEGY, liveContext(2)), cardName).toBe(false);
+      expect(Number.isFinite(draftScore(name(cardName), DEFAULT_STRATEGY, liveContext(6))), cardName).toBe(true);
+    }
+  });
+
+  it("opens on a 3-payer, then a 5-payer, with a 2-payer as the cheaper fallback", () => {
+    const options = ["Crypto-Cycle", "Crypto-Binary", "Slash-Dot"].map(liveOption);
+    expect(planDraft(options, 6, DEFAULT_STRATEGY, liveContext(1))).toEqual(["Crypto-Cycle"]);
+    expect(planDraft(["Crypto-Binary", "Slash-Dot"].map(liveOption), 5, DEFAULT_STRATEGY, liveContext(1))).toContain("Crypto-Binary");
+    const withCycle = [...liveDeck, { ...name("Crypto-Cycle"), id: "cycle#owned" }];
+    expect(planDraft(["Crypt-Cache", "Crypto-Cycle"].map(liveOption), 9, DEFAULT_STRATEGY, liveContext(2, withCycle))).toContain("Crypt-Cache");
+  });
+
+  it("keeps Crypto-Shyte while the hand needs its Crypto, and trashes it once denser payers cover it", () => {
+    const shytes = liveDeck.filter(card => card.name === "Crypto-Shyte");
+    const hand = shytes.slice(0, 2);
+    expect(thinningPicks(hand, DEFAULT_STRATEGY, liveContext(2), 2)).toEqual([]);
+    // One 3-payer lifts the deck to under one Crypto per slot, so a 1-paying Shyte still carries the hand.
+    const withCycle = [...liveDeck, { ...name("Crypto-Cycle"), id: "cycle#owned" }];
+    expect(thinningPicks(hand, DEFAULT_STRATEGY, liveContext(2, withCycle), 2)).toEqual([]);
+    // One 5-payer stands in for the Shytes: every one that leaves raises Crypto per hand.
+    const withCache = [...liveDeck, { ...name("Crypt-Cache"), id: "cache#owned" }];
+    expect(thinningPicks(shytes, DEFAULT_STRATEGY, liveContext(2, withCache), 7).map(card => card.name)).toEqual(Array(7).fill("Crypto-Shyte"));
+    expect(cryptoPerHand(withCache.filter(card => card.name !== "Crypto-Shyte"), liveContext(2))).toBeGreaterThan(cryptoPerHand(withCache, liveContext(2)));
+    const withTwoCycles = [...withCycle, { ...name("Crypto-Cycle"), id: "cycle#owned-2" }];
+    expect(thinningPicks(hand, DEFAULT_STRATEGY, liveContext(8, withTwoCycles), 1).map(card => card.name)).toEqual(["Crypto-Shyte"]);
+  });
+
+  it("counts a dense payer as the Shytes it replaces when drafting", () => {
+    const options = ["Crypt-Cache", "Crypto-Binary"].map(liveOption);
+    expect(planDraft(options, 9, DEFAULT_STRATEGY, liveContext(6))).toContain("Crypt-Cache");
+    expect(draftScore(name("Crypt-Cache"), DEFAULT_STRATEGY, liveContext(6)))
+      .toBeGreaterThan(draftScore(name("Crypt-Cache"), DEFAULT_STRATEGY, liveContext(6, liveDeck.filter(card => card.name !== "Crypto-Shyte"))));
+  });
+
+  it("reads net Crypto through optional payments, as on Chrome Mitchell", () => {
+    expect(cryptoPerDraw(name("Chrome Mitchell"), liveContext(2))).toBeCloseTo(0.7 * 3, 5);
+  });
+
+  it("deploys Crypto with Power, Ongoing or a better reveal, and holds plain coins for the Draft", () => {
+    for (const cardName of ["Crypto-Heist", "Crypto-Vault", "Crypto-Archangel", "Crypto-Shyte", "Crypt-Cache"]) expect(cryptoPlays(name(cardName)), cardName).toBe(true);
+    expect(cryptoPlays(byId("byte-coin"))).toBe(false);
+    expect(cryptoPlays(byId("mega-cache"))).toBe(false);
+  });
+
+  it("buys Crypto in seeded self-play on the live pack", () => {
+    const content = compileContent(structuredClone((authored as unknown as { document: ContentDocument }).document));
+    const cryptoIds = new Set(content.cards.filter(card => card.type === "Crypto").map(card => card.definitionId ?? card.id));
+    const bought = [1000, 1007, 1014].flatMap(seed => playSelfPlayGame({ content, seed, strategy: DEFAULT_STRATEGY, recordDecisions: false }).report!.purchases)
+      .filter(purchase => cryptoIds.has(purchase.definitionId));
+    expect(bought.length).toBeGreaterThanOrEqual(6);
+    expect(bought.some(purchase => purchase.definitionId === "crypto-shyte")).toBe(false);
+  }, 60_000);
+});
 
 describe("opponent runtime integration", () => {
   it("plays full sessions without buying Shyte-Coin and records a match report", () => {
@@ -461,5 +543,34 @@ describe("Last2Go brain hooks", () => {
     session.endTurn(0);
     expect(boardCards()).toBeGreaterThan(0);
     expect(session.matchReport().decisions.some(item => item.kind === "deploy" && item.owner === 1 && item.turn === 2)).toBe(true);
+  });
+});
+
+describe("AI strategic in-game choices", () => {
+  it("resolves transferPower with a strategy pick instead of logging random", () => {
+    const session = createSession({
+      carryover: true, priorityPreference: "higher", strategicMarket: true, evaluationContent: true,
+      random: seededRandom(3), aiSeats: [1], recordDecisions: true, midCycleDraw: false,
+    });
+    session.state.nodeOrder = [0, 1, 2, 3, 4];
+    session.state.players.forEach(player => { player.hand = []; player.draw = []; player.discard = []; });
+    const shifter: Card = {
+      id: "ai-shifter", definitionId: "ai-shifter", name: "AI Shifter", type: "Character", power: 6, cost: 0, art: "",
+      effect: "Push or pull",
+      onReveal: [{ action: "transferPower", amount: 2, direction: "choice", flow: "push", target: { type: "node", which: "neighbours" } }],
+    };
+    // Face-down on the AI seat so endTurn reveals it and the AI must pick a transfer direction.
+    session.state.nodes[2].cards[1].push({ card: shifter, owner: 1, node: 2, order: 1, revealed: false });
+    session.endTurn(0);
+    const events: { kind: string }[] = [];
+    for (let guard = 0; session.pendingCount || session.state.choice; guard++) {
+      if (guard > 2000) throw new Error("Resolution stalled.");
+      if (session.state.choice) throw new Error(`AI left a human choice pending: ${session.state.choice.prompt}`);
+      events.push(session.step()!.event);
+    }
+    expect(events.some(event => event.kind === "power")).toBe(true);
+    const choices = session.matchReport().decisions.filter(item => item.kind === "choice" && item.source === "AI Shifter");
+    expect(choices.length).toBeGreaterThan(0);
+    expect(choices.every(item => item.kind === "choice" && item.method === "strategy")).toBe(true);
   });
 });

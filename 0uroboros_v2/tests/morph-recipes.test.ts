@@ -300,7 +300,7 @@ describe('Morph recipes', () => {
       // Random morph transforms immediately (sequential evolve would only register until cleanup).
       deploy(game, card('source', { onReveal: [{ kind: 'morph', formIds, selection: 'random' }] }));
       expect(game.step()?.event.kind).toBe('reveal');
-      expect(() => game.step()).toThrow(formIds[0] === 'byte-coin' ? /Character or VP/ : /unavailable/);
+      expect(() => { while (game.pendingCount) game.step(); }).toThrow(formIds[0] === 'byte-coin' ? /Character or VP/ : /unavailable/);
       expect(game.state.nodes[0].cards[0][0].card.definitionId).toBe('source');
     }
   });

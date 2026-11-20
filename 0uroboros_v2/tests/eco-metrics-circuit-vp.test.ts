@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { MatchReport } from '@0uroboros/engine/runtime';
-import { cohortMetrics, gameMetrics } from '../server/agents/ecoMetrics';
+import { addToTally, emptyTally, stallFromTally } from '../server/agents/leagueEpochs';
+import { cohortMetrics, gameMetrics, isGameEnder } from '../server/agents/ecoMetrics';
 
 const emptyTelemetry = {
   events: 0, failedOutcomes: [0, 0] as [number, number], randomResults: 0, choices: [0, 0] as [number, number],
@@ -41,6 +42,7 @@ describe('Eco metrics Circuit differential and market VP', () => {
     }));
     expect(m.timeline.map(row => row.locationsWon)).toEqual([[3, 2], [4, 1], [2, 3]]);
     expect(m.timeline.map(row => row.circuitClaims)).toEqual([[1, 0], [2, 0], [2, 1]]);
+    expect(m.timeline.map(row => row.circuitClaimsThisCycle)).toEqual([[1, 0], [1, 0], [0, 1]]);
     expect(m.timeline.map(row => row.circuitDifferential)).toEqual([1, 2, 1]);
     expect(m.circuitLead2At).toEqual([2, null]);
     expect(m.circuitClaims).toEqual([2, 1]);
@@ -49,6 +51,35 @@ describe('Eco metrics Circuit differential and market VP', () => {
     expect(m.mostCircuitsLeader).toBe(0);
     expect(m.mostNodesLeader).toBe(0);
     expect(m.mostCircuitsVsMostNodes).toBe('same');
+  });
+
+  it('surfaces quarterly Circuit claim timing and early-lead → later Location dominance', () => {
+    const cycles = Array.from({ length: 12 }, (_, index) => {
+      const cycle = index + 1;
+      const seat0Claims = cycle <= 8;
+      return {
+        cycle,
+        vp: [cycle, Math.max(0, cycle - 2)] as [number, number],
+        servers: [3500, 3500] as [number, number],
+        wallet: [0, 0] as [number, number],
+        locationsWon: (cycle >= 9 ? [2, 3] : [4, 1]) as [number, number],
+        deckSize: [10, 10] as [number, number],
+        locations: [],
+        circuit: seat0Claims
+          ? { rewardId: `r${cycle}`, name: `R${cycle}`, eligible: [0 as const], claimed: [0 as const] }
+          : { rewardId: `r${cycle}`, name: `R${cycle}`, eligible: [1 as const], claimed: [1 as const] },
+      };
+    });
+    const cohort = cohortMetrics([{ id: 'quarterly', report: report({ finalVP: [40, 20], winner: 0, purchases: [], cycles }) }]);
+    expect(cohort.progress.quarters).toHaveLength(4);
+    expect(cohort.progress.quarters[0]).toMatchObject({ id: 'Q1', avgCircuitClaimsThisQuarter: 4 });
+    // Seat 0's second claim lands on Cycle 2, so the 2+ lead first appears in Q1.
+    expect(cohort.progress.quarters[0].circuitLead2PlusFirstReachedShare).toBe(1);
+    expect(cohort.progress.quarters[1].circuitLead2PlusFirstReachedShare).toBe(0);
+    expect(cohort.progress.earlyCircuitLeadLaterLocations.games).toBe(1);
+    // Seat 0 led Circuits early but seat 1 won more Locations in Q3; rate is 0.
+    expect(cohort.progress.earlyCircuitLeadLaterLocations.wonMoreLocationsInQ3Q4).toBe(0);
+    expect(cohort.progress.earlyCircuitLeadLaterLocations.wonGame).toBe(1);
   });
 
   it('flags when most-Circuits and most-Nodes leaders disagree (observational)', () => {
@@ -210,5 +241,82 @@ describe('Eco metrics Circuit differential and market VP', () => {
     expect(cohort.snowball.circuitLead2Plus.keptCircuitLead).toBe(1);
     expect(cohort.snowball.circuitLead2Plus.leaderWonGame).toBe(1);
     expect(cohort.vpSources.avgMarketVp).toBe(0);
+  });
+
+  it('matches game-enders by id or Shoggoth-style name and diagnoses Cycle-16 stalls', () => {
+    expect(isGameEnder('delta-wave', '∆-Wave')).toBe(true);
+    expect(isGameEnder('card-a2qeb5kn', 'The Shoggoth')).toBe(true);
+    expect(isGameEnder('other-id', 'The Shoggoth')).toBe(true);
+    expect(isGameEnder('kilo-coin', 'Kilo-Coin')).toBe(false);
+
+    const cycle16Games = Array.from({ length: 4 }, (_, index) => report({
+      cycle: 16,
+      endedReason: 'Cycle 16 final Draft complete.',
+      finalVP: [24 + index, 18],
+      winner: 0,
+      purchases: [
+        { cycle: 8, owner: 0, definitionId: 'vault-encryption', name: 'Vault Encryption', category: 'VP', cost: 5, vp: 4 },
+        { cycle: 10, owner: 1, definitionId: 'vault-encryption', name: 'Vault Encryption', category: 'VP', cost: 5, vp: 4 },
+      ],
+      cycles: Array.from({ length: 16 }, (__, cycleIndex) => ({
+        cycle: cycleIndex + 1,
+        vp: [cycleIndex, Math.max(0, cycleIndex - 2)] as [number, number],
+        servers: [3500, 3500] as [number, number],
+        wallet: [4, 4] as [number, number],
+        locationsWon: [0, 0] as [number, number],
+        deckSize: [10, 10] as [number, number],
+        locations: [],
+        circuit: null,
+        market: [{ id: 'vault-encryption', name: 'Vault Encryption', category: 'VP' as const, cost: 5, stock: [1, 1] as [number, number] }],
+      })),
+      telemetry: {
+        ...emptyTelemetry,
+        drainDealt: [200, 180] as [number, number],
+        restoreDone: [160, 150] as [number, number],
+      } as unknown as MatchReport['telemetry'],
+    }));
+    const destructionGames = Array.from({ length: 4 }, (_, index) => report({
+      cycle: 12,
+      endedReason: 'Servers destroyed.',
+      finalVP: [18, 10 + index],
+      winner: 0,
+      purchases: [
+        { cycle: 9, owner: 0, definitionId: 'delta-wave', name: '∆-Wave', category: 'Chaos', cost: 9, vp: 0 },
+      ],
+      cycles: Array.from({ length: 12 }, (__, cycleIndex) => ({
+        cycle: cycleIndex + 1,
+        vp: [cycleIndex, Math.max(0, cycleIndex - 3)] as [number, number],
+        servers: [2000, 3500] as [number, number],
+        wallet: [10, 8] as [number, number],
+        locationsWon: [0, 0] as [number, number],
+        deckSize: [10, 10] as [number, number],
+        locations: [],
+        circuit: null,
+        market: [{ id: 'delta-wave', name: '∆-Wave', category: 'Chaos' as const, cost: 9, stock: [1, 1] as [number, number] }],
+      })),
+      telemetry: {
+        ...emptyTelemetry,
+        drainDealt: [400, 120] as [number, number],
+        restoreDone: [80, 60] as [number, number],
+        destructions: [{ cycle: 12, victim: 1, server: 'primary', by: 0, source: 'card', sourceId: 'delta-wave', vp: 8 }],
+      } as unknown as MatchReport['telemetry'],
+    }));
+    const cohort = cohortMetrics([
+      ...cycle16Games.map((item, index) => ({ id: `c16-${index}`, report: item })),
+      ...destructionGames.map((item, index) => ({ id: `dest-${index}`, report: item })),
+    ]);
+    expect(cohort.endedBy.cycle16).toBe(4);
+    expect(cohort.endedBy.destruction).toBe(4);
+    expect(cohort.cycle16Stall.cycle16.gameEnders.anyBoughtShare).toBe(0);
+    expect(cohort.cycle16Stall.destruction.gameEnders.anyBoughtShare).toBe(1);
+    expect(['missing-enders', 'mixed', 'repair-and-vp']).toContain(cohort.cycle16Stall.diagnosis);
+
+    const tally = emptyTally();
+    for (const game of [...cycle16Games, ...destructionGames]) addToTally(tally, game);
+    const stall = stallFromTally(tally);
+    expect(stall.cycle16.games).toBe(4);
+    expect(stall.destruction.games).toBe(4);
+    expect(stall.cycle16.anyBoughtShare).toBe(0);
+    expect(stall.destruction.anyBoughtShare).toBe(1);
   });
 });

@@ -1,10 +1,86 @@
 /**
  * Headless AI-vs-AI sessions for evaluation. Both seats are driven by the runtime's own AI
- * (`aiSeats: [0, 1]`) under normal rules; nothing here changes cards, costs or rewards.
+ * (`aiSeats: [0, 1]`). Cards and costs are untouched; the optional `SelfPlayRules` set the Configure options.
  */
 import { compileContent, type CompiledContent, type ContentDocument } from "../authoring/contentModel";
-import { createSession, seededRandom, type MatchReport, type RuntimeSession } from "../runtime";
+import { defaultMostCircuitsBonusVP, defaultNodeWinVP, defaultServerVP, type Servers } from "../game";
+import { createSession, DEFAULT_END_GAME_AWARDS, END_GAME_AWARD_LABELS, seededRandom, type EndGameAwardId, type EndGameAwards, type MatchReport, type RuntimeSession } from "../runtime";
 import type { StrategyProfile } from "./strategy";
+
+/** The Configure options that change the game itself (no timers, no opponent); shared by every AI self-play run. */
+export type SelfPlayRules = {
+  serverVP: Servers;
+  noLocations: boolean;
+  middleNodesOnly: boolean;
+  noCircuitRewards: boolean;
+  noTrailingRewards: boolean;
+  mostCircuitsBonusVP: number;
+  nodeWinVP: number;
+  endGameAwards: EndGameAwards;
+};
+
+const RULE_VP_MAX = 50;
+const clampInt = (value: unknown, fallback: number) => typeof value === "number" && Number.isFinite(value) ? Math.min(RULE_VP_MAX, Math.max(0, Math.round(value))) : fallback;
+
+/** Circuit and Trailing rewards default off, matching the Configure defaults. */
+export const DEFAULT_SELF_PLAY_RULES: SelfPlayRules = {
+  serverVP: { ...defaultServerVP }, noLocations: false, middleNodesOnly: false, noCircuitRewards: true, noTrailingRewards: true,
+  mostCircuitsBonusVP: defaultMostCircuitsBonusVP, nodeWinVP: defaultNodeWinVP, endGameAwards: structuredClone(DEFAULT_END_GAME_AWARDS),
+};
+
+export function sanitizeSelfPlayRules(raw: unknown): SelfPlayRules {
+  const value = (raw && typeof raw === "object" ? raw : {}) as Partial<Record<keyof SelfPlayRules, unknown>>;
+  const servers = (value.serverVP && typeof value.serverVP === "object" ? value.serverVP : {}) as Partial<Servers>;
+  const awardsIn = (value.endGameAwards && typeof value.endGameAwards === "object" ? value.endGameAwards : {}) as Partial<Record<EndGameAwardId, { enabled?: unknown; vp?: unknown }>>;
+  const endGameAwards = structuredClone(DEFAULT_END_GAME_AWARDS);
+  for (const id of Object.keys(endGameAwards) as EndGameAwardId[]) {
+    const next = awardsIn[id];
+    if (!next || typeof next !== "object") continue;
+    endGameAwards[id] = { enabled: typeof next.enabled === "boolean" ? next.enabled : endGameAwards[id].enabled, vp: clampInt(next.vp, endGameAwards[id].vp) };
+  }
+  const flag = (key: keyof SelfPlayRules) => typeof value[key] === "boolean" ? value[key] as boolean : DEFAULT_SELF_PLAY_RULES[key] as boolean;
+  const noCircuitRewards = flag("noCircuitRewards");
+  return {
+    serverVP: { primary: clampInt(servers.primary, defaultServerVP.primary), backup: clampInt(servers.backup, defaultServerVP.backup) },
+    noLocations: flag("noLocations"), middleNodesOnly: flag("middleNodesOnly"),
+    // Trailing rewards are a subset of Circuit rewards, so they cannot be on while Circuits are off.
+    noCircuitRewards, noTrailingRewards: noCircuitRewards || flag("noTrailingRewards"),
+    mostCircuitsBonusVP: clampInt(value.mostCircuitsBonusVP, defaultMostCircuitsBonusVP), nodeWinVP: clampInt(value.nodeWinVP, defaultNodeWinVP),
+    endGameAwards,
+  };
+}
+
+/** Flat, labelled view of a ruleset; the basis for hashes and diffs. */
+export function flattenSelfPlayRules(rules: SelfPlayRules): { key: string; label: string; value: number | boolean }[] {
+  return [
+    { key: "serverVP.primary", label: "Primary Server VP", value: rules.serverVP.primary },
+    { key: "serverVP.backup", label: "Backup Server VP", value: rules.serverVP.backup },
+    { key: "locations", label: "Locations", value: !rules.noLocations },
+    { key: "middleNodesOnly", label: "Middle Nodes only", value: rules.middleNodesOnly },
+    { key: "circuitRewards", label: "Circuit rewards", value: !rules.noCircuitRewards },
+    { key: "trailingRewards", label: "Trailing rewards", value: !rules.noTrailingRewards },
+    { key: "mostCircuitsBonusVP", label: "Most Circuits bonus VP", value: rules.mostCircuitsBonusVP },
+    { key: "nodeWinVP", label: "Node win VP", value: rules.nodeWinVP },
+    ...(Object.keys(rules.endGameAwards) as EndGameAwardId[]).flatMap(id => [
+      { key: `award.${id}.enabled`, label: `${END_GAME_AWARD_LABELS[id]} award`, value: rules.endGameAwards[id].enabled },
+      { key: `award.${id}.vp`, label: `${END_GAME_AWARD_LABELS[id]} VP`, value: rules.endGameAwards[id].vp },
+    ]),
+  ];
+}
+
+export type RuleChange = { key: string; label: string; from: number | boolean; to: number | boolean };
+export function diffSelfPlayRules(before: SelfPlayRules, after: SelfPlayRules): RuleChange[] {
+  const old = new Map(flattenSelfPlayRules(before).map(entry => [entry.key, entry.value]));
+  return flattenSelfPlayRules(after).filter(entry => old.get(entry.key) !== entry.value).map(entry => ({ key: entry.key, label: entry.label, from: old.get(entry.key)!, to: entry.value }));
+}
+
+/** Short stable FNV-1a hash of the ruleset. */
+export function selfPlayRulesHash(rules: SelfPlayRules): string {
+  const text = flattenSelfPlayRules(rules).map(entry => `${entry.key}=${entry.value}`).join(";");
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; }
+  return hash.toString(16).padStart(8, "0");
+}
 
 export type SelfPlayResult = {
   seed: number; valid: boolean;
@@ -20,12 +96,17 @@ export function compileForSelfPlay(document: ContentDocument): CompiledContent {
   return compileContent(structuredClone(document));
 }
 
-/** `seatStrategies` gives each seat its own profile (Strat-G's experiments); otherwise both play `strategy`. */
-export function playSelfPlayGame(options: { content: CompiledContent; seed: number; strategy: StrategyProfile; seatStrategies?: [StrategyProfile, StrategyProfile]; recordDecisions?: boolean }): SelfPlayResult {
+/**
+ * `seatStrategies` gives each seat its own profile (Strat-G's experiments); otherwise both play `strategy`.
+ * `rules` applies the league ruleset; without it the engine defaults apply.
+ */
+export function playSelfPlayGame(options: { content: CompiledContent; seed: number; strategy: StrategyProfile; seatStrategies?: [StrategyProfile, StrategyProfile]; recordDecisions?: boolean; rules?: SelfPlayRules }): SelfPlayResult {
   const started = Date.now();
   let session: RuntimeSession | null = null;
   try {
+    const rules = options.rules ? sanitizeSelfPlayRules(options.rules) : null;
     session = createSession({
+      ...(rules ? { ...rules, serverVP: { ...rules.serverVP }, endGameAwards: structuredClone(rules.endGameAwards) } : {}),
       carryover: true, priorityPreference: "higher", random: seededRandom(options.seed),
       strategicMarket: true, evaluationContent: true, content: options.content,
       strategy: structuredClone(options.strategy), aiSeats: [0, 1], recordDecisions: options.recordDecisions ?? true,

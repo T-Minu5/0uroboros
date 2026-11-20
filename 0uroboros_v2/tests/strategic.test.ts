@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { EVALUATION_BASE_CARDS, EVALUATION_CHAOS_CARDS, EVALUATION_CRYPTO_CARDS, EVALUATION_VP_CARDS, CURRENCY_CARD_IDS, DRAFT_AVOID_ROUNDS, DRAFT_COPIES_PER_PLAYER, DRAFT_EARLY_COST_MAX, DRAFT_EARLY_CYCLES, DRAFT_LATE_COST_BIAS_FROM, DRAFT_LATE_COST_BIAS_HEAVY_FROM, DRAFT_LATE_COST_THRESHOLD, DRAFT_LATE_COST_WEIGHT, DRAFT_LATE_COST_WEIGHT_HEAVY, DRAFT_SLOTS, DRAFT_SLOTS_TEN, chaosClassOf, createStrategicMarket, draftOffer, draftSlotPickWeight, isSolarMonk } from "@0uroboros/engine/evaluationMarket";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent } from "@0uroboros/engine/runtime";
-import { legalNodes, canDeploy, type Card } from "@0uroboros/engine/game";
+import { createSession, DEFAULT_END_GAME_AWARDS, firstLegalSelection, seededRandom, type RuntimeSession, type RuntimeEvent, type SessionConfig } from "@0uroboros/engine/runtime";
+import { legalNodes, canDeploy, defaultServerVP, type Card } from "@0uroboros/engine/game";
 import { bundledContent } from "../src/contentPack/contentStore";
 
-const make = (seed = 41) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed), content: bundledContent });
+const make = (seed = 41, extra: Partial<SessionConfig> = {}) => createSession({ evaluationContent: true, strategicMarket: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed), content: bundledContent, ...extra });
+const NO_AWARDS: Partial<SessionConfig> = { endGameAwards: Object.fromEntries(Object.keys(DEFAULT_END_GAME_AWARDS).map(id => [id, { enabled: false, vp: 0 }])) };
 const card = (name: string, id = name): Card => ({ ...EVALUATION_BASE_CARDS.find(card => card.name === name)!, id });
 const chaosCard = (name: string, id = name): Card => ({ ...EVALUATION_CHAOS_CARDS.find(card => card.name === name)!, id });
 const vpCard = (name: string, id = name): Card => ({ ...EVALUATION_VP_CARDS.find(card => card.name === name)!, id });
@@ -24,7 +25,8 @@ function cycle(session: RuntimeSession, play = false) {
   const events: RuntimeEvent[] = drain(session);
   for (let turn = 1; turn <= 3; turn++) {
     if (play) for (const item of [...session.state.players[0].hand]) {
-      const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.turn, node, session.state.nodes[node].cards[0].length, session.view().openNodes));
+      const occupancy = (node: number) => session.state.nodes[node].cards[0].length + session.state.nodes[node].holograms.filter(entry => entry.owner === 0).length;
+      const target = legalNodes(session.state.turn, session.state.nodeOrder).find(node => !canDeploy(item, session.state.turn, node, occupancy(node), session.view().openNodes));
       if (target !== undefined) session.deploy(item.id, target);
     }
     session.endTurn(); events.push(...drain(session));
@@ -244,15 +246,19 @@ describe("Strategic evaluation Draft", () => {
 describe("Strategic card systems", () => {
   it("pauses for a mandatory move, excludes full destinations, and preserves revelation and ownership", () => {
     const session = make(); empty(session);
-    const [source, full, target] = session.view().openNodes;
+    const [source, full] = session.view().openNodes;
     session.state.players[0].hand = [card("Phase Runner", "mover")];
     session.state.nodes[full].cards[0] = Array.from({ length: 4 }, (_, i) => ({ card: card("Dash Relay", `block-${i}`), owner: 0, node: full, order: 100 + i, revealed: true }));
     session.deploy("mover", source); session.endTurn(); drain(session, false);
     expect(session.pendingCount).toBe(0); expect(session.step()).toBeNull();
-    expect(session.state.choice?.options.map(option => option.id)).toEqual([`node-${target}`]);
+    // Moves may land on any playable Node with room, including ones not open yet this Cycle.
+    const destinations = [0, 1, 2, 3, 4].filter(node => node !== source && node !== full).map(node => `node-${node}`);
+    expect(session.state.choice?.options.map(option => option.id).sort()).toEqual(destinations);
     expect(() => session.choose(`node-${full}`)).toThrow(/legal/);
     const event = session.resolveChoiceTimeout();
-    expect(event).toMatchObject({ kind: "move", sourceNode: source, targetNode: target });
+    expect(event).toMatchObject({ kind: "move", sourceNode: source });
+    const target = event!.targetNode!;
+    expect(destinations).toContain(`node-${target}`);
     expect(session.state.nodes[target].cards[0][0]).toMatchObject({ owner: 0, revealed: true, card: { id: "mover" } });
     drain(session); expect(session.state.phase).toBe("runtime"); expect(session.state.turn).toBe(2);
   });
@@ -492,13 +498,13 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
     expect(events.some(event => event.node !== undefined && event.node > node)).toBe(false);
     expect(events.some(event => event.cardId === "bank-must-not-fire")).toBe(false);
     expect(events.some(event => ["circuit", "draft"].includes(event.kind))).toBe(false);
-    expect(session.state.players[0].destructionVP).toBe(16);
+    expect(session.state.players[0].destructionVP).toBe(defaultServerVP.backup);
     expect(session.state.players[0].rewardVP).toBeGreaterThanOrEqual(2);
     expect(session.state.players[1].servers).toEqual({ primary: 0, backup: 0 });
     expect(session.state.phase).toBe("gameover");
     const score = session.view().finalScore![0];
     expect(score.locationVP).toBe(2);
-    expect(score.destructionVP).toBe(16);
+    expect(score.destructionVP).toBe(defaultServerVP.backup);
     expect(score.cardVP + score.locationVP + score.circuitVP + score.effectVP + score.destructionVP).toBe(score.total);
   });
 
@@ -559,7 +565,7 @@ describe("Strategic adversarial scoring and lethal resolution", () => {
   });
 
   it("counts actual VP market purchases in the final Draft before scoring", () => {
-    const session = make(); draft(session);
+    const session = make(41, NO_AWARDS); draft(session);
     session.state.cycle = 16;
     const before = session.view().players[0].totalVP;
     // Volume VP slot (index 9) plus any Solar-monk VP in the offer.

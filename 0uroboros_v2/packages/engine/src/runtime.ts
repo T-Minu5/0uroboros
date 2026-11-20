@@ -16,7 +16,7 @@ import {
   type Card, type CardClass, type CardModifier, type PlayerId, type RandomSource, type Deployment, type Servers,
   type OpeningSchedule,
   applyServerEffect, serverMaximums, defaultServerVP, drawCards,
-  initialWeights, MIDDLE_NODES, legalNodes, playableNodes, mirroredOpening, nodeWinner, trailingPlayer,
+  initialWeights, MIDDLE_NODES, legalNodes, playableNodes, mirroredOpening, nodeWinner, projectedEndGameAwardVP, TRAILING_REWARDS_FROM_CYCLE, trailingPlayer,
   selectCircuitNode, revealOrder, starterEffects, canDeploy,
   shuffleCards, effectiveCardPower, cardPowerFloor, expandDeck, DEFAULT_STARTING_DECK, setPowerDelta, isCharacterCard,
 } from "./game";
@@ -27,7 +27,7 @@ import { DECK_ENDS, filterClasses, isBuiltinModifier, type ActionId, type AnyEff
 import { MULTIPLY_MAX, MULTIPLY_MIN, REFLECT_PERCENTS, type CardTrigger, type ListenWhose, type TriggerEvent } from "./effects/triggers";
 import type { CardIf } from "./effects/cardIfs";
 import { formatAmount, transferFlow, transferText } from "./transferText";
-import { DEFAULT_STRATEGY, deployPriority, draftScore, JUNK_KEEP_VALUE, keepValue, locationStakes, optionValue, planDraft, strategyPhase, thinningPicks, type StrategyContext, type StrategyProfile } from "./ai/strategy";
+import { cryptoPlays, DEFAULT_STRATEGY, deployPriority, draftScore, handValue, JUNK_KEEP_VALUE, keepValue, locationStakes, optionValue, planDraft, strategyPhase, thinningPicks, type StrategyContext, type StrategyProfile } from "./ai/strategy";
 import { TelemetryCollector, type GameTelemetry } from "./ai/telemetry";
 
 export type SessionPhase = "runtime" | "reveal" | "collapse" | "draft" | "gameover";
@@ -88,7 +88,12 @@ export type SessionConfig = {
   seatNames?: [string, string];
   /** Every Node is No Man's Land for the whole session. */
   noLocations?: boolean;
-  /** Legacy opt-out: when true, Circuit Rewards that go to the trailing player are never drawn. Defaults off (trailing rewards stay in the pool). */
+  /**
+   * When true, skip the per-Cycle Circuit Reward lottery entirely (no Draft privilege).
+   * End-game Most Circuits VP is separate (`mostCircuitsBonusVP`). Configure defaults this on.
+   */
+  noCircuitRewards?: boolean;
+  /** When true, Circuit Rewards that go to the trailing player are never drawn. Configure defaults this on. */
   noTrailingRewards?: boolean;
   /** Each player draws 1 at the start of Runtime turns 2 and 3. Fixed rule (defaults on; tests may opt out). */
   midCycleDraw?: boolean;
@@ -118,7 +123,7 @@ export type SessionConfig = {
    * `null` or `0` disables; unset defaults to 50. Peek uses its own `autoResolveMs`.
    */
   choiceSeconds?: number | null;
-  /** Configurable end-game achievement VP awards (ties grant both seats). */
+  /** Configurable end-game achievement VP awards (ties award nothing). */
   endGameAwards?: Partial<EndGameAwards>;
   /** The clock Draft deadlines read; defaults to Date.now. Inject for tests and servers. */
   now?: () => number;
@@ -1179,6 +1184,10 @@ export class RuntimeSession {
   private get strategy(): StrategyProfile { return this.config.strategy ?? DEFAULT_STRATEGY; }
   private strategyOf(owner: PlayerId): StrategyProfile { return this.config.seatStrategies?.[owner] ?? this.strategy; }
 
+  /** Card definitions by id for the AI (morph forms); published content and built-in catalog are public. */
+  private readonly lookupDefinition = (id: string): Card | undefined =>
+    (this.config.content?.cards ?? EVALUATION_ALL_CARDS).find(card => (card.definitionId ?? card.id) === id);
+
   /** Only the owner's own cards and the public scoreboard; the local hand and draw order stay hidden. */
   private strategyContext(owner: PlayerId = 1): StrategyContext {
     const own = this.state.players[owner], enemy = this.state.players[1 - owner];
@@ -1193,6 +1202,7 @@ export class RuntimeSession {
       ownServers: own.servers.primary + own.servers.backup, ownServersMax: max,
       enemyServers: enemy.servers.primary + enemy.servers.backup, enemyServersMax: max,
       opponentBoughtIds,
+      lookup: this.lookupDefinition,
     };
   }
 
@@ -1217,8 +1227,8 @@ export class RuntimeSession {
     const winsBefore = this.locationWins();
     const ownWins = winsBefore[owner], enemyWins = winsBefore[enemy];
     for (const card of hand) {
-      // Currency without Power stays in hand for Draft auto-resolve; Power Crypto (e.g. Crypto-Shyte) may deploy.
-      if (card.type === "Crypto" && !(card.power ?? 0) && !card.powerDelta && !card.powerSource) continue;
+      // Plain coins stay in hand for Draft auto-resolve; Crypto with Power, Ongoing or a better reveal deploys.
+      if (!cryptoPlays(card, context)) continue;
       const candidates = this.openNodes().filter(node => !canDeploy(card, this.state.turn, node, this.occupancy(node, owner), this.playableNodeList()));
       const locationScore = (node: number, swing: number) => {
         const read = stakes.get(node);
@@ -1609,12 +1619,34 @@ export class RuntimeSession {
     return this.event("bank", callbacks.length ? "Mod effects resolve for the new Runtime turn." : "No mod effects this turn.");
   }
 
-  private requestChoice(placement: Deployment, prompt: string, options: (ChoiceOption & { resolve: () => RuntimeEvent })[], icon?: string, zone?: ChoiceZone, verb?: string, zoneOwner?: PlayerId): RuntimeEvent {
+  private requestChoice(placement: Deployment, prompt: string, options: (ChoiceOption & { resolve: () => RuntimeEvent })[], icon?: string, zone?: ChoiceZone, verb?: string, zoneOwner?: PlayerId, aiPick?: () => string[]): RuntimeEvent {
     return this.openChoice(placement, {
       prompt, icon, zone, zoneOwner, verb,
       options: options.map(({ resolve: _resolve, ...option }) => option),
       resolve: ([id]) => options.find(option => option.id === id)!.resolve(),
+      ...(aiPick ? { aiPick } : {}),
     });
+  }
+
+  /** Whether an optional Accept/Resolve is worth taking for this seat (vs Skip/Decline). */
+  private aiWantsOptional(chooser: PlayerId, steps: readonly EffectStep[]): boolean {
+    return optionValue([...steps], this.strategyOf(chooser), this.strategyContext(chooser)) > 0.05;
+  }
+
+  /** Rank Nodes by how much adding `power` helps this seat contest them (flips > ties > padding). */
+  private aiNodeContestScore(owner: PlayerId, node: number, power: number): number {
+    const enemy = (1 - owner) as PlayerId;
+    const state = this.state.nodes[node];
+    if (!state) return 0;
+    const own = state.powers[owner];
+    const visibleEnemy = this.visibleEnemyPower(node, enemy);
+    const after = own + power;
+    const flips = own <= visibleEnemy && after > visibleEnemy;
+    const ties = own <= visibleEnemy && after === visibleEnemy;
+    const stake = state.location ? locationStakes(state.location, this.strategyOf(owner), this.strategyContext(owner), this.state.turn).stake : 0;
+    const outcome = flips ? 3 : ties ? 1.5 : own < visibleEnemy ? 0.7 : 0.25;
+    const swing = flips ? 1 : ties ? 0.5 : own < visibleEnemy ? 0.15 : 0.05;
+    return 20 * outcome + LOCATION_POINT * swing * stake - state.cards[owner].length * 2;
   }
 
   private openChoice(placement: Deployment, request: ChoiceRequest): RuntimeEvent {
@@ -2061,7 +2093,9 @@ export class RuntimeSession {
           ...(canAccept ? [{ id: "resolve", label: accept, resolve: () => this.resolveChained(acting, follow, () => this.dispatchStep(acting, head)) }] : []),
           { id: "skip", label: canAccept ? "Decline" : "Can't pay", resolve: decline },
         ];
-        return this.requestChoice({ ...acting.source, owner: recipient }, `${acting.source.card.name}: ${label}?`, options);
+        const scored = canAccept ? [head, ...follow] : [];
+        return this.requestChoice({ ...acting.source, owner: recipient }, `${acting.source.card.name}: ${label}?`, options, undefined, undefined, undefined, undefined,
+          () => [canAccept && this.aiWantsOptional(recipient, scored) ? "resolve" : "skip"]);
       });
     }
     // Hand and Discard costs run their own `then` once paid; next-reveal targets carry it on the waiting trigger.
@@ -2072,10 +2106,12 @@ export class RuntimeSession {
     if (step.optional && !OPTIONAL_INSIDE.has(step.action) && !(step.target?.type === "card" && !DECK_ENDS.includes(step.target.where) && (step.pick?.mode ?? "choose") === "choose")) {
       const { optional: _optional, ...required } = step;
       const label = describeStep(required, ctx.scope, this.config.content?.cards ?? EVALUATION_ALL_CARDS, this.mods).replace(/\.$/, "");
+      const chooser = ctx.source.owner;
       return this.requestChoice(ctx.source, `${ctx.source.card.name}: ${label}?`, [
         { id: "resolve", label: step.action === "payCrypto" ? label : "Resolve", resolve: () => this.resolveStep(ctx, required) },
         { id: "skip", label: step.action === "payCrypto" ? "Decline" : "Skip", resolve: () => this.event("choice", `${ctx.source.card.name}: optional ${ACTIONS[step.action].label.toLowerCase()} skipped.`, this.base(ctx)) },
-      ]);
+      ], undefined, undefined, undefined, undefined,
+        () => [this.aiWantsOptional(chooser, [required]) ? "resolve" : "skip"]);
     }
     switch (step.action) {
       case "draw": case "gainCrypto": case "payCrypto": case "gainVP":
@@ -2387,11 +2423,15 @@ export class RuntimeSession {
       return bumpBank(Array.from({ length: count }, () => pool.splice(Math.floor(this.config.random() * pool.length), 1)[0].card.id));
     }
     const foreign = cleanse ? " foreign" : "";
+    const options = candidates.map(entry => ({ id: entry.card.id, label: entry.card.name, card: structuredClone(entry.card) }));
     return this.openChoice({ ...ctx.source, owner: chooser }, {
       prompt: `${card.name}: choose ${count === 1 ? `a${foreign} card` : `${count}${foreign} cards`} to bump from ${whose} Effect Bank to Discard.`,
-      options: candidates.map(entry => ({ id: entry.card.id, label: entry.card.name, card: structuredClone(entry.card) })),
-      select: { min: count, max: count }, verb: "Bump",
+      options, select: { min: count, max: count }, verb: "Bump",
       resolve: ids => bumpBank(ids),
+      aiPick: () => [...candidates]
+        .sort((a, b) => this.livePower(b.card) - this.livePower(a.card) || handValue(b.card, this.strategyOf(chooser), this.strategyContext(chooser)) - handValue(a.card, this.strategyOf(chooser), this.strategyContext(chooser)))
+        .slice(0, count)
+        .map(entry => entry.card.id),
     });
   }
 
@@ -2439,11 +2479,16 @@ export class RuntimeSession {
     const prompt = count === 1 ? `Recover one card from ${source} to your ${placeName}.` : `Recover ${count} cards from ${source} to your ${placeName}.`;
     const drawerZone: ChoiceZone | undefined = fromDestroyed ? undefined : fromDiscard ? "discard" : "trash";
     const zoneOwner = fromDiscard ? recipient : undefined;
+    const rankRecover = () => {
+      const profile = this.strategyOf(ctx.source.owner), context = this.strategyContext(ctx.source.owner);
+      return [...candidates].sort((a, b) => keepValue(b, profile, context, true) - keepValue(a, profile, context, true) || handValue(b, profile, context) - handValue(a, profile, context));
+    };
     if (count === 1) {
       return this.requestChoice(
         ctx.source, prompt,
         candidates.map(target => ({ id: target.id, label: target.name, card: this.shownCard(target), resolve: () => recover([target.id]) })),
         undefined, drawerZone, "Recover", zoneOwner,
+        () => [rankRecover()[0].id],
       );
     }
     return this.openChoice(ctx.source, {
@@ -2452,6 +2497,7 @@ export class RuntimeSession {
       ...(drawerZone ? { zone: drawerZone } : {}),
       ...(zoneOwner !== undefined ? { zoneOwner } : {}),
       resolve: recover,
+      aiPick: () => rankRecover().slice(0, count).map(card => card.id),
     });
   }
 
@@ -2480,7 +2526,18 @@ export class RuntimeSession {
         { id: "decline", label: "Decline", resolve: () => this.event("choice", `${placement.card.name}: optional payment declined.`, { owner }) },
         { id: "pay", label: `${trash ? "Trash" : "Discard"} ${maximum} cards`, resolve: () => this.resolveHandSelection(ctx, { ...step, optional: false, min: maximum }, victim) },
       ];
-      return this.requestChoice({ ...placement, owner: chooser }, `${placement.card.name}: pay the optional ${verb} cost?`, options, "discard", undefined, trash ? "Trash" : "Discard");
+      return this.requestChoice({ ...placement, owner: chooser }, `${placement.card.name}: pay the optional ${verb} cost?`, options, "discard", undefined, trash ? "Trash" : "Discard", undefined, () => {
+        const profile = this.strategyOf(chooser), context = this.strategyContext(victim);
+        const pool = poolCards();
+        const benefit = optionValue(step.then ?? [], profile, this.strategyContext(chooser));
+        if (trash) {
+          const thinned = thinningPicks(pool, profile, context, maximum);
+          return [thinned.length >= maximum || benefit > 0.5 ? "pay" : "decline"];
+        }
+        const weakest = [...pool].sort((a, b) => keepValue(a, profile, context, false) - keepValue(b, profile, context, false)).slice(0, maximum);
+        const cost = weakest.reduce((sum, card) => sum + Math.max(0, keepValue(card, profile, context, false)), 0);
+        return [benefit > cost * 0.35 ? "pay" : "decline"];
+      });
     }
     const minimum = step.min ?? (step.optional ? 0 : maximum);
     const finish = (selected: number) => {
@@ -2786,9 +2843,18 @@ export class RuntimeSession {
 
   /** The AI's picks when it chooses cards for an effect: harm the other side's strongest cards, help its own. */
   private aiCardPicks(step: EffectStep, chooser: PlayerId, entries: readonly { id: string; owner: PlayerId; power: number }[], count: number): string[] | undefined {
-    const helpful = step.action === "healCard" || step.action === "restoreCard" || (step.action === "changePower" && (step.amount ?? 0) > 0);
-    const harmful = step.action === "destroyCard" || step.action === "trashCard" || (step.action === "changePower" && (step.amount ?? 0) < 0);
-    if (!helpful && !harmful) return undefined;
+    const helpful = step.action === "healCard" || step.action === "restoreCard" || step.action === "attachModifier"
+      || (step.action === "changePower" && (step.amount ?? 0) > 0);
+    const harmful = step.action === "destroyCard" || step.action === "trashCard" || step.action === "removeModifier"
+      || (step.action === "changePower" && (step.amount ?? 0) < 0);
+    // Merge / other board picks: prefer own high-Power hosts when mixed, else highest Power overall.
+    if (!helpful && !harmful) {
+      if (!entries.length) return undefined;
+      return [...entries]
+        .sort((a, b) => Number(b.owner === chooser) - Number(a.owner === chooser) || b.power - a.power)
+        .slice(0, count)
+        .map(entry => entry.id);
+    }
     const good = (entry: { owner: PlayerId }) => (entry.owner === chooser) === helpful;
     return [...entries].sort((a, b) => Number(good(b)) - Number(good(a)) || (good(a) ? b.power - a.power : a.power - b.power)).slice(0, count).map(entry => entry.id);
   }
@@ -3469,6 +3535,21 @@ export class RuntimeSession {
       }),
       transfer: { amount, center: node, nodes: [left, node, right].filter((value): value is number => value !== null).map(target => ({ node: target, name: nodeName(target), power: this.state.nodes[target].powers[owner] })), moves },
       resolve: ([id]) => apply(id),
+      aiPick: () => {
+        const score = (id: string) => {
+          const legs = moves[id];
+          // Net Power added to each Node for this seat after the transfer.
+          const delta = new Map<number, number>();
+          for (const leg of legs) {
+            delta.set(leg.from, (delta.get(leg.from) ?? 0) - leg.amount);
+            delta.set(leg.to, (delta.get(leg.to) ?? 0) + leg.amount);
+          }
+          let total = 0;
+          for (const [target, change] of delta) total += this.aiNodeContestScore(owner, target, change);
+          return total;
+        };
+        return [[...ids].sort((a, b) => score(b) - score(a))[0]];
+      },
     });
   }
 
@@ -3779,7 +3860,19 @@ export class RuntimeSession {
       options,
       select: { min: 0, max: candidates.length },
       verb: "Sacrifice",
-      aiPick: () => this.randomSelection({ options, select: { min: 0, max: candidates.length } }),
+      aiPick: () => {
+        const profile = this.strategyOf(owner), context = this.strategyContext(owner);
+        const cryptoWorth = optionValue([{ action: "gainCrypto", amount: cryptoEach, target: { type: "player", who: "self" } }], profile, context);
+        // Sacrifice low-Power / low keep-value cards when the Crypto is worth more than holding the Node.
+        const ranked = [...candidates].sort((a, b) => this.livePower(a.card) - this.livePower(b.card) || keepValue(a.card, profile, context, true) - keepValue(b.card, profile, context, true));
+        const picks: string[] = [];
+        for (const target of ranked) {
+          const power = this.livePower(target.card);
+          const keep = keepValue(target.card, profile, context, true);
+          if (cryptoWorth > power * 0.35 + Math.max(0, keep) * 0.05) picks.push(`card-${target.card.id}`);
+        }
+        return picks;
+      },
       resolve: ids => apply(candidates.filter(target => ids.includes(`card-${target.card.id}`))),
     });
   }
@@ -3994,7 +4087,13 @@ export class RuntimeSession {
       prompt: `${ctx.source.card.name}: place a card onto Node ${node + 1}.`,
       options: [...options, ...(step.optional ? [{ id: "skip", label: "Skip" }] : [])],
       verb: "Place",
-      aiPick: () => this.randomSelection({ options }),
+      aiPick: () => {
+        const profile = this.strategyOf(owner), context = this.strategyContext(owner);
+        const best = [...candidates].sort((a, b) => deployPriority(b, profile, context) - deployPriority(a, profile, context) || handValue(b, profile, context) - handValue(a, profile, context))[0];
+        if (!best) return step.optional ? ["skip"] : [options[0].id];
+        if (step.optional && deployPriority(best, profile, context) < 0.5 && this.aiNodeContestScore(owner, node, this.printedPower(best)) < 8) return ["skip"];
+        return [`card-${best.id}`];
+      },
       resolve: ([id]) => {
         const card = candidates.find(entry => `card-${entry.id}` === id);
         return card ? place(card) : this.event("choice", `${ctx.source.card.name}: place skipped.`, this.base(ctx));
@@ -4108,9 +4207,15 @@ export class RuntimeSession {
       owner: source.owner, cardId: source.card.id, targetCardId: target.card.id, targetOwner: target.owner,
       node: source.node >= 0 ? source.node : undefined, source: "card", sourceName: source.card.name, amount: 0,
     });
+    const mover = target.owner;
+    const power = this.livePower(target.card);
     return this.requestChoice(source, `${source.card.name}: move ${target.card.name} to which Node?`, destinations.map(node => ({
       id: `node-${node}`, label: `Node ${node + 1}`, node, resolve: () => this.movePlacement(source, node, target),
-    })));
+    })), undefined, undefined, undefined, undefined, () => {
+      // Favour destinations where this card's Power flips or contests the Node for its owner.
+      const best = [...destinations].sort((a, b) => this.aiNodeContestScore(mover, b, power) - this.aiNodeContestScore(mover, a, power) || a - b)[0];
+      return [`node-${best}`];
+    });
   }
 
   /** Forced adjacent move; blocked destinations nudge in place with a Can’t move cue. */
@@ -4298,40 +4403,61 @@ export class RuntimeSession {
     this.queue.push(() => {
       // Weight lottery still picks a "particle" Node for ControlledWeight visualization.
       // Locations tied → both seats share a normal Circuit Reward (trailing catch-up is excluded
-      // from the draw). Location counts differ → leader eligibility, or awardTrailing → VP trailer.
+      // from the draw). Location counts differ → leader eligibility, or awardTrailing → VP trailer
+      // (projected VP includes unfinished Server damage and strict end-game award leads).
       const liveWeights = this.state.weights.map((weight, node) => this.playableNodeList().includes(node) ? weight : 0);
       this.state.selectedNode = liveWeights.some(weight => weight > 0)
         ? selectCircuitNode(liveWeights, this.config.random)
         : null;
+      const particle = this.state.selectedNode !== null ? ` Particle on N${this.state.selectedNode + 1}.` : "";
+      const particleDetail = this.state.selectedNode !== null ? { node: this.state.selectedNode } : {};
+      if (this.config.noCircuitRewards === true) {
+        this.state.circuitEligible = [];
+        this.state.circuitReward = { definition: null, claimed: [] };
+        if (this.telemetry) { this.telemetry.circuitId = null; this.telemetry.circuitName = null; }
+        return this.event("circuit", `Circuit Rewards are off this session.${particle}`, {
+          source: "circuit", ...particleDetail,
+        });
+      }
       const wins = this.locationWins();
       const locationsTied = wins[0] === wins[1];
-      const pool=this.config.content?.circuitRewards??EVALUATION_CIRCUIT_REWARDS;
-      const leaders=this.config.noTrailingRewards === true ? pool.filter(reward => !reward.awardTrailing) : pool;
-      const shared=leaders.filter(reward => !reward.awardTrailing);
-      // On a Locations tie, only share normal rewards. Fall back to the full pool only if every
-      // remaining reward is trailing (still share both seats — never apply catch-up on a tie).
+      const pool = this.config.content?.circuitRewards ?? EVALUATION_CIRCUIT_REWARDS;
+      // Catch-up rewards stay out of the pool until Cycle 8 (and whenever Trailing rewards is off).
+      const trailingInPool = this.config.noTrailingRewards !== true && this.state.cycle >= TRAILING_REWARDS_FROM_CYCLE;
+      const nonTrailing = pool.filter(reward => !reward.awardTrailing);
+      const withTrailing = trailingInPool ? pool : nonTrailing;
+      // On a Locations tie, only share normal rewards. Fall back to trailing only if every remaining
+      // reward is trailing and catch-up is allowed (still share both seats — never apply catch-up on a tie).
       const rewards = locationsTied
-        ? (shared.length ? shared : leaders.length ? leaders : pool)
-        : (leaders.length ? leaders : pool);
-      const definition = this.config.evaluationContent ? structuredClone(rewards[Math.floor(this.config.random() * rewards.length)]) : null;
+        ? (nonTrailing.length ? nonTrailing : withTrailing)
+        : (withTrailing.length ? withTrailing : nonTrailing);
+      const definition = rewards.length && this.config.evaluationContent
+        ? structuredClone(rewards[Math.floor(this.config.random() * rewards.length)])
+        : null;
       this.refreshScores();
       const [me, them] = this.state.players;
+      const endGameBonus = projectedEndGameAwardVP(this.endGameStandings({ includeCurrentCycle: true }));
       const winner = locationsTied
         ? null
         : definition?.awardTrailing
-          ? trailingPlayer([{ vp: me.totalVP, servers: me.servers }, { vp: them.totalVP, servers: them.servers }], this.config.serverVP ?? defaultServerVP)
+          ? trailingPlayer(
+            [
+              { vp: me.totalVP + endGameBonus[0], servers: me.servers },
+              { vp: them.totalVP + endGameBonus[1], servers: them.servers },
+            ],
+            this.config.serverVP ?? defaultServerVP,
+          )
           : nodeWinner(wins);
       this.state.circuitEligible = winner === null ? [0, 1] : [winner];
       this.state.circuitReward = { definition, claimed: [] };
       if (this.telemetry) { this.telemetry.circuitId = definition?.id ?? null; this.telemetry.circuitName = definition?.name ?? null; }
-      const particle = this.state.selectedNode !== null ? ` Particle on N${this.state.selectedNode + 1}.` : "";
       const visibleName = this.circuitNamePublic() ? definition?.name : undefined;
       const basis = locationsTied
         ? `Locations won ${wins[0]}–${wins[1]} (tied). Both players are eligible`
         : definition?.awardTrailing
-          ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP plus Server damage dealt). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}`
+          ? `Locations won ${wins[0]}–${wins[1]}, but this reward goes to the trailing player (VP, Server damage dealt, and end-game award leads). ${winner === null ? "Neither trails, so both players are eligible" : `${this.say(winner, "You trail and are", "trails and is")} eligible`}`
           : `Locations won ${wins[0]}–${wins[1]}. ${winner === null ? "Both players are eligible" : winner === 0 ? "You are eligible" : "Opponent is eligible"}`;
-      return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}${particle}`, { source: "circuit", sourceName: visibleName, ...(this.state.selectedNode !== null ? { node: this.state.selectedNode } : {}) });
+      return this.event("circuit", `${basis}${definition ? visibleName ? ` for ${visibleName}.` : " for a private Circuit Reward." : "; reward content unresolved."}${particle}`, { source: "circuit", sourceName: visibleName, ...particleDetail });
     });
     this.queue.push(() => {
       this.nextRevealTriggers = [];
@@ -4430,7 +4556,9 @@ export class RuntimeSession {
     }
     const record = this.cycleRecords[this.cycleRecords.length - 1];
     if (record) record.market = this.state.market.map(pile => ({ id: pile.card.definitionId ?? pile.card.id, name: pile.card.name, category: pile.category, cost: Math.max(0, pile.card.cost), stock: pile.remaining ? [pile.remaining[0], pile.remaining[1]] : [pile.supply, pile.supply] }));
-    for (const seat of this.aiSeats) if (this.state.circuitReward.definition && this.state.circuitEligible.includes(seat)) this.queue.push(() => this.applyCircuitClaim(seat));
+    if (this.config.noCircuitRewards !== true) {
+      for (const seat of this.aiSeats) if (this.state.circuitReward.definition && this.state.circuitEligible.includes(seat)) this.queue.push(() => this.applyCircuitClaim(seat));
+    }
     return this.event("draft", "Draft begins. Held Crypto resolves into Wallet; hand and deployed cards enter Discard.");
   }
 
@@ -4443,6 +4571,7 @@ export class RuntimeSession {
   }
 
   claimCircuitReward(owner: PlayerId = 0, now = this.now()): RuntimeEvent {
+    if (this.config.noCircuitRewards === true) throw new Error("Circuit Rewards are off this session.");
     if(this.state.phase==="draft"&&this.state.circuitReward.claimed.includes(owner))throw new Error("This player already claimed the Circuit Reward.");
     if (this.state.phase !== "draft" || this.queue.length || this.state.draftEnded || this.state.draftReady[owner]) throw new Error("Circuit claims require an active Draft.");
     if (this.state.draftEndsAt !== null && now > this.state.draftEndsAt) throw new Error("Draft deadline has passed.");
@@ -4450,6 +4579,7 @@ export class RuntimeSession {
   }
 
   private applyCircuitClaim(owner: PlayerId): RuntimeEvent {
+    if (this.config.noCircuitRewards === true) throw new Error("Circuit Rewards are off this session.");
     const slot = this.state.circuitReward;
     if (!slot.definition) throw new Error("No Circuit Reward is available.");
     if (!this.state.circuitEligible.includes(owner)) throw new Error("This player is not eligible for the Circuit Reward.");
@@ -4655,20 +4785,30 @@ export class RuntimeSession {
     return mergeEndGameAwards(this.config.endGameAwards);
   }
 
-  /** Absolute-seat standings for the live HUD; `view()` reindexes them for the reader. */
-  private endGameStandings(): EndGameStanding[] {
+  /**
+   * Absolute-seat standings for the live HUD; `view()` reindexes them for the reader.
+   * When `includeCurrentCycle` is set (trailing projection), the in-progress Cycle's Location
+   * lead counts as a Circuit win that is not yet in `cycleRecords`.
+   */
+  private endGameStandings(options?: { includeCurrentCycle?: boolean }): EndGameStanding[] {
     const rows: EndGameStanding[] = [];
     const lead = (scores: [number, number]): PlayerId | null =>
       scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
     const circuitsVP = this.config.mostCircuitsBonusVP ?? 0;
     if (circuitsVP > 0) {
       const { wins } = this.circuitWinTally();
+      const scores: [number, number] = [wins[0], wins[1]];
+      if (options?.includeCurrentCycle) {
+        const current = this.locationWins();
+        if (current[0] > current[1]) scores[0]++;
+        else if (current[1] > current[0]) scores[1]++;
+      }
       rows.push({
         id: "mostCircuits",
         label: END_GAME_STANDING_LABELS.mostCircuits,
         vp: circuitsVP,
-        scores: wins,
-        leader: lead(wins),
+        scores,
+        leader: lead(scores),
       });
     }
     const awards = this.resolvedEndGameAwards();
@@ -4698,16 +4838,9 @@ export class RuntimeSession {
     return rows;
   }
 
-  /** Credits end-game achievement VP. Strict lead → that seat; ties → both. */
+  /** Credits end-game achievement VP. Strict lead → that seat; ties (0–0 included) award nothing. */
   private awardStatLead(label: string, stats: [number, number], vp: number): string | null {
-    if (vp <= 0) return null;
-    if (stats[0] === stats[1]) {
-      this.state.players[0].rewardVP += vp;
-      this.state.players[1].rewardVP += vp;
-      this.rewardSources[0].circuit += vp;
-      this.rewardSources[1].circuit += vp;
-      return `Both earn +${vp} VP for ${label} (tied ${stats[0]}–${stats[1]}).`;
-    }
+    if (vp <= 0 || stats[0] === stats[1]) return null;
     const leader = (stats[0] > stats[1] ? 0 : 1) as PlayerId;
     this.state.players[leader].rewardVP += vp;
     this.rewardSources[leader].circuit += vp;

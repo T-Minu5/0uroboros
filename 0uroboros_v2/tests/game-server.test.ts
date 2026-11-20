@@ -27,11 +27,11 @@ class FakeConnection implements Connection {
   clear() { this.messages = []; }
 }
 
-function table(options: { mode?: "pvp" | "ai"; turnSeconds?: number; choiceSeconds?: number; seed?: number; store?: MemoryStore; scheduler?: ManualScheduler } = {}) {
+function table(options: { mode?: "pvp" | "ai"; turnSeconds?: number; draftSeconds?: number; choiceSeconds?: number; seed?: number; store?: MemoryStore; scheduler?: ManualScheduler } = {}) {
   const scheduler = options.scheduler ?? new ManualScheduler();
   const store = options.store ?? new MemoryStore();
   const lobby = new Lobby({ content, contentRevision: PACK_REVISION, scheduler, store });
-  const room = lobby.createRoom(options.mode ?? "pvp", { turnSeconds: options.turnSeconds ?? 0, choiceSeconds: options.choiceSeconds ?? 50, seed: options.seed ?? 7 });
+  const room = lobby.createRoom(options.mode ?? "pvp", { turnSeconds: options.turnSeconds ?? 0, draftSeconds: options.draftSeconds ?? 0, choiceSeconds: options.choiceSeconds ?? 50, seed: options.seed ?? 7 });
   const a = new FakeConnection(), b = new FakeConnection();
   const seatA = room.join("Ada", a)!;
   const seatB = room.mode === "pvp" ? room.join("Bo", b)! : null;
@@ -199,10 +199,11 @@ describe("game server rooms", () => {
   });
 
   it("pauses on a first disconnect, resumes the seat mid-Draft from its token and forfeits a seat that never returns", () => {
-    const { room, a, b, scheduler, tokens } = table();
+    const { room, a, b, scheduler, tokens } = table({ draftSeconds: 90 });
     while (room.session!.state.phase === "runtime") playTurn(room, [a, b]);
     expect(room.session!.state.phase).toBe("draft");
     const deadline = room.session!.state.draftEndsAt!;
+    expect(deadline).toBeGreaterThan(0);
     command(room, 0, { type: "endDraft" });
 
     room.disconnect(1);

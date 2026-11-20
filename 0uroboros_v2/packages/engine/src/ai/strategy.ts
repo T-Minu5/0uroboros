@@ -1,4 +1,4 @@
-import { type Card } from '../game';
+import { type Card, type CardTrigger } from '../game';
 import { migrateEffects } from '../effects/migrate';
 import type { AnyEffect, ChoiceOption, EffectStep, Who } from '../effects/types';
 
@@ -9,11 +9,15 @@ export const versionLabel = (revision: number) => revision < 0 ? `before v${STRA
 /** Every AI player follows the shared money-and-thinning opener through this Cycle, then returns to its own objective. */
 export const EARLY_ECONOMY_THROUGH = 4;
 const EARLY_JUNK_VP = new Set(['basic-encryption']);
-const EARLY_CRYPTO_UPGRADE = new Set(['kilo-coin', 'mega-cache']);
+/** Payout per draw the server prompts call an upgrade over the starting Shyte; the AI itself reasons from Crypto per hand. */
+export const CRYPTO_UPGRADE_PAYOUT = 3;
+/** Non-Crypto play value (Power, other effects, Ongoing) a low-paying Crypto card needs before it is worth buying or keeping. */
+const CRYPTO_SUPPORT_MIN = 1.5;
+/** Cycles 1-4 points per Crypto a card pays per draw, before the deck reaches its Crypto target. */
+const OPENING_CRYPTO_POINTS = 6;
+/** Cycles 1-4 cost of filling one more deck slot, so one dense payer beats several thin ones. */
+const OPENING_SLOT_COST = 5;
 const earlyEconomy = (cycle: number) => cycle >= 1 && cycle <= EARLY_ECONOMY_THROUGH;
-const cardId = (card: Card) => card.definitionId ?? card.id;
-const ownsUpgrade = (owned: readonly Card[]) => owned.some(card => EARLY_CRYPTO_UPGRADE.has(cardId(card)));
-const deckCrypto = (owned: readonly Card[]) => owned.reduce((sum, card) => sum + (card.type === 'Crypto' ? card.cryptoValue ?? 0 : 0), 0);
 
 /** Relative worth of each effect family, in "hand points" (roughly one point of Node Power). */
 export type StrategyWeights = {
@@ -59,7 +63,7 @@ export type StrategyProfile = {
   midgameMix?: number;
   /** Crypto per five-card hand the economy aims for; Crypto buys taper off as the deck approaches it. */
   handCryptoTarget: number;
-  /** Crypto cards printing less than this are never bought (Shyte-Coin dilutes the deck). */
+  /** Crypto cards paying less than this per draw, and doing little else, are never bought (Shyte dilutes the deck). */
   minCryptoValue: number;
   /** A purchase must be worth at least this many points after dilution. */
   minBuyScore: number;
@@ -79,7 +83,7 @@ export type StrategyProfile = {
 
 export const DEFAULT_STRATEGY: StrategyProfile = {
   version: 0,
-  plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, plus Kilo/Mega/Byte from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte after a better Crypto source), then pivot into Chaos for the Drain race, finishing on VP cards.',
+  plan: 'Shared early economy through Cycle 4 (Characters that print Crypto, plus Crypto cards ranked by Crypto per draw from Hacker/Crypto Draft slots; trash Basic Encryption, then Shyte once denser Crypto carries the hand), then pivot into Chaos for the Drain race, finishing on VP cards.',
   economyUntilCycle: 4,
   chaosFromCycle: 5,
   vpFromCycle: 12,
@@ -147,6 +151,8 @@ export type StrategyContext = {
   enemyServers: number; enemyServersMax: number;
   /** Definition ids the other seat bought this Cycle's Draft (for mirrorBuys). */
   opponentBoughtIds?: readonly string[];
+  /** Card definitions by id, so random morph forms can be valued; unset, morphs count for nothing. */
+  lookup?: (id: string) => Card | undefined;
 };
 
 export type Phase = 'economy' | 'build' | 'endgame';
@@ -176,7 +182,7 @@ function multipliers(profile: StrategyProfile, context: StrategyContext): Multip
 const NEUTRAL: Multipliers = { econ: 1, drain: 1, restore: 1, vp: 1 };
 const ENEMY = new Set<Who>(['opponent', 'loser', 'other']);
 /** Cards that only clog a deck when gained (Locations hand them out). */
-const JUNK_CARDS = new Set(['glitch', 'shyte-coin']);
+const JUNK_CARDS = new Set(['glitch', 'shyte-coin', 'crypto-shyte']);
 const targetWho = (step: EffectStep): Who | undefined => step.target && 'who' in step.target ? step.target.who : undefined;
 const listValue = (steps: readonly EffectStep[] | undefined, w: StrategyWeights, m: Multipliers) =>
   (steps ?? []).reduce((sum, step) => sum + effectValue(step, w, m), 0);
@@ -249,45 +255,147 @@ export function effectTotal(effects: readonly AnyEffect[] | undefined, action: E
     .reduce((sum, step) => sum + (step.amount ?? 1), 0);
 }
 
+/** Net Crypto a step list pays its controller, following `then`; an optional payment is only made when it nets Crypto. */
+function netCrypto(steps: readonly EffectStep[] | undefined): number {
+  return (steps ?? []).reduce((sum, step) => {
+    const own = ENEMY.has(targetWho(step) ?? 'self') ? 0
+      : step.action === 'gainCrypto' ? step.amount ?? 1 : step.action === 'payCrypto' ? -(step.amount ?? 1) : 0;
+    const total = own + netCrypto(step.then);
+    return sum + (step.optional ? Math.max(0, total) : total);
+  }, 0);
+}
+
 /** Whether any step in the list has one of these actions. */
 export const hasAction = (effects: readonly AnyEffect[] | undefined, ...actions: EffectStep['action'][]) => stepsOf(effects).some(step => actions.includes(step.action));
 
 const sumEffects = (effects: readonly AnyEffect[] | undefined, w: StrategyWeights, m: Multipliers) => listValue(stepsOf(effects), w, m);
+
+/** Expected firings of an Ongoing trigger while its card is on the board for a Cycle. */
+const triggerFirings = (trigger: CardTrigger) =>
+  trigger.kind === 'listenAccess' || (trigger.kind === 'whenPlayed' && trigger.scope === 'thisNode') ? 0.5 : 1;
+/** Rough Crypto the enemy gains per Cycle, which a `mirrorCrypto` Ongoing copies. */
+const MIRRORED_CRYPTO = 2;
+
+/** Worth of a card's Ongoing triggers over one Cycle on the board. */
+function triggerValue(card: Card, w: StrategyWeights, m: Multipliers): number {
+  return (card.triggers ?? []).reduce((sum, trigger) => {
+    if ('then' in trigger) return sum + triggerFirings(trigger) * listValue(trigger.then, w, m);
+    if (trigger.kind === 'mirrorCrypto') return sum + w.crypto * MIRRORED_CRYPTO * m.econ;
+    return sum + w.power * 0.5;
+  }, 0);
+}
+
+/** Expected Crypto from a card's Ongoing triggers over one Cycle on the board. */
+function triggerCrypto(card: Card): number {
+  return (card.triggers ?? []).reduce((sum, trigger) =>
+    sum + ('then' in trigger ? triggerFirings(trigger) * effectTotal(trigger.then, 'gainCrypto') : trigger.kind === 'mirrorCrypto' ? MIRRORED_CRYPTO : 0), 0);
+}
+
+/** Average On Reveal Crypto of the forms a random morph can become (the new form reveals as if played). */
+function morphCrypto(card: Card, context: StrategyContext | undefined, depth: number): number {
+  if (!context?.lookup || depth > 1) return 0;
+  return stepsOf(card.onReveal).reduce((sum, step) => {
+    if (step.action !== 'morph' || step.selection !== 'random' || !step.formIds?.length) return sum;
+    const forms = step.formIds.map(id => context.lookup!(id)).filter((form): form is Card => Boolean(form));
+    return forms.length ? sum + forms.reduce((total, form) => total + revealCrypto(form, context, depth + 1), 0) / forms.length : sum;
+  }, 0);
+}
+
+/** Crypto a card is sure to pay when revealed: gains, steals and random morph forms. */
+function revealCrypto(card: Card, context?: StrategyContext, depth = 0): number {
+  return effectTotal(card.onReveal, 'gainCrypto') + effectTotal(card.onReveal, 'stealCrypto', true) + morphCrypto(card, context, depth);
+}
+
+const printedPower = (card: Card) => card.powerSource ? 2 : (card.power ?? 0) + (card.powerDelta ?? 0);
+
+/**
+ * Whether the AI deploys a Crypto card instead of holding it for its Draft auto-pay. Plain coins stay in hand;
+ * anything with Power, Ongoing triggers, non-Crypto effects or a reveal paying more than holding is played.
+ */
+export function cryptoPlays(card: Card, context?: StrategyContext): boolean {
+  if (card.type !== 'Crypto') return true;
+  if (printedPower(card) > 0 || card.triggers?.length) return true;
+  if (stepsOf(card.onReveal).some(step => step.action !== 'gainCrypto')) return true;
+  return revealCrypto(card, context) > (card.cryptoValue ?? 0);
+}
+
+/** Crypto a Crypto card yields per draw: what it pays when played, or its Draft auto-pay when held. Ongoing income is not counted. */
+export function cryptoPayout(card: Card, context?: StrategyContext): number {
+  const held = card.cryptoValue ?? 0;
+  return cryptoPlays(card, context) ? Math.max(held, revealCrypto(card, context)) : held;
+}
+
+/** What a played Crypto card is worth beyond the Crypto it pays: Power, other reveal effects and Ongoing triggers. */
+function cryptoSupport(card: Card, w: StrategyWeights, m: Multipliers, context?: StrategyContext): number {
+  if (!cryptoPlays(card, context)) return 0;
+  const others = stepsOf(card.onReveal).filter(step => step.action !== 'gainCrypto' && step.action !== 'morph');
+  return w.power * printedPower(card) + listValue(others, w, m) + sumEffects(card.onCollapse, w, m)
+    + sumEffects(card.recurring, w, m) + triggerValue(card, w, m);
+}
+
+/** Crypto that pays under `minCryptoValue` and does little else: Shyte. It is never bought, and trashed once the deck's Crypto per hand holds without it. */
+export function isJunkCrypto(card: Card, profile: StrategyProfile, context: StrategyContext): boolean {
+  if (card.type !== 'Crypto' || cryptoPayout(card, context) >= profile.minCryptoValue) return false;
+  return cryptoSupport(card, profile.weights, NEUTRAL, context) < CRYPTO_SUPPORT_MIN;
+}
 
 /** Worth of a list of steps to the player who controls them; used to rank choice options. */
 export function optionValue(steps: readonly EffectStep[], profile: StrategyProfile, context?: StrategyContext): number {
   return listValue(steps, profile.weights, context ? multipliers(profile, context) : NEUTRAL);
 }
 
-/** Expected Crypto a five-card hand from this deck produces. */
-export function cryptoPerHand(owned: readonly Card[]): number {
+/** Expected Crypto one draw of this card yields. Crypto cards pay on reveal or auto-pay at Draft; other cards' Crypto (net of any payment) depends on being deployed. */
+export function cryptoPerDraw(card: Card, context?: StrategyContext): number {
+  if (card.type === 'Crypto') return cryptoPayout(card, context) + 0.7 * triggerCrypto(card);
+  return 0.7 * (netCrypto(stepsOf(card.onReveal)) + triggerCrypto(card));
+}
+
+/** Expected Crypto a five-card hand from this deck produces: Crypto per card slot, times five. */
+export function cryptoPerHand(owned: readonly Card[], context?: StrategyContext): number {
   if (!owned.length) return 0;
-  const total = owned.reduce((sum, card) => {
-    // Undeployed Crypto still auto-resolves cryptoValue at Draft; Character/VP Crypto comes from effects.
-    if (card.type === 'Crypto') return sum + (card.cryptoValue ?? 0);
-    return sum + 0.7 * effectTotal(card.onReveal, 'gainCrypto');
-  }, 0);
-  return (total / owned.length) * 5;
+  return (owned.reduce((sum, card) => sum + cryptoPerDraw(card, context), 0) / owned.length) * 5;
+}
+
+/**
+ * Whether trashing `card` keeps the deck's income: Crypto per hand stays at least where it is, or at the hand target.
+ * A card paying under the deck's average per slot raises Crypto per hand when it leaves, so one dense payer frees several Shytes.
+ */
+export function incomeHoldsWithout(card: Card, owned: readonly Card[], profile: StrategyProfile, context?: StrategyContext): boolean {
+  const rest = owned.filter(item => item.id !== card.id);
+  if (!rest.length || rest.length === owned.length) return false;
+  return cryptoPerHand(rest, context) >= Math.min(profile.handCryptoTarget, cryptoPerHand(owned, context)) - 1e-9;
+}
+
+/**
+ * Leanness a Crypto source buys: how many owned junk Crypto cards its per-draw Crypto replaces, less the slot it takes,
+ * valued as that many trashes. A 5-payer stands in for five Shytes in one card.
+ */
+function consolidationValue(card: Card, profile: StrategyProfile, context: StrategyContext, m: Multipliers): number {
+  const junk = context.owned.filter(item => isJunkCrypto(item, profile, context));
+  if (!junk.length) return 0;
+  const junkPay = Math.max(0.25, junk.reduce((sum, item) => sum + cryptoPerDraw(item, context), 0) / junk.length);
+  const replaced = Math.min(junk.length, Math.floor(cryptoPerDraw(card, context) / junkPay + 1e-9)) - 1;
+  return replaced > 0 ? profile.weights.thin * replaced * m.econ * 0.5 : 0;
 }
 
 /** Worth of a card each time it is drawn and played, excluding the VP it scores just by being owned. */
 export function handValue(card: Card, profile: StrategyProfile, context: StrategyContext): number {
   const w = profile.weights, m = multipliers(profile, context);
   if (card.type === 'Crypto') {
-    // Wallet-first currency: Draft cryptoValue. Printed Power / board hooks add play worth (Crypto-Shyte).
-    const wallet = w.crypto * (card.cryptoValue ?? 0) * Math.max(m.econ, 0.3);
-    const power = card.powerSource ? 2 : (card.power ?? 0) + (card.powerDelta ?? 0);
-    if (!power && !card.onCollapse?.length && !card.recurring?.length && !(card.schedule?.length)) return wallet;
-    return wallet + w.power * power + sumEffects(card.onReveal, w, m) + sumEffects(card.onCollapse, w, m)
-      + sumEffects(card.recurring, w, m) + (card.schedule ?? []).reduce((sum, entry) => sum + sumEffects(entry.effects, w, m), 0);
+    // A Crypto card is either held for its Draft auto-pay or played for its reveal, never both.
+    const held = w.crypto * (card.cryptoValue ?? 0) * Math.max(m.econ, 0.3);
+    if (!cryptoPlays(card, context)) return held;
+    const played = w.crypto * revealCrypto(card, context) * Math.max(m.econ, 0.3) + cryptoSupport(card, w, m, context)
+      + (card.schedule ?? []).reduce((sum, entry) => sum + sumEffects(entry.effects, w, m), 0);
+    return Math.max(held, played);
   }
   const lasting = card.duration ? Math.min(card.duration, 3) : 1;
-  const power = card.powerSource ? 2 : (card.power ?? 0) + (card.powerDelta ?? 0);
-  return w.power * power
+  return w.power * printedPower(card)
     + sumEffects(card.onReveal, w, m)
     + sumEffects(card.onCollapse, w, m) * lasting
     + sumEffects(card.recurring, w, m) * lasting
     + (card.schedule ?? []).reduce((sum, entry) => sum + sumEffects(entry.effects, w, m), 0)
+    + triggerValue(card, w, m) * lasting
     + (card.duration ? w.duration : 0);
 }
 
@@ -308,16 +416,15 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
   const mirrorBonus = profile.mirrorBuys && context.opponentBoughtIds?.includes(id) ? 4.5 : 0;
 
   if (card.type === 'Crypto') {
-    if ((card.cryptoValue ?? 0) < profile.minCryptoValue) return -Infinity;
-    if (opening) {
-      // Shared opener when Crypto cards appear in Hacker/Crypto slots: Kilo first, then Mega-Cache; Byte as the cheaper fallback.
-      if (id === 'mega-cache') return 24 - plannedCopies * 2 + bias + mirrorBonus;
-      if (id === 'kilo-coin') return (ownsUpgrade(owned) ? 12 : 30) - plannedCopies * 2 + bias + mirrorBonus;
-      if (id === 'byte-coin') return (ownsUpgrade(owned) ? 2 + bias : 8 - plannedCopies * 3 + bias) + mirrorBonus;
-    }
-    const need = Math.min(1, Math.max(0.15, (profile.handCryptoTarget - cryptoPerHand(owned)) / profile.handCryptoTarget));
+    if (isJunkCrypto(card, profile, context)) return -Infinity;
+    const payout = cryptoPayout(card, context);
+    const support = cryptoSupport(card, profile.weights, m, context);
+    const need = Math.min(1, Math.max(0.15, (profile.handCryptoTarget - cryptoPerHand(owned, context)) / profile.handCryptoTarget));
     const decay = 1 / (1 + 0.25 * plannedCopies);
-    return (profile.weights.crypto * (card.cryptoValue ?? 0) * (0.4 + need) * m.econ) * decay - dilution + bias + mirrorBonus;
+    const lean = consolidationValue(card, profile, context, m);
+    // Shared opener: Crypto per draw is worth the most while the deck is short of its target, and every extra slot costs a draw.
+    if (opening) return OPENING_CRYPTO_POINTS * payout * (0.4 + need) * decay - OPENING_SLOT_COST + support + lean + bias + mirrorBonus;
+    return (profile.weights.crypto * payout * (0.4 + need) * m.econ + support * uses + lean) * decay - dilution + bias + mirrorBonus;
   }
   if (card.type === 'VP') {
     if (opening && EARLY_JUNK_VP.has(id)) return -Infinity;
@@ -330,7 +437,7 @@ export function draftScore(card: Card, profile: StrategyProfile, context: Strate
     ? (strategyPhase(profile, context.cycle) === 'endgame' ? profile.weights.chaos : (-0.5 + 1.5 * midgameShare(profile, context.cycle)) * profile.weights.chaos)
     : 0;
   // Early opener still values draw, Actions and trash enablers (Night Scythe) once Crypto buys are scored above them.
-  const value = (handValue(card, profile, context) + chaos) * uses;
+  const value = (handValue(card, profile, context) + chaos + consolidationValue(card, profile, context, m)) * uses;
   return value / (1 + 0.5 * copies) - dilution + bias + mirrorBonus;
 }
 
@@ -455,20 +562,19 @@ export function locationRead(location: LocationRules, profile: StrategyProfile =
 /**
  * Lower means the AI would rather lose it. Trashing removes a card for good, so positive VP cards
  * are protected; a discard keeps the card owned, so only its hand value matters. In Cycles 1-4 the
- * shared early economy overrides that for Basic Encryption and for Crypto until a Kilo (or Mega) is owned.
+ * shared early economy overrides that for Basic Encryption and for Crypto. Junk Crypto (Shyte) is the first card out
+ * once the deck's Crypto per hand holds without it, and is kept through the opener while it still funds the hand.
  */
 export function keepValue(card: Card, profile: StrategyProfile, context: StrategyContext, permanent: boolean): number {
   const hand = handValue(card, profile, context) + (profile.cardBias[definition(card)] ?? 0);
   const id = definition(card);
+  if (permanent && isJunkCrypto(card, profile, context)) {
+    if (incomeHoldsWithout(card, context.owned, profile, context)) return 0.5;
+    if (earlyEconomy(context.cycle)) return 40;
+  }
   if (permanent && earlyEconomy(context.cycle)) {
     if (EARLY_JUNK_VP.has(id)) return -20;
-    if (id === 'shyte-coin') {
-      // Keep Shyte until a Kilo/Mega lands; Cycle 1 may trash one Shyte when the deck no longer prints 6 Crypto for a Kilo.
-      if (ownsUpgrade(context.owned)) return 0.5;
-      if (context.cycle === 1 && deckCrypto(context.owned) < 6) return 1;
-      return 40;
-    }
-    if (card.type === 'Crypto') return 45 + (card.cryptoValue ?? 0);
+    if (card.type === 'Crypto') return 45 + cryptoPayout(card, context);
   }
   if (card.type === 'VP' && permanent) return (card.vp ?? 0) > 0 ? 50 + (card.vp ?? 0) : -10;
   return hand;
@@ -481,27 +587,21 @@ export const MIN_THIN_DECK = 8;
 
 /**
  * Which of the controller's own `candidates` to trash, weakest first, up to `limit`. Junk always goes. In Cycles 1-4
- * Basic Encryption goes first, then Shyte only after a Kilo/Mega (or one Shyte on Cycle 1 when the deck prints under 6
- * Crypto). After the opener, cards go when they fall below the purchase bar, while the deck keeps MIN_THIN_DECK cards
+ * Basic Encryption goes first, then junk Crypto (Shyte) one card at a time while the deck's Crypto per hand holds
+ * without it. After the opener, cards go when they fall below the purchase bar, while the deck keeps MIN_THIN_DECK cards
  * and Crypto stays until the rest of the deck still meets `handCryptoTarget`.
  */
 export function thinningPicks(candidates: readonly Card[], profile: StrategyProfile, context: StrategyContext, limit: number): Card[] {
-  const value = (card: Card) => keepValue(card, profile, context, true);
   let owned = [...context.owned];
+  const value = (card: Card) => keepValue(card, profile, { ...context, owned }, true);
   const picks: Card[] = [];
-  let earlyShyteTrashed = 0;
   for (const card of [...candidates].sort((a, b) => value(a) - value(b))) {
     if (picks.length >= limit) break;
     const rest = owned.filter(item => item.id !== card.id);
     const id = definition(card);
     if (earlyEconomy(context.cycle) && card.type === 'Crypto') {
-      if (EARLY_CRYPTO_UPGRADE.has(id) || id === 'byte-coin') continue;
-      if (id === 'shyte-coin') {
-        if (ownsUpgrade(owned)) { /* trash after upgrade */ }
-        else if (context.cycle === 1 && deckCrypto(owned) < 6 && earlyShyteTrashed < 1) earlyShyteTrashed++;
-        else continue;
-      }
-    } else if (card.type === 'Crypto' && (card.cryptoValue ?? 0) >= profile.minCryptoValue && cryptoPerHand(rest) < profile.handCryptoTarget) {
+      if (!isJunkCrypto(card, profile, context) || !incomeHoldsWithout(card, owned, profile, context)) continue;
+    } else if (card.type === 'Crypto' && !isJunkCrypto(card, profile, context) && cryptoPerHand(rest, context) < profile.handCryptoTarget) {
       // Keep Crypto worth keeping (not Shyte) that still funds the hand target, even when endgame econ makes it look like junk.
       continue;
     }

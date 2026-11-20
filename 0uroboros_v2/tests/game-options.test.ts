@@ -9,7 +9,8 @@ import { Lobby } from "@0uroboros/server/lobby";
 import { ManualScheduler } from "@0uroboros/server/scheduler";
 import { MemoryStore } from "@0uroboros/server/store";
 import { RoomSettingsSchema } from "@0uroboros/protocol/messages";
-import { sanitizeGameSetup } from "../src/gameSetup";
+import { loadGameSetup, sanitizeGameSetup, saveGameSetup, withClientRules, type ClientRulesFile } from "../src/gameSetup";
+import clientRules from "../content/client-rules.json";
 import { BOARD_STYLE_KEY, DEFAULT_BOARD_STYLE, loadBoardStyle } from "../src/boardStyles";
 import { DEFAULT_THEME, PLAYER_COLOR_IDS, colorChoiceLabel, loadColorTheme, playerColor } from "../src/playerTheme";
 
@@ -54,7 +55,7 @@ describe("No trailing rewards", () => {
   it("never draws a Circuit Reward that goes to the trailing player", () => {
     expect(content.circuitRewards.some(reward => reward.awardTrailing)).toBe(true);
     const drawn: { name: string; trailing: boolean }[] = [];
-    for (const seed of [1, 2, 3, 4, 5, 6]) play({ noTrailingRewards: true }, seed, 4, session => {
+    for (const seed of [1, 2, 3, 4, 5, 6]) play({ noCircuitRewards: false, noTrailingRewards: true }, seed, 4, session => {
       const definition = session.state.circuitReward?.definition;
       if (session.state.phase === "draft" && definition) drawn.push({ name: definition.name, trailing: !!definition.awardTrailing });
     });
@@ -63,12 +64,31 @@ describe("No trailing rewards", () => {
   });
 });
 
+describe("No Circuit rewards", () => {
+  it("skips the lottery so Draft has no circuit definition or eligibility", () => {
+    const seen: { phase: string; definition: string | null; eligible: number }[] = [];
+    play({ noCircuitRewards: true }, 11, 3, session => {
+      if (session.state.phase !== "draft") return;
+      seen.push({
+        phase: session.state.phase,
+        definition: session.state.circuitReward.definition?.id ?? null,
+        eligible: session.state.circuitEligible.length,
+      });
+    });
+    expect(seen.length).toBeGreaterThan(0);
+    for (const row of seen) {
+      expect(row.definition).toBeNull();
+      expect(row.eligible).toBe(0);
+    }
+  });
+});
+
 describe("online tables", () => {
-  it("defaults trailing rewards in the pool and hands options to the room's session", () => {
-    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noTrailingRewards: false, draftSeconds: 0, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6, nodeWinVP: 1 });
+  it("defaults Circuit and trailing rewards off and hands options to the room's session", () => {
+    expect(RoomSettingsSchema.parse({})).toMatchObject({ noLocations: false, noCircuitRewards: true, noTrailingRewards: true, draftSeconds: 0, midCycleDraw: true, draftCrypto: false, middleNodesOnly: false, mostCircuitsBonusVP: 6, nodeWinVP: 1 });
     const lobby = new Lobby({ content: publishedContent(), contentRevision: PACK_REVISION, scheduler: new ManualScheduler(), store: new MemoryStore() });
-    const room = lobby.createRoom("pvp", { seed: 5, noLocations: true, noTrailingRewards: false, draftSeconds: 90, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
-    expect(room.settings).toMatchObject({ noLocations: true, noTrailingRewards: false, draftSeconds: 90, midCycleDraw: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
+    const room = lobby.createRoom("pvp", { seed: 5, noLocations: true, noCircuitRewards: false, noTrailingRewards: false, draftSeconds: 90, draftCrypto: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
+    expect(room.settings).toMatchObject({ noLocations: true, noCircuitRewards: false, noTrailingRewards: false, draftSeconds: 90, midCycleDraw: true, middleNodesOnly: true, mostCircuitsBonusVP: 4, nodeWinVP: 2 });
     room.join("Ada", { send: () => undefined, close: () => undefined } as never);
     room.join("Bo", { send: () => undefined, close: () => undefined } as never);
     expect(room.session!.state.nodes.map(node => node.location?.name ?? null)).toEqual([null, "No Man's Land", "No Man's Land", "No Man's Land", null]);
@@ -111,11 +131,23 @@ describe("setup and look defaults", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("keeps game options through a save; Draft Crypto shelf is not a Configure field", () => {
-    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, trailingRewards: true, draftSeconds: 300, mostCircuitsBonusVP: 6, nodeWinVP: 1, serverVP: { primary: 16, backup: 24 } });
-    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0, nodeWinVP: 0 })).toMatchObject({ noLocations: true, middleNodesOnly: true, trailingRewards: false, mostCircuitsBonusVP: 0, nodeWinVP: 0 });
+    expect(sanitizeGameSetup(null)).toMatchObject({ noLocations: false, middleNodesOnly: false, circuitRewards: false, trailingRewards: false, draftSeconds: 300, mostCircuitsBonusVP: 6, nodeWinVP: 1, serverVP: { primary: 16, backup: 24 } });
+    expect(sanitizeGameSetup({ noLocations: true, noTrailingRewards: true, midCycleDraw: false, draftCrypto: true, middleNodesOnly: true, noActions: true, mostCircuitsBonusVP: 0, nodeWinVP: 0 })).toMatchObject({ noLocations: true, middleNodesOnly: true, circuitRewards: false, trailingRewards: false, mostCircuitsBonusVP: 0, nodeWinVP: 0 });
     expect(sanitizeGameSetup(null)).not.toHaveProperty("noTrailingRewards");
+    expect(sanitizeGameSetup(null)).not.toHaveProperty("noCircuitRewards");
     expect(sanitizeGameSetup(null)).not.toHaveProperty("draftCrypto");
     expect(sanitizeGameSetup(null)).not.toHaveProperty("tenCardDraft");
+  });
+
+  it("saves only the player's Circuit mode and timers; VP comes from the applied epoch", () => {
+    saveGameSetup({ ...sanitizeGameSetup(null), turnSeconds: 45, draftSeconds: null, noLocations: true, nodeWinVP: 9, serverVP: { primary: 1, backup: 1 } });
+    expect(JSON.parse(store.get("ouroboros.gameSetup")!)).toEqual({ turnSeconds: 45, draftSeconds: null, noLocations: true, middleNodesOnly: false });
+    store.set("ouroboros.gameSetup", JSON.stringify({ turnSeconds: 45, draftSeconds: null, noLocations: true, middleNodesOnly: false, nodeWinVP: 9, circuitRewards: true }));
+    const loaded = loadGameSetup();
+    expect(loaded).toMatchObject({ turnSeconds: 45, draftSeconds: null, noLocations: true, middleNodesOnly: false });
+    expect(loaded).toEqual(withClientRules(sanitizeGameSetup({ turnSeconds: 45, draftSeconds: null, noLocations: true }), clientRules as ClientRulesFile));
+    store.clear();
+    expect(loadGameSetup().draftSeconds).toBe(300);
   });
 
   it("defaults the board to Neon once, then keeps a saved Classic", () => {

@@ -4,11 +4,15 @@ import { compileForSelfPlay } from "@0uroboros/engine/ai/selfPlay";
 import { validateContent, type ContentDocument } from "@0uroboros/engine/authoring/contentModel";
 import { serverVPNote } from "../server/aiStrategist";
 import { withTrailing } from "../src/authoring/modRewards";
-import { projectedVP, starterCards, trailingPlayer, type PlayerId } from "@0uroboros/engine/game";
+import { projectedEndGameAwardVP, projectedVP, starterCards, TRAILING_REWARDS_FROM_CYCLE, trailingPlayer, type PlayerId } from "@0uroboros/engine/game";
 import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
 
 const document = (authored as unknown as { document: ContentDocument }).document;
 const trailingContent = compileForSelfPlay({ ...document, circuitRewards: document.circuitRewards.map(reward => withTrailing(reward, true)) });
+const mixedContent = compileForSelfPlay({
+  ...document,
+  circuitRewards: document.circuitRewards.map((reward, index) => index === 0 ? withTrailing(reward, true) : withTrailing(reward, false)),
+});
 
 function drain(session: RuntimeSession) {
   let steps = 0;
@@ -17,9 +21,10 @@ function drain(session: RuntimeSession) {
     session.step(); if (++steps > 500) throw new Error("Resolution did not terminate.");
   }
 }
-function cycleEnd(locationWinner: PlayerId, setup: (session: RuntimeSession) => void) {
-  const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: trailingContent, noTrailingRewards: false });
+function cycleEnd(locationWinner: PlayerId, setup: (session: RuntimeSession) => void, cycle = TRAILING_REWARDS_FROM_CYCLE, content = trailingContent) {
+  const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content, noTrailingRewards: false });
   session.state.players.forEach(player => { player.draw = []; player.hand = []; player.discard = []; player.destroyed = []; player.rewardVP = 0; });
+  session.state.cycle = cycle;
   session.state.turn = 3;
   session.state.nodes.forEach(node => { node.location = null; });
   for (let node = 0; node < 5; node++) session.state.nodes[node].cards[locationWinner].push({ card: { ...starterCards[0], id: `winner-${node}`, vp: undefined, onReveal: [] }, owner: locationWinner, node, order: node + 1, revealed: true });
@@ -40,6 +45,15 @@ describe("projected VP", () => {
     expect(trailingPlayer([{ vp: 5, servers: full }, { vp: 4, servers: full }], { primary: 8, backup: 16 })).toBe(1);
     expect(trailingPlayer([{ vp: 0, servers: full }, { vp: 5, servers: { primary: 500, backup: 1500 } }], { primary: 8, backup: 16 })).toBe(1);
     expect(trailingPlayer([{ vp: 6, servers: { primary: 500, backup: 1500 } }, { vp: 0, servers: full }], { primary: 8, backup: 16 })).toBeNull();
+  });
+
+  it("sums strict end-game award leads into projected VP per seat", () => {
+    expect(projectedEndGameAwardVP([
+      { vp: 6, leader: 0 },
+      { vp: 4, leader: 1 },
+      { vp: 2, leader: null },
+      { vp: 4, leader: 0 },
+    ])).toEqual([10, 4]);
   });
 });
 
@@ -72,13 +86,29 @@ describe("Circuit Rewards awarded to the trailing player", () => {
     expect(session.state.circuitEligible).toEqual([0, 1]);
   });
 
-  it("on a Locations tie draws a normal reward for both seats, not trailing catch-up", () => {
-    const mixed = compileForSelfPlay({
-      ...document,
-      circuitRewards: document.circuitRewards.map((reward, index) => index === 0 ? withTrailing(reward, true) : withTrailing(reward, false)),
+  it("factors strict end-game award leads into who trails", () => {
+    // Level on board VP/servers; seat 0 leads Cards Destroyed (+4), so seat 1 is the trailer.
+    const session = cycleEnd(0, game => {
+      (game as unknown as { telemetry: { data: { cardsDestroyed: [number, number] } } }).telemetry.data.cardsDestroyed = [5, 0];
     });
-    const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: mixed, noTrailingRewards: false });
+    expect(session.state.circuitReward.definition?.awardTrailing).toBe(true);
+    expect(session.state.circuitEligible).toEqual([1]);
+  });
+
+  it("does not offer trailing rewards before Cycle 8", () => {
+    const session = cycleEnd(0, game => {
+      game.state.players[1].servers = { primary: 500, backup: 1500 };
+      game.state.players[1].rewardVP = 5;
+    }, TRAILING_REWARDS_FROM_CYCLE - 1, mixedContent);
+    expect(session.state.cycle).toBe(TRAILING_REWARDS_FROM_CYCLE - 1);
+    expect(session.state.circuitReward.definition?.awardTrailing).toBeFalsy();
+    expect(session.state.circuitEligible).toEqual([0]);
+  });
+
+  it("on a Locations tie draws a normal reward for both seats, not trailing catch-up", () => {
+    const session = createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(17), content: mixedContent, noTrailingRewards: false });
     session.state.players.forEach(player => { player.draw = []; player.hand = []; player.discard = []; player.destroyed = []; player.rewardVP = 0; });
+    session.state.cycle = TRAILING_REWARDS_FROM_CYCLE;
     session.state.turn = 3;
     session.state.nodes.forEach(node => { node.location = null; node.cards = [[], []]; });
     session.state.nodes[0].cards[0].push({ card: { ...starterCards[0], id: "p0-n0", vp: undefined, onReveal: [] }, owner: 0, node: 0, order: 1, revealed: true });

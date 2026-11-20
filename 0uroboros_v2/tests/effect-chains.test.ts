@@ -72,11 +72,12 @@ describe('chained effects', () => {
 
   it('pays the chained reward only after the full discard', () => {
     const game = session();
-    game.state.players[0].hand = [card('one'), card('two'), card('three')];
+    // A fourth card keeps the selection a real choice; an exact fit discards automatically.
+    game.state.players[0].hand = [card('one'), card('two'), card('three'), card('four')];
     play(game, card('broker', [{ kind: 'handDiscard', amount: 3, optional: true, chain: true }, { kind: 'crypto', amount: 4 }], { name: 'Broker' }));
     game.choose('pay');
     expect(() => game.choose(['one', 'two'])).toThrow(/Choose 3/);
-    expect(game.state.players[0].hand).toHaveLength(3);
+    expect(game.state.players[0].hand).toHaveLength(4);
     const events: RuntimeEvent[] = [game.choose(['one', 'two', 'three']), ...finish(game)];
     const discards = events.filter(event => event.target === 'discard');
     const rewards = cryptoFrom(events, 'Broker');

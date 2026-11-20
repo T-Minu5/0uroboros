@@ -7,13 +7,14 @@ import type { ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import type { MatchReport } from '@0uroboros/engine/runtime';
 import { createStrategist, type StratGGameRecord } from '../aiStrategist';
 import { isLocalRequest } from '../contentApi';
+import { sanitizeSelfPlayRules, selfPlayRulesHash } from '@0uroboros/engine/ai/selfPlay';
 import { runCohort, type SelfPlayHarness } from './cohortRunner';
-import { runContentAbExperiment } from './contentAbRunner';
 import { createEcoStrat } from './ecoStrat';
 import { createEvidenceBus } from './evidence';
 import { createOnlineEvidence } from './onlineEvidence';
 import { createLeague, type LeagueMember } from './league';
-import type { AuthoredCard } from '@0uroboros/engine/authoring/contentModel';
+import { compareTallies, createEpochStore } from './leagueEpochs';
+import { clientRulesFor, createClientRulesStore } from './clientRules';
 import { coach, coachingTips, combineTips, createCoachingStore, withoutCoaching, type CoachingStore } from './coaching';
 import {
   appendWatchedGame, buildHumanTempoStore, createHumanTempoStore, humanTempoNotebookSection, humanTempoStatus, humanTempoTips,
@@ -58,7 +59,15 @@ export function createAgentSystem(options: AgentSystemOptions) {
   };
 
   const strategistKey = env.AI_STRATEGIST_DISABLE_MODEL ? undefined : env.OPENAI_API_KEY;
-  const loadSelfPlay = () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as never;
+  /** Every AI self-play game (league, Eco-Strat cohorts, Strat-G lab) is played under the league ruleset. */
+  const leagueRules = () => settings.read().leagueRules;
+  const rulesHash = () => selfPlayRulesHash(leagueRules());
+  const loadSelfPlay = async () => {
+    const harness = await options.loadModule('/packages/engine/src/ai/selfPlay.ts') as { playSelfPlayGame: (game: Record<string, unknown>) => unknown };
+    return { ...harness, playSelfPlayGame: (game: Record<string, unknown>) => harness.playSelfPlayGame({ ...game, rules: leagueRules() }) } as never;
+  };
+  const epochs = createEpochStore(resolve(cwd, 'ai-agents/league/epochs.json'), leagueRules);
+  const clientRules = createClientRulesStore(resolve(cwd, 'content/client-rules.json'));
   const mentoringStore = createMentoringStore(resolve(cwd, 'ai-agents/league/mentoring.json'));
   const coachingStore = createCoachingStore(resolve(cwd, 'ai-agents/league/coaching.json'));
   const humanTempoStore = createHumanTempoStore(resolve(cwd, 'ai-agents/league/human-tempo.json'));
@@ -124,9 +133,27 @@ export function createAgentSystem(options: AgentSystemOptions) {
     harness: loadSelfPlay,
     document: readDocument,
     settings: () => settings.read().league,
+    rules: leagueRules,
+    rulesHash,
+    onGame: report => epochs.recordGame(report),
+    onRunFinished: async table => {
+      const epoch = await epochs.finishRun(table.map(({ label: _label, ...row }) => row));
+      await reportEpoch(epoch.id);
+    },
     publish: evidence => bus.publish(evidence),
     log: message => log(`league ${message}`),
   });
+
+  /** Eco-Strat's before/after report for an epoch, against the latest earlier epoch with games. */
+  async function reportEpoch(epochId: number) {
+    if (!ecoStratActive(settings.read())) return;
+    const all = await epochs.list();
+    const epoch = all.find(item => item.id === epochId);
+    const before = await epochs.previousWithGames(epochId);
+    if (!epoch || !before || !epoch.tally.games) return;
+    const entry = await eco.reportRulesDelta({ before, after: epoch, rows: compareTallies(before.tally, epoch.tally) });
+    if (entry) await epochs.setReport(epochId, entry.id);
+  }
 
   const ecoRoot = resolve(cwd, 'ai-agents/eco-strat');
   const eco = createEcoStrat({
@@ -138,6 +165,24 @@ export function createAgentSystem(options: AgentSystemOptions) {
       return module.systemFacts(await readDocument());
     },
     settings: () => { const s = settings.read(); return { active: ecoStratActive(s), observeHumanGames: s.ecoStrat.observeHumanGames, continuous: s.ecoStrat.continuous, reportEvery: s.ecoStrat.reportEvery, baselineGames: s.ecoStrat.baselineGames }; },
+    rulesHash,
+    loadLeagueEpoch: async () => {
+      const epoch = await epochs.current();
+      return {
+        id: epoch.id,
+        rulesHash: epoch.rulesHash,
+        ...(epoch.note ? { note: epoch.note } : {}),
+        rules: {
+          serverVP: { ...epoch.rules.serverVP },
+          noLocations: epoch.rules.noLocations,
+          noCircuitRewards: epoch.rules.noCircuitRewards,
+          noTrailingRewards: epoch.rules.noTrailingRewards,
+          mostCircuitsBonusVP: epoch.rules.mostCircuitsBonusVP,
+          nodeWinVP: epoch.rules.nodeWinVP,
+        },
+        changes: epoch.changes.map(change => ({ ...change })),
+      };
+    },
   });
   bus.subscribe(evidence => eco.observe(evidence));
 
@@ -179,44 +224,6 @@ export function createAgentSystem(options: AgentSystemOptions) {
   type CohortState = { running: boolean; kind: 'baseline' | 'evaluation' | null; phase: 'studying' | 'researching' | 'playing' | null; seedBase: number | null; cohortId: string | null; valid: number; invalid: number; target: number; error: string | null; stop: boolean };
   let cohort: CohortState = { running: false, kind: null, phase: null, seedBase: null, cohortId: null, valid: 0, invalid: 0, target: 0, error: null, stop: false };
 
-  type ContentAbState = {
-    running: boolean; stop: boolean; experimentId: string | null; cardId: string | null;
-    seedIndex: number; seedCount: number; error: string | null;
-    last: { experimentId: string; cardId: string; patchWinRate: number | null; reportId: string | null } | null;
-  };
-  let contentAb: ContentAbState = { running: false, stop: false, experimentId: null, cardId: null, seedIndex: 0, seedCount: 0, error: null, last: null };
-
-  async function runContentAbFromUi(definitionId: string, changes: Partial<AuthoredCard>, seedCount: number) {
-    contentAb = { running: true, stop: false, experimentId: null, cardId: definitionId, seedIndex: 0, seedCount, error: null, last: contentAb.last };
-    try {
-      if (!eco.hasStudied()) await eco.study();
-      if (!eco.hasResearched()) await eco.research();
-      if (contentAb.stop) return;
-      const result = await runContentAbExperiment({
-        eco,
-        harness: () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as unknown as Promise<SelfPlayHarness>,
-        control: readDocument,
-        patch: { definitionId, changes },
-        stratG: await stratGProfile(),
-        seedCount,
-        log: message => log(`content A/B ${message}`),
-        shouldStop: () => contentAb.stop || !ecoStratActive(settings.read()),
-        onProgress: state => { contentAb = { ...contentAb, experimentId: state.experimentId, seedIndex: state.seedIndex, seedCount: state.seedCount }; },
-      });
-      contentAb.last = {
-        experimentId: result.experimentId,
-        cardId: definitionId,
-        patchWinRate: result.ab.patchWinRate,
-        reportId: result.compare?.entry.id ?? null,
-      };
-    } catch (error) {
-      contentAb.error = error instanceof Error ? error.message : String(error);
-      log(`content A/B failed (gameplay unaffected): ${contentAb.error}`);
-    } finally {
-      contentAb = { ...contentAb, running: false, stop: false };
-    }
-  }
-
   /** Strat-G's current profile, read without touching Strat-G: its live snapshot if online, else its saved memory. */
   async function stratGProfile(): Promise<{ profile: StrategyProfile; version: number; mode: string; plan: string }> {
     if (strategist.status().state === 'online') {
@@ -241,7 +248,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
       cohort.phase = 'playing';
       await runCohort({
         kind, target, eco,
-        harness: () => options.loadModule('/packages/engine/src/ai/selfPlay.ts') as unknown as Promise<SelfPlayHarness>,
+        harness: loadSelfPlay as () => Promise<SelfPlayHarness>, rulesHash: rulesHash(),
         document: readDocument, stratG: await stratGProfile(), seedBase, log: message => log(`Eco-Strat cohort ${message}`),
         shouldStop: () => cohort.stop || !ecoStratActive(settings.read()),
         onProgress: state => { cohort = { ...cohort, ...state }; },
@@ -326,11 +333,18 @@ export function createAgentSystem(options: AgentSystemOptions) {
       humanTempo: { ...humanTempoStatus(humanTempo.store), error: humanTempo.error, applying: humanTempo.applying, file: rel(humanTempoStore.file) },
       ecoStrat: eco.status(),
       cohort: { running: cohort.running, kind: cohort.kind, phase: cohort.phase, seedBase: cohort.seedBase, cohortId: cohort.cohortId, valid: cohort.valid, invalid: cohort.invalid, target: cohort.target, error: cohort.error },
-      contentAb: {
-        running: contentAb.running, experimentId: contentAb.experimentId, cardId: contentAb.cardId,
-        seedIndex: contentAb.seedIndex, seedCount: contentAb.seedCount, error: contentAb.error, last: contentAb.last,
-      },
+      rules: { current: current.leagueRules, hash: selfPlayRulesHash(current.leagueRules) },
+      clientRules: clientRules.applied(),
     };
+  }
+
+  /** Every epoch with its before/after comparison against the latest earlier epoch that has games. */
+  async function epochHistory() {
+    const all = await epochs.list();
+    return all.map((epoch, index) => {
+      const before = [...all.slice(0, index)].reverse().find(item => item.tally.games > 0) ?? null;
+      return { ...epoch, comparedWith: before?.id ?? null, metrics: compareTallies(before?.tally ?? null, epoch.tally) };
+    }).reverse();
   }
 
   /** The agents' readable outputs, newest report first. Only these files can be read through the documents route. */
@@ -383,20 +397,49 @@ export function createAgentSystem(options: AgentSystemOptions) {
         reply(response, 200, best); return;
       }
       if (path === '/api/agents/settings' && request.method === 'PUT') {
-        settings.write(await body(request));
+        // Rules change only through a new epoch, so every rules change is tracked.
+        const { leagueRules: _ignored, ...patch } = await body(request) as Record<string, unknown>;
+        settings.write(patch);
         start();
+        reply(response, 200, status()); return;
+      }
+      if (path === '/api/agents/league/epochs' && request.method === 'GET') { reply(response, 200, await epochHistory()); return; }
+      if (path === '/api/agents/league/rules' && request.method === 'GET') { reply(response, 200, { rules: leagueRules(), hash: rulesHash(), epoch: (await epochs.current()).id }); return; }
+      if ((path === '/api/agents/league/rules' && request.method === 'PUT') || (path === '/api/agents/league/epoch' && request.method === 'POST')) {
+        const payload = await body(request) as { rules?: unknown; wipeElo?: unknown; note?: unknown };
+        if (league.running()) { reply(response, 409, { error: 'Stop the league run before changing the rules.' }); return; }
+        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        const rules = sanitizeSelfPlayRules(payload.rules ?? leagueRules());
+        const wipeElo = payload.wipeElo !== false;
+        const current = await epochs.current();
+        if (selfPlayRulesHash(rules) === current.rulesHash && !wipeElo) { reply(response, 409, { error: 'These are already the current rules.' }); return; }
+        if (wipeElo) {
+          const cleared = await league.resetRatings();
+          if (!cleared.ok) { reply(response, 409, { error: cleared.reason }); return; }
+        }
+        settings.write({ leagueRules: rules });
+        const epoch = await epochs.begin(rules, { eloWiped: wipeElo, note: typeof payload.note === 'string' ? payload.note : undefined });
+        log(`league epoch ${epoch.id}: ${epoch.changes.length ? epoch.changes.map(change => `${change.label} ${change.from} → ${change.to}`).join(', ') : 'same rules'}${wipeElo ? ', Elo wiped' : ''}`);
+        reply(response, 200, { status: status(), epochs: await epochHistory() }); return;
+      }
+      if (path === '/api/agents/league/apply-client' && request.method === 'POST') {
+        const epoch = await epochs.current();
+        await clientRules.write(clientRulesFor(epoch.id, epoch.rules, new Date().toISOString()));
+        log(`client defaults set from league epoch ${epoch.id}`);
         reply(response, 200, status()); return;
       }
       const leagueAction = /^\/api\/agents\/league\/(run|stop|reset)$/.exec(path)?.[1];
       if (leagueAction && request.method === 'POST') {
         if (leagueAction === 'stop') { league.stop(); reply(response, 202, status()); return; }
         if (leagueAction === 'reset') {
+          // A plain Elo wipe also opens an epoch, so the standings history stays per ruleset and per wipe.
           const cleared = await league.resetRatings();
           if (!cleared.ok) { reply(response, 409, { error: cleared.reason }); return; }
+          await epochs.begin(leagueRules(), { eloWiped: true });
           reply(response, 200, status()); return;
         }
         if (!settings.read().agentsEnabled) { reply(response, 409, { error: 'AI agents are switched off.' }); return; }
-        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         if (mentoring.running || coaching.running) { reply(response, 409, { error: 'Wait for the mentoring or coaching hand-off to finish.' }); return; }
         const started = league.run();
         if (!started.ok) { reply(response, 409, { error: started.reason }); return; }
@@ -466,7 +509,7 @@ export function createAgentSystem(options: AgentSystemOptions) {
         if (!vpDogActive(current) || !dv8Active(current) || !t5Active(current) || !stratGActive(current)) { reply(response, 409, { error: 'Mentoring needs VP-Dog, DV-8, T-5 and Strat-G switched on.' }); return; }
         if (mentoring.running) { reply(response, 409, { error: 'Mentoring is already running.' }); return; }
         if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
-        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         void runMentoring();
         reply(response, 202, status()); return;
       }
@@ -476,28 +519,15 @@ export function createAgentSystem(options: AgentSystemOptions) {
         if (!stratGActive(current) || !t5Active(current) || !dv8Active(current) || !vpDogActive(current)) { reply(response, 409, { error: 'Coaching needs Strat-G, T-5, DV-8 and VP-Dog switched on.' }); return; }
         if (coaching.running || mentoring.running) { reply(response, 409, { error: 'Wait for the current hand-off to finish.' }); return; }
         if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
-        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
+        if (cohort.running) { reply(response, 409, { error: 'Wait for the Eco-Strat run to finish.' }); return; }
         void runCoaching();
-        reply(response, 202, status()); return;
-      }
-      if (path === '/api/agents/eco-strat/content-ab' && request.method === 'POST') {
-        if (!ecoStratActive(settings.read())) { reply(response, 409, { error: 'Eco-Strat is switched off.' }); return; }
-        if (cohort.running || contentAb.running) { reply(response, 409, { error: 'Wait for the current Eco-Strat run to finish.' }); return; }
-        if (league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
-        const payload = await body(request) as { definitionId?: string; changes?: Partial<AuthoredCard>; seedCount?: number };
-        const definitionId = typeof payload.definitionId === 'string' ? payload.definitionId.trim() : '';
-        const changes = payload.changes && typeof payload.changes === 'object' ? payload.changes : null;
-        if (!definitionId) { reply(response, 400, { error: 'Pick a card.' }); return; }
-        if (!changes || !Object.keys(changes).length) { reply(response, 400, { error: 'Provide at least one card change (cost, power, …).' }); return; }
-        const seedCount = Math.min(80, Math.max(1, Math.floor(Number(payload.seedCount) || 10)));
-        void runContentAbFromUi(definitionId, changes, seedCount);
         reply(response, 202, status()); return;
       }
       const action = /^\/api\/agents\/eco-strat\/(study|research|baseline|evaluate|report|archive|stop)$/.exec(path)?.[1];
       if (action && request.method === 'POST') {
-        if (action === 'stop') { cohort.stop = true; contentAb.stop = true; reply(response, 202, status()); return; }
+        if (action === 'stop') { cohort.stop = true; reply(response, 202, status()); return; }
         if (!ecoStratActive(settings.read())) { reply(response, 409, { error: 'Eco-Strat is switched off.' }); return; }
-        if ((cohort.running || contentAb.running) && action !== 'report') { reply(response, 409, { error: 'An evaluation cohort is running.' }); return; }
+        if (cohort.running && action !== 'report') { reply(response, 409, { error: 'An evaluation cohort is running.' }); return; }
         if ((action === 'baseline' || action === 'evaluate') && league.running()) { reply(response, 409, { error: 'Wait for the league run to finish.' }); return; }
         if (action === 'evaluate' && eco.status().baseline.status !== 'complete') { reply(response, 409, { error: 'Run the baseline for this build first.' }); return; }
         const task = action === 'study' ? eco.study() : action === 'research' ? eco.research() : action === 'report' ? eco.report('manual') : action === 'archive' ? eco.archive() : runEvaluationCohort(action === 'evaluate' ? 'evaluation' : 'baseline');
@@ -510,5 +540,5 @@ export function createAgentSystem(options: AgentSystemOptions) {
     }
   };
 
-  return { start, status, middlewares: [strategist.middleware, t5.middleware, dv8.middleware, vpDog.middleware, last2go.middleware, middleware], strategist, t5, dv8, vpDog, last2go, league, eco, settings, runEvaluationCohort, runMentoring, runCoaching, coachingState: () => ({ ...coaching }), mentoringState: () => ({ ...mentoring }), cohortState: () => ({ ...cohort }) };
+  return { start, status, middlewares: [strategist.middleware, t5.middleware, dv8.middleware, vpDog.middleware, last2go.middleware, middleware], strategist, t5, dv8, vpDog, last2go, league, eco, settings, epochs, runEvaluationCohort, runMentoring, runCoaching, coachingState: () => ({ ...coaching }), mentoringState: () => ({ ...mentoring }), cohortState: () => ({ ...cohort }) };
 }

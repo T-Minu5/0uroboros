@@ -18,7 +18,7 @@ import { join, relative, resolve } from 'node:path';
 const root = process.cwd();
 const check = process.argv.includes('--check');
 const MANIFEST = resolve(root, 'packages/content/art-manifest.json');
-const STUDIO_ONLY = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts', 'src/studio.tsx', 'src/agents.tsx']);
+const STUDIO_ONLY = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/LeagueRulesPanel.tsx', 'src/AgentChatPanel.tsx', 'src/leagueControls.tsx', 'src/agentAvatars.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts', 'src/studio.tsx', 'src/agents.tsx']);
 // Written by vite.config.ts at build time (and served by the dev server) from the songs in assets/music.
 const GENERATED = new Set(['assets/music/playlist.json']);
 

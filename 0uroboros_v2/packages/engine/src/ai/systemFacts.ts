@@ -38,27 +38,32 @@ export function configurableFacts(): ConfigurableFact[] {
     {
       id: "serverVP.primary", surface: "configure", label: "Primary Server destruction VP",
       default: defaultServerVP.primary, cohortDefault: defaultServerVP.primary,
-      notes: "VP awarded when you destroy the enemy Primary. Configure UI; not Server integrity.",
+      notes: "VP awarded when you destroy the enemy Primary. Configure UI; not Server integrity. Current league Floor often uses 12 (with Backup 20 = 32 total); Mel's theory is that market VP can then race destruction — test that claim, do not assume it.",
     },
     {
       id: "serverVP.backup", surface: "configure", label: "Backup Server destruction VP",
       default: defaultServerVP.backup, cohortDefault: defaultServerVP.backup,
-      notes: "VP awarded when you destroy the enemy Backup. Configure UI; not Server integrity.",
+      notes: "VP awarded when you destroy the enemy Backup. Configure UI; not Server integrity. Current league Floor often uses 20 (with Primary 12 = 32 total); Mel hopes Economy vs Destruction stays close and Balanced leads — evidence can refute that.",
     },
     {
       id: "noLocations", surface: "configure", label: "No location text",
       default: false, cohortDefault: false,
-      notes: "When on, every Node is No Man's Land for the whole game (no Location effects). Configure label: No location text.",
+      notes: "When on, every Node is No Man's Land for the whole game (no Location effects). Landing-screen Circuit mode Closed (Location text off); Open and Short keep Location text. League epochs may turn this on deliberately to isolate card and reward balance — read the epoch note before treating it as a bug.",
     },
     {
-      id: "middleNodesOnly", surface: "configure", label: "Short Circuit (3 Locations)",
+      id: "middleNodesOnly", surface: "configure", label: "Circuit mode Short (3 Locations)",
       default: false, cohortDefault: false,
-      notes: "Game mode Short Circuit: only Nodes 2–4 are in play; one opens each Runtime turn (random order). Nodes 1 and 5 stay closed — no deploys, moves, holograms, Power push/pull, Locations, or Collapse. Extended runtime (default) uses all five Nodes. Open-order weights use the first three buckets (30/25/20) on Short Circuit Nodes.",
+      notes: "Circuit mode Short: only Nodes 2–4 are in play; one opens each Runtime turn (random order). Nodes 1 and 5 stay closed — no deploys, moves, holograms, Power push/pull, Locations, or Collapse. Circuit mode Open (default) and Closed use all five Nodes. Open-order weights use the first three buckets (30/25/20) on Short Nodes. Picked on the landing screen.",
+    },
+    {
+      id: "circuitRewards", surface: "configure", label: "Circuit rewards",
+      default: false, cohortDefault: false,
+      notes: "When on, after Collapse one random Circuit Reward is drawn for Draft claim. Off maps to noCircuitRewards and skips the lottery (no Draft privilege). End-game Most Circuits VP is separate. Default off.",
     },
     {
       id: "trailingRewards", surface: "configure", label: "Trailing rewards",
-      default: true, cohortDefault: true,
-      notes: "When on (default), Circuit Rewards with awardTrailing stay in the pool. Off maps to noTrailingRewards and strips catch-up rewards from the draw.",
+      default: false, cohortDefault: false,
+      notes: "Only applies when Circuit rewards are on. When on, Circuit Rewards with awardTrailing stay in the pool from Cycle 8 onward (Cycles 1–7 never draw catch-up). Off maps to noTrailingRewards and strips catch-up rewards from the draw. Default off.",
     },
     {
       id: "tenCardDraft", surface: "code-constant", label: "10-card Draft (engine)",
@@ -83,7 +88,7 @@ export function configurableFacts(): ConfigurableFact[] {
     {
       id: "endGameAwards", surface: "configure", label: "End-game achievement awards",
       default: "default slate", cohortDefault: "off / harness",
-      notes: "Configure slate (also sent on online rooms): destroyed, trashed, power removed/boosted, crypto banked/stolen, server repair, deck attacks. Ties grant both seats the VP. Deck attacks count card-sourced enemy deck/hand access (peek, mill, steal, poison, forced discard); location sources do not. Crypto-Canary Listen uses the same card-only access announce.",
+      notes: "Configure slate (also sent on online rooms): destroyed, trashed, power removed/boosted, crypto banked/stolen, server repair, deck attacks. Ties (including 0–0) award no VP to either seat. Deck attacks count card-sourced enemy deck/hand access (peek, mill, steal, poison, forced discard); location sources do not. Crypto-Canary Listen uses the same card-only access announce.",
     },
     {
       id: "turnSeconds", surface: "configure", label: "Runtime turn timer",
@@ -93,7 +98,7 @@ export function configurableFacts(): ConfigurableFact[] {
     {
       id: "startingDeck", surface: "configure", label: "Starting deck",
       default: "active pack deck", cohortDefault: "active pack deck",
-      notes: "Configure can pick among authored startingDecks. Cohorts use the pack's activeStartingDeckId.",
+      notes: "Human games and cohorts both use the pack's activeStartingDeckId (Content Studio “Load in game”). Configure no longer picks a deck.",
     },
     {
       id: "opponent", surface: "configure", label: "Opponent",
@@ -128,7 +133,7 @@ export function configurableFacts(): ConfigurableFact[] {
     {
       id: "startingDecks", surface: "content-studio", label: "Starting deck definitions",
       default: "authored pack", cohortDefault: "active deck",
-      notes: "Named decks Mel authors; Configure picks which one a human game uses.",
+      notes: "Named decks Mel authors; the one marked “Load in game” is the starting deck for every game.",
     },
     {
       id: "serverIntegrity", surface: "code-constant", label: "Server integrity (Primary / Backup HP)",
@@ -177,7 +182,7 @@ export function systemFacts(document: ContentDocument): SystemFacts {
       actions: "There is no Action resource. Characters and VP cards deploy free during Runtime; wallet Crypto settles at Draft, but generated Crypto with printed Power (e.g. Crypto-Shyte) can deploy. Legacy gainActions steps on cards are ignored.",
       midCycleDraw: "Fixed rule: each player draws 1 card at the start of Runtime turns 2 and 3.",
       draftCrypto: "Removed. There is no persistent Crypto shelf. Crypto-type cards appear in the rotating Hacker/Crypto Draft slots; Wallet also comes from Character Crypto effects and held Crypto that auto-resolves at Draft.",
-      startingDeck: "Both seats use the active starting deck from content. Current Standard is weaker than older builds (mostly Shyte-Coin plus a thin Character/VP core), so early hands are softer and the Draft shapes the economy more.",
+      startingDeck: "Both seats use the active starting deck from content. Current Standard is weaker than older builds (mostly Crypto-Shyte plus a thin Character/VP core), so early hands are softer and the Draft shapes the economy more.",
       deploy: "Cards deploy face down. Max 4 cards+holograms per seat per Node. Characters, VP and Crypto all deploy free. Crypto left in hand still auto-resolves cryptoValue at Draft; Crypto played fires onReveal/onCollapse (currency cards typically reprint their payout on reveal). Reveal alternates priority seat then other, chronological within a seat; each reveal fully resolves its onReveal before the next.",
       power: "Higher numeric Power controls a Node (negatives allowed; empty side is 0 so 0 beats negative). Equal totals tie and split ControlledWeight. ControlledWeight = sum of weights of Nodes you win + half the weights of ties; higher ControlledWeight gets next reveal priority (ties keep current).",
       primaryServer: serverMaximums.primary, backupServer: serverMaximums.backup,
@@ -185,16 +190,16 @@ export function systemFacts(document: ContentDocument): SystemFacts {
       drainRestore: "Drain damages available enemy Primary then Backup (clamps at 0, no spill). Restore repairs available Primary then Backup up to max and cannot resurrect a destroyed Server. Destroying a Server awards destruction VP once.",
       nodeWeights: initialWeights.join(", ") + " assigned by open order",
       collapse: "Resolve Nodes 1→5. At each Node: card onCollapse → recalculate Power → winner/tie → optional nodeWinVP to the controller (ties get 0) → Location Reward. Then Effect Bank onCollapse (oldest first). Then a weight lottery picks a particle Node for the ControlledWeight UI; Circuit eligibility stays Location-lead based.",
-      locations: "Each Cycle deals one Location onto each of the 5 Nodes (unless noLocations). Whoever has more Power at a Node when it collapses wins that Location and its collapse effects fire once with the winner as the actor. When nodeWinVP > 0, that controller also earns that many VP (tied Nodes earn none). Location 'Ongoing' effects fire at the start of turns 2 and 3 for whoever leads the Node then; 'when a card is played here' effects fire for that card's owner. Card Ongoing (card.triggers) is separate: reactive rules while a revealed host stays on the board, silenced by Location suppressOngoing or Banishing-style Cycle silence. Text says who benefits: you (the winner), your opponent (the loser), both players, the player with the least VP. A Location that rewards the loser, or hands out Glitch/Shyte-Coin junk, is worth conceding; one that draws, Drains or pays VP is worth contesting. Locations won also count toward the Circuit Reward. 'read' is the default AI's valuation at Cycle 8.",
+      locations: "Each Cycle deals one Location onto each of the 5 Nodes (unless noLocations). Whoever has more Power at a Node when it collapses wins that Location and its collapse effects fire once with the winner as the actor. When nodeWinVP > 0, that controller also earns that many VP (tied Nodes earn none). Location 'Ongoing' effects fire at the start of turns 2 and 3 for whoever leads the Node then; 'when a card is played here' effects fire for that card's owner. Card Ongoing (card.triggers) is separate: reactive rules while a revealed host stays on the board, silenced by Location suppressOngoing or Banishing-style Cycle silence. Text says who benefits: you (the winner), your opponent (the loser), both players, the player with the least VP. A Location that rewards the loser, or hands out Glitch/Crypto-Shyte junk, is worth conceding; one that draws, Drains or pays VP is worth contesting. Locations won also count toward the Circuit Reward. 'read' is the default AI's valuation at Cycle 8.",
       cardOngoing: "Card Ongoing (triggers) stays live while the host is revealed, the Location does not suppressOngoing, and no Cycle silence covers it. Kinds: mirrorCrypto (copy enemy Crypto gains), reflectDrain (percent of enemy Drain returned), protectPower (your cards cannot lose Power), multiplyNode (× Power at the host Node), when/whenPlayed (event or matching card play → then steps), listenAccess (card-sourced deck/hand access — Crypto-Canary; location sources do not fire). Destroy/trash telemetry feeds end-game awards; self-destroy payoffs (Ghetto Blaster) intentionally enable Ms. Mosquito / Crypto-Echo / Blaster+cat lines.",
-      circuit: "Whoever won more Locations in the Cycle is eligible for one random Circuit Reward; a Locations-won tie makes both eligible for a normal (non-trailing) Circuit Reward — awardTrailing catch-up rewards are excluded from that draw. When Location counts differ, a reward with awardTrailing goes instead to the trailing player: lower VP once each enemy Server still standing adds the share of its destruction VP matching the share of its health already lost (both eligible when level). Catch-up (awardTrailing) rewards stay in the pool when Configure Trailing rewards is on (default); noTrailingRewards strips them.",
+      circuit: "When Configure Circuit rewards is on: whoever won more Locations in the Cycle is eligible for one random Circuit Reward; a Locations-won tie makes both eligible for a normal (non-trailing) Circuit Reward — awardTrailing catch-up rewards are excluded from that draw. When Location counts differ, a reward with awardTrailing goes instead to the trailing player: lower projected score = current VP + unfinished enemy Server damage (share of destruction VP matching health lost) + strict end-game award leads (enabled Configure achievements and mostCircuitsBonusVP, including the in-progress Cycle's Location lead as a Circuit win); both eligible when level. Catch-up stays in the pool only when Trailing rewards is on and only from Cycle 8 onward; noTrailingRewards strips them always. Configure defaults both Circuit rewards and Trailing rewards off (noCircuitRewards / noTrailingRewards); end-game Most Circuits VP is separate.",
       runtimeHacks: "Secret authored reveal combos. After a card's reveal effects (and Location on-play / opening schedule queued with that reveal) finish, if that seat has revealed every required card inside the hack's window (game, Cycle, Runtime turn, same Node across the game, or same Node within one Cycle), both seats see the award modal; only the unlocking seat gets the reward (usually a card into hand). Each hack fires at most once per seat per game. Face-down deploys do not count.",
       draft: "Spendable Crypto comes from Character effects, Crypto cards bought from the rotating Hacker/Crypto slots, and any held Crypto that auto-resolves at Draft. Default Draft is 8 fixed slots (Action/Utility ×2, Hacker/Crypto ×2, Attack, Horror, Solar Monk, VP); engine tenCardDraft expands to 10 with two Chaos fills (Configure no longer exposes it). Offers prefer identities not seen in the last 3 Drafts. Cycles 1–4 prefer cost 1–8; later Cycles any cost. From Cycle 8, Attack/Horror slots favour cards costing more than 6 (+40% pick weight, +60% in Cycles 12–16). There is no persistent Crypto shelf. Crypto/Wallet resets each Cycle; unspent Crypto is lost. Bought cards go to the Discard. Draft timer is Off by default; Configure can set a Draft-phase countdown separately from the Runtime turn timer.",
       zones: "Draw, Hand, Discard, Nodes (board), Effect Bank (duration cards), Trash (shared, recoverable when text allows), Destroyed (permanent — usually no recover). Trash thins without permanent loss; destroy fills Destroyed for non-Runtime cards, trips destroy-when Ongoing (Ms. Mosquito, Crypto-Echo), and end-game Cards Destroyed. Runtime-class cards that are destroyed/trashed leave play without entering those piles, but a destroy still fires anyCardDestroyed — Schrödinger Box cats are Runtime, so Hag→Blaster pays Blaster's then and wakes Mosquito/Echo. End-of-Cycle: remaining hand to Discard; new Cycle draws 5.",
       mods: "Mods attach to host cards (Circuit/collection awards often choose between two hosts, prefer unmodded). Built-ins include double printed effects, Power aura to allies at the Location, and movable-each-turn. Authored mods (Aura Farming, Lefty, etc.) add hooks such as onReveal / recurring. Holograms: a card can create a hologram at the mirrored Node (1↔5, 2↔4; center does nothing); holograms occupy a slot, add Power, cannot be targeted, and clear after that Node's Collapse.",
-      vpSources: "Final VP = destruction VP (Server kills) + printed VP on owned cards in active zones (Draw/Hand/Discard/Nodes; Destroyed excluded) + Location/Circuit/effect VP tracked as reward VP + Configure end-game awards (destroyed/trashed/power removed/boosted/crypto banked/stolen/server repair/deck attacks; ties grant both) + mostCircuitsBonusVP when set. When nodeWinVP > 0, controlling a Node on Collapse (strict Power lead) adds that many location VP; ties award nothing. When mostCircuitsBonusVP > 0, the seat with more Circuit wins across completed Cycles (strict Location lead per Cycle) also gets that bonus once at game end, counted as circuit VP; ties award nothing. Deck-attack award uses card-sourced enemyAccesses only. Market VP is the printed VP on bought VP-category cards.",
+      vpSources: "Final VP = destruction VP (Server kills) + printed VP on owned cards in active zones (Draw/Hand/Discard/Nodes; Destroyed excluded) + Location/Circuit/effect VP tracked as reward VP + Configure end-game awards (destroyed/trashed/power removed/boosted/crypto banked/stolen/server repair/deck attacks; ties, 0–0 included, award nothing) + mostCircuitsBonusVP when set. When nodeWinVP > 0, controlling a Node on Collapse (strict Power lead) adds that many location VP; ties award nothing. When mostCircuitsBonusVP > 0, the seat with more Circuit wins across completed Cycles (strict Location lead per Cycle) also gets that bonus once at game end, counted as circuit VP; ties award nothing. Deck-attack award uses card-sourced enemyAccesses only. Market VP is the printed VP on bought VP-category cards.",
       victory: "Most VP after the Cycle 16 Draft, or when a player loses both Servers (finish current Collapse Node, skip remaining Nodes/Draft). Equal VP is a tie. End-game award VP is included in that total.",
-      setup: "Configurable per game — see facts.configurable. Read those flags before assuming mid-cycle draws or Locations are in play. Crypto is drafted from Hacker/Crypto slots (no shelf). Trailing Circuit Rewards are always in the pool. Cohorts use Configure defaults unless noted in configurable.cohortDefault.",
+      setup: "Configurable per game — see facts.configurable. Server VP, Node win VP, Most Circuits VP, end-game awards and the Circuit/Trailing reward switches in the game client come from the League epoch last applied with Apply Epoch VP (content/client-rules.json); players only pick Circuit mode and timers. Read those flags before assuming mid-cycle draws or Locations are in play. Crypto is drafted from Hacker/Crypto slots (no shelf). Trailing Circuit Rewards are always in the pool. Cohorts use Configure defaults unless noted in configurable.cohortDefault.",
     },
     configurable: configurableFacts(),
     market: {

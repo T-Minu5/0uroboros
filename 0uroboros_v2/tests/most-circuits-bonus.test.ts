@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import authored from "../content/authored-content.json";
 import { compileForSelfPlay } from "@0uroboros/engine/ai/selfPlay";
-import { createSession, seededRandom, type RuntimeSession, type SessionConfig } from "@0uroboros/engine/runtime";
+import { createSession, DEFAULT_END_GAME_AWARDS, seededRandom, type RuntimeSession, type SessionConfig } from "@0uroboros/engine/runtime";
 
 const content = compileForSelfPlay((authored as unknown as { document: Parameters<typeof compileForSelfPlay>[0] }).document);
 
@@ -67,7 +67,8 @@ describe("mostCircuitsBonusVP", () => {
 
   it("does nothing when the bonus is 0", () => {
     const seed = 21;
-    const off = play({ mostCircuitsBonusVP: 0 }, seed, 3);
+    const noAwards = Object.fromEntries(Object.keys(DEFAULT_END_GAME_AWARDS).map(id => [id, { enabled: false, vp: 0 }]));
+    const off = play({ mostCircuitsBonusVP: 0, endGameAwards: noAwards }, seed, 3);
     const beforeOff = off.view().players.map(player => player.totalVP);
     off.endSessionNow();
     expect(off.view().players.map(player => player.totalVP)).toEqual(beforeOff);
@@ -93,5 +94,15 @@ describe("mostCircuitsBonusVP", () => {
     awarded!.endSessionNow();
     control!.endSessionNow();
     expect(awarded!.view().players[leader].totalVP).toBe(control!.view().players[leader].totalVP + bonus);
+  });
+});
+
+describe("end-game awards", () => {
+  it("award no VP to either seat on a tie, including 0–0", () => {
+    const fresh = () => createSession({ content, strategicMarket: true, evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(3), aiSeats: [0, 1], recordDecisions: false, mostCircuitsBonusVP: 0, endGameAwards: DEFAULT_END_GAME_AWARDS });
+    const session = fresh();
+    const event = session.endSessionNow();
+    expect(session.state.players.map(player => player.rewardVP)).toEqual([0, 0]);
+    expect(event.text).not.toMatch(/Both earn/);
   });
 });

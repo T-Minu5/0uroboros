@@ -4,9 +4,7 @@ import { join, relative, resolve } from 'node:path';
 import { DECKBUILDING_BASICS, EARLY_ECONOMY_PLAYBOOK } from './deckbuilding';
 import { isHumanSource, type GameEvidence } from './evidence';
 import { ACHIEVEMENT_SLATE, ACHIEVEMENT_VP, archetypeResults, BLOWOUT_MARGIN, cardDemand, CLOSE_MARGIN, cohortMetrics, gameMetrics, isBlowoutMargin, isCloseMargin, MAX_ACHIEVEMENT_RECOMMENDATIONS, TARGET_BOTH_DESTROYED_RATE, TARGET_CYCLE16_MAX_RATE, TARGET_DESTRUCTION_END_RATE_MAX, TARGET_DESTRUCTION_END_RATE_MIN, type ArchetypeResults, type CardDemand, type CohortMetrics, type GameMetrics } from './ecoMetrics';
-import { enrichDemandWithBudget, focalBudgetRow } from './ecoBudgetJoin';
-import type { ContentAbReport } from '@0uroboros/engine/ai/contentAb';
-import type { BudgetCard } from '@0uroboros/engine/authoring/cardBudget';
+import { stallFromTally, type Epoch, type MetricRow } from './leagueEpochs';
 import { LEAGUE_ROSTER } from './roster';
 import {
   appendDesignerGuidance, answerOpenQuestions, confidenceOf, createGuardedWriter, emptyJournal, hypothesisSections, pointOfViewSections, readJournal, renderJournal, retractCardVerdicts,
@@ -63,6 +61,18 @@ export const DESIGNER_NOTICES = [
     id: 'trailing-boost-not-enable',
     text: 'Trailing Circuit catch-up (awardTrailing) is on by default via Configure. If snowball persists with catch-ups in the pool, recommend boosting catch-up strength or adding more awardTrailing rewards — not "turning trailing on" unless Mel disabled it. facts.rules.circuit is authoritative.',
   },
+  {
+    id: 'floor-server-vp-12-20',
+    text: 'Mel\'s working theory (not proven, not infallible): Floor Server destruction VP Primary 12 / Backup 20 (total 32) is meant to put All-Economy close to All-Destruction on score — two top market VP cards print 8 and 7 (30), and VP bought through the game can exceed kill VP. Mel hopes Strat-G (Balanced) wins most often as a blend of both lines. Treat this as a lens to test with metrics (margins, archetype win rates, marketVp vs destructionVp), not as a rule you must defend. If evidence shows Economy cannot race, Destruction still snowballs, or Balanced does not lead, say so and you may recommend changing Floor VP or other knobs.',
+  },
+  {
+    id: 'floor-vp-theory-not-gospel',
+    text: 'Correction: the Floor 12/20 Economy-vs-Destruction framing is Mel\'s design theory for why that VP pair was chosen — a hypothesis to evaluate, not a design goal you are forbidden to challenge. Prefer measured archetype races and VP-source splits over protecting the theory.',
+  },
+  {
+    id: 'epoch-no-locations-card-balance',
+    text: 'League epochs version the ruleset under test. Current Floor epochs run with No location text (noLocations), No Circuit Rewards, and No Trailing Rewards on purpose: Mel is isolating card-to-card interactions, sequencing, deck-building, Power, Drain/Restore and reward/VP balance without Location text or Circuit prize effects. When leagueEpoch.rules.noLocations or noCircuitRewards is true, do not ask whether Circuit Rewards granted Restore, do not blame low HealOffset on missing Circuit heals, and do not treat absent Location text as a bug — read the epoch note and rules before hypothesizing. Re-evaluate Locations/Circuits only when an epoch turns them back on.',
+  },
 ];
 /** Cards both players start with are played in every game; Eco-Strat must not read that exposure as power. */
 export function startingDeckNote(names: string[]) {
@@ -107,6 +117,21 @@ type Facts = {
   circuitRewards?: { id: string; name: string; text: string }[];
   mods?: { id: string; name: string; text: string; kind?: string }[];
 };
+/** Snapshot of the league epoch Eco-Strat must judge games against (rules versioning). */
+export type LeagueEpochContext = {
+  id: number;
+  rulesHash: string;
+  note?: string;
+  rules: {
+    serverVP: { primary: number; backup: number };
+    noLocations: boolean;
+    noCircuitRewards: boolean;
+    noTrailingRewards: boolean;
+    mostCircuitsBonusVP: number;
+    nodeWinVP: number;
+  };
+  changes: { key: string; label: string; from: number | boolean; to: number | boolean }[];
+};
 export type EcoStratOptions = {
   /** Eco-Strat's own folder; the only place it writes. */
   root: string;
@@ -121,6 +146,10 @@ export type EcoStratOptions = {
   loadFacts: () => Promise<Facts>;
   /** Settings are read on every call so toggles take effect immediately. */
   settings: () => { active: boolean; observeHumanGames: boolean; continuous: boolean; reportEvery: number; baselineGames: number };
+  /** Hash of the league ruleset self-play runs under; part of the build id. */
+  rulesHash?: () => string;
+  /** Current league epoch (rules + Mel's test note); read on each report/study. */
+  loadLeagueEpoch?: () => Promise<LeagueEpochContext | null>;
 };
 export type EcoStatus = {
   active: boolean; state: string; busy: string | null; modelConfigured: boolean; model: string | null; preferredModels: string[];
@@ -182,8 +211,10 @@ const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').re
 const str = (value: unknown, max = 1200) => typeof value === 'string' ? value.trim().slice(0, max) : '';
 const strings = (value: unknown, count: number, max = 400) => Array.isArray(value) ? value.filter(item => typeof item === 'string' && item.trim()).slice(0, count).map(item => (item as string).trim().slice(0, max)) : [];
 
-export async function computeBuild(projectRoot: string) {
+/** A build is content + rule sources + the league ruleset, so a rules change starts fresh evidence. */
+export async function computeBuild(projectRoot: string, rulesHash?: string) {
   const hash = createHash('sha256');
+  if (rulesHash) hash.update(`league-rules:${rulesHash}`);
   let revision: number | null = null;
   try {
     const content = JSON.parse(await readFile(join(projectRoot, 'content/authored-content.json'), 'utf8')) as { revision?: number; document?: Record<string, unknown> };
@@ -193,7 +224,7 @@ export async function computeBuild(projectRoot: string) {
   } catch { hash.update('no-content'); }
   for (const file of RULE_SOURCES) { try { hash.update(await readFile(join(projectRoot, file), 'utf8')); } catch { hash.update(`missing:${file}`); } }
   const id = hash.digest('hex').slice(0, 12);
-  return { id, label: `content r${revision ?? '?'} · rules ${id.slice(0, 6)}`, contentRevision: revision };
+  return { id, label: `content r${revision ?? '?'} · rules ${id.slice(0, 6)}${rulesHash ? ` · league ruleset ${rulesHash.slice(0, 6)}` : ''}`, contentRevision: revision };
 }
 
 function htmlToText(html: string): { title?: string; text: string } {
@@ -282,13 +313,15 @@ export function createEcoStrat(options: EcoStratOptions) {
         journal.resets = [...(journal.resets ?? []), notice.id];
         log(`designer notice ${notice.id} recorded in journal guidance.`);
       }
+      const epoch = await leagueEpoch();
+      answerEpochAwareQuestions(epoch);
       await save();
     })().catch(error => { loaded = null; throw error; });
     return loaded;
   }
 
   async function refreshBuild() {
-    build = await computeBuild(options.projectRoot);
+    build = await computeBuild(options.projectRoot, options.rulesHash?.());
     if (!journal.builds.some(item => item.id === build!.id)) {
       journal.builds.push({ id: build.id, label: build.label, contentRevision: build.contentRevision, firstSeen: now() });
       if (journal.currentBuild && journal.currentBuild !== build.id) log(`new build ${build.label}; earlier evidence is kept but no longer counts toward confidence.`);
@@ -349,7 +382,50 @@ export function createEcoStrat(options: EcoStratOptions) {
     return null;
   }
 
-  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? The FACTS object is the implemented game extracted from running code: facts.rules (how Cycles, Drain/Restore, Collapse, Locations, Circuit Rewards, Draft, zones, mods/holograms and VP scoring work — there is no Action resource), facts.configurable (every piece Mel can change today — Configure UI, Content Studio, or code constants — with defaults and what cohorts assume), facts.market, facts.cards, facts.locations, facts.circuitRewards, facts.mods and facts.startingDeck. Treat FACTS as authoritative for rules and for what is tunable; design docs may be stale — where they disagree, FACTS win. Before recommending a change, name which configurable id or content piece it targets and stay within those surfaces (do not invent knobs that are not listed). Read setup flags (midCycleDraw, noLocations, serverVP) and facts.rules.circuit before assuming mid-cycle draws or Locations are in play. Trailing Circuit catch-up rewards (awardTrailing) are always in the pool — never recommend turning them on or toggling noTrailingRewards; if snowball persists, recommend boosting catch-up strength or adding more awardTrailing rewards. Crypto deploys free; there is no Draft Crypto shelf (Hacker/Crypto slots only). All measured numbers were computed by deterministic code; do not recompute or invent numbers, cite the ones given. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. Distinguish healthy strategic skill from systemic imbalance: a player who thins a weak starting deck, pollutes the opponent with Shyte-Coins or Glitches, intentionally concedes a bad Location, sequences card effects well, or builds a coherent Draft plan is using legitimate skill — do not treat those advantages as balance bugs. Flag systemic imbalance only when one line dominates across many games, strategies, and seats (for example one card, Location, Circuit Reward, Draft slot, cost band, or first-player advantage that repeatedly produces blowouts or prevents Server destruction). Prefer small, testable candidate proposals over large batches; never recommend a change from a few unusual games. ${DECKBUILDING_BASICS} Shared early economy every AI player is taught (Cycles 1-4): ${EARLY_ECONOMY_PLAYBOOK.join(' ')} Use these basics to judge deck-building play: an AI that skips the early Kilo/Mega line, never trashes Basic Encryption and Shyte in that order, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
+  function describeEpoch(epoch: LeagueEpochContext | null): string {
+    if (!epoch) return 'No league epoch is loaded; treat Configure defaults and FACTS as the rules under test.';
+    const { rules: r } = epoch;
+    const flags = [
+      `Server VP ${r.serverVP.primary}/${r.serverVP.backup} (destruction total ${r.serverVP.primary + r.serverVP.backup})`,
+      r.noLocations ? 'No location text ON (Nodes are No Man\'s Land — Mel is testing card/reward balance without Location effects)' : 'Locations ON',
+      r.noCircuitRewards ? 'Circuit Rewards OFF (no lottery prizes; do not attribute HealOffset or Restore to Circuit Rewards)' : 'Circuit Rewards ON',
+      r.noTrailingRewards ? 'Trailing Rewards OFF' : 'Trailing Rewards ON',
+      `mostCircuitsBonusVP ${r.mostCircuitsBonusVP}`,
+      `nodeWinVP ${r.nodeWinVP}`,
+    ];
+    const changes = epoch.changes.length ? ` Changes from prior epoch: ${epoch.changes.map(change => `${change.label} ${change.from}→${change.to}`).join('; ')}.` : '';
+    const note = epoch.note ? ` Mel's epoch note: ${epoch.note}` : '';
+    return `League epoch ${epoch.id} (rulesHash ${epoch.rulesHash}): ${flags.join('; ')}.${changes}${note} Always read leagueEpoch before asking about Locations, Circuit Rewards, or Restore-from-Circuits.`;
+  }
+
+  async function leagueEpoch(): Promise<LeagueEpochContext | null> {
+    if (!options.loadLeagueEpoch) return null;
+    try { return await options.loadLeagueEpoch(); } catch { return null; }
+  }
+
+  /** Close open questions that the current epoch already answers (no Circuit prizes / no Location text). */
+  function answerEpochAwareQuestions(epoch: LeagueEpochContext | null) {
+    if (!epoch) return;
+    const answers: { match: RegExp; text: string }[] = [];
+    if (epoch.rules.noCircuitRewards) {
+      answers.push({
+        match: /circuit reward/i,
+        text: `Epoch ${epoch.id} has Circuit Rewards off (noCircuitRewards). No Circuit Rewards were available or claimed, so none were Restore-granting; do not compare Circuit heals to HealOffset under this epoch.`,
+      });
+    }
+    if (epoch.rules.noLocations) {
+      answers.push({
+        match: /location text|noLocations|no man's land|without locations/i,
+        text: `Epoch ${epoch.id} has No location text on (noLocations). Mel turned Location text off to isolate card and reward balance; treat No Man's Land as intentional for this test, not a missing feature.`,
+      });
+    }
+    for (const answer of answers) {
+      const open = journal.questions.filter(item => item.status === 'open' && answer.match.test(item.text)).map(item => item.text);
+      if (open.length) answerOpenQuestions(journal, answer.text, open, now());
+    }
+  }
+
+  const ROLE = `You are Eco-Strat, an independent expert evaluator of the economy and strategy of the two-player deck-building game 0uroboros: strategy, deck-builders, game economy, balance, systems design, player experience, resource systems, strategic diversity, feedback loops, snowballing and comebacks. You are NOT a player and never coach the AI player (Strat-G); you only evaluate. Your central question: does 0uroboros create an interesting, understandable, reasonably balanced economy that supports multiple meaningful strategies? The FACTS object is the implemented game extracted from running code: facts.rules (how Cycles, Drain/Restore, Collapse, Locations, Circuit Rewards, Draft, zones, mods/holograms and VP scoring work — there is no Action resource), facts.configurable (every piece Mel can change today — Configure UI, Content Studio, or code constants — with defaults and what cohorts assume), facts.market, facts.cards, facts.locations, facts.circuitRewards, facts.mods and facts.startingDeck. leagueEpoch (when present) is the versioned ruleset Mel is currently testing — it overrides assumptions about Locations, Circuit Rewards, Trailing Rewards, and Server VP for league/self-play evidence; read its note and flags before asking questions or blaming systems that are deliberately off. Treat FACTS as authoritative for rules and for what is tunable; design docs may be stale — where they disagree, FACTS win. Before recommending a change, name which configurable id or content piece it targets and stay within those surfaces (do not invent knobs that are not listed). Read setup flags (midCycleDraw, noLocations, serverVP), leagueEpoch.rules, and facts.rules.circuit before assuming mid-cycle draws or Locations are in play. Trailing Circuit catch-up rewards (awardTrailing) are always in the pool when Circuit Rewards are on — never recommend turning them on or toggling noTrailingRewards; if snowball persists with Circuits on, recommend boosting catch-up strength or adding more awardTrailing rewards. Crypto deploys free; there is no Draft Crypto shelf (Hacker/Crypto slots only). All measured numbers were computed by deterministic code; do not recompute or invent numbers, cite the ones given. metrics.progress.quarters is the quarterly (Cycles 1–4 / 5–8 / 9–12 / 13–16) breakdown of Circuit claim timing, Locations, VP, first destructions, and when 2+ Circuit leads appear; metrics.progress.earlyCircuitLeadLaterLocations tests whether an early (by Cycle 8) Circuit lead predicts later Location dominance. Fields about the AI player (aiPlayer, decisions, Strat-G) describe how the AI played, not the game's rules: for example, choices the AI picks at random are an AI limitation, not randomness in the design. Per-card effect totals include effects that Locations, Circuit Rewards or attachments granted to that card. rules.locations explains when Location effects fire and who benefits; each Location's read is how the default AI values holding it, so judge whether a Location creates a real choice (worth contesting or worth conceding) or is noise — but when leagueEpoch.rules.noLocations is true, skip Location-text conclusions. Distinguish evidence from speculation, say when a sample is too small, and keep your own opinion even when Strat-G's records disagree. Distinguish healthy strategic skill from systemic imbalance: a player who thins a weak starting deck, pollutes the opponent with Crypto-Shyte or Glitches, intentionally concedes a bad Location, sequences card effects well, or builds a coherent Draft plan is using legitimate skill — do not treat those advantages as balance bugs. Flag systemic imbalance only when one line dominates across many games, strategies, and seats (for example one card, Location, Circuit Reward, Draft slot, cost band, or first-player advantage that repeatedly produces blowouts or prevents Server destruction). Prefer small, testable candidate proposals over large batches; never recommend a change from a few unusual games. ${DECKBUILDING_BASICS} Shared early economy every AI player is taught (Cycles 1-4): ${EARLY_ECONOMY_PLAYBOOK.join(' ')} Use these basics to judge deck-building play: an AI that skips the early Crypto upgrade line (3+ per draw), never trashes Basic Encryption and Shyte in that order, or keeps buying filler, plays below what the cards allow, and that is an AI limitation, not evidence about the cards. The designer's goals for 0uroboros, which define what "balanced" means here: ${DESIGN_GOALS.map((goal, index) => `(${index + 1}) ${goal}`).join(' ')} Judge the game against these goals; never recommend moving away from one, and say plainly when a change would trade one goal for another. Reply with one JSON object only.`;
 
   async function study() {
     return serialize(async () => {
@@ -361,8 +437,10 @@ export function createEcoStrat(options: EcoStratOptions) {
           try { docs.push({ file, excerpt: (await readFile(join(options.projectRoot, file), 'utf8')).slice(0, 6000) }); }
           catch { docs.push({ file, excerpt: '(missing)' }); }
         }
-        const advice = await askModel(`${ROLE}\n\nTask: study the implemented game before observing any games. The FACTS were extracted from the running code and are authoritative (especially facts.rules and facts.configurable); the DOCS are design documents that may be stale. Where they disagree, FACTS win: list each disagreement you can see. In summary and economyModel, show you understand the Cycle loop, Drain/Restore vs Server integrity, Collapse/Circuit, Draft Crypto rules, and which knobs are Configure vs Content Studio vs code constants. Reply as {"summary": string (<=900 chars), "economyModel": string[] (resources, sources, sinks, conversions and their rates; <=10), "risks": string[] (economic or balance risks you expect to test; <=8), "docDiscrepancies": string[] (<=10), "hypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars)}] (<=6 testable hypotheses), "questions": string[] (<=6)}.`,
-          { facts, docs }, 'medium', 240_000);
+        const epoch = await leagueEpoch();
+        answerEpochAwareQuestions(epoch);
+        const advice = await askModel(`${ROLE}\n\nTask: study the implemented game before observing any games. The FACTS were extracted from the running code and are authoritative (especially facts.rules and facts.configurable); the DOCS are design documents that may be stale. Where they disagree, FACTS win: list each disagreement you can see. In summary and economyModel, show you understand the Cycle loop, Drain/Restore vs Server integrity, Collapse/Circuit, Draft Crypto rules, and which knobs are Configure vs Content Studio vs code constants. leagueEpoch is the ruleset Mel is testing now — name what is intentionally off (Locations, Circuit Rewards, Server VP Floor) before listing risks. Reply as {"summary": string (<=900 chars), "economyModel": string[] (resources, sources, sinks, conversions and their rates; <=10), "risks": string[] (economic or balance risks you expect to test; <=8), "docDiscrepancies": string[] (<=10), "hypotheses": [{"topic": string, "statement": string (one plain sentence <=160 chars)}] (<=6 testable hypotheses), "questions": string[] (<=6)}.`,
+          { facts, docs, leagueEpoch: epoch, leagueEpochSummary: describeEpoch(epoch) }, 'medium', 240_000);
         const cards = facts.cards ?? [];
         journal.study = advice ? {
           buildId: build!.id, at: now(), mode: 'model', model: advice.model, summary: str(advice.data.summary, 900),
@@ -683,7 +761,9 @@ export function createEcoStrat(options: EcoStratOptions) {
         const humanGames = games.filter(game => isHumanSource(game.evidence.source)).length;
         const humanOpponents = [...new Set(games.filter(game => isHumanSource(game.evidence.source)).map(game => humanOpponent(game.evidence)).filter((id): id is string => !!id))].map(id => AGENT_NAMES[id] ?? id);
         const readSources = (journal.research?.sources ?? []).filter(source => source.accessible && source.takeaways.length);
-        const advice = await askModel(`${ROLE}\n\nTask: write your balance report on the 0uroboros economy for the game's designer. Context: ${cohort ? `this is a ${cohort.kind} cohort of ${ids.length} complete AI-vs-AI games in which both seats are Strat-G running one frozen profile (a mirror match), so strategic diversity reflects one AI's preferences, not the design space` : `these are ${ids.length} complete games (${sources.join(', ')})`}. Be honest about sample size.
+        const epoch = await leagueEpoch();
+        answerEpochAwareQuestions(epoch);
+        const advice = await askModel(`${ROLE}\n\nTask: write your balance report on the 0uroboros economy for the game's designer. Context: ${cohort ? `this is a ${cohort.kind} cohort of ${ids.length} complete AI-vs-AI games in which both seats are Strat-G running one frozen profile (a mirror match), so strategic diversity reflects one AI's preferences, not the design space` : `these are ${ids.length} complete games (${sources.join(', ')})`}. ${describeEpoch(epoch)} Be honest about sample size. Cite metrics.progress.quarters when discussing how games develop over Cycles, and metrics.progress.earlyCircuitLeadLaterLocations when asking whether early Circuit leads drive later Location dominance (when Circuits/Locations are on).
 
 Write plainly: short sentences, everyday words, game terms as the game uses them. Cite the given numbers in words a designer understands ("the Cycle 8 VP leader won 75% of games", never "vpLeaderWins.at8 0.75"). Do not turn a single game into a general rule. Lead with what to change; keep everything else brief and about balance.
 
@@ -698,6 +778,8 @@ Reply as one JSON object:
  "questions": string[] (<=3)}
 
 Final scores: metrics.vp.margins splits games into close (margin under ${CLOSE_MARGIN} VP), mid (${CLOSE_MARGIN}–${BLOWOUT_MARGIN} VP inclusive) and blowouts (over ${BLOWOUT_MARGIN} VP), overall and by how the game ended; metrics.vp.winnerLead says how much of the winner's lead came from destroying Servers versus every other VP source, and bothDestroyed counts games where each player destroyed at least one enemy Server (target more than ${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%). Destruction endings should land in ${Math.round(TARGET_DESTRUCTION_END_RATE_MIN * 100)}–${Math.round(TARGET_DESTRUCTION_END_RATE_MAX * 100)}% (Cycle 16 at most ${Math.round(TARGET_CYCLE16_MAX_RATE * 100)}%). metrics.vp.winnerKill reports how often the winner destroyed both enemy Servers versus winning without a full kill (one Server + other VP, or no Servers). metrics.vpSources splits final VP into destructionVp, marketVp (printed VP on bought VP cards) and otherVp; use it when separating Server-kill scoring from market VP. metrics.timeline rows carry per-cycle locationsWon, cumulative circuitClaims and circuitDifferential (seat0−seat1). metrics.snowball.circuitLead2Plus tests whether a 2+ Circuit-claim lead snowballs (kept lead, later Circuits/Locations, game win). Use these to explain why margins are wide or narrow and what would close them without pushing destruction endings outside the band. metrics.cycles.destructionEnd says in which Cycle destruction endings came.
+
+Cycle-16 stalls: when games do not end by Server destruction, use metrics.cycle16Stall. Compare Cycle-16 games vs destruction endings on market VP, Server restore / restoreToDrain, and whether game-enders were offered or bought (∆-Wave, Chrome Mitchell, Veil of Cthulhu, The Shoggoth, Tihkal Hound, The Azimuthal Kill). Say whether the stall looks like repair-and-vp, missing-enders, mixed, or unclear — cite metrics.cycle16Stall.diagnosis and the numbers; do not invent a cause the metrics do not support.
 
 Board awards (observation only — Mel already ships Configure mostCircuitsBonusVP; do NOT invent or recommend shipping a most-Nodes award unless metrics.boardAwards.mostCircuitsVsMostNodes shows the leaders differ often enough that a second award would reward a distinct skill): metrics.circuit.winsPerGame and metrics.circuit.winnerWonMoreCircuits use Circuit wins (Cycles with a strict Location lead — same definition as mostCircuitsBonusVP), distinct from circuitClaims. metrics.boardAwards.mostCircuitsVsMostNodes reports how often most-Circuits and most-Nodes (total Locations/Nodes won) leaders are the same seat, differ, or tied; differAmongDecided is the share among games where both leaders were decided. metrics.boardAwards.particle reports the Collapse weight-lottery particle Node (UI highlight, not Circuit eligibility): controlledPerGame vs tiedPerGame, and particle.vsCircuit splits Cycles into particle caught by that Cycle's Circuit winner, by the Circuit loser, tied Node, or controlled while the Circuit itself was tied. Weigh in findings.areas.boardAwards whether a second Nodes end-game VP award is warranted from these rates alone; prefer "not yet / too correlated" when differShare is low or the sample is small. Never treat this as an implemented Configure knob.
 
@@ -714,7 +796,7 @@ ${startingDeckNote([...starters])}
 Strat-G: compare your view with Strat-G's (agree / disagree / it over- or undervalues X / not enough data). Do not address Strat-G or give it instructions.
 
 Point of view: your own considered view of how a deck-building economy should work, built from the research you have read (research.sources, concepts), economic and game-theory ideas (feedback loops, dominant strategies, opportunity cost, tempo versus value, scarcity, information) and what you have measured here. If previousPointOfView exists, revise it: keep principles you still hold and change one only when the evidence or your reading changed your mind.`,
-          { metrics: { ...metrics, cards: markStarters(metrics.cards.slice(0, 30), starters) }, archetypes, cardDemand: { ...demand, cards: demand.cards.slice(0, 40) }, hypotheses: hypothesesForModel(), repeatedObservations: journal.observations.filter(item => item.buildId === build!.id && item.kind === 'measured').sort((a, b) => b.occurrences - a.occurrences).slice(0, 25).map(item => ({ topic: item.topic, text: item.text, games: item.occurrences })), study: journal.study, research: journal.research ? { concepts: journal.research.concepts, applications: journal.research.applications, sources: readSources.map(source => ({ title: source.title ?? source.url, takeaways: source.takeaways })) } : null, previousPointOfView: journal.pointOfView ?? null, stratG: { onDisk: stratG, purchasesByPhase: phaseBuys, choicesPickedAtRandomByAiPerGame: metrics.aiPlayer.choicesPickedAtRandomByAiPerGame }, facts },
+          { metrics: { ...metrics, cards: markStarters(metrics.cards.slice(0, 30), starters) }, archetypes, cardDemand: { ...demand, cards: demand.cards.slice(0, 40) }, hypotheses: hypothesesForModel(), repeatedObservations: journal.observations.filter(item => item.buildId === build!.id && item.kind === 'measured').sort((a, b) => b.occurrences - a.occurrences).slice(0, 25).map(item => ({ topic: item.topic, text: item.text, games: item.occurrences })), study: journal.study, research: journal.research ? { concepts: journal.research.concepts, applications: journal.research.applications, sources: readSources.map(source => ({ title: source.title ?? source.url, takeaways: source.takeaways })) } : null, previousPointOfView: journal.pointOfView ?? null, stratG: { onDisk: stratG, purchasesByPhase: phaseBuys, choicesPickedAtRandomByAiPerGame: metrics.aiPlayer.choicesPickedAtRandomByAiPerGame }, facts, leagueEpoch: epoch, leagueEpochSummary: describeEpoch(epoch), designerGuidance: (journal.designerGuidance ?? []).slice(-12).map(item => item.text) },
           'medium', 300_000);
         const id = `${now().slice(0, 10)}-${kind}-${journal.reports.length + 1}`;
         const rawRecs = advice && Array.isArray(advice.data.recommendations) ? (advice.data.recommendations as Record<string, unknown>[]) : [];
@@ -820,6 +902,10 @@ Point of view: your own considered view of how a deck-building economy should wo
       ['Circuit lead snowball', m.snowball.circuitLead2Plus.seats
         ? `a 2+ Circuit lead appeared in ${m.snowball.circuitLead2Plus.games} games (avg Cycle ${m.snowball.circuitLead2Plus.avgCycleReached}); afterward the leader kept the lead ${pct(m.snowball.circuitLead2Plus.keptCircuitLead)}, claimed more Circuits ${pct(m.snowball.circuitLead2Plus.gainedMoreCircuitsAfter)}, won more Locations ${pct(m.snowball.circuitLead2Plus.wonMoreLocationsAfter)}, and won the game ${pct(m.snowball.circuitLead2Plus.leaderWonGame)}`
         : 'no seat reached a 2+ Circuit-claim lead in this sample'],
+      ['Quarterly progress', m.progress.quarters.map(q => `${q.id} (${q.label}): claims ${q.avgCircuitClaimsThisQuarter}/game, Locations ${q.avgLocationsWonThisQuarter}/game, VP/seat ${q.avgVpPerSeatAtQuarterEnd}, |claim lead| ${q.avgAbsCircuitClaimLeadAtQuarterEnd}, first kill ${pct(q.firstDestructionShare)}, 2+ Circuit lead first ${pct(q.circuitLead2PlusFirstReachedShare)} (${q.gamesReached} games)`).join(' · ')],
+      ['Early Circuit → later Locations', m.progress.earlyCircuitLeadLaterLocations.seats
+        ? `2+ Circuit lead by Cycle 8 in ${m.progress.earlyCircuitLeadLaterLocations.games} games; that leader won more Locations in Cycles 9–16 ${pct(m.progress.earlyCircuitLeadLaterLocations.wonMoreLocationsInQ3Q4)} and won the game ${pct(m.progress.earlyCircuitLeadLaterLocations.wonGame)}`
+        : 'no seat held a 2+ Circuit-claim lead by Cycle 8 in this sample'],
       ['VP sources', `per seat avg destruction ${m.vpSources.avgDestructionVp} VP, market (bought VP cards) ${m.vpSources.avgMarketVp} VP, other ${m.vpSources.avgOtherVp} VP; market is ${pct(m.vpSources.marketShare)} of all VP, destruction ${pct(m.vpSources.destructionShare)}`],
       ['Locations', `the player who won more Locations won the game ${pct(m.locations.winnerWonMoreLocations.rate)} of the time`],
       ['Circuit Rewards', `${m.circuit.claimsPerGame} claims per game; the player who claimed more won ${pct(m.circuit.winnerClaimedMore.rate)}; Circuit wins (Location-lead Cycles) ${m.circuit.winsPerGame} per game, that leader won ${pct(m.circuit.winnerWonMoreCircuits.rate)}`],
@@ -946,6 +1032,32 @@ Point of view: your own considered view of how a deck-building economy should wo
       '',
       ...hypothesisSections(journal.hypotheses, build!.id, '####', 5),
       ...(a && strings(findings.uncertainties, 4).length ? ['### What I could not tell', '', ...bullets(findings.uncertainties, 4), ''] : []),
+      '### Quarterly progress',
+      '',
+      '| Quarter | Games | Circuit claims | Locations | VP/seat | |Claim lead| | First kill | 2+ Circuit lead first |',
+      '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+      ...m.progress.quarters.map(q => `| ${q.id} (${q.label}) | ${q.gamesReached} | ${q.avgCircuitClaimsThisQuarter} | ${q.avgLocationsWonThisQuarter} | ${q.avgVpPerSeatAtQuarterEnd} | ${q.avgAbsCircuitClaimLeadAtQuarterEnd} | ${pct(q.firstDestructionShare)} | ${pct(q.circuitLead2PlusFirstReachedShare)} |`),
+      '',
+      ...(m.progress.earlyCircuitLeadLaterLocations.seats
+        ? [`_Early Circuit lead (2+ by Cycle 8): ${m.progress.earlyCircuitLeadLaterLocations.games} games; that leader won more Locations in Cycles 9–16 ${pct(m.progress.earlyCircuitLeadLaterLocations.wonMoreLocationsInQ3Q4)} and won the game ${pct(m.progress.earlyCircuitLeadLaterLocations.wonGame)}._`, '']
+        : ['_No seat held a 2+ Circuit-claim lead by Cycle 8 in this sample._', '']),
+      '### Cycle-16 stalls vs destruction endings',
+      '',
+      `_Diagnosis: **${m.cycle16Stall.diagnosis}.** ${m.cycle16Stall.note}_`,
+      '',
+      `| Ending | Games | Avg market VP/seat | Restore/Drain | Game-ender offered | Game-ender bought |`,
+      `| --- | ---: | ---: | ---: | ---: | ---: |`,
+      `| Cycle 16 | ${m.cycle16Stall.cycle16.games} | ${m.cycle16Stall.cycle16.avgMarketVpPerSeat} | ${m.cycle16Stall.cycle16.restoreToDrain} | ${pct(m.cycle16Stall.cycle16.gameEnders.anyOfferedShare)} | ${pct(m.cycle16Stall.cycle16.gameEnders.anyBoughtShare)} |`,
+      `| Server destruction | ${m.cycle16Stall.destruction.games} | ${m.cycle16Stall.destruction.avgMarketVpPerSeat} | ${m.cycle16Stall.destruction.restoreToDrain} | ${pct(m.cycle16Stall.destruction.gameEnders.anyOfferedShare)} | ${pct(m.cycle16Stall.destruction.gameEnders.anyBoughtShare)} |`,
+      '',
+      ...(m.cycle16Stall.cycle16.gameEnders.cards.some(card => card.offers || card.copies)
+        ? [
+          '| Game-ender | Offers | Affordable | Picks | Copies bought |',
+          '| --- | ---: | ---: | ---: | ---: |',
+          ...m.cycle16Stall.cycle16.gameEnders.cards.filter(card => card.offers || card.copies).map(card => `| ${card.name} (Cycle 16) | ${card.offers} | ${card.affordable} | ${card.picks} | ${card.copies} |`),
+          '',
+        ]
+        : []),
       '### Data',
       '',
       `- Build ${build!.label} (\`${build!.id}\`)${input.cohort ? `; ${input.cohort.kind} cohort ${input.cohort.id}, ${seeds}; Strat-G ${stratGVersion(input.cohort)} profile ${input.cohort.strategyHash} frozen for the run` : ''}.`,
@@ -960,7 +1072,7 @@ Point of view: your own considered view of how a deck-building economy should wo
     ].join('\n');
   }
 
-  async function beginCohort(input: { kind: Cohort['kind']; target: number; seeds: number[]; strategyHash: string; strategyVersion: string; arm?: Cohort['arm'] }) {
+  async function beginCohort(input: { kind: Cohort['kind']; target: number; seeds: number[]; strategyHash: string; strategyVersion: string }) {
     return serialize(async () => {
       await load(); await refreshBuild();
       const cohort: Cohort = {
@@ -968,7 +1080,6 @@ Point of view: your own considered view of how a deck-building economy should wo
         kind: input.kind, buildId: build!.id, startedAt: now(), target: input.target, seeds: [],
         strategyHash: input.strategyHash, strategyVersion: input.strategyVersion, status: 'running',
         validGames: [], invalid: [],
-        ...(input.arm ? { arm: input.arm } : {}),
       };
       journal.cohorts.push(cohort);
       await save();
@@ -1047,109 +1158,147 @@ Point of view: your own considered view of how a deck-building economy should wo
   }
 
   /**
-   * Content A/B arm compare: metrics + cardDemand for control vs patch cohorts, joined with
-   * cardBudget E for the focal card. Writes reports/{id}.md + .json; does not call the model.
+   * League rules change: deterministic metric deltas plus model POV/recommendations for this epoch
+   * (separate from baseline / league-play reports). Writes reports/{id}.md + .json.
    */
-  async function reportArmCompare(input: {
-    experimentId: string;
-    controlCohortId: string;
-    patchCohortId: string;
-    cardId: string;
-    ab: ContentAbReport;
-    catalogCards: readonly BudgetCard[];
-  }) {
+  async function reportRulesDelta(input: { before: Epoch; after: Epoch; rows: MetricRow[] }): Promise<ReportEntry | null> {
     return serialize(async () => {
-      await load(); await refreshBuild();
-      const controlCohort = journal.cohorts.find(item => item.id === input.controlCohortId);
-      const patchCohort = journal.cohorts.find(item => item.id === input.patchCohortId);
-      if (!controlCohort || !patchCohort) throw new Error('arm compare: missing cohort');
-      const controlGames = await loadGames(controlCohort.validGames);
-      const patchGames = await loadGames(patchCohort.validGames);
-      const controlMetrics = cohortMetrics(controlGames.map(game => ({ id: game.id, report: game.evidence.report })));
-      const patchMetrics = cohortMetrics(patchGames.map(game => ({ id: game.id, report: game.evidence.report })));
-      const catalog = input.catalogCards.map(card => ({
-        id: card.definitionId ?? card.id,
-        name: card.name,
-        cost: card.cost ?? 0,
-        pool: (card as { pool?: string }).pool ?? card.type ?? 'Base',
-      }));
-      const controlDemand = cardDemand(controlGames.map(game => ({ id: game.id, report: game.evidence.report })), catalog);
-      const patchDemand = cardDemand(patchGames.map(game => ({ id: game.id, report: game.evidence.report })), catalog);
-      const seatWinRate = controlMetrics.games
-        ? (controlMetrics.seatWins[0] + controlMetrics.seatWins[1]) / (2 * Math.max(1, controlMetrics.decisive))
-        : 0.5;
-      const controlBudget = enrichDemandWithBudget(input.catalogCards, controlDemand, seatWinRate || 0.5);
-      const patchBudget = enrichDemandWithBudget(input.catalogCards, patchDemand, seatWinRate || 0.5);
-      const focalControl = focalBudgetRow(controlBudget, input.cardId);
-      const focalPatch = focalBudgetRow(patchBudget, input.cardId);
-      const pct = (value: number | null) => value === null ? 'n/a' : `${Math.round(value * 100)}%`;
-      const id = `${now().slice(0, 10)}-ab-${input.experimentId}`.replace(/[^a-zA-Z0-9._-]+/g, '-').slice(0, 80);
-      const arms = {
-        experimentId: input.experimentId,
-        cardId: input.cardId,
-        control: {
-          cohortId: controlCohort.id,
-          metrics: controlMetrics,
-          demand: controlDemand,
-          ab: input.ab.control,
-          focal: focalControl,
-        },
-        patch: {
-          cohortId: patchCohort.id,
-          metrics: patchMetrics,
-          demand: patchDemand,
-          ab: input.ab.patch,
-          focal: focalPatch,
-        },
-        patchWinRate: input.ab.patchWinRate,
-        pairedDecided: input.ab.pairedDecided,
-        meanMarginDelta: Math.round((input.ab.patch.meanMargin - input.ab.control.meanMargin) * 10) / 10,
-        disagreements: [...new Set([...controlBudget, ...patchBudget].filter(row => row.flag).map(row => ({ id: row.definitionId, name: row.name, flag: row.flag })))],
-      };
-      const markdown = [
-        `# Content A/B · ${input.cardId}`,
-        '',
-        `Experiment \`${input.experimentId}\` · ${input.ab.seeds.length} paired seeds · patch win rate ${pct(input.ab.patchWinRate)} (${input.ab.pairedDecided} decided pairs).`,
-        '',
-        '## Arm comparison',
-        '',
-        `| Arm | Valid | Seat0 wins | Mean margin | Both destroyed ≥1 enemy Server |`,
-        `| --- | ---: | ---: | ---: | ---: |`,
-        `| Control | ${controlMetrics.games} | ${controlMetrics.seatWins[0]} | ${input.ab.control.meanMargin} | ${controlMetrics.vp.bothDestroyed} (${pct(controlMetrics.games ? controlMetrics.vp.bothDestroyed / controlMetrics.games : null)}; floor >${Math.round(TARGET_BOTH_DESTROYED_RATE * 100)}%) |`,
-        `| Patch | ${patchMetrics.games} | ${patchMetrics.seatWins[0]} | ${input.ab.patch.meanMargin} | ${patchMetrics.vp.bothDestroyed} (${pct(patchMetrics.games ? patchMetrics.vp.bothDestroyed / patchMetrics.games : null)}) |`,
-        '',
-        `Mean margin Δ (patch − control): **${arms.meanMarginDelta}**.`,
-        '',
-        '## Focal card vs budget',
-        '',
-        focalControl || focalPatch
-          ? [
-            `| Arm | E | Band | Soft | Pick rate | Buyer win | Win Δ | Flag |`,
-            `| --- | ---: | --- | ---: | ---: | ---: | ---: | --- |`,
-            focalControl ? `| Control | ${focalControl.efficiency} | ${focalControl.band} | ${focalControl.softCount} | ${pct(focalControl.pickRate)} | ${pct(focalControl.buyerWinRate)} | ${focalControl.winDelta ?? 'n/a'} | ${focalControl.flag ?? '—'} |` : '| Control | — | — | — | — | — | — | — |',
-            focalPatch ? `| Patch | ${focalPatch.efficiency} | ${focalPatch.band} | ${focalPatch.softCount} | ${pct(focalPatch.pickRate)} | ${pct(focalPatch.buyerWinRate)} | ${focalPatch.winDelta ?? 'n/a'} | ${focalPatch.flag ?? '—'} |` : '| Patch | — | — | — | — | — | — | — |',
-          ].join('\n')
-          : `_Focal card \`${input.cardId}\` had no demand row (never offered in these drafts)._`,
-        '',
-        arms.disagreements.length
-          ? ['## Budget × sim disagreements', '', ...arms.disagreements.map(item => `- **${item.name}** (\`${item.id}\`): ${item.flag}`)].join('\n')
-          : '',
-      ].filter(Boolean).join('\n');
-      const entry: ReportEntry = {
-        id, at: now(), kind: 'manual', buildId: build!.id, games: controlMetrics.games + patchMetrics.games,
-        markdown: `reports/${id}.md`, json: `reports/${id}.json`, model: null,
-      };
-      await writer.write(entry.markdown, `${markdown}\n`);
-      await writer.write(entry.json, `${JSON.stringify({ ...entry, arms }, null, 2)}\n`);
-      journal.reports.push(entry);
-      await save();
-      log(`content A/B report ${id} written.`);
-      return { entry, arms };
+      try {
+        await load(); await refreshBuild();
+        const { before, after, rows } = input;
+        const show = (row: MetricRow, value: number | null) => value === null ? 'n/a' : row.unit === 'rate' ? `${Math.round(value * 100)}%` : value.toFixed(1);
+        const changeLine = (epoch: Epoch) => epoch.changes.length ? epoch.changes.map(change => `${change.label} ${change.from} → ${change.to}`).join('; ') : 'no rule changes (Elo wipe only)';
+        const verdictText = { closer: 'closer to target', further: 'further from target', same: 'no real change', 'n/a': 'not enough games' } as const;
+        const judged = rows.filter(row => row.verdict === 'closer' || row.verdict === 'further');
+        const summary = judged.length
+          ? `${judged.filter(row => row.verdict === 'closer').length} of ${judged.length} target metrics moved closer, ${judged.filter(row => row.verdict === 'further').length} further`
+          : 'too few games on one side to judge';
+        const stallAfter = stallFromTally(after.tally);
+        const stallBefore = stallFromTally(before.tally);
+        const pct = (value: number | null) => value === null ? 'n/a' : `${Math.round(value * 100)}%`;
+        const advice = await askModel(`${ROLE}
+
+Task: write your point of view and recommendations for this **league epoch ruleset change**, not a full baseline play report. Focus on whether the rule change moved the target metrics the right way, and on Cycle-16 stalls under this epoch.
+
+Context: Mel changed league SelfPlayRules between epoch ${before.id} and epoch ${after.id}. Changed: ${changeLine(after)}.${after.note ? ` Test focus: ${after.note}.` : ''} Rules under test: Server VP ${after.rules.serverVP.primary}/${after.rules.serverVP.backup}; Locations ${after.rules.noLocations ? 'OFF' : 'ON'}; Circuit Rewards ${after.rules.noCircuitRewards ? 'OFF' : 'ON'}; Trailing ${after.rules.noTrailingRewards ? 'OFF' : 'ON'}; mostCircuitsBonusVP ${after.rules.mostCircuitsBonusVP}. Games: ${before.tally.games} before, ${after.tally.games} after. Measured verdict: ${summary}.
+
+Cycle-16 stalls (after epoch): diagnosis=${stallAfter.diagnosis}. ${stallAfter.note} Compare Cycle-16 vs destruction on market VP / restoreToDrain and whether game-enders (∆-Wave, Chrome Mitchell, Veil of Cthulhu, Shoggoth, Tihkal, Azimuthal) were offered or bought. Prefer the coded diagnosis unless the numbers clearly contradict it.
+
+Write plainly. This report is about the epoch ruleset, not Strat-G coaching. Do not revise the journal-wide pointOfView — give an epoch-scoped view only.
+
+Reply as one JSON object:
+{"headline": string (<=350),
+ "recommendations": [{"title": string (<=80), "change": string (<=250), "why": string[] (2-4), "cause": string (<=200), "hypothesis": string (<=350), "watchFor": string (<=200), "confidence": "strong"|"moderate"|"weak"|"insufficient", "test": string (<=200)}] (<=${MAX_RECOMMENDATIONS}),
+ "findings": {"working": string[] (<=3), "problems": string[] (<=4), "stall": string (<=280: Cycle-16 stall verdict citing numbers), "uncertainties": string[] (<=3)},
+ "pointOfView": {"summary": string (<=500: your view of this epoch's ruleset results), "principles": [{"principle": string (<=110), "why": string (<=220), "here": string (<=220)}] (3-5)}}`,
+          { before: { id: before.id, rulesHash: before.rulesHash, tally: before.tally, stall: stallBefore }, after: { id: after.id, rulesHash: after.rulesHash, changes: after.changes, note: after.note ?? null, rules: after.rules, tally: after.tally, stall: stallAfter }, metrics: rows, summary },
+          'medium', 180_000);
+        const id = `${now().slice(0, 10)}-league-epoch-${after.id}`;
+        const rawRecs = advice && Array.isArray(advice.data.recommendations) ? (advice.data.recommendations as Record<string, unknown>[]).slice(0, MAX_RECOMMENDATIONS) : [];
+        const recommendations: Recommendation[] = rawRecs.map((item, index) => {
+          const why = strings(item.why, 4, 240), change = str(item.change, 300), hypothesis = str(item.hypothesis, 450);
+          return {
+            id: `${id}-r${index + 1}`, at: now(), buildId: build!.id, reportId: id, title: str(item.title, 120) || `Epoch recommendation ${index + 1}`,
+            observed: why[0] ?? '', evidence: why.join(' '), likelyCause: str(item.cause, 300), adjustment: change, expectedEffect: hypothesis,
+            risks: str(item.watchFor, 300), confidence: (['strong', 'moderate', 'weak', 'insufficient'] as Confidence[]).find(level => level === item.confidence) ?? 'insufficient',
+            test: str(item.test, 300), why, hypothesis, status: 'candidate',
+          };
+        });
+        journal.recommendations = journal.recommendations.filter(item => item.reportId !== id);
+        journal.recommendations.push(...recommendations);
+        const findings = (advice?.data.findings ?? {}) as Record<string, unknown>;
+        const view = advice?.data.pointOfView as Record<string, unknown> | undefined;
+        const principles = Array.isArray(view?.principles)
+          ? (view!.principles as Record<string, unknown>[]).slice(0, 5).map(item => ({ principle: str(item?.principle, 140), why: str(item?.why, 260), here: str(item?.here, 260) })).filter(item => item.principle)
+          : [];
+        const markdown = [
+          `# Epoch ${after.id} results (vs epoch ${before.id})`,
+          '',
+          `${after.tally.games} games under this epoch · compared with ${before.tally.games} under epoch ${before.id} · model ${advice?.model ?? 'none (measured facts only)'}.`,
+          '',
+          '<!-- tab: Findings -->',
+          '## Epoch metrics',
+          '',
+          `Changed: ${changeLine(after)}.`,
+          ...(after.note ? [`Test focus: ${after.note}`, ''] : []),
+          `Rules under test: Server VP ${after.rules.serverVP.primary}/${after.rules.serverVP.backup}; Locations ${after.rules.noLocations ? 'OFF (No location text)' : 'ON'}; Circuit Rewards ${after.rules.noCircuitRewards ? 'OFF' : 'ON'}; Trailing ${after.rules.noTrailingRewards ? 'OFF' : 'ON'}; mostCircuitsBonusVP ${after.rules.mostCircuitsBonusVP}.`,
+          '',
+          `**Measured:** ${summary}.`,
+          '',
+          '| Metric | Target | Before | After | Verdict |',
+          '| --- | --- | ---: | ---: | --- |',
+          ...rows.map(row => `| ${row.label} | ${row.targetLabel} | ${show(row, row.before)} | ${show(row, row.after)} | ${verdictText[row.verdict]} |`),
+          '',
+          '### Cycle-16 stalls under this epoch',
+          '',
+          `_Diagnosis: **${stallAfter.diagnosis}.** ${stallAfter.note}_`,
+          '',
+          `| Ending | Games | Avg market VP/seat | Restore/Drain | Game-ender offered | Game-ender bought |`,
+          `| --- | ---: | ---: | ---: | ---: | ---: |`,
+          `| Cycle 16 | ${stallAfter.cycle16.games} | ${stallAfter.cycle16.avgMarketVpPerSeat} | ${stallAfter.cycle16.restoreToDrain} | ${pct(stallAfter.cycle16.anyOfferedShare)} | ${pct(stallAfter.cycle16.anyBoughtShare)} |`,
+          `| Server destruction | ${stallAfter.destruction.games} | ${stallAfter.destruction.avgMarketVpPerSeat} | ${stallAfter.destruction.restoreToDrain} | ${pct(stallAfter.destruction.anyOfferedShare)} | ${pct(stallAfter.destruction.anyBoughtShare)} |`,
+          '',
+          ...(advice ? [
+            ...(strings(findings.working, 3).length ? ['### Working', '', ...strings(findings.working, 3).map(line => `- ${line}`), ''] : []),
+            ...(strings(findings.problems, 4).length ? ['### Problems', '', ...strings(findings.problems, 4).map(line => `- ${line}`), ''] : []),
+            ...(str(findings.stall, 300) ? [`### Stall read`, '', str(findings.stall, 300), ''] : []),
+            ...(strings(findings.uncertainties, 3).length ? ['### Uncertainties', '', ...strings(findings.uncertainties, 3).map(line => `- ${line}`), ''] : []),
+          ] : ['_No model was available; metrics only._', '']),
+          '_League games are AI vs AI with every agent playing its own style; a change of a few points on a small sample can be noise._',
+          '',
+          '<!-- tab: Recommendations -->',
+          '## Recommendations for this epoch',
+          '',
+          ...(advice ? [`**In short:** ${str(advice.data.headline, 400) || 'No headline given.'}`, ''] : ['_No model was available for recommendations._', '']),
+          ...(recommendations.length ? recommendations.flatMap((item, index) => [
+            `### ${index + 1}. ${item.title}`, '',
+            `**The change:** ${item.adjustment}`, '',
+            '**Why:**', '',
+            ...(item.why ?? []).map(line => `- ${line}`), ...(item.likelyCause ? [`- *Likely cause:* ${item.likelyCause}`] : []), '',
+            `**If implemented, I expect:** ${item.hypothesis ?? item.expectedEffect}`, '',
+            ...(item.risks ? [`**Watch for:** ${item.risks}`, ''] : []),
+            `**Confidence:** ${item.confidence}${item.test ? ` · **How to test it:** ${item.test}` : ''}`, '',
+          ]) : [advice ? '_No change is supported by the evidence this time._' : '', '']),
+          '<!-- tab: Point of view -->',
+          '## Point of view on this epoch',
+          '',
+          `_Scoped to epoch ${after.id} results — separate from the journal Baseline point of view._`,
+          '',
+          ...(principles.length
+            ? [
+              str(view?.summary, 600) || '_No summary._',
+              '',
+              ...principles.flatMap(item => [
+                `### ${item.principle}`,
+                '',
+                item.why ? `${item.why}` : '',
+                item.here ? `*Here:* ${item.here}` : '',
+                '',
+              ]),
+            ]
+            : [advice ? '_No epoch POV returned._' : '_No model was available._', '']),
+        ].join('\n');
+        const entry: ReportEntry = { id, at: now(), kind: 'epoch', buildId: build!.id, games: after.tally.games, markdown: `reports/${id}.md`, json: `reports/${id}.json`, model: advice?.model ?? null };
+        await writer.write(entry.markdown, `${markdown}\n`);
+        await writer.write(entry.json, `${JSON.stringify({ ...entry, before: { id: before.id, rulesHash: before.rulesHash, tally: before.tally, stall: stallBefore }, after: { id: after.id, rulesHash: after.rulesHash, changes: after.changes, tally: after.tally, stall: stallAfter }, metrics: rows, assessment: advice?.data ?? null, recommendations }, null, 2)}\n`);
+        journal.reports = journal.reports.filter(item => item.id !== id);
+        journal.reports.push(entry);
+        const key = `league-epoch:${after.id}`;
+        journal.observations = journal.observations.filter(item => item.key !== key);
+        journal.observations.push({
+          key, topic: 'League rules',
+          text: `Epoch ${after.id} (${changeLine(after)}): ${summary}. Stall: ${stallAfter.diagnosis}. ${judged.map(row => `${row.label} ${show(row, row.before)} → ${show(row, row.after)}`).join('; ')}`.slice(0, 600),
+          kind: 'measured', firstSeen: now(), lastSeen: now(), buildId: build!.id, occurrences: 1, gameIds: [],
+        });
+        await save();
+        log(`league epoch report ${id} written (${advice ? advice.model : 'deterministic only'}).`);
+        return entry;
+      } catch (error) { recordError('league rules report', error); return null; }
     });
   }
 
   return {
-    load, study, research, observe, report, reportArmCompare, beginCohort, updateCohort, archive, status,
+    load, study, research, observe, report, reportRulesDelta, beginCohort, updateCohort, archive, status,
     recordGuidance, answerQuestions,
     hasStudied: () => journal.study?.buildId === build?.id,
     hasResearched: () => !!journal.research,

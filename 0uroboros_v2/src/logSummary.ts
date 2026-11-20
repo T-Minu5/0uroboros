@@ -33,7 +33,10 @@ function choiceLogNote(text: string): string | null {
     return from ? `Nothing to copy from ${from}` : 'Nothing to copy';
   }
   const chooses = /chooses:\s*(.+)$/i.exec(trimmed);
-  if (chooses) return `Choosing ${chooses[1].replace(/\.$/, '').trim()}`;
+  if (chooses) {
+    const picked = chooses[1].replace(/\.$/, '').trim();
+    return /^nothing$/i.test(picked) ? null : `Choosing ${picked}`;
+  }
   const afterCard = detail({ text: trimmed } as RuntimeEvent);
   const body = (afterCard && afterCard !== trimmed ? afterCard : trimmed).replace(/\.$/, '').trim();
   if (!body) return null;

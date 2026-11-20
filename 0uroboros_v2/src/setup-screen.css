@@ -15,34 +15,22 @@
 .game-configure-head b{font:600 12px Inter,sans-serif;color:#e8ecf4}
 .game-configure-head small{font-size:10px;line-height:1.35;color:#8b93a7}
 .game-configure-panel{display:flex;flex-direction:column;gap:14px;padding:12px;max-height:min(70vh,640px);overflow-y:auto;background:#ffffff05}
-.topline nav .game-configure-popover .game-mode-toggle>button,
-.topline nav .game-configure-popover .game-configure-vp button,
-.topline nav .game-configure-popover .deck-picker-options button{width:auto;padding:7px 11px;font-size:11px;text-align:center}
+.topline nav .game-configure-popover .game-mode-toggle>button{width:auto;padding:7px 11px;font-size:11px;text-align:center}
 .game-configure-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:0;border:0;min-width:0;font-size:12px;color:#c4bfd2}
 .game-configure-row>span{display:flex;flex-direction:column;gap:2px}
 .game-configure-row small{font-size:10px;color:#7f899e}
 .game-configure-row select,.game-configure-row input{padding:6px 8px;background:#111621;color:#e7f7fa;border:1px solid #526579;border-radius:4px;font:inherit}
 .game-configure-row select{width:130px}
-.game-configure-vp>div{display:flex;align-items:center;gap:8px}
-.game-configure-vp label{display:flex;align-items:center;gap:6px;font-size:11px;color:#aab3c5}
-.game-configure-vp input{width:58px}
-.game-configure-vp button{padding:5px 9px;font-size:11px}
-.game-configure-check{cursor:pointer}
-.game-configure-row.game-configure-check input{width:18px;height:18px;padding:0;accent-color:var(--green,#1fffb1);cursor:pointer}
-.game-configure-awards{flex-direction:column;align-items:stretch;justify-content:flex-start;gap:8px}
-.game-configure-award-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;width:100%}
-.game-configure-award-list li{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:6px;min-width:0;padding:6px 8px;border:1px solid #ffffff14;border-radius:6px;background:#ffffff06}
-.game-configure-award-list .game-configure-check{display:flex;align-items:flex-start;gap:6px;min-width:0;font-size:11px;line-height:1.25;color:#c4bfd2}
-.game-configure-award-list .game-configure-check input{flex:none;width:16px;height:16px;margin-top:1px;padding:0;accent-color:var(--green,#1fffb1);cursor:pointer}
-.game-configure-award-list .game-configure-check span{min-width:0}
-.game-configure-award-list input[type='number']{width:52px;padding:5px 6px;font-size:11px}
-@media(max-width:520px){.game-configure-award-list{grid-template-columns:1fr}}
 .game-mode-toggle{display:inline-flex;padding:2px;border:1px solid #1fffb144;border-radius:7px;background:#04150f88;gap:2px}
 .game-mode-toggle>button{padding:7px 11px;border:0;border-radius:5px;background:transparent;color:#9ff5d6;font:600 11px Inter,sans-serif;white-space:nowrap}
 .game-mode-toggle>button:hover:not(:disabled):not(.selected){background:#1fffb114}
 .game-mode-toggle>button.selected,.game-mode-toggle>button[aria-checked='true']{background:var(--green,#1fffb1);color:#04150f}
 .game-mode-toggle>button:disabled{opacity:.45}
-.game-configure .deck-picker{margin-bottom:12px}
+.circuit-mode{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.circuit-mode>small{font:600 10px Inter,sans-serif;letter-spacing:.12em;color:#8b93a7}
+.circuit-mode-tabs{display:flex;width:100%}
+.circuit-mode-tabs>button{flex:1 1 0;padding:8px 11px;font-size:12px}
+.circuit-mode-hint{margin:0;font-size:11px;color:#9ff5d6}
 .setup-actions{
   display:flex;align-items:stretch;gap:16px;margin:0 0 14px;width:100%;
 }
@@ -54,51 +42,37 @@
 .setup-gallery-button .icon{
   width:14px;height:14px;background:currentColor;
 }
-.setup-card>.setup-gallery-button{
+.setup-actions>.setup-gallery-button{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  width:auto;align-self:flex-start;margin:0;height:32px;min-height:32px;padding:0 16px;
+  flex:none;width:auto;margin:0;height:32px;min-height:32px;padding:0 16px;white-space:nowrap;
   font-size:14px;font-weight:400;background:transparent;
 }
 /*
  * Dual-layer chamfer stroke (same as other setup secondaries): ::before = green shell,
  * ::after = inset face. Face uses the frosted-card tint so default reads unfilled, not a dark slab.
  */
-.setup-card>.setup-gallery-button::before{
+.setup-actions>.setup-gallery-button::before{
   content:'';display:block;position:absolute;inset:0;z-index:-1;pointer-events:none;
   background:var(--green,#1fffb1);border-radius:0 5px 0 5px;padding:0;
   clip-path:polygon(var(--btn-cut) 0,100% 0,100% calc(100% - var(--btn-cut)),calc(100% - var(--btn-cut)) 100%,0 100%,0 var(--btn-cut));
   -webkit-mask:none;mask:none;box-shadow:none;
 }
-.setup-card>.setup-gallery-button::after{
+.setup-actions>.setup-gallery-button::after{
   content:'';display:block;position:absolute;inset:2px;z-index:-1;pointer-events:none;
   background:#0506148c;border-radius:0 4px 0 4px;
   clip-path:polygon(calc(var(--btn-cut) - 2px) 0,100% 0,100% calc(100% - (var(--btn-cut) - 2px)),calc(100% - (var(--btn-cut) - 2px)) 100%,0 100%,0 calc(var(--btn-cut) - 2px));
 }
-.setup-card>.setup-gallery-button:hover:not(:disabled)::before{background:var(--green,#1fffb1)}
-.setup-card>.setup-gallery-button:hover:not(:disabled)::after{background:color-mix(in srgb,var(--green,#1fffb1) 14%,#0506148c)}
+.setup-actions>.setup-gallery-button:hover:not(:disabled)::before{background:var(--green,#1fffb1)}
+.setup-actions>.setup-gallery-button:hover:not(:disabled)::after{background:color-mix(in srgb,var(--green,#1fffb1) 14%,#0506148c)}
 .setup-actions>.primary-button .icon{
   width:16px;height:16px;background:currentColor;
 }
 
-.deck-picker{margin:0 0 16px;padding:0;border:0;min-width:0}
-.deck-picker legend{display:flex;align-items:baseline;justify-content:space-between;width:100%;padding:0;margin-bottom:8px;font-size:12px;color:#c4bfd2}
-.deck-picker legend small{font-size:10px;color:#7f899e}
-.deck-picker-options{display:flex;flex-wrap:wrap;gap:6px;max-height:112px;overflow-y:auto}
-.deck-picker-options button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:120px;padding:8px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff08;text-align:left}
-.deck-picker-options button b{font:600 12px Inter,sans-serif;color:#e8ecf4}
-.deck-picker-options button small{font-size:10px;color:#8b93a7}
-.deck-picker-options button:hover:not(:disabled){border-color:#ffffff55;background:#ffffff12}
-.deck-picker-options button[aria-checked='true'],.deck-picker-options button[aria-checked='true']:hover{border-color:var(--green,#1fffb1);background:#1fffb114;box-shadow:0 0 0 1px var(--green,#1fffb1) inset}
-.deck-picker-options button[aria-checked='true'] small{color:#9ff5d6}
-.deck-picker-options button:disabled{opacity:.45}
-.deck-picker-cards{display:flex;flex-wrap:wrap;gap:4px 10px;margin:8px 0 0;font-size:10px;line-height:1.4;color:#9eabc0}
-.deck-picker-cards i{margin-right:3px;font-style:normal;color:#7f899e}
-.deck-picker-note{margin:0;font-size:11px;color:#7f899e}
 
 @media(max-width:1100px){.setup-backdrop{flex-wrap:nowrap}}
 
 /* Online: create a table for a friend, join one by code, or quick-match. */
-.online-lobby{display:flex;flex-direction:column;gap:10px;margin:18px 0 12px;padding:14px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff06}
+.online-lobby{display:flex;flex-direction:column;gap:10px;margin:18px 0 36px;padding:14px 12px;border:1px solid #ffffff1f;border-radius:7px;background:#ffffff06}
 .online-identity{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:end;margin-bottom:14px}
 .online-identity-fields{display:flex;flex-direction:column;gap:8px;min-width:0}
 .online-identity-fields>.primary-button{width:100%;height:32px;min-height:32px;margin:0;font-size:14px;font-weight:400;--btn-fill:var(--green,#1fffb1);--btn-border:var(--green,#1fffb1);--btn-face:var(--green,#1fffb1);color:#04150f}

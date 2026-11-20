@@ -42,7 +42,7 @@ describe('authored pack', () => {
     const document = saved.document as ContentDocument;
     expect(validateContent(document)).toEqual([]);
     const compiled = compileContent(document);
-    expect(compiled.cards.map(card => card.definitionId)).toEqual(expect.arrayContaining(['time-slide', 'superpositioning', 'koppy-kat']));
+    expect(compiled.cards.map(card => card.definitionId)).toEqual(expect.arrayContaining(['time-slide', 'banishing-ritual', 'koppy-kat']));
     expect(compiled.mods?.map(mod => mod.id)).toEqual(expect.arrayContaining(['aura-farming', 'lefty', 'superpositioning']));
   });
 });

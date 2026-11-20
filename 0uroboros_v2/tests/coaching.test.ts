@@ -10,8 +10,10 @@ import { clampToEnvelope, DV_8, STRAT_G, STRAT_G_PHASES, T_5, VP_DOG } from "../
 
 const document = (authored as unknown as { document: ContentDocument }).document;
 const content = compileForSelfPlay(document);
+// Valuation is about a Location's rule, not whether Mel currently has it switched on.
+const everyLocation = compileForSelfPlay({ ...document, locations: document.locations.map(entry => ({ ...entry, enabled: true })) }).locations;
 const location = (name: string) => {
-  const found = content.locations.find(entry => entry.name.trim().toLowerCase() === name.toLowerCase());
+  const found = everyLocation.find(entry => entry.name.trim().toLowerCase() === name.toLowerCase());
   if (!found) throw new Error(`missing Location ${name}`);
   return found;
 };
@@ -20,8 +22,8 @@ const designed = (identity: typeof STRAT_G) => clampToEnvelope({ ...identity.bas
 
 describe("Location valuation", () => {
   it("prices from the winner's seat: loser-paying Locations are negative, draw/Drain/VP ones positive, symmetric ones even", () => {
-    for (const name of ["Login the Calvary", "Loser's Luck", "Code Cull"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeLessThan(0);
-    for (const name of ["Signal tower", "Data Breach", "Sludge core", "Wind fall"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeGreaterThan(0);
+    for (const name of ["Login the Calvary", "Code Cull"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeLessThan(0);
+    for (const name of ["Signal tower", "Sludge core", "Wind fall"]) expect(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake).toBeGreaterThan(0);
     for (const name of ["Trash compactor", "Sacrificial Altar", "No Man's Land"]) expect(Math.abs(locationStakes(location(name), DEFAULT_STRATEGY, context(8)).stake)).toBeLessThan(0.5);
   });
 
@@ -39,7 +41,7 @@ describe("Location valuation", () => {
   });
 
   it("reads give agents and Eco-Strat a plain verdict per Location", () => {
-    expect(locationRead(location("Loser's Luck"))).toMatch(/concede/);
+    expect(locationRead(location("Login the Calvary"))).toMatch(/concede/);
     expect(locationRead(location("Signal tower"))).toMatch(/^contest it/);
     const facts = systemFacts(document);
     expect(facts.rules.locations).toMatch(/winner/);

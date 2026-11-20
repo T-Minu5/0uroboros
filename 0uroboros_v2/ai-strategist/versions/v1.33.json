@@ -1,0 +1,583 @@
+{
+  "version": "v1.33",
+  "since": "2026-11-19T08:36:16.565Z",
+  "mode": "llm",
+  "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, focusing on Basic Encryption and Shyte-Coins. By building a strong economy, I will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide decisions through each phase. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+  "profile": {
+    "version": 33,
+    "plan": "In Cycles 1-4, I will maximize Wallet income by drafting Characters that generate Crypto and trash weak cards from my starting deck, focusing on Basic Encryption and Shyte-Coins. By building a strong economy, I will support my strategies in future Cycles. From Cycle 5 to 8, I will balance aggressive strategies, engine development, Server Restore, and VP collection while adapting to the dynamics of Locations. Starting at Cycle 9, I will focus on aggressive attacks on the opponent's Servers and prioritize acquiring high-value VP cards. My numeric profile will guide decisions through each phase. (Schedule: economy through Cycle 4, balanced midgame Cycles 5-8, Chaos from Cycle 9, VP from Cycle 9.)",
+    "economyUntilCycle": 4,
+    "chaosFromCycle": 9,
+    "vpFromCycle": 9,
+    "midgameMix": 0.5,
+    "handCryptoTarget": 11.67,
+    "minCryptoValue": 2,
+    "minBuyScore": 1.72,
+    "dilution": 0.83,
+    "weights": {
+      "power": 1.01,
+      "draw": 2.48,
+      "crypto": 2.04,
+      "drain": 2.25,
+      "restore": 2.5,
+      "vp": 2.66,
+      "duration": 0.8,
+      "thin": 1.67,
+      "disrupt": 1.77,
+      "chaos": 1.45
+    },
+    "cardBias": {}
+  },
+  "adopted": {
+    "weights": {
+      "restore": 2.5,
+      "disrupt": 1.77
+    },
+    "cardBias": {}
+  },
+  "experiment": {
+    "id": "x313-fallback-313-0",
+    "theoryId": null,
+    "supportsTheory": true,
+    "menuId": "fallback-313-0",
+    "hypothesis": "A small envelope-clamped nudge while the experiment menu has nothing left to try.",
+    "prediction": "More wins or a better margin than the current best.",
+    "change": {
+      "weights": {
+        "power": 1.56
+      }
+    },
+    "source": "heuristic",
+    "changeSummary": "power weight 1.31→1.56",
+    "proposedBy": 32,
+    "proposedAt": "2026-11-19T08:31:44.260Z",
+    "stage": "lab",
+    "lab": null,
+    "field": {
+      "experiment": {
+        "games": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "margin": 0
+      },
+      "control": {
+        "games": 0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 0,
+        "margin": 0
+      }
+    },
+    "verdict": null,
+    "concludedBy": null,
+    "concludedAt": null
+  },
+  "theories": [
+    {
+      "id": "no-shyte",
+      "text": "Shyte-Coin is not worth a deck slot: it dilutes draws. Bigger Crypto (Kilo, Mega-Cache) or Characters that draw cards are better buys.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "no-shyte",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "economy-first",
+      "text": "Buying a few high-value Crypto cards (cost 6+) by Cycle 5 builds the economy that wins the late game.",
+      "status": "retired",
+      "confidence": 0.64,
+      "support": 8,
+      "against": 4,
+      "test": "economy-first",
+      "createdBy": -1,
+      "updatedBy": 7
+    },
+    {
+      "id": "draw-engine",
+      "text": "Characters that draw cards cycle the deck back to its best cards faster than extra Crypto does.",
+      "status": "retired",
+      "confidence": 0.4,
+      "support": 1,
+      "against": 2,
+      "test": "draw-engine",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "chaos-endgame",
+      "text": "Pivoting into Chaos cards around Cycle 9 sets up an endgame Drain push that destroys Servers for +8/+12 VP.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 2,
+      "against": 2,
+      "test": "chaos-endgame",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-aggression",
+      "text": "Heavy Chaos buying before Cycle 6 beats a slow economy (the counter-theory to chaos-endgame).",
+      "status": "retired",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "test": "early-aggression",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "vp-late",
+      "text": "VP cards are best bought late (Cycle 12+); earlier they clog the hand.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "test": "vp-late",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "drain-race",
+      "text": "Most games are decided by Server destruction before Cycle 12, so Drain matters from the start and Restore is real defense.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 1,
+      "against": 1,
+      "test": "drain-race",
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-chaos-transition",
+      "text": "Transitioning into Chaos by Cycle 5 is optimal for enhancing Drain and server destruction.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "strong-draw-focus",
+      "text": "Focusing on strong draw/Action Base cards in the early game maximizes efficiency and prepares for later cycles.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "mid-game-vp-acquisition",
+      "text": "Acquiring VP cards in the mid to late game (Cycle 10+) prevents hand clogging and maximizes scoring potential.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "restore-importance",
+      "text": "Including Restore cards earlier in the strategy can help mitigate Server damage and prolong the game.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "high-value-chaos",
+      "text": "Focusing on high-value Chaos cards early (cost 5+) can enhance Drain effects and Server destruction capabilities.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "mid-game-draft-adjustment",
+      "text": "Adjusting my mid-game Draft strategy to aim for at least 10 cards will improve my economy and performance against aggressive opponents.",
+      "status": "retired",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": 0
+    },
+    {
+      "id": "early-vp-strategy",
+      "text": "Acquiring VP cards earlier (Cycle 10+) can enhance scoring opportunities without clogging the hand.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "high-value-draw-action-focus",
+      "text": "Prioritizing high-value draw and Action cards early maximizes efficiency and prepares for later cycles.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "timely-vp-acquisition",
+      "text": "Adjusting VP acquisition timing based on observed human strategies maximizes scoring potential.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "early-chaos-priority",
+      "text": "Acquiring high-value Chaos cards early enhances Drain strategies and increases chances of Server destruction.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": -1
+    },
+    {
+      "id": "healing-hands-impact",
+      "text": "The Healing Hands location will likely increase the defensive capabilities of decks, allowing for sustained pressure.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": -1,
+      "updatedBy": 28
+    },
+    {
+      "id": "healing-hands-potential",
+      "text": "The 'Healing Hands' location significantly enhances recovery strategies, making it a priority in future drafts.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 0,
+      "updatedBy": 0
+    },
+    {
+      "id": "early-vp-focus",
+      "text": "Acquiring VP cards earlier will help secure victories before the Drain race escalates.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 0,
+      "updatedBy": 1
+    },
+    {
+      "id": "early-chaos-pivot",
+      "text": "An early pivot to Chaos (before Cycle 5) provides an aggressive advantage, allowing for immediate pressure on the opponent's Servers.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 2
+    },
+    {
+      "id": "chaos-later",
+      "text": "Delaying the Chaos pivot to Cycle 6 will build a more effective economy for a stronger endgame Drain push.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 2,
+      "updatedBy": 7
+    },
+    {
+      "id": "the-nudge-impact",
+      "text": "Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 2,
+      "updatedBy": 3
+    },
+    {
+      "id": "healing-impact",
+      "text": "Integrating more Restore cards will help stabilize my Servers against aggressive VP strategies.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 3
+    },
+    {
+      "id": "location-impact",
+      "text": "New Locations can significantly alter the game's strategic landscape, affecting both offensive and defensive plays.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 3,
+      "updatedBy": 28
+    },
+    {
+      "id": "higher-crypto-target",
+      "text": "Setting a higher handCryptoTarget of 12 will improve my economy and performance against aggressive opponents.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 5,
+      "updatedBy": 7
+    },
+    {
+      "id": "location-impact-monitoring",
+      "text": "Monitoring the impact of new Locations on strategies is crucial for adapting gameplay.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 5,
+      "updatedBy": 7
+    },
+    {
+      "id": "monitor-nothing-happens-here",
+      "text": "The Location 'Nothing ever happens here' may shift strategies significantly by providing a neutral space.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 7,
+      "updatedBy": 7
+    },
+    {
+      "id": "evaluate-new-locations",
+      "text": "Assessing the impact of new Locations like 'The Might Meek' and 'The Nudge' will enhance my strategic decisions.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 7,
+      "updatedBy": 11
+    },
+    {
+      "id": "location-impact-on-strategy",
+      "text": "New Locations may significantly alter gameplay dynamics and strategies, especially regarding power and resource management.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 11,
+      "updatedBy": 27
+    },
+    {
+      "id": "new-locations-impact",
+      "text": "Evaluate the impact of new Locations on overall strategy and adapt accordingly.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 11,
+      "updatedBy": 27
+    },
+    {
+      "id": "prioritize-restore",
+      "text": "Prioritizing Restore is essential for server defense.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15
+    },
+    {
+      "id": "aggressive-drain",
+      "text": "Aggressive Drain pushes are crucial as the human's Servers have been vulnerable.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 15
+    },
+    {
+      "id": "power-dynamics",
+      "text": "Valuing Power higher wins more Locations and their rewards.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 15,
+      "updatedBy": 18,
+      "observation": "I lost most Locations in recent Cycles.",
+      "hypothesis": "Increasing Power weight will help secure Locations.",
+      "proposedTest": "Increase power weight by 0.3."
+    },
+    {
+      "id": "restore-value",
+      "text": "Valuing Restore higher keeps my Servers alive long enough to win on VP.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 15,
+      "updatedBy": 18,
+      "observation": "My Servers are critically low; defense with Restore is essential.",
+      "hypothesis": "Higher Restore weight will improve my Server survivability.",
+      "proposedTest": "Restore weight increased from 2.09 to 2.5."
+    },
+    {
+      "id": "more-economy-focused-draft",
+      "text": "Include more economy-focused cards in the draft strategy.",
+      "status": "retired",
+      "confidence": 0.67,
+      "support": 1,
+      "against": 0,
+      "createdBy": 18,
+      "updatedBy": 22,
+      "observation": "The human consistently has a higher Draft wallet.",
+      "interpretation": "Current draft strategy may neglect economy-focused cards.",
+      "hypothesis": "Focusing on economy in the draft will improve my overall performance.",
+      "proposedTest": "Draft a higher proportion of economy-focused cards over the next 5 games and compare results."
+    },
+    {
+      "id": "strategic-location-control",
+      "text": "New Locations provide opportunities for shifting game dynamics; I should prioritize Locations that enhance my economic advantage.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 22,
+      "updatedBy": 22
+    },
+    {
+      "id": "early-economy-adjustment",
+      "text": "Adjusting my early economy focus may help keep pace with human opponents who are consistently outpacing my Draft wallet.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 22,
+      "updatedBy": 22
+    },
+    {
+      "id": "evaluate-new-cards",
+      "text": "Incorporating new cards will lead to improved deck performance and win rates.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 22,
+      "updatedBy": 25
+    },
+    {
+      "id": "adjust-early-economy-focus",
+      "text": "Focusing on early economy may help balance the Draft wallet disparity.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 22,
+      "updatedBy": 24
+    },
+    {
+      "id": "early-agg-adoption",
+      "text": "Incorporating early aggression will apply consistent pressure on the opponent.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 25,
+      "updatedBy": 27,
+      "hypothesis": "Higher early aggression will lead to a higher VP margin in games.",
+      "proposedTest": "Measure VP margins in games where early aggression strategies are applied compared to standard strategies."
+    },
+    {
+      "id": "aggressive-strategies",
+      "text": "By increasing the weight of Chaos cards slightly, I will improve my chances of winning by focusing on aggression.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 28,
+      "updatedBy": 28,
+      "observation": "I have struggled against opponents who efficiently build their economy.",
+      "hypothesis": "Aggression can disrupt their plans and lead to quicker Server destruction.",
+      "proposedTest": "Test the impact of additional aggressive cards in the current strategy."
+    },
+    {
+      "id": "high-value-characters",
+      "text": "Prioritizing high-value Characters enhances early game pressure.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 28,
+      "updatedBy": 28,
+      "observation": "High-value Characters like Iterative Incubus have shown potential in previous games.",
+      "hypothesis": "Focusing on high-value Characters will improve my chances of winning early.",
+      "proposedTest": "Test with a higher bias towards high-value Characters in Draft."
+    },
+    {
+      "id": "card-synergy",
+      "text": "Incorporating new cards will enhance my deck's synergy and overall performance.",
+      "status": "retired",
+      "confidence": 0.5,
+      "support": 0,
+      "against": 0,
+      "createdBy": 28,
+      "updatedBy": 30
+    },
+    {
+      "id": "nothing-ever-happens-here-impact",
+      "text": "The Nothing Ever Happens Here location may incentivize aggressive VP collection strategies, impacting game dynamics.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "createdBy": 28,
+      "updatedBy": 32
+    },
+    {
+      "id": "endgame-awards",
+      "text": "Configure end-game awards (Destroyed/Trashed/Stolen/Deck Attacks/Circuits/…) decide close games, so play that banks those metrics is worth weight even when Server kill VP looks decided.",
+      "status": "retired",
+      "confidence": 0.33,
+      "support": 0,
+      "against": 1,
+      "test": "endgame-awards",
+      "observation": "Winner vs loser share of end-game award VP and which award rows they led.",
+      "interpretation": "Award leaders associating with wins means the slate is skill-relevant, not noise.",
+      "hypothesis": "Valuing destroy/access/Circuit edges slightly higher raises win rate in close VP finishes.",
+      "proposedTest": "Experiment: mild disrupt/drain/thin bumps; measure award VP share and wins vs current best.",
+      "createdBy": 29,
+      "updatedBy": 33
+    },
+    {
+      "id": "ongoing-hosts",
+      "text": "Revealed card Ongoing hosts (reflect, mirror, destroy-when, listenAccess) change node priority; silencing or sequencing around them beats ignoring them.",
+      "status": "retired",
+      "confidence": 0.45,
+      "support": 0,
+      "against": 0,
+      "test": "ongoing-hosts",
+      "observation": "Games where Banishing/reflect/Canary/Mosquito were bought and whether the buyer won.",
+      "interpretation": "Ongoing packages associating with wins means hosts are real tempo, not flavor text.",
+      "hypothesis": "Card bias toward key Ongoing definitions (or against enemy reflect) improves results.",
+      "proposedTest": "Experiment: +1 cardBias on Banishing / Mosquito / Canary; measure wins and Drain efficiency.",
+      "createdBy": 29,
+      "updatedBy": 33
+    }
+  ]
+}

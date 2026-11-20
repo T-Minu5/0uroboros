@@ -98,7 +98,7 @@ describe("the journal's tabs and summary", () => {
     expect(topRecommendations(journal, 3).map(item => item.title)).toEqual(["First idea", "Second idea", "Old idea"]);
     const { preamble, tabs } = splitTabs(renderJournal(journal));
     expect(preamble).toMatch(/# Eco-Strat journal/);
-    expect(tabs.map(tab => tab.title)).toEqual(["Summary", "Point of view", "Hypotheses", "Observations", "Recommendations", "Reports", "Research", "Errors"]);
+    expect(tabs.map(tab => tab.title)).toEqual(["Baseline", "Reports", "Working notes", "Errors"]);
     const summary = tabs[0].text;
     expect(summary).toMatch(/1\. \*\*First idea\*\* Cut A\.[\s\S]*2\. \*\*Second idea\*\*[\s\S]*3\. \*\*Old idea\*\*/);
     expect(summary).not.toMatch(/Withdrawn idea/);
@@ -110,7 +110,11 @@ describe("the journal's tabs and summary", () => {
     expect(summary).toMatch(/\| Server destruction \| 3 \(60%\) \| 2 \| 1 \| 0 \|/);
     expect(summary).toMatch(/\| Full 16 Cycles \| 2 \(40%\) \| 1 \| 0 \| 1 \|/);
     expect(summary).toMatch(/\| \*\*All games\*\* \| 5 \(100%\) \| 3 \| 1 \| 1 \|/);
-    expect(tabs[4].text).toMatch(/### Withdrawn \(1\)[\s\S]*_Starts in every deck\._[\s\S]*- Withdrawn idea/);
+    expect(tabs[1].text).toMatch(/### Withdrawn \(1\)[\s\S]*_Starts in every deck\._[\s\S]*- Withdrawn idea/);
+    expect(tabs[0].text).toMatch(/## My point of view/);
+    expect(tabs[0].text).toMatch(/## Research/);
+    expect(tabs[1].text).toMatch(/## Epoch results/);
+    expect(tabs[1].text).toMatch(/## League and baseline reports/);
   });
 });
 
@@ -146,7 +150,7 @@ describe("Eco-Strat and the starting deck", () => {
       expect(purchases.top.length).toBeGreaterThan(0);
       expect(purchases.top.every(line => line.buyerGames >= 3)).toBe(true);
       const summary = splitTabs(await readFile(join(root, "ai-agents/eco-strat/JOURNAL.md"), "utf8")).tabs[0];
-      expect(summary.title).toBe("Summary");
+      expect(summary.title).toBe("Baseline");
       expect(summary.text).toMatch(new RegExp(`\\| ${purchases.top[0].name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\|`));
     } finally { await rm(root, { recursive: true, force: true }); }
   }, 60_000);

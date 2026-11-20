@@ -99,7 +99,8 @@ describe('authored content in RuntimeSession', () => {
       session.state.turn = 3;
       session.endTurn(); finish(session);
       const offer = session.state.market.filter(pile => pile.rotating);
-      expect(offer.length).toBeGreaterThanOrEqual(8);
+      // Eight slots; built-in content has no Solar Monk, so that slot stays empty.
+      expect(offer.length).toBe(7);
       expect(offer.every(pile => pile.rotating && pile.remaining?.join() === '2,2')).toBe(true);
       offers.push(offer.map(pile => identity(pile.card)));
       for (const pile of offer) {

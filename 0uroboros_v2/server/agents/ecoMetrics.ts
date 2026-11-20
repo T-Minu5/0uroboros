@@ -199,11 +199,12 @@ export type GameMetrics = {
   achievements: GameAchievementHit[];
   /**
    * Per-cycle board state for snowball analysis. `circuitClaims` is cumulative through this Cycle;
-   * `circuitDifferential` is seat0 − seat1 cumulative Circuit claims; `locationsWon` is that Cycle only.
+   * `circuitClaimsThisCycle` is claims earned on this Cycle only; `circuitDifferential` is seat0 − seat1
+   * cumulative Circuit claims; `locationsWon` is that Cycle only.
    */
   timeline: {
     cycle: number; vp: Pair; servers: Pair; wallet: Pair; deckSize: Pair;
-    locationsWon: Pair; circuitClaims: Pair; circuitDifferential: number;
+    locationsWon: Pair; circuitClaims: Pair; circuitClaimsThisCycle: Pair; circuitDifferential: number;
   }[];
   /** Printed VP from market purchases (VP cards bought). Separates market from destruction/other VP. */
   marketVp: Pair;
@@ -252,11 +253,15 @@ export function gameMetrics(report: MatchReport): GameMetrics {
   const destructionVP = pair(seat => sum(destructions.filter(item => item.by === seat && item.victim !== seat).map(item => item.vp)));
   const cumulativeClaims: Pair = [0, 0];
   const timeline = report.cycles.map(cycle => {
-    for (const seat of SEATS) if (cycle.circuit?.claimed.includes(seat)) cumulativeClaims[seat]++;
+    const circuitClaimsThisCycle: Pair = [
+      cycle.circuit?.claimed.includes(0) ? 1 : 0,
+      cycle.circuit?.claimed.includes(1) ? 1 : 0,
+    ];
+    for (const seat of SEATS) cumulativeClaims[seat] += circuitClaimsThisCycle[seat];
     const circuitClaims: Pair = [cumulativeClaims[0], cumulativeClaims[1]];
     return {
       cycle: cycle.cycle, vp: cycle.vp, servers: cycle.servers, wallet: cycle.wallet, deckSize: cycle.deckSize ?? [0, 0] as Pair,
-      locationsWon: cycle.locationsWon, circuitClaims, circuitDifferential: circuitClaims[0] - circuitClaims[1],
+      locationsWon: cycle.locationsWon, circuitClaims, circuitClaimsThisCycle, circuitDifferential: circuitClaims[0] - circuitClaims[1],
     };
   });
   const leader = (values: Pair): Seat | null => values[0] === values[1] ? null : values[0] > values[1] ? 0 : 1;
@@ -668,12 +673,95 @@ export function cohortMetrics(games: { id: string; report: MatchReport }[]) {
       categoryShare: Object.fromEntries(Object.entries(categoryCounts).map(([key, value]) => [key, round(value / Math.max(1, purchases.length))])),
       winnerSpentMore: winnerVs((m, seat) => m.economy.spent[seat]),
     },
+    /**
+     * Quarterly game progress (Cycles 1–4 / 5–8 / 9–12 / 13–16): Circuit claim timing, Location pace,
+     * VP, and when first destructions / 2+ Circuit leads appear. Use to test whether early Circuit leads
+     * predict later Location dominance independent of raw Drain.
+     */
+    progress: (() => {
+      const QUARTERS = [
+        { id: 'Q1', label: 'Cycles 1–4', from: 1, to: 4 },
+        { id: 'Q2', label: 'Cycles 5–8', from: 5, to: 8 },
+        { id: 'Q3', label: 'Cycles 9–12', from: 9, to: 12 },
+        { id: 'Q4', label: 'Cycles 13–16', from: 13, to: 16 },
+      ] as const;
+      const inRange = (cycle: number, from: number, to: number) => cycle >= from && cycle <= to;
+      const reached = (from: number) => rows.filter(row => row.m.cycles >= from);
+      return {
+        quarters: QUARTERS.map(({ id, label, from, to }) => {
+          const sample = reached(from);
+          const endRow = (m: GameMetrics) => [...m.timeline].reverse().find(entry => inRange(entry.cycle, from, to))
+            ?? m.timeline.find(entry => entry.cycle === Math.min(to, m.cycles));
+          const claimsIn = (m: GameMetrics) => sum(m.timeline.filter(entry => inRange(entry.cycle, from, to)).map(entry => sum(entry.circuitClaimsThisCycle)));
+          const locationsIn = (m: GameMetrics) => sum(m.timeline.filter(entry => inRange(entry.cycle, from, to)).map(entry => sum(entry.locationsWon)));
+          const firstKillHere = sample.filter(row => row.m.firstDestructionCycle !== null && inRange(row.m.firstDestructionCycle, from, to)).length;
+          const lead2Here = sample.filter(row => {
+            const at = row.m.circuitLead2At[0] ?? row.m.circuitLead2At[1];
+            return at !== null && inRange(at, from, to);
+          }).length;
+          const avgVpAtEnd = round(mean(sample.map(row => {
+            const entry = endRow(row.m);
+            return entry ? (entry.vp[0] + entry.vp[1]) / 2 : 0;
+          })));
+          const avgClaimLeadAtEnd = round(mean(sample.map(row => {
+            const entry = endRow(row.m);
+            return entry ? Math.abs(entry.circuitDifferential) : 0;
+          })));
+          return {
+            id, label, cycles: `${from}–${to}`, gamesReached: sample.length,
+            avgCircuitClaimsThisQuarter: round(mean(sample.map(row => claimsIn(row.m)))),
+            avgLocationsWonThisQuarter: round(mean(sample.map(row => locationsIn(row.m)))),
+            avgVpPerSeatAtQuarterEnd: avgVpAtEnd,
+            avgAbsCircuitClaimLeadAtQuarterEnd: avgClaimLeadAtEnd,
+            firstDestructionShare: rate(firstKillHere, sample.length),
+            circuitLead2PlusFirstReachedShare: rate(lead2Here, sample.length),
+          };
+        }),
+        /** Among games where a 2+ Circuit-claim lead appeared by Cycle 8, how often that leader won more Locations in Cycles 9–16. */
+        earlyCircuitLeadLaterLocations: (() => {
+          const early: { row: (typeof rows)[number]; seat: Seat; at: number }[] = [];
+          for (const row of rows) for (const seat of SEATS) {
+            const at = row.m.circuitLead2At[seat];
+            if (at !== null && at <= 8) early.push({ row, seat, at });
+          }
+          if (!early.length) return { games: 0, seats: 0, wonMoreLocationsInQ3Q4: null as number | null, wonGame: null as number | null };
+          const laterLoc = (lead: typeof early[number]) => {
+            const later = lead.row.m.timeline.filter(entry => entry.cycle >= 9);
+            return {
+              leader: sum(later.map(entry => entry.locationsWon[lead.seat])),
+              trailer: sum(later.map(entry => entry.locationsWon[1 - lead.seat])),
+            };
+          };
+          const decisive = early.filter(lead => lead.row.m.winner !== null);
+          return {
+            games: new Set(early.map(lead => lead.row.id)).size,
+            seats: early.length,
+            wonMoreLocationsInQ3Q4: rate(early.filter(lead => {
+              const next = laterLoc(lead);
+              return next.leader > next.trailer;
+            }).length, early.length),
+            wonGame: rate(decisive.filter(lead => lead.row.m.winner === lead.seat).length, decisive.length),
+          };
+        })(),
+      };
+    })(),
     diversity: {
       distinctCardsBought: Object.keys(boughtCounts).length, topThreeShare: round(sum(topBought.slice(0, 3).map(entry => entry[1])) / Math.max(1, purchases.length)),
       topBought: topBought.slice(0, 10).map(([name, count]) => ({ name, count })),
       sameGameSimilarity: avg(m => m.purchaseSimilarity), crossGameSimilarity: round(mean(crossGame)), archetypes: archetypeStats,
     },
     cards,
+    /**
+     * When games hit Cycle 16 instead of Server destruction: was it market VP + Server repair
+     * stalling the race, or were game-enders (∆-Wave, Chrome Mitchell, Veil of Cthulhu, Shoggoth,
+     * Tihkal, Azimuthal) never offered / bought? Compared against destruction endings in the same cohort.
+     */
+    cycle16Stall: (() => {
+      const cycle16 = endingBucket(rows.filter(row => row.m.endedBy === 'cycle16'));
+      const destruction = endingBucket(rows.filter(row => row.m.endedBy === 'destruction'));
+      const { diagnosis, note } = diagnoseCycle16Stall(cycle16, destruction);
+      return { cycle16, destruction, diagnosis, note };
+    })(),
     ux: { failedOutcomesPerGame: avg(m => sum(m.ux.failedOutcomes)), randomResultsPerGame: avg(m => m.ux.randomResults), choicesPerGame: avg(m => sum(m.ux.choices)), eventsPerCycle: avg(m => m.ux.eventsPerCycle) },
     /** AI behaviour (Strat-G), not game rules. */
     aiPlayer: { avgDeployOptions: avg(m => m.decisions.avgDeployOptions), choicesPickedAtRandomByAiPerGame: avg(m => m.decisions.aiRandomPicks) },
@@ -725,6 +813,110 @@ export function archetypeResults(games: { id: string; report: MatchReport; seats
     };
   }).sort((a, b) => (b.winRate ?? -1) - (a.winRate ?? -1));
   return { games: rows.length, targets: { damage: targets.damage, vpBought: targets.vpBought }, agents: agentsOut };
+}
+
+/**
+ * High-cost finishers that can end games by Server destruction. Used to diagnose Cycle-16 stalls:
+ * were VP cards / Server repair dragging games out, or were these enders simply unavailable / unbought?
+ */
+export const GAME_ENDERS: { id: string; name: string }[] = [
+  { id: 'delta-wave', name: '∆-Wave' },
+  { id: 'chrome-mitchell', name: 'Chrome Mitchell' },
+  { id: 'veil-of-cthulhu', name: 'Veil of Cthulhu' },
+  { id: 'card-a2qeb5kn', name: 'The Shoggoth' },
+  { id: 'tihkal-hound', name: 'Tihkal Hound' },
+  { id: 'the-azimuthal-kill', name: 'The Azimuthal Kill' },
+];
+const GAME_ENDER_ID_SET = new Set(GAME_ENDERS.map(item => item.id));
+
+/** Match by stable definitionId, or by name when Shoggoth-style authored ids drift. */
+export function isGameEnder(definitionId: string, name = ''): boolean {
+  if (GAME_ENDER_ID_SET.has(definitionId)) return true;
+  return /(?:^|[\s(])(?:the\s+)?(?:shoggoth|veil of cthulhu|azimuthal(?:\s+kill)?|tihkal(?:\s+hound)?|delta[- ]?wave|chrome\s*mitchell)(?:$|[\s)])/i.test(name.trim());
+}
+
+export type StallDiagnosis = 'repair-and-vp' | 'missing-enders' | 'mixed' | 'unclear';
+
+/** Per-ending-bucket stats for Cycle-16 stall diagnosis. */
+export function endingBucket(rows: { report: MatchReport; m: GameMetrics }[]) {
+  const n = rows.length;
+  const totalDrain = sum(rows.map(row => sum(row.m.drain)));
+  const totalRestore = sum(rows.map(row => sum(row.m.restore)));
+  const perSeat = (fn: (m: GameMetrics, seat: Seat) => number) => round(mean(rows.flatMap(row => SEATS.map(seat => fn(row.m, seat)))));
+  const enderPresence = (row: { report: MatchReport }) => {
+    const offered = new Set<string>();
+    let affordable = false;
+    for (const cycle of row.report.cycles) for (const pile of cycle.market ?? []) {
+      if (!isGameEnder(pile.id, pile.name)) continue;
+      offered.add(pile.id);
+      for (const seat of SEATS) if (pile.stock[seat] > 0 && cycle.wallet[seat] >= pile.cost) affordable = true;
+    }
+    const bought = row.report.purchases.filter(item => isGameEnder(item.definitionId, item.name));
+    return { offered: offered.size > 0, affordable: affordable || bought.length > 0, bought: bought.length > 0, buyCount: bought.length };
+  };
+  const presence = rows.map(enderPresence);
+  const matchesEnder = (id: string, name: string, ender: (typeof GAME_ENDERS)[number]) =>
+    id === ender.id
+    || (ender.id === 'card-a2qeb5kn' && /shoggoth/i.test(name))
+    || (ender.id === 'delta-wave' && /(?:delta[- ]?wave|∆-?wave)/i.test(name));
+  const cards = GAME_ENDERS.map(ender => {
+    let offers = 0, affordable = 0, picks = 0, copies = 0;
+    for (const row of rows) {
+      for (const cycle of row.report.cycles) for (const pile of cycle.market ?? []) {
+        if (!matchesEnder(pile.id, pile.name, ender)) continue;
+        for (const seat of SEATS) {
+          if (pile.stock[seat] <= 0) continue;
+          offers++;
+          const bought = row.report.purchases.some(item => item.cycle === cycle.cycle && item.owner === seat && item.definitionId === pile.id);
+          if (cycle.wallet[seat] >= pile.cost || bought) { affordable++; if (bought) picks++; }
+        }
+      }
+      copies += row.report.purchases.filter(item => matchesEnder(item.definitionId, item.name, ender)).length;
+    }
+    return { ...ender, offers, affordable, picks, copies, pickRate: rate(picks, affordable) };
+  });
+  return {
+    games: n,
+    avgMarketVpPerSeat: perSeat((m, seat) => m.marketVp[seat]),
+    avgRestorePerSeat: perSeat((m, seat) => m.restore[seat]),
+    avgDrainPerSeat: perSeat((m, seat) => m.drain[seat]),
+    restoreToDrain: totalDrain ? round(totalRestore / totalDrain) : 0,
+    avgHealOffset: perSeat((m, seat) => m.healOffset[seat]),
+    gameEnders: {
+      anyOfferedShare: rate(presence.filter(item => item.offered).length, n),
+      anyAffordableShare: rate(presence.filter(item => item.affordable).length, n),
+      anyBoughtShare: rate(presence.filter(item => item.bought).length, n),
+      avgBuysPerGame: round(mean(presence.map(item => item.buyCount))),
+      cards,
+    },
+  };
+}
+
+export type EndingBucket = ReturnType<typeof endingBucket>;
+
+export function diagnoseCycle16Stall(cycle16: EndingBucket, destruction: EndingBucket): { diagnosis: StallDiagnosis; note: string } {
+  if (cycle16.games < 3) return { diagnosis: 'unclear', note: `Only ${cycle16.games} Cycle-16 game(s); need a few more before diagnosing stall causes.` };
+  const repairVp = cycle16.games >= 3 && (
+    (destruction.games >= 3 && (cycle16.restoreToDrain >= destruction.restoreToDrain * 1.15 || cycle16.avgMarketVpPerSeat >= destruction.avgMarketVpPerSeat * 1.2))
+    || (destruction.games < 3 && (cycle16.restoreToDrain >= 0.55 || cycle16.avgMarketVpPerSeat >= 8))
+  );
+  const c16Buy = cycle16.gameEnders.anyBoughtShare ?? 0;
+  const destBuy = destruction.gameEnders.anyBoughtShare ?? 0;
+  const c16Afford = cycle16.gameEnders.anyAffordableShare ?? 0;
+  const missingEnders = cycle16.games >= 3 && (
+    (c16Buy <= 0.25 && (destruction.games < 3 || destBuy >= Math.max(0.35, c16Buy + 0.2)))
+    || (c16Afford <= 0.3 && c16Buy <= 0.2)
+  );
+  if (repairVp && missingEnders) {
+    return { diagnosis: 'mixed', note: 'Cycle-16 games show both elevated market VP / Server repair relative to destruction endings, and rare game-ender buys (∆-Wave, Chrome Mitchell, Veil of Cthulhu, Shoggoth, Tihkal, Azimuthal).' };
+  }
+  if (repairVp) {
+    return { diagnosis: 'repair-and-vp', note: 'Cycle-16 games lean toward market VP and/or Server repair stalling the race more than missing finishers.' };
+  }
+  if (missingEnders) {
+    return { diagnosis: 'missing-enders', note: 'Cycle-16 games rarely see game-enders bought (or even affordable); destruction endings buy them more often when comparable.' };
+  }
+  return { diagnosis: 'unclear', note: 'Cycle-16 vs destruction does not yet show a clear VP/repair stall or a missing-ender gap.' };
 }
 
 export type CatalogCard = { id: string; name: string; pool: string; cost: number };

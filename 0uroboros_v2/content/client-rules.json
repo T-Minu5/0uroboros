@@ -1,0 +1,48 @@
+{
+  "appliedAt": "2026-11-20T01:46:01.547Z",
+  "epochId": 8,
+  "rules": {
+    "serverVP": {
+      "primary": 12,
+      "backup": 20
+    },
+    "nodeWinVP": 1,
+    "mostCircuitsBonusVP": 4,
+    "endGameAwards": {
+      "mostDestroyed": {
+        "enabled": true,
+        "vp": 4
+      },
+      "mostTrashed": {
+        "enabled": true,
+        "vp": 2
+      },
+      "mostPowerRemoved": {
+        "enabled": true,
+        "vp": 4
+      },
+      "mostPowerBoosted": {
+        "enabled": true,
+        "vp": 2
+      },
+      "mostCryptoBanked": {
+        "enabled": true,
+        "vp": 2
+      },
+      "mostCryptoStolen": {
+        "enabled": true,
+        "vp": 4
+      },
+      "mostServerRepair": {
+        "enabled": true,
+        "vp": 2
+      },
+      "mostDeckAttacks": {
+        "enabled": true,
+        "vp": 4
+      }
+    },
+    "noCircuitRewards": false,
+    "noTrailingRewards": false
+  }
+}

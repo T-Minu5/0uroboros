@@ -19,7 +19,8 @@ export function replayGame(replay: ReplayRecord, content: CompiledContent, strat
   const session = createSession({
     content, strategicMarket: true, evaluationContent: true,
     carryover: replay.settings.carryover, priorityPreference: replay.settings.priorityPreference,
-    noLocations: replay.settings.noLocations, noTrailingRewards: replay.settings.noTrailingRewards,
+    noLocations: replay.settings.noLocations,
+    noCircuitRewards: replay.settings.noCircuitRewards, noTrailingRewards: replay.settings.noTrailingRewards,
     midCycleDraw: replay.settings.midCycleDraw,
     middleNodesOnly: replay.settings.middleNodesOnly,
     tenCardDraft: replay.settings.tenCardDraft,

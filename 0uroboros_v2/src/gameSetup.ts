@@ -5,6 +5,7 @@ import {
   type EndGameAwardId,
   type EndGameAwards,
 } from '@0uroboros/engine/runtime';
+import clientRules from '../content/client-rules.json';
 
 /** Runtime turn countdown choices in seconds; null leaves turns untimed. */
 export const TURN_TIMER_CHOICES: readonly number[] = Array.from({ length: 12 }, (_, i) => 35 + i * 5);
@@ -26,8 +27,13 @@ export type GameSetup = {
   /** Only Nodes 2–4 are in play; one opens each Runtime turn. Nodes 1 and 5 stay closed. */
   middleNodesOnly: boolean;
   /**
+   * When true, the per-Cycle Circuit Reward lottery runs (Draft privilege).
+   * Maps to session `noCircuitRewards: !circuitRewards`. Default off.
+   */
+  circuitRewards: boolean;
+  /**
    * When true, Circuit Rewards with awardTrailing stay in the pool.
-   * Maps to session `noTrailingRewards: !trailingRewards`.
+   * Maps to session `noTrailingRewards: !trailingRewards`. Default off.
    */
   trailingRewards: boolean;
   /**
@@ -40,7 +46,7 @@ export type GameSetup = {
    * Default 1; 0 disables.
    */
   nodeWinVP: number;
-  /** Configurable end-game achievement awards; ties grant both seats. */
+  /** Configurable end-game achievement awards; ties award nothing. */
   endGameAwards: EndGameAwards;
 };
 
@@ -66,14 +72,21 @@ function sanitizeEndGameAwards(raw: unknown): EndGameAwards {
 export function sanitizeGameSetup(raw: unknown): GameSetup {
   const value = (raw && typeof raw === 'object' ? raw : {}) as {
     serverVP?: Partial<Servers>; turnSeconds?: unknown; draftSeconds?: unknown; noLocations?: unknown;
-    middleNodesOnly?: unknown; trailingRewards?: unknown; noTrailingRewards?: unknown;
+    middleNodesOnly?: unknown; circuitRewards?: unknown; noCircuitRewards?: unknown;
+    trailingRewards?: unknown; noTrailingRewards?: unknown;
     mostCircuitsBonusVP?: unknown; nodeWinVP?: unknown; endGameAwards?: unknown;
   };
-  const trailingRewards = value.trailingRewards === false || value.noTrailingRewards === true
-    ? false
-    : value.trailingRewards === true || value.noTrailingRewards === false
-      ? true
-      : true;
+  // Explicit true/false wins; missing keys default off (snowball tests start without Circuit privileges).
+  const circuitRewards = value.circuitRewards === true || value.noCircuitRewards === false
+    ? true
+    : value.circuitRewards === false || value.noCircuitRewards === true
+      ? false
+      : false;
+  const trailingRewards = value.trailingRewards === true || value.noTrailingRewards === false
+    ? true
+    : value.trailingRewards === false || value.noTrailingRewards === true
+      ? false
+      : false;
   return {
     serverVP: { primary: clampInt(value.serverVP?.primary, 0, SERVER_VP_MAX, defaultServerVP.primary), backup: clampInt(value.serverVP?.backup, 0, SERVER_VP_MAX, defaultServerVP.backup) },
     turnSeconds: typeof value.turnSeconds === 'number' && TURN_TIMER_CHOICES.includes(value.turnSeconds) ? value.turnSeconds : null,
@@ -84,6 +97,7 @@ export function sanitizeGameSetup(raw: unknown): GameSetup {
         : DEFAULT_DRAFT_SECONDS,
     noLocations: value.noLocations === true,
     middleNodesOnly: value.middleNodesOnly === true,
+    circuitRewards,
     trailingRewards,
     mostCircuitsBonusVP: clampInt(value.mostCircuitsBonusVP, 0, MOST_CIRCUITS_BONUS_VP_MAX, defaultMostCircuitsBonusVP),
     nodeWinVP: clampInt(value.nodeWinVP, 0, NODE_WIN_VP_MAX, defaultNodeWinVP),
@@ -91,11 +105,57 @@ export function sanitizeGameSetup(raw: unknown): GameSetup {
   };
 }
 
+/** Landing-screen Circuit mode: which Nodes open and whether Location text is in play. */
+export type CircuitMode = 'open' | 'closed' | 'short';
+export const CIRCUIT_MODES: readonly { id: CircuitMode; label: string; hint: string }[] = [
+  { id: 'open', label: 'Open', hint: 'Location text on' },
+  { id: 'closed', label: 'Closed', hint: 'Location text off' },
+  { id: 'short', label: 'Short', hint: '3 Locations, text on' },
+];
+export function circuitModeOf(setup: Pick<GameSetup, 'noLocations' | 'middleNodesOnly'>): CircuitMode {
+  return setup.middleNodesOnly ? 'short' : setup.noLocations ? 'closed' : 'open';
+}
+export function circuitModeFlags(mode: CircuitMode): Pick<GameSetup, 'noLocations' | 'middleNodesOnly'> {
+  return mode === 'short' ? { noLocations: false, middleNodesOnly: true }
+    : mode === 'closed' ? { noLocations: true, middleNodesOnly: false }
+      : { noLocations: false, middleNodesOnly: false };
+}
+export const circuitModeLabel = (mode: CircuitMode) => CIRCUIT_MODES.find(item => item.id === mode)!.label;
+
+/**
+ * Rules pushed from a league epoch with "Apply Epoch VP" (`content/client-rules.json`). They replace the
+ * VP and Circuit settings of every client game; the player only picks timers and Circuit mode.
+ */
+export type ClientRulesFile = {
+  appliedAt: string | null;
+  epochId: number | null;
+  rules: {
+    serverVP: Servers; nodeWinVP: number; mostCircuitsBonusVP: number; endGameAwards: EndGameAwards;
+    noCircuitRewards: boolean; noTrailingRewards: boolean;
+  } | null;
+};
+
+export function withClientRules(setup: GameSetup, file: ClientRulesFile | null | undefined): GameSetup {
+  const rules = file?.rules;
+  if (!rules) return setup;
+  return sanitizeGameSetup({
+    ...setup,
+    serverVP: rules.serverVP, nodeWinVP: rules.nodeWinVP, mostCircuitsBonusVP: rules.mostCircuitsBonusVP,
+    endGameAwards: rules.endGameAwards, circuitRewards: !rules.noCircuitRewards,
+    trailingRewards: !rules.noCircuitRewards && !rules.noTrailingRewards,
+  });
+}
+
 export function loadGameSetup(): GameSetup {
-  try { return sanitizeGameSetup(JSON.parse(localStorage.getItem(SETUP_KEY) ?? 'null')); }
-  catch { return sanitizeGameSetup(null); }
+  let stored: unknown = null;
+  try { stored = JSON.parse(localStorage.getItem(SETUP_KEY) ?? 'null'); } catch { stored = null; }
+  const value = (stored && typeof stored === 'object' ? stored : {}) as Record<string, unknown>;
+  // Only the player's choices persist; VP and Circuit rules always come from the applied epoch (or defaults).
+  const own = sanitizeGameSetup({ turnSeconds: value.turnSeconds, draftSeconds: value.draftSeconds, noLocations: value.noLocations, middleNodesOnly: value.middleNodesOnly });
+  return withClientRules(own, clientRules as ClientRulesFile);
 }
 
 export function saveGameSetup(setup: GameSetup) {
-  localStorage.setItem(SETUP_KEY, JSON.stringify(setup));
+  const { turnSeconds, draftSeconds, noLocations, middleNodesOnly } = setup;
+  localStorage.setItem(SETUP_KEY, JSON.stringify({ turnSeconds, draftSeconds, noLocations, middleNodesOnly }));
 }

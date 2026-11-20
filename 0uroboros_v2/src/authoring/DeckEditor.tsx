@@ -44,7 +44,7 @@ export function DeckEditor({ deck, cards, active, update }: { deck: StartingDeck
       <div className="au-field-grid">
         <label className={`au-field${nameInvalid ? ' is-invalid' : ''}`} data-field="name"><span>Name</span><input aria-label="Deck name" aria-invalid={nameInvalid || undefined} value={deck.name} onChange={event => update({ ...deck, name: event.target.value })} /></label>
       </div>
-      <p className="au-deck-status" data-active={active}>{active ? 'New games deal this deck to both players.' : 'Not loaded in new games. Turn on “Load in game” above to use it.'}</p>
+      <p className="au-deck-status" data-active={active}>{active ? 'Starting hand for every game: both players, the game client, online tables and the League use this deck.' : 'Not the starting deck. Turn on “Load in game” above to make it the starting hand for every game.'}</p>
     </section>
 
     <section className={`au-panel${[...invalid].some(key => key === 'cards' || key.startsWith('cards.')) ? ' is-invalid' : ''}`} data-field="cards" aria-label="Deck list">

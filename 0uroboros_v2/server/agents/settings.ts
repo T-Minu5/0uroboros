@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { DEFAULT_SELF_PLAY_RULES, sanitizeSelfPlayRules, type SelfPlayRules } from '@0uroboros/engine/ai/selfPlay';
 
 /** Server-side agent switches. Never holds keys; the API only reports whether a model is configured. */
 export type AgentSettings = {
@@ -11,6 +12,8 @@ export type AgentSettings = {
   last2go: { enabled: boolean };
   /** AI-vs-AI league between Strat-G, T-5, DV-8, VP-Dog and Last2Go. */
   league: { rounds: number; seedsPerBlock: number; ecoObserves: boolean };
+  /** The ruleset every AI self-play game uses (league, Eco-Strat cohorts, Strat-G trials). Changed through league epochs. */
+  leagueRules: SelfPlayRules;
   ecoStrat: { enabled: boolean; observeHumanGames: boolean; continuous: boolean; reportEvery: number; baselineGames: number };
 };
 
@@ -22,6 +25,7 @@ export const DEFAULT_AGENT_SETTINGS: AgentSettings = {
   vpDog: { enabled: true },
   last2go: { enabled: true },
   league: { rounds: 3, seedsPerBlock: 4, ecoObserves: true },
+  leagueRules: structuredClone(DEFAULT_SELF_PLAY_RULES),
   ecoStrat: { enabled: true, observeHumanGames: true, continuous: true, reportEvery: 10, baselineGames: 10 },
 };
 
@@ -44,6 +48,7 @@ export function sanitizeSettings(value: unknown, base: AgentSettings = DEFAULT_A
       rounds: int(league.rounds, base.league.rounds, 1, 5), seedsPerBlock: int(league.seedsPerBlock, base.league.seedsPerBlock, 2, 8),
       ecoObserves: bool(league.ecoObserves, base.league.ecoObserves),
     },
+    leagueRules: sanitizeSelfPlayRules(input.leagueRules ?? base.leagueRules),
     ecoStrat: {
       enabled: bool(eco.enabled, base.ecoStrat.enabled), observeHumanGames: bool(eco.observeHumanGames, base.ecoStrat.observeHumanGames),
       continuous: bool(eco.continuous, base.ecoStrat.continuous),
@@ -78,6 +83,8 @@ export function createSettingsStore(file: string) {
     const input = section(patch);
     const merged: Record<string, unknown> = { ...current, ...input };
     for (const key of SECTIONS) merged[key] = { ...current[key], ...section(input[key]) };
+    // Rules are replaced whole, never merged, so a saved epoch is exactly what was sent.
+    merged.leagueRules = input.leagueRules === undefined ? current.leagueRules : input.leagueRules;
     const next = sanitizeSettings(merged, current);
     mkdirSync(dirname(file), { recursive: true });
     const temp = `${file}.${process.pid}.tmp`;

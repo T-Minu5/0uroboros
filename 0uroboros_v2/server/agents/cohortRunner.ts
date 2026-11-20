@@ -6,7 +6,7 @@ import { sealEvidence, type GameEvidence, type StratGEvidence } from './evidence
 import type { EcoStrat } from './ecoStrat';
 
 /**
- * Runs seeded AI-vs-AI cohorts under normal rules. Content and the Strat-G profile are read
+ * Runs seeded AI-vs-AI cohorts under the league ruleset (applied by the harness). Content and the Strat-G profile are read
  * once and frozen for the whole cohort, so nothing changes between games; Strat-G itself is not
  * involved (no debriefs, no learning) and Eco-Strat only receives the sealed results.
  */
@@ -21,6 +21,8 @@ export type CohortOptions = {
   harness: () => Promise<SelfPlayHarness>;
   document: () => Promise<ContentDocument>;
   stratG: { profile: StrategyProfile; version: number; mode: string; plan: string };
+  /** Stamped on each game; the harness applies the ruleset itself. */
+  rulesHash?: string;
   seedBase?: number;
   /** Attempts allowed beyond the target before the cohort is declared failed. */
   maxExtraAttempts?: number;
@@ -54,6 +56,7 @@ export async function runCohort(options: CohortOptions) {
       const evidence: GameEvidence = {
         id: `${cohortId}-s${seed}`, source: 'self-play', recordedAt: new Date().toISOString(), seed, cohortId, strategyHash, durationMs: result.durationMs,
         valid: result.valid, ...(result.invalidReason ? { invalidReason: result.invalidReason } : {}), report: result.report, stratG,
+        ...(options.rulesHash ? { rulesHash: options.rulesHash } : {}),
       };
       await options.eco.observe(sealEvidence(evidence));
       if (result.valid) await options.eco.updateCohort(cohortId, { validGame: evidence.id });

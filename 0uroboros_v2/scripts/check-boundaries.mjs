@@ -17,7 +17,7 @@ import { join, relative, resolve, dirname } from 'node:path';
 
 const root = resolve(process.cwd());
 const rel = p => relative(root, p).split('\\').join('/');
-const STUDIO_ONLY_CLIENT_FILES = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts']);
+const STUDIO_ONLY_CLIENT_FILES = new Set(['src/AgentsPanel.tsx', 'src/TestGamesPanel.tsx', 'src/LeagueRulesPanel.tsx', 'src/AgentChatPanel.tsx', 'src/leagueControls.tsx', 'src/agentAvatars.tsx', 'src/AgentReader.tsx', 'src/AgentsPage.tsx', 'src/devGameLog.ts', 'src/agentsApi.ts']);
 const STUDIO_ENTRY = new Set(['src/studio.tsx', 'src/agents.tsx']);
 
 function walk(dir, out = []) {

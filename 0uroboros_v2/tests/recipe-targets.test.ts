@@ -39,14 +39,14 @@ describe('effect recipe quantities and recipients', () => {
     game.state.players[0].draw = [card('existing')];
     const stock = game.state.market.map(pile => [pile.id, pile.supply]);
     const events = play(game, card('source', [{ kind: 'gain', cardId: 'mega-cache', amount: 3 }]));
-    const gain = events.find(event => event.kind === 'draw' && event.cardId?.includes(':generated-'))!;
+    const gain = events.find(event => event.kind === 'draw' && event.definitionId === 'mega-cache')!;
     const copies = game.state.players[0].draw.slice(0, 3);
     expect(copies.map(copy => copy.definitionId)).toEqual(['mega-cache', 'mega-cache', 'mega-cache']);
     expect(copies.map(copy => copy.cryptoValue)).toEqual([5, 5, 5]);
     expect(new Set(copies.map(copy => copy.id)).size).toBe(3);
     expect(copies.map(copy => copy.id)).toEqual([...copies.map(copy => copy.id)].sort());
     expect(game.state.players[0].draw[3].id).toBe('existing');
-    expect(gain).toMatchObject({ owner: 0, targetOwner: 0, amount: 3, cardId: copies[0].id, definitionId: 'mega-cache' });
+    expect(gain).toMatchObject({ owner: 0, targetOwner: 0, amount: 3, cardId: 'source', definitionId: 'mega-cache' });
     expect(gain.target).toBeUndefined();
     expect(game.state.market.map(pile => [pile.id, pile.supply])).toEqual(stock);
   });
@@ -55,15 +55,16 @@ describe('effect recipe quantities and recipients', () => {
     const game = session();
     game.state.players[1].hand = [card('already-held', [], { type: 'Crypto' })];
     const events = play(game, card('source', [{ kind: 'gain', cardId: 'basic-encryption', amount: 3, destination: 'hand', opponent: true }]));
-    const gained = game.state.players[1].hand.slice(1);
+    // The opponent AI may deploy the card it already held, so only the generated copies are counted.
+    const gained = game.state.players[1].hand.filter(copy => copy.id.startsWith('1:generated-'));
     expect(gained).toHaveLength(3);
     expect(new Set(gained.map(copy => copy.id)).size).toBe(3);
     expect(gained.every(copy => copy.id.startsWith('1:generated-') && copy.definitionId === 'basic-encryption')).toBe(true);
     expect(game.state.players[1].totalVP).toBe(3 * gained[0].vp!);
     expect(game.state.players[0].totalVP).toBe(0);
-    expect(events).toEqual(expect.arrayContaining([expect.objectContaining({
-      kind: 'draw', owner: 0, targetOwner: 1, target: 'hand', amount: 3, before: 1, after: 4,
-    })]));
+    const gain = events.find(event => event.kind === 'draw' && event.targetOwner === 1 && event.definitionId === 'basic-encryption');
+    expect(gain).toMatchObject({ owner: 0, targetOwner: 1, target: 'hand', amount: 3 });
+    expect(gain!.after! - gain!.before!).toBe(3);
   });
 
   it('routes gains from an opponent-owned source, and keeps legacy one-card Discard gain and zero harmless', () => {
@@ -87,7 +88,7 @@ describe('effect recipe quantities and recipients', () => {
     game.deploy('source', 0);
     game.endTurn();
     expect(game.step()?.event.kind).toBe('reveal');
-    expect(() => game.step()).toThrow(/Gain count must be an integer from 0 to 100/);
+    expect(() => { while (game.pendingCount) game.step(); }).toThrow(/Gain count must be an integer from 0 to 100/);
     expect(game.state.players[0].draw).toHaveLength(0);
   });
 

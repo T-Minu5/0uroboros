@@ -57,8 +57,10 @@ export const RoomSettingsSchema = z.object({
   opponent: z.string().trim().min(1).max(80).optional(),
   /** Every Node is No Man's Land for the whole game. */
   noLocations: z.boolean().default(false),
-  /** When true, Circuit Rewards that go to the trailing player are never drawn. Configure maps Trailing rewards off → true. */
-  noTrailingRewards: z.boolean().default(false),
+  /** When true, skip the per-Cycle Circuit Reward lottery. Configure maps Circuit rewards off → true (default). */
+  noCircuitRewards: z.boolean().default(true),
+  /** When true, Circuit Rewards that go to the trailing player are never drawn. Configure maps Trailing rewards off → true (default). */
+  noTrailingRewards: z.boolean().default(true),
   /** Fixed rule: each player draws 1 at the start of Runtime turns 2 and 3. Kept for replay compat; always treated as on. */
   midCycleDraw: z.boolean().default(true),
   /** @deprecated Crypto shelf removed; ignored if present on old clients/replays. */

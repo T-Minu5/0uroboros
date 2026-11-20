@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { packHash } from '@0uroboros/content/hash';
 import { DEFAULT_OPPONENTS } from '@0uroboros/engine/ai/opponents';
+import type { RuleChange, SelfPlayRules } from '@0uroboros/engine/ai/selfPlay';
 import type { StrategyProfile } from '@0uroboros/engine/ai/strategy';
 import { upgradeDocument, validateContent, type ContentDocument } from '@0uroboros/engine/authoring/contentModel';
 import type { AgentDocument } from './AgentReader';
 
+export type { RuleChange, SelfPlayRules };
 export type AgentSettings = {
   agentsEnabled: boolean;
   stratG: { enabled: boolean; recordDecisions: boolean };
@@ -13,7 +15,19 @@ export type AgentSettings = {
   vpDog: { enabled: boolean };
   last2go: { enabled: boolean };
   league: { rounds: number; seedsPerBlock: number; ecoObserves: boolean };
+  leagueRules: SelfPlayRules;
   ecoStrat: { enabled: boolean; observeHumanGames: boolean; continuous: boolean; reportEvery: number; baselineGames: number };
+};
+/** One league ruleset and its results; `metrics` compares it with the latest earlier epoch that had games. */
+export type MetricRow = {
+  id: string; label: string; unit: 'rate' | 'number'; targetLabel: string;
+  before: number | null; after: number | null; verdict: 'closer' | 'further' | 'same' | 'n/a';
+};
+export type LeagueEpoch = {
+  id: number; startedAt: string; rules: SelfPlayRules; rulesHash: string; changes: RuleChange[]; eloWiped: boolean; note?: string;
+  runs: number; tally: { games: number };
+  standings: { agent: string; elo: number | null; games: number; wins: number; losses: number; ties: number }[] | null;
+  reportId?: string | null; comparedWith: number | null; metrics: MetricRow[];
 };
 /** Strat-G, T-5, DV-8, VP-Dog and Last2Go share one learning loop and report the same status. */
 export type LearnerStatus = {
@@ -75,11 +89,9 @@ export type AgentsStatus = {
     paths: { journal: string; reports: string };
   };
   cohort: { running: boolean; kind: 'baseline' | 'evaluation' | null; phase?: 'studying' | 'researching' | 'playing' | null; seedBase: number | null; valid: number; invalid: number; target: number; error: string | null };
-  contentAb: {
-    running: boolean; experimentId: string | null; cardId: string | null;
-    seedIndex: number; seedCount: number; error: string | null;
-    last: { experimentId: string; cardId: string; patchWinRate: number | null; reportId: string | null } | null;
-  };
+  rules: { current: SelfPlayRules; hash: string };
+  /** Last Apply Epoch VP: the epoch whose VP and Circuit reward rules the game client uses. */
+  clientRules: { appliedAt: string | null; epochId: number | null };
 };
 /** What a running Eco-Strat cohort is waiting on; the first run on a new build studies and researches before any game. */
 export const cohortPhaseLabel = (phase: AgentsStatus['cohort']['phase']) =>
@@ -127,14 +139,16 @@ export function useAgents(active = true) {
   const [status, setStatus] = useState<AgentsStatus | null>(null);
   const [error, setError] = useState('');
   const [docs, setDocs] = useState<AgentDocument[]>([]);
+  const [epochs, setEpochs] = useState<LeagueEpoch[]>([]);
 
   const refresh = useCallback(async () => {
     try {
       const response = await fetch('/api/agents/status', { cache: 'no-store' });
       if (!response.ok) throw new Error(response.status === 404 ? 'Agents run only with the local dev server.' : `Status unavailable (${response.status}).`);
       setStatus(await response.json() as AgentsStatus); setError('');
-      const listed = await fetch('/api/agents/documents', { cache: 'no-store' });
+      const [listed, history] = await Promise.all([fetch('/api/agents/documents', { cache: 'no-store' }), fetch('/api/agents/league/epochs', { cache: 'no-store' })]);
       if (listed.ok) setDocs(await listed.json() as AgentDocument[]);
+      if (history.ok) setEpochs(await history.json() as LeagueEpoch[]);
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Agents unavailable.'); }
   }, []);
   useEffect(() => {
@@ -153,10 +167,21 @@ export function useAgents(active = true) {
   }, []);
   const update = useCallback((patch: AgentsPatch) => send('/api/agents/settings', 'PUT', patch), [send]);
   const act = useCallback((agent: 'eco-strat' | 'league' | 'mentoring' | 'coaching', action: string) => send(`/api/agents/${agent}/${action}`, 'POST'), [send]);
-  const runContentAb = useCallback((body: { definitionId: string; changes: Record<string, number | boolean | string>; seedCount: number }) =>
-    send('/api/agents/eco-strat/content-ab', 'POST', body), [send]);
+  /** Saves the ruleset as a new league epoch (wiping Elo unless told not to). Resolves true on success. */
+  const applyRules = useCallback(async (rules: SelfPlayRules, options: { wipeElo: boolean; note?: string }) => {
+    try {
+      const response = await fetch('/api/agents/league/epoch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rules, ...options }) });
+      const value = await response.json() as { status?: AgentsStatus; epochs?: LeagueEpoch[]; error?: string };
+      if (!response.ok || !value.status) throw new Error(value.error ?? `Request failed (${response.status}).`);
+      setStatus(value.status); setEpochs(value.epochs ?? []); setError('');
+      return true;
+    } catch (reason) { setError(reason instanceof Error ? reason.message : 'Request failed.'); return false; }
+  }, []);
 
-  return { status, error, docs, update, act, runContentAb, chat: chatWithStrat };
+  /** Writes the current epoch's VP and Circuit reward rules into the game client's defaults. */
+  const applyClientRules = useCallback(() => send('/api/agents/league/apply-client', 'POST'), [send]);
+
+  return { status, error, docs, epochs, update, act, applyRules, applyClientRules, refresh, chat: chatWithStrat };
 }
 
 export type ChatAudience = 'strat-g' | 'eco-strat' | 't-5' | 'dv-8' | 'vp-dog' | 'last-2go' | 'both' | 'all';

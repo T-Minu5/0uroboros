@@ -73,14 +73,6 @@ export type ResearchSource = { url: string; fetchedFrom?: string; accessible: bo
 /** A source taken off the reading list after a model-backed research run found nothing in it. */
 export type RemovedSource = { url: string; title?: string; file?: string; reason: string; at: string };
 export type GameEntry = { id: string; source: string; buildId: string; at: string; valid: boolean; invalidReason?: string; winner: 0 | 1 | null; endedBy: string; cycles: number; finalVP: [number, number]; cohortId?: string; seed?: number };
-/** Content A/B arm: control vs patched document for one focal card. */
-export type CohortArm = {
-  role: 'control' | 'patch';
-  cardId: string;
-  experimentId: string;
-  label?: string;
-};
-
 export type Cohort = {
   id: string; kind: 'baseline' | 'evaluation'; buildId: string; startedAt: string; finishedAt?: string;
   target: number; seeds: number[]; strategyHash: string;
@@ -88,10 +80,8 @@ export type Cohort = {
   strategyVersion: string | number;
   status: 'running' | 'complete' | 'failed' | 'cancelled';
   validGames: string[]; invalid: { seed: number; reason: string }[]; note?: string;
-  /** Present when this cohort is one arm of a content A/B experiment. */
-  arm?: CohortArm;
 };
-export type ReportEntry = { id: string; at: string; kind: 'baseline' | 'periodic' | 'manual'; buildId: string; games: number; markdown: string; json: string; model: string | null };
+export type ReportEntry = { id: string; at: string; kind: 'baseline' | 'periodic' | 'manual' | 'epoch'; buildId: string; games: number; markdown: string; json: string; model: string | null };
 export type ErrorEntry = { at: string; scope: string; message: string };
 
 export type Journal = {
@@ -346,7 +336,7 @@ function summarySections(journal: Journal): string[] {
   ];
 }
 
-/** One tab per section, split by the reader at `<!-- tab: … -->` markers; Summary comes first and opens by default. */
+/** One tab per section, split by the reader at `<!-- tab: … -->` markers. Baseline (study/POV/research) opens first; Reports stay separate. */
 export function renderJournal(journal: Journal): string {
   const build = journal.builds.find(item => item.id === journal.currentBuild);
   const currentObs = journal.observations.filter(item => item.buildId === journal.currentBuild).sort((a, b) => b.occurrences - a.occurrences);
@@ -355,6 +345,9 @@ export function renderJournal(journal: Journal): string {
   const active = journal.recommendations.filter(item => item.status !== 'withdrawn');
   const withdrawn = journal.recommendations.filter(item => item.status === 'withdrawn');
   const withdrawnReasons = [...new Set(withdrawn.map(item => item.withdrawn?.reason ?? 'Withdrawn.'))];
+  const epochReports = journal.reports.filter(item => item.kind === 'epoch').slice(-8).reverse();
+  const playReports = journal.reports.filter(item => item.kind !== 'epoch').slice(-10).reverse();
+  const reportLine = (item: ReportEntry) => `- ${date(item.at)} · ${item.kind} · ${item.games} games · \`${item.markdown}\``;
   return [
     `# Eco-Strat journal`,
     ``,
@@ -363,19 +356,53 @@ export function renderJournal(journal: Journal): string {
     `Current build: ${build ? `${build.label} (\`${build.id}\`)` : 'unknown'} · games observed on this build: ${current.filter(game => game.valid).length} valid, ${current.filter(game => !game.valid).length} invalid · total all builds: ${journal.games.length}`,
     `Model: ${journal.model.used ?? 'none (deterministic only)'}${journal.model.fallbacks.length ? ` · fallbacks recorded: ${journal.model.fallbacks.length}` : ''}`,
     ``,
-    `<!-- tab: Summary -->`,
+    `<!-- tab: Baseline -->`,
+    `## Baseline study`,
+    ``,
+    journal.study ? `Study of build \`${journal.study.buildId}\` (${journal.study.mode}, ${date(journal.study.at)}): ${journal.study.summary}` : '_Study not yet run for this build._',
+    ``,
+    ...(journal.study?.economyModel.length ? [`### Economy model`, ``, ...journal.study.economyModel.map(item => `- ${item}`), ``] : []),
+    ...(journal.study?.risks.length ? [`### Risks to test`, ``, ...journal.study.risks.map(item => `- ${item}`), ``] : []),
     ...summarySections(journal),
-    `<!-- tab: Point of view -->`,
     `## My point of view`,
     ``,
     ...pointOfViewSections(journal.pointOfView, '###'),
-    `<!-- tab: Hypotheses -->`,
+    `## Research`,
+    ``,
+    ...(journal.research ? journal.research.sources.flatMap(source => [
+      `- ${source.accessible ? source.via === 'provided' ? source.fetchFailure ? `read from a copy provided by the user (direct fetch failed: ${source.fetchFailure})` : 'read from an article provided by the user' : 'read' : 'inaccessible'} · ${source.title ? `${source.title} · ` : ''}${source.url}${source.accessible ? '' : ` (${source.reason ?? 'unknown reason'})`}`,
+      ...source.takeaways.map(item => `  - ${item}`),
+    ]) : ['_Research not yet run._']),
+    ...(journal.research?.concepts.length ? [``, `Concepts:`, ...journal.research.concepts.map(item => `- ${item}`)] : []),
+    ...(journal.research?.applications.length ? [``, `Lenses for 0uroboros:`, ...journal.research.applications.map(item => `- ${item}`)] : []),
+    ...(journal.research?.removed?.length ? [``, `Removed from the reading list (no takeaways):`, ...journal.research.removed.slice(-15).reverse().map(item => `- ${date(item.at)} · ${item.title ? `${item.title} · ` : ''}${item.url} · ${item.reason}${item.file ? ` · copy moved to \`${item.file}\`` : ''}`)] : []),
+    ``,
+    `<!-- tab: Reports -->`,
+    `## Epoch results`,
+    ``,
+    `_Ruleset-change reports (POV and recommendations for each epoch). Separate from baseline / league-play reports._`,
+    ``,
+    ...(epochReports.length ? epochReports.map(reportLine) : ['_No epoch reports yet. Finish a league run under an epoch to write one._']),
+    ``,
+    `## League and baseline reports`,
+    ``,
+    ...(playReports.length ? playReports.map(reportLine) : ['_None yet._']),
+    ``,
+    `## Recommendations (candidates only, never applied automatically)`,
+    ``,
+    ...(active.length ? active.slice(-10).reverse().map(item => `- **${item.title}** · ${item.confidence} · from report ${item.reportId}`) : ['- none yet']),
+    ``,
+    ...(withdrawn.length ? [
+      `### Withdrawn (${withdrawn.length})`,
+      ``,
+      ...withdrawnReasons.flatMap(reason => [`_${reason}_`, ``, ...withdrawn.filter(item => (item.withdrawn?.reason ?? 'Withdrawn.') === reason).slice(-10).reverse().map(item => `- ${item.title} · from report ${item.reportId}`), ``]),
+    ] : []),
+    `<!-- tab: Working notes -->`,
     `## Hypotheses`,
     ``,
     `Confidence counts only evidence from the current build: a measured result counts 1, an interpretation 0.5.${priorEntries ? ` ${priorEntries} evidence entries from older builds are kept but not counted.` : ''}`,
     ``,
     ...(journal.hypotheses.some(item => item.status === 'open') ? hypothesisSections(journal.hypotheses, journal.currentBuild, '###') : ['- none yet', '']),
-    `<!-- tab: Observations -->`,
     `## Observations on this build`,
     ``,
     ...(currentObs.length ? currentObs.slice(0, 20).map(item => `- ${item.text} *(${item.occurrences > 1 ? `${item.occurrences} games` : 'once'} · ${item.topic}${item.kind === 'interpreted' ? ' · interpretation' : ''})*`) : ['- none yet']),
@@ -387,34 +414,6 @@ export function renderJournal(journal: Journal): string {
     `## Designer Q&A guidance`,
     ``,
     ...((journal.designerGuidance?.length) ? journal.designerGuidance.slice(-12).reverse().map(item => `- ${item.text} (${date(item.at)})`) : ['- none yet']),
-    ``,
-    `<!-- tab: Recommendations -->`,
-    `## Recommendations (candidates only, never applied automatically)`,
-    ``,
-    ...(active.length ? active.slice(-10).reverse().map(item => `- **${item.title}** · ${item.confidence} · from report ${item.reportId}`) : ['- none yet']),
-    ``,
-    ...(withdrawn.length ? [
-      `### Withdrawn (${withdrawn.length})`,
-      ``,
-      ...withdrawnReasons.flatMap(reason => [`_${reason}_`, ``, ...withdrawn.filter(item => (item.withdrawn?.reason ?? 'Withdrawn.') === reason).slice(-10).reverse().map(item => `- ${item.title} · from report ${item.reportId}`), ``]),
-    ] : []),
-    `<!-- tab: Reports -->`,
-    `## Reports`,
-    ``,
-    ...(journal.reports.length ? journal.reports.slice(-10).reverse().map(item => `- ${date(item.at)} · ${item.kind} · ${item.games} games · \`${item.markdown}\``) : ['- none yet']),
-    ``,
-    `<!-- tab: Research -->`,
-    `## Study and research`,
-    ``,
-    journal.study ? `Study of build \`${journal.study.buildId}\` (${journal.study.mode}, ${date(journal.study.at)}): ${journal.study.summary}` : 'Study: not yet run.',
-    ``,
-    ...(journal.research ? journal.research.sources.flatMap(source => [
-      `- ${source.accessible ? source.via === 'provided' ? source.fetchFailure ? `read from a copy provided by the user (direct fetch failed: ${source.fetchFailure})` : 'read from an article provided by the user' : 'read' : 'inaccessible'} · ${source.title ? `${source.title} · ` : ''}${source.url}${source.accessible ? '' : ` (${source.reason ?? 'unknown reason'})`}`,
-      ...source.takeaways.map(item => `  - ${item}`),
-    ]) : ['Research: not yet run.']),
-    ...(journal.research?.concepts.length ? [``, `Concepts:`, ...journal.research.concepts.map(item => `- ${item}`)] : []),
-    ...(journal.research?.applications.length ? [``, `Lenses for 0uroboros:`, ...journal.research.applications.map(item => `- ${item}`)] : []),
-    ...(journal.research?.removed?.length ? [``, `Removed from the reading list (no takeaways):`, ...journal.research.removed.slice(-15).reverse().map(item => `- ${date(item.at)} · ${item.title ? `${item.title} · ` : ''}${item.url} · ${item.reason}${item.file ? ` · copy moved to \`${item.file}\`` : ''}`)] : []),
     ``,
     `<!-- tab: Errors -->`,
     `## Errors (Eco-Strat only; gameplay is unaffected)`,

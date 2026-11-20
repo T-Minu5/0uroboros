@@ -1,160 +1,26 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { AGENT_NAMES, AgentAvatar, type AgentId } from './agentAvatars';
-import { AgentReader } from './AgentReader';
-import {
-  CHAT_KICKOFF_MESSAGE, chatWithStrat, cohortPhaseLabel, formatChatReplyContent, publishOpponent, useAgents,
-  type AgentsApi, type AgentsStatus, type ChatAudience, type ChatHistoryTurn, type ChatReply, type LearnerStatus,
-} from './agentsApi';
+import { useState, type ReactNode } from 'react';
 import { versionLabel } from '@0uroboros/engine/ai/strategy';
+import { AGENT_NAMES, AGENT_STYLES, AgentAvatar, type AgentId } from './agentAvatars';
+import { AgentReader } from './AgentReader';
+import { publishOpponent, type AgentsApi, type AgentsStatus, type LearnerStatus } from './agentsApi';
+import { Choice, Fold, Switch } from './leagueControls';
 
 const REPORT_CADENCE = [5, 10, 20] as const;
-const ADVERSARIES = {
-  't-5': { key: 't5', about: 'Pure aggression: almost no economy, Chaos and Drain from Cycle 3, aiming to destroy both enemy Servers by Cycles 10-13.' },
-  'dv-8': { key: 'dv8', about: 'An engine and control deviant: a long, thin, draw-heavy economy, Restore for defense, then late heavy VP.' },
-  'vp-dog': { key: 'vpDog', about: 'Pure economy: big Crypto and draw first, then VP every Draft from the midgame, aiming to buy 25+ VP by Cycles 11-14.' },
-  'last-2go': { key: 'last2go', about: 'Reactive Location control: mirrors opponent Draft buys with a mild destruction bias, skips Runtime turn 1, then contests on turns 2–3 for Location majority (ties OK).' },
+const LEARNERS = {
+  'strat-g': { key: 'stratG', about: 'Plays you from the designer’s baseline and plays T-5, DV-8, VP-Dog and Last2Go in the league. It changes its play only through measured experiments and never sees the other agents’ strategies.' },
+  't-5': { key: 't5', about: 'Almost no economy, Chaos and Drain from Cycle 3, aiming to destroy both enemy Servers by Cycles 10–13.' },
+  'vp-dog': { key: 'vpDog', about: 'Big Crypto and draw first, then VP every Draft from the midgame, aiming to buy 25+ VP by Cycles 11–14.' },
+  'last-2go': { key: 'last2go', about: 'Mirrors opponent Draft buys with a mild destruction bias, skips Runtime turn 1, then contests turns 2–3 for Location majority.' },
+  'dv-8': { key: 'dv8', about: 'A long, thin, draw-heavy economy, Restore for defense, then late heavy VP. Plays you as the Novice opponent and mentors the others; it is not Elo-rated.' },
 } as const;
-const isAdversary = (tab: AgentId): tab is keyof typeof ADVERSARIES => tab in ADVERSARIES;
+type LearnerId = keyof typeof LEARNERS;
+const ORDER: AgentId[] = ['eco-strat', 'strat-g', 't-5', 'vp-dog', 'last-2go', 'dv-8'];
 
-const learnerState = (on: boolean, agent: LearnerStatus) => !on ? 'off' : agent.state === 'online' ? `${versionLabel(agent.version)} · ${agent.mode === 'llm' ? 'model' : 'heuristic'}` : agent.state;
+const learnerState = (on: boolean, agent: LearnerStatus) => !on ? 'Off' : agent.state === 'online' ? `${versionLabel(agent.version)}, ${agent.mode === 'llm' ? 'model' : 'heuristic'}` : agent.state;
 const leagueLine = (status: AgentsStatus, agent: string) => {
   const row = status.league.table.find(entry => entry.agent === agent);
-  return row?.elo != null ? `Elo ${Math.round(row.elo)} · ${row.wins}–${row.losses}–${row.ties}${row.label ? ` · ${row.label}` : ''}` : 'not rated yet';
+  return row?.elo != null ? `Elo ${Math.round(row.elo)}, ${row.wins}–${row.losses}–${row.ties}` : 'Not rated yet';
 };
-
-/** Text-only parts of a tab fold away so the switches stay in view. */
-export function Fold({ title, children }: { title: string; children: ReactNode }) {
-  return <details className='agents-fold'><summary>{title}</summary><div className='agents-fold-body'>{children}</div></details>;
-}
-
-export const reportStamp = (iso: string) => new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-
-/** "Write report now", busy with a running clock while a report is queued or written, then when the last report landed. */
-export function ReportControl({ status, act, onRead }: { status: AgentsStatus; act: AgentsApi['act']; onRead?: (id: string) => void }) {
-  const eco = status.ecoStrat;
-  const [requested, setRequested] = useState(false);
-  const writing = requested || !!eco.reporting;
-  const since = useRef<number | null>(null);
-  const [, tick] = useState(0);
-  if (writing && since.current === null) since.current = Date.now();
-  if (!writing) since.current = null;
-  useEffect(() => {
-    if (!writing) return;
-    const timer = window.setInterval(() => tick(value => value + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [writing]);
-  const elapsed = since.current === null ? 0 : Math.floor((Date.now() - since.current) / 1000);
-  const last = eco.lastReport, failure = eco.reportFailure;
-  const failedLast = failure && (!last || failure.at > last.at);
-  const write = async () => { setRequested(true); try { await act('eco-strat', 'report'); } finally { setRequested(false); } };
-  return <div className='report-control'>
-    <button type='button' className={writing ? 'busy' : ''} aria-busy={writing} disabled={writing || !status.effective.ecoStrat || !eco.gamesObserved.currentBuild} onClick={() => void write()}>
-      {writing ? <><i className='report-spinner' aria-hidden='true'/>Writing report… {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}</> : 'Write report now'}
-    </button>
-    <p className='report-stamp' aria-live='polite'>
-      {writing ? eco.busy === 'reporting' ? 'Eco-Strat is reading the games and writing; this can take a few minutes.' : 'Queued: Eco-Strat starts once it finishes the game it is reading.'
-        : last ? <>Last report <b>{reportStamp(last.at)}</b> · {last.kind}{last.games ? ` · ${last.games} games` : ''}{onRead && <> · <button type='button' className='report-read' onClick={() => onRead(`eco-strat-report-${last.id}`)}>Read</button></>}</>
-        : 'No report yet.'}
-      {!!eco.leagueBacklog && <> · {eco.leagueBacklog} league game{eco.leagueBacklog === 1 ? '' : 's'} still to read (~{Math.ceil(eco.leagueBacklog * 40 / 60)} min)</>}
-    </p>
-    {!writing && failedLast && <p className='agents-error'>Report failed at {reportStamp(failure.at)}: {failure.message}</p>}
-  </div>;
-}
-
-const CHAT_AUDIENCES: { id: ChatAudience; label: string }[] = [
-  { id: 'strat-g', label: 'Strat-G' },
-  { id: 'eco-strat', label: 'Eco-Strat' },
-  { id: 't-5', label: 'T-5' },
-  { id: 'dv-8', label: 'DV-8' },
-  { id: 'vp-dog', label: 'VP-Dog' },
-  { id: 'last-2go', label: 'Last2Go' },
-  { id: 'both', label: 'Strat+Eco' },
-  { id: 'all', label: 'All' },
-];
-
-const SPEAKER_LABEL: Record<ChatReply['speaker'], string> = {
-  'strat-g': 'Strat-G', 'eco-strat': 'Eco-Strat', 't-5': 'T-5', 'dv-8': 'DV-8', 'vp-dog': 'VP-Dog', 'last-2go': 'Last2Go',
-};
-
-type ChatLogEntry =
-  | { kind: 'user'; content: string }
-  | { kind: 'assistant'; reply: ChatReply };
-
-function ChatWithStratPanel() {
-  const [audience, setAudience] = useState<ChatAudience>('both');
-  const [message, setMessage] = useState('');
-  const [history, setHistory] = useState<ChatHistoryTurn[]>([]);
-  const [log, setLog] = useState<ChatLogEntry[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const logEnd = useRef<HTMLDivElement | null>(null);
-  useEffect(() => { logEnd.current?.scrollIntoView({ block: 'nearest' }); }, [log, busy]);
-
-  const send = async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || busy) return;
-    setBusy(true); setError('');
-    setLog(prev => [...prev, { kind: 'user', content: trimmed }]);
-    try {
-      const result = await chatWithStrat(audience, trimmed, history);
-      const assistantTurns = result.replies.map(reply => ({
-        role: 'assistant' as const,
-        speaker: reply.speaker,
-        content: formatChatReplyContent(reply),
-      }));
-      setHistory(prev => [...prev, { role: 'user', content: trimmed }, ...assistantTurns]);
-      setLog(prev => [...prev, ...result.replies.map(reply => ({ kind: 'assistant' as const, reply }))]);
-      setMessage('');
-      if (result.error) setError(result.error);
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Chat failed.');
-    } finally { setBusy(false); }
-  };
-
-  const ask = (event: FormEvent) => {
-    event.preventDefault();
-    void send(message);
-  };
-
-  return <Fold title='Chat with Strat'>
-    <p className='agents-note'>Temporary Q&amp;A tuner. Agents can complain, ask mechanics questions, and learn from your answers — guidance is written into their notes / Eco journal (profiles stay unchanged). Clear wipes this thread only.</p>
-    <div className='agents-chat-audience' role='radiogroup' aria-label='Chat audience'>
-      {CHAT_AUDIENCES.map(entry => <button key={entry.id} type='button' role='radio' aria-checked={audience === entry.id} disabled={busy} onClick={() => setAudience(entry.id)}>{entry.label}</button>)}
-    </div>
-    <div className='agents-chat-log' aria-live='polite'>
-      {!log.length ? <p className='agents-note'>No messages yet. Open a session for top-3 complaints, or ask anything.</p> : null}
-      {log.map((entry, index) => entry.kind === 'user'
-        ? <article key={`u-${index}`} className='agents-chat-user'><header><strong>You</strong></header><p>{entry.content}</p></article>
-        : <article key={`a-${entry.reply.speaker}-${index}`} className='agents-chat-reply'>
-          <header><strong>{SPEAKER_LABEL[entry.reply.speaker]}</strong><small>{entry.reply.confidence}</small></header>
-          <p className='agents-chat-answer'>{entry.reply.answer}</p>
-          {!!entry.reply.complaints.length && <div className='agents-chat-block'>
-            <h4>Top complaints</h4>
-            <ol>{entry.reply.complaints.map((item, i) => <li key={i}>{item}</li>)}</ol>
-          </div>}
-          {!!entry.reply.questionsForMel.length && <div className='agents-chat-block agents-chat-ask'>
-            <h4>Asks Mel</h4>
-            <ol>{entry.reply.questionsForMel.map((item, i) => <li key={i}>{item}</li>)}</ol>
-          </div>}
-          {!!entry.reply.learned.length && <div className='agents-chat-block'>
-            <h4>Learned</h4>
-            <ul>{entry.reply.learned.map((item, i) => <li key={i}>{item}</li>)}</ul>
-          </div>}
-          {!!entry.reply.sources.length && <p className='agents-chat-sources'>Sources: {entry.reply.sources.map(source => source.id).join(', ')}</p>}
-        </article>)}
-      <div ref={logEnd} />
-    </div>
-    <form className='agents-chat-form' onSubmit={ask}>
-      <textarea value={message} disabled={busy} rows={3} placeholder='Answer their questions, give guidance, or ask your own…' onChange={event => setMessage(event.target.value)}/>
-      <div className='agents-actions'>
-        <button type='button' disabled={busy} onClick={() => void send(CHAT_KICKOFF_MESSAGE)}>{busy ? 'Working…' : 'Open session'}</button>
-        <button type='submit' disabled={busy || !message.trim()}>{busy ? 'Sending…' : 'Send'}</button>
-        <button type='button' disabled={busy || !log.length} onClick={() => { setHistory([]); setLog([]); setError(''); }}>Clear</button>
-      </div>
-    </form>
-    {error && <p className='agents-error'>{error}</p>}
-  </Fold>;
-}
 
 /** Writes the agent's current best into the content pack; players get it once the pack is committed and deployed. */
 function PublishControl({ agent }: { agent: AgentId }) {
@@ -167,136 +33,89 @@ function PublishControl({ agent }: { agent: AgentId }) {
       setState({ busy: false, failed: false, message: `${name} ${done.label} is in the content pack (revision ${done.revision}, pack ${done.hash}). Commit and deploy the server to ship it.` });
     } catch (reason) { setState({ busy: false, failed: true, message: reason instanceof Error ? reason.message : 'Publishing failed.' }); }
   };
-  return <div className='agents-publish'>
-    <button type='button' disabled={state.busy} aria-busy={state.busy} onClick={() => void publish()}>{state.busy ? 'Publishing…' : `Publish ${name} to the pack`}</button>
-    {state.message && <p className={state.failed ? 'agents-error' : 'agents-note'} aria-live='polite'>{state.message}</p>}
+  return <div className='lc-publish'>
+    <button type='button' className='lc-button' disabled={state.busy} aria-busy={state.busy} onClick={() => void publish()}>{state.busy ? 'Publishing' : 'Publish to the pack'}</button>
+    {state.message && <p className={state.failed ? 'lc-error' : 'lc-meta'} aria-live='polite'>{state.message}</p>}
   </div>;
 }
 
-/**
- * Switches and status for Eco-Strat, Strat-G and the league adversaries T-5, DV-8, VP-Dog and Last2Go, one agent per tab, with a reader for
- * each agent's notebook, journal and reports. Chat with Strat is always shown. `settingsOnly` (Agents page) keeps Status / baseline
- * actions / Files folded away; a full mount adds those. Pass `agents` to share one status poll with a sibling panel.
- */
-export function AgentsPanel({ settingsOnly = false, agents }: { settingsOnly?: boolean; agents?: AgentsApi }) {
-  const polled = useAgents(!agents);
-  const { status, error, docs, update, act: post } = agents ?? polled;
-  const act = (action: string) => post('eco-strat', action);
-  const [confirmArchive, setConfirmArchive] = useState(false);
-  const [tab, setTab] = useState<AgentId>('eco-strat');
-  const [reading, setReading] = useState<string | null>(null);
+function AgentCard({ agent, state, on, master, onToggle, children, extra, about }: {
+  agent: AgentId; state: string; on: boolean; master: boolean; onToggle: (on: boolean) => void; children?: ReactNode; extra?: ReactNode; about: string;
+}) {
+  return <article className={`lc-panel agent-card${on ? '' : ' is-off'}`} aria-labelledby={`agent-${agent}-name`}>
+    <header className='agent-card-head'>
+      <AgentAvatar agent={agent} size={64}/>
+      <span className='agent-card-who'>
+        <h2 id={`agent-${agent}-name`}>{AGENT_NAMES[agent]}</h2>
+        <small>{AGENT_STYLES[agent]}</small>
+        <small className='agent-card-state'>{state}</small>
+      </span>
+      <Switch label={on ? 'On' : 'Off'} on={on} disabled={!master} onChange={onToggle}/>
+    </header>
+    {children && <div className='agent-card-switches'>{children}</div>}
+    {extra}
+    <Fold title={`About ${AGENT_NAMES[agent]}`}><p>{about}</p></Fold>
+  </article>;
+}
 
-  if (!status) return <p className='agents-note'>{error || 'Loading agents…'}</p>;
-  const { settings, stratG, ecoStrat, cohort } = status;
+/**
+ * League settings: one card per agent with its switches, outputs and publish control, under a master switch. Changes
+ * apply to the next game.
+ */
+export function LeagueSettingsPanel({ agents }: { agents: AgentsApi }) {
+  const { status, error, docs, update } = agents;
+  const [reading, setReading] = useState<string | null>(null);
+  if (!status) return <p className='lc-meta lc-loading'>{error || 'Loading agents'}</p>;
+  const { settings, ecoStrat } = status;
   const master = settings.agentsEnabled;
-  const toggle = (label: string, on: boolean, change: () => void, disabled = false) => <button type='button' aria-pressed={on} disabled={disabled} onClick={change}>{label}: {on ? 'On' : 'Off'}</button>;
-  const baseline = cohort.running ? { valid: cohort.valid, target: cohort.target, invalid: cohort.invalid } : ecoStrat.baseline;
-  const ecoState = status.effective.ecoStrat ? ecoStrat.state : 'off';
-  const tabs: { id: AgentId; state: string }[] = [
-    { id: 'eco-strat', state: ecoState }, { id: 'strat-g', state: learnerState(status.effective.stratG, stratG) },
-    { id: 't-5', state: learnerState(status.effective.t5, status.t5) }, { id: 'dv-8', state: learnerState(status.effective.dv8, status.dv8) },
-    { id: 'vp-dog', state: learnerState(status.effective.vpDog, status.vpDog) },
-    { id: 'last-2go', state: learnerState(status.effective.last2go, status.last2go) },
-  ];
-  const details = !settingsOnly;
+
   const reader = (agent: AgentId) => {
     const own = docs.filter(doc => doc.agent === agent);
     const latest = own.find(doc => doc.id.startsWith('eco-strat-report-'));
     const main = own.find(doc => !doc.id.startsWith('eco-strat-report-'));
-    const reports = own.filter(doc => doc.id.startsWith('eco-strat-report-')).length;
-    return <div className='agents-reading' role='group' aria-label={`${AGENT_NAMES[agent]} outputs`}>
-      <button type='button' disabled={!main} onClick={() => main && setReading(main.id)}>{agent === 'eco-strat' ? 'Read journal' : 'Read notebook'}</button>
-      {agent === 'eco-strat' && <button type='button' disabled={!latest} title={reports ? `${reports} report${reports === 1 ? '' : 's'}` : 'No reports yet'} onClick={() => latest && setReading(latest.id)}>Read latest report</button>}
+    return <div className='lc-actions' role='group' aria-label={`${AGENT_NAMES[agent]} outputs`}>
+      <button type='button' className='lc-button' disabled={!main} onClick={() => main && setReading(main.id)}>{agent === 'eco-strat' ? 'Read journal' : 'Read notebook'}</button>
+      {agent === 'eco-strat' && <button type='button' className='lc-button' disabled={!latest} onClick={() => latest && setReading(latest.id)}>Read latest report</button>}
+      {agent !== 'eco-strat' && <PublishControl agent={agent}/>}
     </div>;
   };
 
-  return <div className={`agents-panel ${settingsOnly ? 'settings-only' : ''}`}>
-    {toggle('AI agents', master, () => update({ agentsEnabled: !master }))}
-    <div className='agents-tabs' role='tablist' aria-label='AI agent'>{tabs.map(entry => <button key={entry.id} type='button' role='tab' id={`agents-tab-${entry.id}`} aria-selected={tab === entry.id} aria-controls={`agents-panel-${entry.id}`} onClick={() => setTab(entry.id)}>
-      <AgentAvatar agent={entry.id}/><span><strong>{AGENT_NAMES[entry.id]}</strong><small>{entry.state}</small></span>
-    </button>)}</div>
-    {tab === 'strat-g' ? <section className='agent-card' role='tabpanel' id='agents-panel-strat-g' aria-labelledby='agents-tab-strat-g'>
-      {toggle('Strat-G', settings.stratG.enabled, () => update({ stratG: { enabled: !settings.stratG.enabled } }), !master)}
-      {toggle('Decision log', settings.stratG.recordDecisions, () => update({ stratG: { recordDecisions: !settings.stratG.recordDecisions } }), !master)}
-      {reader('strat-g')}
-      <PublishControl agent='strat-g'/>
-      <Fold title='About Strat-G'><p>Balanced: plays you from the designer's baseline, and plays T-5, DV-8, VP-Dog and Last2Go in the league. It changes its play only through measured experiments, and never sees the adversaries' strategies.</p></Fold>
-      {details&&<Fold title='Status'><dl>
-        <dt>Record</dt><dd>{stratG.record.aiWins}–{stratG.record.humanWins}–{stratG.record.ties} over {stratG.record.games}</dd>
-        <dt>League</dt><dd>{leagueLine(status, 'strat-g')}</dd>
-        <dt>Human tempo</dt><dd>{status.humanTempo
-          ? `Watching you vs VP-Dog · ${status.humanTempo.games} game${status.humanTempo.games === 1 ? '' : 's'}${status.humanTempo.applied ? ' · soft coaching on' : status.humanTempo.games < status.humanTempo.minGames ? ` · needs ${status.humanTempo.minGames}` : ''}`
-          : '—'}</dd>
-        <dt>Theories</dt><dd>{stratG.activeTheories} active</dd>
-        <dt>Experiment</dt><dd>{stratG.experiment ? `${stratG.experiment.id} (${stratG.experiment.stage}): ${stratG.experiment.change}` : 'none running'}</dd>
-        <dt>Learned</dt><dd>{stratG.adoptedChanges ?? 0} adopted of {stratG.experimentsConcluded ?? 0} tested{stratG.ignoredGames ? ` · ${stratG.ignoredGames} non-games ignored` : ''}</dd>
-        <dt>Model</dt><dd>{stratG.modelConfigured ? stratG.model : 'not configured'}</dd>
-        <dt>Notebook</dt><dd><code>{stratG.paths.notebook}</code></dd>
-      </dl></Fold>}
-      {status.humanTempo?.planBlurb && <p className='agents-note'>{status.humanTempo.planBlurb}</p>}
-      {status.humanTempo?.error && <p className='agents-error'>{status.humanTempo.error}</p>}
-      {stratG.error&&<p className='agents-error'>{stratG.error}</p>}
+  const card = (agent: AgentId) => {
+    if (agent === 'eco-strat') return <AgentCard key={agent} agent={agent} master={master} on={settings.ecoStrat.enabled}
+      state={status.effective.ecoStrat ? `${ecoStrat.state}, ${ecoStrat.gamesObserved.currentBuild} games on this build` : 'Off'}
+      onToggle={enabled => void update({ ecoStrat: { enabled } })}
+      about='Evaluates the economy and the league ruleset from finished games. Read-only: it never plays or advises the other agents.'
+      extra={<>
+        {settings.ecoStrat.continuous && <Choice label='Report every' values={REPORT_CADENCE} value={(REPORT_CADENCE as readonly number[]).includes(settings.ecoStrat.reportEvery) ? settings.ecoStrat.reportEvery as typeof REPORT_CADENCE[number] : 10} unit={count => `${count} games`} disabled={!master} onChange={reportEvery => void update({ ecoStrat: { reportEvery } })}/>}
+        {reader(agent)}
+        {ecoStrat.lastError && <p className='lc-error'>{ecoStrat.lastError}</p>}
+      </>}>
+      <Switch label='Observe my games' on={settings.ecoStrat.observeHumanGames} disabled={!master} onChange={observeHumanGames => void update({ ecoStrat: { observeHumanGames } })}/>
+      <Switch label='Continuous reports' on={settings.ecoStrat.continuous} disabled={!master} onChange={continuous => void update({ ecoStrat: { continuous } })}/>
+    </AgentCard>;
+
+    const { key, about } = LEARNERS[agent as LearnerId];
+    const learner = status[key];
+    return <AgentCard key={agent} agent={agent} master={master} on={settings[key].enabled}
+      state={`${learnerState(status.effective[key], learner)}${agent === 'dv-8' ? '' : `. ${leagueLine(status, agent)}`}`}
+      onToggle={enabled => void update({ [key]: { enabled } })} about={about}
+      extra={<>
+        {learner.experiment && <p className='lc-meta'>Testing {learner.experiment.id} ({learner.experiment.stage}): {learner.experiment.change}</p>}
+        {agent === 'strat-g' && status.humanTempo?.planBlurb && <p className='lc-meta'>{status.humanTempo.planBlurb}</p>}
+        {reader(agent)}
+        {learner.error && <p className='lc-error'>{learner.error}</p>}
+      </>}>
+      {agent === 'strat-g' && <Switch label='Decision log' hint='Records each choice Strat-G makes against you' on={settings.stratG.recordDecisions} disabled={!master} onChange={recordDecisions => void update({ stratG: { recordDecisions } })}/>}
+    </AgentCard>;
+  };
+
+  return <div className='league-settings'>
+    <section className='lc-panel league-master' aria-label='All agents'>
+      <Switch label='AI agents' hint={master ? 'Changes apply to the next game.' : 'Every agent is off. Opponents fall back to the profiles in the content pack.'} on={master} onChange={agentsEnabled => void update({ agentsEnabled })}/>
+      <p className='lc-meta'>Settings file <code>{status.settingsFile}</code>. API keys stay in <code>.env</code> on the server.</p>
     </section>
-    : isAdversary(tab) ? (() => {
-      const { key, about } = ADVERSARIES[tab];
-      const agent = status[key], name = AGENT_NAMES[tab];
-      return <section className='agent-card' role='tabpanel' id={`agents-panel-${tab}`} aria-labelledby={`agents-tab-${tab}`}>
-        {toggle(name, settings[key].enabled, () => update({ [key]: { enabled: !settings[key].enabled } }), !master)}
-        <p className='agents-note'>{leagueLine(status, tab)}</p>
-        {reader(tab)}
-        <PublishControl key={tab} agent={tab}/>
-        <Fold title={`About ${name}`}><p>{about} Plays in the AI league and against you when you pick it as your opponent, and learns only from its own results: it never sees the other agents' strategies.</p></Fold>
-        {details&&<Fold title='Status'><dl>
-          <dt>Experiment</dt><dd>{agent.experiment ? `${agent.experiment.id} (${agent.experiment.stage}): ${agent.experiment.change}` : 'none running'}</dd>
-          <dt>Learned</dt><dd>{agent.adoptedChanges ?? 0} adopted of {agent.experimentsConcluded ?? 0} tested</dd>
-          <dt>Model</dt><dd>{agent.modelConfigured ? agent.model : 'not configured'}</dd>
-          <dt>Notebook</dt><dd><code>{agent.paths.notebook}</code></dd>
-        </dl></Fold>}
-        {agent.error&&<p className='agents-error'>{agent.error}</p>}
-      </section>;
-    })()
-    : <section className='agent-card' role='tabpanel' id='agents-panel-eco-strat' aria-labelledby='agents-tab-eco-strat'>
-      {toggle('Evaluation', settings.ecoStrat.enabled, () => update({ ecoStrat: { enabled: !settings.ecoStrat.enabled } }), !master)}
-      {toggle('Observe my games', settings.ecoStrat.observeHumanGames, () => update({ ecoStrat: { observeHumanGames: !settings.ecoStrat.observeHumanGames } }), !master)}
-      {toggle('Continuous reports', settings.ecoStrat.continuous, () => update({ ecoStrat: { continuous: !settings.ecoStrat.continuous } }), !master)}
-      {settings.ecoStrat.continuous&&<div className='agents-cadence' role='radiogroup' aria-label='Report every'>
-        <small>Report every</small>
-        {REPORT_CADENCE.map(count => <button key={count} type='button' role='radio' aria-checked={settings.ecoStrat.reportEvery === count} disabled={!master} onClick={() => update({ ecoStrat: { reportEvery: count } })}>{count} games</button>)}
-      </div>}
-      {details&&<>
-        <div className='agents-progress' aria-label='Baseline progress'>
-          <span>Baseline {baseline.valid}/{baseline.target}{baseline.invalid ? ` · ${baseline.invalid} invalid` : ''}{cohort.running ? ` · ${cohortPhaseLabel(cohort.phase)}` : ecoStrat.baseline.status === 'complete' ? ' · complete' : ''}</span>
-          <i style={{ width: `${Math.min(100, (baseline.valid / Math.max(1, baseline.target)) * 100)}%` }}/>
-        </div>
-        <div className='agents-actions'>
-          {cohort.running
-            ? <button type='button' onClick={() => act('stop')}>Stop baseline</button>
-            : <button type='button' disabled={!status.effective.ecoStrat} onClick={() => act('baseline')}>{ecoStrat.baseline.status === 'complete' ? 'Re-run baseline' : 'Run baseline'} ({settings.ecoStrat.baselineGames} AI games)</button>}
-        </div>
-        <ReportControl status={status} act={post} onRead={setReading}/>
-      </>}
-      {reader('eco-strat')}
-      <Fold title='About Eco-Strat'><p>Evaluates the economy from finished games. Read-only: it never plays or advises Strat-G. Content A/B (try one card change on paired seeds) has its own tab.</p></Fold>
-      {details&&<>
-        <Fold title='Status'><dl>
-          <dt>Build</dt><dd>{ecoStrat.build?.label ?? '—'}</dd>
-          <dt>Games</dt><dd>{ecoStrat.gamesObserved.currentBuild} this build · {ecoStrat.gamesObserved.allBuilds} total</dd>
-          <dt>Journal</dt><dd>{ecoStrat.hypotheses} hypotheses · {ecoStrat.observations} observations · {ecoStrat.recommendations} recommendations</dd>
-          <dt>Model</dt><dd>{ecoStrat.modelConfigured ? ecoStrat.model ?? `${ecoStrat.preferredModels[0]} (not yet used)` : 'not configured'}</dd>
-          <dt>Next report</dt><dd>{ecoStrat.nextReportIn === null ? 'after baseline' : `in ${ecoStrat.nextReportIn} games`}</dd>
-          <dt>Last report</dt><dd>{ecoStrat.lastReport ? <code>{ecoStrat.lastReport.markdown}</code> : 'none yet'}</dd>
-          <dt>Journal file</dt><dd><code>{ecoStrat.paths.journal}</code></dd>
-          {ecoStrat.errors > 0&&<><dt>Errors</dt><dd>{ecoStrat.errors} (gameplay unaffected)</dd></>}
-        </dl></Fold>
-        {confirmArchive
-          ? <div className='agents-actions'><button type='button' onClick={() => { setConfirmArchive(false); void act('archive'); }}>Archive and start fresh</button><button type='button' onClick={() => setConfirmArchive(false)}>Cancel</button></div>
-          : <button type='button' disabled={!status.effective.ecoStrat || cohort.running} onClick={() => setConfirmArchive(true)}>Archive journal…</button>}
-      </>}
-      {ecoStrat.lastError&&<p className='agents-error'>{ecoStrat.lastError}</p>}
-    </section>}
-    <ChatWithStratPanel/>
-    {details&&<Fold title='Files'><p className='agents-note'>Settings: <code>{status.settingsFile}</code>. API keys stay in <code>.env</code> on the server.</p></Fold>}
-    {(error || cohort.error)&&<p className='agents-error'>{error || cohort.error}</p>}
-    {reading&&<AgentReader docs={docs} initial={reading} onClose={() => setReading(null)}/>}
+    <div className='agent-grid'>{ORDER.map(card)}</div>
+    {error && <p className='lc-error'>{error}</p>}
+    {reading && <AgentReader docs={docs} initial={reading} onClose={() => setReading(null)}/>}
   </div>;
 }

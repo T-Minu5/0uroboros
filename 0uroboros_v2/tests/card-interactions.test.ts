@@ -37,7 +37,8 @@ describe('revealed card movement', () => {
     session.deploy('source', 0); session.deploy('later', 0); session.endTurn(); advance(session);
     expect(session.state.choice?.options.map(option => option.id)).toContain('card-target');
     session.choose('card-target');
-    expect(session.state.choice?.options.map(option => option.id)).toEqual(['node-1', 'node-2']);
+    // Any playable Node with room, including ones not open yet this Cycle.
+    expect(session.state.choice?.options.map(option => option.id)).toEqual(['node-1', 'node-2', 'node-3', 'node-4']);
     const move = session.choose('node-2');
     expect(move).toMatchObject({ kind: 'move', cardId: 'source', targetCardId: 'target', targetOwner: 0, sourceNode: 0, targetNode: 2 });
     expect(session.state.nodes[2].cards[0][0]).toBe(target);
@@ -64,7 +65,7 @@ describe('revealed card movement', () => {
   it('has harmless no-target results when destinations are full or the requested side has no revealed card', () => {
     const full = make();
     full.state.nodes[0].cards[1].push(placed(card('victim'), 1, 0, 1), ...Array.from({ length: 3 }, (_, i) => placed(card(`block-0-${i}`), 1, 0, i + 2)));
-    for (const node of [1, 2]) full.state.nodes[node].cards[1] = Array.from({ length: 4 }, (_, i) => placed(card(`block-${node}-${i}`), 1, node, i + 10));
+    for (const node of [1, 2, 3, 4]) full.state.nodes[node].cards[1] = Array.from({ length: 4 }, (_, i) => placed(card(`block-${node}-${i}`), 1, node, i + 10));
     full.state.players[0].hand = [card('source', [{ kind: 'moveCard', opponent: true }])];
     full.deploy('source', 0); full.endTurn();
     const result = advance(full).find(event => event.kind === 'move');

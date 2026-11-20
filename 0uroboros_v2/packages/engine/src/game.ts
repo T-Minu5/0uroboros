@@ -233,16 +233,36 @@ export const defaultNodeWinVP = 1;
 /**
  * A player's VP plus, for each enemy Server still standing, the share of its destruction VP matching the share of its
  * health they have taken (75% gone counts as 75% of that Server's VP). Destroyed Servers already paid out into VP.
+ * Callers may already fold strict end-game award leads into `vp` (see Runtime trailing eligibility).
  */
 export function projectedVP(vp: number, enemyServers: Servers, serverVP: Servers = defaultServerVP): number {
   return (Object.keys(serverMaximums) as (keyof Servers)[]).reduce((sum, server) =>
     enemyServers[server] > 0 ? sum + (1 - enemyServers[server] / serverMaximums[server]) * serverVP[server] : sum, vp);
 }
 
+/**
+ * First Cycle in which `awardTrailing` catch-up Circuit Rewards may enter the draw pool
+ * (Configure Trailing rewards must also be on).
+ */
+export const TRAILING_REWARDS_FROM_CYCLE = 8;
+
 /** The player behind on projected VP, or null when they are level (to the hundredth). */
 export function trailingPlayer(players: readonly [{ vp: number; servers: Servers }, { vp: number; servers: Servers }], serverVP: Servers = defaultServerVP): PlayerId | null {
   const [mine, theirs] = [projectedVP(players[0].vp, players[1].servers, serverVP), projectedVP(players[1].vp, players[0].servers, serverVP)].map(value => Math.round(value * 100));
   return mine === theirs ? null : mine < theirs ? 0 : 1;
+}
+
+/**
+ * Sum of enabled end-game award VP each seat would receive if the game ended now
+ * (strict leaders only; ties award nothing). Used when naming the Circuit trailing player.
+ */
+export function projectedEndGameAwardVP(standings: readonly { vp: number; leader: PlayerId | null }[]): [number, number] {
+  const bonus: [number, number] = [0, 0];
+  for (const row of standings) {
+    if (row.leader === null || row.vp <= 0) continue;
+    bonus[row.leader] += row.vp;
+  }
+  return bonus;
 }
 
 export function nodeWinner(powers: readonly [number, number]): PlayerId | null {

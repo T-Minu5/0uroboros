@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { EVALUATION_LOCATIONS, EVALUATION_CIRCUIT_REWARDS } from "@0uroboros/engine/content";
-import { createSession, firstLegalSelection, seededRandom, type RuntimeSession } from "@0uroboros/engine/runtime";
-import { starterCards } from "@0uroboros/engine/game";
+import { createSession, DEFAULT_END_GAME_AWARDS, firstLegalSelection, seededRandom, type RuntimeSession, type SessionConfig } from "@0uroboros/engine/runtime";
+import { defaultServerVP, starterCards } from "@0uroboros/engine/game";
 
-const make = (seed = 17) => createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed) });
+const make = (seed = 17, extra: Partial<SessionConfig> = {}) => createSession({ evaluationContent: true, carryover: true, priorityPreference: "higher", random: seededRandom(seed), ...extra });
+const NO_AWARDS: Partial<SessionConfig> = { endGameAwards: Object.fromEntries(Object.keys(DEFAULT_END_GAME_AWARDS).map(id => [id, { enabled: false, vp: 0 }])) };
 function drain(session: RuntimeSession) {
   const output = [];
   while (session.pendingCount || session.state.choice) {
@@ -93,16 +94,16 @@ describe("Evaluation Location content", () => {
     const hit = result.find(step => step.event.kind === "drain" && step.event.source === "location")!;
     expect(hit.event).toMatchObject({ node: 2, owner: 0, targetOwner: 1, target: "primary", amount: 100, before: 100, after: 0 });
     expect(session.state.players[1].servers.backup).toBe(1500);
-    expect(session.state.players[0].destructionVP).toBe(12);
+    expect(session.state.players[0].destructionVP).toBe(defaultServerVP.primary);
   });
 
   it("finishes lethal Node awards then stops later Nodes, Effect Bank, Circuit selection and Draft", () => {
-    const session = make(); clear(session); locationOnly(session, "breach_relay", 1); winNode(session, 1, 0);
+    const session = make(17, NO_AWARDS); clear(session); locationOnly(session, "breach_relay", 1); winNode(session, 1, 0);
     session.state.players[1].servers = { primary: 0, backup: 150 };
     session.endTurn(); const result = drain(session);
     expect(session.state.phase).toBe("gameover");
-    expect(session.state.players[0].destructionVP).toBe(16);
-    expect(session.state.players[0].totalVP).toBe(16);
+    expect(session.state.players[0].destructionVP).toBe(defaultServerVP.backup);
+    expect(session.state.players[0].totalVP).toBe(defaultServerVP.backup);
     expect(session.state.winner).toBe(0);
     expect(result.some(step => step.event.node !== undefined && step.event.node > 1)).toBe(false);
     expect(result.some(step => step.event.text.startsWith("Effect Bank"))).toBe(false);
